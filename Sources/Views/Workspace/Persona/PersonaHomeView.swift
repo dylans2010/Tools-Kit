@@ -6,7 +6,6 @@ struct PersonaHomeView: View {
     @State private var query = ""
     @AppStorage("persona.welcome_shown") private var hasShownWelcome = false
     @State private var activeModal: PersonaHomeModal?
-    @State private var shuffledPrompts: [String] = []
     @State private var chatThreads: [PersonaChatThread] = []
     @State private var activeThreadID: UUID?
 
@@ -336,11 +335,11 @@ struct PersonaHomeView: View {
                 chatHistory: manager.chatHistory,
                 isThinking: manager.isThinking,
                 query: $query,
-                shuffledPrompts: shuffledPrompts,
                 followUpSuggestions: followUpSuggestions,
                 onPromptSelection: selectPromptAndSend(_:),
                 onSend: sendMessage,
                 onOpenDiscovery: openDiscovery,
+                onOpenChats: openChats,
                 onNeedScroll: scrollToBottom
             )
         }
@@ -369,11 +368,15 @@ struct PersonaHomeView: View {
             activeModal = .welcome
             hasShownWelcome = true
         }
-        shufflePrompts()
     }
 
     private func openDiscovery() {
         activeModal = .discovery
+    }
+
+    private func openChats() {
+        hydrateThreadsIfNeeded()
+        activeModal = nil
     }
 
     private func hydrateThreadsIfNeeded() {
@@ -423,10 +426,6 @@ struct PersonaHomeView: View {
         }
     }
 
-    private func shufflePrompts() {
-        shuffledPrompts = Array(allPrompts.shuffled().prefix(3))
-    }
-
     private func scrollToBottom(_ proxy: ScrollViewProxy) {
         withAnimation {
             if manager.isThinking {
@@ -456,11 +455,11 @@ private struct PersonaHomeNavigationContent: View {
     let chatHistory: [PersonaMessage]
     let isThinking: Bool
     @Binding var query: String
-    let shuffledPrompts: [String]
     let followUpSuggestions: [String]
     let onPromptSelection: (String) -> Void
     let onSend: () -> Void
     let onOpenDiscovery: () -> Void
+    let onOpenChats: () -> Void
     let onNeedScroll: (ScrollViewProxy) -> Void
 
     var body: some View {
@@ -475,11 +474,11 @@ private struct PersonaHomeNavigationContent: View {
             PersonaComposerView(
                 query: $query,
                 isThinking: isThinking,
-                shuffledPrompts: shuffledPrompts,
                 followUpSuggestions: followUpSuggestions,
                 onTapPrompt: onPromptSelection,
                 onSend: onSend,
-                onOpenDiscovery: onOpenDiscovery
+                onOpenDiscovery: onOpenDiscovery,
+                onOpenChats: onOpenChats
             )
         }
     }
@@ -547,8 +546,8 @@ private struct PersonaChatTimelineView: View {
                 }
                 .padding()
             }
-            .onChange(of: chatHistory.count) { _ in onNeedScroll(proxy) }
-            .onChange(of: isThinking) { thinking in if thinking { onNeedScroll(proxy) } }
+            .onChange(of: chatHistory.count) { _, _ in onNeedScroll(proxy) }
+            .onChange(of: isThinking) { _, thinking in if thinking { onNeedScroll(proxy) } }
         }
     }
 }
@@ -556,11 +555,11 @@ private struct PersonaChatTimelineView: View {
 private struct PersonaComposerView: View {
     @Binding var query: String
     let isThinking: Bool
-    let shuffledPrompts: [String]
     let followUpSuggestions: [String]
     let onTapPrompt: (String) -> Void
     let onSend: () -> Void
     let onOpenDiscovery: () -> Void
+    let onOpenChats: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -569,7 +568,7 @@ private struct PersonaComposerView: View {
             if !followUpSuggestions.isEmpty {
                 PersonaFollowUpsView(suggestions: followUpSuggestions, onSelect: onTapPrompt)
             }
-            PersonaInputPanelView(query: $query, isThinking: isThinking, shuffledPrompts: shuffledPrompts, onTapPrompt: onTapPrompt, onSend: onSend, onOpenDiscovery: onOpenDiscovery)
+            PersonaInputPanelView(query: $query, isThinking: isThinking, onSend: onSend, onOpenDiscovery: onOpenDiscovery, onOpenChats: onOpenChats)
         }
     }
 }
@@ -1009,7 +1008,7 @@ private struct PersonaInfoRow: View {
 }
 
 
-private struct PersonaChatThread: Identifiable, Equatable {
+private struct PersonaChatThread: Identifiable {
     let id: UUID = UUID()
     var title: String
     var messages: [PersonaMessage]
