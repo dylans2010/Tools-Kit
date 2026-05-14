@@ -40,7 +40,7 @@ struct AgentToolInvocation: Identifiable {
     let tool: AgentToolName
     let parameters: [String: String]
     let timestamp: Date
-    var result: AgentToolResult?
+    var result: UIAgentToolResult?
 }
 
 // MARK: - Agent Intent & Plan
@@ -157,7 +157,7 @@ final class PersonaAgentFramework: ObservableObject {
 
     // MARK: - Tool Execution Pipeline (token + scope validated per step)
 
-    func executeTool(_ tool: AgentToolName, parameters: [String: String], dryRun: Bool = false) -> AgentToolResult {
+    func executeTool(_ tool: AgentToolName, parameters: [String: String], dryRun: Bool = false) -> UIAgentToolResult {
         guard tokenEngine.currentToken != nil else {
             audit("Tool Blocked", detail: tool.rawValue, outcome: "no_token")
             return .failure("No valid token — execution blocked")
@@ -168,13 +168,13 @@ final class PersonaAgentFramework: ObservableObject {
         }
 
         if dryRun {
-            let result = AgentToolResult.dryRun("DRY RUN: \(tool.displayName) with \(parameters)")
+            let result = UIAgentToolResult.dryRun("DRY RUN: \(tool.displayName) with \(parameters)")
             logInvocation(tool: tool, parameters: parameters, result: result)
             audit("Dry Run", detail: tool.rawValue, outcome: "simulated")
             return result
         }
 
-        let result: AgentToolResult
+        let result: UIAgentToolResult
         switch tool {
         case .installPackage: result = executeInstallPackage(parameters)
         case .resolveDependencies: result = executeResolveDependencies(parameters)
@@ -304,7 +304,7 @@ final class PersonaAgentFramework: ObservableObject {
 
     // MARK: - Private Tool Implementations
 
-    private func executeInstallPackage(_ params: [String: String]) -> AgentToolResult {
+    private func executeInstallPackage(_ params: [String: String]) -> UIAgentToolResult {
         guard let name = params["name"], let version = params["version"] else {
             return .failure("Missing required parameters: name, version")
         }
@@ -315,7 +315,7 @@ final class PersonaAgentFramework: ObservableObject {
         return .success("Installed \(name)@\(version)")
     }
 
-    private func executeResolveDependencies(_ params: [String: String]) -> AgentToolResult {
+    private func executeResolveDependencies(_ params: [String: String]) -> UIAgentToolResult {
         let graph = PackageRegistry.shared.buildDependencyGraph()
         if let cycle = graph.detectCycle() {
             return .failure("Circular dependency detected: \(cycle.joined(separator: " -> "))")
@@ -324,7 +324,7 @@ final class PersonaAgentFramework: ObservableObject {
         return .success("Resolved \(resolved.count) packages in order")
     }
 
-    private func executeInstallLibrary(_ params: [String: String]) -> AgentToolResult {
+    private func executeInstallLibrary(_ params: [String: String]) -> UIAgentToolResult {
         guard let name = params["name"], let version = params["version"] else {
             return .failure("Missing required parameters: name, version")
         }
@@ -334,7 +334,7 @@ final class PersonaAgentFramework: ObservableObject {
         return .success("Installed library \(name)@\(version)")
     }
 
-    private func executeInvokeLibrary(_ params: [String: String]) -> AgentToolResult {
+    private func executeInvokeLibrary(_ params: [String: String]) -> UIAgentToolResult {
         guard let libraryId = params["id"], let uuid = UUID(uuidString: libraryId) else {
             return .failure("Invalid library ID")
         }
@@ -344,7 +344,7 @@ final class PersonaAgentFramework: ObservableObject {
         return LibraryExecutionBridge.invoke(library: lib, input: params)
     }
 
-    private func executeAttachFramework(_ params: [String: String]) -> AgentToolResult {
+    private func executeAttachFramework(_ params: [String: String]) -> UIAgentToolResult {
         guard let name = params["name"] else {
             return .failure("Missing framework name")
         }
@@ -354,7 +354,7 @@ final class PersonaAgentFramework: ObservableObject {
         return .success("Attached framework \(name)")
     }
 
-    private func executeExecuteFramework(_ params: [String: String]) -> AgentToolResult {
+    private func executeExecuteFramework(_ params: [String: String]) -> UIAgentToolResult {
         guard let frameworkId = params["id"], let uuid = UUID(uuidString: frameworkId) else {
             return .failure("Invalid framework ID")
         }
@@ -368,7 +368,7 @@ final class PersonaAgentFramework: ObservableObject {
         return FrameworkSandboxRunner.execute(framework: fw, params: params)
     }
 
-    private func logInvocation(tool: AgentToolName, parameters: [String: String], result: AgentToolResult) {
+    private func logInvocation(tool: AgentToolName, parameters: [String: String], result: UIAgentToolResult) {
         var invocation = AgentToolInvocation(tool: tool, parameters: parameters, timestamp: Date())
         invocation.result = result
         invocationLog.append(invocation)
