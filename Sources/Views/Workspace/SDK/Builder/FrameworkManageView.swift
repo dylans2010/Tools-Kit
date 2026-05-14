@@ -10,15 +10,33 @@ struct FrameworkDescriptor: Identifiable, Codable {
     let packageDependencies: [UUID]
     let requiredScopes: [SDKScope]
     var isEnabled: Bool
+    var sandboxProfile: SandboxProfile
 
     init(
         id: UUID = UUID(), name: String, entryPoints: [String] = ["main"],
         languageType: String = "swift", packageDependencies: [UUID] = [],
-        requiredScopes: [SDKScope] = [.frameworkExecute], isEnabled: Bool = true
+        requiredScopes: [SDKScope] = [.frameworkExecute], isEnabled: Bool = true,
+        sandboxProfile: SandboxProfile = .balanced
     ) {
         self.id = id; self.name = name; self.entryPoints = entryPoints
         self.languageType = languageType; self.packageDependencies = packageDependencies
         self.requiredScopes = requiredScopes; self.isEnabled = isEnabled
+        self.sandboxProfile = sandboxProfile
+    }
+}
+
+enum SandboxProfile: String, CaseIterable, Codable {
+    case restricted, balanced, unrestricted
+
+    var config: FrameworkSandboxConfig {
+        switch self {
+        case .restricted:
+            return FrameworkSandboxConfig(maxExecutionTimeMs: 5000, maxMemoryBytes: 64 * 1024 * 1024, allowFileSystem: false, allowNetwork: false)
+        case .balanced:
+            return .default
+        case .unrestricted:
+            return FrameworkSandboxConfig(maxExecutionTimeMs: 60000, maxMemoryBytes: 1024 * 1024 * 1024, allowFileSystem: true, allowNetwork: true)
+        }
     }
 }
 
@@ -121,6 +139,19 @@ final class FrameworkManager: ObservableObject {
         registry.install(fw)
     }
 
+    func setSandboxProfile(id: UUID, profile: SandboxProfile) {
+        guard var fw = registry.framework(by: id) else { return }
+        fw.sandboxProfile = profile
+        registry.install(fw)
+    }
+
+    func preExecuteHealthCheck(id: UUID) -> Bool {
+        guard let fw = registry.framework(by: id) else { return false }
+        let installedPkgIds = Set(packageRegistry.packages.map(\.id))
+        let missingDeps = fw.packageDependencies.filter { !installedPkgIds.contains($0) }
+        return fw.isEnabled && missingDeps.isEmpty
+    }
+
     /// Execution Pipeline: Load → Validate → Resolve Dependencies → Scope Check → Sandbox → Execute → Validate Output → Commit
     func executeFramework(id: UUID, params: [String: String]) -> AgentToolResult {
         let startTime = Date()
@@ -163,7 +194,7 @@ final class FrameworkManager: ObservableObject {
 
         executionState = .sandboxing
         executionState = .executing
-        let sandboxResult = FrameworkSandboxRunner.execute(framework: fw, params: params, config: sandboxConfig)
+        let sandboxResult = FrameworkSandboxRunner.execute(framework: fw, params: params, config: fw.sandboxProfile.config)
 
         executionState = .validatingOutput
         switch sandboxResult {
@@ -267,7 +298,11 @@ struct FrameworkManageView: View {
                                 Spacer()
                                 Text(fw.isEnabled ? "Enabled" : "Disabled").font(.caption2.bold()).foregroundStyle(fw.isEnabled ? .green : .red)
                             }
-                            Text("Language: \(fw.languageType) | Entry: \(fw.entryPoints.joined(separator: ", "))").font(.caption2).foregroundStyle(.secondary)
+                            HStack {
+                                Text("Lang: \(fw.languageType)").font(.caption2)
+                                Spacer()
+                                Text("Profile: \(fw.sandboxProfile.rawValue)").font(.caption2).italic()
+                            }
                             if !fw.packageDependencies.isEmpty {
                                 Text("Dependencies: \(fw.packageDependencies.count)").font(.caption2).foregroundStyle(.tertiary)
                             }
@@ -377,6 +412,26 @@ struct FrameworkDetailSheet: View {
                 LabeledContent("Language", value: framework.languageType)
                 LabeledContent("Enabled", value: framework.isEnabled ? "Yes" : "No")
             }
+            Section("Sandbox Profile") {
+                Picker("Profile", selection: Binding(
+                    get: { framework.sandboxProfile },
+                    set: { manager.setSandboxProfile(id: framework.id, profile: $0) }
+                )) {
+                    ForEach(SandboxProfile.allCases, id: \.self) { profile in
+                        Text(profile.rawValue.capitalized).tag(profile)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                let config = framework.sandboxProfile.config
+                VStack(alignment: .leading, spacing: 4) {
+                    LabeledContent("Max Time", value: "\(config.maxExecutionTimeMs)ms")
+                    LabeledContent("Max Memory", value: "\(config.maxMemoryBytes / (1024*1024))MB")
+                    LabeledContent("Filesystem", value: config.allowFileSystem ? "Allow" : "Block")
+                    LabeledContent("Network", value: config.allowNetwork ? "Allow" : "Block")
+                }
+                .font(.caption2).foregroundStyle(.secondary)
+            }
             Section("Entry Points") {
                 ForEach(framework.entryPoints, id: \.self) { ep in
                     Label(ep, systemImage: "arrow.right.circle").font(.caption)
@@ -396,11 +451,22 @@ struct FrameworkDetailSheet: View {
                     Label(scope.displayName, systemImage: "lock").font(.caption)
                 }
             }
-            Section("Execute") {
+            Section("Execution Controls") {
+                HStack {
+                    Label("Health Status", systemImage: manager.preExecuteHealthCheck(id: framework.id) ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
+                        .foregroundStyle(manager.preExecuteHealthCheck(id: framework.id) ? .green : .red)
+                    Spacer()
+                    if !manager.preExecuteHealthCheck(id: framework.id) {
+                        Text("Check deps/status").font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+
                 TextField("params (key=value)", text: Binding(get: { execParams["input"] ?? "" }, set: { execParams["input"] = $0 }))
                 Button("Execute in Sandbox") {
                     _ = manager.executeFramework(id: framework.id, params: execParams)
-                }.buttonStyle(.borderedProminent)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(!manager.preExecuteHealthCheck(id: framework.id))
             }
         }
         .navigationTitle(framework.name)

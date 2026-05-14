@@ -54,6 +54,7 @@ struct SDKBuildView: View {
                 buildMetricsSection
                 developmentSection
                 sdkSystemsSection
+                sdkAssetsSection
                 architectureSection(project)
                 stabilitySection
                 explorationSection
@@ -275,6 +276,18 @@ struct SDKBuildView: View {
             NavigationLink("Connector Bindings", destination: SDKConnectorBindingView())
         } header: {
             Text("SDK Systems")
+        }
+    }
+
+    // MARK: - SDK Assets
+
+    private var sdkAssetsSection: some View {
+        Section {
+            NavigationLink("Package Dependencies", destination: PackageDependenciesView())
+            NavigationLink("Library Management", destination: LibraryManageView())
+            NavigationLink("Framework Management", destination: FrameworkManageView())
+        } header: {
+            Text("SDK Assets")
         }
     }
 

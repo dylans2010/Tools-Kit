@@ -182,9 +182,20 @@ final class DeterministicTokenEngine: ObservableObject {
         let decodedScopes = SDKScope.decode(token.payload.scp)
         guard !decodedScopes.isEmpty else { return fail("No valid scopes") }
 
+        // 8. Contextual Integrity Validation
+        guard validateContext(token: token, expectedFingerprint: expectedFingerprint) else {
+            return fail("Contextual integrity validation failed")
+        }
+
         validationStatus = .valid
-        logEvent("Validation Passed", detail: "All 7 checks passed")
+        logEvent("Validation Passed", detail: "All 8 checks passed")
         return .valid
+    }
+
+    private func validateContext(token: DeterministicToken, expectedFingerprint: String) -> Bool {
+        // In a real implementation, this would check against active SDK project state
+        // For now, we ensure the device fingerprint and session ID follow expected patterns
+        return token.payload.dfp == expectedFingerprint && !token.payload.sid.isEmpty
     }
 
     // MARK: - Enforcement (No token = no access, Invalid = rejection, Scope mismatch = blocked)
@@ -269,6 +280,7 @@ struct AuthRootView: View {
                                 showingScopeInspector = true
                             }
                         }
+                        securityAuditSection
                         NavigationLink("Access Control Overview", destination: AccessControlOverviewView())
                     }
                 case .sessionExpired:
@@ -308,6 +320,35 @@ struct AuthRootView: View {
         }
         .onAppear {
             showingSignInSheet = authorizationManager.authState == .unauthenticated || authorizationManager.authState == .sessionExpired || authorizationManager.authState == .revoked
+        }
+    }
+
+    private var securityAuditSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Security Audit", systemImage: "shield.text.check")
+                    .font(.headline)
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(DeterministicTokenEngine.shared.sessionTimeline.suffix(5).reversed()) { event in
+                            VStack(alignment: .leading) {
+                                HStack {
+                                    Text(event.event).font(.caption.bold())
+                                    Spacer()
+                                    Text(event.timestamp, style: .time).font(.caption2).foregroundStyle(.secondary)
+                                }
+                                Text(event.detail).font(.caption2).foregroundStyle(.secondary)
+                            }
+                            .padding(6)
+                            .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
+                }
+                .frame(maxHeight: 150)
+            }
+            .padding()
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         }
     }
 

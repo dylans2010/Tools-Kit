@@ -208,6 +208,26 @@ final class PackageDependencyManager: ObservableObject {
         return orphaned.count
     }
 
+    func updatePackage(id: UUID, version: String) -> Bool {
+        guard tokenEngine.requireScope(.sdkManagePackages) else { return false }
+        guard let existing = registry.package(by: id) else { return false }
+        let updated = PackageDescriptor(
+            id: existing.id,
+            name: existing.name,
+            version: version,
+            exports: existing.exports,
+            dependencyIds: existing.dependencyIds,
+            integrityHash: PackageIntegrityEngine.computeHash(name: existing.name, version: version, exports: existing.exports)
+        )
+        registry.install(updated)
+        return true
+    }
+
+    func exportManifest() -> String {
+        guard let data = try? JSONEncoder().encode(registry.packages) else { return "{}" }
+        return String(data: data, encoding: .utf8) ?? "{}"
+    }
+
     func checkCycles() -> [String]? {
         registry.buildDependencyGraph().detectCycle()
     }
@@ -242,6 +262,7 @@ struct PackageDependenciesView: View {
             List {
                 authSection
                 cycleSection
+                bulkActionsSection
                 packageListSection
                 graphSection
                 integritySection
@@ -291,7 +312,36 @@ struct PackageDependenciesView: View {
             } else {
                 Label("No circular dependencies", systemImage: "checkmark.circle").font(.caption).foregroundStyle(.green)
             }
+
+            let graph = registry.buildDependencyGraph()
+            let orphans = graph.orphans()
+            if !orphans.isEmpty {
+                Label("\(orphans.count) orphans detected", systemImage: "link.badge.plus")
+                    .font(.caption).foregroundStyle(.orange)
+            }
+
             Button("Re-check") { cycleWarning = manager.checkCycles() }.font(.caption)
+        }
+    }
+
+    private var bulkActionsSection: some View {
+        Section("Bulk Actions") {
+            Button {
+                for pkg in registry.packages {
+                    _ = manager.updatePackage(id: pkg.id, version: pkg.version) // Simulate update
+                }
+            } label: {
+                Label("Update All Packages", systemImage: "arrow.clockwise.circle")
+            }
+            .disabled(registry.packages.isEmpty || tokenEngine.currentToken == nil)
+
+            Button {
+                let manifest = manager.exportManifest()
+                UIPasteboard.general.string = manifest
+            } label: {
+                Label("Export Manifest to Clipboard", systemImage: "doc.on.doc")
+            }
+            .disabled(registry.packages.isEmpty)
         }
     }
 
