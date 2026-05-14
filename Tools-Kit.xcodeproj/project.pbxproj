@@ -1347,6 +1347,10 @@
 		SDK2A00000000000000000011 /* SDKRunConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000011 /* SDKRunConfigurationView.swift */; };
 		SDK2A00000000000000000012 /* SDKLibraryManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000012 /* SDKLibraryManagerView.swift */; };
 		SDK2A00000000000000000013 /* SDKDependencyManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */; };
+		TK0200000000000000000001 /* LibraryManageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TK0100000000000000000001 /* LibraryManageView.swift */; };
+		TK0200000000000000000002 /* FrameworkManageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TK0100000000000000000002 /* FrameworkManageView.swift */; };
+		TK0200000000000000000003 /* PackageDependenciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TK0100000000000000000003 /* PackageDependenciesView.swift */; };
+		TK0200000000000000000004 /* PersonaAgentFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = TK0100000000000000000004 /* PersonaAgentFramework.swift */; };
 		WK02AICONTEXT0000000001 /* AIContextEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK01AICONTEXT0000000001 /* AIContextEngine.swift */; };
 		WK02VERSIONCTRL00000001 /* VersionControlManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK01VERSIONCTRL00000001 /* VersionControlManager.swift */; };
 		EXP200000000000000000001 /* SDKModuleRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000001 /* SDKModuleRegistry.swift */; };
@@ -2777,6 +2781,10 @@
 		SDK1A00000000000000000011 /* SDKRunConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKRunConfigurationView.swift; sourceTree = "<group>"; };
 		SDK1A00000000000000000012 /* SDKLibraryManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/SDKLibraryManagerView.swift; sourceTree = "<group>"; };
 		SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/SDKDependencyManagerView.swift; sourceTree = "<group>"; };
+		TK0100000000000000000001 /* LibraryManageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/LibraryManageView.swift; sourceTree = "<group>"; };
+		TK0100000000000000000002 /* FrameworkManageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/FrameworkManageView.swift; sourceTree = "<group>"; };
+		TK0100000000000000000003 /* PackageDependenciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PackageDependenciesView.swift; sourceTree = "<group>"; };
+		TK0100000000000000000004 /* PersonaAgentFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaAgentFramework.swift; sourceTree = "<group>"; };
 		PL010000000000000000000026 /* SDKInternalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKInternalView.swift; sourceTree = "<group>"; };
 		WK01AICONTEXT0000000001 /* AIContextEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/AIContextEngine.swift; sourceTree = SOURCE_ROOT; };
 		WK01VERSIONCTRL00000001 /* VersionControlManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/VersionControlManager.swift; sourceTree = SOURCE_ROOT; };
@@ -7526,6 +7534,9 @@
 				SDK1A00000000000000000011 /* SDKRunConfigurationView.swift */,
 				SDK1A00000000000000000012 /* SDKLibraryManagerView.swift */,
 				SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */,
+				TK0100000000000000000001 /* LibraryManageView.swift */,
+				TK0100000000000000000002 /* FrameworkManageView.swift */,
+				TK0100000000000000000003 /* PackageDependenciesView.swift */,
 				EXP100000000000000000006 /* SDKDownloadView.swift */,
 				EXP100000000000000000007 /* CustomAppSDKView.swift */,
 				EXP100000000000000000008 /* SDKHelpView.swift */,
@@ -8176,6 +8187,7 @@
 		E09BD8427CCE4E3BB77F34C0 /* AI */ = {
 			isa = PBXGroup;
 			children = (
+				TK0100000000000000000004 /* PersonaAgentFramework.swift */,
 				TKRF0000000000000000000002 /* AIOrchestrator.swift */,
 				TKRF0000000000000000000003 /* EmbeddingService.swift */,
 			);
@@ -10028,6 +10040,10 @@
 				SDK2A00000000000000000011 /* SDKRunConfigurationView.swift in Sources */,
 				SDK2A00000000000000000012 /* SDKLibraryManagerView.swift in Sources */,
 				SDK2A00000000000000000013 /* SDKDependencyManagerView.swift in Sources */,
+				TK0200000000000000000001 /* LibraryManageView.swift in Sources */,
+				TK0200000000000000000002 /* FrameworkManageView.swift in Sources */,
+				TK0200000000000000000003 /* PackageDependenciesView.swift in Sources */,
+				TK0200000000000000000004 /* PersonaAgentFramework.swift in Sources */,
 				SDK2A00000000000000000001 /* SDKIDEWorkspaceState.swift in Sources */,
 				SDK2A00000000000000000002 /* SDKExecutionCoordinator.swift in Sources */,
 				SDK2A00000000000000000003 /* SDKLibraryExecutionEngine.swift in Sources */,
