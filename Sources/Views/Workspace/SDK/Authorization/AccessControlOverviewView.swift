@@ -6,6 +6,8 @@ struct AccessControlOverviewView: View {
     @StateObject private var pluginManager = SDKPluginManager.shared
     @StateObject private var connectorManager = SDKConnectorManager.shared
 
+    @State private var searchText = ""
+
     var body: some View {
         List {
             Section("Auth State") {
@@ -14,33 +16,36 @@ struct AccessControlOverviewView: View {
             }
 
             Section("Modules") {
-                if moduleRegistry.modules.isEmpty {
+                let modules = moduleRegistry.modules.filter { searchText.isEmpty || $0.identifier.localizedCaseInsensitiveContains(searchText) || $0.displayName.localizedCaseInsensitiveContains(searchText) }
+                if modules.isEmpty {
                     Text("No modules")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(moduleRegistry.modules, id: \.id) { module in
+                    ForEach(modules, id: \.id) { module in
                         row(name: module.identifier, requiredScopes: module.requiredScopes, allowed: authorizationManager.canAccessModule(id: module.identifier))
                     }
                 }
             }
 
             Section("Plugins") {
-                if pluginManager.plugins.isEmpty {
+                let plugins = pluginManager.plugins.filter { searchText.isEmpty || $0.name.localizedCaseInsensitiveContains(searchText) }
+                if plugins.isEmpty {
                     Text("No plugins")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(pluginManager.plugins, id: \.id) { plugin in
+                    ForEach(plugins, id: \.id) { plugin in
                         row(name: plugin.name, requiredScopes: plugin.requiredScopes, allowed: authorizationManager.canUsePlugin(id: plugin.id))
                     }
                 }
             }
 
             Section("Connectors") {
-                if connectorManager.connectors.isEmpty {
+                let connectors = connectorManager.connectors.filter { searchText.isEmpty || $0.name.localizedCaseInsensitiveContains(searchText) }
+                if connectors.isEmpty {
                     Text("No connectors")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(connectorManager.connectors, id: \.id) { connector in
+                    ForEach(connectors, id: \.id) { connector in
                         row(name: connector.name, requiredScopes: connector.requiredScopes, allowed: authorizationManager.canUseConnector(id: connector.id))
                     }
                 }
@@ -49,6 +54,7 @@ struct AccessControlOverviewView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("Access Control")
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, prompt: "Search modules, plugins, connectors")
     }
 
     private func row(name: String, requiredScopes: [String], allowed: Bool) -> some View {

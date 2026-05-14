@@ -6,20 +6,31 @@ struct ScopeInspectorView: View {
     @StateObject private var pluginManager = SDKPluginManager.shared
     @StateObject private var connectorManager = SDKConnectorManager.shared
 
+    @State private var query = ""
+    @State private var showOnlyBlocked = false
+
     var body: some View {
         List {
+            Section("Overview") {
+                LabeledContent("Active Scope Count", value: "\(authorizationManager.currentScopes().count)")
+                LabeledContent("Violations", value: "\(authorizationManager.securityViolations.count)")
+                Toggle("Show only blocked resources", isOn: $showOnlyBlocked)
+            }
+
             Section("Active Scopes") {
-                if authorizationManager.currentScopes().isEmpty {
+                let activeScopes = authorizationManager.currentScopes()
+                    .filter { query.isEmpty || $0.localizedCaseInsensitiveContains(query) }
+                if activeScopes.isEmpty {
                     Text("No active scopes")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(authorizationManager.currentScopes(), id: \.self) { scope in
+                    ForEach(activeScopes, id: \.self) { scope in
                         Text(scope).font(.caption.monospaced())
                     }
                 }
             }
 
-            ForEach(authorizationManager.currentScopes(), id: \.self) { scope in
+            ForEach(authorizationManager.currentScopes().filter { query.isEmpty || $0.localizedCaseInsensitiveContains(query) }, id: \.self) { scope in
                 Section(scope) {
                     resourceRows(for: scope)
                 }
@@ -51,6 +62,7 @@ struct ScopeInspectorView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("Scope Inspector")
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $query, prompt: "Filter scopes")
     }
 
     @ViewBuilder
@@ -64,13 +76,22 @@ struct ScopeInspectorView: View {
                 .foregroundStyle(.secondary)
         } else {
             ForEach(modules, id: \.id) { module in
-                scopeRow("Module", name: module.displayName, allowed: authorizationManager.canAccessModule(id: module.identifier))
+                let allowed = authorizationManager.canAccessModule(id: module.identifier)
+                if !showOnlyBlocked || !allowed {
+                    scopeRow("Module", name: module.displayName, allowed: allowed)
+                }
             }
             ForEach(plugins, id: \.id) { plugin in
-                scopeRow("Plugin", name: plugin.name, allowed: authorizationManager.canUsePlugin(id: plugin.id))
+                let allowed = authorizationManager.canUsePlugin(id: plugin.id)
+                if !showOnlyBlocked || !allowed {
+                    scopeRow("Plugin", name: plugin.name, allowed: allowed)
+                }
             }
             ForEach(connectors, id: \.id) { connector in
-                scopeRow("Connector", name: connector.name, allowed: authorizationManager.canUseConnector(id: connector.id))
+                let allowed = authorizationManager.canUseConnector(id: connector.id)
+                if !showOnlyBlocked || !allowed {
+                    scopeRow("Connector", name: connector.name, allowed: allowed)
+                }
             }
         }
     }

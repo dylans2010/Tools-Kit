@@ -1,5 +1,6 @@
 import SwiftUI
 import Aurora
+import UIKit
 
 public struct AIAnimationCoreModifier: ViewModifier {
     let isLoading: Bool
@@ -22,6 +23,24 @@ public struct AIAnimationCoreModifier: ViewModifier {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: isLoading)
+        .onChange(of: isLoading) { _, newValue in
+            guard newValue else { return }
+            dismissKeyboardAggressively()
+        }
+    }
+
+    private func dismissKeyboardAggressively() {
+        DispatchQueue.main.async {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            UIApplication.shared.connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .flatMap(\.windows)
+                .forEach { window in
+                    window.endEditing(true)
+                    window.rootViewController?.view.endEditing(true)
+                    window.subviews.forEach { $0.endEditing(true) }
+                }
+        }
     }
 }
 

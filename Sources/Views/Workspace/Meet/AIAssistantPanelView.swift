@@ -25,7 +25,9 @@ struct AIAssistantPanelView: View {
             }
 
             if isLoading {
-                ProgressView("AI Is Processing…")
+                Text("AI Is Processing…")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             if !result.isEmpty && !isLoading {
@@ -39,5 +41,6 @@ struct AIAssistantPanelView: View {
                 .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
             }
         }
+        .aiAnimationLoading(isLoading)
     }
 }
