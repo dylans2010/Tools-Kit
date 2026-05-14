@@ -26,6 +26,7 @@ struct WorkspaceMeetingNotesView: View {
             .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
+        .aiAnimationLoading(isLoading)
         .navigationTitle("Meeting Notes")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

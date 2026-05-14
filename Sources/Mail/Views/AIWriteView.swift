@@ -131,9 +131,7 @@ struct AIWriteView: View {
                     generateButton
                 }
             }
-            .glowWhileLoading(isGenerating) {
-                HeroGlow(style: .standard)
-            }
+            .aiAnimationLoading(isGenerating)
             .navigationTitle("AI Intelligence")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

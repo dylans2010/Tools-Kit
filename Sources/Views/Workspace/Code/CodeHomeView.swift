@@ -61,6 +61,7 @@ struct CodeHomeView: View {
                     .buttonStyle(.borderedProminent)
                 }
             }
+            .aiAnimationLoading(analyzer.isAnalyzing)
             .navigationTitle("Code Workspace")
         }
     }

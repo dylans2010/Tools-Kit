@@ -161,6 +161,7 @@ struct CalendarAIPlannerView: View {
                     .disabled(prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
+            .aiAnimationLoading(isProcessing)
             .navigationTitle("AI Assistant")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

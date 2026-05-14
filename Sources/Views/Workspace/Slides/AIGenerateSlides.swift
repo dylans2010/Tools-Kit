@@ -7,7 +7,7 @@ public struct AIGenerateSlides: View {
     @StateObject private var manager = AISlidesManager.shared
     @StateObject private var whiteboardStore = WhiteboardStore.shared
     @StateObject private var keyboardObserver = KeyboardObserver()
-    @StateObject private var backdropManager = KeyboardBackdropManager.shared
+    @State private var showingKeyboardSheet = false
 
     // All text input state is owned here but edited exclusively via the keyboard extension.
     @State private var rawText = ""
@@ -40,155 +40,43 @@ public struct AIGenerateSlides: View {
 
     public var body: some View {
         ZStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-
-                    // Input field selector chips
-                    glassCard {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Input Source")
-                                .font(.headline)
-
-                            fieldSelectorRow
-
-                            activeFieldPreview
-                                .onTapGesture {
-                                    isFieldFocused = true
-                                }
-                        }
-                    }
-
-                    // Configuration (non-text controls)
-                    glassCard {
-                        DisclosureGroup("Settings", isExpanded: $inputExpanded) {
-                            VStack(alignment: .leading, spacing: 12) {
-                                Picker("Whiteboard", selection: $selectedBoardID) {
-                                    Text("None").tag(UUID?.none)
-                                    ForEach(whiteboardStore.boards) { board in
-                                        Text(board.title).tag(UUID?.some(board.id))
-                                    }
-                                }
-
-                                Divider().padding(.vertical, 4)
-                                Text("Advanced")
-                                    .font(.subheadline.weight(.semibold))
-                                HStack {
-                                    Text("Slide Count")
-                                    Spacer()
-                                    Text("\(slideCount)")
-                                        .foregroundStyle(.secondary)
-                                }
-                                Slider(
-                                    value: Binding(
-                                        get: { Double(slideCount) },
-                                        set: { slideCount = Int($0) }
-                                    ),
-                                    in: 5...15,
-                                    step: 1
-                                )
-                                Picker("Tone", selection: $tone) {
-                                    ForEach(SlideTone.allCases, id: \.self) {
-                                        Text($0.rawValue.capitalized).tag($0)
-                                    }
-                                }
-                                Picker("Audience", selection: $audience) {
-                                    ForEach(SlideAudience.allCases, id: \.self) {
-                                        Text($0.rawValue.capitalized).tag($0)
-                                    }
-                                }
-                                Picker("Visual Density", selection: $density) {
-                                    ForEach(SlideVisualDensity.allCases, id: \.self) {
-                                        Text($0.rawValue.capitalized).tag($0)
-                                    }
-                                }
+            if !manager.isGenerating {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        if let scheme = manager.latestScheme {
+                            schemePreview(scheme)
+                        } else if let deck = generatedDeck ?? manager.latestDeck {
+                            deckPreview(deck)
+                        } else {
+                            VStack(spacing: 20) {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 40))
+                                    .foregroundStyle(.secondary)
+                                Text("Enter details below to generate slides")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
                             }
-                            .padding(.top, 8)
-                        }
-                        .font(.headline)
-                    }
-
-                    // Image Upload
-                    glassCard {
-                        DisclosureGroup("Image Upload", isExpanded: $imagesExpanded) {
-                            VStack(alignment: .leading, spacing: 12) {
-                                PhotosPicker(selection: $selectedImages, matching: .images) {
-                                    Label("Import Photos", systemImage: "photo.on.rectangle.angled")
-                                        .font(.subheadline.weight(.semibold))
-                                }
-                                .onChange(of: selectedImages) { _, newItems in
-                                    Task {
-                                        var assets: [SlidePhotoAsset] = []
-                                        for (index, item) in newItems.enumerated() {
-                                            if let data = try? await item.loadTransferable(type: Data.self) {
-                                                assets.append(
-                                                    SlidePhotoAsset(
-                                                        fileName: "photo_\(index + 1).jpg",
-                                                        dataBase64: data.base64EncodedString()
-                                                    )
-                                                )
-                                            }
-                                        }
-                                        uploadedImages = assets
-                                    }
-                                }
-
-                                if !uploadedImages.isEmpty {
-                                    Text("\(uploadedImages.count) image(s) ready")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-
-                                Toggle("Include AI Images", isOn: $includeImages)
-                            }
-                            .padding(.top, 8)
-                        }
-                        .font(.headline)
-                    }
-
-                    // Generate Button
-                    Button(action: generate) {
-                        HStack {
-                            Image(systemName: "sparkles")
-                            Text(manager.isGenerating ? "Generating..." : "Generate Slides")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.indigo)
-                    .disabled(manager.isGenerating)
-                    .shadow(color: .purple.opacity(0.5), radius: 8, x: 0, y: 4)
-
-                    if manager.isGenerating {
-                        VStack(alignment: .leading, spacing: 6) {
-                            ProgressView(value: manager.progressValue)
-                                .tint(.cyan)
-                            Text(manager.progressMessage)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 100)
                         }
                     }
-
-                    // Slide Preview (Scheme)
-                    if let scheme = manager.latestScheme {
-                        schemePreview(scheme)
-                    } else if let deck = generatedDeck ?? manager.latestDeck {
-                        deckPreview(deck)
-                    }
+                    .padding()
                 }
-                .padding()
+            } else {
+                VStack(spacing: 20) {
+                    Text(manager.progressMessage)
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                    ProgressView(value: manager.progressValue)
+                        .tint(.cyan)
+                        .padding(.horizontal, 40)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(.black.opacity(0.4))
             }
         }
-        .glowWhileLoading(manager.isGenerating) {
-            LiveTuningGlow(
-                style: .standard,
-                cornerRadius: 55,
-                borderWidth: 6,
-                glowSize: 28,
-                speed: 0.12
-            )
-        }
-        .withKeyboardGlowBackdrop()
+        .keyboardGlow(keyboard: keyboardObserver)
+        .aiAnimationLoading(manager.isGenerating)
         .navigationTitle("AI Slides")
         .safeAreaInset(edge: .bottom) {
             DualKeyboardInputView(
@@ -209,6 +97,40 @@ public struct AIGenerateSlides: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(manager.lastError ?? "Something went wrong.")
+        }
+        .onAppear {
+            isFieldFocused = true
+        }
+        .sheet(isPresented: $showingKeyboardSheet) {
+            ZStack {
+                AuroraGlow(.dramatic)
+                    .palette(.appleIntelligence)
+                    .direction(.bottomToTop)
+                    .washSweepDuration(1.2)
+                    .washPulseWidth(1.0)
+                    .washPeak(0.6)
+                    .ignoresSafeArea()
+
+                LinearGradient(
+                    colors: [.clear, .black.opacity(0.3)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            }
+            .presentationDetents([.height(max(300, keyboardObserver.height + 80))])
+            .presentationBackgroundInteraction(.enabled)
+            .interactiveDismissDisabled()
+        }
+        .onChange(of: keyboardObserver.isVisible) { _, visible in
+            showingKeyboardSheet = visible
+            if !visible {
+                // Re-focus to keep keyboard open
+                isFieldFocused = true
+            }
+        }
+        .sheet(item: Binding(get: { generatedDeck }, set: { generatedDeck = $0 })) { deck in
+            AIGenSlidesPreview(deck: deck)
         }
     }
 

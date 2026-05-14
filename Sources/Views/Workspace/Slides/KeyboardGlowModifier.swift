@@ -2,7 +2,7 @@ import SwiftUI
 
 /// A view modifier that renders a dynamic, fluid gradient glow background behind content.
 /// Intensity and motion increase when the keyboard is visible.
-/// Works in concert with ``KeyboardBackdropManager`` which places a separate UIWindow
+/// Works in concert with the Aurora sheet system which places a backdrop
 /// behind the system keyboard to show the gradient glow beneath the keys.
 struct KeyboardGlowModifier: ViewModifier {
     @ObservedObject var keyboard: KeyboardObserver

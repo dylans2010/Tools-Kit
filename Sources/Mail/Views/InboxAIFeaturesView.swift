@@ -39,9 +39,7 @@ struct InboxAIFeaturesView: View {
                     .padding(20)
                 }
             }
-            .glowWhileLoading(isAnalyzing) {
-                MoodGlow(mood: .thinking, style: .standard)
-            }
+            .aiAnimationLoading(isAnalyzing)
             .navigationTitle("AI Intelligence")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

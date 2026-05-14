@@ -27,6 +27,7 @@ public final class PluginRuntimeEngine: PluginRuntimeProtocol, ObservableObject 
 
     @Published public var loadedApps: [SDKAppDefinition] = []
     @Published public var runningApps: Set<UUID> = []
+    @Published public private(set) var bridgeEvents: [String] = []
 
     private let persistenceKey = "sdk_runtime_apps"
     private var lifecycleHandlers: [UUID: SDKAppLifecycle] = [:]
@@ -35,6 +36,15 @@ public final class PluginRuntimeEngine: PluginRuntimeProtocol, ObservableObject 
 
     public func initialize() {
         loadApps()
+    }
+
+    public func secureBridgeMessage(_ message: String) {
+        bridgeEvents.append(message)
+        SDKEventBus.shared.publish(SDKBusEvent(
+            channel: "secure.bridge.message",
+            name: "bridge.message",
+            data: ["message": message]
+        ))
     }
 
     // MARK: - Registration

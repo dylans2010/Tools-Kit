@@ -28,6 +28,7 @@ struct GitHubRefactorPlannerView: View {
                             ProgressView(value: step.progress)
                                 .tint(.secondary)
                         }
+        .aiAnimationLoading(isAnalyzing)
                         .padding(.vertical, 4)
                     }
                 }

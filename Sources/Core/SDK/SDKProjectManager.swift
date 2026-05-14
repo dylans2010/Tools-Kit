@@ -23,11 +23,13 @@ public struct SDKProject: Identifiable, Codable {
     public var healthStatus: HealthStatus
     public var sourceCode: String
     public var requiredScopes: [String]
+    public var ownerIdentifier: String?
+    public var vulnerabilityDatabase: [String: String]?
 
     private enum CodingKeys: String, CodingKey {
         case id, name, description, createdAt, updatedAt, lastBuiltAt, version, status
         case enabledScopes, enabledPluginIDs, enabledToolIDs, enabledConnectorIDs
-        case automationRules, healthStatus, sourceCode, requiredScopes
+        case automationRules, healthStatus, sourceCode, requiredScopes, ownerIdentifier, vulnerabilityDatabase
     }
 
     public init(
@@ -46,7 +48,9 @@ public struct SDKProject: Identifiable, Codable {
         automationRules: [SDKAutomationRule] = [],
         healthStatus: HealthStatus = .healthy,
         sourceCode: String = "",
-        requiredScopes: [String] = []
+        requiredScopes: [String] = [],
+        ownerIdentifier: String? = nil,
+        vulnerabilityDatabase: [String: String]? = nil
     ) {
         self.id = id
         self.name = name
@@ -84,6 +88,8 @@ public struct SDKProject: Identifiable, Codable {
         healthStatus = try c.decodeIfPresent(HealthStatus.self, forKey: .healthStatus) ?? .healthy
         sourceCode = try c.decodeIfPresent(String.self, forKey: .sourceCode) ?? ""
         requiredScopes = try c.decodeIfPresent([String].self, forKey: .requiredScopes) ?? []
+        ownerIdentifier = try c.decodeIfPresent(String.self, forKey: .ownerIdentifier)
+        vulnerabilityDatabase = try c.decodeIfPresent([String: String].self, forKey: .vulnerabilityDatabase)
     }
 }
 
@@ -111,7 +117,8 @@ public final class SDKProjectManager: ObservableObject {
 
     @discardableResult
     public func createProject(name: String, description: String = "", status: SDKProject.ProjectStatus = .draft) -> SDKProject {
-        let project = SDKProject(name: name, description: description, status: status)
+        let owner = SDKStorageManager.shared.getSecureValue(key: "last_user_id_hash")
+        let project = SDKProject(name: name, description: description, status: status, ownerIdentifier: owner)
         projects.insert(project, at: 0)
         currentProject = project
         try? save()

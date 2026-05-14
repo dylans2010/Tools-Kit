@@ -6,7 +6,7 @@ import SwiftUI
 ///
 /// This view is the **sole** input mechanism for AIGenerateSlides – all text editing is
 /// routed through the TextField here so the system keyboard renders behind the gradient
-/// glow backdrop managed by ``KeyboardBackdropManager``.
+/// glow backdrop managed by the Aurora sheet system.
 struct DualKeyboardInputView: View {
     @Binding var promptText: String
     @Binding var notesText: String

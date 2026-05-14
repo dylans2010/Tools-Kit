@@ -41,6 +41,7 @@ struct SpreadsheetEditorView: View {
                     }
                 }
             }
+        .aiAnimationLoading(aiLoading)
             .navigationTitle(sheet.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -1,4 +1,5 @@
 import SwiftUI
+import CryptoKit
 
 struct SignInView: View {
     @Environment(\.dismiss) private var dismiss
@@ -24,9 +25,16 @@ struct SignInView: View {
 
             Section {
                 Button("Authenticate") {
+                    let trimmedUserId = userId.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let finalUserId: String? = trimmedUserId.isEmpty ? nil : hashUserId(trimmedUserId)
+
+                    if let finalUserId {
+                        try? SDKStorageManager.shared.setSecureValue(key: "last_user_id_hash", value: finalUserId)
+                    }
+
                     authorizationManager.beginAuthentication()
                     _ = authorizationManager.authenticate(
-                        userId: userId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : userId,
+                        userId: finalUserId,
                         scopes: parseScopes(scopesText),
                         sessionDuration: durationHours * 3600,
                         refreshToken: refreshToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : refreshToken
@@ -38,6 +46,12 @@ struct SignInView: View {
         }
         .navigationTitle("Sign In")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func hashUserId(_ id: String) -> String {
+        let inputData = Data(id.utf8)
+        let hashed = SHA256.hash(data: inputData)
+        return hashed.compactMap { String(format: "%02x", $0) }.joined()
     }
 
     private func parseScopes(_ text: String) -> [String] {
