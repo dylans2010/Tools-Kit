@@ -48,50 +48,6 @@ struct DeterministicToken: Codable {
     }
 }
 
-// MARK: - Scope System (Encoded, Not Plaintext, Enforced at Runtime)
-
-enum SDKScope: String, CaseIterable, Codable, Identifiable {
-    case workspaceRead = "workspace.read"
-    case workspaceWrite = "workspace.write"
-    case sdkProjectCreate = "sdk.project.create"
-    case sdkManageLibraries = "sdk.manage.libraries"
-    case sdkManageFrameworks = "sdk.manage.frameworks"
-    case sdkManagePackages = "sdk.manage.packages"
-    case frameworkExecute = "framework.execute"
-    case libraryInvoke = "library.invoke"
-    case agentExecute = "agent.execute"
-    case agentTakeover = "agent.takeover"
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .workspaceRead: return "Workspace Read"
-        case .workspaceWrite: return "Workspace Write"
-        case .sdkProjectCreate: return "Create SDK Projects"
-        case .sdkManageLibraries: return "Manage Libraries"
-        case .sdkManageFrameworks: return "Manage Frameworks"
-        case .sdkManagePackages: return "Manage Packages"
-        case .frameworkExecute: return "Execute Frameworks"
-        case .libraryInvoke: return "Invoke Libraries"
-        case .agentExecute: return "Agent Execution"
-        case .agentTakeover: return "Agent Workspace Takeover"
-        }
-    }
-
-    static func encode(_ scopes: Set<SDKScope>) -> String {
-        let sorted = scopes.map(\.rawValue).sorted()
-        guard let data = try? JSONEncoder().encode(sorted) else { return "" }
-        return data.base64EncodedString()
-    }
-
-    static func decode(_ encoded: String) -> Set<SDKScope> {
-        guard let data = Data(base64Encoded: encoded),
-              let raw = try? JSONDecoder().decode([String].self, from: data) else { return [] }
-        return Set(raw.compactMap { SDKScope(rawValue: $0) })
-    }
-}
-
 // MARK: - Deterministic Token Engine (7-Step Validation Pipeline)
 
 @MainActor
