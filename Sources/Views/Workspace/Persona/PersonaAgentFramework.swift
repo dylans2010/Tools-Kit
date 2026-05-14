@@ -519,24 +519,13 @@ struct PersonaAgentFrameworkView: View {
             if agent.currentPlan.isEmpty {
                 Text("No active plan").foregroundStyle(.secondary)
             } else {
-                ForEach(Array(agent.currentPlan.enumerated()), id: \.element.id) { index, step in
+                ForEach(agent.currentPlan) { step in
                     HStack {
-                        Image(systemName: stepIcon(step.status)).foregroundStyle(stepColor(step.status))
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(step.description).font(.caption)
-                            Text(step.requiredScopes.map(\.rawValue).joined(separator: ", ")).font(.caption2).foregroundStyle(.secondary)
-                        }
+                        Text(step.title)
                         Spacer()
-                        if step.status == .pending || step.status == .failed {
-                            Button("Skip") {
-                                agent.skipStep(index: index)
-                            }
-                            .font(.caption2)
-                            .buttonStyle(.bordered)
-                        } else {
-                            Text(step.status.rawValue).font(.caption2.bold()).foregroundStyle(stepColor(step.status))
-                        }
+                        Text(step.status.rawValue)
                     }
+                    .padding(.vertical, 4)
                 }
             }
         }
