@@ -13,7 +13,7 @@ struct LoadingDemo: View {
         ResponseCard(text: lastResult, isLoading: isLoading)
           .glowWhileLoading(isLoading, style: .standard, cornerRadius: 22)
         Spacer()
-        ActionButton(isLoading: isLoading, action: runFakeRequest)
+        LoadingActionButton(isLoading: isLoading, action: runFakeRequest)
       }
       .padding(24)
     }
@@ -57,7 +57,7 @@ private struct ResponseCard: View {
   }
 }
 
-private struct ActionButton: View {
+private struct LoadingActionButton: View {
   let isLoading: Bool
   let action: () -> Void
 
