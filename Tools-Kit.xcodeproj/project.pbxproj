@@ -58,6 +58,10 @@
 		CL020000000000000000000016 /* WorkspaceControlViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000016 /* WorkspaceControlViews.swift */; };
 		CL020000000000000000000017 /* ReviewViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000017 /* ReviewViews.swift */; };
 		CL020000000000000000000018 /* CollaborationToolViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000018 /* CollaborationToolViews.swift */; };
+		SDK_LIB_MAN_002 /* LibraryManageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK_LIB_MAN_001 /* LibraryManageView.swift */; };
+		SDK_FRM_MAN_002 /* FrameworkManageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK_FRM_MAN_001 /* FrameworkManageView.swift */; };
+		SDK_PKG_DEP_002 /* PackageDependenciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK_PKG_DEP_001 /* PackageDependenciesView.swift */; };
+		PER_AGT_FRM_002 /* PersonaAgentFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = PER_AGT_FRM_001 /* PersonaAgentFramework.swift */; };
 		CDB93E05C5973585CC3B4457 /* HistoryInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A467EE22AA44C60F7633C2C1 /* HistoryInspectorView.swift */; };
 		B7F5A33B3D9C44B069B3CB56 /* AIEditControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023B6EAF3B05FA2E1B194460 /* AIEditControlsView.swift */; };
 		255994A117DABA42CF2C4FE9 /* ProfessionalToolViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34FBFB3593F01B45E73252C /* ProfessionalToolViews.swift */; };
@@ -2630,6 +2634,7 @@
 		WS01CEDE12EC1A3C4B62BE89 /* PersonaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaManager.swift; sourceTree = "<group>"; };
 		WS013BBA0D8E9D6444C5890B /* PersonaWorkspace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaWorkspace.swift; sourceTree = "<group>"; };
 		ML0180133150940C4A3C83DA /* PersonaHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaHomeView.swift; sourceTree = "<group>"; };
+		PER_AGT_FRM_001 /* PersonaAgentFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaAgentFramework.swift; sourceTree = "<group>"; };
 		WS010221CB88A3A14E1D9D6E /* IntegrationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationEngine.swift; sourceTree = "<group>"; };
 		ML0157AFE2F8373C4F1BA902 /* IntegrationsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationsHomeView.swift; sourceTree = "<group>"; };
 		ML01FC3317E40F374F26AA98 /* WorkflowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowBuilderView.swift; sourceTree = "<group>"; };
@@ -2777,6 +2782,9 @@
 		SDK1A00000000000000000011 /* SDKRunConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKRunConfigurationView.swift; sourceTree = "<group>"; };
 		SDK1A00000000000000000012 /* SDKLibraryManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/SDKLibraryManagerView.swift; sourceTree = "<group>"; };
 		SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/SDKDependencyManagerView.swift; sourceTree = "<group>"; };
+		SDK_LIB_MAN_001 /* LibraryManageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/LibraryManageView.swift; sourceTree = "<group>"; };
+		SDK_FRM_MAN_001 /* FrameworkManageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/FrameworkManageView.swift; sourceTree = "<group>"; };
+		SDK_PKG_DEP_001 /* PackageDependenciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PackageDependenciesView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000026 /* SDKInternalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKInternalView.swift; sourceTree = "<group>"; };
 		WK01AICONTEXT0000000001 /* AIContextEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/AIContextEngine.swift; sourceTree = SOURCE_ROOT; };
 		WK01VERSIONCTRL00000001 /* VersionControlManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/VersionControlManager.swift; sourceTree = SOURCE_ROOT; };
@@ -3489,6 +3497,7 @@
 			isa = PBXGroup;
 			children = (
 				ML0180133150940C4A3C83DA /* PersonaHomeView.swift */,
+				PER_AGT_FRM_001 /* PersonaAgentFramework.swift */,
 			);
 			path = Persona;
 			sourceTree = "<group>";
@@ -7526,6 +7535,9 @@
 				SDK1A00000000000000000011 /* SDKRunConfigurationView.swift */,
 				SDK1A00000000000000000012 /* SDKLibraryManagerView.swift */,
 				SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */,
+				SDK_LIB_MAN_001 /* LibraryManageView.swift */,
+				SDK_FRM_MAN_001 /* FrameworkManageView.swift */,
+				SDK_PKG_DEP_001 /* PackageDependenciesView.swift */,
 				EXP100000000000000000006 /* SDKDownloadView.swift */,
 				EXP100000000000000000007 /* CustomAppSDKView.swift */,
 				EXP100000000000000000008 /* SDKHelpView.swift */,
@@ -10028,6 +10040,10 @@
 				SDK2A00000000000000000011 /* SDKRunConfigurationView.swift in Sources */,
 				SDK2A00000000000000000012 /* SDKLibraryManagerView.swift in Sources */,
 				SDK2A00000000000000000013 /* SDKDependencyManagerView.swift in Sources */,
+				SDK_LIB_MAN_002 /* LibraryManageView.swift in Sources */,
+				SDK_FRM_MAN_002 /* FrameworkManageView.swift in Sources */,
+				SDK_PKG_DEP_002 /* PackageDependenciesView.swift in Sources */,
+				PER_AGT_FRM_002 /* PersonaAgentFramework.swift in Sources */,
 				SDK2A00000000000000000001 /* SDKIDEWorkspaceState.swift in Sources */,
 				SDK2A00000000000000000002 /* SDKExecutionCoordinator.swift in Sources */,
 				SDK2A00000000000000000003 /* SDKLibraryExecutionEngine.swift in Sources */,
