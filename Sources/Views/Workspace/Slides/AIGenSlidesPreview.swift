@@ -7,13 +7,19 @@ struct AIGenSlidesPreview: View {
     @State private var currentSlideIndex = 0
     @Environment(\.dismiss) private var dismiss
 
+    private var resolvedTheme: SlideTheme? {
+        AIGenSlideCatalog.themes.first { $0.id == deck.theme || $0.name == deck.theme }
+            ?? AIGenSlideCatalog.themes.first { $0.id == AIGenSlideCatalog.defaultThemeID }
+    }
+
+
     var body: some View {
         NavigationStack {
             VStack {
                 // Slide Content
                 TabView(selection: $currentSlideIndex) {
                     ForEach(0..<deck.slides.count, id: \.self) { index in
-                        SlidePreviewCard(slide: deck.slides[index], theme: deck.theme)
+                        SlidePreviewCard(slide: deck.slides[index], theme: resolvedTheme)
                             .tag(index)
                     }
                 }
