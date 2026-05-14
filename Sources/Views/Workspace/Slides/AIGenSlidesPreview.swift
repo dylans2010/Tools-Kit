@@ -2,7 +2,7 @@ import SwiftUI
 import Aurora
 
 struct AIGenSlidesPreview: View {
-    @ObservedObject var manager = AISlidesManager.shared
+    @StateObject private var manager = SlideDecksManager.shared
     let deck: SlideDeck
     @State private var currentSlideIndex = 0
     @Environment(\.dismiss) private var dismiss
@@ -49,7 +49,7 @@ struct AIGenSlidesPreview: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
-                        SlideEditorView(deck: deck)
+                        SlideEditorView(deck: deck, manager: manager)
                     } label: {
                         Text("Edit")
                     }
