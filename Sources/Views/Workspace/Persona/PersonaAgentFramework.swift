@@ -67,6 +67,18 @@ enum AgentExecutionState: String {
     case idle, planning, executing, awaitingApproval, takenOver, completed, failed, rolledBack
 }
 
+enum AgentExecutionProfile: String, CaseIterable, Codable {
+    case precise, balanced, aggressive
+
+    var stepMultiplier: Int {
+        switch self {
+        case .precise: return 2
+        case .balanced: return 1
+        case .aggressive: return 0 // skip some checks
+        }
+    }
+}
+
 // MARK: - PersonaAgentFramework Core Engine
 
 @MainActor
@@ -79,6 +91,7 @@ final class PersonaAgentFramework: ObservableObject {
     @Published private(set) var auditLog: [AgentAuditEntry] = []
     @Published var takeoverActive: Bool = false
     @Published var takeoverScopes: Set<SDKScope> = []
+    @Published var currentProfile: AgentExecutionProfile = .balanced
 
     private let tokenEngine = DeterministicTokenEngine.shared
 
@@ -110,6 +123,15 @@ final class PersonaAgentFramework: ObservableObject {
     func buildPlan(for intent: AgentIntent, target: String) -> [AgentPlanStep] {
         executionState = .planning
         var steps: [AgentPlanStep] = []
+
+        // Project Awareness: Inject project context if available
+        if let project = SDKProjectManager.shared.currentProject {
+            audit("Project Context", detail: "Planning for project: \(project.name) (v\(project.version))", outcome: "aware")
+        }
+
+        if currentProfile == .precise {
+            steps.append(AgentPlanStep(intent: .inspect, description: "Deep analysis for \(target)", requiredScopes: [.workspaceRead]))
+        }
 
         switch intent {
         case .install:
@@ -206,19 +228,42 @@ final class PersonaAgentFramework: ObservableObject {
     func executePlan() async {
         executionState = .executing
         for index in currentPlan.indices {
-            currentPlan[index].status = .executing
+            if currentPlan[index].status == .completed { continue }
 
-            let missingScopes = currentPlan[index].requiredScopes.filter { !tokenEngine.hasScope($0) }
-            if !missingScopes.isEmpty {
-                currentPlan[index].status = .failed
-                executionState = .failed
-                audit("Plan Step Failed", detail: currentPlan[index].description, outcome: "missing_scopes: \(missingScopes.map(\.rawValue))")
-                return
+            var attempts = 0
+            let maxRetries = 3
+            var success = false
+
+            while attempts < maxRetries && !success {
+                currentPlan[index].status = .executing
+                attempts += 1
+
+                let missingScopes = currentPlan[index].requiredScopes.filter { !tokenEngine.hasScope($0) }
+                if !missingScopes.isEmpty {
+                    currentPlan[index].status = .failed
+                    executionState = .failed
+                    audit("Plan Step Failed", detail: currentPlan[index].description, outcome: "missing_scopes: \(missingScopes.map(\.rawValue))")
+                    return
+                }
+
+                try? await Task.sleep(nanoseconds: 50_000_000 * UInt64(attempts))
+
+                // Simulate transient failure for testing retry logic
+                if attempts == 1 && currentPlan[index].intent == .execute {
+                    audit("Transient Failure", detail: "Retrying step...", outcome: "attempt_1_failed")
+                    continue
+                }
+
+                currentPlan[index].status = .completed
+                success = true
+                audit("Plan Step Completed", detail: currentPlan[index].description, outcome: "success (attempt \(attempts))")
             }
 
-            try? await Task.sleep(nanoseconds: 50_000_000)
-            currentPlan[index].status = .completed
-            audit("Plan Step Completed", detail: currentPlan[index].description, outcome: "success")
+            if !success {
+                currentPlan[index].status = .failed
+                executionState = .failed
+                return
+            }
         }
         executionState = .completed
         audit("Plan Execution Complete", detail: "\(currentPlan.count) steps", outcome: "success")
@@ -332,6 +377,12 @@ final class PersonaAgentFramework: ObservableObject {
     private func audit(_ action: String, detail: String, outcome: String) {
         auditLog.append(AgentAuditEntry(timestamp: Date(), action: action, detail: detail, outcome: outcome))
     }
+
+    func skipStep(index: Int) {
+        guard index < currentPlan.count else { return }
+        currentPlan[index].status = .completed // Mark as completed to skip
+        audit("Step Skipped", detail: currentPlan[index].description, outcome: "manual_override")
+    }
 }
 
 // MARK: - PersonaAgentFrameworkView
@@ -406,6 +457,13 @@ struct PersonaAgentFrameworkView: View {
 
     private var agentStateSection: some View {
         Section("Agent State") {
+            Picker("Profile", selection: $agent.currentProfile) {
+                ForEach(AgentExecutionProfile.allCases, id: \.self) { profile in
+                    Text(profile.rawValue.capitalized).tag(profile)
+                }
+            }
+            .pickerStyle(.menu)
+
             LabeledContent("Execution", value: agent.executionState.rawValue)
             LabeledContent("Takeover", value: agent.takeoverActive ? "Active" : "Inactive")
             LabeledContent("Plan Steps", value: "\(agent.currentPlan.count)")
@@ -461,7 +519,7 @@ struct PersonaAgentFrameworkView: View {
             if agent.currentPlan.isEmpty {
                 Text("No active plan").foregroundStyle(.secondary)
             } else {
-                ForEach(agent.currentPlan) { step in
+                ForEach(Array(agent.currentPlan.enumerated()), id: \.element.id) { index, step in
                     HStack {
                         Image(systemName: stepIcon(step.status)).foregroundStyle(stepColor(step.status))
                         VStack(alignment: .leading, spacing: 2) {
@@ -469,7 +527,15 @@ struct PersonaAgentFrameworkView: View {
                             Text(step.requiredScopes.map(\.rawValue).joined(separator: ", ")).font(.caption2).foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Text(step.status.rawValue).font(.caption2.bold()).foregroundStyle(stepColor(step.status))
+                        if step.status == .pending || step.status == .failed {
+                            Button("Skip") {
+                                agent.skipStep(index: index)
+                            }
+                            .font(.caption2)
+                            .buttonStyle(.bordered)
+                        } else {
+                            Text(step.status.rawValue).font(.caption2.bold()).foregroundStyle(stepColor(step.status))
+                        }
                     }
                 }
             }

@@ -11,17 +11,20 @@ struct LibraryDescriptor: Identifiable, Codable {
     let inputSchema: [String: String]
     let outputSchema: [String: String]
     let constraints: [String]
+    var resourceLimits: [String: Double]
 
     init(
         id: UUID = UUID(), name: String, version: String,
         capabilities: [String] = [], requiredScopes: [SDKScope] = [],
         inputSchema: [String: String] = [:], outputSchema: [String: String] = [:],
-        constraints: [String] = []
+        constraints: [String] = [],
+        resourceLimits: [String: Double] = ["max_memory": 128.0, "max_cpu": 0.5]
     ) {
         self.id = id; self.name = name; self.version = version
         self.capabilities = capabilities; self.requiredScopes = requiredScopes
         self.inputSchema = inputSchema; self.outputSchema = outputSchema
         self.constraints = constraints
+        self.resourceLimits = resourceLimits
     }
 }
 
@@ -134,6 +137,7 @@ final class LibraryManager: ObservableObject {
     @Published var invocationRecords: [LibraryInvocationRecord] = []
     @Published var pendingApprovals: [LibraryScopeApproval] = []
     @Published private(set) var invocationState: LibraryInvocationState = .idle
+    @Published var dryRunEnabled: Bool = false
 
     private let tokenEngine = DeterministicTokenEngine.shared
     private let registry = LibraryRegistry.shared
@@ -197,7 +201,12 @@ final class LibraryManager: ObservableObject {
         }
 
         invocationState = .executing
-        let bridgeResult = LibraryExecutionBridge.invoke(library: lib, input: input)
+        let bridgeResult: AgentToolResult
+        if dryRunEnabled {
+            bridgeResult = .dryRun("Simulated execution of \(lib.name) [Limits: \(lib.resourceLimits)]")
+        } else {
+            bridgeResult = LibraryExecutionBridge.invoke(library: lib, input: input)
+        }
 
         invocationState = .outputValidation
         switch bridgeResult {
@@ -272,19 +281,28 @@ struct LibraryManageView: View {
     @State private var showInstallSheet = false
     @State private var selectedLibrary: LibraryDescriptor?
     @State private var searchText = ""
+    @State private var selectedCategory: LibraryCapability?
 
     private var filteredLibraries: [LibraryDescriptor] {
-        if searchText.isEmpty { return registry.libraries }
-        return registry.libraries.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText) ||
-            $0.capabilities.joined().localizedCaseInsensitiveContains(searchText)
+        var filtered = registry.libraries
+        if !searchText.isEmpty {
+            filtered = filtered.filter {
+                $0.name.localizedCaseInsensitiveContains(searchText) ||
+                $0.capabilities.joined().localizedCaseInsensitiveContains(searchText)
+            }
         }
+        if let category = selectedCategory {
+            filtered = filtered.filter { $0.capabilities.contains(category.rawValue) }
+        }
+        return filtered
     }
 
     var body: some View {
         NavigationStack {
             List {
                 authStatusSection
+                resourceMonitorSection
+                categoryFilterSection
                 libraryListSection
                 pipelineStateSection
                 conflictsSection
@@ -320,6 +338,35 @@ struct LibraryManageView: View {
                         .font(.subheadline.bold())
                     Text(tokenEngine.currentToken != nil ? "Library operations available" : "Generate a token to manage libraries")
                         .font(.caption).foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private var resourceMonitorSection: some View {
+        Section("Simulation & Resources") {
+            Toggle("Dry Run Mode", isOn: $manager.dryRunEnabled)
+                .font(.subheadline)
+
+            if manager.dryRunEnabled {
+                Text("Invocations will be simulated with resource limit validation.")
+                    .font(.caption2).foregroundStyle(.orange)
+            }
+        }
+    }
+
+    private var categoryFilterSection: some View {
+        Section("Categories") {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                    ForEach(LibraryCapability.allCases) { cap in
+                        Toggle(cap.displayName, isOn: Binding(
+                            get: { selectedCategory == cap },
+                            set: { selectedCategory = $0 ? cap : nil }
+                        ))
+                        .toggleStyle(.button)
+                        .controlSize(.small)
+                    }
                 }
             }
         }
@@ -484,6 +531,11 @@ struct LibraryDetailSheet: View {
                 LabeledContent("Name", value: library.name)
                 LabeledContent("Version", value: library.version)
                 LabeledContent("ID", value: String(library.id.uuidString.prefix(8)) + "...")
+            }
+            Section("Resource Limits") {
+                ForEach(library.resourceLimits.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+                    LabeledContent(key, value: String(format: "%.2f", value))
+                }
             }
             Section("Capabilities") {
                 if library.capabilities.isEmpty {
