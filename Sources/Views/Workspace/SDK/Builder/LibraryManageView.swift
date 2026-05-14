@@ -72,7 +72,7 @@ enum LibraryCapability: String, CaseIterable, Codable, Identifiable {
 // MARK: - Library Execution Bridge (SDK Bridge — No Direct Workspace Writes)
 
 struct LibraryExecutionBridge {
-    static func invoke(library: LibraryDescriptor, input: [String: String]) -> AgentToolResult {
+    static func invoke(library: LibraryDescriptor, input: [String: String]) -> UIAgentToolResult {
         guard !library.capabilities.isEmpty else {
             return .failure("Library has no capabilities")
         }
@@ -173,7 +173,7 @@ final class LibraryManager: ObservableObject {
 
     // MARK: - Execution Pipeline: Request → Scope Check → Capability Match → Input Validation → Execution Bridge → Output Validation
 
-    func invokeLibrary(id: UUID, capability: String, input: [String: String]) -> AgentToolResult {
+    func invokeLibrary(id: UUID, capability: String, input: [String: String]) -> UIAgentToolResult {
         let startTime = Date()
 
         invocationState = .scopeCheck
@@ -201,7 +201,7 @@ final class LibraryManager: ObservableObject {
         }
 
         invocationState = .executing
-        let bridgeResult: AgentToolResult
+        let bridgeResult: UIAgentToolResult
         if dryRunEnabled {
             bridgeResult = .dryRun("Simulated execution of \(lib.name) [Limits: \(lib.resourceLimits)]")
         } else {
@@ -258,7 +258,7 @@ final class LibraryManager: ObservableObject {
         invocationRecords.last { $0.libraryId == libraryId && $0.capability == capability && $0.state == .completed }
     }
 
-    private func recordAndReturn(id: UUID, name: String, capability: String, input: [String: String], result: AgentToolResult, state: LibraryInvocationState, start: Date) -> AgentToolResult {
+    private func recordAndReturn(id: UUID, name: String, capability: String, input: [String: String], result: UIAgentToolResult, state: LibraryInvocationState, start: Date) -> UIAgentToolResult {
         let duration = Int(Date().timeIntervalSince(start) * 1000)
         let outputText: String
         switch result {

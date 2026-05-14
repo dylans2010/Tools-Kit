@@ -83,7 +83,7 @@ struct FrameworkSandboxConfig {
 // MARK: - Framework Sandbox Runner
 
 struct FrameworkSandboxRunner {
-    static func execute(framework: FrameworkDescriptor, params: [String: String], config: FrameworkSandboxConfig = .default) -> AgentToolResult {
+    static func execute(framework: FrameworkDescriptor, params: [String: String], config: FrameworkSandboxConfig = .default) -> UIAgentToolResult {
         guard framework.isEnabled else { return .failure("Framework is disabled") }
         guard !framework.entryPoints.isEmpty else { return .failure("No entry points defined") }
         return .success("Executed \(framework.name) via '\(framework.entryPoints[0])' [sandbox: time=\(config.maxExecutionTimeMs)ms mem=\(config.maxMemoryBytes / (1024*1024))MB fs=\(config.allowFileSystem) net=\(config.allowNetwork)]")
@@ -153,7 +153,7 @@ final class FrameworkManager: ObservableObject {
     }
 
     /// Execution Pipeline: Load → Validate → Resolve Dependencies → Scope Check → Sandbox → Execute → Validate Output → Commit
-    func executeFramework(id: UUID, params: [String: String]) -> AgentToolResult {
+    func executeFramework(id: UUID, params: [String: String]) -> UIAgentToolResult {
         let startTime = Date()
 
         executionState = .loading
@@ -212,7 +212,7 @@ final class FrameworkManager: ObservableObject {
         }
     }
 
-    private func record(id: UUID, name: String, entryPoint: String, result: AgentToolResult, state: FrameworkExecutionState, start: Date) -> AgentToolResult {
+    private func record(id: UUID, name: String, entryPoint: String, result: UIAgentToolResult, state: FrameworkExecutionState, start: Date) -> UIAgentToolResult {
         let duration = Int(Date().timeIntervalSince(start) * 1000)
         let output: String
         switch result {

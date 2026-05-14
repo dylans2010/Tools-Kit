@@ -247,7 +247,7 @@ final class DeterministicTokenEngine: ObservableObject {
 
 // MARK: - Shared Result Type
 
-enum AgentToolResult {
+enum UIAgentToolResult {
     case success(String)
     case failure(String)
     case dryRun(String)
