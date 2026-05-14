@@ -7,6 +7,11 @@ public final class SDKConnectorEngine: ObservableObject {
 
     @Published public var connectorHealth: [UUID: ConnectorHealthInfo] = [:]
     @Published public var syncInProgress = false
+    @Published public private(set) var circuitStates: [UUID: CircuitState] = [:]
+
+    public enum CircuitState: String, Codable {
+        case closed, open, halfOpen
+    }
 
     private var backgroundSyncTimers: [UUID: AnyCancellable] = [:]
     private let maxSyncRetries = 3
@@ -104,6 +109,14 @@ public final class SDKConnectorEngine: ObservableObject {
     }
 
     // MARK: - Health
+
+    public func getCircuitState(for connectorId: UUID) -> CircuitState {
+        return circuitStates[connectorId] ?? .closed
+    }
+
+    public func updateCircuitState(for connectorId: UUID, state: CircuitState) {
+        circuitStates[connectorId] = state
+    }
 
     public func checkHealth() async -> [ConnectorHealthInfo] {
         var healthInfos: [ConnectorHealthInfo] = []

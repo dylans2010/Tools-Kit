@@ -80,6 +80,7 @@ struct WorkspaceHabitTrackerView: View {
                 }
             }
         }
+            .aiAnimationLoading(aiLoading)
         .navigationTitle("Habits")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {

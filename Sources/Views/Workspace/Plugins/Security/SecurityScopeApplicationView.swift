@@ -5,6 +5,7 @@ import SwiftUI
 struct SecurityScopeApplicationView: View {
     @Binding var plugin: PluginDefinition
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var authManager = AuthorizationManager.shared
 
     var body: some View {
         Form {
@@ -55,24 +56,31 @@ struct SecurityScopeApplicationView: View {
             }
 
             Section {
-                let highRiskCapabilities = plugin.capabilities.filter { $0.riskLevel == .high }
-                if highRiskCapabilities.isEmpty {
-                    Text("No high-risk scopes requested.").font(.caption).foregroundStyle(.secondary)
-                } else {
-                    ForEach(highRiskCapabilities) { cap in
-                        HStack {
-                            Label(cap.displayName, systemImage: cap.icon).font(.subheadline)
-                            Spacer()
-                            Text("HIGH RISK")
+                ForEach(plugin.capabilities) { cap in
+                    HStack {
+                        Label(cap.displayName, systemImage: cap.icon).font(.subheadline)
+                        Spacer()
+
+                        let isGranted = authManager.validateScope(cap.technicalKey)
+
+                        if cap.riskLevel == .high || cap.riskLevel == .critical {
+                            Text(cap.riskLevel.rawValue.uppercased())
                                 .font(.system(size: 8, weight: .black))
                                 .padding(.horizontal, 6).padding(.vertical, 2)
                                 .background(Color.red.opacity(0.1), in: Capsule())
                                 .foregroundStyle(.red)
                         }
+
+                        Image(systemName: isGranted ? "checkmark.shield.fill" : "xmark.shield.fill")
+                            .foregroundStyle(isGranted ? .green : .red)
                     }
                 }
+
+                if plugin.capabilities.isEmpty {
+                    Text("No scopes requested.").font(.caption).foregroundStyle(.secondary)
+                }
             } header: {
-                Label("Requested High-Risk Scopes", systemImage: "exclamationmark.shield.fill")
+                Label("Scope Authorization Status", systemImage: "shield.checkered")
             } footer: {
                 Text("Changes are applied to the plugin definition. High-risk plugins without an API Key or Privacy Note will be blocked during installation or execution.")
             }

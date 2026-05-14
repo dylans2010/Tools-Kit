@@ -44,8 +44,17 @@ public final class AuthorizationManager: ObservableObject {
 
     @Published public private(set) var authState: AuthState = .unauthenticated
     @Published public private(set) var authSession: AuthSession?
+    @Published public private(set) var securityViolations: [SecurityViolation] = []
 
     private let sessionKey = "sdk.authorization.session"
+
+    public struct SecurityViolation: Identifiable, Codable {
+        public let id: UUID
+        public let timestamp: Date
+        public let scope: String
+        public let resourceType: String
+        public let resourceId: String
+    }
 
     private init() {
         loadPersistedSession()
@@ -125,10 +134,17 @@ public final class AuthorizationManager: ObservableObject {
         reevaluateAccessControls()
     }
 
-    public func validateScope(_ scope: String) -> Bool {
-        guard ensureActiveSession() else { return false }
+    public func validateScope(_ scope: String, resourceType: String = "generic", resourceId: String = "unknown") -> Bool {
+        guard ensureActiveSession() else {
+            logViolation(scope: scope, resourceType: resourceType, resourceId: resourceId)
+            return false
+        }
         let granted = activeScopes()
-        return hasScope(scope, in: granted)
+        let result = hasScope(scope, in: granted)
+        if !result {
+            logViolation(scope: scope, resourceType: resourceType, resourceId: resourceId)
+        }
+        return result
     }
 
     public func canAccessModule(id: String) -> Bool {
@@ -192,6 +208,18 @@ public final class AuthorizationManager: ObservableObject {
     private func activeScopes() -> Set<String> {
         guard authState == .authenticated, let session = authSession else { return [] }
         return Set(session.scopes)
+    }
+
+    private func logViolation(scope: String, resourceType: String, resourceId: String) {
+        let violation = SecurityViolation(
+            id: UUID(),
+            timestamp: Date(),
+            scope: scope,
+            resourceType: resourceType,
+            resourceId: resourceId
+        )
+        securityViolations.append(violation)
+        SDKLogStore.shared.log("Security violation: Unauthorized access to scope \(scope) for \(resourceType) \(resourceId)", source: "AuthorizationManager", level: .warning)
     }
 
     private func hasScope(_ scope: String, in granted: Set<String>) -> Bool {

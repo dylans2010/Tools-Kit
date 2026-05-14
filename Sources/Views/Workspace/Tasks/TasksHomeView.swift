@@ -68,6 +68,7 @@ struct TasksHomeView: View {
                 }
             }
         }
+            .aiAnimationLoading(aiLoading)
         .navigationTitle("Tasks")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {

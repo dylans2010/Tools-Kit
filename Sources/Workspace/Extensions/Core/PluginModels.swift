@@ -16,6 +16,8 @@ struct PluginDefinition: Codable, Identifiable {
     var lastExecutedAt: Date? = nil
     var errorCount: Int = 0
     var executionCount: Int = 0
+    var isolationLevel: IsolationLevel = .standard
+    var sourceIntegrityHash: String?
 
     var capabilities: [PluginCapability]
     var actions: [PluginAction]
@@ -28,6 +30,12 @@ struct PluginDefinition: Codable, Identifiable {
     var privacyNote: String? // Developer justification
     var dataUsageExplanation: String?
     var retentionPolicy: String?
+    var assets: [String] = []
+    var storageQuota: Int? // in MB
+    var locales: [String] = []
+    var analyticsEnabled: Bool = true
+    var backgroundTasks: [String] = []
+    var sandboxConfig: [String: String] = [:]
 
     // Advanced Builder Features
     var endpoints: [ExternalAPIEndpoint] = []
@@ -64,6 +72,10 @@ enum RiskLevel: String, Codable {
 
 enum AccessLevel: String, Codable {
     case read, write, full, selective
+}
+
+enum IsolationLevel: String, Codable {
+    case standard, restricted, isolated, unrestricted
 }
 
 // MARK: - Capabilities & Actions

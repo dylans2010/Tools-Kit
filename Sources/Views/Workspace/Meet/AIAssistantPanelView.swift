@@ -28,7 +28,7 @@ struct AIAssistantPanelView: View {
                 ProgressView("AI Is Processing…")
             }
 
-            if !result.isEmpty {
+            if !result.isEmpty && !isLoading {
                 ScrollView {
                     Text(result)
                         .frame(maxWidth: .infinity, alignment: .leading)

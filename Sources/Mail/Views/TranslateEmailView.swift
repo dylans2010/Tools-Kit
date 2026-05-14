@@ -82,12 +82,8 @@ struct TranslateEmailView: View {
                 }
                 .scrollBounceBehavior(.basedOnSize)
 
-                MailAILoadingView(
-                    isActive: isTranslating,
-                    title: "Translating message",
-                    subtitle: "Preserving tone, meaning, and context"
-                )
             }
+            .aiAnimationLoading(isTranslating)
             .navigationTitle("Translate")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

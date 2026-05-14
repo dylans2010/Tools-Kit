@@ -24,6 +24,29 @@ struct ScopeInspectorView: View {
                     resourceRows(for: scope)
                 }
             }
+
+            Section("Recent Violations") {
+                if authorizationManager.securityViolations.isEmpty {
+                    Text("No violations detected")
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(authorizationManager.securityViolations) { violation in
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text(violation.scope)
+                                    .font(.caption.monospaced().bold())
+                                Spacer()
+                                Text(violation.timestamp, style: .time)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Text("\(violation.resourceType): \(violation.resourceId)")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                        }
+                    }
+                }
+            }
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Scope Inspector")

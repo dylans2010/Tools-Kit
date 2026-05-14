@@ -537,6 +537,7 @@ struct PageEditorView: View {
                     infoRow("Estimated", value: "\(minutes) min read")
                 }
             }
+        .aiAnimationLoading(aiLoading)
             .navigationTitle("Page Info")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

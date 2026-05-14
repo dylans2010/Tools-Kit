@@ -73,6 +73,7 @@ struct ArticlesHomeView: View {
                 }
             }
         }
+            .aiAnimationLoading(aiLoading)
         .navigationTitle("Articles")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {

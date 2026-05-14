@@ -22,12 +22,36 @@ public final class SDKSecurityManager: ObservableObject {
     }
 
     @Published public private(set) var sensitiveOperations: [SensitiveOperation] = []
+    @Published public private(set) var resourceQuotas: [String: ResourceQuota] = [:]
+
+    public struct ResourceQuota: Codable {
+        public let scope: String
+        public var limit: Int
+        public var current: Int
+    }
 
     private var appPermissions: [UUID: Set<String>] = [:]
     private var deniedScopes: Set<String> = []
     private var projectAPIKeys: [UUID: Set<String>] = [:]
 
-    private init() {}
+    private init() {
+        setupDefaultQuotas()
+    }
+
+    private func setupDefaultQuotas() {
+        resourceQuotas["external.api.unrestricted"] = ResourceQuota(scope: "external.api.unrestricted", limit: 100, current: 0)
+        resourceQuotas["ai.persona.query"] = ResourceQuota(scope: "ai.persona.query", limit: 50, current: 0)
+    }
+
+    public func trackExecution(scope: String) -> Bool {
+        guard var quota = resourceQuotas[scope] else { return true }
+        if quota.current < quota.limit {
+            quota.current += 1
+            resourceQuotas[scope] = quota
+            return true
+        }
+        return false
+    }
 
     public func setPermissions(for appId: UUID, permissions: Set<String>) {
         appPermissions[appId] = permissions

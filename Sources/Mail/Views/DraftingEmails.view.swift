@@ -106,9 +106,7 @@ struct DraftingEmailsView: View {
                     generateButton
                 }
             }
-            .glowWhileLoading(isGenerating) {
-                WashGlow(style: .dramatic)
-            }
+            .aiAnimationLoading(isGenerating)
             .navigationTitle("Drafting Assistant")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

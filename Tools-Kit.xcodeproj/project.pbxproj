@@ -1447,6 +1447,8 @@
 		A00200000000000000000203 /* LiveTuningGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000203 /* LiveTuningGlow.swift */; };
 		A00200000000000000000204 /* MoodGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000204 /* MoodGlow.swift */; };
 		A00200000000000000000205 /* WashGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000205 /* WashGlow.swift */; };
+		A00200000000000000000206 /* AIAnimationCoreModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000206 /* AIAnimationCoreModifier.swift */; };
+		AS0200000000000000000031 /* AIGenSlidesPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000031 /* AIGenSlidesPreview.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2874,6 +2876,8 @@
 		A00100000000000000000203 /* LiveTuningGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/LiveTuningGlow.swift"; sourceTree = "<group>"; };
 		A00100000000000000000204 /* MoodGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/MoodGlow.swift"; sourceTree = "<group>"; };
 		A00100000000000000000205 /* WashGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/WashGlow.swift"; sourceTree = "<group>"; };
+		A00100000000000000000206 /* AIAnimationCoreModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/AIAnimationCoreModifier.swift"; sourceTree = "<group>"; };
+		AS0100000000000000000031 /* AIGenSlidesPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Workspace/Slides/AIGenSlidesPreview.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -6375,6 +6379,7 @@
 				A00100000000000000000203 /* LiveTuningGlow.swift */,
 				A00100000000000000000204 /* MoodGlow.swift */,
 				A00100000000000000000205 /* WashGlow.swift */,
+				A00100000000000000000206 /* AIAnimationCoreModifier.swift */,
 			);
 			path = Structs;
 			sourceTree = "<group>";
@@ -8384,6 +8389,7 @@
 			isa = PBXGroup;
 			children = (
 				AC0100000000000000000001 /* AppConfig.swift */,
+				AS0100000000000000000031 /* AIGenSlidesPreview.swift */,
 				WS010000000000000000000001 /* WorkspacePersistence.swift */,
 				WS010000000000000000000002 /* SyncEngine.swift */,
 			);
@@ -9896,6 +9902,7 @@
 				A00200000000000000000203 /* LiveTuningGlow.swift in Sources */,
 				A00200000000000000000204 /* MoodGlow.swift in Sources */,
 				A00200000000000000000205 /* WashGlow.swift in Sources */,
+				A00200000000000000000206 /* AIAnimationCoreModifier.swift in Sources */,
 				A00200000000000000000113 /* PaletteGalleryDemo.swift in Sources */,
 				A00200000000000000000115 /* MoodDemo.swift in Sources */,
 				A00200000000000000000117 /* LoadingDemo.swift in Sources */,
@@ -10852,7 +10859,7 @@
 				AS0200000000000000000027 /* KeyboardObserver.swift in Sources */,
 				AS0200000000000000000028 /* KeyboardGlowModifier.swift in Sources */,
 				AS0200000000000000000029 /* DualKeyboardInputView.swift in Sources */,
-				AS0200000000000000000030 /* KeyboardBackdropManager.swift in Sources */,
+				AS0200000000000000000031 /* AIGenSlidesPreview.swift in Sources */,
 				WS0200000000000000000006 /* SlidesHomeView.swift in Sources */,
 				WS0200000000000000000007 /* SlideEditorView.swift in Sources */,
 				AS0200000000000000000002 /* SlideCanvasView.swift in Sources */,

@@ -12,12 +12,24 @@ struct SDKHomeView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Navigation") {
+                Section("Core Services") {
+                    NavigationLink(destination: AuthRootView()) {
+                        Label("Authorization", systemImage: "lock.shield")
+                    }
+                    NavigationLink(destination: PluginsMainView()) {
+                        Label("Plugins", systemImage: "puzzlepiece")
+                    }
+                    NavigationLink(destination: ConnectorsMainView()) {
+                        Label("Connectors", systemImage: "link")
+                    }
+                }
+
+                Section("Development") {
                     NavigationLink(destination: SDKBuildView()) {
-                        Label("Build", systemImage: "hammer")
+                        Label("App Builder", systemImage: "hammer")
                     }
                     NavigationLink(destination: SDKWorkspaceContainerView()) {
-                        Label("Editor", systemImage: "pencil.and.list.clipboard")
+                        Label("IDE Editor", systemImage: "pencil.and.list.clipboard")
                     }
                     NavigationLink(destination: SDKDebugView()) {
                         Label("Diagnostics", systemImage: "stethoscope")
@@ -26,7 +38,7 @@ struct SDKHomeView: View {
                         Label("Developer Guide", systemImage: "book")
                     }
                     NavigationLink(destination: SDKInternalView()) {
-                        Label("Internal", systemImage: "gearshape.2")
+                        Label("Internal Tools", systemImage: "gearshape.2")
                     }
                 }
 

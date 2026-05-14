@@ -310,6 +310,7 @@ struct SDKSupportView: View {
                 }
             }
         }
+        .aiAnimationLoading(isGenerating)
         .navigationTitle("Generation Plan")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

@@ -78,6 +78,7 @@ struct ArticleDetailView: View {
                 }
             }
         }
+        .aiAnimationLoading(aiLoading)
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

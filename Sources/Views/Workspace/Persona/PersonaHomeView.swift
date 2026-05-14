@@ -330,11 +330,6 @@ struct PersonaHomeView: View {
 
     var body: some View {
         ZStack {
-            AuroraGlow(.standard)
-                .palette(.appleIntelligence)
-                .speed(0.08)
-                .ignoresSafeArea()
-
             PersonaHomeNavigationContent(
                 chatHistory: manager.chatHistory,
                 isThinking: manager.isThinking,
@@ -347,6 +342,7 @@ struct PersonaHomeView: View {
                 onNeedScroll: scrollToBottom
             )
         }
+        .aiAnimationLoading(manager.isThinking)
         .navigationTitle("AI Persona")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -536,10 +532,6 @@ private struct PersonaComposerView: View {
         VStack(spacing: 0) {
             Divider()
 
-            PersonaQuickActionsView(onTapAction: onTapPrompt)
-                .padding(.vertical, 8)
-                .background(.ultraThinMaterial.opacity(0.5))
-
             if !followUpSuggestions.isEmpty {
                 PersonaFollowUpsView(suggestions: followUpSuggestions, onSelect: onTapPrompt)
             }
@@ -693,22 +685,13 @@ private struct PersonaInputPanelView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            HStack(spacing: 8) {
-                ForEach(shuffledPrompts, id: \.self) { prompt in
-                    Button(action: { onTapPrompt(prompt) }) {
-                        Text(prompt)
-                            .font(.system(size: 11, weight: .medium))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(.white.opacity(0.05), in: Capsule())
-                            .overlay(Capsule().stroke(Color.white.opacity(0.1), lineWidth: 1))
-                    }
-                }
-                Button(action: onOpenDiscovery) { Image(systemName: "plus.circle.fill").font(.system(size: 22)).foregroundStyle(.blue) }
-            }
-            .padding(.horizontal)
-
             HStack(spacing: 12) {
+                Button(action: onOpenDiscovery) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 20))
+                        .foregroundStyle(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom))
+                }
+
                 TextField("Message Persona...", text: $query, axis: .vertical)
                     .padding(12)
                     .background(.white.opacity(0.08))
@@ -723,6 +706,22 @@ private struct PersonaInputPanelView: View {
             }
             .padding(.horizontal)
             .padding(.bottom, 12)
+
+            HStack(spacing: 8) {
+                ForEach(shuffledPrompts, id: \.self) { prompt in
+                    Button(action: { onTapPrompt(prompt) }) {
+                        Text(prompt)
+                            .font(.system(size: 10, weight: .medium))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(.white.opacity(0.05), in: Capsule())
+                            .overlay(Capsule().stroke(Color.white.opacity(0.1), lineWidth: 1))
+                            .lineLimit(1)
+                    }
+                }
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 8)
         }
         .padding(.top, 10)
         .background(.ultraThinMaterial)
