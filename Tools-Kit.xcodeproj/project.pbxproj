@@ -2877,7 +2877,7 @@
 		A00100000000000000000204 /* MoodGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/MoodGlow.swift"; sourceTree = "<group>"; };
 		A00100000000000000000205 /* WashGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/WashGlow.swift"; sourceTree = "<group>"; };
 		A00100000000000000000206 /* AIAnimationCoreModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/AIAnimationCoreModifier.swift"; sourceTree = "<group>"; };
-		AS0100000000000000000031 /* AIGenSlidesPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Workspace/Slides/AIGenSlidesPreview.swift"; sourceTree = "<group>"; };
+		AS0100000000000000000031 /* AIGenSlidesPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Workspace/Slides/AIGenSlidesPreview.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
