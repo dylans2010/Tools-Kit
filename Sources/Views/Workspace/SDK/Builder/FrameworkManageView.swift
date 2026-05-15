@@ -1217,7 +1217,7 @@ struct FrameworkAuditLogView: View {
                 Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
                     .font(.caption2).foregroundStyle(.secondary)
             }
-            Text(entry.action).font(.caption.bold()).foregroundStyle(.accentColor)
+            Text(entry.action).font(.caption.bold()).foregroundStyle(Color.accentColor)
             HStack {
                 Text(entry.oldValue).foregroundStyle(.red)
                 Image(systemName: "arrow.right").font(.caption2)
