@@ -1191,21 +1191,7 @@ struct FrameworkAuditLogView: View {
     var body: some View {
         List {
             ForEach(Array(log.reversed())) { entry in
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text(entry.frameworkName).font(.subheadline.bold())
-                        Spacer()
-                        Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
-                            .font(.caption2).foregroundStyle(.secondary)
-                    }
-                    Text(entry.action).font(.caption.bold()).foregroundStyle(.accentColor)
-                    HStack {
-                        Text(entry.oldValue).foregroundStyle(.red)
-                        Image(systemName: "arrow.right").font(.caption2)
-                        Text(entry.newValue).foregroundStyle(.green)
-                    }
-                    .font(.system(size: 10, design: .monospaced))
-                }
+                auditEntryRow(entry)
             }
         }
         .navigationTitle("Audit Log")
@@ -1219,6 +1205,25 @@ struct FrameworkAuditLogView: View {
                     Label("Export", systemImage: "square.and.arrow.up")
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func auditEntryRow(_ entry: FrameworkManager.FrameworkAuditEntry) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(entry.frameworkName).font(.subheadline.bold())
+                Spacer()
+                Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+            Text(entry.action).font(.caption.bold()).foregroundStyle(.accentColor)
+            HStack {
+                Text(entry.oldValue).foregroundStyle(.red)
+                Image(systemName: "arrow.right").font(.caption2)
+                Text(entry.newValue).foregroundStyle(.green)
+            }
+            .font(.system(size: 10, design: .monospaced))
         }
     }
 }
