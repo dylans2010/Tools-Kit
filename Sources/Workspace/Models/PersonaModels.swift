@@ -17,7 +17,7 @@ struct PersonaInteraction: Codable, Identifiable {
     var timestamp: Date = Date()
 }
 
-struct PersonaMessage: Codable, Identifiable {
+struct PersonaMessage: Codable, Hashable, Identifiable {
     var id: UUID = UUID()
     var role: String // "user" or "assistant"
     var content: String
@@ -29,4 +29,27 @@ struct PersonaModelTraining: Codable, Identifiable {
     var userQuery: String
     var aiResponse: String
     var timestamp: Date = Date()
+}
+
+
+struct PersonaChatThread: Identifiable, Codable, Hashable {
+    let id: UUID
+    var title: String
+    var messages: [PersonaMessage]
+    var createdAt: Date
+    var updatedAt: Date
+
+    init(
+        id: UUID = UUID(),
+        title: String = "New Chat",
+        messages: [PersonaMessage] = [],
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
+    ) {
+        self.id = id
+        self.title = title
+        self.messages = messages
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
 }

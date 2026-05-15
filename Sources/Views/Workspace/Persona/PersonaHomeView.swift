@@ -309,13 +309,18 @@ struct PersonaHomeView: View {
         "What are the habits in 'Design' category?", "How many slides in 'Design' deck?", "Summarize 'Design' space"
     ]
 
-    enum PersonaHomeModal: String, Identifiable {
-        case welcome
-        case tuning
+    enum PersonaHomeModal: Identifiable {
+        case chats
+        case settings
         case discovery
-        case history
 
-        var id: String { rawValue }
+        var id: String {
+            switch self {
+            case .chats: return "chats"
+            case .settings: return "settings"
+            case .discovery: return "discovery"
+            }
+        }
     }
 
     private var lastAssistantContent: String? {
@@ -353,8 +358,8 @@ struct PersonaHomeView: View {
         .toolbar {
             PersonaHomeToolbar(
                 agentMode: $agentModeEnabled,
-                onShowWelcome: { activeModal = .welcome },
-                onShowTuning: { activeModal = .tuning }
+                onShowWelcome: { activeModal = .discovery },
+                onShowTuning: { activeModal = .settings }
             )
         }
         .onAppear(perform: handleOnAppear)
@@ -371,7 +376,7 @@ struct PersonaHomeView: View {
 
     private func handleOnAppear() {
         if manager.chatHistory.isEmpty && !hasShownWelcome {
-            activeModal = .welcome
+            activeModal = .discovery
             hasShownWelcome = true
         }
     }
@@ -382,7 +387,7 @@ struct PersonaHomeView: View {
 
     private func openChats() {
         hydrateThreadsIfNeeded()
-        activeModal = .history
+        activeModal = .chats
     }
 
     private func hydrateThreadsIfNeeded() {
@@ -405,10 +410,11 @@ struct PersonaHomeView: View {
     }
 
     private func startNewChat() {
-        let thread = PersonaChatThread(title: "New Chat", messages: [], updatedAt: Date())
-        chatThreads.insert(thread, at: 0)
+        let thread = PersonaChatThread()
+        manager.threads.insert(thread, at: 0)
+        manager.activeThread = thread
+        chatThreads = manager.threads
         activeThreadID = thread.id
-        manager.chatThreads = chatThreads
         manager.chatHistory = []
         manager.saveChatHistory()
     }
@@ -618,26 +624,22 @@ private struct PersonaHomeModalContent: View {
     var body: some View {
         Group {
             switch modal {
-            case .welcome:
-                WelcomePersonaView()
-            case .tuning:
+            case .settings:
                 TuningSheetView(manager: manager)
                     .presentationDetents([.medium])
             case .discovery:
                 PromptDiscoveryView(allPrompts: allPrompts, onSelect: onPromptSelection)
                     .presentationDetents([.medium])
-            case .history:
+            case .chats:
                 PersonaChatHistorySheet(
                     threads: $manager.chatThreads,
                     activeThreadID: .constant(nil),
                     onCreateNew: {
-                        startNewChat()
-                        activeModal = nil
-                    },
-                    onContinue: { thread in
+                        let thread = PersonaChatThread()
+                        manager.chatThreads.insert(thread, at: 0)
                         onThreadSelection(thread)
-                        activeModal = nil
-                    }
+                    },
+                    onContinue: onThreadSelection
                 )
             }
         }
@@ -1126,13 +1128,6 @@ private struct PersonaInfoRow: View {
     }
 }
 
-
-private struct PersonaChatThread: Identifiable {
-    let id: UUID = UUID()
-    var title: String
-    var messages: [PersonaMessage]
-    var updatedAt: Date
-}
 
 private struct PersonaChatHistorySheet: View {
     @Binding var threads: [PersonaChatThread]
