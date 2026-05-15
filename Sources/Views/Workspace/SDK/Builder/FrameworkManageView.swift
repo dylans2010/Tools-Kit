@@ -166,13 +166,13 @@ struct FrameworkExecutionRecord: Identifiable {
 
 // MARK: - Framework Template
 
-public struct FrameworkTemplate: Identifiable {
-    public let id = UUID()
-    public let name: String
-    public let description: String
-    public let language: FrameworkLanguage
-    public let defaultEntryPoints: [String]
-    public let suggestedScopes: [SDKScope]
+struct FrameworkTemplate: Identifiable {
+    let id = UUID()
+    let name: String
+    let description: String
+    let language: FrameworkLanguage
+    let defaultEntryPoints: [String]
+    let suggestedScopes: [SDKScope]
 }
 
 // MARK: - Dependency Binding Engine
@@ -208,7 +208,7 @@ final class FrameworkManager: ObservableObject {
     private let registry = FrameworkRegistry.shared
     private let packageRegistry = PackageRegistry.shared
 
-    public static let templates: [FrameworkTemplate] = [
+    static let templates: [FrameworkTemplate] = [
         FrameworkTemplate(name: "AI Middleware", description: "Process and augment data using AI services.", language: .python, defaultEntryPoints: ["process", "refine"], suggestedScopes: [.persona, .workspaceRead]),
         FrameworkTemplate(name: "Network Utility", description: "Safe and rate-limited network operations.", language: .swift, defaultEntryPoints: ["fetch", "sync"], suggestedScopes: [.all]),
         FrameworkTemplate(name: "Data Transformer", description: "High-performance data manipulation.", language: .swift, defaultEntryPoints: ["transform"], suggestedScopes: [.workspaceRead, .workspaceWrite]),
