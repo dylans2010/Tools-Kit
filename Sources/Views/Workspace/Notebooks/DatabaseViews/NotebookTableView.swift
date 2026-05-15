@@ -22,7 +22,7 @@ struct NotebookTableView: View {
                     .font(.caption.bold())
                     .frame(width: 120, height: 34, alignment: .leading)
                     .padding(.horizontal, 8)
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .border(Color.primary.opacity(0.1))
             }
         }

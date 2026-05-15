@@ -26,7 +26,7 @@ struct AgentResultView: View {
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
             .cornerRadius(8)
 
             Button(action: openPR) {
@@ -48,7 +48,7 @@ struct AgentResultView: View {
                 .multilineTextAlignment(.center)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
         .cornerRadius(12)
         .shadow(radius: 5)
     }

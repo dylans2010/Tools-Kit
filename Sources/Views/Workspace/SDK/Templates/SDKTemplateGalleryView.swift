@@ -74,7 +74,7 @@ struct SDKTemplateGalleryView: View {
                         Text(tag)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color(uiColor: .secondarySystemBackground))
                             .clipShape(Capsule())
                     }
                 }
@@ -91,7 +91,7 @@ struct SDKTemplateGalleryView: View {
                 .font(.caption)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
-                .background(selectedCategory == category ? Color.blue : Color(.secondarySystemBackground))
+                .background(selectedCategory == category ? Color.blue : Color(uiColor: .secondarySystemBackground))
                 .foregroundStyle(selectedCategory == category ? .white : .primary)
                 .clipShape(Capsule())
         }

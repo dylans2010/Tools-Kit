@@ -10,7 +10,7 @@ struct EventDetailView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(.systemBackground).ignoresSafeArea()
+                Color(uiColor: .systemBackground).ignoresSafeArea()
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
@@ -76,21 +76,21 @@ struct EventDetailView: View {
             }
         }
         .padding()
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
     }
 
     private var detailsSection: some View {
         VStack(spacing: 1) {
             detailRow(icon: "clock", label: "Starts", value: event.startTime.formatted(date: .omitted, time: .shortened))
-            Divider().background(Color(.secondarySystemBackground))
+            Divider().background(Color(uiColor: .secondarySystemBackground))
             detailRow(icon: "clock.fill", label: "Ends", value: event.endTime.formatted(date: .omitted, time: .shortened))
 
             if !event.location.isEmpty {
-                Divider().background(Color(.secondarySystemBackground))
+                Divider().background(Color(uiColor: .secondarySystemBackground))
                 detailRow(icon: "mappin.and.ellipse", label: "Location", value: event.location)
             }
         }
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
     }
 
     private var descriptionSection: some View {

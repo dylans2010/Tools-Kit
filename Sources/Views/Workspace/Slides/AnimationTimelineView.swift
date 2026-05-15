@@ -15,7 +15,7 @@ struct AnimationTimelineView: View {
                     .font(.caption2.monospacedDigit())
             }
             .padding(10)
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
 
             ScrollView(.horizontal) {
                 ZStack(alignment: .topLeading) {

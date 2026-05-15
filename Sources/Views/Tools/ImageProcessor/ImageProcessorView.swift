@@ -62,7 +62,7 @@ struct ImageProcessorView: View {
                             }
                         }
                         .padding()
-                        .background(Color(.secondarySystemBackground))
+                        .background(Color(uiColor: .secondarySystemBackground))
                         .cornerRadius(10)
 
                         Button(action: backend.compressImage) {

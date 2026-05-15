@@ -81,7 +81,7 @@ struct CollabNotificationsView: View {
                 .font(.caption)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
-                .background(filterType == type ? Color.blue : Color(.secondarySystemBackground))
+                .background(filterType == type ? Color.blue : Color(uiColor: .secondarySystemBackground))
                 .foregroundStyle(filterType == type ? .white : .primary)
                 .clipShape(Capsule())
         }

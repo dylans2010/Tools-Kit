@@ -17,7 +17,7 @@ struct GitHubProjectBoardView: View {
                                 .font(.caption)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
-                                .background(Color(.secondarySystemBackground))
+                                .background(Color(uiColor: .secondarySystemBackground))
                                 .clipShape(Capsule())
                             Spacer()
                             Button { } label: {
@@ -34,7 +34,7 @@ struct GitHubProjectBoardView: View {
                         Spacer()
                     }
                     .frame(width: 280)
-                    .background(Color(.systemGroupedBackground))
+                    .background(Color(uiColor: .systemGroupedBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
 
@@ -48,7 +48,7 @@ struct GitHubProjectBoardView: View {
                             .font(.caption)
                     }
                     .frame(width: 200, height: 100)
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
@@ -96,7 +96,7 @@ struct GitHubProjectBoardView: View {
             .foregroundStyle(.secondary)
         }
         .padding(10)
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 8))
         .shadow(color: .black.opacity(0.05), radius: 2, y: 1)
         .padding(.horizontal, 8)

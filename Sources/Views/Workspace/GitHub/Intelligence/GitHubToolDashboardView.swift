@@ -54,7 +54,7 @@ struct GitHubToolDashboardView: View {
             }
             .padding(.vertical)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Intelligence Module")
     }
 
@@ -92,7 +92,7 @@ struct IntelligenceToolCard: View {
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.secondarySystemGroupedBackground))
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
             .cornerRadius(16)
             .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
         }

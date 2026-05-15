@@ -12,7 +12,7 @@ struct FilterChip: View {
                 .font(.caption.bold())
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(isSelected ? color : Color(.secondarySystemBackground))
+                .background(isSelected ? color : Color(uiColor: .secondarySystemBackground))
                 .foregroundColor(isSelected ? .white : .primary)
                 .clipShape(Capsule())
         }

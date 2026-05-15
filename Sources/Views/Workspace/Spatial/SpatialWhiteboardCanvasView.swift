@@ -64,7 +64,7 @@ struct InfiniteGridView: View {
                 }, with: .color(.gray.opacity(0.2)))
             }
         }
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
     }
 }
 
@@ -106,7 +106,7 @@ struct ToolbarView: View {
             }
         }
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .clipShape(Capsule())
         .shadow(radius: 10)
     }

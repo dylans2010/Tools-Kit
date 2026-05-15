@@ -26,7 +26,7 @@ struct CodeGenerationView: View {
                     .padding(.top, 8)
                 }
                 .padding()
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
 
                 // Logs
                 ScrollViewReader { proxy in

@@ -74,7 +74,7 @@ public final class SDKDataEngine: ObservableObject {
             let to = payload["to"] as? String ?? ""
             let body = payload["body"] as? String ?? ""
             try await WorkspaceAPI.shared.mail.sendMail(to: to, subject: title, body: body)
-        default:
+        case .all, .files, .whiteboards, .plugins, .media, .meet, .repos, .automations, .intelligence, .persona, .custom, .workspaceRead, .workspaceWrite, .sdkProjectCreate, .sdkManageLibraries, .sdkManageFrameworks, .sdkManagePackages, .frameworkExecute, .libraryInvoke, .agentExecute, .agentTakeover:
             break
         }
 
@@ -89,7 +89,7 @@ public final class SDKDataEngine: ObservableObject {
         switch scope {
         case .files:
             WorkspaceAPI.shared.files.deleteFile(id: id.uuidString)
-        default:
+        case .all, .tasks, .notes, .calendar, .emails, .whiteboards, .plugins, .slides, .media, .meet, .repos, .automations, .intelligence, .persona, .custom, .workspaceRead, .workspaceWrite, .sdkProjectCreate, .sdkManageLibraries, .sdkManageFrameworks, .sdkManagePackages, .frameworkExecute, .libraryInvoke, .agentExecute, .agentTakeover:
             break
         }
 

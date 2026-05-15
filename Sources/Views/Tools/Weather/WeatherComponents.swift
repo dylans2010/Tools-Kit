@@ -29,7 +29,7 @@ struct WeatherCard: View {
         }
         .padding()
         .frame(maxWidth: .infinity, minHeight: 120, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
         .cornerRadius(16)
     }
 }

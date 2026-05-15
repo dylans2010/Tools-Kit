@@ -19,7 +19,7 @@ struct PasswordStrengthView: View {
                                 .font(.body.monospaced())
                         }
                         .padding()
-                        .background(Color(.secondarySystemBackground))
+                        .background(Color(uiColor: .secondarySystemBackground))
                         .cornerRadius(12)
                     }
                 }
@@ -45,7 +45,7 @@ struct PasswordStrengthView: View {
                             .foregroundColor(.secondary)
                     }
                     .padding()
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .cornerRadius(12)
                 }
 
@@ -66,7 +66,7 @@ struct PasswordStrengthView: View {
                         }
                     }
                     .padding()
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .cornerRadius(12)
                 }
 

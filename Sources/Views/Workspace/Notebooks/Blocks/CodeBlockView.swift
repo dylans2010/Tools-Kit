@@ -14,7 +14,7 @@ struct CodeBlockView: View {
                 .frame(minHeight: 80)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(12)
-                .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
+                .background(Color(uiColor: .tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
                 .onChange(of: block.content) { _, _ in onUpdate() }
 
             HStack {

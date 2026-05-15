@@ -24,7 +24,7 @@ struct LyricsExportView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
 
                 Divider()
 
@@ -52,7 +52,7 @@ struct LyricsExportView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
             }
             .navigationTitle("Export Lyrics")
             .navigationBarTitleDisplayMode(.inline)

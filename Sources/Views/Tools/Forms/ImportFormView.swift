@@ -24,7 +24,7 @@ struct ImportFormView: View {
             }
             .padding()
             .frame(maxWidth: .infinity)
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 14))
 
             Button("Pick .form File") { showPicker = true }

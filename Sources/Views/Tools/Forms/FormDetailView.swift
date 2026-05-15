@@ -112,7 +112,7 @@ struct FormDetailView: View {
         .padding(18)
         .background(
             LinearGradient(
-                colors: [Color(.systemBackground), accentColor.opacity(0.08)],
+                colors: [Color(uiColor: .systemBackground), accentColor.opacity(0.08)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -151,7 +151,7 @@ struct FormDetailView: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
@@ -194,7 +194,7 @@ struct FormDetailView: View {
                         }
                     }
                     .padding(12)
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
             }
@@ -215,7 +215,7 @@ struct FormDetailView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(12)
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
         }
@@ -226,7 +226,7 @@ struct FormDetailView: View {
             SectionHeader(title: "Manifest", subtitle: nil, icon: "doc.badge.gearshape")
             ManifestDataForm(manifest: form.manifest)
                 .padding(12)
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
     }
@@ -244,7 +244,7 @@ struct FormDetailView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 

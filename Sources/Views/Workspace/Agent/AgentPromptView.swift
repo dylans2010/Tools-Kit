@@ -111,7 +111,7 @@ struct AgentPromptView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 20)
                 }
-                .background(Color(.systemGroupedBackground))
+                .background(Color(uiColor: .systemGroupedBackground))
             }
             .navigationTitle("Agent Prompt")
             .navigationBarTitleDisplayMode(.inline)

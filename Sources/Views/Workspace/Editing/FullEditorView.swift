@@ -594,7 +594,7 @@ struct FullEditorView: View {
             )
 
             ZStack {
-                Color(.systemGroupedBackground)
+                Color(uiColor: .systemGroupedBackground)
 
                 canvasBoard(fitScale: fitScale)
                     .scaleEffect(state.canvasZoom)
@@ -611,7 +611,7 @@ struct FullEditorView: View {
 
         return ZStack {
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color(.systemBackground))
+                .fill(Color(uiColor: .systemBackground))
                 .frame(width: canvasW, height: canvasH)
                 .shadow(color: .black.opacity(0.15), radius: 8, y: 2)
 

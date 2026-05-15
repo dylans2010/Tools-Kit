@@ -2,11 +2,11 @@ import SwiftUI
 
 struct CardView<Content: View>: View {
     let content: Content
-    var backgroundColor: Color = Color(.secondarySystemBackground)
+    var backgroundColor: Color = Color(uiColor: .secondarySystemBackground)
     var cornerRadius: CGFloat = 16
     var shadowRadius: CGFloat = 4
 
-    init(backgroundColor: Color = Color(.secondarySystemBackground),
+    init(backgroundColor: Color = Color(uiColor: .secondarySystemBackground),
          cornerRadius: CGFloat = 16,
          shadowRadius: CGFloat = 4,
          @ViewBuilder content: () -> Content) {

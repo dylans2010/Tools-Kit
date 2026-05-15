@@ -53,7 +53,7 @@ struct GitHubChangeReviewerView: View {
                 .disabled(approvedFiles.count != gitEngine.stagedChanges.count || gitEngine.stagedChanges.isEmpty)
             }
             .padding()
-            .background(Color(.systemGroupedBackground))
+            .background(Color(uiColor: .systemGroupedBackground))
         }
         .navigationTitle("Change Reviewer")
     }

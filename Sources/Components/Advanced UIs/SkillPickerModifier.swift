@@ -31,7 +31,7 @@ struct SkillPickerModifier: ViewModifier {
                 VStack {
                     pickerView
                         .frame(maxWidth: 300, maxHeight: 200)
-                        .background(Color(.systemBackground))
+                        .background(Color(uiColor: .systemBackground))
                         .cornerRadius(12)
                         .shadow(radius: 8)
                         .padding(.bottom, 50) // Adjust based on keyboard/input height
@@ -59,7 +59,7 @@ struct SkillPickerModifier: ViewModifier {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
 
             List {
                 let filteredSkills = skillsManager.skills.filter {

@@ -67,7 +67,7 @@ struct GitHubStagingAreaView: View {
                 .foregroundStyle(.red)
             }
             .padding()
-            .background(Color(.systemGroupedBackground))
+            .background(Color(uiColor: .systemGroupedBackground))
         }
         .navigationTitle("Staging Area")
     }

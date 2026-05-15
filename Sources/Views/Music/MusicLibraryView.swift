@@ -34,7 +34,7 @@ struct MusicLibraryView: View {
                                         .background(
                                             selectedTab == section
                                                 ? Color.accentColor
-                                                : Color(.secondarySystemBackground),
+                                                : Color(uiColor: .secondarySystemBackground),
                                             in: Capsule()
                                         )
                                         .foregroundColor(selectedTab == section ? .white : .primary)

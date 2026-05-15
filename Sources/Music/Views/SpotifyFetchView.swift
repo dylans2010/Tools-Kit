@@ -82,7 +82,7 @@ struct SpotifyFetchView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
         }
     }
 
@@ -124,7 +124,7 @@ struct SpotifyFetchView: View {
                     TextEditor(text: $viewModel.manualTrackInput)
                         .frame(minHeight: 90, maxHeight: 140)
                         .padding(8)
-                        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+                        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
 
                     Button("Import Manual List") {
                         viewModel.importManualTracks()
@@ -301,7 +301,7 @@ struct SpotifyFetchView: View {
                         .textFieldStyle(.roundedBorder)
                 }
                 .padding()
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
                 .cornerRadius(12)
 
                 if let result = thirdPartyResult {
@@ -322,7 +322,7 @@ struct SpotifyFetchView: View {
                         }
                     }
                     .padding()
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .cornerRadius(12)
                 }
 

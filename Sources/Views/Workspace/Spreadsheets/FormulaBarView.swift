@@ -37,7 +37,7 @@ struct FormulaBarView: View {
                 .onChange(of: selectedCell?.col) { _, _ in editingFormula = currentFormula }
         }
         .padding(10)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
         .onAppear { editingFormula = currentFormula }
     }
 

@@ -97,7 +97,7 @@ struct NotesView: View {
         }
         .navigationTitle("Notes")
         .searchable(text: $searchText, prompt: "Search notes…")
-        .background(Color(.systemGroupedBackground))
+        .background(Color(uiColor: .systemGroupedBackground))
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack(spacing: 14) {
@@ -203,7 +203,7 @@ private struct NoteCardView: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .cornerRadius(14)
         .contextMenu {
             Button { onPin() } label: {
@@ -255,7 +255,7 @@ private struct NoteListRowView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
     }
 }
 
@@ -270,7 +270,7 @@ struct FolderChip: View {
                 .font(.subheadline.bold())
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
-                .background(isSelected ? Color.blue : Color(.secondarySystemBackground))
+                .background(isSelected ? Color.blue : Color(uiColor: .secondarySystemBackground))
                 .foregroundColor(isSelected ? .white : .primary)
                 .cornerRadius(14)
         }

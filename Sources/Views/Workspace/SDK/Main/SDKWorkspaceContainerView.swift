@@ -50,7 +50,7 @@ struct SDKWorkspaceContainerView: View {
                     regularWorkspace(in: geo)
                 }
             }
-            .background(Color(.systemGroupedBackground))
+            .background(Color(uiColor: .systemGroupedBackground))
             .onDisappear { state.saveSnapshot() }
             .onChange(of: authorizationManager.authState) { _, _ in
                 state.recalculateDiagnostics()

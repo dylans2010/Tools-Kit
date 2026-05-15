@@ -41,7 +41,7 @@ struct ManifestDataForm: View {
                 row(label: "Tags", value: manifest.tags.joined(separator: ", "))
             }
         }
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .cornerRadius(12)
     }
 

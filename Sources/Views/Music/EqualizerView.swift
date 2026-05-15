@@ -24,7 +24,7 @@ struct EqualizerView: View {
                     .foregroundColor(.secondary)
             }
         }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
     }
 
     // MARK: - Enable Toggle
@@ -50,7 +50,7 @@ struct EqualizerView: View {
             .labelsHidden()
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
         .cornerRadius(14)
     }
 
@@ -85,7 +85,7 @@ struct EqualizerView: View {
                 .foregroundColor(isSelected ? .white : .primary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
-                .background(isSelected ? Color.accentColor : Color(.secondarySystemGroupedBackground))
+                .background(isSelected ? Color.accentColor : Color(uiColor: .secondarySystemGroupedBackground))
                 .cornerRadius(20)
         }
         .buttonStyle(.plain)
@@ -105,7 +105,7 @@ struct EqualizerView: View {
 
             ZStack {
                 RoundedRectangle(cornerRadius: 14)
-                    .fill(Color(.secondarySystemGroupedBackground))
+                    .fill(Color(uiColor: .secondarySystemGroupedBackground))
 
                 HStack(alignment: .top, spacing: 0) {
                     ForEach(Array(engine.bandFrequencies.enumerated()), id: \.offset) { index, _ in

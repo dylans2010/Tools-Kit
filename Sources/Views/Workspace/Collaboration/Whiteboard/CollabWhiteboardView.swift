@@ -8,7 +8,7 @@ struct CollabWhiteboardView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
 
             VStack(spacing: 0) {
                 if showingToolbar {
@@ -64,7 +64,7 @@ struct CollabWhiteboardView: View {
             .padding(.horizontal)
             .padding(.vertical, 8)
         }
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
     }
 
     private var bottomBar: some View {
@@ -93,7 +93,7 @@ struct CollabWhiteboardView: View {
             .buttonStyle(.bordered)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
     }
 
     private func canvasItemView(_ item: WhiteboardCanvasItem) -> some View {

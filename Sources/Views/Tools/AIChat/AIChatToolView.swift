@@ -160,7 +160,7 @@ struct AIChatToolView: View {
         HStack {
             ProgressView()
                 .padding(12)
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
                 .cornerRadius(18)
             Spacer()
         }
@@ -181,7 +181,7 @@ struct AIChatToolView: View {
                 .padding(.horizontal)
             }
             .padding(.vertical, 6)
-            .background(Color(.systemBackground))
+            .background(Color(uiColor: .systemBackground))
         }
     }
 
@@ -302,7 +302,7 @@ struct ChatBubble: View {
     var isUser: Bool { message.role == "user" }
 
     var bubbleColor: Color {
-        isUser ? (Color(hex: bubbleColorHex)) : Color(.secondarySystemBackground)
+        isUser ? (Color(hex: bubbleColorHex)) : Color(uiColor: .secondarySystemBackground)
     }
 
     var body: some View {
@@ -369,7 +369,7 @@ struct AttachmentChip: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .cornerRadius(12)
     }
 

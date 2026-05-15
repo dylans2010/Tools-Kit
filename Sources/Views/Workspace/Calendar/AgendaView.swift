@@ -20,7 +20,7 @@ struct CalendarAgendaView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemBackground).ignoresSafeArea()
+            Color(uiColor: .systemBackground).ignoresSafeArea()
 
             ScrollView {
                 if manager.events.isEmpty {
@@ -52,7 +52,7 @@ struct CalendarAgendaView: View {
             Spacer()
         }
         .padding(.vertical, 8)
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
     }
 
     private var emptyState: some View {
@@ -104,6 +104,6 @@ struct EventAgendaRow: View {
                 .frame(width: 8, height: 8)
         }
         .padding()
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
     }
 }

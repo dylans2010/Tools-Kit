@@ -48,7 +48,7 @@ struct CreateHabitView: View {
                             Image(systemName: icon)
                                 .font(.title3)
                                 .frame(width: 40, height: 40)
-                                .background(selectedIcon == icon ? Color.accentColor.opacity(0.2) : Color(.secondarySystemBackground))
+                                .background(selectedIcon == icon ? Color.accentColor.opacity(0.2) : Color(uiColor: .secondarySystemBackground))
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                                 .onTapGesture { selectedIcon = icon }
                         }

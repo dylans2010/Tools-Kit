@@ -62,7 +62,7 @@ struct LinkPreviewView: View {
                         }
                 }
                 .padding()
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
                 .cornerRadius(12)
                 .padding()
             } else if !backend.isLoading {

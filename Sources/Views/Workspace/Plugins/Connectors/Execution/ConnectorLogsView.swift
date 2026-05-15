@@ -66,7 +66,7 @@ struct ConnectorLogsView: View {
                     Toggle(isOn: $autoRefreshEnabled) { Label("Live", systemImage: "arrow.clockwise") }.toggleStyle(.button).controlSize(.mini)
                 }
             }
-            .padding().background(Color(.secondarySystemGroupedBackground))
+            .padding().background(Color(uiColor: .secondarySystemGroupedBackground))
 
             List {
                 if filteredLogs.isEmpty {
@@ -119,7 +119,7 @@ private struct StatsBar: View {
             DetailMetricPill(label: "Warn", value: "\(base.filter { $0.type == .warning }.count)", color: .orange)
             DetailMetricPill(label: "Perf", value: "\(base.filter { $0.type == .performance }.count)", color: .purple)
         }
-        .padding(.vertical, 12).background(Color(.systemGroupedBackground))
+        .padding(.vertical, 12).background(Color(uiColor: .systemGroupedBackground))
     }
 }
 

@@ -46,7 +46,7 @@ struct ProjectSettingsView: View {
                                 Image(systemName: icon)
                                     .font(.system(size: 18))
                                     .frame(width: 32, height: 32)
-                                    .background(project.iconName == icon ? (Color(hex: project.colorHex)) : Color(.secondarySystemGroupedBackground))
+                                    .background(project.iconName == icon ? (Color(hex: project.colorHex)) : Color(uiColor: .secondarySystemGroupedBackground))
                                     .foregroundColor(project.iconName == icon ? .white : .primary)
                                     .cornerRadius(8)
                             }

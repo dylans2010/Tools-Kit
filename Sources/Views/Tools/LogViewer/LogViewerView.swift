@@ -26,7 +26,7 @@ struct LogViewerView: View {
                 .buttonStyle(.bordered)
             }
             .padding()
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
 
             List {
                 if backend.filteredEntries.isEmpty {

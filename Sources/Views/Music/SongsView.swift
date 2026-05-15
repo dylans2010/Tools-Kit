@@ -166,7 +166,7 @@ struct SongsView: View {
             }
 
             if isImportingZIP {
-                Color(.systemBackground).opacity(0.85)
+                Color(uiColor: .systemBackground).opacity(0.85)
                     .ignoresSafeArea()
                 VStack(spacing: 16) {
                     ProgressView().scaleEffect(1.4)
@@ -308,7 +308,7 @@ struct SongsView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .frame(minWidth: 110, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .cornerRadius(12)
     }
 
@@ -336,7 +336,7 @@ struct SongsView: View {
                             .foregroundColor(selected ? .white : .primary)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
-                            .background(selected ? Color.accentColor : Color(.secondarySystemBackground))
+                            .background(selected ? Color.accentColor : Color(uiColor: .secondarySystemBackground))
                             .cornerRadius(16)
                     }
                     .buttonStyle(.plain)
@@ -401,7 +401,7 @@ struct SongsView: View {
                 Image(systemName: "chevron.right").font(.system(size: 14)).foregroundColor(.secondary)
             }
             .padding(14)
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
             .cornerRadius(14)
         }
         .buttonStyle(.plain)

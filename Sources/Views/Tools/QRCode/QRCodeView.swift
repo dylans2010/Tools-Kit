@@ -59,7 +59,7 @@ struct QRCodeView: View {
                                 .font(.headline)
                                 .multilineTextAlignment(.center)
                                 .padding()
-                                .background(Color(.secondarySystemBackground))
+                                .background(Color(uiColor: .secondarySystemBackground))
                                 .cornerRadius(12)
 
                             HStack {
@@ -118,7 +118,7 @@ private struct QRGenerationView: View {
                     .disabled(inputText.isEmpty)
                 }
                 .padding()
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
                 .cornerRadius(16)
 
                 if let image = qrCodeImage {

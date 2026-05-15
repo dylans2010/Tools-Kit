@@ -51,6 +51,6 @@ struct SecurityEmergencyLockView: View {
             .foregroundStyle(.secondary)
             .padding(.bottom, 20)
         }
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
     }
 }

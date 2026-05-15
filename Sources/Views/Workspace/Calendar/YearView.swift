@@ -57,7 +57,7 @@ struct YearMiniMonthView: View {
             }
         }
         .padding(10)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
         .onTapGesture(perform: onTap)
     }
 

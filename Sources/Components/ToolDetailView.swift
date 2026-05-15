@@ -53,7 +53,7 @@ struct ToolDetailView<Content: View>: View {
                         .padding(.top, 8)
                 }
                 .padding()
-                .background(Color(.secondarySystemGroupedBackground))
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
                 .cornerRadius(16)
                 .padding(.horizontal)
 
@@ -63,6 +63,6 @@ struct ToolDetailView<Content: View>: View {
             .padding(.vertical)
         }
         .navigationBarTitleDisplayMode(.inline)
-        .background(Color(.systemGroupedBackground))
+        .background(Color(uiColor: .systemGroupedBackground))
     }
 }

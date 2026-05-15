@@ -62,7 +62,7 @@ struct TLSInspectorView: View {
                 Spacer()
             }
             .padding()
-            .background(Color(.secondarySystemGroupedBackground))
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
             .cornerRadius(12)
             .padding(.horizontal)
 

@@ -50,7 +50,7 @@ struct RadioView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
         .padding(.top, 8)
         .padding(.bottom, 4)
@@ -99,7 +99,7 @@ struct RadioView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
-            .background(isActive ? Color.accentColor : Color(.secondarySystemBackground),
+            .background(isActive ? Color.accentColor : Color(uiColor: .secondarySystemBackground),
                         in: Capsule())
             .foregroundColor(isActive ? .white : .primary)
         }

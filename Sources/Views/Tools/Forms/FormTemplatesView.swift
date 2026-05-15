@@ -45,7 +45,7 @@ struct FormTemplatesView: View {
                                 .foregroundColor(.blue)
                         }
                         .padding(12)
-                        .background(Color(.secondarySystemBackground))
+                        .background(Color(uiColor: .secondarySystemBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .padding(.horizontal)
                     }

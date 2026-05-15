@@ -17,7 +17,7 @@ struct AgentWorkspaceView: View {
                 }
                 .padding()
             }
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
 
             Divider()
 
@@ -83,7 +83,7 @@ struct QuickAccessButton: View {
                     .foregroundColor(.primary)
             }
             .frame(width: 70, height: 60)
-            .background(Color(.systemBackground))
+            .background(Color(uiColor: .systemBackground))
             .cornerRadius(8)
             .shadow(radius: 1)
         }

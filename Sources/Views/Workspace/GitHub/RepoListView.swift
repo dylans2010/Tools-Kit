@@ -110,7 +110,7 @@ private struct RepoRow: View {
                 Image(systemName: repository.private ? "lock.fill" : "book.closed.fill")
                     .font(.title3)
                     .frame(width: 40, height: 40)
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .clipShape(Circle())
 
                 VStack(alignment: .leading, spacing: 4) {

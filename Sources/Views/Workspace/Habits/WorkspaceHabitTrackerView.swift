@@ -157,7 +157,7 @@ private struct HabitRow: View {
                 Image(systemName: habit.icon)
                     .font(.title3)
                     .frame(width: 36, height: 36)
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .clipShape(Circle())
 
                 VStack(alignment: .leading, spacing: 4) {

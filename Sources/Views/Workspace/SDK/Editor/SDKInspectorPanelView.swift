@@ -31,7 +31,7 @@ struct SDKInspectorPanelView: View {
                 }
             }
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color(uiColor: .systemGroupedBackground))
         .onAppear { jsonDraft = state.inspectorJSON }
     }
 }

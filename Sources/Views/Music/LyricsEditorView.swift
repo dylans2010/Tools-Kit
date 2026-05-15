@@ -154,7 +154,7 @@ struct LyricsEditorView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
     }
 
     private func syncLineRow(line: LyricLine, idx: Int) -> some View {
@@ -190,7 +190,7 @@ struct LyricsEditorView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
     }
 
     // MARK: - Actions

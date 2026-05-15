@@ -30,7 +30,7 @@ struct SecurityAuditDashboardView: View {
                     .frame(width: 180, height: 180)
                 }
                 .padding()
-                .background(Color(.secondarySystemGroupedBackground))
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
                 .cornerRadius(20)
 
                 VStack(alignment: .leading, spacing: 12) {
@@ -52,12 +52,12 @@ struct SecurityAuditDashboardView: View {
                     }
                 }
                 .padding()
-                .background(Color(.secondarySystemGroupedBackground))
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
                 .cornerRadius(20)
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Security Audit")
         .onAppear {
             runAudit()

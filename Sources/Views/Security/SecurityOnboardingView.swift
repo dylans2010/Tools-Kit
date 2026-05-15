@@ -36,7 +36,7 @@ struct SecurityOnboardingView: View {
                 }
             }
             .padding()
-            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+            .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
             .padding(.horizontal)
 
             if let error {
@@ -58,7 +58,7 @@ struct SecurityOnboardingView: View {
             Spacer()
         }
         .padding(.vertical)
-        .background(Color(.systemGroupedBackground))
+        .background(Color(uiColor: .systemGroupedBackground))
     }
 
     @MainActor private func setupVault() async {

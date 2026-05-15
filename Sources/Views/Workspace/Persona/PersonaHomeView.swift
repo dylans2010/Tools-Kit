@@ -1151,11 +1151,17 @@ struct PromptDiscoveryView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("Select a prompt to get started with Persona.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
+                .padding(12)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .cornerRadius(12)
+                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
 
                 ForEach(discoveryPrompts, id: \.self) { prompt in
                     Button {
@@ -1173,7 +1179,7 @@ struct PromptDiscoveryView: View {
                     }
                 }
 
-                Section {
+                VStack(alignment: .leading, spacing: 8) {
                     Button {
                         refresh()
                     } label: {
@@ -1184,6 +1190,12 @@ struct PromptDiscoveryView: View {
                         }
                     }
                 }
+                .padding(12)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .cornerRadius(12)
+                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
             }
             .navigationTitle("Discover")
             .navigationBarTitleDisplayMode(.inline)
@@ -1305,23 +1317,42 @@ struct TuningSheetView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("Persona Identity")) {
-                    TextField("Name", text: $manager.config.name)
-                    VStack(alignment: .leading) {
-                        Text("Instructions").font(.caption).foregroundStyle(.secondary)
-                        TextEditor(text: $manager.config.instructions)
-                            .frame(height: 80)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Persona Identity").font(.caption).foregroundStyle(.secondary).padding(.leading, 4)
+                    VStack(alignment: .leading, spacing: 8) {
+                        TextField("Name", text: $manager.config.name)
+                        Divider()
+                        VStack(alignment: .leading) {
+                            Text("Instructions").font(.caption).foregroundStyle(.secondary)
+                            TextEditor(text: $manager.config.instructions)
+                                .frame(height: 80)
+                        }
                     }
+                    .padding(12)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .cornerRadius(12)
                 }
+                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
 
-                Section(header: Text("Training & Data")) {
-                    Toggle("Train Persona With My Data", isOn: $manager.config.isTrainingEnabled)
-                    Text("Interaction pairs are used to improve the Persona's future responses. This can be disabled at any time.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Training & Data").font(.caption).foregroundStyle(.secondary).padding(.leading, 4)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Toggle("Train Persona With My Data", isOn: $manager.config.isTrainingEnabled)
+                        Text("Interaction pairs are used to improve the Persona's future responses. This can be disabled at any time.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(12)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .cornerRadius(12)
                 }
+                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
 
-                Section {
+                VStack(alignment: .leading, spacing: 8) {
                     Button(role: .destructive) {
                         manager.clearHistory()
                         dismiss()
@@ -1333,6 +1364,12 @@ struct TuningSheetView: View {
                         }
                     }
                 }
+                .padding(12)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .cornerRadius(12)
+                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
             }
             .navigationTitle("Tuning")
             .toolbar {

@@ -28,7 +28,7 @@ struct FileConverterView: View {
                         }
                     }
                     .padding()
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .cornerRadius(12)
                 } else {
                     Button(action: { showingFilePicker = true }) {
@@ -63,7 +63,7 @@ struct FileConverterView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .cornerRadius(12)
                 }
             }

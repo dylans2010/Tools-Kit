@@ -56,7 +56,7 @@ struct AgentDiffViewerView: View {
                         .disabled(isApplying)
                     }
                     .padding()
-                    .background(Color(.systemBackground))
+                    .background(Color(uiColor: .systemBackground))
                 }
             } else {
                 ContentUnavailableView(
@@ -112,7 +112,7 @@ struct SideBySideDiffView: View {
                 .font(.caption.bold())
                 .padding(8)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
 
             HStack(spacing: 0) {
                 // Left side: Old (Deletions)

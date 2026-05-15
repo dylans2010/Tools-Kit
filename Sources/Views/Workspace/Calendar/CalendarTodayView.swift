@@ -71,7 +71,7 @@ struct CalendarTodayView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 10)
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
     }
 
     private var timelineView: some View {

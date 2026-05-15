@@ -20,7 +20,7 @@ struct CollaborationChatView: View {
                             .font(.caption)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
-                            .background(selectedChannel == channel ? Color.blue : Color(.secondarySystemBackground))
+                            .background(selectedChannel == channel ? Color.blue : Color(uiColor: .secondarySystemBackground))
                             .foregroundStyle(selectedChannel == channel ? .white : .primary)
                             .clipShape(Capsule())
                         }
@@ -94,7 +94,7 @@ struct CollaborationChatView: View {
                                 .font(.caption)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
-                                .background(Color(.secondarySystemBackground))
+                                .background(Color(uiColor: .secondarySystemBackground))
                                 .clipShape(Capsule())
                         }
                     }

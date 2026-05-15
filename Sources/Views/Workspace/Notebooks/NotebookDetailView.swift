@@ -70,7 +70,7 @@ struct NotebookDetailView: View {
             }
             .padding(16)
         }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
         .navigationTitle(liveNotebook.name)
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, prompt: "Search folders/pages")

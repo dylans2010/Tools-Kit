@@ -300,7 +300,7 @@ struct PageEditorView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 7)
                         .background(
-                            Capsule().fill(editorMode == mode ? Color.accentColor.opacity(0.18) : Color(.secondarySystemBackground))
+                            Capsule().fill(editorMode == mode ? Color.accentColor.opacity(0.18) : Color(uiColor: .secondarySystemBackground))
                         )
                 }
                 .buttonStyle(.plain)
@@ -392,7 +392,7 @@ struct PageEditorView: View {
             ScrollView([.horizontal, .vertical]) {
                 ZStack(alignment: .topLeading) {
                     RoundedRectangle(cornerRadius: 24)
-                        .fill(Color(.secondarySystemBackground).opacity(0.35))
+                        .fill(Color(uiColor: .secondarySystemBackground).opacity(0.35))
                         .frame(width: 2400, height: 2400)
                         .overlay(canvasGrid)
 

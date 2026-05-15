@@ -19,7 +19,7 @@ struct ToolInputSection<Content: View>: View {
             VStack(spacing: 0) {
                 content
             }
-            .background(Color(.secondarySystemGroupedBackground))
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
             .cornerRadius(12)
         }
     }

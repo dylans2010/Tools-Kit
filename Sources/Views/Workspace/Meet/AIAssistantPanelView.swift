@@ -38,7 +38,7 @@ struct AIAssistantPanelView: View {
                 }
                 .frame(minHeight: 120)
                 .padding(8)
-                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
+                .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
             }
         }
         .aiAnimationLoading(isLoading)

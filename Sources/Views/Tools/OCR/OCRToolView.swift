@@ -34,7 +34,7 @@ struct OCRToolView: View {
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 40)
-                                .background(Color(.secondarySystemBackground))
+                                .background(Color(uiColor: .secondarySystemBackground))
                                 .cornerRadius(16)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 16)
@@ -97,7 +97,7 @@ struct OCRToolView: View {
                             .frame(minHeight: 200)
                             .font(.body.monospaced())
                             .padding(8)
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color(uiColor: .secondarySystemBackground))
                             .cornerRadius(12)
                     }
                     .padding()

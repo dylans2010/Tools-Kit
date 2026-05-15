@@ -95,7 +95,7 @@ struct BoardColumnView: View {
             }
         }
         .padding(.top, 12)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -140,7 +140,7 @@ struct BoardTaskCard: View {
             .buttonStyle(.bordered)
         }
         .padding(12)
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 

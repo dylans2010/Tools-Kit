@@ -93,7 +93,7 @@ struct FormsView: View {
         }
         .navigationTitle("Forms")
         .searchable(text: $searchText, prompt: "Search forms…")
-        .background(Color(.systemGroupedBackground))
+        .background(Color(uiColor: .systemGroupedBackground))
         .sheet(isPresented: $showingCreate) {
             NavigationStack { CreateFormView(backend: backend) }
                 .presentationDetents([.large])
@@ -148,7 +148,7 @@ struct FormsView: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color(.secondarySystemBackground))
+                .fill(Color(uiColor: .secondarySystemBackground))
         )
         .padding(.horizontal)
     }
@@ -270,7 +270,7 @@ private struct FormCard: View {
         }
         .padding(14)
         .frame(minHeight: 120)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .cornerRadius(14)
     }
 }

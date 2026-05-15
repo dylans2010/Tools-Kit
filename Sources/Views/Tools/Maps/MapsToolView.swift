@@ -53,7 +53,7 @@ struct MapsToolView: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
     }
 
     private var searchResultsList: some View {
@@ -86,7 +86,7 @@ struct MapsToolView: View {
                         }
                         .padding()
                         .frame(width: 200)
-                        .background(Color(.systemBackground))
+                        .background(Color(uiColor: .systemBackground))
                         .cornerRadius(12)
                         .shadow(radius: 3)
                     }

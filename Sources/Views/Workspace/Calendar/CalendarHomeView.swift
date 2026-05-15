@@ -113,7 +113,7 @@ struct CalendarModeSelector: View {
                             .font(.subheadline.bold())
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
-                            .background(selectedMode == mode ? Color.accentColor : Color(.secondarySystemBackground), in: Capsule())
+                            .background(selectedMode == mode ? Color.accentColor : Color(uiColor: .secondarySystemBackground), in: Capsule())
                             .foregroundStyle(selectedMode == mode ? .white : .secondary)
                     }
                 }

@@ -104,7 +104,7 @@ struct NamedOptionsEditorView: View {
             }
         }
         .padding(10)
-        .background(Color(.tertiarySystemBackground))
+        .background(Color(uiColor: .tertiarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
@@ -146,7 +146,7 @@ struct RatingScaleEditorView: View {
             .font(.caption)
         }
         .padding(10)
-        .background(Color(.tertiarySystemBackground))
+        .background(Color(uiColor: .tertiarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
@@ -189,7 +189,7 @@ struct SliderEditorView: View {
             .font(.caption)
         }
         .padding(10)
-        .background(Color(.tertiarySystemBackground))
+        .background(Color(uiColor: .tertiarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 

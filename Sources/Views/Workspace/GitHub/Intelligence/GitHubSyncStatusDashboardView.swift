@@ -16,7 +16,7 @@ struct GitHubSyncStatusDashboardView: View {
                     SyncMetricView(title: "Active Conflicts", count: 0, icon: "exclamationmark.triangle.fill", color: .orange)
                 }
                 .padding()
-                .background(Color(.secondarySystemGroupedBackground))
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
                 .cornerRadius(16)
 
                 Section {
@@ -41,7 +41,7 @@ struct GitHubSyncStatusDashboardView: View {
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Sync Status")
         .toolbar {
             Button("Fetch") { performFullSync() }

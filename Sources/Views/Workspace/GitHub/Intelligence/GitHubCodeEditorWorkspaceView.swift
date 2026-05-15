@@ -59,7 +59,7 @@ struct GitHubCodeEditorWorkspaceView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
     }
 
     private var diffPreview: some View {

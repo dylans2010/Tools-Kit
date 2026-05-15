@@ -60,7 +60,7 @@ struct AIMentorChatView: View {
         VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
             Text(message.text)
                 .padding(10)
-                .background(message.role == .user ? Color.accentColor.opacity(0.2) : Color(.secondarySystemGroupedBackground))
+                .background(message.role == .user ? Color.accentColor.opacity(0.2) : Color(uiColor: .secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             if !message.insights.isEmpty && message.role == .assistant {
                 VStack(alignment: .leading, spacing: 2) {

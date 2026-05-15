@@ -32,7 +32,7 @@ struct CreateCollectionView: View {
                             Image(systemName: icon)
                                 .font(.title3)
                                 .frame(width: 44, height: 44)
-                                .background(selectedIcon == icon ? Color.accentColor.opacity(0.2) : Color(.secondarySystemBackground))
+                                .background(selectedIcon == icon ? Color.accentColor.opacity(0.2) : Color(uiColor: .secondarySystemBackground))
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                                 .onTapGesture { selectedIcon = icon }
                         }

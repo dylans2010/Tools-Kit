@@ -143,7 +143,7 @@ struct JsonSectionView: View {
                     .font(.system(.caption, design: .monospaced))
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .cornerRadius(8)
             } else {
                 Text("No data")

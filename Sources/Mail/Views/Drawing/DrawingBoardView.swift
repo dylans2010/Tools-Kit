@@ -335,7 +335,7 @@ struct DrawingBoardView: View {
     private var backgroundFill: some ShapeStyle {
         switch backgroundStyle {
         case .plain:
-            return AnyShapeStyle(Color(.secondarySystemBackground))
+            return AnyShapeStyle(Color(uiColor: .secondarySystemBackground))
         case .graph:
             return AnyShapeStyle(LinearGradient(colors: [Color.white, Color.blue.opacity(0.08)], startPoint: .top, endPoint: .bottom))
         case .dot:

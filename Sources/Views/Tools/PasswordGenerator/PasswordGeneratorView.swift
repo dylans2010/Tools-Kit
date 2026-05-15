@@ -32,7 +32,7 @@ struct PasswordGeneratorView: View {
                             .multilineTextAlignment(.center)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color(uiColor: .secondarySystemBackground))
                             .cornerRadius(12)
                             .textSelection(.enabled)
 

@@ -49,7 +49,7 @@ struct CrossIntelligenceHomeView: View {
                     Text(result)
                 }
                 .padding()
-                .background(Color(.secondarySystemGroupedBackground))
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
                 .cornerRadius(12)
             }
         }
@@ -78,7 +78,7 @@ struct CrossIntelligenceHomeView: View {
                             .foregroundColor(.secondary)
                     }
                     .padding()
-                    .background(Color(.secondarySystemGroupedBackground))
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
                     .cornerRadius(12)
                 }
             }

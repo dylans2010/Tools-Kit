@@ -73,7 +73,7 @@ struct TokenInspectorView: View {
                 }
             }
             .padding()
-            .background(Color(.secondarySystemGroupedBackground))
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
             .cornerRadius(12)
             .padding(.horizontal)
 

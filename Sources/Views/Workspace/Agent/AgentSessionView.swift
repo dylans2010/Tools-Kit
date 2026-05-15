@@ -40,7 +40,7 @@ struct AgentSessionView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding()
-                .background(Color(.systemBackground))
+                .background(Color(uiColor: .systemBackground))
 
                 Divider()
 
@@ -60,7 +60,7 @@ struct AgentSessionView: View {
                             }
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color(uiColor: .secondarySystemBackground))
 
                             // Activities
                             VStack(alignment: .leading, spacing: 16) {
@@ -316,7 +316,7 @@ struct AgentSessionView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
     }
 }
 

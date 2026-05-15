@@ -20,7 +20,7 @@ struct EndpointTesterView: View {
                 if backend.isLoading {
                     ProgressView("Sending request…")
                         .frame(maxWidth: .infinity).padding()
-                        .background(Color(.secondarySystemGroupedBackground)).cornerRadius(12)
+                        .background(Color(uiColor: .secondarySystemGroupedBackground)).cornerRadius(12)
                 }
                 if !backend.errorMessage.isEmpty {
                     errorCard

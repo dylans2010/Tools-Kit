@@ -42,7 +42,7 @@ struct AgentCheckpointManagerView: View {
             if isRestoring {
                 ProgressView("Restoring Checkpoint...")
                     .padding()
-                    .background(Color(.systemBackground))
+                    .background(Color(uiColor: .systemBackground))
                     .cornerRadius(12)
                     .shadow(radius: 10)
             }

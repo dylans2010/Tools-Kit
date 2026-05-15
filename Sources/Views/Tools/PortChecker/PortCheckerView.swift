@@ -22,7 +22,7 @@ struct PortCheckerView: View {
                 }
             }
             .padding()
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
             .cornerRadius(12)
 
             Button(action: backend.check) {

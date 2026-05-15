@@ -63,7 +63,7 @@ struct CodeExplainerView: View {
                             }
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color(uiColor: .secondarySystemBackground))
                             .cornerRadius(10)
                         }
                     }

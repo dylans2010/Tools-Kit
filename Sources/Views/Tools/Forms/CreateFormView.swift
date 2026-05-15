@@ -326,7 +326,7 @@ struct CreateFormView: View {
                     .padding(14)
             }
         }
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .overlay(
             RoundedRectangle(cornerRadius: CGFloat(cardCornerRadius))
                 .stroke(accentColor.opacity(0.14), lineWidth: 1)
@@ -348,7 +348,7 @@ struct CreateFormView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(selectedType == type ? accentColor : Color(.tertiarySystemBackground))
+            .background(selectedType == type ? accentColor : Color(uiColor: .tertiarySystemBackground))
             .foregroundColor(selectedType == type ? .white : .primary)
             .cornerRadius(20)
         }
@@ -362,7 +362,7 @@ struct CreateFormView: View {
             content()
                 .padding(16)
         }
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
         .cornerRadius(CGFloat(cardCornerRadius))
         .shadow(color: .black.opacity(cardShadowOpacity), radius: 8, y: 4)
     }
@@ -380,7 +380,7 @@ struct CreateFormView: View {
                 .foregroundColor(.secondary)
             TextField(placeholder, text: text)
                 .padding(10)
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
                 .cornerRadius(8)
         }
     }

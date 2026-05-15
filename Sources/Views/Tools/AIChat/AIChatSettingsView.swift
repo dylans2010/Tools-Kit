@@ -218,7 +218,7 @@ struct AIChatSettingsView: View {
                     )
                 }
                 .padding()
-                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+                .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
             }
         }
     }
@@ -799,7 +799,7 @@ struct PresetCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding(12)
-        .background(isSelected ? Color.blue : Color(.secondarySystemGroupedBackground))
+        .background(isSelected ? Color.blue : Color(uiColor: .secondarySystemGroupedBackground))
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)

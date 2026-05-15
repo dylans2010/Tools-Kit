@@ -55,7 +55,7 @@ struct FillOutFormView: View {
                     }
                 }
                 .padding(16)
-                .background(Color(.systemBackground))
+                .background(Color(uiColor: .systemBackground))
                 .cornerRadius(14)
                 .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
 
@@ -66,11 +66,11 @@ struct FillOutFormView: View {
                         .foregroundColor(accentColor)
                     TextField("Enter Your Name", text: $responderName)
                         .padding(10)
-                        .background(Color(.secondarySystemBackground))
+                        .background(Color(uiColor: .secondarySystemBackground))
                         .cornerRadius(10)
                 }
                 .padding(16)
-                .background(Color(.systemBackground))
+                .background(Color(uiColor: .systemBackground))
                 .cornerRadius(14)
                 .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
 
@@ -93,7 +93,7 @@ struct FillOutFormView: View {
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
         .navigationTitle(form.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -157,7 +157,7 @@ struct FillOutFormView: View {
             )
         }
         .padding(16)
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
         .cornerRadius(14)
         .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
     }

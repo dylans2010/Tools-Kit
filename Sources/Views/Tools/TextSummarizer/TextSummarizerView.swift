@@ -23,7 +23,7 @@ struct TextSummarizerView: View {
                     Slider(value: $backend.sentenceCount, in: 1...10, step: 1)
                 }
                 .padding()
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
                 .cornerRadius(12)
 
                 Button(action: { Task { await backend.summarize() } }) {

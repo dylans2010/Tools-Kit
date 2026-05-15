@@ -18,7 +18,7 @@ struct CreateEventView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(.systemBackground).ignoresSafeArea()
+                Color(uiColor: .systemBackground).ignoresSafeArea()
 
                 Form {
                     Section {
@@ -27,14 +27,14 @@ struct CreateEventView: View {
 
                         TextField("Location", text: $location)
                     }
-                    .listRowBackground(Color(.secondarySystemBackground))
+                    .listRowBackground(Color(uiColor: .secondarySystemBackground))
 
                     Section {
                         DatePicker("Date", selection: $date, displayedComponents: .date)
                         DatePicker("Start", selection: $startTime, displayedComponents: .hourAndMinute)
                         DatePicker("End", selection: $endTime, displayedComponents: .hourAndMinute)
                     }
-                    .listRowBackground(Color(.secondarySystemBackground))
+                    .listRowBackground(Color(uiColor: .secondarySystemBackground))
 
                     Section {
                         Button { showingAISummarySheet = true } label: {
@@ -52,7 +52,7 @@ struct CreateEventView: View {
                     } header: {
                         Text("Intelligence")
                     }
-                    .listRowBackground(Color(.secondarySystemBackground))
+                    .listRowBackground(Color(uiColor: .secondarySystemBackground))
 
                     Section {
                         Picker("Priority", selection: $priority) {
@@ -61,7 +61,7 @@ struct CreateEventView: View {
                             }
                         }
                     }
-                    .listRowBackground(Color(.secondarySystemBackground))
+                    .listRowBackground(Color(uiColor: .secondarySystemBackground))
                 }
                 .scrollContentBackground(.hidden)
             }

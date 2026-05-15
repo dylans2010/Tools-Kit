@@ -37,7 +37,7 @@ struct FallbackFetchView: View {
                     }
                 }
                 .padding()
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
                 .cornerRadius(12)
 
                 // CSV Import Section
@@ -143,7 +143,7 @@ struct FallbackFetchView: View {
 
                     InternalLogsView(logger: logger)
                         .frame(maxHeight: 260)
-                        .background(Color(.secondarySystemBackground))
+                        .background(Color(uiColor: .secondarySystemBackground))
                         .cornerRadius(12)
                 }
             }
@@ -265,7 +265,7 @@ private struct LogEntryRow: View {
             }
         }
         .padding(6)
-        .background(Color(.tertiarySystemBackground))
+        .background(Color(uiColor: .tertiarySystemBackground))
         .cornerRadius(8)
     }
 }

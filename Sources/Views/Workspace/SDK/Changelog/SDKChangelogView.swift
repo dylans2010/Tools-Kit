@@ -66,7 +66,7 @@ struct SDKChangelogView: View {
                 .font(.caption)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
-                .background(selectedChangeType == type ? Color.blue : Color(.secondarySystemBackground))
+                .background(selectedChangeType == type ? Color.blue : Color(uiColor: .secondarySystemBackground))
                 .foregroundStyle(selectedChangeType == type ? .white : .primary)
                 .clipShape(Capsule())
         }

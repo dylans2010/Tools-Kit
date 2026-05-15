@@ -162,7 +162,7 @@ struct EditFormView: View {
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("Edit Form")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingFillOut) {
@@ -246,7 +246,7 @@ struct EditFormView: View {
                     .padding(14)
             }
         }
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .cornerRadius(12)
     }
 
@@ -264,7 +264,7 @@ struct EditFormView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(selectedType == type ? accentColor : Color(.tertiarySystemBackground))
+            .background(selectedType == type ? accentColor : Color(uiColor: .tertiarySystemBackground))
             .foregroundColor(selectedType == type ? .white : .primary)
             .cornerRadius(20)
         }
@@ -278,7 +278,7 @@ struct EditFormView: View {
             content()
                 .padding(16)
         }
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
         .cornerRadius(14)
         .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
     }
@@ -296,7 +296,7 @@ struct EditFormView: View {
                 .foregroundColor(.secondary)
             TextField(label, text: text)
                 .padding(10)
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
                 .cornerRadius(8)
         }
     }

@@ -23,7 +23,7 @@ struct GraphView: View {
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                Color(.systemGroupedBackground).ignoresSafeArea()
+                Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
 
                 // Draw links
                 ForEach(links) { link in

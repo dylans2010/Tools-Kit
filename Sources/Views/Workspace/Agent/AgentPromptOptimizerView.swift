@@ -22,7 +22,7 @@ struct AgentPromptOptimizerView: View {
                             .foregroundColor(.secondary)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(.systemGroupedBackground))
+                    .background(Color(uiColor: .systemGroupedBackground))
                 } else if let error = error {
                     VStack(spacing: 20) {
                         Image(systemName: "exclamationmark.bubble.fill")
@@ -45,7 +45,7 @@ struct AgentPromptOptimizerView: View {
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(.systemGroupedBackground))
+                    .background(Color(uiColor: .systemGroupedBackground))
                 } else {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 20) {
@@ -61,7 +61,7 @@ struct AgentPromptOptimizerView: View {
                                 .frame(minHeight: 240)
                                 .font(.system(.body, design: .monospaced))
                                 .padding(12)
-                                .background(Color(.secondarySystemGroupedBackground))
+                                .background(Color(uiColor: .secondarySystemGroupedBackground))
                                 .cornerRadius(12)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
@@ -82,7 +82,7 @@ struct AgentPromptOptimizerView: View {
                         }
                         .padding()
                     }
-                    .background(Color(.systemGroupedBackground))
+                    .background(Color(uiColor: .systemGroupedBackground))
                 }
 
                 if !isOptimizing && error == nil {

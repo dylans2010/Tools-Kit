@@ -59,7 +59,7 @@ struct RatingQuestionView: View {
                                     .font(.subheadline.bold())
                                     .padding(.horizontal, 14)
                                     .padding(.vertical, 8)
-                                    .background(selected ? Color.orange : Color(.secondarySystemBackground))
+                                    .background(selected ? Color.orange : Color(uiColor: .secondarySystemBackground))
                                     .foregroundColor(selected ? .white : .primary)
                                     .cornerRadius(8)
                             }

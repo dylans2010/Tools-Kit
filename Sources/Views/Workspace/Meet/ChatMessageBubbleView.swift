@@ -31,7 +31,7 @@ struct ChatMessageBubbleView: View {
                                 .font(.caption2)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
-                                .background(Color(.tertiarySystemBackground), in: Capsule())
+                                .background(Color(uiColor: .tertiarySystemBackground), in: Capsule())
                         }
                     }
                 }

@@ -249,7 +249,7 @@ struct EditingHomeView: View {
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Media Editing")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {

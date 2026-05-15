@@ -54,7 +54,7 @@ struct FocusTrackerView: View {
                             .font(.title2)
                             .foregroundColor(.secondary)
                             .padding()
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color(uiColor: .secondarySystemBackground))
                             .clipShape(Circle())
                     }
 
@@ -74,7 +74,7 @@ struct FocusTrackerView: View {
                             .font(.title2)
                             .foregroundColor(.secondary)
                             .padding()
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color(uiColor: .secondarySystemBackground))
                             .clipShape(Circle())
                     }
                     .opacity(0) // Hide for now but keep spacing
@@ -96,7 +96,7 @@ struct FocusTrackerView: View {
                         }
                     }
                     .padding()
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .cornerRadius(20)
 
                     HStack {

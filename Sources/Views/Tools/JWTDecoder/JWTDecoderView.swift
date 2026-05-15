@@ -33,7 +33,7 @@ struct JWTDecoderView: View {
                             .font(.system(.body, design: .monospaced))
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color(uiColor: .secondarySystemBackground))
                             .cornerRadius(8)
                     }
                 }
@@ -45,7 +45,7 @@ struct JWTDecoderView: View {
                             .font(.system(.body, design: .monospaced))
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color(uiColor: .secondarySystemBackground))
                             .cornerRadius(8)
                     }
                 }

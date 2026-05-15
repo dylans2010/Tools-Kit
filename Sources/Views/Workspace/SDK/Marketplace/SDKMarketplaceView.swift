@@ -96,7 +96,7 @@ struct SDKMarketplaceView: View {
         }
         .frame(width: 180)
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
@@ -106,7 +106,7 @@ struct SDKMarketplaceView: View {
                 .font(.caption)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
-                .background(selectedCategory == cat ? Color.blue : Color(.secondarySystemBackground))
+                .background(selectedCategory == cat ? Color.blue : Color(uiColor: .secondarySystemBackground))
                 .foregroundStyle(selectedCategory == cat ? .white : .primary)
                 .clipShape(Capsule())
         }

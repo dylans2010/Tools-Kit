@@ -89,7 +89,7 @@ struct PRDetailView: View {
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("PR #\(pullRequest.number)")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

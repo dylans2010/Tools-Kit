@@ -52,7 +52,7 @@ struct EncryptedVaultView: View {
         }
         .padding(32)
         .frame(maxWidth: .infinity)
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
         .cornerRadius(16)
     }
 

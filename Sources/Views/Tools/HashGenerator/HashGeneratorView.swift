@@ -45,7 +45,7 @@ struct HashGeneratorView: View {
                             .font(.system(.body, design: .monospaced))
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color(uiColor: .secondarySystemBackground))
                             .cornerRadius(10)
                             .textSelection(.enabled)
                     }

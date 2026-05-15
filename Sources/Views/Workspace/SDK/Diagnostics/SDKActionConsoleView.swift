@@ -36,7 +36,7 @@ struct SDKActionConsoleView: View {
                     Text("Quick Commands").font(.caption2.bold()).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-            .padding().background(Color(.secondarySystemGroupedBackground))
+            .padding().background(Color(uiColor: .secondarySystemGroupedBackground))
         }
         .navigationTitle("Action Console").navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } } }

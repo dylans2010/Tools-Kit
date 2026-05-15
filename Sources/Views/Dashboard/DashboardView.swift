@@ -42,7 +42,7 @@ struct DashboardView: View {
                 }
                 .padding(.bottom, 24)
             }
-            .background(Color(.systemGroupedBackground).ignoresSafeArea())
+            .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
             .navigationTitle("Tools Kit")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -143,7 +143,7 @@ struct DashboardView: View {
         .background(
             privateMode.isEnabled
                 ? LinearGradient(colors: [Color.blue.opacity(0.15), Color.indigo.opacity(0.1)], startPoint: .leading, endPoint: .trailing)
-                : LinearGradient(colors: [Color(.secondarySystemGroupedBackground)], startPoint: .leading, endPoint: .trailing)
+                : LinearGradient(colors: [Color(uiColor: .secondarySystemGroupedBackground)], startPoint: .leading, endPoint: .trailing)
         )
         .cornerRadius(16)
         .overlay(
@@ -187,7 +187,7 @@ struct DashboardView: View {
         .background(
             musicMode.isMusicModeEnabled
                 ? LinearGradient(colors: [Color.pink.opacity(0.15), Color.purple.opacity(0.1)], startPoint: .leading, endPoint: .trailing)
-                : LinearGradient(colors: [Color(.secondarySystemGroupedBackground)], startPoint: .leading, endPoint: .trailing)
+                : LinearGradient(colors: [Color(uiColor: .secondarySystemGroupedBackground)], startPoint: .leading, endPoint: .trailing)
         )
         .cornerRadius(16)
         .overlay(
@@ -304,7 +304,7 @@ struct CategoryTag: View {
                 .fontWeight(isSelected ? .bold : .regular)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
-                .background(isSelected ? Color.blue : Color(.secondarySystemBackground))
+                .background(isSelected ? Color.blue : Color(uiColor: .secondarySystemBackground))
                 .foregroundColor(isSelected ? .white : .primary)
                 .cornerRadius(18)
         }

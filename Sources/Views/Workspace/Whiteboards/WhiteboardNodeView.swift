@@ -16,7 +16,7 @@ struct WhiteboardNodeView: View {
         .frame(width: 180)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color(.secondarySystemBackground))
+                .fill(Color(uiColor: .secondarySystemBackground))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 10)

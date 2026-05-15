@@ -246,7 +246,7 @@ private struct DisplayView: View {
             .padding()
             .lineLimit(1)
             .minimumScaleFactor(0.5)
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
             .cornerRadius(16)
     }
 }

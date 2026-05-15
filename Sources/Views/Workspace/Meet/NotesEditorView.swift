@@ -11,7 +11,7 @@ struct NotesEditorView: View {
             TextEditor(text: $notes)
                 .frame(minHeight: 220)
                 .padding(8)
-                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
+                .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
             HStack {
                 Spacer()
                 Button("Save Notes", action: onSave)

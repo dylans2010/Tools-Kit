@@ -85,7 +85,7 @@ struct ProjectDetailsView: View {
                 }
             }
         }
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
         .overlay(alignment: .bottom) {
             Divider()
         }
@@ -199,7 +199,7 @@ struct ProjectDetailsView: View {
                     Label("Photo", systemImage: "photo")
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(.secondarySystemBackground))
+                        .background(Color(uiColor: .secondarySystemBackground))
                         .cornerRadius(12)
                 }
 
@@ -209,7 +209,7 @@ struct ProjectDetailsView: View {
                     Label("File", systemImage: "doc.badge.plus")
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(.secondarySystemBackground))
+                        .background(Color(uiColor: .secondarySystemBackground))
                         .cornerRadius(12)
                 }
             }
@@ -402,7 +402,7 @@ struct StatCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .cornerRadius(12)
     }
 }

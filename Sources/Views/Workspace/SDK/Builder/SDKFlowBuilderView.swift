@@ -23,7 +23,7 @@ struct SDKFlowBuilderView: View {
                 }
             }
         }
-        .background(Color(.systemBackground))
+        .background(Color(uiColor: .systemBackground))
         .onAppear(perform: analyzeProject)
         .overlay(alignment: .bottomTrailing) {
             Button(action: addNode) {

@@ -29,7 +29,7 @@ struct CommandPaletteView: View {
                         .textFieldStyle(.plain)
                 }
                 .padding()
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
 
                 List {
                     ForEach(groupedActions.keys.sorted(), id: \.self) { category in

@@ -11,7 +11,7 @@ struct DiffView: View {
                     .font(.caption.bold())
                     .padding(8)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
 
                 if let patch = fileDiff.patch {
                     ForEach(patch.components(separatedBy: .newlines), id: \.self) { line in

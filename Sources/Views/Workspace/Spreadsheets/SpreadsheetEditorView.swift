@@ -24,7 +24,7 @@ struct SpreadsheetEditorView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(.systemBackground).ignoresSafeArea()
+                Color(uiColor: .systemBackground).ignoresSafeArea()
 
                 VStack(spacing: 0) {
                     FormulaBarView(selectedCell: selectedCell, sheet: sheet) { newFormula in
@@ -86,7 +86,7 @@ struct SpreadsheetEditorView: View {
             .font(.caption.bold())
             .frame(height: rowHeight)
             .frame(maxWidth: .infinity)
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
             .overlay(Rectangle().stroke(Color.white.opacity(0.1), lineWidth: 0.5))
     }
 

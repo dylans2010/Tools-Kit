@@ -72,7 +72,7 @@ struct MemoryEntryRow: View {
                             .font(.system(.caption, design: .monospaced))
                             .padding(8)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color(uiColor: .secondarySystemBackground))
                             .cornerRadius(4)
                     }
                 }

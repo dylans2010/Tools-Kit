@@ -29,7 +29,7 @@ struct HealthDataView: View {
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Apple Health")
         .toolbar {
             Button {
@@ -69,6 +69,6 @@ struct HealthDataView: View {
                 .foregroundStyle(.tertiary)
         }
         .padding()
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 }

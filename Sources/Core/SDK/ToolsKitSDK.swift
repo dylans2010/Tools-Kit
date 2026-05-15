@@ -54,6 +54,22 @@ public enum SDKScope: String, Hashable, CaseIterable, Codable, Identifiable {
 
     public var displayName: String {
         switch self {
+        case .all: return "All"
+        case .tasks: return "Tasks"
+        case .notes: return "Notes"
+        case .calendar: return "Calendar"
+        case .files: return "Files"
+        case .emails: return "Emails"
+        case .whiteboards: return "Whiteboards"
+        case .plugins: return "Plugins"
+        case .slides: return "Slides"
+        case .media: return "Media"
+        case .meet: return "Meet"
+        case .repos: return "Repos"
+        case .automations: return "Automations"
+        case .intelligence: return "Intelligence"
+        case .persona: return "Persona"
+        case .custom: return "Custom"
         case .workspaceRead: return "Workspace Read"
         case .workspaceWrite: return "Workspace Write"
         case .sdkProjectCreate: return "Create SDK Projects"
@@ -64,7 +80,6 @@ public enum SDKScope: String, Hashable, CaseIterable, Codable, Identifiable {
         case .libraryInvoke: return "Invoke Libraries"
         case .agentExecute: return "Agent Execution"
         case .agentTakeover: return "Agent Workspace Takeover"
-        default: return rawValue.replacingOccurrences(of: ".", with: " ").capitalized
         }
     }
 

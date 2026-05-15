@@ -112,7 +112,7 @@ struct AgentProgressSessionView: View {
             }
             .frame(maxHeight: 200)
             .padding(8)
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 8))
         }
     }
@@ -139,7 +139,7 @@ struct AgentProgressSessionView: View {
                         .font(.system(.caption, design: .monospaced))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(8)
-                        .background(Color(.secondarySystemBackground))
+                        .background(Color(uiColor: .secondarySystemBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
             }

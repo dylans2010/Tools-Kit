@@ -32,7 +32,7 @@ struct DropdownQuestionView: View {
                     .foregroundColor(.secondary)
             }
             .padding(12)
-            .background(Color(.secondarySystemBackground))
+            .background(Color(uiColor: .secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
     }

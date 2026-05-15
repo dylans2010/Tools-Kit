@@ -45,7 +45,7 @@ struct ConnectorExecutionView: View {
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Live Execution")
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: isRunning) { _, running in
@@ -137,7 +137,7 @@ private struct ExecutionTimelineSection: View {
                         Spacer()
                         StepStatusView(index: index, selectedIndex: selectedStepIndex)
                     }
-                    .padding(12).background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                    .padding(12).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
                 }
             }
         }
@@ -191,7 +191,7 @@ private struct ExecutionHistorySection: View {
                             .padding(.horizontal, 6).padding(.vertical, 2)
                             .background(log.type.color.opacity(0.1), in: Capsule()).foregroundStyle(log.type.color)
                     }
-                    .padding(12).background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                    .padding(12).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
                 }
             }
         }
@@ -206,7 +206,7 @@ private struct ExecutionStatsSection: View {
             DetailMetricPill(label: "Latency", value: String(format: "%.0fms", metadata.averageLatency), color: .purple)
             DetailMetricPill(label: "Errors", value: String(format: "%.1f%%", metadata.errorRate * 100), color: metadata.errorRate > 0.1 ? .red : .green)
         }
-        .padding(16).background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .padding(16).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
     }
 }
 

@@ -166,7 +166,7 @@ struct CustomizePlaylistArtwork: View {
                         .font(.headline)
                 }
             }
-            .background(Color(.systemGroupedBackground).ignoresSafeArea())
+            .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
             .sheet(isPresented: $showStickerPicker) {
                 StickerPickerSheet { emoji in
                     stickers.append(ArtworkSticker(emoji: emoji, position: CGPoint(x: artworkSize / 2, y: artworkSize / 2)))
@@ -754,7 +754,7 @@ struct CustomizePlaylistArtwork: View {
                 content()
                     .padding(16)
             }
-            .background(Color(.secondarySystemGroupedBackground))
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
             .cornerRadius(14)
         }
     }
@@ -831,7 +831,7 @@ private struct StickerPickerSheet: View {
                                     Text(emoji)
                                         .font(.system(size: 36))
                                         .frame(width: 56, height: 56)
-                                        .background(Color(.secondarySystemBackground))
+                                        .background(Color(uiColor: .secondarySystemBackground))
                                         .cornerRadius(12)
                                 }
                                 .buttonStyle(.plain)

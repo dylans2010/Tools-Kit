@@ -29,7 +29,7 @@ struct GitHubDiscussionsView: View {
                                 .font(.caption)
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 6)
-                                .background(selectedCategory == category ? Color.blue : Color(.secondarySystemBackground))
+                                .background(selectedCategory == category ? Color.blue : Color(uiColor: .secondarySystemBackground))
                                 .foregroundStyle(selectedCategory == category ? .white : .primary)
                                 .clipShape(Capsule())
                             }

@@ -202,7 +202,7 @@ public struct AIGenerateSlides: View {
             .padding(10)
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color(.systemBackground).opacity(0.5))
+                    .fill(Color(uiColor: .systemBackground).opacity(0.5))
             )
             .contentShape(Rectangle())
     }

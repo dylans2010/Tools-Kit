@@ -125,7 +125,7 @@ struct HabitCard: View {
             .chartYAxis(.hidden)
         }
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .cornerRadius(20)
         .padding(.horizontal)
         .swipeActions {

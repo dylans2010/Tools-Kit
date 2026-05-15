@@ -69,7 +69,7 @@ struct GitHubCommandCenterView: View {
             if isSyncing {
                 ProgressView("Syncing...")
                     .padding()
-                    .background(Color(.systemBackground))
+                    .background(Color(uiColor: .systemBackground))
                     .cornerRadius(12)
                     .shadow(radius: 10)
             }

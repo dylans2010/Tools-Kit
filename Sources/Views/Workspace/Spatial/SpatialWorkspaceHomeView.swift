@@ -9,7 +9,7 @@ struct SpatialWorkspaceHomeView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
 
             // Grid Background
             Canvas { context, size in
@@ -77,7 +77,7 @@ struct SpatialNodeView: View {
                 .font(.caption.bold())
         }
         .frame(width: 100, height: 100)
-        .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color(uiColor: .secondarySystemGroupedBackground)))
         .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
     }
 }

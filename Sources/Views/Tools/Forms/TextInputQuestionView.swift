@@ -10,7 +10,7 @@ struct TextInputQuestionView: View {
             if question.options.first == "multiline" {
                 ZStack(alignment: .topLeading) {
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(.secondarySystemBackground))
+                        .fill(Color(uiColor: .secondarySystemBackground))
                     TextEditor(text: $answer)
                         .frame(minHeight: 80)
                         .padding(8)
@@ -19,7 +19,7 @@ struct TextInputQuestionView: View {
             } else {
                 TextField("Your Answer…", text: $answer)
                     .padding(10)
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
         }

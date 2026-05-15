@@ -60,7 +60,7 @@ struct WiFiTransferView: View {
             .buttonStyle(.plain)
         }
         .padding(20)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
     }
 
     // MARK: - Connection Info
@@ -106,7 +106,7 @@ struct WiFiTransferView: View {
             }
         }
         .padding(20)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
     }
 
     // MARK: - Instructions
@@ -123,7 +123,7 @@ struct WiFiTransferView: View {
             instructionStep(number: "5", text: "Files will appear in your Library when done")
         }
         .padding(20)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
     }
 
     private func instructionStep(number: String, text: String) -> some View {
@@ -163,6 +163,6 @@ struct WiFiTransferView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
     }
 }

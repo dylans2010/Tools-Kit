@@ -181,10 +181,32 @@ struct SDKDiagnosticsView: View {
 
     private func scopeTitle(_ scope: SDKScope) -> String {
         switch scope {
-        case .custom:
-            return "Custom"
-        default:
-            return String(describing: scope).capitalized
+        case .all: return "All"
+        case .tasks: return "Tasks"
+        case .notes: return "Notes"
+        case .calendar: return "Calendar"
+        case .files: return "Files"
+        case .emails: return "Emails"
+        case .whiteboards: return "Whiteboards"
+        case .plugins: return "Plugins"
+        case .slides: return "Slides"
+        case .media: return "Media"
+        case .meet: return "Meet"
+        case .repos: return "Repos"
+        case .automations: return "Automations"
+        case .intelligence: return "Intelligence"
+        case .persona: return "Persona"
+        case .custom: return "Custom"
+        case .workspaceRead: return "Workspace Read"
+        case .workspaceWrite: return "Workspace Write"
+        case .sdkProjectCreate: return "Create SDK Projects"
+        case .sdkManageLibraries: return "Manage Libraries"
+        case .sdkManageFrameworks: return "Manage Frameworks"
+        case .sdkManagePackages: return "Manage Packages"
+        case .frameworkExecute: return "Execute Frameworks"
+        case .libraryInvoke: return "Invoke Libraries"
+        case .agentExecute: return "Agent Execution"
+        case .agentTakeover: return "Agent Workspace Takeover"
         }
     }
 }
@@ -337,7 +359,7 @@ private struct DiagnosticsStatusPanel: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
@@ -377,7 +399,7 @@ private struct MetricsSummaryView: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private func metric(at index: Int) -> SummaryMetric? {

@@ -97,7 +97,7 @@ struct EmailComposingView: View {
 
                 composeToolbar
             }
-            .background(Color(.systemGroupedBackground))
+            .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle(replyTo == nil ? "Compose" : "Reply")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -393,7 +393,7 @@ struct EmailComposingView: View {
                 .font(.subheadline)
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
         }
     }
 
@@ -507,7 +507,7 @@ struct EmailComposingView: View {
                     }
                 }
                 .padding(10)
-                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+                .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
             }
         }
     }

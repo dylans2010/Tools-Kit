@@ -103,7 +103,7 @@ struct SecureFileSenderView: View {
                 .font(.caption).foregroundColor(.secondary)
         }
         .padding()
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
         .cornerRadius(12)
     }
 

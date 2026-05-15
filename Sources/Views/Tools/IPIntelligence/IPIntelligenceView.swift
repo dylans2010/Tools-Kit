@@ -20,7 +20,7 @@ struct IPIntelligenceView: View {
                 if backend.isLoading {
                     ProgressView("Fetching intelligence…")
                         .frame(maxWidth: .infinity).padding()
-                        .background(Color(.secondarySystemGroupedBackground))
+                        .background(Color(uiColor: .secondarySystemGroupedBackground))
                         .cornerRadius(12)
                 }
                 if !backend.errorMessage.isEmpty {

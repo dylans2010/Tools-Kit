@@ -45,14 +45,14 @@ struct ImageUploadQuestionView: View {
                         Spacer()
                     }
                     .padding(24)
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 }
             }
 
             TextField("Image description / notes (optional)", text: $answer)
                 .padding(10)
-                .background(Color(.secondarySystemBackground))
+                .background(Color(uiColor: .secondarySystemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
         .onChange(of: pickerItem) { _, newItem in

@@ -23,7 +23,7 @@ struct EmbedBlockView: View {
                 Spacer()
             }
             .padding(12)
-            .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+            .background(Color(uiColor: .tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
             .onChange(of: block.content) { _, _ in onUpdate() }
             .onChange(of: block.metadata["url"]) { _, _ in onUpdate() }
         }
