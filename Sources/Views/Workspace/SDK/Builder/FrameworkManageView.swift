@@ -560,7 +560,7 @@ struct FrameworkManageView: View {
             .onAppear { loadPresetsFromDisk() }
             .sheet(isPresented: $showShareSheet) {
                 if let url = exportURL {
-                    ShareSheet(activityItems: [url])
+                    FrameworkShareSheet(activityItems: [url])
                 }
             }
         }
@@ -904,24 +904,30 @@ struct FrameworkInfoPlistView: View {
     @ViewBuilder
     private func renderNode(key: String, value: AnyHashable) -> some View {
         if let dict = value as? [String: AnyHashable] {
-            Section(key) {
-                ForEach(dict.keys.sorted(), id: \.self) { subkey in
-                    renderNode(key: subkey, value: dict[subkey]!)
+            AnyView(
+                Section(key) {
+                    ForEach(dict.keys.sorted(), id: \.self) { subkey in
+                        renderNode(key: subkey, value: dict[subkey]!)
+                    }
                 }
-            }
+            )
         } else if let array = value as? [AnyHashable] {
-            Section(key) {
-                ForEach(Array(array.enumerated()), id: \.offset) { index, subvalue in
-                    renderNode(key: "[\(index)]", value: subvalue)
+            AnyView(
+                Section(key) {
+                    ForEach(Array(array.enumerated()), id: \.offset) { index, subvalue in
+                        renderNode(key: "[\(index)]", value: subvalue)
+                    }
                 }
-            }
+            )
         } else {
-            LabeledContent(key) {
-                Text(String(describing: value))
-                    .font(.caption2.monospaced())
-                    .foregroundStyle(.secondary)
-                    .textSelection(.enabled)
-            }
+            AnyView(
+                LabeledContent(key) {
+                    Text(String(describing: value))
+                        .font(.caption2.monospaced())
+                        .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                }
+            )
         }
     }
 }
@@ -1183,7 +1189,7 @@ struct FrameworkAuditLogView: View {
     let log: [FrameworkManager.FrameworkAuditEntry]
 
     var body: some View {
-        List(log.reversed()) { entry in
+        List(Array(log.reversed())) { entry in
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text(entry.frameworkName).font(.subheadline.bold())
@@ -1311,9 +1317,9 @@ struct NativeZipArchive {
     }
 
     mutating func addDirectory(url: URL, base: URL) {
-        let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: [.isRegularFileKey], options: [.allowsAnyFileHierarchyEnumeration])
+        let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: [URLResourceKey.isRegularFileKey], options: [])
         while let fileURL = enumerator?.nextObject() as? URL {
-            if let vals = try? fileURL.resourceValues(forKeys: [.isRegularFileKey]), vals.isRegularFile == true {
+            if let vals = try? fileURL.resourceValues(forKeys: [URLResourceKey.isRegularFileKey]), vals.isRegularFile == true {
                 let rel = fileURL.path.replacingOccurrences(of: base.path + "/", with: "")
                 if let d = try? Data(contentsOf: fileURL) { addFile(name: rel, data: d) }
             }
@@ -1344,7 +1350,7 @@ struct NativeZipArchive {
     }
 }
 
-struct ShareSheet: UIViewControllerRepresentable {
+struct FrameworkShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
     func makeUIViewController(context: Context) -> UIActivityViewController { UIActivityViewController(activityItems: activityItems, applicationActivities: nil) }
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
