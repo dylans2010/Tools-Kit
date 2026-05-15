@@ -18,6 +18,7 @@ struct LibraryDescriptor: Identifiable, Codable, Hashable {
     var resourceLimits: [String: Double]
     var targetCount: Int
     var addedDate: Date
+    var lastModified: Date
     var size: Int64
 
     enum LibraryType: String, Codable, CaseIterable {
@@ -31,7 +32,7 @@ struct LibraryDescriptor: Identifiable, Codable, Hashable {
         inputSchema: [String: String] = [:], outputSchema: [String: String] = [:],
         constraints: [String] = [],
         resourceLimits: [String: Double] = ["max_memory": 128.0, "max_cpu": 0.5],
-        targetCount: Int = 0, addedDate: Date = Date(), size: Int64 = 0
+        targetCount: Int = 0, addedDate: Date = Date(), lastModified: Date = Date(), size: Int64 = 0
     ) {
         self.id = id; self.name = name; self.path = path; self.version = version
         self.channel = channel; self.type = type
@@ -39,7 +40,7 @@ struct LibraryDescriptor: Identifiable, Codable, Hashable {
         self.inputSchema = inputSchema; self.outputSchema = outputSchema
         self.constraints = constraints
         self.resourceLimits = resourceLimits
-        self.targetCount = targetCount; self.addedDate = addedDate; self.size = size
+        self.targetCount = targetCount; self.addedDate = addedDate; self.lastModified = lastModified; self.size = size
     }
 }
 
@@ -182,11 +183,10 @@ struct CapabilityConflict: Identifiable {
 // MARK: - Library Registry
 
 @MainActor
-@Observable
-final class LibraryRegistry {
+final class LibraryRegistry: ObservableObject {
     static let shared = LibraryRegistry()
-    var libraries: [LibraryDescriptor] = []
-    var marketplaceLibraries: [LibraryDescriptor] = []
+    @Published var libraries: [LibraryDescriptor] = []
+    @Published var marketplaceLibraries: [LibraryDescriptor] = []
 
     private init() {
         seedMarketplace()
@@ -218,23 +218,22 @@ final class LibraryRegistry {
 // MARK: - Library Manager
 
 @MainActor
-@Observable
-final class LibraryManager {
+final class LibraryManager: ObservableObject {
     static let shared = LibraryManager()
 
-    var invocationRecords: [LibraryInvocationRecord] = []
-    var usageMetrics: [UUID: UsageMetrics] = [:]
-    var pendingApprovals: [LibraryScopeApproval] = []
-    var compositeWorkflows: [CompositeWorkflow] = []
-    var invocationTemplates: [InvocationTemplate] = []
-    var invocationState: LibraryInvocationState = .idle
-    var dryRunEnabled: Bool = false
-    var rateLimits: [UUID: Int] = [:] // libraryId: max per minute
-    var quotas: [UUID: Int] = [:] // libraryId: total allowed
-    var quotaUsage: [UUID: Int] = [:] // libraryId: current usage
+    @Published var invocationRecords: [LibraryInvocationRecord] = []
+    @Published var usageMetrics: [UUID: UsageMetrics] = [:]
+    @Published var pendingApprovals: [LibraryScopeApproval] = []
+    @Published var compositeWorkflows: [CompositeWorkflow] = []
+    @Published var invocationTemplates: [InvocationTemplate] = []
+    @Published var invocationState: LibraryInvocationState = .idle
+    @Published var dryRunEnabled: Bool = false
+    @Published var rateLimits: [UUID: Int] = [:] // libraryId: max per minute
+    @Published var quotas: [UUID: Int] = [:] // libraryId: total allowed
+    @Published var quotaUsage: [UUID: Int] = [:] // libraryId: current usage
 
     private let tokenEngine = DeterministicTokenEngine.shared
-    private let registry = LibraryRegistry.shared
+    internal let registry = LibraryRegistry.shared
 
     struct LibraryScopeApproval: Identifiable {
         let id = UUID()
@@ -951,7 +950,7 @@ struct LibrarySymbolBrowser: View {
         let id = UUID()
         let name: String
         let type: String
-        let conflicts: [String]
+        var conflicts: [String]
     }
 
     var filteredSymbols: [LibrarySymbol] {
@@ -1161,7 +1160,7 @@ struct CapabilityMarketplaceView: View {
     @State private var searchText = ""
 
     private var availableLibraries: [LibraryDescriptor] {
-        let installedNames = Set(registry.libraries.map(\.name))
+        let installedNames = Set(registry.libraries.map(\LibraryDescriptor.name))
         var list = registry.marketplaceLibraries.filter { !installedNames.contains($0.name) }
         if !searchText.isEmpty {
             list = list.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
@@ -1178,45 +1177,7 @@ struct CapabilityMarketplaceView: View {
             }
 
             ForEach(availableLibraries) { lib in
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(lib.name)
-                                .font(.headline)
-                            Text("v\(lib.version)")
-                                .font(.caption2.monospaced())
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Button("Install") {
-                            _ = manager.installLibrary(
-                                name: lib.name,
-                                version: lib.version,
-                                channel: lib.channel,
-                                capabilities: lib.capabilities,
-                                scopes: lib.requiredScopes
-                            )
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.small)
-                    }
-
-                    Text(lib.capabilities.joined(separator: " • "))
-                        .font(.caption2)
-                        .foregroundStyle(.purple)
-
-                    HStack {
-                        ForEach(lib.requiredScopes.prefix(3)) { scope in
-                            Text(scope.rawValue)
-                                .font(.system(size: 8, weight: .bold, design: .monospaced))
-                                .padding(.horizontal, 4)
-                                .padding(.vertical, 2)
-                                .background(Color.accentColor.opacity(0.1))
-                                .cornerRadius(4)
-                        }
-                    }
-                }
-                .padding(.vertical, 4)
+                MarketplaceLibraryRow(lib: lib, manager: manager)
             }
         }
         .navigationTitle("Marketplace")
@@ -1227,6 +1188,53 @@ struct CapabilityMarketplaceView: View {
                 Button("Close") { dismiss() }
             }
         }
+    }
+}
+
+struct MarketplaceLibraryRow: View {
+    let lib: LibraryDescriptor
+    let manager: LibraryManager
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(lib.name)
+                        .font(.headline)
+                    Text("v\(lib.version)")
+                        .font(.caption2.monospaced())
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button("Install") {
+                    _ = manager.installLibrary(
+                        name: lib.name,
+                        version: lib.version,
+                        channel: lib.channel,
+                        capabilities: lib.capabilities,
+                        scopes: lib.requiredScopes
+                    )
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+            }
+
+            Text(lib.capabilities.joined(separator: " • "))
+                .font(.caption2)
+                .foregroundStyle(.purple)
+
+            HStack {
+                ForEach(lib.requiredScopes.prefix(3)) { scope in
+                    Text(scope.rawValue)
+                        .font(.system(size: 8, weight: .bold, design: .monospaced))
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(Color.accentColor.opacity(0.1))
+                        .cornerRadius(4)
+                }
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 

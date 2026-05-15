@@ -47,7 +47,7 @@ struct SDKAppBuilderView: View {
         }
         .navigationTitle("App Builder")
         .sheet(item: $exportedURL) { url in
-            ShareSheet(activityItems: [url])
+            AppBuilderShareSheet(activityItems: [url])
         }
     }
 
@@ -208,7 +208,7 @@ extension URL: Identifiable {
     public var id: String { absoluteString }
 }
 
-struct ShareSheet: UIViewControllerRepresentable {
+struct AppBuilderShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
     func makeUIViewController(context: Context) -> UIActivityViewController {
         UIActivityViewController(activityItems: activityItems, applicationActivities: nil)

@@ -48,12 +48,11 @@ enum RegistryType: String, CaseIterable, Codable, Identifiable {
 }
 
 @MainActor
-@Observable
-final class PackageRegistry {
+final class PackageRegistry: ObservableObject {
     static let shared = PackageRegistry()
-    var packages: [PackageDescriptor] = []
-    var activeRegistry: RegistryType = .local
-    var remoteRegistryURL: String = "https://registry.toolskit.dev"
+    @Published var packages: [PackageDescriptor] = []
+    @Published var activeRegistry: RegistryType = .local
+    @Published var remoteRegistryURL: String = "https://registry.toolskit.dev"
 
     private init() {}
 
@@ -131,7 +130,9 @@ struct DependencyGraph {
 
     var adjacency: [UUID: [UUID]] {
         var map: [UUID: [UUID]] = [:]
-        for pkg in packages { map[pkg.id] = pkg.dependencyIds }
+        for pkg in packages {
+            map[pkg.id] = pkg.dependencyIds
+        }
         return map
     }
 
@@ -274,8 +275,7 @@ struct SemverResolver {
 // MARK: - Package Manager
 
 @MainActor
-@Observable
-final class PackageDependencyManager {
+final class PackageDependencyManager: ObservableObject {
     static let shared = PackageDependencyManager()
 
     private let tokenEngine = DeterministicTokenEngine.shared
@@ -383,9 +383,9 @@ final class PackageDependencyManager {
         return findings
     }
 
-    var syncProgress: Double = 0
-    var isSyncing: Bool = false
-    var lastSyncError: String?
+    @Published var syncProgress: Double = 0
+    @Published var isSyncing: Bool = false
+    @Published var lastSyncError: String?
 
     func syncWithRemoteRegistry() async {
         isSyncing = true
@@ -393,7 +393,7 @@ final class PackageDependencyManager {
         syncProgress = 0
 
         // Real Registry Sync simulation with file integrity verification
-        for i in 1... registry.packages.count {
+        for i in 1...registry.packages.count {
             syncProgress = Double(i) / Double(registry.packages.count)
             let pkg = registry.packages[i-1]
             if !PackageIntegrityEngine.verify(package: pkg) {

@@ -32,11 +32,17 @@ struct SecurityPackageView: View {
             }
             .navigationTitle("Security Package")
             .overlay { if isWorking { ProgressView("Processing…") } }
-            .sheet(isPresented: $showingExportShare) { if let exportURL { ShareSheet(activityItems: [exportURL]) } }
+            .sheet(isPresented: $showingExportShare) { if let exportURL { SecurityShareSheet(activityItems: [exportURL]) } }
             .fileImporter(isPresented: $showingImportPicker, allowedContentTypes: [UTType(filenameExtension: "toolkitsec") ?? .data]) { if case .success(let url) = $0 { handleImport(urls: [url]) } }
             .sheet(isPresented: $showingImportBridge) { FileImporterRepresentableView(allowedContentTypes: [UTType(filenameExtension: "toolkitsec") ?? .data], allowsMultipleSelection: false) { handleImport(urls: $0) } }
         }
     }
     private func exportVault() { Task { isWorking = true; defer { isWorking = false }; do { let url = try await SecurityPackageService.shared.exportPackage(password: password); exportURL = url; showingExportShare = true; statusMessage = "Backup Generated Successfully."; isError = false } catch { statusMessage = "Export failed: \(error.localizedDescription)"; isError = true } } }
     private func handleImport(urls: [URL]) { guard let url = urls.first else { return }; Task { isWorking = true; defer { isWorking = false }; do { try await SecurityPackageService.shared.importPackage(at: url, password: password); statusMessage = "Vault Imported Successfully."; isError = false } catch { statusMessage = "Import failed: \(error.localizedDescription)"; isError = true } } }
+}
+
+struct SecurityShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    func makeUIViewController(context: Context) -> UIActivityViewController { UIActivityViewController(activityItems: activityItems, applicationActivities: nil) }
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
