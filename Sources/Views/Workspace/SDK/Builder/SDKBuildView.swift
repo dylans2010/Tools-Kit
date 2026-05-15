@@ -302,7 +302,7 @@ struct SDKBuildView: View {
                     set: { projectManager.currentProject = $0 }
                 ))
             }
-            NavigationLink("Authorization", destination: AuthRootView())
+            NavigationLink("Authorization", destination: SignInView())
             NavigationLink("Automation", destination: SDKAutomationView())
             NavigationLink("Flow Builder") {
                 SDKFlowBuilderView(project: Binding(
