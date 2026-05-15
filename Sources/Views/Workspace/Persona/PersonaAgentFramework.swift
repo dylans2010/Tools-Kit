@@ -549,7 +549,9 @@ struct PersonaAgentFrameworkView: View {
 
     @ViewBuilder
     private var tokenSection: some View {
-        Section(content: {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Authentication")
+                .font(.headline)
             if let token = tokenEngine.currentToken {
                 LabeledContent("Status") {
                     Text(token.isExpired ? "Expired" : "Active")
@@ -564,13 +566,12 @@ struct PersonaAgentFrameworkView: View {
                     _ = tokenEngine.generateToken(uid: tokenGenUid, scopes: tokenGenScopes, sessionDuration: tokenGenDuration * 3600, deviceFingerprint: UUID().uuidString)
                 }.buttonStyle(.borderedProminent)
             }
-        }, header: {
-            Text("Authentication")
-        })
+        }
     }
 
     private var agentStateSection: some View {
-        Section("Agent State") {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Agent State").font(.headline)
             Picker("Profile", selection: $agent.currentProfile) {
                 ForEach(AgentExecutionProfile.allCases, id: \.self) { profile in
                     Text(profile.rawValue.capitalized).tag(profile)
@@ -586,7 +587,8 @@ struct PersonaAgentFrameworkView: View {
     }
 
     private var intentSection: some View {
-        Section("Intent Parser") {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Intent Parser").font(.headline)
             TextField("Describe what to do", text: $intentInput)
             TextField("Target (package/library/framework)", text: $targetInput)
             Button("Build Plan") {
@@ -602,7 +604,8 @@ struct PersonaAgentFrameworkView: View {
     }
 
     private var toolSection: some View {
-        Section("Tool Execution") {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Tool Execution").font(.headline)
             Picker("Tool", selection: $selectedTool) {
                 ForEach(AgentToolName.allCases) { tool in Text(tool.displayName).tag(tool) }
             }
@@ -615,7 +618,8 @@ struct PersonaAgentFrameworkView: View {
     }
 
     private var takeoverSection: some View {
-        Section("Workspace Takeover") {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Workspace Takeover").font(.headline)
             if agent.takeoverActive {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Agent has workspace control").font(.caption.bold()).foregroundStyle(.orange)
@@ -672,7 +676,8 @@ struct PersonaAgentFrameworkView: View {
     }
 
     private var auditSection: some View {
-        Section("Audit Log (\(agent.auditLog.count))") {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Audit Log (\(agent.auditLog.count))").font(.headline)
             ForEach(agent.auditLog.suffix(20).reversed()) { entry in
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {
@@ -690,12 +695,14 @@ struct PersonaAgentFrameworkView: View {
     @ViewBuilder
     private var tokenInspectorSections: some View {
         if let token = tokenEngine.currentToken {
-            Section("Header") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Header").font(.headline)
                 LabeledContent("Type", value: token.header.tokenType)
                 LabeledContent("Algorithm", value: token.header.algorithm)
                 LabeledContent("Key ID", value: token.header.keyId)
             }
-            Section("Payload") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Payload").font(.headline)
                 LabeledContent("UID", value: token.payload.uid)
                 LabeledContent("Session ID", value: String(token.payload.sid.prefix(12)))
                 LabeledContent("Nonce", value: String(token.payload.nonce.prefix(12)))
@@ -704,14 +711,16 @@ struct PersonaAgentFrameworkView: View {
                 LabeledContent("Issued", value: Date(timeIntervalSince1970: token.payload.iat).formatted())
                 LabeledContent("Expires", value: Date(timeIntervalSince1970: token.payload.exp).formatted())
             }
-            Section("Scopes") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Scopes").font(.headline)
                 ForEach(Array(SDKScope.decode(token.payload.scp)).sorted(by: { $0.rawValue < $1.rawValue })) { scope in
                     Label(scope.displayName, systemImage: "checkmark.circle.fill").font(.caption)
                 }
             }
-            Section("Signature") { Text(token.signature).font(.caption2.monospaced()).lineLimit(3) }
-            Section("Serialized") { Text(token.serialized).font(.caption2.monospaced()).lineLimit(5) }
-            Section("Validation") {
+            VStack(alignment: .leading, spacing: 8) { Text("Signature").font(.headline); Text(token.signature).font(.caption2.monospaced()).lineLimit(3) }
+            VStack(alignment: .leading, spacing: 8) { Text("Serialized").font(.headline); Text(token.serialized).font(.caption2.monospaced()).lineLimit(5) }
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Validation").font(.headline)
                 HStack {
                     Text("Status")
                     Spacer()
@@ -724,7 +733,9 @@ struct PersonaAgentFrameworkView: View {
                 Button("Validate Now") { _ = tokenEngine.validate(token: token, expectedFingerprint: token.payload.dfp) }
             }
         } else {
-            Section(content: {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Generate Token")
+                    .font(.headline)
                 TextField("User ID", text: $tokenGenUid)
                 Stepper("Duration: \(Int(tokenGenDuration))h", value: $tokenGenDuration, in: 1...24)
                 ForEach(SDKScope.allCases) { scope in
@@ -733,16 +744,15 @@ struct PersonaAgentFrameworkView: View {
                 Button("Generate") {
                     _ = tokenEngine.generateToken(uid: tokenGenUid, scopes: tokenGenScopes, sessionDuration: tokenGenDuration * 3600, deviceFingerprint: UUID().uuidString)
                 }.buttonStyle(.borderedProminent)
-            }, header: {
-                Text("Generate Token")
-            })
+            }
         }
     }
 
     private var tokenInspectorView: some View {
         List {
             tokenInspectorSections
-            Section("Session Timeline (\(tokenEngine.sessionTimeline.count))") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Session Timeline (\(tokenEngine.sessionTimeline.count))").font(.headline)
                 ForEach(tokenEngine.sessionTimeline.suffix(15).reversed()) { event in
                     VStack(alignment: .leading, spacing: 2) {
                         Text(event.event).font(.caption.bold())
@@ -758,15 +768,17 @@ struct PersonaAgentFrameworkView: View {
 
     private var takeoverApprovalView: some View {
         List {
-            Section("Agent requests workspace control") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Agent requests workspace control").font(.headline)
                 Text("Select scopes to grant the agent:").font(.caption)
             }
-            Section("Scopes") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Scopes").font(.headline)
                 ForEach(SDKScope.allCases) { scope in
                     Toggle(scope.displayName, isOn: Binding(get: { selectedTakeoverScopes.contains(scope) }, set: { if $0 { selectedTakeoverScopes.insert(scope) } else { selectedTakeoverScopes.remove(scope) } })).font(.caption)
                 }
             }
-            Section {
+            VStack(alignment: .leading, spacing: 8) {
                 Button("Approve Takeover") {
                     agent.approveTakeover(grantedScopes: selectedTakeoverScopes)
                     showTakeoverSheet = false
