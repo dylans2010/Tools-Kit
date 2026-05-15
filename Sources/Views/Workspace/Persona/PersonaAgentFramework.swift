@@ -549,7 +549,7 @@ struct PersonaAgentFrameworkView: View {
 
     @ViewBuilder
     private var tokenSection: some View {
-        Section("Authentication") {
+        Section {
             if let token = tokenEngine.currentToken {
                 LabeledContent("Status") {
                     Text(token.isExpired ? "Expired" : "Active")
@@ -564,6 +564,8 @@ struct PersonaAgentFrameworkView: View {
                     _ = tokenEngine.generateToken(uid: tokenGenUid, scopes: tokenGenScopes, sessionDuration: tokenGenDuration * 3600, deviceFingerprint: UUID().uuidString)
                 }.buttonStyle(.borderedProminent)
             }
+        } header: {
+            Text("Authentication")
         }
     }
 
@@ -722,7 +724,7 @@ struct PersonaAgentFrameworkView: View {
                 Button("Validate Now") { _ = tokenEngine.validate(token: token, expectedFingerprint: token.payload.dfp) }
             }
         } else {
-            Section("Generate Token") {
+            Section {
                 TextField("User ID", text: $tokenGenUid)
                 Stepper("Duration: \(Int(tokenGenDuration))h", value: $tokenGenDuration, in: 1...24)
                 ForEach(SDKScope.allCases) { scope in
@@ -731,6 +733,8 @@ struct PersonaAgentFrameworkView: View {
                 Button("Generate") {
                     _ = tokenEngine.generateToken(uid: tokenGenUid, scopes: tokenGenScopes, sessionDuration: tokenGenDuration * 3600, deviceFingerprint: UUID().uuidString)
                 }.buttonStyle(.borderedProminent)
+            } header: {
+                Text("Generate Token")
             }
         }
     }
