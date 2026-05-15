@@ -1310,6 +1310,7 @@
 		SDK2C2F744FA2B14E0BAFA002 /* SDKRateLimiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1C2F744FA2B14E0BAFA002 /* SDKRateLimiter.swift */; };
 		SDK2C2F744FA2B14E0BAFA003 /* SDKAuditLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1C2F744FA2B14E0BAFA003 /* SDKAuditLogger.swift */; };
 		SDK2C2F744FA2B14E0BAFA004 /* SDKPolicyEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1C2F744FA2B14E0BAFA004 /* SDKPolicyEngine.swift */; };
+		SDK2C2F744FA2B14E0BAFA005 /* DeveloperIDManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1C2F744FA2B14E0BAFA005 /* DeveloperIDManager.swift */; };
 		SDK2794F041FAE423CA8FEB4 /* SDKMailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK178D40446D42F18991AF8 /* SDKMailService.swift */; };
 		SDK2065E9BA28CDD37D46AD8 /* SDKNotebookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1FAA6D7ED6ADAFA63D593 /* SDKNotebookService.swift */; };
 		SDK277F284C03A68F2B2572E /* SDKMeetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK15DBE0E80391E2E7833B8 /* SDKMeetService.swift */; };
@@ -2745,6 +2746,7 @@
 		SDK1C2F744FA2B14E0BAFA002 /* SDKRateLimiter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKRateLimiter.swift; sourceTree = "<group>"; };
 		SDK1C2F744FA2B14E0BAFA003 /* SDKAuditLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAuditLogger.swift; sourceTree = "<group>"; };
 		SDK1C2F744FA2B14E0BAFA004 /* SDKPolicyEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPolicyEngine.swift; sourceTree = "<group>"; };
+		SDK1C2F744FA2B14E0BAFA005 /* DeveloperIDManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperIDManager.swift; sourceTree = "<group>"; };
 		SDK178D40446D42F18991AF8 /* SDKMailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKMailService.swift; sourceTree = "<group>"; };
 		SDK1FAA6D7ED6ADAFA63D593 /* SDKNotebookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNotebookService.swift; sourceTree = "<group>"; };
 		SDK15DBE0E80391E2E7833B8 /* SDKMeetService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKMeetService.swift; sourceTree = "<group>"; };
@@ -9482,6 +9484,7 @@
 				SDK1C2F744FA2B14E0BAFA002 /* SDKRateLimiter.swift */,
 				SDK1C2F744FA2B14E0BAFA003 /* SDKAuditLogger.swift */,
 				SDK1C2F744FA2B14E0BAFA004 /* SDKPolicyEngine.swift */,
+				SDK1C2F744FA2B14E0BAFA005 /* DeveloperIDManager.swift */,
 			);
 			path = Security;
 			sourceTree = "<group>";
@@ -9984,6 +9987,7 @@
 				SDK2C2F744FA2B14E0BAFA002 /* SDKRateLimiter.swift in Sources */,
 				SDK2C2F744FA2B14E0BAFA003 /* SDKAuditLogger.swift in Sources */,
 				SDK2C2F744FA2B14E0BAFA004 /* SDKPolicyEngine.swift in Sources */,
+				SDK2C2F744FA2B14E0BAFA005 /* DeveloperIDManager.swift in Sources */,
 				SDK2794F041FAE423CA8FEB4 /* SDKMailService.swift in Sources */,
 				SDK2065E9BA28CDD37D46AD8 /* SDKNotebookService.swift in Sources */,
 				SDK277F284C03A68F2B2572E /* SDKMeetService.swift in Sources */,
