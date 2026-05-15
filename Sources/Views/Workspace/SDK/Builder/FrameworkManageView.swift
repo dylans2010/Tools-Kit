@@ -866,7 +866,7 @@ struct FrameworkManageView: View {
             if manager.executionRecords.isEmpty {
                 Text("No executions yet").foregroundStyle(.secondary).font(.caption)
             } else {
-                ForEach(manager.executionRecords.suffix(10).reversed()) { record in
+                ForEach(Array(manager.executionRecords.suffix(10).reversed())) { record in
                     VStack(alignment: .leading, spacing: 2) {
                         HStack {
                             Text(record.frameworkName).font(.caption.bold())
