@@ -285,3 +285,86 @@ public final class AuthorizationManager: ObservableObject {
         }
     }
 }
+
+public struct DeterministicToken: Equatable {
+    public let id: String
+    public let scopes: Set<String>
+    public let issuedAt: Date
+    public let expiresAt: Date
+
+    public var isExpired: Bool {
+        Date() >= expiresAt
+    }
+}
+
+public enum UIAgentToolResult {
+    case success(String)
+    case failure(String)
+    case dryRun(String)
+}
+
+@MainActor
+public final class DeterministicTokenEngine: ObservableObject {
+    public static let shared = DeterministicTokenEngine()
+
+    @Published public private(set) var currentToken: DeterministicToken?
+
+    private let authorizationManager = AuthorizationManager.shared
+
+    private init() {
+        syncFromAuthorization()
+    }
+
+    @discardableResult
+    public func generateToken(
+        developerId: String,
+        scopes: Set<SDKScope>,
+        sessionDuration: TimeInterval = 3600,
+        deviceFingerprint: String
+    ) -> DeterministicToken {
+        let now = Date()
+        let token = DeterministicToken(
+            id: UUID().uuidString,
+            scopes: Set(scopes.map(\.rawValue)),
+            issuedAt: now,
+            expiresAt: now.addingTimeInterval(max(1, sessionDuration))
+        )
+        currentToken = token
+        return token
+    }
+
+    public func revokeToken() {
+        currentToken = nil
+    }
+
+    public func hasScope(_ scope: SDKScope) -> Bool {
+        syncFromAuthorization()
+
+        if let token = currentToken, !token.isExpired {
+            if token.scopes.contains("*") || token.scopes.contains(scope.rawValue) {
+                return true
+            }
+        }
+
+        return authorizationManager.canUseScopes([scope.rawValue])
+    }
+
+    public func requireScope(_ scope: SDKScope) -> Bool {
+        hasScope(scope)
+    }
+
+    private func syncFromAuthorization() {
+        guard authorizationManager.authState == .authenticated, let session = authorizationManager.authSession else {
+            currentToken = nil
+            return
+        }
+
+        let token = DeterministicToken(
+            id: session.sessionId,
+            scopes: Set(session.scopes),
+            issuedAt: session.issuedAt,
+            expiresAt: session.expiresAt
+        )
+        currentToken = token.isExpired ? nil : token
+    }
+}

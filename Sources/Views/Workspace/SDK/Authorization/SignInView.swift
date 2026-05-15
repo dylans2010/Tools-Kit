@@ -1,139 +1,244 @@
 import SwiftUI
-import CryptoKit
 
 struct SignInView: View {
-    @Environment(\.dismiss) private var dismiss
-    @StateObject private var authorizationManager = AuthorizationManager.shared
-
-    @State private var developerId = "workspace-dev"
-    @State private var selectedScopes: Set<SDKScope> = [.workspaceRead, .sdkProjectCreate]
-    @State private var durationHours: Double = 1
-    @State private var refreshToken = ""
-    @State private var showingScopeSelection = false
+    @State private var keyValue: String?
+    @State private var metadata: KeyMetadata?
+    @State private var errorMessage: String?
+    @State private var currentTier: KeyTier = AuthRootView.currentBuildTier()
+    @State private var showSessionStatus = false
+    @State private var isLoading = false
 
     var body: some View {
-        Form {
-            Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Developer Identity")
-                        .font(.headline)
-                    Text("Your Developer ID is used to sign all SDK operations and bound to your local device fingerprint.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+        NavigationStack {
+            VStack(spacing: 20) {
+                header
+
+                if let errorMessage {
+                    errorBanner(errorMessage)
                 }
-                .padding(.vertical, 4)
 
-                TextField("Developer ID", text: $developerId)
-                    .textFieldStyle(.roundedBorder)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
+                statusCard
 
-                TextField("Refresh Token (optional)", text: $refreshToken)
-                    .textFieldStyle(.roundedBorder)
-            } header: {
-                Text("Identity")
+                if let keyValue {
+                    keyDisplayCard(keyValue)
+                }
+
+                metadataCard
+
+                Spacer(minLength: 0)
             }
-
-            Section {
-                Button {
-                    showingScopeSelection = true
-                } label: {
-                    HStack {
-                        Label("\(selectedScopes.count) Scopes Selected", systemImage: "shield.lefthalf.filled")
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+            .padding(20)
+            .background(
+                LinearGradient(
+                    colors: [Color(hex: "#0A0F1E"), Color(hex: "#121C36")],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+            )
+            .navigationTitle("Sign In")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Session Status") {
+                        showSessionStatus = true
                     }
                 }
-
-                Stepper("Session Duration: \(Int(durationHours))h", value: $durationHours, in: 1...24)
-            } header: {
-                Text("Security Scopes")
             }
+            .navigationDestination(isPresented: $showSessionStatus) {
+                SessionStatusView(state: sessionStatusState) {
+                    showSessionStatus = false
+                    loadStoredKey()
+                }
+            }
+            .onAppear {
+                loadStoredKey()
+            }
+        }
+    }
 
-            Section {
-                Button {
-                    performAuthentication()
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Developer Identity")
+                .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                .foregroundStyle(.white)
+
+            Text("Secure access key for workspace SDK sessions")
+                .font(.system(.subheadline, design: .rounded))
+                .foregroundStyle(.white.opacity(0.7))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var statusCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if metadata != nil {
+                HStack {
+                    Label("Developer ID Active", systemImage: "checkmark.seal.fill")
+                        .font(.system(.headline, design: .rounded))
+                        .foregroundStyle(.green)
+                    Spacer()
+                }
+
+                Button(role: .destructive) {
+                    revokeKey()
                 } label: {
-                    Text("Create Developer ID & Authenticate")
+                    Text("Revoke")
                         .frame(maxWidth: .infinity)
-                        .font(.headline)
+                }
+                .buttonStyle(.bordered)
+            } else {
+                Button {
+                    generateKey()
+                } label: {
+                    Text("Generate Developer ID")
+                        .font(.system(.headline, design: .rounded))
+                        .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .disabled(developerId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .tint(Color(hex: "#3D8EFF"))
             }
         }
-        .navigationTitle("SDK Sign In")
-        .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showingScopeSelection) {
-            NavigationStack {
-                ScopeSelectionSheet(selectedScopes: $selectedScopes)
-            }
-        }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
     }
 
-    private func performAuthentication() {
-        let trimmedDevId = developerId.trimmingCharacters(in: .whitespacesAndNewlines)
-        let hashedId = hashDeveloperId(trimmedDevId)
+    @ViewBuilder
+    private func keyDisplayCard(_ key: String) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Developer ID")
+                .font(.system(.headline, design: .rounded))
+                .foregroundStyle(.white)
 
-        try? SDKStorageManager.shared.setSecureValue(key: "last_developer_id_hash", value: hashedId)
-
-        authorizationManager.beginAuthentication()
-        _ = authorizationManager.authenticate(
-            developerId: hashedId,
-            scopes: selectedScopes.map(\.rawValue),
-            sessionDuration: durationHours * 3600,
-            refreshToken: refreshToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : refreshToken
-        )
-        dismiss()
-    }
-
-    private func hashDeveloperId(_ id: String) -> String {
-        let inputData = Data(id.utf8)
-        let hashed = SHA256.hash(data: inputData)
-        return hashed.compactMap { String(format: "%02x", $0) }.joined()
-    }
-
-}
-
-struct ScopeSelectionSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @Binding var selectedScopes: Set<SDKScope>
-
-    var body: some View {
-        List {
-            Section {
-                Text("Select the security scopes required for your development session. These will be encoded into your deterministic token.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            ForEach(SDKScope.allCases) { scope in
-                Toggle(isOn: Binding(
-                    get: { selectedScopes.contains(scope) },
-                    set: { if $0 { selectedScopes.insert(scope) } else { selectedScopes.remove(scope) } }
-                )) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(scope.displayName)
-                            .font(.subheadline.bold())
-                        Text(scope.rawValue)
-                            .font(.caption2.monospaced())
-                            .foregroundStyle(.secondary)
-                    }
+            Text(key)
+                .font(.system(.footnote, design: .monospaced))
+                .textSelection(.enabled)
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+                .onTapGesture {
+                    UIPasteboard.general.string = key
                 }
-            }
+
+            Text("Tap key to copy")
+                .font(.system(.caption, design: .rounded))
+                .foregroundStyle(.white.opacity(0.6))
         }
-        .navigationTitle("Select Scopes")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Done") { dismiss() }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
+    }
+
+    @ViewBuilder
+    private var metadataCard: some View {
+        if let metadata {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Metadata")
+                    .font(.system(.headline, design: .rounded))
+                    .foregroundStyle(.white)
+
+                HStack {
+                    Text("Tier")
+                    Spacer()
+                    Text(metadata.tier.rawValue)
+                        .font(.system(.caption, design: .rounded, weight: .bold))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color(hex: "#3D8EFF").opacity(0.3), in: Capsule())
+                }
+                .foregroundStyle(.white)
+
+                HStack {
+                    Text("Generated")
+                    Spacer()
+                    Text(metadata.generatedAt.formatted(date: .abbreviated, time: .shortened))
+                }
+                .foregroundStyle(.white.opacity(0.85))
+
+                HStack {
+                    Text("Expires")
+                    Spacer()
+                    Text(metadata.expiryDate.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? "Never")
+                }
+                .foregroundStyle(.white.opacity(0.85))
             }
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Clear All") { selectedScopes.removeAll() }
-            }
+            .padding()
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
         }
+    }
+
+    private func errorBanner(_ message: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.red)
+            Text(message)
+                .font(.system(.subheadline, design: .rounded))
+                .foregroundStyle(.white)
+            Spacer()
+        }
+        .padding(12)
+        .background(Color.red.opacity(0.25), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func loadStoredKey() {
+        isLoading = true
+        errorMessage = nil
+        do {
+            guard let stored = try AuthRootView.shared.retrieveStoredKey() else {
+                metadata = nil
+                keyValue = nil
+                isLoading = false
+                return
+            }
+
+            let validated = try AuthRootView.shared.validate(stored)
+            keyValue = stored
+            metadata = validated
+            currentTier = validated.tier
+            isLoading = false
+        } catch let validationError as KeyValidationError {
+            if case .expired = validationError {
+                try? AuthRootView.shared.deleteStoredKey()
+                keyValue = nil
+                metadata = nil
+            }
+            errorMessage = validationError.localizedDescription
+            isLoading = false
+        } catch {
+            errorMessage = error.localizedDescription
+            keyValue = nil
+            metadata = nil
+            isLoading = false
+        }
+    }
+
+    private func generateKey() {
+        errorMessage = nil
+        do {
+            let key = try AuthRootView.shared.generateKey(tier: currentTier)
+            let validated = try AuthRootView.shared.validate(key)
+            keyValue = key
+            metadata = validated
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func revokeKey() {
+        errorMessage = nil
+        do {
+            try AuthRootView.shared.deleteStoredKey()
+            keyValue = nil
+            metadata = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private var sessionStatusState: SessionStatusView.State {
+        if isLoading { return .loading }
+        if metadata != nil { return .active }
+        if let errorMessage, errorMessage.localizedCaseInsensitiveContains("expired") { return .expired }
+        if let errorMessage { return .error(message: errorMessage) }
+        return .expired
     }
 }

@@ -3,7 +3,6 @@ import Aurora
 
 struct PersonaHomeView: View {
     @ObservedObject private var manager = PersonaManager.shared
-    @StateObject private var agent = PersonaAgentFramework.shared
     @State private var query = ""
     @AppStorage("persona.welcome_shown") private var hasShownWelcome = false
     @State private var activeModal: PersonaHomeModal?
@@ -478,111 +477,351 @@ private struct PersonaHomeNavigationContent: View {
     let onNeedScroll: (ScrollViewProxy) -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            if agentMode {
-                PersonaAgentStatusOverlay()
+        ZStack(alignment: .bottom) {
+            Color(hex: "#0A0F1E")
+                .opacity(agentMode ? 0.35 : 0)
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                PersonaChatTimelineView(
+                    chatHistory: chatHistory,
+                    isThinking: isThinking,
+                    onDiscoverPrompts: onOpenDiscovery,
+                    onNeedScroll: onNeedScroll
+                )
+
+                PersonaComposerView(
+                    query: $query,
+                    isThinking: isThinking,
+                    followUpSuggestions: followUpSuggestions,
+                    onTapPrompt: onPromptSelection,
+                    onSend: onSend,
+                    onOpenDiscovery: onOpenDiscovery,
+                    onOpenChats: onOpenChats
+                )
             }
 
-            PersonaChatTimelineView(
-                chatHistory: chatHistory,
-                isThinking: isThinking,
-                onDiscoverPrompts: onOpenDiscovery,
-                onNeedScroll: onNeedScroll
-            )
-
-            PersonaComposerView(
-                query: $query,
-                isThinking: isThinking,
-                followUpSuggestions: followUpSuggestions,
-                onTapPrompt: onPromptSelection,
-                onSend: onSend,
-                onOpenDiscovery: onOpenDiscovery,
-                onOpenChats: onOpenChats
-            )
+            if agentMode {
+                PersonaAgentCommandSurface()
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
     }
 }
 
-private struct PersonaAgentStatusOverlay: View {
-    @StateObject private var agent = PersonaAgentFramework.shared
+private enum PersonaAgentIndicatorState {
+    case idle
+    case thinking
+    case acting
+    case error
+}
+
+private struct AgentActionFeedEvent: Identifiable {
+    let id = UUID()
+    let icon: String
+    let label: String
+    let timestamp: Date
+    let tint: Color
+}
+
+private struct PersonaAgentCommandSurface: View {
+    @Namespace private var panelNamespace
+
+    @State private var command = ""
+    @State private var events: [AgentActionFeedEvent] = []
+    @State private var status: PersonaAgentIndicatorState = .idle
+    @State private var isExpanded = false
+    @State private var isExecuting = false
+    @State private var pulse = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
+        VStack {
+            Spacer()
+
+            Group {
+                if isExpanded {
+                    expandedPanel
+                        .matchedGeometryEffect(id: "agent-panel", in: panelNamespace)
+                } else {
+                    compactPill
+                        .matchedGeometryEffect(id: "agent-panel", in: panelNamespace)
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.bottom, 12)
+        }
+        .animation(.spring(response: 0.45, dampingFraction: 0.82), value: isExpanded)
+        .onAppear {
+            pulse = true
+        }
+    }
+
+    private var compactPill: some View {
+        Button {
+            isExpanded = true
+        } label: {
+            HStack(spacing: 10) {
+                statusDot
+                Text(lastActionLabel)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.9))
+                    .lineLimit(1)
+                Spacer()
+                Image(systemName: "chevron.up")
+                    .font(.caption.bold())
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+        }
+        .buttonStyle(.plain)
+        .background(.ultraThinMaterial, in: Capsule())
+        .overlay(Capsule().stroke(Color(hex: "#3D8EFF").opacity(0.35), lineWidth: 1))
+    }
+
+    private var expandedPanel: some View {
+        VStack(spacing: 14) {
+            HStack(spacing: 10) {
+                statusDot
                 VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Circle()
-                            .fill(statusColor)
-                            .frame(width: 8, height: 8)
-                        Text("AGENT MODE ACTIVE")
-                            .font(.system(size: 10, weight: .black))
-                    }
-                    Text(agent.executionState.rawValue.uppercased())
-                        .font(.system(size: 8))
-                        .foregroundStyle(.secondary)
+                    Text("Agent Mode")
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text(lastActionLabel)
+                        .font(.system(size: 11, weight: .regular, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.65))
+                        .lineLimit(1)
                 }
                 Spacer()
-                if agent.takeoverActive {
-                    Label("TAKEOVER", systemImage: "bolt.fill")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(.orange)
+                Button {
+                    isExpanded = false
+                } label: {
+                    Image(systemName: "chevron.down")
+                        .font(.caption.bold())
+                        .foregroundStyle(.white.opacity(0.7))
+                        .padding(8)
+                        .background(Color.white.opacity(0.08), in: Circle())
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(.orange.opacity(0.1))
 
-            if !agent.currentPlan.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        ForEach(agent.currentPlan) { step in
-                            HStack(spacing: 4) {
-                                Image(systemName: stepIcon(step.status))
-                                    .font(.system(size: 10))
-                                Text(step.description)
-                                    .font(.system(size: 10))
+            ScrollView {
+                LazyVStack(spacing: 8) {
+                    if events.isEmpty && !isExecuting {
+                        Text("No actions yet")
+                            .font(.system(size: 12, weight: .regular, design: .monospaced))
+                            .foregroundStyle(.white.opacity(0.45))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 4)
+                    }
+
+                    ForEach(events) { event in
+                        HStack(alignment: .top, spacing: 10) {
+                            Image(systemName: event.icon)
+                                .foregroundStyle(event.tint)
+                                .frame(width: 14, height: 14)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(event.label)
+                                    .font(.system(size: 11, weight: .regular, design: .monospaced))
+                                    .foregroundStyle(.white.opacity(0.92))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                Text(event.timestamp, style: .time)
+                                    .font(.system(size: 10, weight: .regular, design: .monospaced))
+                                    .foregroundStyle(.white.opacity(0.45))
                             }
-                            .foregroundStyle(stepColor(step.status))
+                        }
+                        .padding(10)
+                        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
+                    }
+
+                    if isExecuting {
+                        ForEach(0..<2, id: \.self) { _ in
+                            PersonaAgentShimmerRow()
                         }
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 4)
                 }
-                .background(.black.opacity(0.05))
             }
-            Divider()
+            .frame(maxHeight: 180)
+
+            HStack(spacing: 10) {
+                TextField("Run action", text: $command)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 13, weight: .regular, design: .rounded))
+                    .foregroundStyle(.white)
+                    .submitLabel(.go)
+                    .onSubmit {
+                        runCommand()
+                    }
+
+                Button("Run") {
+                    runCommand()
+                }
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .buttonStyle(.borderedProminent)
+                .tint(Color(hex: "#3D8EFF"))
+                .disabled(command.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isExecuting)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
         }
+        .padding(14)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 22))
+        .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color(hex: "#3D8EFF").opacity(0.3), lineWidth: 1))
+    }
+
+    private var lastActionLabel: String {
+        events.first?.label ?? "No actions yet"
+    }
+
+    private var statusDot: some View {
+        Circle()
+            .fill(statusColor)
+            .frame(width: 10, height: 10)
+            .scaleEffect(pulse ? 1.0 : 0.72)
+            .animation(.easeInOut(duration: 0.95).repeatForever(autoreverses: true), value: pulse)
     }
 
     private var statusColor: Color {
-        switch agent.executionState {
-        case .idle: return .gray
-        case .planning, .executing: return .blue
-        case .awaitingApproval: return .orange
-        case .takenOver: return .red
-        case .completed: return .green
-        case .failed, .rolledBack: return .red
+        switch status {
+        case .idle: return Color(hex: "#3D8EFF")
+        case .thinking: return .orange
+        case .acting: return .green
+        case .error: return .red
         }
     }
 
-    private func stepIcon(_ status: PersonaAgentPlanStep.StepStatus) -> String {
-        switch status {
-        case .pending: return "circle"
-        case .executing: return "arrow.triangle.2.circlepath"
-        case .completed: return "checkmark.circle.fill"
-        case .failed: return "xmark.circle.fill"
-        case .rolledBack: return "arrow.uturn.backward.circle"
+    private func runCommand() {
+        let raw = command.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !raw.isEmpty else { return }
+
+        command = ""
+        status = .thinking
+        isExecuting = true
+
+        Task {
+            do {
+                let action = try parseAction(from: raw)
+                await MainActor.run { status = .acting }
+
+                let result = try await PersonaAgentFramework.shared.execute(action)
+                await MainActor.run {
+                    appendEvent(for: result, actionText: raw)
+                    status = .idle
+                    isExecuting = false
+                }
+            } catch {
+                await MainActor.run {
+                    status = .error
+                    events.insert(
+                        AgentActionFeedEvent(
+                            icon: "exclamationmark.triangle.fill",
+                            label: "Error: \(error.localizedDescription)",
+                            timestamp: Date(),
+                            tint: .red
+                        ),
+                        at: 0
+                    )
+                    isExecuting = false
+                }
+            }
         }
     }
 
-    private func stepColor(_ status: PersonaAgentPlanStep.StepStatus) -> Color {
-        switch status {
-        case .pending: return .secondary
-        case .executing: return .blue
-        case .completed: return .green
-        case .failed: return .red
-        case .rolledBack: return .orange
+    private func parseAction(from raw: String) throws -> AgentAction {
+        let lower = raw.lowercased()
+        let parts = raw.split(separator: " ").map(String.init)
+
+        if lower == "list" || lower.hasPrefix("list ") {
+            return .listWorkspaceItems(filter: WorkspaceFilter())
         }
+
+        if lower.hasPrefix("read "), parts.count >= 2 {
+            return .readWorkspaceItem(id: parts[1])
+        }
+
+        if lower.hasPrefix("delete note "), parts.count >= 3 {
+            return .deleteWorkspaceItem(id: parts[2], type: .note)
+        }
+
+        if lower.hasPrefix("delete slide "), parts.count >= 3 {
+            return .deleteWorkspaceItem(id: parts[2], type: .slideDeck)
+        }
+
+        if lower.hasPrefix("delete form "), parts.count >= 3 {
+            return .deleteWorkspaceItem(id: parts[2], type: .form)
+        }
+
+        if lower.hasPrefix("delete email "), parts.count >= 3 {
+            return .deleteWorkspaceItem(id: parts[2], type: .emailDraft)
+        }
+
+        if lower.hasPrefix("edit note "), parts.count >= 3 {
+            let id = parts[2]
+            let body = raw.components(separatedBy: "::").dropFirst().joined(separator: "::").trimmingCharacters(in: .whitespaces)
+            return .editNote(id: id, newTitle: nil, newBody: body.isEmpty ? "Updated by Persona Agent" : body)
+        }
+
+        return .listWorkspaceItems(filter: WorkspaceFilter())
+    }
+
+    private func appendEvent(for result: AgentActionResult, actionText: String) {
+        switch result {
+        case .success(let payload):
+            let label: String
+            switch payload {
+            case .message(let message):
+                label = message
+            case .itemSnapshot(let snapshot):
+                label = "\(snapshot.type.rawValue): \(snapshot.title)"
+            case .itemSummaries(let summaries):
+                label = "Listed \(summaries.count) workspace item(s)"
+            }
+
+            events.insert(
+                AgentActionFeedEvent(
+                    icon: "checkmark.circle.fill",
+                    label: label,
+                    timestamp: Date(),
+                    tint: .green
+                ),
+                at: 0
+            )
+
+        case .failure(let error):
+            events.insert(
+                AgentActionFeedEvent(
+                    icon: "xmark.octagon.fill",
+                    label: "\(actionText): \(error.localizedDescription)",
+                    timestamp: Date(),
+                    tint: .red
+                ),
+                at: 0
+            )
+            status = .error
+        }
+    }
+}
+
+private struct PersonaAgentShimmerRow: View {
+    @State private var animate = false
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 10)
+            .fill(Color.white.opacity(0.08))
+            .frame(height: 44)
+            .overlay(
+                LinearGradient(
+                    colors: [Color.clear, Color.white.opacity(0.25), Color.clear],
+                    startPoint: animate ? .leading : .trailing,
+                    endPoint: animate ? .trailing : .leading
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            )
+            .onAppear {
+                withAnimation(.linear(duration: 1.0).repeatForever(autoreverses: false)) {
+                    animate.toggle()
+                }
+            }
     }
 }
 
