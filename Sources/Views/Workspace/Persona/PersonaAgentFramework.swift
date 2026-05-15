@@ -515,16 +515,19 @@ struct PersonaAgentFrameworkView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                tokenSection
-                agentStateSection
-                intentSection
-                toolSection
-                takeoverSection
-                planSection
-                auditSection
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    tokenSection
+                    agentStateSection
+                    intentSection
+                    toolSection
+                    takeoverSection
+                    planSection
+                    auditSection
+                }
+                .padding(.vertical)
             }
-            .listStyle(.insetGrouped)
+            .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle("Agent Framework")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -549,83 +552,136 @@ struct PersonaAgentFrameworkView: View {
 
     @ViewBuilder
     private var tokenSection: some View {
-        Section(content: {
-            if let token = tokenEngine.currentToken {
-                LabeledContent("Status") {
-                    Text(token.isExpired ? "Expired" : "Active")
-                        .foregroundStyle(token.isExpired ? .red : .green).font(.caption.bold())
-                }
-                LabeledContent("Session", value: String(token.payload.sid.prefix(8)) + "...")
-                LabeledContent("Scopes", value: "\(SDKScope.decode(token.payload.scp).count)")
-                Button("Revoke Token", role: .destructive) { tokenEngine.revokeToken() }
-            } else {
-                Text("No active token").foregroundStyle(.secondary)
-                Button("Generate Token") {
-                    _ = tokenEngine.generateToken(uid: tokenGenUid, scopes: tokenGenScopes, sessionDuration: tokenGenDuration * 3600, deviceFingerprint: UUID().uuidString)
-                }.buttonStyle(.borderedProminent)
-            }
-        }, header: {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Authentication")
-        })
+                .font(.headline)
+                .padding(.horizontal)
+
+            VStack(alignment: .leading, spacing: 8) {
+                if let token = tokenEngine.currentToken {
+                    LabeledContent("Status") {
+                        Text(token.isExpired ? "Expired" : "Active")
+                            .foregroundStyle(token.isExpired ? .red : .green).font(.caption.bold())
+                    }
+                    LabeledContent("Session", value: String(token.payload.sid.prefix(8)) + "...")
+                    LabeledContent("Scopes", value: "\(SDKScope.decode(token.payload.scp).count)")
+                    Button("Revoke Token", role: .destructive) { tokenEngine.revokeToken() }
+                } else {
+                    Text("No active token").foregroundStyle(.secondary)
+                    Button("Generate Token") {
+                        _ = tokenEngine.generateToken(uid: tokenGenUid, scopes: tokenGenScopes, sessionDuration: tokenGenDuration * 3600, deviceFingerprint: UUID().uuidString)
+                    }.buttonStyle(.borderedProminent)
+                }
+            }
+            .padding(.horizontal)
+        }
+        .padding(.vertical, 8)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .cornerRadius(12)
+        .padding(.horizontal)
     }
 
     private var agentStateSection: some View {
-        Section("Agent State") {
-            Picker("Profile", selection: $agent.currentProfile) {
-                ForEach(AgentExecutionProfile.allCases, id: \.self) { profile in
-                    Text(profile.rawValue.capitalized).tag(profile)
-                }
-            }
-            .pickerStyle(.menu)
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Agent State")
+                .font(.headline)
+                .padding(.horizontal)
 
-            LabeledContent("Execution", value: agent.executionState.rawValue)
-            LabeledContent("Takeover", value: agent.takeoverActive ? "Active" : "Inactive")
-            LabeledContent("Plan Steps", value: "\(agent.currentPlan.count)")
-            LabeledContent("Invocations", value: "\(agent.invocationLog.count)")
+            VStack(alignment: .leading, spacing: 8) {
+                Picker("Profile", selection: $agent.currentProfile) {
+                    ForEach(AgentExecutionProfile.allCases, id: \.self) { profile in
+                        Text(profile.rawValue.capitalized).tag(profile)
+                    }
+                }
+                .pickerStyle(.menu)
+
+                LabeledContent("Execution", value: agent.executionState.rawValue)
+                LabeledContent("Takeover", value: agent.takeoverActive ? "Active" : "Inactive")
+                LabeledContent("Plan Steps", value: "\(agent.currentPlan.count)")
+                LabeledContent("Invocations", value: "\(agent.invocationLog.count)")
+            }
+            .padding(.horizontal)
         }
+        .padding(.vertical, 8)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .cornerRadius(12)
+        .padding(.horizontal)
     }
 
     private var intentSection: some View {
-        Section("Intent Parser") {
-            TextField("Describe what to do", text: $intentInput)
-            TextField("Target (package/library/framework)", text: $targetInput)
-            Button("Build Plan") {
-                guard !intentInput.isEmpty, !targetInput.isEmpty else { return }
-                _ = agent.buildPlan(for: agent.parseIntent(from: intentInput), target: targetInput)
-            }.disabled(intentInput.isEmpty || targetInput.isEmpty)
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Intent Parser")
+                .font(.headline)
+                .padding(.horizontal)
 
-            if !agent.currentPlan.isEmpty {
-                Button("Execute Plan") { Task { await agent.executePlan() } }.disabled(agent.executionState == .executing)
-                Button("Rollback Plan", role: .destructive) { agent.rollbackPlan() }
+            VStack(alignment: .leading, spacing: 8) {
+                TextField("Describe what to do", text: $intentInput)
+                TextField("Target (package/library/framework)", text: $targetInput)
+                Button("Build Plan") {
+                    guard !intentInput.isEmpty, !targetInput.isEmpty else { return }
+                    _ = agent.buildPlan(for: agent.parseIntent(from: intentInput), target: targetInput)
+                }.disabled(intentInput.isEmpty || targetInput.isEmpty)
+
+                if !agent.currentPlan.isEmpty {
+                    Button("Execute Plan") { Task { await agent.executePlan() } }.disabled(agent.executionState == .executing)
+                    Button("Rollback Plan", role: .destructive) { agent.rollbackPlan() }
+                }
             }
+            .padding(.horizontal)
         }
+        .padding(.vertical, 8)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .cornerRadius(12)
+        .padding(.horizontal)
     }
 
     private var toolSection: some View {
-        Section("Tool Execution") {
-            Picker("Tool", selection: $selectedTool) {
-                ForEach(AgentToolName.allCases) { tool in Text(tool.displayName).tag(tool) }
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Tool Execution")
+                .font(.headline)
+                .padding(.horizontal)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Picker("Tool", selection: $selectedTool) {
+                    ForEach(AgentToolName.allCases) { tool in Text(tool.displayName).tag(tool) }
+                }
+                Toggle("Dry Run", isOn: $dryRunEnabled)
+                TextField("name", text: binding(for: "name"))
+                TextField("version", text: binding(for: "version"))
+                TextField("id", text: binding(for: "id"))
+                Button("Execute Tool") { _ = agent.executeTool(selectedTool, parameters: toolParams, dryRun: dryRunEnabled) }
             }
-            Toggle("Dry Run", isOn: $dryRunEnabled)
-            TextField("name", text: binding(for: "name"))
-            TextField("version", text: binding(for: "version"))
-            TextField("id", text: binding(for: "id"))
-            Button("Execute Tool") { _ = agent.executeTool(selectedTool, parameters: toolParams, dryRun: dryRunEnabled) }
+            .padding(.horizontal)
         }
+        .padding(.vertical, 8)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .cornerRadius(12)
+        .padding(.horizontal)
     }
 
     private var takeoverSection: some View {
-        Section("Workspace Takeover") {
-            if agent.takeoverActive {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Agent has workspace control").font(.caption.bold()).foregroundStyle(.orange)
-                    Text("Granted: \(agent.takeoverScopes.map(\.rawValue).joined(separator: ", "))").font(.caption2)
-                    Button("Release Control") { agent.releaseTakeover() }.buttonStyle(.bordered)
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Workspace Takeover")
+                .font(.headline)
+                .padding(.horizontal)
+
+            VStack(alignment: .leading, spacing: 8) {
+                if agent.takeoverActive {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Agent has workspace control").font(.caption.bold()).foregroundStyle(.orange)
+                        Text("Granted: \(agent.takeoverScopes.map(\.rawValue).joined(separator: ", "))").font(.caption2)
+                        Button("Release Control") { agent.releaseTakeover() }.buttonStyle(.bordered)
+                    }
+                } else {
+                    Button("Request Takeover") { if agent.requestTakeover() { showTakeoverSheet = true } }
                 }
-            } else {
-                Button("Request Takeover") { if agent.requestTakeover() { showTakeoverSheet = true } }
             }
+            .padding(.horizontal)
         }
+        .padding(.vertical, 8)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .cornerRadius(12)
+        .padding(.horizontal)
     }
 
     private var planSection: some View {
@@ -666,113 +722,174 @@ struct PersonaAgentFrameworkView: View {
             }
         }
         .padding(.vertical, 8)
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
         .cornerRadius(12)
         .padding(.horizontal)
     }
 
     private var auditSection: some View {
-        Section("Audit Log (\(agent.auditLog.count))") {
-            ForEach(agent.auditLog.suffix(20).reversed()) { entry in
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack {
-                        Text(entry.action).font(.caption.bold())
-                        Spacer()
-                        Text(entry.outcome).font(.caption2).foregroundStyle(entry.outcome == "success" ? .green : .orange)
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Audit Log (\(agent.auditLog.count))")
+                .font(.headline)
+                .padding(.horizontal)
+
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(agent.auditLog.suffix(20).reversed()) { entry in
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack {
+                            Text(entry.action).font(.caption.bold())
+                            Spacer()
+                            Text(entry.outcome).font(.caption2).foregroundStyle(entry.outcome == "success" ? .green : .orange)
+                        }
+                        Text(entry.detail).font(.caption2).foregroundStyle(.secondary)
+                        Text(entry.timestamp.formatted(date: .omitted, time: .standard)).font(.caption2).foregroundStyle(.tertiary)
                     }
-                    Text(entry.detail).font(.caption2).foregroundStyle(.secondary)
-                    Text(entry.timestamp.formatted(date: .omitted, time: .standard)).font(.caption2).foregroundStyle(.tertiary)
                 }
             }
+            .padding(.horizontal)
         }
+        .padding(.vertical, 8)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .cornerRadius(12)
+        .padding(.horizontal)
     }
 
     @ViewBuilder
     private var tokenInspectorSections: some View {
         if let token = tokenEngine.currentToken {
-            Section("Header") {
-                LabeledContent("Type", value: token.header.tokenType)
-                LabeledContent("Algorithm", value: token.header.algorithm)
-                LabeledContent("Key ID", value: token.header.keyId)
-            }
-            Section("Payload") {
-                LabeledContent("UID", value: token.payload.uid)
-                LabeledContent("Session ID", value: String(token.payload.sid.prefix(12)))
-                LabeledContent("Nonce", value: String(token.payload.nonce.prefix(12)))
-                LabeledContent("Device FP", value: String(token.payload.dfp.prefix(12)))
-                LabeledContent("Version", value: token.payload.ver)
-                LabeledContent("Issued", value: Date(timeIntervalSince1970: token.payload.iat).formatted())
-                LabeledContent("Expires", value: Date(timeIntervalSince1970: token.payload.exp).formatted())
-            }
-            Section("Scopes") {
-                ForEach(Array(SDKScope.decode(token.payload.scp)).sorted(by: { $0.rawValue < $1.rawValue })) { scope in
-                    Label(scope.displayName, systemImage: "checkmark.circle.fill").font(.caption)
-                }
-            }
-            Section("Signature") { Text(token.signature).font(.caption2.monospaced()).lineLimit(3) }
-            Section("Serialized") { Text(token.serialized).font(.caption2.monospaced()).lineLimit(5) }
-            Section("Validation") {
-                HStack {
-                    Text("Status")
-                    Spacer()
-                    switch tokenEngine.validationStatus {
-                    case .none: Text("Not Validated").foregroundStyle(.secondary)
-                    case .valid: Text("Valid").foregroundStyle(.green).bold()
-                    case .invalid(let reason): Text("Invalid: \(reason)").foregroundStyle(.red)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Header").font(.headline).padding(.horizontal)
+                VStack(alignment: .leading, spacing: 8) {
+                    LabeledContent("Type", value: token.header.tokenType)
+                    LabeledContent("Algorithm", value: token.header.algorithm)
+                    LabeledContent("Key ID", value: token.header.keyId)
+                }.padding(.horizontal)
+            }.padding(.vertical, 8).background(Color(uiColor: .secondarySystemGroupedBackground)).cornerRadius(12).padding(.horizontal)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Payload").font(.headline).padding(.horizontal)
+                VStack(alignment: .leading, spacing: 8) {
+                    LabeledContent("UID", value: token.payload.uid)
+                    LabeledContent("Session ID", value: String(token.payload.sid.prefix(12)))
+                    LabeledContent("Nonce", value: String(token.payload.nonce.prefix(12)))
+                    LabeledContent("Device FP", value: String(token.payload.dfp.prefix(12)))
+                    LabeledContent("Version", value: token.payload.ver)
+                    LabeledContent("Issued", value: Date(timeIntervalSince1970: token.payload.iat).formatted())
+                    LabeledContent("Expires", value: Date(timeIntervalSince1970: token.payload.exp).formatted())
+                }.padding(.horizontal)
+            }.padding(.vertical, 8).background(Color(uiColor: .secondarySystemGroupedBackground)).cornerRadius(12).padding(.horizontal)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Scopes").font(.headline).padding(.horizontal)
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(Array(SDKScope.decode(token.payload.scp)).sorted(by: { $0.rawValue < $1.rawValue })) { scope in
+                        Label(scope.displayName, systemImage: "checkmark.circle.fill").font(.caption)
                     }
-                }.font(.caption)
-                Button("Validate Now") { _ = tokenEngine.validate(token: token, expectedFingerprint: token.payload.dfp) }
-            }
+                }.padding(.horizontal)
+            }.padding(.vertical, 8).background(Color(uiColor: .secondarySystemGroupedBackground)).cornerRadius(12).padding(.horizontal)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Signature").font(.headline).padding(.horizontal)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(token.signature).font(.caption2.monospaced()).lineLimit(3)
+                }.padding(.horizontal)
+            }.padding(.vertical, 8).background(Color(uiColor: .secondarySystemGroupedBackground)).cornerRadius(12).padding(.horizontal)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Serialized").font(.headline).padding(.horizontal)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(token.serialized).font(.caption2.monospaced()).lineLimit(5)
+                }.padding(.horizontal)
+            }.padding(.vertical, 8).background(Color(uiColor: .secondarySystemGroupedBackground)).cornerRadius(12).padding(.horizontal)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Validation").font(.headline).padding(.horizontal)
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Status")
+                        Spacer()
+                        switch tokenEngine.validationStatus {
+                        case .none: Text("Not Validated").foregroundStyle(.secondary)
+                        case .valid: Text("Valid").foregroundStyle(.green).bold()
+                        case .invalid(let reason): Text("Invalid: \(reason)").foregroundStyle(.red)
+                        }
+                    }.font(.caption)
+                    Button("Validate Now") { _ = tokenEngine.validate(token: token, expectedFingerprint: token.payload.dfp) }
+                }.padding(.horizontal)
+            }.padding(.vertical, 8).background(Color(uiColor: .secondarySystemGroupedBackground)).cornerRadius(12).padding(.horizontal)
         } else {
-            Section(content: {
-                TextField("User ID", text: $tokenGenUid)
-                Stepper("Duration: \(Int(tokenGenDuration))h", value: $tokenGenDuration, in: 1...24)
-                ForEach(SDKScope.allCases) { scope in
-                    Toggle(scope.displayName, isOn: Binding(get: { tokenGenScopes.contains(scope) }, set: { if $0 { tokenGenScopes.insert(scope) } else { tokenGenScopes.remove(scope) } })).font(.caption)
-                }
-                Button("Generate") {
-                    _ = tokenEngine.generateToken(uid: tokenGenUid, scopes: tokenGenScopes, sessionDuration: tokenGenDuration * 3600, deviceFingerprint: UUID().uuidString)
-                }.buttonStyle(.borderedProminent)
-            }, header: {
-                Text("Generate Token")
-            })
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Generate Token").font(.headline).padding(.horizontal)
+                VStack(alignment: .leading, spacing: 8) {
+                    TextField("User ID", text: $tokenGenUid)
+                    Stepper("Duration: \(Int(tokenGenDuration))h", value: $tokenGenDuration, in: 1...24)
+                    ForEach(SDKScope.allCases) { scope in
+                        Toggle(scope.displayName, isOn: Binding(get: { tokenGenScopes.contains(scope) }, set: { if $0 { tokenGenScopes.insert(scope) } else { tokenGenScopes.remove(scope) } })).font(.caption)
+                    }
+                    Button("Generate") {
+                        _ = tokenEngine.generateToken(uid: tokenGenUid, scopes: tokenGenScopes, sessionDuration: tokenGenDuration * 3600, deviceFingerprint: UUID().uuidString)
+                    }.buttonStyle(.borderedProminent)
+                }.padding(.horizontal)
+            }.padding(.vertical, 8).background(Color(uiColor: .secondarySystemGroupedBackground)).cornerRadius(12).padding(.horizontal)
         }
     }
 
     private var tokenInspectorView: some View {
-        List {
-            tokenInspectorSections
-            Section("Session Timeline (\(tokenEngine.sessionTimeline.count))") {
-                ForEach(tokenEngine.sessionTimeline.suffix(15).reversed()) { event in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(event.event).font(.caption.bold())
-                        Text(event.detail).font(.caption2).foregroundStyle(.secondary)
-                        Text(event.timestamp.formatted(date: .omitted, time: .standard)).font(.caption2).foregroundStyle(.tertiary)
-                    }
-                }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                tokenInspectorSections
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Session Timeline (\(tokenEngine.sessionTimeline.count))").font(.headline).padding(.horizontal)
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(tokenEngine.sessionTimeline.suffix(15).reversed()) { event in
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(event.event).font(.caption.bold())
+                                Text(event.detail).font(.caption2).foregroundStyle(.secondary)
+                                Text(event.timestamp.formatted(date: .omitted, time: .standard)).font(.caption2).foregroundStyle(.tertiary)
+                            }
+                        }
+                    }.padding(.horizontal)
+                }.padding(.vertical, 8).background(Color(uiColor: .secondarySystemGroupedBackground)).cornerRadius(12).padding(.horizontal)
             }
+            .padding(.vertical)
         }
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Token Inspector")
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private var takeoverApprovalView: some View {
-        List {
-            Section("Agent requests workspace control") {
-                Text("Select scopes to grant the agent:").font(.caption)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Agent requests workspace control").font(.headline).padding(.horizontal)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Select scopes to grant the agent:").font(.caption)
+                    }.padding(.horizontal)
+                }.padding(.vertical, 8).background(Color(uiColor: .secondarySystemGroupedBackground)).cornerRadius(12).padding(.horizontal)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Scopes").font(.headline).padding(.horizontal)
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(SDKScope.allCases) { scope in
+                            Toggle(scope.displayName, isOn: Binding(get: { selectedTakeoverScopes.contains(scope) }, set: { if $0 { selectedTakeoverScopes.insert(scope) } else { selectedTakeoverScopes.remove(scope) } })).font(.caption)
+                        }
+                    }.padding(.horizontal)
+                }.padding(.vertical, 8).background(Color(uiColor: .secondarySystemGroupedBackground)).cornerRadius(12).padding(.horizontal)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Button("Approve Takeover") {
+                            agent.approveTakeover(grantedScopes: selectedTakeoverScopes)
+                            showTakeoverSheet = false
+                        }.buttonStyle(.borderedProminent).disabled(selectedTakeoverScopes.isEmpty)
+                    }.padding(.horizontal)
+                }.padding(.vertical, 8).background(Color(uiColor: .secondarySystemGroupedBackground)).cornerRadius(12).padding(.horizontal)
             }
-            Section("Scopes") {
-                ForEach(SDKScope.allCases) { scope in
-                    Toggle(scope.displayName, isOn: Binding(get: { selectedTakeoverScopes.contains(scope) }, set: { if $0 { selectedTakeoverScopes.insert(scope) } else { selectedTakeoverScopes.remove(scope) } })).font(.caption)
-                }
-            }
-            Section {
-                Button("Approve Takeover") {
-                    agent.approveTakeover(grantedScopes: selectedTakeoverScopes)
-                    showTakeoverSheet = false
-                }.buttonStyle(.borderedProminent).disabled(selectedTakeoverScopes.isEmpty)
-            }
+            .padding(.vertical)
         }
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Approve Takeover")
     }
 
