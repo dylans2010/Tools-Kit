@@ -9,6 +9,13 @@ struct WorkspaceHomeView: View {
         !mailStore.accounts.isEmpty
     }
 
+    private func handleSDKAccess() {
+        authorizationManager.tryAutoAuthenticate()
+        if authorizationManager.authState != .authenticated {
+            showingSignIn = true
+        }
+    }
+
     var body: some View {
         NavigationStack {
             List {
@@ -86,19 +93,19 @@ struct WorkspaceHomeView: View {
                             }
                         } else {
                             Button {
-                                showingSignIn = true
+                                handleSDKAccess()
                             } label: {
                                 Label("SDK (Sign In Required)", systemImage: "hammer")
                                     .foregroundStyle(.secondary)
                             }
                             Button {
-                                showingSignIn = true
+                                handleSDKAccess()
                             } label: {
                                 Label("Plugins (Sign In Required)", systemImage: "puzzlepiece.extension")
                                     .foregroundStyle(.secondary)
                             }
                             Button {
-                                showingSignIn = true
+                                handleSDKAccess()
                             } label: {
                                 Label("Connectors (Sign In Required)", systemImage: "cable.connector")
                                     .foregroundStyle(.secondary)
@@ -138,9 +145,7 @@ struct WorkspaceHomeView: View {
                 }
             }
             .onAppear {
-                if authorizationManager.authState != .authenticated {
-                    showingSignIn = true
-                }
+                // Remove auto sign-in on appear, let handleSDKAccess manage it
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
