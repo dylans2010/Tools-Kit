@@ -13,7 +13,7 @@ struct SDKHomeView: View {
         NavigationStack {
             List {
                 Section("Core Services") {
-                    NavigationLink(destination: AuthRootView()) {
+                    NavigationLink(destination: SignInView()) {
                         Label("Authorization", systemImage: "lock.shield")
                     }
                     NavigationLink(destination: PluginsMainView()) {
