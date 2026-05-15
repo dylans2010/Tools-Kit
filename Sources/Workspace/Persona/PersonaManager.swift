@@ -9,6 +9,12 @@ final class PersonaManager: ObservableObject {
     @Published var interactions: [PersonaInteraction] = []
     @Published var chatHistory: [PersonaMessage] = []
     @Published var chatThreads: [PersonaChatThread] = []
+    @Published var activeThread: PersonaChatThread?
+
+    var threads: [PersonaChatThread] {
+        get { chatThreads }
+        set { chatThreads = newValue }
+    }
     @Published var config: PersonaConfig = PersonaConfig(name: "Expert Assistant", instructions: "You are an expert AI Persona.", baseModel: "gpt-4", workspaceScope: ["All"])
     @Published var isThinking: Bool = false
 

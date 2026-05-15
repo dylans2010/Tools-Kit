@@ -631,6 +631,7 @@ struct DependencyGraphVisualizerView: View {
     @Environment(\.dismiss) private var dismiss
     let packages: [PackageDescriptor]
     @State private var expandedNodes: Set<UUID> = []
+    @StateObject private var registry = PackageRegistry.shared
 
     var body: some View {
         ScrollView([.horizontal, .vertical]) {
@@ -646,33 +647,6 @@ struct DependencyGraphVisualizerView: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done") { dismiss() }
-            }
-        }
-    }
-
-    private func healthDetailSection(for package: PackageDescriptor) -> some View {
-        let health = DependencyHealthEngine.analyze(package: package, graph: registry.buildDependencyGraph())
-        return Group {
-            Section("Health Analysis") {
-                LabeledContent("Score", value: "\(health.score)%")
-
-                if !health.issues.isEmpty {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Issues").font(.caption.bold()).foregroundStyle(.red)
-                        ForEach(health.issues, id: \.self) { issue in
-                            Text("• \(issue)").font(.caption2)
-                        }
-                    }
-                }
-
-                if !health.recommendations.isEmpty {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Recommendations").font(.caption.bold()).foregroundStyle(.blue)
-                        ForEach(health.recommendations, id: \.self) { rec in
-                            Text("• \(rec)").font(.caption2)
-                        }
-                    }
-                }
             }
         }
     }
@@ -771,5 +745,30 @@ struct PackageDetailSheet: View {
         .navigationTitle(package.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
+    }
+
+    private func healthDetailSection(for package: PackageDescriptor) -> some View {
+        let health = DependencyHealthEngine.analyze(package: package, graph: registry.buildDependencyGraph())
+        return Section("Dependency Health") {
+            LabeledContent("Score", value: "\(health.score)%")
+
+            if !health.issues.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Issues").font(.caption.bold()).foregroundStyle(.red)
+                    ForEach(health.issues, id: \.self) { issue in
+                        Text("• \(issue)").font(.caption2)
+                    }
+                }
+            }
+
+            if !health.recommendations.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Recommendations").font(.caption.bold()).foregroundStyle(.blue)
+                    ForEach(health.recommendations, id: \.self) { rec in
+                        Text("• \(rec)").font(.caption2)
+                    }
+                }
+            }
+        }
     }
 }

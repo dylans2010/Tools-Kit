@@ -1,5 +1,11 @@
 import SwiftUI
 
+extension TokenPayload {
+    var uid: String {
+        devId
+    }
+}
+
 // MARK: - Agent Tool System
 
 enum AgentToolName: String, CaseIterable, Identifiable {
