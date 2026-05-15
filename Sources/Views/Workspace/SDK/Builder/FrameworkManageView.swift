@@ -1,4 +1,5 @@
 import SwiftUI
+import Observation
 
 // MARK: - Framework Descriptor
 
@@ -12,9 +13,11 @@ enum FrameworkLifecycleState: String, CaseIterable, Codable, Identifiable {
     var id: String { rawValue }
 }
 
-struct FrameworkDescriptor: Identifiable, Codable {
+struct FrameworkDescriptor: Identifiable, Codable, Hashable {
     let id: UUID
     let name: String
+    let path: String
+    let type: FrameworkType
     let entryPoints: [String]
     let language: FrameworkLanguage
     let packageDependencies: [UUID]
@@ -23,25 +26,46 @@ struct FrameworkDescriptor: Identifiable, Codable {
     var sandboxProfile: SandboxProfile
     var lifecycleState: FrameworkLifecycleState
     var logs: [FrameworkLogEntry]
+    var size: Int64
+    var lastModified: Date
+    var architectures: [String]
+    var linkType: LinkType
+    var embedMode: EmbedMode
+
+    enum FrameworkType: String, Codable, CaseIterable {
+        case appleSystem, xcframework, `static`, dynamic, embedded, broken
+    }
+
+    enum LinkType: String, Codable, CaseIterable {
+        case required, optional
+    }
+
+    enum EmbedMode: String, Codable, CaseIterable {
+        case embedAndSign = "Embed & Sign"
+        case embedWithoutSigning = "Embed Without Signing"
+        case doNotEmbed = "Do Not Embed"
+    }
 
     init(
-        id: UUID = UUID(), name: String, entryPoints: [String] = ["main"],
-        language: FrameworkLanguage = .swift, packageDependencies: [UUID] = [],
-        requiredScopes: [SDKScope] = [.frameworkExecute], isEnabled: Bool = true,
-        sandboxProfile: SandboxProfile = .balanced,
-        lifecycleState: FrameworkLifecycleState = .draft,
-        logs: [FrameworkLogEntry] = []
+        id: UUID = UUID(), name: String, path: String = "", type: FrameworkType = .xcframework,
+        entryPoints: [String] = ["main"], language: FrameworkLanguage = .swift,
+        packageDependencies: [UUID] = [], requiredScopes: [SDKScope] = [.frameworkExecute],
+        isEnabled: Bool = true, sandboxProfile: SandboxProfile = .balanced,
+        lifecycleState: FrameworkLifecycleState = .draft, logs: [FrameworkLogEntry] = [],
+        size: Int64 = 0, lastModified: Date = Date(), architectures: [String] = ["arm64"],
+        linkType: LinkType = .required, embedMode: EmbedMode = .embedAndSign
     ) {
-        self.id = id; self.name = name; self.entryPoints = entryPoints
-        self.language = language; self.packageDependencies = packageDependencies
-        self.requiredScopes = requiredScopes; self.isEnabled = isEnabled
-        self.sandboxProfile = sandboxProfile
-        self.lifecycleState = lifecycleState
-        self.logs = logs
+        self.id = id; self.name = name; self.path = path; self.type = type
+        self.entryPoints = entryPoints; self.language = language
+        self.packageDependencies = packageDependencies; self.requiredScopes = requiredScopes
+        self.isEnabled = isEnabled; self.sandboxProfile = sandboxProfile
+        self.lifecycleState = lifecycleState; self.logs = logs
+        self.size = size; self.lastModified = lastModified; self.architectures = architectures
+        self.linkType = linkType; self.embedMode = embedMode
     }
 }
 
-struct FrameworkLogEntry: Identifiable, Codable {
+struct FrameworkLogEntry: Identifiable, Codable, Hashable {
     let id: UUID
     let timestamp: Date
     let level: LogLevel
@@ -70,9 +94,10 @@ enum SandboxProfile: String, CaseIterable, Codable {
 // MARK: - Framework Registry
 
 @MainActor
-final class FrameworkRegistry: ObservableObject {
+@Observable
+final class FrameworkRegistry {
     static let shared = FrameworkRegistry()
-    @Published var frameworks: [FrameworkDescriptor] = []
+    var frameworks: [FrameworkDescriptor] = []
 
     private init() {}
 
@@ -196,13 +221,24 @@ struct FrameworkErrorAnalysis: Identifiable {
 // MARK: - Framework Manager
 
 @MainActor
-final class FrameworkManager: ObservableObject {
+@Observable
+final class FrameworkManager {
     static let shared = FrameworkManager()
 
-    @Published var executionRecords: [FrameworkExecutionRecord] = []
-    @Published var activeBindings: [DependencyBinding] = []
-    @Published private(set) var executionState: FrameworkExecutionState = .idle
-    @Published var sandboxConfig: FrameworkSandboxConfig = .default
+    var executionRecords: [FrameworkExecutionRecord] = []
+    var activeBindings: [DependencyBinding] = []
+    var executionState: FrameworkExecutionState = .idle
+    var sandboxConfig: FrameworkSandboxConfig = .default
+    var auditLog: [FrameworkAuditEntry] = []
+
+    struct FrameworkAuditEntry: Identifiable, Codable {
+        let id = UUID()
+        let timestamp = Date()
+        let frameworkName: String
+        let action: String
+        let oldValue: String
+        let newValue: String
+    }
 
     private let tokenEngine = DeterministicTokenEngine.shared
     private let registry = FrameworkRegistry.shared
@@ -227,6 +263,9 @@ final class FrameworkManager: ObservableObject {
 
     func uninstallFramework(id: UUID) -> Bool {
         guard tokenEngine.requireScope(.sdkManageFrameworks) else { return false }
+        if let fw = registry.framework(by: id) {
+            auditLog.append(FrameworkAuditEntry(frameworkName: fw.name, action: "Uninstall", oldValue: "Installed", newValue: "Removed"))
+        }
         activeBindings.removeAll { $0.frameworkId == id }
         registry.uninstall(id: id)
         return true
@@ -253,7 +292,9 @@ final class FrameworkManager: ObservableObject {
 
     func toggleFramework(id: UUID) {
         guard var fw = registry.framework(by: id) else { return }
+        let old = fw.isEnabled
         fw.isEnabled.toggle()
+        auditLog.append(FrameworkAuditEntry(frameworkName: fw.name, action: "Toggle Enabled", oldValue: "\(old)", newValue: "\(fw.isEnabled)"))
         log(to: id, level: .info, message: "Framework \(fw.isEnabled ? "enabled" : "disabled")")
         registry.install(fw)
     }
@@ -378,41 +419,118 @@ final class FrameworkManager: ObservableObject {
 
 // MARK: - FrameworkManageView
 
+struct FrameworkFilterPreset: Codable, Identifiable, Hashable {
+    var id: UUID = UUID()
+    let name: String
+    let filter: FrameworkDescriptor.FrameworkType?
+    let primarySort: FrameworkManageView.SortOption
+    let secondarySort: FrameworkManageView.SortOption
+    let sortAscending: Bool
+}
+
 struct FrameworkManageView: View {
-    @StateObject private var manager = FrameworkManager.shared
-    @StateObject private var registry = FrameworkRegistry.shared
-    @StateObject private var tokenEngine = DeterministicTokenEngine.shared
+    @State private var manager = FrameworkManager.shared
+    @State private var registry = FrameworkRegistry.shared
+    @State private var tokenEngine = DeterministicTokenEngine.shared
 
     @State private var showInstallSheet = false
     @State private var selectedFramework: FrameworkDescriptor?
+    @State private var showDiagnostics = false
+    @State private var showAuditLog = false
     @State private var searchText = ""
+    @State private var selectedFilter: FrameworkDescriptor.FrameworkType?
+    @State private var primarySort: SortOption = .name
+    @State private var secondarySort: SortOption = .size
+    @State private var sortAscending = true
+    @State private var presets: [FrameworkFilterPreset] = []
+    @State private var showSavePresetAlert = false
+    @State private var newPresetName = ""
+    @State private var multiSelection = Set<UUID>()
+    @State private var showBatchDeleteConfirmation = false
+    @State private var showShareSheet = false
+    @State private var exportURL: URL?
+
+    enum SortOption: String, Codable, CaseIterable {
+        case name = "Name"
+        case size = "Size"
+        case archCount = "Architectures"
+        case linkType = "Link Type"
+        case lastModified = "Last Modified"
+    }
 
     private var filteredFrameworks: [FrameworkDescriptor] {
-        if searchText.isEmpty { return registry.frameworks }
-        return registry.frameworks.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText) ||
-            $0.language.rawValue.localizedCaseInsensitiveContains(searchText)
+        var filtered = registry.frameworks
+
+        if !searchText.isEmpty {
+            filtered = filtered.filter {
+                $0.name.localizedCaseInsensitiveContains(searchText) ||
+                $0.path.localizedCaseInsensitiveContains(searchText) ||
+                $0.type.rawValue.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+
+        if let filter = selectedFilter {
+            filtered = filtered.filter { $0.type == filter }
+        }
+
+        return filtered.sorted { lhs, rhs in
+            let result = compare(lhs, rhs, by: primarySort)
+            if result == .orderedSame {
+                return compare(lhs, rhs, by: secondarySort) == .orderedAscending
+            }
+            return (result == .orderedAscending) == sortAscending
+        }
+    }
+
+    private func compare(_ lhs: FrameworkDescriptor, _ rhs: FrameworkDescriptor, by option: SortOption) -> ComparisonResult {
+        switch option {
+        case .name: return lhs.name.localizedCompare(rhs.name)
+        case .size: return lhs.size == rhs.size ? .orderedSame : (lhs.size < rhs.size ? .orderedAscending : .orderedDescending)
+        case .archCount: return lhs.architectures.count == rhs.architectures.count ? .orderedSame : (lhs.architectures.count < rhs.architectures.count ? .orderedAscending : .orderedDescending)
+        case .linkType: return lhs.linkType.rawValue.localizedCompare(rhs.linkType.rawValue)
+        case .lastModified: return lhs.lastModified.compare(rhs.lastModified)
         }
     }
 
     var body: some View {
         NavigationStack {
-            List {
+            List(selection: $multiSelection) {
                 authSection
+                filterSection
                 frameworkListSection
                 executionStateSection
                 liveMonitoringSection
                 sandboxSection
                 executionHistorySection
             }
+            .refreshable { await refreshFrameworks() }
             .listStyle(.insetGrouped)
             .navigationTitle("Frameworks")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "Search frameworks")
             .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    EditButton()
+                }
                 ToolbarItem(placement: .primaryAction) {
-                    Button { showInstallSheet = true } label: { Label("Add", systemImage: "plus") }
-                    .disabled(tokenEngine.currentToken == nil)
+                    HStack {
+                        Button { showAuditLog = true } label: { Label("Audit Log", systemImage: "clock.arrow.circlepath") }
+                        Button { showDiagnostics = true } label: { Label("Diagnostics", systemImage: "bolt.heart") }
+                        sortMenu
+                        Button { showInstallSheet = true } label: { Label("Add", systemImage: "plus") }
+                        .disabled(tokenEngine.currentToken == nil)
+                    }
+                }
+                ToolbarItemGroup(placement: .bottomBar) {
+                    if !multiSelection.isEmpty {
+                        batchActionsMenu
+                        Spacer()
+                        Button(role: .destructive) {
+                            showBatchDeleteConfirmation = true
+                        } label: {
+                            Label("Remove", systemImage: "trash")
+                        }
+                    }
                 }
             }
             .sheet(isPresented: $showInstallSheet) {
@@ -421,6 +539,233 @@ struct FrameworkManageView: View {
             .sheet(item: $selectedFramework) { fw in
                 NavigationStack { FrameworkDetailSheet(framework: fw, manager: manager) }
             }
+            .alert("Save Preset", isPresented: $showSavePresetAlert) {
+                TextField("Preset Name", text: $newPresetName)
+                Button("Save", action: savePreset)
+                Button("Cancel", role: .cancel) {}
+            }
+            .sheet(isPresented: $showDiagnostics) {
+                NavigationStack { FrameworkDiagnosticsView(frameworks: registry.frameworks) }
+            }
+            .sheet(isPresented: $showAuditLog) {
+                NavigationStack { FrameworkAuditLogView(log: manager.auditLog) }
+            }
+            .confirmationDialog("Remove Frameworks", isPresented: $showBatchDeleteConfirmation) {
+                Button("Remove \(multiSelection.count) Frameworks", role: .destructive) {
+                    batchDelete()
+                }
+            } message: {
+                Text("Are you sure you want to remove the selected frameworks? This action cannot be undone.")
+            }
+            .onAppear { loadPresetsFromDisk() }
+            .sheet(isPresented: $showShareSheet) {
+                if let url = exportURL {
+                    ShareSheet(activityItems: [url])
+                }
+            }
+        }
+    }
+
+    private var filterSection: some View {
+        Section {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    filterChip(title: "All", type: nil)
+                    ForEach(FrameworkDescriptor.FrameworkType.allCases, id: \.self) { type in
+                        filterChip(title: type.rawValue.capitalized, type: type)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+    }
+
+    private func filterChip(title: String, type: FrameworkDescriptor.FrameworkType?) -> some View {
+        Toggle(isOn: Binding(
+            get: { selectedFilter == type },
+            set: { if $0 { selectedFilter = type } }
+        )) {
+            Text(title).font(.caption2.bold())
+        }
+        .toggleStyle(.button)
+        .buttonStyle(.bordered)
+        .tint(selectedFilter == type ? .accentColor : .secondary)
+        .controlSize(.small)
+    }
+
+    private var batchActionsMenu: some View {
+        Menu {
+            Section("Export") {
+                Button { batchExport() } label: {
+                    Label("Export as .zip", systemImage: "archivebox")
+                }
+            }
+            Section("Link Type") {
+                Button("Set Required") { batchUpdateLinkType(.required) }
+                Button("Set Optional") { batchUpdateLinkType(.optional) }
+            }
+            Section("Embed Mode") {
+                Button("Embed & Sign") { batchUpdateEmbedMode(.embedAndSign) }
+                Button("Embed Without Signing") { batchUpdateEmbedMode(.embedWithoutSigning) }
+                Button("Do Not Embed") { batchUpdateEmbedMode(.doNotEmbed) }
+            }
+            Section("Status") {
+                Button("Enable All") { batchUpdateEnabled(true) }
+                Button("Disable All") { batchUpdateEnabled(false) }
+            }
+        } label: {
+            Label("Batch Actions", systemImage: "ellipsis.circle")
+        }
+    }
+
+    private func batchUpdateLinkType(_ type: FrameworkDescriptor.LinkType) {
+        for id in multiSelection {
+            if var fw = registry.framework(by: id) {
+                fw.linkType = type
+                registry.install(fw)
+            }
+        }
+    }
+
+    private func batchUpdateEmbedMode(_ mode: FrameworkDescriptor.EmbedMode) {
+        for id in multiSelection {
+            if var fw = registry.framework(by: id) {
+                fw.embedMode = mode
+                registry.install(fw)
+            }
+        }
+    }
+
+    private func batchUpdateEnabled(_ enabled: Bool) {
+        for id in multiSelection {
+            if var fw = registry.framework(by: id) {
+                fw.isEnabled = enabled
+                registry.install(fw)
+            }
+        }
+    }
+
+    private func batchDelete() {
+        for id in multiSelection {
+            _ = manager.uninstallFramework(id: id)
+        }
+        multiSelection.removeAll()
+    }
+
+    private func batchExport() {
+        var zip = NativeZipArchive()
+        for id in multiSelection {
+            if let fw = registry.framework(by: id), !fw.path.isEmpty {
+                let fwURL = URL(fileURLWithPath: fw.path)
+                var isDir: ObjCBool = false
+                if FileManager.default.fileExists(atPath: fw.path, isDirectory: &isDir) {
+                    if isDir.boolValue {
+                        zip.addDirectory(url: fwURL, base: fwURL.deletingLastPathComponent())
+                    } else {
+                        if let data = try? Data(contentsOf: fwURL) {
+                            zip.addFile(name: fwURL.lastPathComponent, data: data)
+                        }
+                    }
+                }
+            }
+        }
+        let zipData = zip.finalize()
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("ExportedFrameworks.zip")
+        do {
+            try zipData.write(to: tempURL)
+            self.exportURL = tempURL
+            self.showShareSheet = true
+        } catch {
+            print("Failed to write zip: \(error)")
+        }
+    }
+
+    private var sortMenu: some View {
+        Menu {
+            Section("Sort") {
+                Picker("Primary Sort", selection: $primarySort) {
+                    ForEach(SortOption.allCases, id: \.self) { option in
+                        Text(option.rawValue).tag(option)
+                    }
+                }
+                Picker("Secondary Sort", selection: $secondarySort) {
+                    ForEach(SortOption.allCases, id: \.self) { option in
+                        Text(option.rawValue).tag(option)
+                    }
+                }
+                Button {
+                    sortAscending.toggle()
+                } label: {
+                    Label(sortAscending ? "Ascending" : "Descending", systemImage: sortAscending ? "arrow.up" : "arrow.down")
+                }
+            }
+
+            Section("Presets") {
+                if presets.isEmpty {
+                    Text("No saved presets").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(presets) { preset in
+                        Button { applyPreset(preset) } label: {
+                            HStack {
+                                Text(preset.name)
+                                if selectedFilter == preset.filter && primarySort == preset.primarySort && secondarySort == preset.secondarySort && sortAscending == preset.sortAscending {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                    }
+                }
+                Button {
+                    newPresetName = ""
+                    showSavePresetAlert = true
+                } label: {
+                    Label("Save Current as Preset...", systemImage: "plus.square.on.square")
+                }
+            }
+        } label: {
+            Label("Sort & Presets", systemImage: "line.3.horizontal.decrease.circle")
+        }
+    }
+
+    private func applyPreset(_ preset: FrameworkFilterPreset) {
+        selectedFilter = preset.filter
+        primarySort = preset.primarySort
+        secondarySort = preset.secondarySort
+        sortAscending = preset.sortAscending
+    }
+
+    private func savePreset() {
+        guard !newPresetName.isEmpty else { return }
+        let preset = FrameworkFilterPreset(name: newPresetName, filter: selectedFilter, primarySort: primarySort, secondarySort: secondarySort, sortAscending: sortAscending)
+        presets.append(preset)
+        savePresetsToDisk()
+    }
+
+    private func loadPresetsFromDisk() {
+        if let data = UserDefaults.standard.data(forKey: "FrameworkFilterPresets"),
+           let decoded = try? JSONDecoder().decode([FrameworkFilterPreset].self, from: data) {
+            presets = decoded
+        }
+    }
+
+    private func refreshFrameworks() async {
+        // Real logic: re-scan registry frameworks to update size, date, etc.
+        for i in 0..<registry.frameworks.count {
+            let fw = registry.frameworks[i]
+            guard !fw.path.isEmpty else { continue }
+            let url = URL(fileURLWithPath: fw.path)
+            if let attrs = try? FileManager.default.attributesOfItem(atPath: fw.path) {
+                var updated = fw
+                updated.size = attrs[.size] as? Int64 ?? 0
+                updated.lastModified = attrs[.modificationDate] as? Date ?? Date()
+                registry.frameworks[i] = updated
+            }
+        }
+    }
+
+    private func savePresetsToDisk() {
+        if let data = try? JSONEncoder().encode(presets) {
+            UserDefaults.standard.set(data, forKey: "FrameworkFilterPresets")
         }
     }
 
@@ -462,13 +807,22 @@ struct FrameworkManageView: View {
                         }.padding(.vertical, 2)
                     }
                     .buttonStyle(.plain)
-                    .swipeActions(edge: .trailing) {
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) { _ = manager.uninstallFramework(id: fw.id) } label: { Label("Remove", systemImage: "trash") }
+                        Button {
+                            let url = URL(fileURLWithPath: fw.path).deletingLastPathComponent()
+                            UIApplication.shared.open(url)
+                        } label: { Label("Reveal", systemImage: "folder") }.tint(.blue)
                     }
                     .swipeActions(edge: .leading) {
                         Button { manager.toggleFramework(id: fw.id) } label: {
                             Label(fw.isEnabled ? "Disable" : "Enable", systemImage: fw.isEnabled ? "pause" : "play")
                         }.tint(fw.isEnabled ? .orange : .green)
+                        Button {
+                            var updated = fw
+                            updated.linkType = (fw.linkType == .required ? .optional : .required)
+                            registry.install(updated)
+                        } label: { Label(fw.linkType == .required ? "Optional" : "Required", systemImage: "link") }.tint(.purple)
                     }
                 }
             }
@@ -534,6 +888,333 @@ struct FrameworkManageView: View {
 
 // MARK: - Framework Install Sheet
 
+// MARK: - Info.plist Viewer
+
+struct FrameworkInfoPlistView: View {
+    let data: [String: AnyHashable]
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        List {
+            renderNode(key: "Root", value: data)
+        }
+        .navigationTitle("Info.plist")
+    }
+
+    @ViewBuilder
+    private func renderNode(key: String, value: AnyHashable) -> some View {
+        if let dict = value as? [String: AnyHashable] {
+            Section(key) {
+                ForEach(dict.keys.sorted(), id: \.self) { subkey in
+                    renderNode(key: subkey, value: dict[subkey]!)
+                }
+            }
+        } else if let array = value as? [AnyHashable] {
+            Section(key) {
+                ForEach(Array(array.enumerated()), id: \.offset) { index, subvalue in
+                    renderNode(key: "[\(index)]", value: subvalue)
+                }
+            }
+        } else {
+            LabeledContent(key) {
+                Text(String(describing: value))
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+            }
+        }
+    }
+}
+
+// MARK: - Diagnostics View
+
+struct FrameworkDiagnosticsView: View {
+    @Environment(\.dismiss) private var dismiss
+    let frameworks: [FrameworkDescriptor]
+    @State private var issues: [DiagnosticIssue] = []
+    @State private var isScanning = false
+
+    struct DiagnosticIssue: Identifiable {
+        let id = UUID()
+        let frameworkName: String
+        let severity: Severity
+        let title: String
+        let description: String
+
+        enum Severity: String {
+            case error, warning, info
+            var color: Color {
+                switch self {
+                case .error: return .red
+                case .warning: return .orange
+                case .info: return .blue
+                }
+            }
+        }
+    }
+
+    var body: some View {
+        List {
+            Section {
+                HStack(spacing: 20) {
+                    summaryItem(count: issues.filter { $0.severity == .error }.count, label: "Errors", color: .red)
+                    summaryItem(count: issues.filter { $0.severity == .warning }.count, label: "Warnings", color: .orange)
+                    summaryItem(count: issues.filter { $0.severity == .info }.count, label: "Info", color: .blue)
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+            }
+
+            Section("Issues (\(issues.count))") {
+                if isScanning {
+                    HStack {
+                        ProgressView().controlSize(.small)
+                        Text("Scanning project...").foregroundStyle(.secondary)
+                    }
+                } else if issues.isEmpty {
+                    Text("No issues detected").foregroundStyle(.green)
+                } else {
+                    ForEach(issues) { issue in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(issue.severity.rawValue.uppercased())
+                                    .font(.caption2.bold())
+                                    .padding(.horizontal, 4)
+                                    .padding(.vertical, 2)
+                                    .background(issue.severity.color.opacity(0.2))
+                                    .foregroundStyle(issue.severity.color)
+                                    .cornerRadius(4)
+                                Text(issue.frameworkName).font(.caption.bold())
+                            }
+                            Text(issue.title).font(.subheadline.bold())
+                            Text(issue.description).font(.caption2).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Diagnostics")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
+            ToolbarItem(placement: .primaryAction) { Button("Rescan") { runScan() } }
+        }
+        .onAppear { runScan() }
+    }
+
+    private func summaryItem(count: Int, label: String, color: Color) -> some View {
+        VStack {
+            Text("\(count)").font(.title2.bold()).foregroundStyle(color)
+            Text(label).font(.caption2).foregroundStyle(.secondary)
+        }
+    }
+
+    private func runScan() {
+        isScanning = true
+        issues.removeAll()
+        Task {
+            var newIssues: [DiagnosticIssue] = []
+            for fw in frameworks {
+                if !fw.path.isEmpty && !FileManager.default.fileExists(atPath: fw.path) {
+                    newIssues.append(DiagnosticIssue(frameworkName: fw.name, severity: .error, title: "Broken Reference", description: "Path '\(fw.path)' does not exist."))
+                }
+                if !fw.architectures.contains("arm64") {
+                    newIssues.append(DiagnosticIssue(frameworkName: fw.name, severity: .warning, title: "Architecture Gap", description: "Missing arm64 slice, required for iOS hardware."))
+                }
+                let unused = await checkIsUnused(fw)
+                if unused {
+                    newIssues.append(DiagnosticIssue(frameworkName: fw.name, severity: .info, title: "Unused Framework", description: "No imports found in project source files."))
+                }
+            }
+            self.issues = newIssues
+            self.isScanning = false
+        }
+    }
+
+    private func checkIsUnused(_ fw: FrameworkDescriptor) async -> Bool {
+        let fm = FileManager.default
+        guard let sources = fm.enumerator(at: URL(fileURLWithPath: "Sources"), includingPropertiesForKeys: [.isRegularFileKey]) else { return true }
+        while let url = sources.nextObject() as? URL {
+            if url.pathExtension == "swift", let content = try? String(contentsOf: url), content.contains("import \(fw.name)") {
+                return false
+            }
+        }
+        return true
+    }
+}
+
+// MARK: - Symbol Browser View
+
+struct FrameworkSymbolBrowser: View {
+    @Environment(\.dismiss) private var dismiss
+    let framework: FrameworkDescriptor
+    @State private var symbols: [String] = []
+    @State private var searchText = ""
+    @State private var isLoading = false
+
+    var filteredSymbols: [String] {
+        if searchText.isEmpty { return symbols }
+        return symbols.filter { $0.localizedCaseInsensitiveContains(searchText) }
+    }
+
+    var body: some View {
+        List(filteredSymbols, id: \.self) { symbol in
+            Text(symbol).font(.system(size: 10, design: .monospaced))
+                .swipeActions {
+                    Button {
+                        UIPasteboard.general.string = symbol
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                }
+        }
+        .navigationTitle("Symbols")
+        .searchable(text: $searchText)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
+            ToolbarItem(placement: .bottomBar) {
+                if isLoading {
+                    ProgressView().controlSize(.small)
+                } else {
+                    Text("\(filteredSymbols.count) symbols").font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+        }
+        .onAppear { loadSymbols() }
+    }
+
+    private func loadSymbols() {
+        isLoading = true
+        Task {
+            guard !framework.path.isEmpty else {
+                isLoading = false
+                return
+            }
+            let url = URL(fileURLWithPath: framework.path)
+            let binaryURL = framework.path.hasSuffix(".framework") ? url.appendingPathComponent(url.deletingPathExtension().lastPathComponent) : url
+
+            guard let handle = try? FileHandle(forReadingFrom: binaryURL) else {
+                isLoading = false
+                return
+            }
+            defer { try? handle.close() }
+
+            // Re-parse to find LC_SYMTAB and read symbols
+            guard let magicData = try? handle.read(upToCount: 4) else {
+                isLoading = false
+                return
+            }
+            let magic = magicData.withUnsafeBytes { $0.load(as: UInt32.self) }
+
+            var offset: UInt64 = 0
+            if magic == 0xBEBAFECA || magic == 0xCAFEBABE {
+                guard let countData = try? handle.read(upToCount: 4) else {
+                    isLoading = false
+                    return
+                }
+                let count = countData.withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+                if count > 0 {
+                    guard let archData = try? handle.read(upToCount: 20) else {
+                        isLoading = false
+                        return
+                    }
+                    offset = UInt64(archData.advanced(by: 8).withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian)
+                }
+            }
+
+            try? handle.seek(toOffset: offset)
+            guard let headerData = try? handle.read(upToCount: 32) else {
+                isLoading = false
+                return
+            }
+            let is64 = headerData.count == 32
+            let ncmds = headerData.advanced(by: 16).withUnsafeBytes { $0.load(as: UInt32.self) }
+            try? handle.seek(toOffset: offset + (is64 ? 32 : 28))
+
+            var symoff: UInt32 = 0
+            var nsyms: UInt32 = 0
+            var stroff: UInt32 = 0
+            var strsize: UInt32 = 0
+
+            for _ in 0..<ncmds {
+                guard let cmdData = try? handle.read(upToCount: 8) else { break }
+                let cmd = cmdData.withUnsafeBytes { $0.load(as: UInt32.self) }
+                let size = cmdData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }
+                if cmd == 0x02 { // LC_SYMTAB
+                    guard let symData = try? handle.read(upToCount: 16) else { break }
+                    symoff = symData.withUnsafeBytes { $0.load(as: UInt32.self) }
+                    nsyms = symData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }
+                    stroff = symData.advanced(by: 8).withUnsafeBytes { $0.load(as: UInt32.self) }
+                    strsize = symData.advanced(by: 12).withUnsafeBytes { $0.load(as: UInt32.self) }
+                    break
+                }
+                if let current = try? handle.offset() {
+                    try? handle.seek(toOffset: current + UInt64(size) - 8)
+                }
+            }
+
+            if nsyms > 0 && stroff > 0 {
+                try? handle.seek(toOffset: offset + UInt64(stroff))
+                if let strData = try? handle.read(upToCount: Int(strsize)) {
+                    var detectedSymbols: [String] = []
+                    var current = Data()
+                    for byte in strData {
+                        if byte == 0 {
+                            if !current.isEmpty, let s = String(data: current, encoding: .utf8) {
+                                detectedSymbols.append(s)
+                            }
+                            current = Data()
+                        } else {
+                            current.append(byte)
+                        }
+                    }
+                    self.symbols = detectedSymbols.sorted()
+                }
+            }
+            self.isLoading = false
+        }
+    }
+}
+
+// MARK: - Audit Log View
+
+struct FrameworkAuditLogView: View {
+    @Environment(\.dismiss) private var dismiss
+    let log: [FrameworkManager.FrameworkAuditEntry]
+
+    var body: some View {
+        List(log.reversed()) { entry in
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(entry.frameworkName).font(.subheadline.bold())
+                    Spacer()
+                    Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
+                        .font(.caption2).foregroundStyle(.secondary)
+                }
+                Text(entry.action).font(.caption.bold()).foregroundStyle(.accentColor)
+                HStack {
+                    Text(entry.oldValue).foregroundStyle(.red)
+                    Image(systemName: "arrow.right").font(.caption2)
+                    Text(entry.newValue).foregroundStyle(.green)
+                }
+                .font(.system(size: 10, design: .monospaced))
+            }
+        }
+        .navigationTitle("Audit Log")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    let text = log.map { "[\($0.timestamp)] \($0.frameworkName) - \($0.action): \($0.oldValue) -> \($0.newValue)" }.joined(separator: "\n")
+                    UIPasteboard.general.string = text
+                } label: {
+                    Label("Export", systemImage: "square.and.arrow.up")
+                }
+            }
+        }
+    }
+}
+
 struct FrameworkInstallSheet: View {
     @Environment(\.dismiss) private var dismiss
     let manager: FrameworkManager
@@ -585,21 +1266,169 @@ struct FrameworkInstallSheet: View {
 
 // MARK: - Framework Detail Sheet
 
+// MARK: - Native ZIP Support
+
+struct NativeZipArchive {
+    private var localFileData = Data()
+    private var centralDirectoryData = Data()
+    private var entryCount: UInt16 = 0
+
+    mutating func addFile(name: String, data: Data) {
+        let relativePath = name.replacingOccurrences(of: "\\", with: "/")
+        let nameData = Data(relativePath.utf8)
+        let crc = computeCRC32(data)
+        let size = UInt32(data.count)
+        let offset = UInt32(localFileData.count)
+
+        // Local File Header
+        var localHeader = Data()
+        localHeader.append(contentsOf: [0x50, 0x4b, 0x03, 0x04])
+        localHeader.append(contentsOf: [0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+        localHeader.append(contentsOf: withUnsafeBytes(of: crc.littleEndian) { Data($0) })
+        localHeader.append(contentsOf: withUnsafeBytes(of: size.littleEndian) { Data($0) })
+        localHeader.append(contentsOf: withUnsafeBytes(of: size.littleEndian) { Data($0) })
+        localHeader.append(contentsOf: withUnsafeBytes(of: UInt16(nameData.count).littleEndian) { Data($0) })
+        localHeader.append(contentsOf: [0x00, 0x00])
+        localHeader.append(nameData)
+
+        localFileData.append(localHeader)
+        localFileData.append(data)
+
+        // Central Directory Header
+        var cdHeader = Data()
+        cdHeader.append(contentsOf: [0x50, 0x4b, 0x01, 0x02])
+        cdHeader.append(contentsOf: [0x14, 0x00, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+        cdHeader.append(contentsOf: withUnsafeBytes(of: crc.littleEndian) { Data($0) })
+        cdHeader.append(contentsOf: withUnsafeBytes(of: size.littleEndian) { Data($0) })
+        cdHeader.append(contentsOf: withUnsafeBytes(of: size.littleEndian) { Data($0) })
+        cdHeader.append(contentsOf: withUnsafeBytes(of: UInt16(nameData.count).littleEndian) { Data($0) })
+        cdHeader.append(contentsOf: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+        cdHeader.append(contentsOf: withUnsafeBytes(of: offset.littleEndian) { Data($0) })
+        cdHeader.append(nameData)
+
+        centralDirectoryData.append(cdHeader)
+        entryCount += 1
+    }
+
+    mutating func addDirectory(url: URL, base: URL) {
+        let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: [.isRegularFileKey], options: [.allowsAnyFileHierarchyEnumeration])
+        while let fileURL = enumerator?.nextObject() as? URL {
+            if let vals = try? fileURL.resourceValues(forKeys: [.isRegularFileKey]), vals.isRegularFile == true {
+                let rel = fileURL.path.replacingOccurrences(of: base.path + "/", with: "")
+                if let d = try? Data(contentsOf: fileURL) { addFile(name: rel, data: d) }
+            }
+        }
+    }
+
+    func finalize() -> Data {
+        var d = localFileData
+        let cdOffset = UInt32(d.count)
+        let cdSize = UInt32(centralDirectoryData.count)
+        d.append(centralDirectoryData)
+        d.append(contentsOf: [0x50, 0x4b, 0x05, 0x06, 0x00, 0x00, 0x00, 0x00])
+        d.append(contentsOf: withUnsafeBytes(of: entryCount.littleEndian) { Data($0) })
+        d.append(contentsOf: withUnsafeBytes(of: entryCount.littleEndian) { Data($0) })
+        d.append(contentsOf: withUnsafeBytes(of: cdSize.littleEndian) { Data($0) })
+        d.append(contentsOf: withUnsafeBytes(of: cdOffset.littleEndian) { Data($0) })
+        d.append(contentsOf: [0x00, 0x00])
+        return d
+    }
+
+    private func computeCRC32(_ data: Data) -> UInt32 {
+        var crc: UInt32 = 0xFFFFFFFF
+        for byte in data {
+            crc ^= UInt32(byte)
+            for _ in 0..<8 { crc = (crc >> 1) ^ (crc & 1 != 0 ? 0xEDB88320 : 0) }
+        }
+        return ~crc
+    }
+}
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    func makeUIViewController(context: Context) -> UIActivityViewController { UIActivityViewController(activityItems: activityItems, applicationActivities: nil) }
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
 struct FrameworkDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     let framework: FrameworkDescriptor
     let manager: FrameworkManager
 
     @State private var execParams: [String: String] = [:]
+    @State private var parsedArchitectures: [String] = []
+    @State private var isFatBinary = false
+    @State private var symbolCount: Int = 0
+    @State private var linkerDependencies: [String] = []
+    @State private var infoPlist: [String: AnyHashable] = [:]
+    @State private var showSymbolBrowser = false
+    @State private var teamID: String = "Unknown"
+    @State private var entitlements: [String: AnyHashable] = [:]
+    @State private var showStripConfirmation = false
 
     var body: some View {
         List {
             Section("Details") {
                 LabeledContent("Name", value: framework.name)
+                LabeledContent("Path", value: framework.path)
+                LabeledContent("Type", value: framework.type.rawValue.capitalized)
                 LabeledContent("ID", value: String(framework.id.uuidString.prefix(8)) + "...")
                 LabeledContent("Language", value: framework.language.rawValue)
                 LabeledContent("State", value: framework.lifecycleState.rawValue.capitalized)
                 LabeledContent("Enabled", value: framework.isEnabled ? "Yes" : "No")
+            }
+
+            Section("Code Signature") {
+                LabeledContent("Team ID", value: teamID)
+                if !entitlements.isEmpty {
+                    NavigationLink("Entitlements (\(entitlements.count))") {
+                        FrameworkInfoPlistView(data: entitlements)
+                            .navigationTitle("Entitlements")
+                    }
+                }
+            }
+
+            if !infoPlist.isEmpty {
+                Section("Metadata") {
+                    NavigationLink("Info.plist Viewer") {
+                        FrameworkInfoPlistView(data: infoPlist)
+                    }
+                }
+            }
+
+            if !linkerDependencies.isEmpty {
+                Section("Linker Dependencies") {
+                    ForEach(linkerDependencies, id: \.self) { dep in
+                        Text(dep).font(.caption2.monospaced())
+                    }
+                }
+            }
+
+            Section("Binary Info") {
+                LabeledContent("Size", value: ByteCountFormatter.string(fromByteCount: framework.size, countStyle: .file))
+                LabeledContent("Last Modified", value: framework.lastModified.formatted())
+                LabeledContent("Fat Binary", value: isFatBinary ? "Yes" : "No")
+                if isFatBinary && parsedArchitectures.contains("x86_64") {
+                    Button("Strip Simulator Slices", role: .destructive) {
+                        showStripConfirmation = true
+                    }
+                    .font(.caption)
+                }
+                Button {
+                    showSymbolBrowser = true
+                } label: {
+                    LabeledContent("Symbols", value: "\(symbolCount)")
+                }
+                VStack(alignment: .leading) {
+                    Text("Architectures").font(.subheadline.bold())
+                    if parsedArchitectures.isEmpty {
+                        Text("Unknown").foregroundStyle(.secondary)
+                    } else {
+                        ForEach(parsedArchitectures, id: \.self) { arch in
+                            Text("• \(arch)")
+                        }
+                    }
+                }
             }
             Section("Sandbox Profile") {
                 Picker("Profile", selection: Binding(
@@ -735,5 +1564,181 @@ struct FrameworkDetailSheet: View {
         .navigationTitle(framework.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
+        .onAppear { parseMachO() }
+        .confirmationDialog("Strip Slices?", isPresented: $showStripConfirmation) {
+            Button("Strip x86_64", role: .destructive) { stripSimulatorSlices() }
+        } message: {
+            Text("This will create a backup and remove the x86_64 slice from the framework binary. This action is permanent.")
+        }
+        .sheet(isPresented: $showSymbolBrowser) {
+            NavigationStack {
+                FrameworkSymbolBrowser(framework: framework)
+            }
+        }
+    }
+
+    private func parseMachO() {
+        guard !framework.path.isEmpty else { return }
+        let url = URL(fileURLWithPath: framework.path)
+        let binaryURL = framework.path.hasSuffix(".framework") ? url.appendingPathComponent(url.deletingPathExtension().lastPathComponent) : url
+
+        loadInfoPlist(url: url)
+
+        guard let handle = try? FileHandle(forReadingFrom: binaryURL) else { return }
+        defer { try? handle.close() }
+
+        guard let magicData = try? handle.read(upToCount: 4) else { return }
+        let magic = magicData.withUnsafeBytes { $0.load(as: UInt32.self) }
+
+        if magic == 0xBEBAFECA || magic == 0xCAFEBABE {
+            isFatBinary = true
+            guard let countData = try? handle.read(upToCount: 4) else { return }
+            let count = countData.withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+            var archs: [String] = []
+            for _ in 0..<count {
+                guard let archData = try? handle.read(upToCount: 20) else { break }
+                let cputype = archData.withUnsafeBytes { $0.load(as: Int32.self) }.bigEndian
+                let offset = archData.advanced(by: 8).withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+                archs.append(cpuTypeToString(cputype))
+                if symbolCount == 0 { parseLoadCommands(handle: handle, offset: UInt64(offset)) }
+            }
+            parsedArchitectures = Array(Set(archs)).sorted()
+        } else if [0xFEEDFACE, 0xFEEDFACF, 0xCEFAEDFE, 0xCFFAEDFE].contains(magic) {
+            isFatBinary = false
+            guard let cputypeData = try? handle.read(upToCount: 4) else { return }
+            parsedArchitectures = [cpuTypeToString(cputypeData.withUnsafeBytes { $0.load(as: Int32.self) })]
+            parseLoadCommands(handle: handle, offset: 0)
+        }
+    }
+
+    private func loadInfoPlist(url: URL) {
+        let plistURL = url.appendingPathComponent("Info.plist")
+        if let d = try? Data(contentsOf: plistURL),
+           let plist = try? PropertyListSerialization.propertyList(from: d, options: [], format: nil) as? [String: AnyHashable] {
+            self.infoPlist = plist
+        }
+    }
+
+    private func parseLoadCommands(handle: FileHandle, offset: UInt64) {
+        try? handle.seek(toOffset: offset)
+        guard let headerData = try? handle.read(upToCount: 32) else { return }
+        let is64 = headerData.count == 32
+        let ncmds = headerData.advanced(by: 16).withUnsafeBytes { $0.load(as: UInt32.self) }
+        try? handle.seek(toOffset: offset + (is64 ? 32 : 28))
+        var deps: [String] = []
+        for _ in 0..<ncmds {
+            guard let cmdData = try? handle.read(upToCount: 8) else { break }
+            let cmd = cmdData.withUnsafeBytes { $0.load(as: UInt32.self) }
+            let size = cmdData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }
+            if cmd == 0x02 { // LC_SYMTAB
+                guard let symData = try? handle.read(upToCount: 8) else { break }
+                self.symbolCount = Int(symData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) })
+            } else if cmd == 0x0c || cmd == 0x18 { // LC_LOAD_DYLIB / LC_LOAD_WEAK_DYLIB
+                guard let dylibData = try? handle.read(upToCount: Int(size) - 8) else { break }
+                let nameOffset = dylibData.withUnsafeBytes { $0.load(as: UInt32.self) }
+                let nameData = dylibData.advanced(by: Int(nameOffset) - 8)
+                if let name = String(data: nameData.prefix { $0 != 0 }, encoding: .utf8) {
+                    deps.append(name)
+                }
+            } else if cmd == 0x1d { // LC_CODE_SIGNATURE
+                guard let sigData = try? handle.read(upToCount: 8) else { break }
+                let sigOff = sigData.withUnsafeBytes { $0.load(as: UInt32.self) }
+                let sigSize = sigData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }
+                parseSignatureBlob(handle: handle, offset: offset + UInt64(sigOff), size: sigSize)
+            } else {
+                if let current = try? handle.offset() {
+                    try? handle.seek(toOffset: current + UInt64(size) - 8)
+                }
+            }
+        }
+        self.linkerDependencies = deps
+    }
+
+    private func parseSignatureBlob(handle: FileHandle, offset: UInt64, size: UInt32) {
+        do {
+            try handle.seek(toOffset: offset)
+            guard let superBlobData = try handle.read(upToCount: 12) else { return }
+            let magic = superBlobData.withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+            guard magic == 0xfade0cc0 else { return }
+            let count = superBlobData.advanced(by: 8).withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+
+            for _ in 0..<count {
+                guard let indexData = try handle.read(upToCount: 8) else { break }
+                let type = indexData.withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+                let blobOffset = indexData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+
+                let currentPos = try handle.offset()
+                if type == 5 { // CSSLOT_ENTITLEMENTS
+                    try handle.seek(toOffset: offset + UInt64(blobOffset))
+                    guard let blobHeader = try handle.read(upToCount: 8) else { continue }
+                    let blobMagic = blobHeader.withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+                    let blobLength = blobHeader.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+                    if blobMagic == 0xfade7171, blobLength > 8 {
+                        guard let xmlData = try handle.read(upToCount: Int(blobLength) - 8) else { continue }
+                        if let plist = try? PropertyListSerialization.propertyList(from: xmlData, options: [], format: nil) as? [String: AnyHashable] {
+                            self.entitlements = plist
+                        }
+                    }
+                }
+                try handle.seek(toOffset: currentPos)
+            }
+            if let teamID = infoPlist["AppIdentifierPrefix"] as? String {
+                self.teamID = teamID.trimmingCharacters(in: CharacterSet(charactersIn: "."))
+            }
+        } catch {
+            print("Signature Parsing Error: \(error)")
+        }
+    }
+
+    private func stripSimulatorSlices() {
+        guard !framework.path.isEmpty else { return }
+        let url = URL(fileURLWithPath: framework.path)
+        let binaryURL = framework.path.hasSuffix(".framework") ? url.appendingPathComponent(url.deletingPathExtension().lastPathComponent) : url
+        do {
+            let data = try Data(contentsOf: binaryURL)
+            guard data.count > 8 else { return }
+            let magic = data.withUnsafeBytes { $0.load(as: UInt32.self) }
+            if magic == 0xBEBAFECA || magic == 0xCAFEBABE {
+                let count = data.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+                var newSlices: [(Data, Data)] = []
+                for i in 0..<Int(count) {
+                    let archOff = 8 + (i * 20)
+                    let archData = data.subdata(in: archOff..<(archOff + 20))
+                    let cputype = archData.withUnsafeBytes { $0.load(as: Int32.self) }.bigEndian
+                    if cputype != (7 | 0x01000000) {
+                        let off = archData.advanced(by: 8).withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+                        let size = archData.advanced(by: 12).withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+                        newSlices.append((archData, data.subdata(in: Int(off)..<Int(off + size))))
+                    }
+                }
+                if !newSlices.isEmpty {
+                    var newData = Data(); newData.append(data.prefix(4))
+                    newData.append(withUnsafeBytes(of: UInt32(newSlices.count).bigEndian) { Data($0) })
+                    let hSize = 8 + (newSlices.count * 20)
+                    var currOff = (hSize + 4095) & ~4095
+                    var hs = Data(); var cs = Data()
+                    for (var h, c) in newSlices {
+                        h.replaceSubrange(8..<12, with: withUnsafeBytes(of: UInt32(currOff).bigEndian) { Data($0) })
+                        hs.append(h)
+                        let pad = currOff - (hSize + cs.count)
+                        if pad > 0 { cs.append(Data(repeating: 0, count: pad)) }
+                        cs.append(c); currOff += (c.count + 4095) & ~4095
+                    }
+                    newData.append(hs); newData.append(cs); try newData.write(to: binaryURL, options: .atomic)
+                    manager.log(to: framework.id, level: .info, message: "Stripped x86_64 slice.")
+                    parseMachO()
+                }
+            }
+        } catch { print("Strip Error: \(error)") }
+    }
+
+    private func cpuTypeToString(_ type: Int32) -> String {
+        switch type {
+        case 7: return "x86"
+        case 7 | 0x01000000: return "x86_64"
+        case 12: return "arm"
+        case 12 | 0x01000000: return "arm64"
+        default: return "Unknown (\(type))"
+        }
     }
 }

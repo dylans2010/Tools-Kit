@@ -1,32 +1,45 @@
 import SwiftUI
+import Observation
 
 // MARK: - Library Descriptor
 
-struct LibraryDescriptor: Identifiable, Codable {
+struct LibraryDescriptor: Identifiable, Codable, Hashable {
     let id: UUID
     let name: String
+    let path: String
     let version: String
     let channel: VersionChannel
+    let type: LibraryType
     let capabilities: [String]
     let requiredScopes: [SDKScope]
     let inputSchema: [String: String]
     let outputSchema: [String: String]
     let constraints: [String]
     var resourceLimits: [String: Double]
+    var targetCount: Int
+    var addedDate: Date
+    var size: Int64
+
+    enum LibraryType: String, Codable, CaseIterable {
+        case `static`, dynamic, tbd, broken, unused, sdk, local
+    }
 
     init(
-        id: UUID = UUID(), name: String, version: String,
-        channel: VersionChannel = .stable,
+        id: UUID = UUID(), name: String, path: String = "", version: String,
+        channel: VersionChannel = .stable, type: LibraryType = .local,
         capabilities: [String] = [], requiredScopes: [SDKScope] = [],
         inputSchema: [String: String] = [:], outputSchema: [String: String] = [:],
         constraints: [String] = [],
-        resourceLimits: [String: Double] = ["max_memory": 128.0, "max_cpu": 0.5]
+        resourceLimits: [String: Double] = ["max_memory": 128.0, "max_cpu": 0.5],
+        targetCount: Int = 0, addedDate: Date = Date(), size: Int64 = 0
     ) {
-        self.id = id; self.name = name; self.version = version; self.channel = channel
+        self.id = id; self.name = name; self.path = path; self.version = version
+        self.channel = channel; self.type = type
         self.capabilities = capabilities; self.requiredScopes = requiredScopes
         self.inputSchema = inputSchema; self.outputSchema = outputSchema
         self.constraints = constraints
         self.resourceLimits = resourceLimits
+        self.targetCount = targetCount; self.addedDate = addedDate; self.size = size
     }
 }
 
@@ -169,10 +182,11 @@ struct CapabilityConflict: Identifiable {
 // MARK: - Library Registry
 
 @MainActor
-final class LibraryRegistry: ObservableObject {
+@Observable
+final class LibraryRegistry {
     static let shared = LibraryRegistry()
-    @Published var libraries: [LibraryDescriptor] = []
-    @Published var marketplaceLibraries: [LibraryDescriptor] = []
+    var libraries: [LibraryDescriptor] = []
+    var marketplaceLibraries: [LibraryDescriptor] = []
 
     private init() {
         seedMarketplace()
@@ -204,19 +218,20 @@ final class LibraryRegistry: ObservableObject {
 // MARK: - Library Manager
 
 @MainActor
-final class LibraryManager: ObservableObject {
+@Observable
+final class LibraryManager {
     static let shared = LibraryManager()
 
-    @Published var invocationRecords: [LibraryInvocationRecord] = []
-    @Published var usageMetrics: [UUID: UsageMetrics] = [:]
-    @Published var pendingApprovals: [LibraryScopeApproval] = []
-    @Published var compositeWorkflows: [CompositeWorkflow] = []
-    @Published var invocationTemplates: [InvocationTemplate] = []
-    @Published private(set) var invocationState: LibraryInvocationState = .idle
-    @Published var dryRunEnabled: Bool = false
-    @Published var rateLimits: [UUID: Int] = [:] // libraryId: max per minute
-    @Published var quotas: [UUID: Int] = [:] // libraryId: total allowed
-    @Published var quotaUsage: [UUID: Int] = [:] // libraryId: current usage
+    var invocationRecords: [LibraryInvocationRecord] = []
+    var usageMetrics: [UUID: UsageMetrics] = [:]
+    var pendingApprovals: [LibraryScopeApproval] = []
+    var compositeWorkflows: [CompositeWorkflow] = []
+    var invocationTemplates: [InvocationTemplate] = []
+    var invocationState: LibraryInvocationState = .idle
+    var dryRunEnabled: Bool = false
+    var rateLimits: [UUID: Int] = [:] // libraryId: max per minute
+    var quotas: [UUID: Int] = [:] // libraryId: total allowed
+    var quotaUsage: [UUID: Int] = [:] // libraryId: current usage
 
     private let tokenEngine = DeterministicTokenEngine.shared
     private let registry = LibraryRegistry.shared
@@ -407,21 +422,34 @@ final class LibraryManager: ObservableObject {
 // MARK: - LibraryManageView
 
 struct LibraryManageView: View {
-    @StateObject private var manager = LibraryManager.shared
-    @StateObject private var registry = LibraryRegistry.shared
-    @StateObject private var tokenEngine = DeterministicTokenEngine.shared
+    @State private var manager = LibraryManager.shared
+    @State private var registry = LibraryRegistry.shared
+    @State private var tokenEngine = DeterministicTokenEngine.shared
 
     @State private var showInstallSheet = false
     @State private var selectedLibrary: LibraryDescriptor?
     @State private var searchText = ""
     @State private var selectedCategory: LibraryCategory?
+    @State private var selectedType: LibraryDescriptor.LibraryType?
+    @State private var sortOption: SortOption = .name
     @State private var showingMarketplace = false
+    @State private var multiSelection = Set<UUID>()
+    @State private var showTargetMigration = false
+
+    enum SortOption: String, CaseIterable {
+        case name = "Name"
+        case size = "Size"
+        case type = "Type"
+        case targetCount = "Target Count"
+        case recentlyAdded = "Recently Added"
+    }
 
     private var filteredLibraries: [LibraryDescriptor] {
         var filtered = registry.libraries
         if !searchText.isEmpty {
             filtered = filtered.filter {
                 $0.name.localizedCaseInsensitiveContains(searchText) ||
+                $0.path.localizedCaseInsensitiveContains(searchText) ||
                 $0.capabilities.joined().localizedCaseInsensitiveContains(searchText)
             }
         }
@@ -432,18 +460,30 @@ struct LibraryManageView: View {
                 }
             }
         }
-        return filtered
+        if let type = selectedType {
+            filtered = filtered.filter { $0.type == type }
+        }
+
+        return filtered.sorted { lhs, rhs in
+            switch sortOption {
+            case .name: return lhs.name.localizedCompare(rhs.name) == .orderedAscending
+            case .size: return lhs.size < rhs.size
+            case .type: return lhs.type.rawValue < rhs.type.rawValue
+            case .targetCount: return lhs.targetCount < rhs.targetCount
+            case .recentlyAdded: return lhs.addedDate > rhs.addedDate
+            }
+        }
     }
 
     var body: some View {
         NavigationStack {
-            List {
+            List(selection: $multiSelection) {
                 authStatusSection
                 marketplaceShortcutSection
                 templatesSection
                 resourceMonitorSection
                 usageIntelligenceSection
-                categoryFilterSection
+                filterSection
                 libraryListSection
                 pipelineStateSection
                 workflowsSection
@@ -451,14 +491,31 @@ struct LibraryManageView: View {
                 approvalsSection
                 invocationHistorySection
             }
+            .refreshable { await refreshLibraries() }
             .listStyle(.insetGrouped)
             .navigationTitle("Libraries")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "Search libraries")
             .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    EditButton()
+                }
                 ToolbarItem(placement: .primaryAction) {
-                    Button { showInstallSheet = true } label: { Label("Install", systemImage: "plus") }
-                    .disabled(tokenEngine.currentToken == nil)
+                    HStack {
+                        sortMenu
+                        Button { showInstallSheet = true } label: { Label("Install", systemImage: "plus") }
+                        .disabled(tokenEngine.currentToken == nil)
+                    }
+                }
+                ToolbarItemGroup(placement: .bottomBar) {
+                    if !multiSelection.isEmpty {
+                        Button { showTargetMigration = true } label: { Label("Migrate", systemImage: "arrow.right.square") }
+                        Spacer()
+                        Button(role: .destructive) {
+                            for id in multiSelection { _ = manager.uninstallLibrary(id: id) }
+                            multiSelection.removeAll()
+                        } label: { Label("Remove", systemImage: "trash") }
+                    }
                 }
             }
             .sheet(isPresented: $showInstallSheet) {
@@ -466,6 +523,9 @@ struct LibraryManageView: View {
             }
             .sheet(item: $selectedLibrary) { lib in
                 NavigationStack { LibraryDetailSheet(library: lib, manager: manager) }
+            }
+            .sheet(isPresented: $showTargetMigration) {
+                NavigationStack { TargetMigrationSheet(selection: multiSelection, manager: manager) }
             }
             .sheet(isPresented: $showingMarketplace) {
                 NavigationStack {
@@ -581,10 +641,26 @@ struct LibraryManageView: View {
         }
     }
 
-    private var categoryFilterSection: some View {
-        Section("Categories") {
+    private var filterSection: some View {
+        Section("Filters & Categories") {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
+                    Menu {
+                        Picker("Type", selection: $selectedType) {
+                            Text("All Types").tag(nil as LibraryDescriptor.LibraryType?)
+                            ForEach(LibraryDescriptor.LibraryType.allCases, id: \.self) { type in
+                                Text(type.rawValue.capitalized).tag(type as LibraryDescriptor.LibraryType?)
+                            }
+                        }
+                    } label: {
+                        Label(selectedType?.rawValue.capitalized ?? "All Types", systemImage: "line.3.horizontal.decrease.circle")
+                            .font(.caption2.bold())
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+
+                    Divider().frame(height: 20)
+
                     ForEach(LibraryCategory.allCases) { cat in
                         Toggle(isOn: Binding(
                             get: { selectedCategory == cat },
@@ -628,11 +704,13 @@ struct LibraryManageView: View {
                         }.padding(.vertical, 2)
                     }
                     .buttonStyle(.plain)
-                    .swipeActions(edge: .trailing) {
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) { _ = manager.uninstallLibrary(id: lib.id) } label: { Label("Remove", systemImage: "trash") }
+                        Button { if let u = URL(string: "share://\(lib.path)") { UIApplication.shared.open(u) } } label: { Label("Reveal", systemImage: "folder") }.tint(.blue)
                     }
                     .swipeActions(edge: .leading) {
                         Button { _ = manager.lockVersion(libraryId: lib.id) } label: { Label("Lock", systemImage: "lock") }.tint(.orange)
+                        Button { /* Toggle Optional */ } label: { Label("Toggle Optional", systemImage: "link") }.tint(.purple)
                     }
                 }
             }
@@ -661,6 +739,39 @@ struct LibraryManageView: View {
             }
             .padding(.vertical, 4)
         }
+    }
+
+    private func refreshLibraries() async {
+        for i in 0..<registry.libraries.count {
+            let lib = registry.libraries[i]
+            guard !lib.path.isEmpty else { continue }
+            if let attrs = try? FileManager.default.attributesOfItem(atPath: lib.path) {
+                var updated = lib
+                updated.size = attrs[.size] as? Int64 ?? 0
+                updated.lastModified = attrs[.modificationDate] as? Date ?? Date()
+                registry.libraries[i] = updated
+            }
+        }
+    }
+
+    private var sortMenu: some View {
+        Menu {
+            Section("Batch Flags") {
+                Button { copyBatchLinkerFlags() } label: { Label("Copy -l Flags", systemImage: "doc.on.doc") }
+            }
+            Picker("Sort By", selection: $sortOption) {
+                ForEach(SortOption.allCases, id: \.self) { option in
+                    Text(option.rawValue).tag(option)
+                }
+            }
+        } label: {
+            Label("Sort", systemImage: "arrow.up.arrow.down.circle")
+        }
+    }
+
+    private func copyBatchLinkerFlags() {
+        let flags = multiSelection.compactMap { registry.library(by: $0)?.name }.map { "-l\($0)" }.joined(separator: " ")
+        UIPasteboard.general.string = flags
     }
 
     private func metricItem(label: String, value: String, icon: String, color: Color = .primary) -> some View {
@@ -740,6 +851,261 @@ struct LibraryManageView: View {
 }
 
 // MARK: - Library Install Sheet
+
+// MARK: - Target Membership & Migration
+
+struct TargetMembershipView: View {
+    let library: LibraryDescriptor
+    @State private var targets: [String] = ["MainApp", "WidgetExtension", "FrameworkA", "UnitTests"]
+    @State private var selection = Set<String>()
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        List(targets, id: \.self) { target in
+            Toggle(target, isOn: Binding(
+                get: { selection.contains(target) },
+                set: { if $0 { selection.insert(target) } else { selection.remove(target) } }
+            ))
+        }
+        .navigationTitle("Membership")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button("Apply") { dismiss() }
+            }
+        }
+    }
+}
+
+struct TargetMigrationSheet: View {
+    let selection: Set<UUID>
+    let manager: LibraryManager
+    @State private var targets: [String] = ["MainApp", "WidgetExtension", "FrameworkA", "UnitTests"]
+    @State private var selectedTarget = ""
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Form {
+            Section("Move \(selection.count) libraries to:") {
+                Picker("Destination", selection: $selectedTarget) {
+                    Text("Select Target...").tag("")
+                    ForEach(targets, id: \.self) { Text($0).tag($0) }
+                }
+            }
+            Section {
+                Button("Execute Migration") { dismiss() }
+                    .disabled(selectedTarget.isEmpty)
+                    .buttonStyle(.borderedProminent)
+            }
+        }
+        .navigationTitle("Batch Migration")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+        }
+    }
+}
+
+// MARK: - Linker Flag Manager
+
+struct LinkerFlagManager: View {
+    let library: LibraryDescriptor
+    @State private var flags: [String] = ["-ObjC"]
+    @State private var newFlag = ""
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("-l\(library.name)").font(.caption.monospaced()).foregroundStyle(.blue)
+                Spacer()
+                Button { UIPasteboard.general.string = "-l\(library.name)" } label: { Image(systemName: "doc.on.doc").font(.caption) }
+            }
+            Divider()
+            ForEach(flags, id: \.self) { flag in
+                HStack {
+                    Text(flag).font(.caption2.monospaced())
+                    Spacer()
+                    Button(role: .destructive) { flags.removeAll { $0 == flag } } label: { Image(systemName: "minus.circle").foregroundStyle(.red) }
+                }
+            }
+            HStack {
+                TextField("Add Flag", text: $newFlag).font(.caption2).textFieldStyle(.roundedBorder)
+                Button { if !newFlag.isEmpty { flags.append(newFlag); newFlag = "" } } label: { Image(systemName: "plus.circle.fill") }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+// MARK: - Library Symbol Browser
+
+struct LibrarySymbolBrowser: View {
+    let library: LibraryDescriptor
+    let allLibraries: [LibraryDescriptor]
+    @Environment(\.dismiss) private var dismiss
+    @State private var symbols: [LibrarySymbol] = []
+    @State private var searchText = ""
+    @State private var filter: SymbolFilter = .all
+
+    enum SymbolFilter: String, CaseIterable { case all = "All", defined = "Defined", undefined = "Undefined" }
+
+    struct LibrarySymbol: Identifiable {
+        let id = UUID()
+        let name: String
+        let type: String
+        let conflicts: [String]
+    }
+
+    var filteredSymbols: [LibrarySymbol] {
+        symbols.filter {
+            (searchText.isEmpty || $0.name.localizedCaseInsensitiveContains(searchText)) &&
+            (filter == .all || (filter == .defined && $0.type != "U") || (filter == .undefined && $0.type == "U"))
+        }
+    }
+
+    var body: some View {
+        List(filteredSymbols) { symbol in
+            VStack(alignment: .leading, spacing: 2) {
+                HStack {
+                    Text(symbol.name).font(.system(size: 10, weight: .bold, design: .monospaced))
+                    if !symbol.conflicts.isEmpty { Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange).font(.caption2) }
+                }
+                Text("Type: \(symbol.type)").font(.system(size: 8, design: .monospaced)).foregroundStyle(.secondary)
+                if !symbol.conflicts.isEmpty {
+                    Text("Also defined in: \(symbol.conflicts.joined(separator: ", "))")
+                        .font(.system(size: 8)).foregroundStyle(.orange)
+                }
+            }
+        }
+        .navigationTitle("Symbols")
+        .searchable(text: $searchText)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
+            ToolbarItem(placement: .primaryAction) {
+                Picker("Filter", selection: $filter) { ForEach(SymbolFilter.allCases, id: \.self) { Text($0.rawValue).tag($0) } }
+                    .pickerStyle(.segmented)
+            }
+        }
+        .onAppear { loadSymbols() }
+    }
+
+    private func loadSymbols() {
+        Task {
+            guard !library.path.isEmpty else { return }
+            let url = URL(fileURLWithPath: library.path)
+            guard let handle = try? FileHandle(forReadingFrom: url) else { return }
+            defer { try? handle.close() }
+
+            var detected: [LibrarySymbol] = []
+            if library.path.hasSuffix(".a") {
+                detected = parseArchiveSymbols(handle: handle)
+            } else {
+                detected = parseMachOSymbols(handle: handle, offset: 0)
+            }
+
+            // Real Conflict Detection: pre-load definitions from other libraries
+            var otherDefinitions = Set<String>()
+            for other in allLibraries where other.id != library.id && !other.path.isEmpty {
+                if let otherHandle = try? FileHandle(forReadingFrom: URL(fileURLWithPath: other.path)) {
+                    let otherSyms = other.path.hasSuffix(".a") ? parseArchiveSymbols(handle: otherHandle) : parseMachOSymbols(handle: otherHandle, offset: 0)
+                    for s in otherSyms where s.type != "U" { otherDefinitions.insert(s.name) }
+                    try? otherHandle.close()
+                }
+            }
+
+            for i in 0..<detected.count {
+                if detected[i].type != "U" && otherDefinitions.contains(detected[i].name) {
+                    detected[i].conflicts = ["Other Linked Library"] // Simplified provider list for performance
+                }
+            }
+            self.symbols = detected.sorted { $0.name < $1.name }
+        }
+    }
+
+    private func parseArchiveSymbols(handle: FileHandle) -> [LibrarySymbol] {
+        // Basic AR parser to find Mach-O objects
+        guard let magic = try? handle.read(upToCount: 8), String(data: magic, encoding: .ascii) == "!<arch>\n" else { return [] }
+        var symbols: [LibrarySymbol] = []
+        while let header = try? handle.read(upToCount: 60) {
+            guard header.count == 60 else { break }
+            let sizeStr = String(data: header.subdata(in: 48..<58), encoding: .ascii)?.trimmingCharacters(in: .whitespaces) ?? "0"
+            let size = Int(sizeStr) ?? 0
+            if let current = try? handle.offset() {
+                symbols.append(contentsOf: parseMachOSymbols(handle: handle, offset: current))
+                try? handle.seek(toOffset: current + UInt64(size + (size % 2)))
+            }
+        }
+        return symbols
+    }
+
+    private func parseMachOSymbols(handle: FileHandle, offset: UInt64) -> [LibrarySymbol] {
+        try? handle.seek(toOffset: offset)
+        guard let magicData = try? handle.read(upToCount: 4) else { return [] }
+        let magic = magicData.withUnsafeBytes { $0.load(as: UInt32.self) }
+
+        var archOffset = offset
+        if magic == 0xBEBAFECA || magic == 0xCAFEBABE {
+            guard let countData = try? handle.read(upToCount: 4) else { return [] }
+            let count = countData.withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+            if count > 0 {
+                guard let archData = try? handle.read(upToCount: 20) else { return [] }
+                archOffset = offset + UInt64(archData.advanced(by: 8).withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian)
+            }
+        }
+
+        try? handle.seek(toOffset: archOffset)
+        guard let headerData = try? handle.read(upToCount: 32) else { return [] }
+        let is64 = headerData.count == 32
+        let ncmds = headerData.advanced(by: 16).withUnsafeBytes { $0.load(as: UInt32.self) }
+        try? handle.seek(toOffset: archOffset + (is64 ? 32 : 28))
+
+        var symoff: UInt32 = 0; var nsyms: UInt32 = 0; var stroff: UInt32 = 0; var strsize: UInt32 = 0
+        for _ in 0..<ncmds {
+            guard let cmdData = try? handle.read(upToCount: 8) else { break }
+            let cmd = cmdData.withUnsafeBytes { $0.load(as: UInt32.self) }
+            let size = cmdData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }
+            if cmd == 0x02 {
+                guard let symData = try? handle.read(upToCount: 16) else { break }
+                symoff = symData.withUnsafeBytes { $0.load(as: UInt32.self) }
+                nsyms = symData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }
+                stroff = symData.advanced(by: 8).withUnsafeBytes { $0.load(as: UInt32.self) }
+                strsize = symData.advanced(by: 12).withUnsafeBytes { $0.load(as: UInt32.self) }
+                break
+            }
+            if let current = try? handle.offset() { try? handle.seek(toOffset: current + UInt64(size) - 8) }
+        }
+
+        var result: [LibrarySymbol] = []
+        if nsyms > 0 && stroff > 0 {
+            try? handle.seek(toOffset: archOffset + UInt64(stroff))
+            guard let strData = try? handle.read(upToCount: Int(strsize)) else { return [] }
+            try? handle.seek(toOffset: archOffset + UInt64(symoff))
+            let symSize = is64 ? 16 : 12
+            for _ in 0..<nsyms {
+                guard let entry = try? handle.read(upToCount: symSize) else { break }
+                let n_strx = entry.withUnsafeBytes { $0.load(as: UInt32.self) }
+                let n_type = entry.advanced(by: 4).first ?? 0
+                if n_strx < UInt32(strData.count) {
+                    let nameData = strData.advanced(by: Int(n_strx))
+                    if let name = String(data: nameData.prefix { $0 != 0 }, encoding: .utf8), !name.isEmpty {
+                        result.append(LibrarySymbol(name: name, type: decodeType(n_type), conflicts: []))
+                    }
+                }
+            }
+        }
+        return result
+    }
+
+    private func decodeType(_ n_type: UInt8) -> String {
+        let type = n_type & 0x0e
+        switch type {
+        case 0x00: return "U"
+        case 0x02: return "A"
+        case 0x0e: return "S"
+        case 0x0c: return "P"
+        case 0x0a: return "I"
+        default: return "?"
+        }
+    }
+}
 
 struct LibraryInstallSheet: View {
     @Environment(\.dismiss) private var dismiss
@@ -875,13 +1241,26 @@ struct LibraryDetailSheet: View {
     @State private var invokeInput = ""
     @State private var healthStatus: String?
     @State private var isCheckingHealth = false
+    @State private var showSymbolBrowser = false
 
     var body: some View {
         List {
             Section("Details") {
                 LabeledContent("Name", value: library.name)
+                LabeledContent("Path", value: library.path)
+                LabeledContent("Type", value: library.type.rawValue.capitalized)
                 LabeledContent("Version", value: library.version)
                 LabeledContent("ID", value: String(library.id.uuidString.prefix(8)) + "...")
+            }
+
+            Section("Target Membership") {
+                NavigationLink("Manage Targets (\(library.targetCount))") {
+                    TargetMembershipView(library: library)
+                }
+            }
+
+            Section("Linker Flags") {
+                LinkerFlagManager(library: library)
             }
             Section("Resource Limits") {
                 ForEach(library.resourceLimits.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
@@ -896,6 +1275,7 @@ struct LibraryDetailSheet: View {
                         Label(cap, systemImage: "gearshape").font(.caption)
                     }
                 }
+                Button("Browse Symbols") { showSymbolBrowser = true }.font(.caption)
             }
             Section("Scopes & Health") {
                 ForEach(library.requiredScopes, id: \.rawValue) { scope in
@@ -967,5 +1347,10 @@ struct LibraryDetailSheet: View {
         .navigationTitle(library.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
+        .sheet(isPresented: $showSymbolBrowser) {
+            NavigationStack {
+                LibrarySymbolBrowser(library: library, allLibraries: manager.registry.libraries)
+            }
+        }
     }
 }
