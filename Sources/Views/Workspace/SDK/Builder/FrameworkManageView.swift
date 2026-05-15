@@ -1189,21 +1189,23 @@ struct FrameworkAuditLogView: View {
     let log: [FrameworkManager.FrameworkAuditEntry]
 
     var body: some View {
-        List(Array(log.reversed())) { entry in
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text(entry.frameworkName).font(.subheadline.bold())
-                    Spacer()
-                    Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
-                        .font(.caption2).foregroundStyle(.secondary)
+        List {
+            ForEach(Array(log.reversed())) { entry in
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(entry.frameworkName).font(.subheadline.bold())
+                        Spacer()
+                        Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
+                    Text(entry.action).font(.caption.bold()).foregroundStyle(.accentColor)
+                    HStack {
+                        Text(entry.oldValue).foregroundStyle(.red)
+                        Image(systemName: "arrow.right").font(.caption2)
+                        Text(entry.newValue).foregroundStyle(.green)
+                    }
+                    .font(.system(size: 10, design: .monospaced))
                 }
-                Text(entry.action).font(.caption.bold()).foregroundStyle(.accentColor)
-                HStack {
-                    Text(entry.oldValue).foregroundStyle(.red)
-                    Image(systemName: "arrow.right").font(.caption2)
-                    Text(entry.newValue).foregroundStyle(.green)
-                }
-                .font(.system(size: 10, design: .monospaced))
             }
         }
         .navigationTitle("Audit Log")
