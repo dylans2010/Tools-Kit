@@ -651,49 +651,51 @@ struct DependencyGraphVisualizerView: View {
         }
     }
 
-    private func nodeView(for pkg: PackageDescriptor, depth: Int) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Rectangle()
-                    .fill(Color.secondary.opacity(0.3))
-                    .frame(width: CGFloat(depth) * 20, height: 1)
-
+    private func nodeView(for pkg: PackageDescriptor, depth: Int) -> AnyView {
+        AnyView(
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Image(systemName: pkg.dependencyIds.isEmpty ? "shippingbox" : (expandedNodes.contains(pkg.id) ? "chevron.down.circle.fill" : "chevron.right.circle.fill"))
-                        .foregroundStyle(pkg.layer == .core ? .blue : .secondary)
+                    Rectangle()
+                        .fill(Color.secondary.opacity(0.3))
+                        .frame(width: CGFloat(depth) * 20, height: 1)
 
-                    VStack(alignment: .leading) {
-                        Text(pkg.name).font(.subheadline.bold())
-                        Text("v\(pkg.version)").font(.system(size: 8, design: .monospaced)).foregroundStyle(.secondary)
+                    HStack {
+                        Image(systemName: pkg.dependencyIds.isEmpty ? "shippingbox" : (expandedNodes.contains(pkg.id) ? "chevron.down.circle.fill" : "chevron.right.circle.fill"))
+                            .foregroundStyle(pkg.layer == .core ? .blue : .secondary)
+
+                        VStack(alignment: .leading) {
+                            Text(pkg.name).font(.subheadline.bold())
+                            Text("v\(pkg.version)").font(.system(size: 8, design: .monospaced)).foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(8)
+                    .background(Color.accentColor.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
+                    .onTapGesture {
+                        if !pkg.dependencyIds.isEmpty {
+                            if expandedNodes.contains(pkg.id) { expandedNodes.remove(pkg.id) }
+                            else { expandedNodes.insert(pkg.id) }
+                        }
                     }
                 }
-                .padding(8)
-                .background(Color.accentColor.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
-                .onTapGesture {
-                    if !pkg.dependencyIds.isEmpty {
-                        if expandedNodes.contains(pkg.id) { expandedNodes.remove(pkg.id) }
-                        else { expandedNodes.insert(pkg.id) }
-                    }
-                }
-            }
 
-            if expandedNodes.contains(pkg.id) {
-                ForEach(pkg.dependencyIds, id: \.self) { depId in
-                    if let depPkg = packages.first(where: { $0.id == depId }) {
-                        nodeView(for: depPkg, depth: depth + 1)
-                    } else {
-                        HStack {
-                            Rectangle()
-                                .fill(Color.secondary.opacity(0.3))
-                                .frame(width: CGFloat(depth + 1) * 20, height: 1)
-                            Text("Missing: \(depId.uuidString.prefix(8))")
-                                .font(.system(size: 8, design: .monospaced))
-                                .foregroundStyle(.red)
+                if expandedNodes.contains(pkg.id) {
+                    ForEach(pkg.dependencyIds, id: \.self) { depId in
+                        if let depPkg = packages.first(where: { $0.id == depId }) {
+                            nodeView(for: depPkg, depth: depth + 1)
+                        } else {
+                            HStack {
+                                Rectangle()
+                                    .fill(Color.secondary.opacity(0.3))
+                                    .frame(width: CGFloat(depth + 1) * 20, height: 1)
+                                Text("Missing: \(depId.uuidString.prefix(8))")
+                                    .font(.system(size: 8, design: .monospaced))
+                                    .foregroundStyle(.red)
+                            }
                         }
                     }
                 }
             }
-        }
+        )
     }
 }
 
