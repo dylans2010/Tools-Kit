@@ -124,42 +124,42 @@ actor PersonaAgentFramework {
         switch action {
         case .editNote(let id, let newTitle, let newBody):
             try validateEditNote(id: id, newTitle: newTitle, newBody: newBody)
-            try ensureScope(.workspaceWrite)
+            try await ensureScope(.workspaceWrite)
             let snapshot = try await editNote(id: id, newTitle: newTitle, newBody: newBody)
             return .success(.itemSnapshot(snapshot))
 
         case .editSlide(let id, let slideIndex, let newContent):
             try validateEditSlide(id: id, slideIndex: slideIndex, newContent: newContent)
-            try ensureScope(.workspaceWrite)
+            try await ensureScope(.workspaceWrite)
             let snapshot = try await editSlide(id: id, slideIndex: slideIndex, newContent: newContent)
             return .success(.itemSnapshot(snapshot))
 
         case .sendEmail(let to, let subject, let body, let attachmentIDs):
             try validateSendEmail(to: to, subject: subject, body: body)
-            try ensureScope(.workspaceWrite)
+            try await ensureScope(.workspaceWrite)
             let receipt = try await sendEmail(to: to, subject: subject, body: body, attachmentIDs: attachmentIDs)
             return .success(.message(receipt))
 
         case .createForm(let title, let fields):
             try validateCreateForm(title: title, fields: fields)
-            try ensureScope(.workspaceWrite)
+            try await ensureScope(.workspaceWrite)
             let snapshot = try await createForm(title: title, fields: fields)
             return .success(.itemSnapshot(snapshot))
 
         case .deleteWorkspaceItem(let id, let type):
             try validateDelete(id: id)
-            try ensureScope(.workspaceWrite)
+            try await ensureScope(.workspaceWrite)
             let message = try await deleteWorkspaceItem(id: id, type: type)
             return .success(.message(message))
 
         case .readWorkspaceItem(let id):
             try validateRead(id: id)
-            try ensureScope(.workspaceRead)
+            try await ensureScope(.workspaceRead)
             let snapshot = try await readWorkspaceItem(id: id)
             return .success(.itemSnapshot(snapshot))
 
         case .listWorkspaceItems(let filter):
-            try ensureScope(.workspaceRead)
+            try await ensureScope(.workspaceRead)
             let summaries = try await listWorkspaceItems(filter: filter)
             return .success(.itemSummaries(summaries))
         }
@@ -172,11 +172,11 @@ actor PersonaAgentFramework {
             throw AgentActionError.invalidParameter("Note id must be a UUID")
         }
 
-        return try await MainActor.run {
-            guard let found = self.findNote(with: noteID) else {
-                throw AgentActionError.itemNotFound("No note found with id \(id)")
-            }
+        guard let found = self.findNote(with: noteID) else {
+            throw AgentActionError.itemNotFound("No note found with id \(id)")
+        }
 
+        return try await MainActor.run {
             var page = found.page
             if let newTitle {
                 page.title = newTitle.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -303,10 +303,10 @@ actor PersonaAgentFramework {
             guard let noteID = UUID(uuidString: id) else {
                 throw AgentActionError.invalidParameter("Note id must be a UUID")
             }
+            guard let found = self.findNote(with: noteID) else {
+                throw AgentActionError.itemNotFound("No note found with id \(id)")
+            }
             return try await MainActor.run {
-                guard let found = self.findNote(with: noteID) else {
-                    throw AgentActionError.itemNotFound("No note found with id \(id)")
-                }
                 NotebooksManager.shared.deletePage(found.page, from: found.folder.id, notebookID: found.notebook.id)
                 return "Deleted note \(id)."
             }
@@ -350,7 +350,7 @@ actor PersonaAgentFramework {
     }
 
     private func readWorkspaceItem(id: String) async throws -> WorkspaceItemSnapshot {
-        if let noteID = UUID(uuidString: id), let note = await MainActor.run(body: { self.findNote(with: noteID) }) {
+        if let noteID = UUID(uuidString: id), let note = self.findNote(with: noteID) {
             return WorkspaceItemSnapshot(
                 id: note.page.id.uuidString,
                 type: .note,
@@ -512,8 +512,10 @@ actor PersonaAgentFramework {
         }
     }
 
-    private func ensureScope(_ scope: SDKScope) throws {
-        let allowed = ToolsKitSDK.shared.validateScope(scope: scope, operation: scope == .workspaceRead ? .read : .write)
+    private func ensureScope(_ scope: SDKScope) async throws {
+        let allowed = await MainActor.run {
+            ToolsKitSDK.shared.validateScope(scope: scope, operation: scope == .workspaceRead ? .read : .write)
+        }
         if !allowed {
             throw AgentActionError.permissionDenied("Missing scope \(scope.rawValue)")
         }
@@ -530,7 +532,7 @@ actor PersonaAgentFramework {
         return nil
     }
 
-    private func mapFormType(_ type: FormFieldSpec.FieldType) -> FormQuestionType {
+    nonisolated private func mapFormType(_ type: FormFieldSpec.FieldType) -> FormQuestionType {
         switch type {
         case .text: return .textInput
         case .toggle: return .multipleChoice
@@ -624,7 +626,6 @@ actor PersonaAgentFramework {
         let email = value.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !email.isEmpty else { return false }
         let digest = SHA256.hash(data: Data(email.utf8))
-        if digest.isEmpty { return false }
         return email.range(of: "^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", options: .regularExpression) != nil
     }
 }
