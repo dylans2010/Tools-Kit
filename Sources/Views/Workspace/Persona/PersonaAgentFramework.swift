@@ -547,6 +547,7 @@ struct PersonaAgentFrameworkView: View {
         }
     }
 
+    @ViewBuilder
     private var tokenSection: some View {
         Section("Authentication") {
             if let token = tokenEngine.currentToken {
@@ -684,54 +685,59 @@ struct PersonaAgentFrameworkView: View {
         }
     }
 
-    private var tokenInspectorView: some View {
-        List {
-            if let token = tokenEngine.currentToken {
-                Section("Header") {
-                    LabeledContent("Type", value: token.header.tokenType)
-                    LabeledContent("Algorithm", value: token.header.algorithm)
-                    LabeledContent("Key ID", value: token.header.keyId)
-                }
-                Section("Payload") {
-                    LabeledContent("UID", value: token.payload.uid)
-                    LabeledContent("Session ID", value: String(token.payload.sid.prefix(12)))
-                    LabeledContent("Nonce", value: String(token.payload.nonce.prefix(12)))
-                    LabeledContent("Device FP", value: String(token.payload.dfp.prefix(12)))
-                    LabeledContent("Version", value: token.payload.ver)
-                    LabeledContent("Issued", value: Date(timeIntervalSince1970: token.payload.iat).formatted())
-                    LabeledContent("Expires", value: Date(timeIntervalSince1970: token.payload.exp).formatted())
-                }
-                Section("Scopes") {
-                    ForEach(Array(SDKScope.decode(token.payload.scp)).sorted(by: { $0.rawValue < $1.rawValue })) { scope in
-                        Label(scope.displayName, systemImage: "checkmark.circle.fill").font(.caption)
-                    }
-                }
-                Section("Signature") { Text(token.signature).font(.caption2.monospaced()).lineLimit(3) }
-                Section("Serialized") { Text(token.serialized).font(.caption2.monospaced()).lineLimit(5) }
-                Section("Validation") {
-                    HStack {
-                        Text("Status")
-                        Spacer()
-                        switch tokenEngine.validationStatus {
-                        case .none: Text("Not Validated").foregroundStyle(.secondary)
-                        case .valid: Text("Valid").foregroundStyle(.green).bold()
-                        case .invalid(let reason): Text("Invalid: \(reason)").foregroundStyle(.red)
-                        }
-                    }.font(.caption)
-                    Button("Validate Now") { _ = tokenEngine.validate(token: token, expectedFingerprint: token.payload.dfp) }
-                }
-            } else {
-                Section("Generate Token") {
-                    TextField("User ID", text: $tokenGenUid)
-                    Stepper("Duration: \(Int(tokenGenDuration))h", value: $tokenGenDuration, in: 1...24)
-                    ForEach(SDKScope.allCases) { scope in
-                        Toggle(scope.displayName, isOn: Binding(get: { tokenGenScopes.contains(scope) }, set: { if $0 { tokenGenScopes.insert(scope) } else { tokenGenScopes.remove(scope) } })).font(.caption)
-                    }
-                    Button("Generate") {
-                        _ = tokenEngine.generateToken(uid: tokenGenUid, scopes: tokenGenScopes, sessionDuration: tokenGenDuration * 3600, deviceFingerprint: UUID().uuidString)
-                    }.buttonStyle(.borderedProminent)
+    @ViewBuilder
+    private var tokenInspectorSections: some View {
+        if let token = tokenEngine.currentToken {
+            Section("Header") {
+                LabeledContent("Type", value: token.header.tokenType)
+                LabeledContent("Algorithm", value: token.header.algorithm)
+                LabeledContent("Key ID", value: token.header.keyId)
+            }
+            Section("Payload") {
+                LabeledContent("UID", value: token.payload.uid)
+                LabeledContent("Session ID", value: String(token.payload.sid.prefix(12)))
+                LabeledContent("Nonce", value: String(token.payload.nonce.prefix(12)))
+                LabeledContent("Device FP", value: String(token.payload.dfp.prefix(12)))
+                LabeledContent("Version", value: token.payload.ver)
+                LabeledContent("Issued", value: Date(timeIntervalSince1970: token.payload.iat).formatted())
+                LabeledContent("Expires", value: Date(timeIntervalSince1970: token.payload.exp).formatted())
+            }
+            Section("Scopes") {
+                ForEach(Array(SDKScope.decode(token.payload.scp)).sorted(by: { $0.rawValue < $1.rawValue })) { scope in
+                    Label(scope.displayName, systemImage: "checkmark.circle.fill").font(.caption)
                 }
             }
+            Section("Signature") { Text(token.signature).font(.caption2.monospaced()).lineLimit(3) }
+            Section("Serialized") { Text(token.serialized).font(.caption2.monospaced()).lineLimit(5) }
+            Section("Validation") {
+                HStack {
+                    Text("Status")
+                    Spacer()
+                    switch tokenEngine.validationStatus {
+                    case .none: Text("Not Validated").foregroundStyle(.secondary)
+                    case .valid: Text("Valid").foregroundStyle(.green).bold()
+                    case .invalid(let reason): Text("Invalid: \(reason)").foregroundStyle(.red)
+                    }
+                }.font(.caption)
+                Button("Validate Now") { _ = tokenEngine.validate(token: token, expectedFingerprint: token.payload.dfp) }
+            }
+        } else {
+            Section("Generate Token") {
+                TextField("User ID", text: $tokenGenUid)
+                Stepper("Duration: \(Int(tokenGenDuration))h", value: $tokenGenDuration, in: 1...24)
+                ForEach(SDKScope.allCases) { scope in
+                    Toggle(scope.displayName, isOn: Binding(get: { tokenGenScopes.contains(scope) }, set: { if $0 { tokenGenScopes.insert(scope) } else { tokenGenScopes.remove(scope) } })).font(.caption)
+                }
+                Button("Generate") {
+                    _ = tokenEngine.generateToken(uid: tokenGenUid, scopes: tokenGenScopes, sessionDuration: tokenGenDuration * 3600, deviceFingerprint: UUID().uuidString)
+                }.buttonStyle(.borderedProminent)
+            }
+        }
+    }
+
+    private var tokenInspectorView: some View {
+        List {
+            tokenInspectorSections
             Section("Session Timeline (\(tokenEngine.sessionTimeline.count))") {
                 ForEach(tokenEngine.sessionTimeline.suffix(15).reversed()) { event in
                     VStack(alignment: .leading, spacing: 2) {
