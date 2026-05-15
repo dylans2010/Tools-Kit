@@ -1,10 +1,12 @@
 import SwiftUI
 
 struct SignInView: View {
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var authorizationManager = AuthorizationManager.shared
     @State private var keyValue: String?
     @State private var metadata: KeyMetadata?
     @State private var errorMessage: String?
-    @State private var currentTier: KeyTier = AuthRootView.currentBuildTier()
+    @State private var currentTier: KeyTier = DeveloperIDManager.currentBuildTier()
     @State private var showSessionStatus = false
     @State private var isLoading = false
 
@@ -53,6 +55,9 @@ struct SignInView: View {
             }
             .onAppear {
                 loadStoredKey()
+                if authorizationManager.authState == .authenticated {
+                    dismiss()
+                }
             }
         }
     }
@@ -183,21 +188,21 @@ struct SignInView: View {
         isLoading = true
         errorMessage = nil
         do {
-            guard let stored = try AuthRootView.shared.retrieveStoredKey() else {
+            guard let stored = try DeveloperIDManager.shared.retrieveStoredKey() else {
                 metadata = nil
                 keyValue = nil
                 isLoading = false
                 return
             }
 
-            let validated = try AuthRootView.shared.validate(stored)
+            let validated = try DeveloperIDManager.shared.validate(stored)
             keyValue = stored
             metadata = validated
             currentTier = validated.tier
             isLoading = false
         } catch let validationError as KeyValidationError {
             if case .expired = validationError {
-                try? AuthRootView.shared.deleteStoredKey()
+                try? DeveloperIDManager.shared.deleteStoredKey()
                 keyValue = nil
                 metadata = nil
             }
@@ -214,8 +219,8 @@ struct SignInView: View {
     private func generateKey() {
         errorMessage = nil
         do {
-            let key = try AuthRootView.shared.generateKey(tier: currentTier)
-            let validated = try AuthRootView.shared.validate(key)
+            let key = try DeveloperIDManager.shared.generateKey(tier: currentTier)
+            let validated = try DeveloperIDManager.shared.validate(key)
             keyValue = key
             metadata = validated
         } catch {
@@ -226,7 +231,7 @@ struct SignInView: View {
     private func revokeKey() {
         errorMessage = nil
         do {
-            try AuthRootView.shared.deleteStoredKey()
+            try DeveloperIDManager.shared.deleteStoredKey()
             keyValue = nil
             metadata = nil
         } catch {

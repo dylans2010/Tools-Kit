@@ -164,6 +164,17 @@ struct FrameworkExecutionRecord: Identifiable {
     let memoryUsageMb: Double
 }
 
+// MARK: - Framework Template
+
+public struct FrameworkTemplate: Identifiable {
+    public let id = UUID()
+    public let name: String
+    public let description: String
+    public let language: FrameworkLanguage
+    public let defaultEntryPoints: [String]
+    public let suggestedScopes: [SDKScope]
+}
+
 // MARK: - Dependency Binding Engine
 
 struct DependencyBinding: Identifiable, Codable {
@@ -196,6 +207,13 @@ final class FrameworkManager: ObservableObject {
     private let tokenEngine = DeterministicTokenEngine.shared
     private let registry = FrameworkRegistry.shared
     private let packageRegistry = PackageRegistry.shared
+
+    public static let templates: [FrameworkTemplate] = [
+        FrameworkTemplate(name: "AI Middleware", description: "Process and augment data using AI services.", language: .python, defaultEntryPoints: ["process", "refine"], suggestedScopes: [.persona, .workspaceRead]),
+        FrameworkTemplate(name: "Network Utility", description: "Safe and rate-limited network operations.", language: .swift, defaultEntryPoints: ["fetch", "sync"], suggestedScopes: [.all]),
+        FrameworkTemplate(name: "Data Transformer", description: "High-performance data manipulation.", language: .swift, defaultEntryPoints: ["transform"], suggestedScopes: [.workspaceRead, .workspaceWrite]),
+        FrameworkTemplate(name: "Security Auditor", description: "Analyze workspace for security patterns.", language: .typescript, defaultEntryPoints: ["audit"], suggestedScopes: [.workspaceRead])
+    ]
 
     private init() {}
 
@@ -523,9 +541,26 @@ struct FrameworkInstallSheet: View {
     @State private var name = ""
     @State private var entryPointsText = "main"
     @State private var language: FrameworkLanguage = .swift
+    @State private var selectedTemplate: UUID?
 
     var body: some View {
         Form {
+            Section("Templates") {
+                Picker("Select Template", selection: $selectedTemplate) {
+                    Text("Custom").tag(nil as UUID?)
+                    ForEach(FrameworkManager.templates) { template in
+                        Text(template.name).tag(template.id as UUID?)
+                    }
+                }
+                .onChange(of: selectedTemplate) { oldValue, newValue in
+                    if let template = FrameworkManager.templates.first(where: { $0.id == newValue }) {
+                        name = template.name
+                        language = template.language
+                        entryPointsText = template.defaultEntryPoints.joined(separator: ", ")
+                    }
+                }
+            }
+
             Section("Framework Info") {
                 TextField("Name", text: $name)
                 TextField("Entry Points (comma-separated)", text: $entryPointsText)
@@ -653,6 +688,29 @@ struct FrameworkDetailSheet: View {
                     }
                 } else {
                     Text("No active issues detected").font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+
+            Section("Resource Consumption History (Last 5)") {
+                let records = manager.executionRecords.filter { $0.frameworkId == framework.id }.suffix(5).reversed()
+                if records.isEmpty {
+                    Text("No resource data available").font(.caption2).foregroundStyle(.secondary)
+                } else {
+                    ForEach(records) { record in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(record.timestamp.formatted(date: .omitted, time: .shortened)).font(.system(size: 8, design: .monospaced))
+                                Spacer()
+                                Text(String(format: "%.1f MB", record.memoryUsageMb)).foregroundStyle(.blue)
+                                Text("\(record.durationMs)ms").foregroundStyle(.purple)
+                            }
+                            .font(.system(size: 10, weight: .bold))
+
+                            ProgressView(value: min(1.0, record.memoryUsageMb / 256.0))
+                                .tint(.blue)
+                                .controlSize(.small)
+                        }
+                    }
                 }
             }
 

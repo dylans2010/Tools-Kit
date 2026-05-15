@@ -215,6 +215,8 @@ final class LibraryManager: ObservableObject {
     @Published private(set) var invocationState: LibraryInvocationState = .idle
     @Published var dryRunEnabled: Bool = false
     @Published var rateLimits: [UUID: Int] = [:] // libraryId: max per minute
+    @Published var quotas: [UUID: Int] = [:] // libraryId: total allowed
+    @Published var quotaUsage: [UUID: Int] = [:] // libraryId: current usage
 
     private let tokenEngine = DeterministicTokenEngine.shared
     private let registry = LibraryRegistry.shared
@@ -276,6 +278,11 @@ final class LibraryManager: ObservableObject {
     // MARK: - Execution Pipeline: Request → Scope Check → Capability Match → Input Validation → Execution Bridge → Output Validation
 
     func invokeLibrary(id: UUID, capability: String, input: [String: String]) -> UIAgentToolResult {
+        // Quota check
+        if let quota = quotas[id], (quotaUsage[id] ?? 0) >= quota {
+            return .failure("Library quota exceeded (\(quota) total)")
+        }
+
         // Rate limiting check
         let now = Date()
         let minuteAgo = now.addingTimeInterval(-60)
@@ -326,6 +333,7 @@ final class LibraryManager: ObservableObject {
                 return recordAndReturn(id: id, name: lib.name, capability: capability, input: input, result: .failure("Output validation failed"), state: .failed, start: startTime)
             }
             invocationState = .completed
+            quotaUsage[id, default: 0] += 1
             updateMetrics(for: id, duration: Int(Date().timeIntervalSince(startTime) * 1000), success: true)
             return recordAndReturn(id: id, name: lib.name, capability: capability, input: input, result: bridgeResult, state: .completed, start: startTime)
         case .failure, .dryRun:
@@ -865,6 +873,8 @@ struct LibraryDetailSheet: View {
 
     @State private var invokeCapability = ""
     @State private var invokeInput = ""
+    @State private var healthStatus: String?
+    @State private var isCheckingHealth = false
 
     var body: some View {
         List {
@@ -887,11 +897,53 @@ struct LibraryDetailSheet: View {
                     }
                 }
             }
-            Section("Scopes") {
+            Section("Scopes & Health") {
                 ForEach(library.requiredScopes, id: \.rawValue) { scope in
                     Label(scope.displayName, systemImage: "lock").font(.caption)
                 }
+
+                Button {
+                    isCheckingHealth = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        let missing = library.requiredScopes.filter { !DeterministicTokenEngine.shared.hasScope($0) }
+                        if missing.isEmpty {
+                            healthStatus = "All scopes granted. Library healthy."
+                        } else {
+                            healthStatus = "Missing scopes: \(missing.map(\.rawValue).joined(separator: ", "))"
+                        }
+                        isCheckingHealth = false
+                    }
+                } label: {
+                    if isCheckingHealth {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Label("Run Health Check", systemImage: "heart.text.square")
+                    }
+                }
+
+                if let healthStatus {
+                    Text(healthStatus)
+                        .font(.caption2)
+                        .foregroundStyle(healthStatus.contains("Missing") ? .red : .green)
+                }
             }
+            Section("Usage Quota") {
+                let usage = manager.quotaUsage[library.id] ?? 0
+                let quota = manager.quotas[library.id] ?? 100
+
+                Stepper("Limit: \(quota)", value: Binding(
+                    get: { manager.quotas[library.id] ?? 100 },
+                    set: { manager.quotas[library.id] = $0 }
+                ), in: 0...1000)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    ProgressView(value: Double(usage), total: Double(quota))
+                        .tint(usage >= quota ? .red : .purple)
+                    Text("\(usage) / \(quota) invocations used")
+                        .font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+
             Section("Constraints") {
                 if library.constraints.isEmpty {
                     Text("No constraints").foregroundStyle(.secondary)

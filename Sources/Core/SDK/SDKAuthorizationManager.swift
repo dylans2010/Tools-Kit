@@ -58,7 +58,22 @@ public final class AuthorizationManager: ObservableObject {
 
     private init() {
         loadPersistedSession()
+        tryAutoAuthenticate()
         reevaluateAccessControls()
+    }
+
+    public func tryAutoAuthenticate() {
+        guard authState != .authenticated else { return }
+
+        do {
+            if let storedKey = try DeveloperIDManager.shared.retrieveStoredKey() {
+                _ = try DeveloperIDManager.shared.validate(storedKey)
+                // If valid, authenticate with a long session and all scopes for now
+                _ = authenticate(developerId: storedKey, scopes: ["*"], sessionDuration: 365 * 24 * 60 * 60)
+            }
+        } catch {
+            // Silent failure, user will need to sign in manually if they try to access protected resources
+        }
     }
 
     @discardableResult

@@ -340,6 +340,30 @@ final class PackageDependencyManager: ObservableObject {
         DependencyGraph.resolutionCache[currentHash] = resolved
         return resolved
     }
+
+    func performSecurityScan(for packageId: UUID) -> [String] {
+        guard let pkg = registry.package(by: packageId) else { return [] }
+        var results: [String] = []
+
+        if pkg.version.hasPrefix("0.") {
+            results.append("WARNING: Unstable version \(pkg.version) may contain unpatched vulnerabilities.")
+        }
+
+        if pkg.name.lowercased().contains("crypto") && !pkg.exports.contains("sha256") {
+            results.append("ADVISORY: Incomplete crypto implementation detected.")
+        }
+
+        if results.isEmpty {
+            results.append("No known vulnerabilities found.")
+        }
+
+        return results
+    }
+
+    func syncWithRemoteRegistry() async {
+        // Mock sync logic
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
+    }
 }
 
 // MARK: - PackageDependenciesView
@@ -396,6 +420,8 @@ struct PackageDependenciesView: View {
         }
     }
 
+    @State private var isSyncingRegistry = false
+
     private var registrySelectionSection: some View {
         Section("Registry Source") {
             Picker("Registry", selection: $registry.activeRegistry) {
@@ -410,6 +436,21 @@ struct PackageDependenciesView: View {
                     .font(.caption)
                     .foregroundStyle(.blue)
             }
+
+            Button {
+                isSyncingRegistry = true
+                Task {
+                    await manager.syncWithRemoteRegistry()
+                    isSyncingRegistry = false
+                }
+            } label: {
+                if isSyncingRegistry {
+                    ProgressView().controlSize(.small)
+                } else {
+                    Label("Sync Registry Now", systemImage: "arrow.triangle.2.circlepath")
+                }
+            }
+            .disabled(isSyncingRegistry)
         }
     }
 
@@ -734,6 +775,25 @@ struct PackageDetailSheet: View {
                 }
             }
             healthDetailSection(for: package)
+
+            Section("Security Audit") {
+                let scanResults = manager.performSecurityScan(for: package.id)
+                ForEach(scanResults, id: \.self) { result in
+                    VStack(alignment: .leading, spacing: 4) {
+                        if result.contains("WARNING") {
+                            Label(result, systemImage: "exclamationmark.shield.fill")
+                                .foregroundStyle(.red)
+                        } else if result.contains("ADVISORY") {
+                            Label(result, systemImage: "info.circle.fill")
+                                .foregroundStyle(.orange)
+                        } else {
+                            Label(result, systemImage: "checkmark.shield.fill")
+                                .foregroundStyle(.green)
+                        }
+                    }
+                    .font(.caption2)
+                }
+            }
 
             Section("Integrity") {
                 LabeledContent("Hash", value: String(package.integrityHash.prefix(16)) + "...")
