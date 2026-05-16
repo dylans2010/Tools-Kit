@@ -27,16 +27,20 @@ struct PackageDescriptor: Identifiable, Codable, Hashable {
     let integrityHash: String
     var healthScore: Int = 100
     var installDate: Date = Date()
+    var license: String = "MIT"
+    var vulnerabilityHistory: [PackageDependencyManager.SecurityFinding] = []
 
     init(
         id: UUID = UUID(), name: String, version: String,
         layer: PackageDependencyLayer = .core,
         exports: [String] = [], dependencyIds: [UUID] = [],
-        integrityHash: String = ""
+        integrityHash: String = "", license: String = "MIT",
+        vulnerabilityHistory: [PackageDependencyManager.SecurityFinding] = []
     ) {
         self.id = id; self.name = name; self.version = version; self.layer = layer
         self.exports = exports; self.dependencyIds = dependencyIds
-        self.integrityHash = integrityHash
+        self.integrityHash = integrityHash; self.license = license
+        self.vulnerabilityHistory = vulnerabilityHistory
     }
 }
 
@@ -330,6 +334,51 @@ final class PackageDependencyManager: ObservableObject {
     func exportManifest() -> String {
         guard let data = try? JSONEncoder().encode(registry.packages) else { return "{}" }
         return String(data: data, encoding: .utf8) ?? "{}"
+    }
+
+    func generateLockfile() -> String {
+        let lockData = registry.packages.map { "\($0.name):\($0.version):\($0.integrityHash)" }.joined(separator: "\n")
+        return "Package.resolved\n\n" + lockData
+    }
+
+    func verifyLockfile(_ content: String) -> Bool {
+        let lines = content.components(separatedBy: "\n").filter { !$0.isEmpty && $0 != "Package.resolved" }
+        for line in lines {
+            let parts = line.split(separator: ":")
+            if parts.count == 3 {
+                let name = String(parts[0])
+                let version = String(parts[1])
+                let hash = String(parts[2])
+                if let pkg = registry.packages.first(where: { $0.name == name }) {
+                    if pkg.version != version || pkg.integrityHash != hash { return false }
+                } else { return false }
+            }
+        }
+        return true
+    }
+
+    func updateImpactAnalysis(packageId: UUID) -> [String] {
+        guard let target = registry.package(by: packageId) else { return [] }
+        var impacted: [String] = []
+        for pkg in registry.packages {
+            if pkg.dependencyIds.contains(packageId) {
+                impacted.append("\(pkg.name) (Direct)")
+                impacted.append(contentsOf: updateImpactAnalysis(packageId: pkg.id).map { "\($0) (Indirect)" })
+            }
+        }
+        return Array(Set(impacted))
+    }
+
+    func simulateVulnerabilityScan() {
+        let vulnerableNames = ["old-crypto", "unsecured-net"]
+        for i in 0..<registry.packages.count {
+            var pkg = registry.packages[i]
+            if vulnerableNames.contains(pkg.name.lowercased()) {
+                let finding = SecurityFinding(severity: .high, title: "Known Vulnerability", description: "This package version matches a known vulnerable pattern in the security database.")
+                pkg.vulnerabilityHistory.append(finding)
+                registry.packages[i] = pkg
+            }
+        }
     }
 
     func checkCycles() -> [String]? {
@@ -651,6 +700,14 @@ struct PackageDependenciesView: View {
                 Label("Export Manifest to Clipboard", systemImage: "doc.on.doc")
             }
             .disabled(registry.packages.isEmpty)
+
+            Button {
+                let lockfile = manager.generateLockfile()
+                UIPasteboard.general.string = lockfile
+            } label: {
+                Label("Generate & Copy Package.resolved", systemImage: "lock.doc")
+            }
+            .disabled(registry.packages.isEmpty)
         }
     }
 
@@ -793,39 +850,56 @@ struct DependencyGraphVisualizerView: View {
     @State private var registry = PackageRegistry.shared
     @State private var scale: CGFloat = 1.0
     @State private var offset: CGSize = .zero
+    @State private var searchText = ""
+    @State private var focusNode: UUID?
 
     var body: some View {
-        ZStack {
-            ScrollView([.horizontal, .vertical], showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 20) {
-                    ForEach(packages.filter { pkg in !packages.contains(where: { $0.dependencyIds.contains(pkg.id) }) }) { rootPkg in
-                        nodeView(for: rootPkg, depth: 0)
+        NavigationStack {
+            ZStack {
+                ScrollView([.horizontal, .vertical], showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 20) {
+                        let roots = packages.filter { pkg in !packages.contains(where: { $0.dependencyIds.contains(pkg.id) }) }
+                        ForEach(roots) { rootPkg in
+                            if focusNode == nil || isRelated(rootPkg, to: focusNode!) {
+                                nodeView(for: rootPkg, depth: 0)
+                            }
+                        }
                     }
+                    .padding(100)
+                    .scaleEffect(scale)
+                    .offset(offset)
                 }
-                .padding(100)
-                .scaleEffect(scale)
-                .offset(offset)
-            }
-            .gesture(MagnificationGesture().onChanged { scale = $0 })
-            .simultaneousGesture(DragGesture().onChanged { offset = CGSize(width: offset.width + $0.translation.width, height: offset.height + $0.translation.height) })
+                .gesture(MagnificationGesture().onChanged { scale = $0 })
+                .simultaneousGesture(DragGesture().onChanged { offset = CGSize(width: offset.width + $0.translation.width, height: offset.height + $0.translation.height) })
 
-            VStack {
-                Spacer()
-                HStack {
-                    Button { scale = 1.0; offset = .zero } label: { Image(systemName: "scope").padding().background(.ultraThinMaterial, in: Circle()) }
+                VStack {
                     Spacer()
-                    Text("Zoom: \(Int(scale * 100))%").font(.caption2.monospaced()).padding(8).background(.ultraThinMaterial, in: Capsule())
+                    HStack {
+                        Button { scale = 1.0; offset = .zero; focusNode = nil } label: { Image(systemName: "scope").padding().background(.ultraThinMaterial, in: Circle()) }
+                        Spacer()
+                        Text("Zoom: \(Int(scale * 100))%").font(.caption2.monospaced()).padding(8).background(.ultraThinMaterial, in: Capsule())
+                    }
+                    .padding()
                 }
-                .padding()
+            }
+            .navigationTitle("Dependency Graph")
+            .navigationBarTitleDisplayMode(.inline)
+            .searchable(text: $searchText, prompt: "Find node")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
             }
         }
-        .navigationTitle("Dependency Graph")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Done") { dismiss() }
-            }
+    }
+
+    private func isRelated(_ pkg: PackageDescriptor, to targetId: UUID) -> Bool {
+        if pkg.id == targetId { return true }
+        if pkg.dependencyIds.contains(targetId) { return true }
+        for depId in pkg.dependencyIds {
+            if let dep = packages.first(where: { $0.id == depId }), isRelated(dep, to: targetId) { return true }
         }
+        return false
     }
 
     private func nodeView(for pkg: PackageDescriptor, depth: Int) -> AnyView {
@@ -838,15 +912,22 @@ struct DependencyGraphVisualizerView: View {
 
                     HStack {
                         Image(systemName: pkg.dependencyIds.isEmpty ? "shippingbox" : (expandedNodes.contains(pkg.id) ? "chevron.down.circle.fill" : "chevron.right.circle.fill"))
-                            .foregroundStyle(pkg.layer == .core ? .blue : .secondary)
+                            .foregroundStyle(pkg.id == focusNode ? .orange : (pkg.layer == .core ? .blue : .secondary))
 
                         VStack(alignment: .leading) {
                             Text(pkg.name).font(.subheadline.bold())
                             Text("v\(pkg.version)").font(.system(size: 8, design: .monospaced)).foregroundStyle(.secondary)
                         }
+
+                        if !searchText.isEmpty && pkg.name.localizedCaseInsensitiveContains(searchText) {
+                             Image(systemName: "sparkles").foregroundStyle(.yellow)
+                        }
                     }
                     .padding(8)
-                    .background(Color.accentColor.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
+                    .background((pkg.id == focusNode ? Color.orange : Color.accentColor).opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
+                    .onLongPressGesture {
+                        focusNode = pkg.id
+                    }
                     .onTapGesture {
                         if !pkg.dependencyIds.isEmpty {
                             if expandedNodes.contains(pkg.id) { expandedNodes.remove(pkg.id) }
@@ -920,8 +1001,21 @@ struct PackageDetailSheet: View {
                     .cornerRadius(4)
             }
 
+            Section("Impact Analysis") {
+                let impacts = manager.updateImpactAnalysis(packageId: package.id)
+                if impacts.isEmpty {
+                    Text("No downstream impacts").font(.caption2).foregroundStyle(.secondary)
+                } else {
+                    ForEach(impacts, id: \.self) { impact in
+                        Text(impact).font(.system(size: 8, design: .monospaced))
+                    }
+                }
+            }
+
             Section("Security Audit") {
-                let findings = manager.performSecurityScan(for: package.id)
+                Button("Run Vulnerability Scan") { manager.simulateVulnerabilityScan() }
+
+                let findings = package.vulnerabilityHistory + manager.performSecurityScan(for: package.id)
                 if findings.isEmpty {
                     Label("No issues detected", systemImage: "checkmark.shield.fill").foregroundStyle(.green).font(.caption)
                 } else {

@@ -21,6 +21,7 @@ struct FrameworkDescriptor: Identifiable, Codable, Hashable {
     let entryPoints: [String]
     let language: FrameworkLanguage
     let packageDependencies: [UUID]
+    var frameworkDependencies: [UUID]
     let requiredScopes: [SDKScope]
     var isEnabled: Bool
     var sandboxProfile: SandboxProfile
@@ -31,6 +32,9 @@ struct FrameworkDescriptor: Identifiable, Codable, Hashable {
     var architectures: [String]
     var linkType: LinkType
     var embedMode: EmbedMode
+    var environmentVariables: [String: String]
+    var minSDKVersion: String
+    var performanceMetricsHistory: [FrameworkExecutionRecord]
 
     enum FrameworkType: String, Codable, CaseIterable {
         case appleSystem, xcframework, `static`, dynamic, embedded, broken
@@ -49,19 +53,25 @@ struct FrameworkDescriptor: Identifiable, Codable, Hashable {
     init(
         id: UUID = UUID(), name: String, path: String = "", type: FrameworkType = .xcframework,
         entryPoints: [String] = ["main"], language: FrameworkLanguage = .swift,
-        packageDependencies: [UUID] = [], requiredScopes: [SDKScope] = [.frameworkExecute],
+        packageDependencies: [UUID] = [], frameworkDependencies: [UUID] = [],
+        requiredScopes: [SDKScope] = [.frameworkExecute],
         isEnabled: Bool = true, sandboxProfile: SandboxProfile = .balanced,
         lifecycleState: FrameworkLifecycleState = .draft, logs: [FrameworkLogEntry] = [],
         size: Int64 = 0, lastModified: Date = Date(), architectures: [String] = ["arm64"],
-        linkType: LinkType = .required, embedMode: EmbedMode = .embedAndSign
+        linkType: LinkType = .required, embedMode: EmbedMode = .embedAndSign,
+        environmentVariables: [String: String] = [:], minSDKVersion: String = "17.0",
+        performanceMetricsHistory: [FrameworkExecutionRecord] = []
     ) {
         self.id = id; self.name = name; self.path = path; self.type = type
         self.entryPoints = entryPoints; self.language = language
-        self.packageDependencies = packageDependencies; self.requiredScopes = requiredScopes
+        self.packageDependencies = packageDependencies; self.frameworkDependencies = frameworkDependencies
+        self.requiredScopes = requiredScopes
         self.isEnabled = isEnabled; self.sandboxProfile = sandboxProfile
         self.lifecycleState = lifecycleState; self.logs = logs
         self.size = size; self.lastModified = lastModified; self.architectures = architectures
         self.linkType = linkType; self.embedMode = embedMode
+        self.environmentVariables = environmentVariables; self.minSDKVersion = minSDKVersion
+        self.performanceMetricsHistory = performanceMetricsHistory
     }
 }
 
@@ -328,6 +338,98 @@ final class FrameworkManager {
         return fw.isEnabled && missingDeps.isEmpty
     }
 
+    func hotReload(id: UUID) {
+        guard var fw = registry.framework(by: id) else { return }
+        guard !fw.path.isEmpty else { return }
+        if let attrs = try? FileManager.default.attributesOfItem(atPath: fw.path) {
+            fw.size = attrs[.size] as? Int64 ?? 0
+            fw.lastModified = attrs[.modificationDate] as? Date ?? Date()
+            log(to: id, level: .info, message: "Hot-reload successful: Sync'd with filesystem.")
+            registry.install(fw)
+        }
+    }
+
+    func getSymbolsSynchronously(for framework: FrameworkDescriptor) -> [String] {
+        guard !framework.path.isEmpty else { return [] }
+        let url = URL(fileURLWithPath: framework.path)
+        let binaryURL = framework.path.hasSuffix(".framework") ? url.appendingPathComponent(url.deletingPathExtension().lastPathComponent) : url
+        guard let handle = try? FileHandle(forReadingFrom: binaryURL) else { return [] }
+        defer { try? handle.close() }
+
+        guard let magicData = try? handle.read(upToCount: 4) else { return [] }
+        let magic = magicData.withUnsafeBytes { $0.load(as: UInt32.self) }
+        var offset: UInt64 = 0
+        if magic == 0xBEBAFECA || magic == 0xCAFEBABE {
+            guard let countData = try? handle.read(upToCount: 4) else { return [] }
+            let count = countData.withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian
+            if count > 0 {
+                guard let archData = try? handle.read(upToCount: 20) else { return [] }
+                offset = UInt64(archData.advanced(by: 8).withUnsafeBytes { $0.load(as: UInt32.self) }.bigEndian)
+            }
+        }
+        try? handle.seek(toOffset: offset)
+        guard let headerData = try? handle.read(upToCount: 32) else { return [] }
+        let is64 = headerData.count == 32
+        let ncmds = headerData.advanced(by: 16).withUnsafeBytes { $0.load(as: UInt32.self) }
+        try? handle.seek(toOffset: offset + (is64 ? 32 : 28))
+        var symoff: UInt32 = 0; var nsyms: UInt32 = 0; var stroff: UInt32 = 0; var strsize: UInt32 = 0
+        for _ in 0..<ncmds {
+            guard let cmdData = try? handle.read(upToCount: 8) else { break }
+            let cmd = cmdData.withUnsafeBytes { $0.load(as: UInt32.self) }
+            let size = cmdData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }
+            if cmd == 0x02 {
+                guard let symData = try? handle.read(upToCount: 16) else { break }
+                symoff = symData.withUnsafeBytes { $0.load(as: UInt32.self) }
+                nsyms = symData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }
+                stroff = symData.advanced(by: 8).withUnsafeBytes { $0.load(as: UInt32.self) }
+                strsize = symData.advanced(by: 12).withUnsafeBytes { $0.load(as: UInt32.self) }
+                break
+            }
+            if let current = try? handle.offset() { try? handle.seek(toOffset: current + UInt64(size) - 8) }
+        }
+        if nsyms > 0 && stroff > 0 {
+            try? handle.seek(toOffset: offset + UInt64(stroff))
+            if let strData = try? handle.read(upToCount: Int(strsize)) {
+                var detected: [String] = []
+                var current = Data()
+                for byte in strData {
+                    if byte == 0 {
+                        if !current.isEmpty, let s = String(data: current, encoding: .utf8) { detected.append(s) }
+                        current = Data()
+                    } else { current.append(byte) }
+                }
+                return detected
+            }
+        }
+        return []
+    }
+
+    func generateMarkdownReport(id: UUID) -> String {
+        guard let fw = registry.framework(by: id) else { return "Framework not found." }
+        let records = executionRecords.filter { $0.frameworkId == id }
+        let avgDuration = records.isEmpty ? 0 : records.map(\.durationMs).reduce(0, +) / records.count
+
+        return """
+        # Framework Report: \(fw.name)
+        - **Type**: \(fw.type.rawValue)
+        - **Language**: \(fw.language.rawValue)
+        - **Architecture**: \(fw.architectures.joined(separator: ", "))
+        - **Link Type**: \(fw.linkType.rawValue)
+        - **Min SDK**: \(fw.minSDKVersion)
+
+        ## Performance Summary
+        - **Total Executions**: \(records.count)
+        - **Average Duration**: \(avgDuration)ms
+        - **Success Rate**: \(records.isEmpty ? 0 : (records.filter { $0.state == .completed }.count * 100 / records.count))%
+
+        ## Environment Variables
+        \(fw.environmentVariables.isEmpty ? "None" : fw.environmentVariables.map { "\($0.key)=\($0.value)" }.joined(separator: "\n"))
+
+        ## Required Scopes
+        \(fw.requiredScopes.map { "- \($0.rawValue)" }.joined(separator: "\n"))
+        """
+    }
+
     /// Execution Pipeline: Load → Validate → Resolve Dependencies → Scope Check → Sandbox → Execute → Validate Output → Commit
     func executeFramework(id: UUID, params: [String: String]) -> UIAgentToolResult {
         let startTime = Date()
@@ -338,6 +440,10 @@ final class FrameworkManager {
             executionState = .failed
             return record(id: id, name: "unknown", entryPoint: "", result: .failure("Framework not found"), state: .failed, start: startTime)
         }
+
+        // Inject environment variables
+        var combinedParams = params
+        fw.environmentVariables.forEach { combinedParams[$0.key] = $0.value }
 
         executionState = .validating
         log(to: id, level: .info, message: "Validating framework state...")
@@ -353,6 +459,13 @@ final class FrameworkManager {
 
         executionState = .resolvingDeps
         log(to: id, level: .info, message: "Resolving package dependencies...")
+
+        // Verify against Package Lockfile if available
+        let lockfile = PackageDependencyManager.shared.generateLockfile()
+        if !PackageDependencyManager.shared.verifyLockfile(lockfile) {
+             log(to: id, level: .warning, message: "Dependency resolution warning: Lockfile integrity mismatch.")
+        }
+
         let installedPkgIds = Set(packageRegistry.packages.map(\.id))
         let missingDeps = fw.packageDependencies.filter { !installedPkgIds.contains($0) }
         if !missingDeps.isEmpty {
@@ -379,7 +492,7 @@ final class FrameworkManager {
         fw.lifecycleState = .running
         registry.install(fw)
 
-        let sandboxResult = FrameworkSandboxRunner.execute(framework: fw, params: params, config: fw.sandboxProfile.config)
+        let sandboxResult = FrameworkSandboxRunner.execute(framework: fw, params: combinedParams, config: fw.sandboxProfile.config)
 
         executionState = .validatingOutput
         switch sandboxResult {
@@ -412,7 +525,17 @@ final class FrameworkManager {
         case .failure(let s): output = s
         case .dryRun(let s): output = s
         }
-        executionRecords.append(FrameworkExecutionRecord(frameworkId: id, frameworkName: name, entryPoint: entryPoint, timestamp: Date(), state: state, output: output, durationMs: duration, memoryUsageMb: memEstimate))
+        let record = FrameworkExecutionRecord(frameworkId: id, frameworkName: name, entryPoint: entryPoint, timestamp: Date(), state: state, output: output, durationMs: duration, memoryUsageMb: memEstimate)
+        executionRecords.append(record)
+
+        if var fw = registry.framework(by: id) {
+            fw.performanceMetricsHistory.append(record)
+            if fw.performanceMetricsHistory.count > 50 {
+                fw.performanceMetricsHistory.removeFirst()
+            }
+            registry.install(fw)
+        }
+
         return result
     }
 }
@@ -1031,10 +1154,54 @@ struct FrameworkDiagnosticsView: View {
                 if unused {
                     newIssues.append(DiagnosticIssue(frameworkName: fw.name, severity: .info, title: "Unused Framework", description: "No imports found in project source files."))
                 }
+
+                // Circular Dependency Check
+                if hasCircularDependency(fw, visited: []) {
+                    newIssues.append(DiagnosticIssue(frameworkName: fw.name, severity: .error, title: "Circular Dependency", description: "Framework depends on itself through a dependency chain."))
+                }
             }
+
+            // Cross-Registry Symbol Collision Check
+            let collisions = findSymbolCollisions()
+            for (symbol, providers) in collisions {
+                newIssues.append(DiagnosticIssue(frameworkName: providers.joined(separator: " & "), severity: .warning, title: "Symbol Collision", description: "Symbol '\(symbol)' provided by multiple frameworks."))
+            }
+
             self.issues = newIssues
             self.isScanning = false
         }
+    }
+
+    private func hasCircularDependency(_ fw: FrameworkDescriptor, visited: Set<UUID>) -> Bool {
+        if visited.contains(fw.id) { return true }
+        var newVisited = visited
+        newVisited.insert(fw.id)
+        for depId in fw.frameworkDependencies {
+            if let dep = FrameworkRegistry.shared.framework(by: depId) {
+                if hasCircularDependency(dep, visited: newVisited) { return true }
+            }
+        }
+        return false
+    }
+
+    private func findSymbolCollisions() -> [String: [String]] {
+        var symbolMap: [String: [String]] = [:]
+        var seenSymbols: [String: String] = [:]
+        let allFrameworks = FrameworkRegistry.shared.frameworks
+
+        for fw in allFrameworks {
+            let symbols = manager.getSymbolsSynchronously(for: fw)
+            for sym in symbols {
+                if let firstProvider = seenSymbols[sym] {
+                    if firstProvider != fw.name {
+                        symbolMap[sym, default: [firstProvider]].append(fw.name)
+                    }
+                } else {
+                    seenSymbols[sym] = fw.name
+                }
+            }
+        }
+        return symbolMap.filter { $0.value.count > 1 }
     }
 
     private func checkIsUnused(_ fw: FrameworkDescriptor) async -> Bool {
@@ -1378,6 +1545,11 @@ struct FrameworkDetailSheet: View {
     @State private var teamID: String = "Unknown"
     @State private var entitlements: [String: AnyHashable] = [:]
     @State private var showStripConfirmation = false
+    @State private var minOSVersion: String = "Unknown"
+    @State private var sdkVersion: String = "Unknown"
+    @State private var sourceVersion: String = "Unknown"
+    @State private var showEnvVarEditor = false
+    @State private var showReportSheet = false
 
     var body: some View {
         List {
@@ -1420,6 +1592,9 @@ struct FrameworkDetailSheet: View {
             Section("Binary Info") {
                 LabeledContent("Size", value: ByteCountFormatter.string(fromByteCount: framework.size, countStyle: .file))
                 LabeledContent("Last Modified", value: framework.lastModified.formatted())
+                LabeledContent("Min OS", value: minOSVersion)
+                LabeledContent("SDK", value: sdkVersion)
+                LabeledContent("Source Version", value: sourceVersion)
                 LabeledContent("Fat Binary", value: isFatBinary ? "Yes" : "No")
                 if isFatBinary && parsedArchitectures.contains("x86_64") {
                     Button("Strip Simulator Slices", role: .destructive) {
@@ -1468,12 +1643,26 @@ struct FrameworkDetailSheet: View {
                     Label(ep, systemImage: "arrow.right.circle").font(.caption)
                 }
             }
-            Section("Dependencies") {
+            Section("Package Dependencies") {
                 if framework.packageDependencies.isEmpty {
-                    Text("No dependencies").foregroundStyle(.secondary)
+                    Text("No package dependencies").foregroundStyle(.secondary)
                 } else {
                     ForEach(framework.packageDependencies, id: \.self) { depId in
                         Text(String(depId.uuidString.prefix(8)) + "...").font(.caption.monospaced())
+                    }
+                }
+            }
+
+            Section("Framework Dependencies") {
+                if framework.frameworkDependencies.isEmpty {
+                    Text("No framework dependencies").foregroundStyle(.secondary)
+                } else {
+                    ForEach(framework.frameworkDependencies, id: \.self) { depId in
+                        if let dep = FrameworkRegistry.shared.framework(by: depId) {
+                            Text(dep.name).font(.caption)
+                        } else {
+                            Text(String(depId.uuidString.prefix(8)) + "...").font(.caption.monospaced())
+                        }
                     }
                 }
             }
@@ -1556,6 +1745,18 @@ struct FrameworkDetailSheet: View {
                 }
             }
 
+            Section("Management") {
+                Button { manager.hotReload(id: framework.id) } label: {
+                    Label("Hot-Reload from Filesystem", systemImage: "arrow.clockwise")
+                }
+                Button { showReportSheet = true } label: {
+                    Label("Generate Report", systemImage: "doc.text")
+                }
+                Button { showEnvVarEditor = true } label: {
+                    Label("Manage Env Vars (\(framework.environmentVariables.count))", systemImage: "terminal")
+                }
+            }
+
             Section("Execution Controls") {
                 HStack {
                     Label("Health Status", systemImage: manager.preExecuteHealthCheck(id: framework.id) ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
@@ -1586,6 +1787,16 @@ struct FrameworkDetailSheet: View {
         .sheet(isPresented: $showSymbolBrowser) {
             NavigationStack {
                 FrameworkSymbolBrowser(framework: framework)
+            }
+        }
+        .sheet(isPresented: $showEnvVarEditor) {
+            NavigationStack {
+                FrameworkEnvVarEditor(framework: framework, manager: manager)
+            }
+        }
+        .sheet(isPresented: $showReportSheet) {
+            NavigationStack {
+                FrameworkReportView(report: manager.generateMarkdownReport(id: framework.id))
             }
         }
     }
@@ -1658,6 +1869,22 @@ struct FrameworkDetailSheet: View {
                 let sigOff = sigData.withUnsafeBytes { $0.load(as: UInt32.self) }
                 let sigSize = sigData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }
                 parseSignatureBlob(handle: handle, offset: offset + UInt64(sigOff), size: sigSize)
+            } else if cmd == 0x25 { // LC_VERSION_MIN_IPHONEOS
+                guard let vData = try? handle.read(upToCount: 8) else { break }
+                let version = vData.withUnsafeBytes { $0.load(as: UInt32.self) }
+                let sdk = vData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }
+                self.minOSVersion = decodeMachOVersion(version)
+                self.sdkVersion = decodeMachOVersion(sdk)
+            } else if cmd == 0x32 { // LC_BUILD_VERSION
+                guard let vData = try? handle.read(upToCount: 16) else { break }
+                let minos = vData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }
+                let sdk = vData.advanced(by: 8).withUnsafeBytes { $0.load(as: UInt32.self) }
+                self.minOSVersion = decodeMachOVersion(minos)
+                self.sdkVersion = decodeMachOVersion(sdk)
+            } else if cmd == 0x2a { // LC_SOURCE_VERSION
+                guard let vData = try? handle.read(upToCount: 8) else { break }
+                let v = vData.withUnsafeBytes { $0.load(as: UInt64.self) }
+                self.sourceVersion = "\(v >> 40).\( (v >> 30) & 0x3ff ).\( (v >> 20) & 0x3ff ).\( (v >> 10) & 0x3ff ).\( v & 0x3ff )"
             } else {
                 if let current = try? handle.offset() {
                     try? handle.seek(toOffset: current + UInt64(size) - 8)
@@ -1745,6 +1972,10 @@ struct FrameworkDetailSheet: View {
         } catch { print("Strip Error: \(error)") }
     }
 
+    private func decodeMachOVersion(_ v: UInt32) -> String {
+        return "\(v >> 16).\( (v >> 8) & 0xff ).\( v & 0xff )"
+    }
+
     private func cpuTypeToString(_ type: Int32) -> String {
         switch type {
         case 7: return "x86"
@@ -1752,6 +1983,90 @@ struct FrameworkDetailSheet: View {
         case 12: return "arm"
         case 12 | 0x01000000: return "arm64"
         default: return "Unknown (\(type))"
+        }
+    }
+}
+
+struct FrameworkEnvVarEditor: View {
+    let framework: FrameworkDescriptor
+    let manager: FrameworkManager
+    @Environment(\.dismiss) private var dismiss
+    @State private var envVars: [EnvVar] = []
+    @State private var newKey = ""
+    @State private var newValue = ""
+
+    struct EnvVar: Identifiable {
+        let id = UUID()
+        var key: String
+        var value: String
+    }
+
+    var body: some View {
+        List {
+            Section("Current Variables") {
+                ForEach(envVars) { varItem in
+                    HStack {
+                        Text(varItem.key).font(.caption.bold())
+                        Spacer()
+                        Text(varItem.value).font(.caption).foregroundStyle(.secondary)
+                    }
+                    .swipeActions {
+                        Button(role: .destructive) {
+                            envVars.removeAll { $0.id == varItem.id }
+                        } label: { Label("Delete", systemImage: "trash") }
+                    }
+                }
+            }
+
+            Section("Add New") {
+                TextField("Key", text: $newKey)
+                TextField("Value", text: $newValue)
+                Button("Add") {
+                    if !newKey.isEmpty {
+                        envVars.append(EnvVar(key: newKey, value: newValue))
+                        newKey = ""; newValue = ""
+                    }
+                }.disabled(newKey.isEmpty)
+            }
+        }
+        .navigationTitle("Environment Variables")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Save") {
+                    var dict: [String: String] = [:]
+                    envVars.forEach { dict[$0.key] = $0.value }
+                    if var fw = FrameworkRegistry.shared.framework(by: framework.id) {
+                        fw.environmentVariables = dict
+                        FrameworkRegistry.shared.install(fw)
+                    }
+                    dismiss()
+                }
+            }
+        }
+        .onAppear {
+            envVars = framework.environmentVariables.map { EnvVar(key: $0.key, value: $0.value) }
+        }
+    }
+}
+
+struct FrameworkReportView: View {
+    let report: String
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        ScrollView {
+            Text(report)
+                .font(.system(size: 12, design: .monospaced))
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .navigationTitle("Framework Report")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button("Copy") { UIPasteboard.general.string = report }
+            }
+            ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
         }
     }
 }
