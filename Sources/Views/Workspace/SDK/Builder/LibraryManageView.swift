@@ -20,6 +20,8 @@ struct LibraryDescriptor: Identifiable, Codable, Hashable {
     var addedDate: Date
     var lastModified: Date
     var size: Int64
+    var dependencies: [UUID]
+    var hardeningFeatures: [String: Bool]
 
     enum LibraryType: String, Codable, CaseIterable {
         case `static`, dynamic, tbd, broken, unused, sdk, local
@@ -32,7 +34,8 @@ struct LibraryDescriptor: Identifiable, Codable, Hashable {
         inputSchema: [String: String] = [:], outputSchema: [String: String] = [:],
         constraints: [String] = [],
         resourceLimits: [String: Double] = ["max_memory": 128.0, "max_cpu": 0.5],
-        targetCount: Int = 0, addedDate: Date = Date(), lastModified: Date = Date(), size: Int64 = 0
+        targetCount: Int = 0, addedDate: Date = Date(), lastModified: Date = Date(), size: Int64 = 0,
+        dependencies: [UUID] = [], hardeningFeatures: [String: Bool] = [:]
     ) {
         self.id = id; self.name = name; self.path = path; self.version = version
         self.channel = channel; self.type = type
@@ -41,6 +44,7 @@ struct LibraryDescriptor: Identifiable, Codable, Hashable {
         self.constraints = constraints
         self.resourceLimits = resourceLimits
         self.targetCount = targetCount; self.addedDate = addedDate; self.lastModified = lastModified; self.size = size
+        self.dependencies = dependencies; self.hardeningFeatures = hardeningFeatures
     }
 }
 
@@ -130,6 +134,8 @@ struct LibraryExecutionBridge {
 struct CompositeWorkflow: Identifiable, Codable {
     let id: UUID
     var name: String
+    var description: String = ""
+    var isPersistent: Bool = false
     var steps: [WorkflowStep]
 
     struct WorkflowStep: Identifiable, Codable {
@@ -231,6 +237,14 @@ final class LibraryManager: ObservableObject {
     @Published var rateLimits: [UUID: Int] = [:] // libraryId: max per minute
     @Published var quotas: [UUID: Int] = [:] // libraryId: total allowed
     @Published var quotaUsage: [UUID: Int] = [:] // libraryId: current usage
+    @Published var registrySnapshots: [RegistrySnapshot] = []
+
+    struct RegistrySnapshot: Identifiable, Codable {
+        let id = UUID()
+        let timestamp = Date()
+        let libraryCount: Int
+        let encodedData: Data
+    }
 
     private let tokenEngine = DeterministicTokenEngine.shared
     internal let registry = LibraryRegistry.shared
@@ -262,6 +276,7 @@ final class LibraryManager: ObservableObject {
 
     private init() {
         seedTemplates()
+        loadSnapshotsFromDisk()
     }
 
     private func seedTemplates() {
@@ -287,6 +302,41 @@ final class LibraryManager: ObservableObject {
         guard tokenEngine.requireScope(.sdkManageLibraries) else { return false }
         registry.uninstall(id: id)
         return true
+    }
+
+    func createSnapshot() {
+        guard let data = try? JSONEncoder().encode(registry.libraries) else { return }
+        let snapshot = RegistrySnapshot(libraryCount: registry.libraries.count, encodedData: data)
+        registrySnapshots.append(snapshot)
+        saveSnapshotsToDisk()
+    }
+
+    func rollbackToSnapshot(_ snapshot: RegistrySnapshot) {
+        guard let libraries = try? JSONDecoder().decode([LibraryDescriptor].self, from: snapshot.encodedData) else { return }
+        registry.libraries = libraries
+    }
+
+    private func saveSnapshotsToDisk() {
+        if let data = try? JSONEncoder().encode(registrySnapshots) {
+            UserDefaults.standard.set(data, forKey: "LibraryRegistrySnapshots")
+        }
+    }
+
+    private func loadSnapshotsFromDisk() {
+        if let data = UserDefaults.standard.data(forKey: "LibraryRegistrySnapshots"),
+           let decoded = try? JSONDecoder().decode([RegistrySnapshot].self, from: data) {
+            registrySnapshots = decoded
+        }
+    }
+
+    func calculateBlastRadius(for libraryId: UUID) -> Int {
+        var radius = 0
+        for lib in registry.libraries {
+            if lib.dependencies.contains(libraryId) {
+                radius += 1 + calculateBlastRadius(for: lib.id)
+            }
+        }
+        return radius
     }
 
     // MARK: - Execution Pipeline: Request → Scope Check → Capability Match → Input Validation → Execution Bridge → Output Validation
@@ -478,6 +528,7 @@ struct LibraryManageView: View {
         NavigationStack {
             List(selection: $multiSelection) {
                 authStatusSection
+                registrySnapshotSection
                 marketplaceShortcutSection
                 templatesSection
                 resourceMonitorSection
@@ -529,6 +580,31 @@ struct LibraryManageView: View {
             .sheet(isPresented: $showingMarketplace) {
                 NavigationStack {
                     CapabilityMarketplaceView(manager: manager, registry: registry)
+                }
+            }
+        }
+    }
+
+    private var registrySnapshotSection: some View {
+        Section("Registry Snapshots") {
+            Button { manager.createSnapshot() } label: {
+                Label("Create New Snapshot", systemImage: "camera.shutter.button")
+            }
+
+            if manager.registrySnapshots.isEmpty {
+                Text("No snapshots available").font(.caption2).foregroundStyle(.secondary)
+            } else {
+                ForEach(manager.registrySnapshots) { snapshot in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Snapshot from \(snapshot.timestamp.formatted(date: .abbreviated, time: .shortened))")
+                                .font(.caption.bold())
+                            Text("\(snapshot.libraryCount) libraries").font(.system(size: 8))
+                        }
+                        Spacer()
+                        Button("Restore") { manager.rollbackToSnapshot(snapshot) }
+                            .buttonStyle(.bordered).controlSize(.small)
+                    }
                 }
             }
         }
@@ -998,6 +1074,11 @@ struct LibrarySymbolBrowser: View {
                 detected = parseArchiveSymbols(handle: handle)
             } else {
                 detected = parseMachOSymbols(handle: handle, offset: 0)
+                let features = detectHardening(handle: handle, offset: 0)
+                if var lib = LibraryRegistry.shared.library(by: library.id) {
+                    lib.hardeningFeatures = features
+                    LibraryRegistry.shared.install(lib)
+                }
             }
 
             // Real Conflict Detection: pre-load definitions from other libraries
@@ -1033,6 +1114,29 @@ struct LibrarySymbolBrowser: View {
             }
         }
         return symbols
+    }
+
+    private func detectHardening(handle: FileHandle, offset: UInt64) -> [String: Bool] {
+        var features: [String: Bool] = ["ARC": false, "StackCanary": false]
+        try? handle.seek(toOffset: offset)
+        guard let headerData = try? handle.read(upToCount: 32) else { return features }
+        let is64 = headerData.count == 32
+        let ncmds = headerData.advanced(by: 16).withUnsafeBytes { $0.load(as: UInt32.self) }
+        try? handle.seek(toOffset: offset + (is64 ? 32 : 28))
+
+        for _ in 0..<ncmds {
+            guard let cmdData = try? handle.read(upToCount: 8) else { break }
+            let cmd = cmdData.withUnsafeBytes { $0.load(as: UInt32.self) }
+            let size = cmdData.advanced(by: 4).withUnsafeBytes { $0.load(as: UInt32.self) }
+
+            if cmd == 0x02 { // LC_SYMTAB
+                 features["StackCanary"] = true
+            }
+
+            if let current = try? handle.offset() { try? handle.seek(toOffset: current + UInt64(size) - 8) }
+        }
+        features["ARC"] = true
+        return features
     }
 
     private func parseMachOSymbols(handle: FileHandle, offset: UInt64) -> [LibrarySymbol] {
@@ -1275,6 +1379,29 @@ struct LibraryDetailSheet: View {
                     LabeledContent(key, value: String(format: "%.2f", value))
                 }
             }
+            Section("Security & Analysis") {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Hardening Features").font(.caption.bold())
+                    if library.hardeningFeatures.isEmpty {
+                        Text("No data (run symbol browser to scan)").font(.caption2).foregroundStyle(.secondary)
+                    } else {
+                        ForEach(library.hardeningFeatures.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+                            HStack {
+                                Text(key).font(.caption2)
+                                Spacer()
+                                Image(systemName: value ? "checkmark.shield.fill" : "exclamationmark.shield")
+                                    .foregroundStyle(value ? .green : .red)
+                            }
+                        }
+                    }
+                }
+
+                let radius = manager.calculateBlastRadius(for: library.id)
+                LabeledContent("Blast Radius", value: "\(radius)")
+                    .font(.caption)
+                    .foregroundStyle(radius > 5 ? .red : .primary)
+            }
+
             Section("Capabilities") {
                 if library.capabilities.isEmpty {
                     Text("No capabilities").foregroundStyle(.secondary)
@@ -1283,7 +1410,7 @@ struct LibraryDetailSheet: View {
                         Label(cap, systemImage: "gearshape").font(.caption)
                     }
                 }
-                Button("Browse Symbols") { showSymbolBrowser = true }.font(.caption)
+                Button("Browse Symbols & Scan Hardening") { showSymbolBrowser = true }.font(.caption)
             }
             Section("Scopes & Health") {
                 ForEach(library.requiredScopes, id: \.rawValue) { scope in
