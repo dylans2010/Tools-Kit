@@ -1548,7 +1548,7 @@
 		CL0100000000000000000008 /* VersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionHistoryView.swift; sourceTree = "<group>"; };
 		CL0100000000000000000009 /* AddDataCollabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDataCollabView.swift; sourceTree = "<group>"; };
 		CL010000000000000000000A /* WorkspaceAutomationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAutomationEngine.swift; sourceTree = "<group>"; };
-		CL010000000000000000000F /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginManager.swift; sourceTree = "<group>"; };
+		CL010000000000000000000F /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PluginManager.swift; path = Sources/Workspace/Extensions/Core/PluginManager.swift; sourceTree = SOURCE_ROOT; };
 		ED010000000000000000000A /* EditingHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditingHomeView.swift; sourceTree = "<group>"; };
 		ED010000000000000000000B /* FullEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullEditorView.swift; sourceTree = "<group>"; };
 		3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentResultView.swift; sourceTree = "<group>"; };
