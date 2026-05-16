@@ -59,6 +59,9 @@ struct WorkspaceHomeView: View {
                 }
 
                 Section("Collaboration") {
+                    NavigationLink { AgenticUIHomeView() } label: {
+                        Label("Agentic System", systemImage: "sparkles")
+                    }
                     NavigationLink { PersonaHomeView() } label: {
                         Label("Persona", systemImage: "brain.head.profile")
                     }
