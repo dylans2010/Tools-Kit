@@ -1,78 +1,92 @@
 import SwiftUI
 
-struct ActivityTimelineView: View {
-    let spaceID: UUID
+struct ActivityFeedView: View {
+    let workspace: CollaborationWorkspace
     @StateObject private var manager = CollaborationManager.shared
-    @State private var filter: ActivityFilter = .all
 
-    enum ActivityFilter: String, CaseIterable {
-        case all = "All"
-        case commits = "Commits"
-        case merges = "Merges"
-        case comments = "Comments"
+    private func iconForAction(_ action: String) -> String {
+        let lower = action.lowercased()
+        if lower.contains("message") { return "message.fill" }
+        if lower.contains("commit") { return "terminal.fill" }
+        if lower.contains("branch") { return "arrow.branch" }
+        if lower.contains("create") { return "plus.circle.fill" }
+        return "bolt.fill"
     }
 
-    private var filteredActivities: [ActivityLog] {
-        guard let space = manager.spaces.first(where: { $0.id == spaceID }) else { return [] }
-        switch filter {
-        case .all: return space.activityFeed
-        case .commits: return space.activityFeed.filter { $0.action.contains("Committed") }
-        case .merges: return space.activityFeed.filter { $0.action.contains("Merged") }
-        case .comments: return space.activityFeed.filter { $0.action.contains("Commented") }
-        }
+    private func colorForAction(_ action: String) -> Color {
+        let lower = action.lowercased()
+        if lower.contains("message") { return .blue }
+        if lower.contains("commit") { return .purple }
+        if lower.contains("branch") { return .orange }
+        if lower.contains("create") { return .green }
+        return .secondary
     }
 
     var body: some View {
-        VStack {
-            Picker("Filter", selection: $filter) {
-                ForEach(ActivityFilter.allCases, id: \.self) { filter in
-                    Text(filter.rawValue).tag(filter)
+        VStack(spacing: 0) {
+            HStack {
+                Text("Activity Feed")
+                    .font(.headline)
+                Spacer()
+                Button { /* Filter */ } label: {
+                    Image(systemName: "line.3.horizontal.decrease.circle")
                 }
             }
-            .pickerStyle(.segmented)
             .padding()
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+
+            Divider()
 
             List {
-                ForEach(filteredActivities) { log in
-                    TimelineActivityRow(log: log)
+                let activity = manager.workspaces.first(where: { $0.id == workspace.id })?.activityFeed ?? []
+
+                if activity.isEmpty {
+                    ContentUnavailableView("No Recent Activity", systemImage: "clock")
+                } else {
+                    Section("Recent Updates") {
+                        ForEach(activity) { log in
+                            ActivityRow(
+                                icon: iconForAction(log.action),
+                                color: colorForAction(log.action),
+                                title: log.action,
+                                detail: "\(log.userName) • \(log.timestamp, style: .relative)",
+                                time: ""
+                            )
+                        }
+                    }
                 }
             }
+            .listStyle(.plain)
         }
-        .navigationTitle("Activity Timeline")
+        .background(Color(uiColor: .systemGroupedBackground))
     }
 }
 
-struct TimelineActivityRow: View {
-    let log: ActivityLog
+private struct ActivityRow: View {
+    let icon: String
+    let color: Color
+    let title: String
+    let detail: String
+    let time: String
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            Image(systemName: iconForAction(log.action))
-                .foregroundStyle(.primary)
-                .frame(width: 24)
+            Image(systemName: icon)
+                .foregroundStyle(color)
+                .font(.headline)
+                .frame(width: 24, height: 24)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(log.action)
-                    .font(.subheadline)
-                    .bold()
-
-                HStack {
-                    Text(log.userName)
-                    Text("•")
-                    Text(log.timestamp, style: .relative)
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline.bold())
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(time)
+                    .font(.system(size: 10))
+                    .foregroundStyle(.tertiary)
             }
         }
         .padding(.vertical, 4)
-    }
-
-    private func iconForAction(_ action: String) -> String {
-        if action.contains("Committed") { return "arrow.triangle.merge" }
-        if action.contains("Forked") { return "arrow.branch" }
-        if action.contains("Created") { return "plus.circle" }
-        if action.contains("Merged") { return "checkmark.circle" }
-        return "circle"
     }
 }

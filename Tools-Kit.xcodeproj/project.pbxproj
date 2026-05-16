@@ -70,6 +70,7 @@
 		CL020000000000000000000B /* ContentGraphService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000B /* ContentGraphService.swift */; };
 		CL020000000000000000000C /* WorkspaceAutomationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000C /* WorkspaceAutomationEngine.swift */; };
 		CL020000000000000000000D /* WorkspaceServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000D /* WorkspaceServices.swift */; };
+		CL020000000000000000000F /* CollaborationNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000F /* CollaborationNotificationService.swift */; };
 		CL020000000000000000000E /* WorkspaceSnapshotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000E /* WorkspaceSnapshotService.swift */; };
 		ED0200000000000000000003 /* EditingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0100000000000000000003 /* EditingModels.swift */; };
 		ED0200000000000000000004 /* EditingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0100000000000000000004 /* EditingManager.swift */; };
@@ -1429,6 +1430,8 @@
 		NB0500000000000000000007 /* GitHubSecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0500000000000000000007 /* GitHubSecurityView.swift */; };
 		NB0600000000000000000001 /* CollabWhiteboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000001 /* CollabWhiteboardView.swift */; };
 		NB0600000000000000000002 /* CollaborationChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000002 /* CollaborationChatView.swift */; };
+		NB0600000000000000000007 /* CollaborationThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000007 /* CollaborationThreadView.swift */; };
+		NB0600000000000000000008 /* CollaborationFileSharingLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000008 /* CollaborationFileSharingLayer.swift */; };
 		NB0600000000000000000003 /* CollabPermissionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000003 /* CollabPermissionsView.swift */; };
 		NB0600000000000000000004 /* CollabTemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000004 /* CollabTemplatesView.swift */; };
 		NB0600000000000000000005 /* CollabNotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000005 /* CollabNotificationsView.swift */; };
@@ -1521,6 +1524,7 @@
 		CL010000000000000000000B /* ContentGraphService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentGraphService.swift; sourceTree = "<group>"; };
 		CL010000000000000000000C /* WorkspaceAutomationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSnapshotService.swift; sourceTree = "<group>"; };
 		CL010000000000000000000D /* WorkspaceServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceServices.swift; sourceTree = "<group>"; };
+		CL010000000000000000000F /* CollaborationNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaborationNotificationService.swift; sourceTree = "<group>"; };
 		CL010000000000000000000E /* WorkspaceSnapshotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandEngine.swift; sourceTree = "<group>"; };
 		ED0100000000000000000003 /* EditingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditingModels.swift; sourceTree = "<group>"; };
 		ED0100000000000000000004 /* EditingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditingManager.swift; sourceTree = "<group>"; };
@@ -2866,6 +2870,8 @@
 		NF0500000000000000000007 /* GitHubSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubSecurityView.swift; sourceTree = "<group>"; };
 		NF0600000000000000000001 /* CollabWhiteboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollabWhiteboardView.swift; sourceTree = "<group>"; };
 		NF0600000000000000000002 /* CollaborationChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaborationChatView.swift; sourceTree = "<group>"; };
+		NF0600000000000000000007 /* CollaborationThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaborationThreadView.swift; sourceTree = "<group>"; };
+		NF0600000000000000000008 /* CollaborationFileSharingLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaborationFileSharingLayer.swift; sourceTree = "<group>"; };
 		NF0600000000000000000003 /* CollabPermissionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollabPermissionsView.swift; sourceTree = "<group>"; };
 		NF0600000000000000000004 /* CollabTemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollabTemplatesView.swift; sourceTree = "<group>"; };
 		NF0600000000000000000005 /* CollabNotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollabNotificationsView.swift; sourceTree = "<group>"; };
@@ -6693,6 +6699,7 @@
 				CL0100000000000000000007 /* SpaceDashboardView.swift */,
 				CL0100000000000000000008 /* VersionHistoryView.swift */,
 				CL0100000000000000000009 /* AddDataCollabView.swift */,
+				NF0600000000000000000008 /* CollaborationFileSharingLayer.swift */,
 				TKRF000000000000000000000C /* AdvancedCollaborationView.swift */,
 			);
 			path = Collaboration;
@@ -6929,6 +6936,7 @@
 				CL010000000000000000000B /* ContentGraphService.swift */,
 				CL010000000000000000000C /* WorkspaceAutomationEngine.swift */,
 				CL010000000000000000000D /* WorkspaceServices.swift */,
+				CL010000000000000000000F /* CollaborationNotificationService.swift */,
 				EBCD6CF334F74BB39BC9A7F0 /* Distribution */,
 				WS012C5C255D0CF443E6AB0C /* SpaceCollabManager.swift */,
 			);
@@ -9652,6 +9660,7 @@
 			isa = PBXGroup;
 			children = (
 				NF0600000000000000000002 /* CollaborationChatView.swift */,
+				NF0600000000000000000007 /* CollaborationThreadView.swift */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -10171,11 +10180,14 @@
 				CL020000000000000000000B /* ContentGraphService.swift in Sources */,
 				CL020000000000000000000C /* WorkspaceAutomationEngine.swift in Sources */,
 				CL020000000000000000000D /* WorkspaceServices.swift in Sources */,
+				CL020000000000000000000F /* CollaborationNotificationService.swift in Sources */,
 				CL020000000000000000000E /* WorkspaceSnapshotService.swift in Sources */,
 				ED0200000000000000000003 /* EditingModels.swift in Sources */,
 				ED0200000000000000000004 /* EditingManager.swift in Sources */,
 				ED0200000000000000000005 /* EditingEngine.swift in Sources */,
 				CL0200000000000000000006 /* CollaborationHomeView.swift in Sources */,
+				NB0600000000000000000007 /* CollaborationThreadView.swift in Sources */,
+				NB0600000000000000000008 /* CollaborationFileSharingLayer.swift in Sources */,
 				CL0200000000000000000007 /* SpaceDashboardView.swift in Sources */,
 				CL0200000000000000000008 /* VersionHistoryView.swift in Sources */,
 				CL0200000000000000000009 /* AddDataCollabView.swift in Sources */,
