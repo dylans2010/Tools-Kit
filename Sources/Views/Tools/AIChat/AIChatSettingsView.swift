@@ -434,6 +434,12 @@ struct AIChatSettingsView: View {
             if debugModeEnabled {
                 NavigationLink("Agent Config") { AgentConfigView() }
             }
+            NavigationLink {
+                AgenticUIDebugPanel()
+                    .navigationTitle("Foundation Models")
+            } label: {
+                Label("Check Foundation Models Availability", systemImage: "cpu")
+            }
         }
     }
 

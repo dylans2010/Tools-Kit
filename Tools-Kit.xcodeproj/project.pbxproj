@@ -1458,6 +1458,20 @@
 		A00200000000000000000205 /* WashGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000205 /* WashGlow.swift */; };
 		A00200000000000000000206 /* AIAnimationCoreModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000206 /* AIAnimationCoreModifier.swift */; };
 		AS0200000000000000000031 /* AIGenSlidesPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000031 /* AIGenSlidesPreview.swift */; };
+		WG5FD79044E10FA97C5EC69F /* WorkspaceGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGE4FAEB1B3B0687077929DE /* WorkspaceGraph.swift */; };
+		MDC32FA79B1B70105A53ED19 /* AgenticModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = MDC64B1890CDC5D4E894FB64 /* AgenticModels.swift */; };
+		TO7EC7A01B15A8F7BFE4020C /* AgenticToolOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = TO235A5C23F2CD6945878245 /* AgenticToolOutput.swift */; };
+		FC02ACD1C6531D397EF356AF /* AgenticFoundationModelsAvailabilityChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC070B5F75920EA18A92A970 /* AgenticFoundationModelsAvailabilityChecker.swift */; };
+		WA78B8788F5FB5D11707E065 /* AgenticWorkspaceAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA1D212F4E81C94D91983C6E /* AgenticWorkspaceAnalyzer.swift */; };
+		SM8366848E87B5455513B114 /* AgenticCoreSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SM344DB9B3FB3425524CABFB /* AgenticCoreSessionManager.swift */; };
+		WT1C4BF8EBB28B8B53DA65BA /* WorkspaceAITools.swift in Sources */ = {isa = PBXBuildFile; fileRef = WT2150AD8D36DF890EC9A009 /* WorkspaceAITools.swift */; };
+		TE0E70F662A3193CE2438F64 /* AgenticToolExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = TEBF3E99FD9CC47C5CA8D3FF /* AgenticToolExecutor.swift */; };
+		CO7790874B97D0E0FF81BC27 /* AgenticCoreOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CO69874D1F9736B27D7BA3BE /* AgenticCoreOrchestrator.swift */; };
+		HV84F970AAEB0D52DC9A1CEB /* AgenticUIHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HVADD29D00189D6E872BCD3E /* AgenticUIHomeView.swift */; };
+		CV2E0D3C56C096DD3DDDF157 /* AgenticUIChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CVD04A162963945B7DC41CA9 /* AgenticUIChatView.swift */; };
+		AS186026B1FB112C9A490D7A /* AgenticUIActionStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS1AE27E255AB74D5E10B24A /* AgenticUIActionStreamView.swift */; };
+		DP4D8FE86D988A869476EF7B /* AgenticUIDebugPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DP510A93DE07E084C71BAD96 /* AgenticUIDebugPanel.swift */; };
+		WI2C4E253F126849AEC87D1F /* AgenticUIWorkspaceInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WI2584A4C5CC1DFC9C844D30 /* AgenticUIWorkspaceInspectorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2896,6 +2910,20 @@
 		A00100000000000000000205 /* WashGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/WashGlow.swift"; sourceTree = "<group>"; };
 		A00100000000000000000206 /* AIAnimationCoreModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/AIAnimationCoreModifier.swift"; sourceTree = "<group>"; };
 		AS0100000000000000000031 /* AIGenSlidesPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Workspace/Slides/AIGenSlidesPreview.swift"; sourceTree = SOURCE_ROOT; };
+		WGE4FAEB1B3B0687077929DE /* WorkspaceGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceGraph.swift; sourceTree = "<group>"; };
+		MDC64B1890CDC5D4E894FB64 /* AgenticModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticModels.swift; sourceTree = "<group>"; };
+		TO235A5C23F2CD6945878245 /* AgenticToolOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolOutput.swift; sourceTree = "<group>"; };
+		FC070B5F75920EA18A92A970 /* AgenticFoundationModelsAvailabilityChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticFoundationModelsAvailabilityChecker.swift; sourceTree = "<group>"; };
+		WA1D212F4E81C94D91983C6E /* AgenticWorkspaceAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticWorkspaceAnalyzer.swift; sourceTree = "<group>"; };
+		SM344DB9B3FB3425524CABFB /* AgenticCoreSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticCoreSessionManager.swift; sourceTree = "<group>"; };
+		WT2150AD8D36DF890EC9A009 /* WorkspaceAITools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAITools.swift; sourceTree = "<group>"; };
+		TEBF3E99FD9CC47C5CA8D3FF /* AgenticToolExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolExecutor.swift; sourceTree = "<group>"; };
+		CO69874D1F9736B27D7BA3BE /* AgenticCoreOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticCoreOrchestrator.swift; sourceTree = "<group>"; };
+		HVADD29D00189D6E872BCD3E /* AgenticUIHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIHomeView.swift; sourceTree = "<group>"; };
+		CVD04A162963945B7DC41CA9 /* AgenticUIChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIChatView.swift; sourceTree = "<group>"; };
+		AS1AE27E255AB74D5E10B24A /* AgenticUIActionStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIActionStreamView.swift; sourceTree = "<group>"; };
+		DP510A93DE07E084C71BAD96 /* AgenticUIDebugPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIDebugPanel.swift; sourceTree = "<group>"; };
+		WI2584A4C5CC1DFC9C844D30 /* AgenticUIWorkspaceInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIWorkspaceInspectorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3406,6 +3434,7 @@
 		1987FFD9C7B9ABE77AB250E2 /* Workspace */ = {
 			isa = PBXGroup;
 			children = (
+				AV7CB96B980CB75590CFDFC6 /* Agentic */,
 				1F52E52BA0DF497BA662A7C8 /* Persona */,
 				262075D3C56B452A99252079 /* Slides */,
 				AS0300000000000000000001 /* Whiteboards */,
@@ -8201,6 +8230,7 @@
 		E09BD8427CCE4E3BB77F34C0 /* AI */ = {
 			isa = PBXGroup;
 			children = (
+				AC658B35520E3C4743D09658 /* Agentic */,
 				TKRF0000000000000000000002 /* AIOrchestrator.swift */,
 				TKRF0000000000000000000003 /* EmbeddingService.swift */,
 			);
@@ -9745,6 +9775,42 @@
 			path = Changelog;
 			sourceTree = "<group>";
 		};
+		AM6AD894AA553CF7061269A8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				WGE4FAEB1B3B0687077929DE /* WorkspaceGraph.swift */,
+				MDC64B1890CDC5D4E894FB64 /* AgenticModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AC658B35520E3C4743D09658 /* Agentic */ = {
+			isa = PBXGroup;
+			children = (
+				AM6AD894AA553CF7061269A8 /* Models */,
+				TO235A5C23F2CD6945878245 /* AgenticToolOutput.swift */,
+				FC070B5F75920EA18A92A970 /* AgenticFoundationModelsAvailabilityChecker.swift */,
+				WA1D212F4E81C94D91983C6E /* AgenticWorkspaceAnalyzer.swift */,
+				SM344DB9B3FB3425524CABFB /* AgenticCoreSessionManager.swift */,
+				WT2150AD8D36DF890EC9A009 /* WorkspaceAITools.swift */,
+				TEBF3E99FD9CC47C5CA8D3FF /* AgenticToolExecutor.swift */,
+				CO69874D1F9736B27D7BA3BE /* AgenticCoreOrchestrator.swift */,
+			);
+			path = Agentic;
+			sourceTree = "<group>";
+		};
+		AV7CB96B980CB75590CFDFC6 /* Agentic */ = {
+			isa = PBXGroup;
+			children = (
+				HVADD29D00189D6E872BCD3E /* AgenticUIHomeView.swift */,
+				CVD04A162963945B7DC41CA9 /* AgenticUIChatView.swift */,
+				AS1AE27E255AB74D5E10B24A /* AgenticUIActionStreamView.swift */,
+				DP510A93DE07E084C71BAD96 /* AgenticUIDebugPanel.swift */,
+				WI2584A4C5CC1DFC9C844D30 /* AgenticUIWorkspaceInspectorView.swift */,
+			);
+			path = Agentic;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -9911,6 +9977,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				WG5FD79044E10FA97C5EC69F /* WorkspaceGraph.swift in Sources */,
+				MDC32FA79B1B70105A53ED19 /* AgenticModels.swift in Sources */,
+				TO7EC7A01B15A8F7BFE4020C /* AgenticToolOutput.swift in Sources */,
+				FC02ACD1C6531D397EF356AF /* AgenticFoundationModelsAvailabilityChecker.swift in Sources */,
+				WA78B8788F5FB5D11707E065 /* AgenticWorkspaceAnalyzer.swift in Sources */,
+				SM8366848E87B5455513B114 /* AgenticCoreSessionManager.swift in Sources */,
+				WT1C4BF8EBB28B8B53DA65BA /* WorkspaceAITools.swift in Sources */,
+				TE0E70F662A3193CE2438F64 /* AgenticToolExecutor.swift in Sources */,
+				CO7790874B97D0E0FF81BC27 /* AgenticCoreOrchestrator.swift in Sources */,
+				HV84F970AAEB0D52DC9A1CEB /* AgenticUIHomeView.swift in Sources */,
+				CV2E0D3C56C096DD3DDDF157 /* AgenticUIChatView.swift in Sources */,
+				AS186026B1FB112C9A490D7A /* AgenticUIActionStreamView.swift in Sources */,
+				DP4D8FE86D988A869476EF7B /* AgenticUIDebugPanel.swift in Sources */,
+				WI2C4E253F126849AEC87D1F /* AgenticUIWorkspaceInspectorView.swift in Sources */,
+
 				SK020001 /* in Sources */,
 				SK020002 /* in Sources */,
 				SK020003 /* in Sources */,
