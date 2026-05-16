@@ -127,7 +127,7 @@ final class FrameworkRegistry {
 
 // MARK: - Framework Execution State
 
-enum FrameworkExecutionState: String {
+enum FrameworkExecutionState: String, Codable {
     case idle, loading, validating, resolvingDeps, scopeCheck, sandboxing, executing, validatingOutput, committing, completed, failed
 }
 
@@ -187,7 +187,7 @@ struct FrameworkSandboxRunner {
 
 // MARK: - Framework Execution Record
 
-struct FrameworkExecutionRecord: Identifiable {
+struct FrameworkExecutionRecord: Identifiable, Codable, Hashable {
     let id = UUID()
     let frameworkId: UUID
     let frameworkName: String
@@ -668,10 +668,10 @@ struct FrameworkManageView: View {
                 Button("Cancel", role: .cancel) {}
             }
             .sheet(isPresented: $showDiagnostics) {
-                NavigationStack { FrameworkDiagnosticsView(frameworks: registry.frameworks) }
+                NavigationStack { FrameworkDiagnosticsView(frameworks: registry.frameworks, manager: manager) }
             }
             .sheet(isPresented: $showAuditLog) {
-                NavigationStack { FrameworkAuditLogView(log: manager.auditLog) }
+                NavigationStack { FrameworkAuditLogView(log: manager.auditLog, manager: manager) }
             }
             .confirmationDialog("Remove Frameworks", isPresented: $showBatchDeleteConfirmation) {
                 Button("Remove \(multiSelection.count) Frameworks", role: .destructive) {
@@ -1060,6 +1060,7 @@ struct FrameworkInfoPlistView: View {
 struct FrameworkDiagnosticsView: View {
     @Environment(\.dismiss) private var dismiss
     let frameworks: [FrameworkDescriptor]
+    let manager: FrameworkManager
     @State private var issues: [DiagnosticIssue] = []
     @State private var isScanning = false
 
@@ -1354,11 +1355,12 @@ struct FrameworkSymbolBrowser: View {
 struct FrameworkAuditLogView: View {
     @Environment(\.dismiss) private var dismiss
     let log: [FrameworkManager.FrameworkAuditEntry]
+    let manager: FrameworkManager
 
     var body: some View {
         List {
             ForEach(Array(log.reversed())) { entry in
-                auditEntryRow(entry)
+                auditEntryRow(entry, manager: manager)
             }
         }
         .navigationTitle("Audit Log")
@@ -1376,7 +1378,7 @@ struct FrameworkAuditLogView: View {
     }
 
     @ViewBuilder
-    private func auditEntryRow(_ entry: FrameworkManager.FrameworkAuditEntry) -> some View {
+    private func auditEntryRow(_ entry: FrameworkManager.FrameworkAuditEntry, manager: FrameworkManager) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(entry.frameworkName).font(.subheadline.bold())
