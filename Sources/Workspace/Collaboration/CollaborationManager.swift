@@ -1,24 +1,30 @@
 import Foundation
 import Combine
+import SwiftUI
 
-/// Manages collaboration spaces, members, and version control operations.
+/// Rebuilt Collaboration Manager for Collaboration 2.0 System.
+@MainActor
 final class CollaborationManager: ObservableObject {
     static let shared = CollaborationManager()
 
-    @Published var spaces: [CollaborationSpace] = []
+    @Published var workspaces: [CollaborationWorkspace] = []
+    @Published var activeWorkspaceID: UUID?
+    @Published var activeChannelID: UUID?
+    @Published var presence: [UUID: CollaborationPresence] = [:]
     @Published var commits: [UUID: CollaborationCommit] = [:]
 
-    private let spacesFile = "collaboration_spaces.json"
-    private let commitsFile = "collaboration_commits.json"
+    private let workspacesFile = "collaboration_workspaces_v2.json"
+    private let commitsFile = "collaboration_commits_v2.json"
+    private let dataStore = UnifiedDataStore.shared
 
     private init() {
-        loadData()
+        loadWorkspaces()
     }
 
-    // MARK: - Space Management
+    // MARK: - Workspace & Channel Management
 
-    func createSpace(name: String, description: String, icon: String, visibility: SpaceVisibility) -> CollaborationSpace {
-        let spaceID = UUID()
+    func createWorkspace(name: String, description: String, icon: String) -> CollaborationWorkspace {
+        let workspaceID = UUID()
         let initialCommitID = UUID()
 
         let initialCommit = CollaborationCommit(
@@ -33,98 +39,98 @@ final class CollaborationManager: ObservableObject {
         commits[initialCommitID] = initialCommit
 
         let initialBranch = CollaborationBranch(id: UUID(), name: "main", headCommitID: initialCommitID)
-        let space = CollaborationSpace(
-            id: spaceID,
+
+        let workspace = CollaborationWorkspace(
+            id: workspaceID,
             name: name,
             description: description,
             icon: icon,
-            visibility: visibility,
-            ownerID: UUID(), // Should be real user ID
+            ownerID: UUID(), // Current user ID
             members: [],
+            channels: [
+                CollaborationChannel(
+                    id: UUID(),
+                    name: "general",
+                    type: .publicChannel,
+                    description: "Workspace-wide discussion",
+                    messages: [],
+                    memberIDs: [],
+                    lastReadTimestamp: Date()
+                )
+            ],
             branches: [initialBranch],
             currentBranchID: initialBranch.id,
-            activityFeed: [],
-            messages: [],
-            sharedFiles: [],
-            notebookIDs: [],
-            slideDeckIDs: [],
-            meetingIDs: [],
-            formIDs: [],
-            spreadsheetIDs: [],
-            mediaProjectIDs: [],
-            taskIDs: [],
-            decisionIDs: [],
             createdAt: Date(),
-            updatedAt: Date(),
-            metadata: [:]
+            updatedAt: Date()
         )
-        spaces.append(space)
-        saveData()
-        logActivity(spaceID: space.id, action: "Created space '\(name)'")
-        return space
+        workspaces.append(workspace)
+        saveWorkspaces()
+        saveCommits()
+        logActivity(workspaceID: workspace.id, action: "Created workspace '\(name)'")
+        return workspace
     }
 
-    func deleteSpace(id: UUID) {
-        spaces.removeAll { $0.id == id }
-        saveData()
+    func selectWorkspace(_ workspaceID: UUID) {
+        activeWorkspaceID = workspaceID
+        if let workspace = workspaces.first(where: { $0.id == workspaceID }) {
+            activeChannelID = workspace.channels.first?.id
+        }
     }
 
-    // MARK: - Version Control
+    func selectChannel(_ channelID: UUID) {
+        activeChannelID = channelID
+    }
 
-    func createCommit(spaceID: UUID, branchID: UUID, message: String, data: Data) {
-        guard let spaceIndex = spaces.firstIndex(where: { $0.id == spaceID }),
-              let branchIndex = spaces[spaceIndex].branches.firstIndex(where: { $0.id == branchID }) else { return }
+    // MARK: - Permissions
 
-        let parentID = spaces[spaceIndex].branches[branchIndex].headCommitID
+    func userHasPermission(workspaceID: UUID, permission: CollaborationRole) -> Bool {
+        guard let workspace = workspaces.first(where: { $0.id == workspaceID }) else { return false }
+        // For local demo, we assume admin
+        return true
+    }
+
+    // MARK: - Version Control (Legacy Restoration)
+
+    func createCommit(workspaceID: UUID, branchID: UUID, message: String, data: Data) {
+        guard let wIdx = workspaces.firstIndex(where: { $0.id == workspaceID }),
+              let bIdx = workspaces[wIdx].branches.firstIndex(where: { $0.id == branchID }) else { return }
+
+        let parentID = workspaces[wIdx].branches[bIdx].headCommitID
         let commit = CollaborationCommit(
             id: UUID(),
             parentID: parentID,
             message: message,
             timestamp: Date(),
             author: "Local User",
-            authorID: UUID(), // Should be real user ID
+            authorID: UUID(),
             dataSnapshot: data
         )
 
         commits[commit.id] = commit
-        spaces[spaceIndex].branches[branchIndex].headCommitID = commit.id
-        spaces[spaceIndex].updatedAt = Date()
+        workspaces[wIdx].branches[bIdx].headCommitID = commit.id
+        workspaces[wIdx].updatedAt = Date()
 
-        logActivity(spaceID: spaceID, action: "Committed: \(message)")
-        saveData()
+        logActivity(workspaceID: workspaceID, action: "Committed: \(message)")
+        saveWorkspaces()
+        saveCommits()
     }
 
-    func createBranch(spaceID: UUID, sourceBranchID: UUID, name: String) {
-        guard let spaceIndex = spaces.firstIndex(where: { $0.id == spaceID }),
-              let sourceBranch = spaces[spaceIndex].branches.first(where: { $0.id == sourceBranchID }) else { return }
+    func createBranch(workspaceID: UUID, sourceBranchID: UUID, name: String) {
+        guard let wIdx = workspaces.firstIndex(where: { $0.id == workspaceID }),
+              let sourceBranch = workspaces[wIdx].branches.first(where: { $0.id == sourceBranchID }) else { return }
 
         let newBranch = CollaborationBranch(id: UUID(), name: name, headCommitID: sourceBranch.headCommitID)
-        spaces[spaceIndex].branches.append(newBranch)
-        saveData()
-        logActivity(spaceID: spaceID, action: "Created branch '\(name)' from '\(sourceBranch.name)'")
-    }
-
-    func mergeBranch(spaceID: UUID, sourceBranchID: UUID, targetBranchID: UUID) {
-        guard let spaceIndex = spaces.firstIndex(where: { $0.id == spaceID }),
-              let sourceBranch = spaces[spaceIndex].branches.first(where: { $0.id == sourceBranchID }),
-              let targetBranchIndex = spaces[spaceIndex].branches.firstIndex(where: { $0.id == targetBranchID }) else { return }
-
-        // Basic conflict detection: check if target has moved ahead since source branched off
-        // For now, we'll just fast-forward or merge the head.
-        let sourceHead = sourceBranch.headCommitID
-        spaces[spaceIndex].branches[targetBranchIndex].headCommitID = sourceHead
-        spaces[spaceIndex].updatedAt = Date()
-
-        saveData()
-        logActivity(spaceID: spaceID, action: "Merged branch '\(sourceBranch.name)' into '\(spaces[spaceIndex].branches[targetBranchIndex].name)'")
+        workspaces[wIdx].branches.append(newBranch)
+        saveWorkspaces()
+        logActivity(workspaceID: workspaceID, action: "Created branch '\(name)' from '\(sourceBranch.name)'")
     }
 
     func getCommitHistory(branchID: UUID) -> [CollaborationCommit] {
         var history: [CollaborationCommit] = []
-        // Find any branch with this ID to get the head
         var currentCommitID: UUID? = nil
-        for space in spaces {
-            if let branch = space.branches.first(where: { $0.id == branchID }) {
+
+        for workspace in workspaces {
+            if let branch = workspace.branches.first(where: { $0.id == branchID }) {
                 currentCommitID = branch.headCommitID
                 break
             }
@@ -138,67 +144,137 @@ final class CollaborationManager: ObservableObject {
         return history
     }
 
-    func revertToCommit(spaceID: UUID, branchID: UUID, commitID: UUID) {
-        guard let spaceIndex = spaces.firstIndex(where: { $0.id == spaceID }),
-              let branchIndex = spaces[spaceIndex].branches.firstIndex(where: { $0.id == branchID }),
-              let _ = commits[commitID] else { return }
-
-        spaces[spaceIndex].branches[branchIndex].headCommitID = commitID
-        spaces[spaceIndex].updatedAt = Date()
-
-        saveData()
-        logActivity(spaceID: spaceID, action: "Reverted branch '\(spaces[spaceIndex].branches[branchIndex].name)' to commit \(commitID.uuidString.prefix(8))")
-    }
-
-    // MARK: - Persistence
-
-    func saveData() {
-        let spacesSnapshot = spaces
-        let commitsSnapshot = commits
-
-        DispatchQueue.global(qos: .utility).async { [spacesFile, commitsFile] in
-            self.saveDataSynchronously(spaces: spacesSnapshot, commits: commitsSnapshot, spacesFile: spacesFile, commitsFile: commitsFile)
-        }
-    }
-
-    private func saveDataSynchronously(
-        spaces: [CollaborationSpace],
-        commits: [UUID: CollaborationCommit],
-        spacesFile: String,
-        commitsFile: String
-    ) {
-        do {
-            try WorkspacePersistence.shared.save(spaces, to: spacesFile)
-            try WorkspacePersistence.shared.save(commits, to: commitsFile)
-        } catch {
-            print("Error saving collaboration data: \(error)")
-        }
-    }
-
-    private func loadData() {
-        do {
-            if WorkspacePersistence.shared.exists(filename: spacesFile) {
-                spaces = try WorkspacePersistence.shared.load([CollaborationSpace].self, from: spacesFile)
-            }
-            if WorkspacePersistence.shared.exists(filename: commitsFile) {
-                commits = try WorkspacePersistence.shared.load([UUID: CollaborationCommit].self, from: commitsFile)
-            }
-        } catch {
-            print("Error loading collaboration data: \(error)")
-        }
-    }
-
-    private func logActivity(spaceID: UUID, action: String) {
-        guard let index = spaces.firstIndex(where: { $0.id == spaceID }) else { return }
+    private func logActivity(workspaceID: UUID, action: String) {
+        guard let index = workspaces.firstIndex(where: { $0.id == workspaceID }) else { return }
         let log = ActivityLog(
             id: UUID(),
             timestamp: Date(),
-            userID: UUID(), // Real user ID
+            userID: UUID(),
             userName: "Local User",
             action: action,
             objectID: nil,
             objectType: nil
         )
-        spaces[index].activityFeed.insert(log, at: 0)
+        workspaces[index].activityFeed.insert(log, at: 0)
+    }
+
+    // MARK: - Messaging & Threads
+
+    func sendMessage(content: String, channelID: UUID, workspaceID: UUID) {
+        guard let wIdx = workspaces.firstIndex(where: { $0.id == workspaceID }),
+              let cIdx = workspaces[wIdx].channels.firstIndex(where: { $0.id == channelID }) else { return }
+
+        let message = CollaborationMessage(
+            id: UUID(),
+            senderID: UUID(), // Current user ID
+            senderName: "Local User",
+            content: content,
+            timestamp: Date()
+        )
+
+        workspaces[wIdx].channels[cIdx].messages.append(message)
+        logActivity(workspaceID: workspaceID, action: "New message in #\(workspaces[wIdx].channels[cIdx].name)")
+        saveWorkspaces()
+    }
+
+    func sendReply(content: String, parentMessageID: UUID, channelID: UUID, workspaceID: UUID) {
+        guard let wIdx = workspaces.firstIndex(where: { $0.id == workspaceID }),
+              let cIdx = workspaces[wIdx].channels.firstIndex(where: { $0.id == channelID }),
+              let mIdx = workspaces[wIdx].channels[cIdx].messages.firstIndex(where: { $0.id == parentMessageID }) else { return }
+
+        let reply = CollaborationMessage(
+            id: UUID(),
+            senderID: UUID(),
+            senderName: "Local User",
+            content: content,
+            timestamp: Date()
+        )
+
+        if workspaces[wIdx].channels[cIdx].messages[mIdx].thread == nil {
+            workspaces[wIdx].channels[cIdx].messages[mIdx].thread = CollaborationThread(
+                id: UUID(),
+                parentMessageID: parentMessageID,
+                replies: []
+            )
+        }
+
+        workspaces[wIdx].channels[cIdx].messages[mIdx].thread?.replies.append(reply)
+        logActivity(workspaceID: workspaceID, action: "New reply in #\(workspaces[wIdx].channels[cIdx].name)")
+        saveWorkspaces()
+    }
+
+    // MARK: - Presence
+
+    func updatePresence(userID: UUID, status: PresenceStatus) {
+        presence[userID] = CollaborationPresence(
+            userID: userID,
+            status: status,
+            lastActive: Date()
+        )
+
+        if status == .typing {
+            // Auto-clear typing status after 3 seconds
+            Task {
+                try? await Task.sleep(nanoseconds: 3 * 1_000_000_000)
+                if presence[userID]?.status == .typing {
+                    presence[userID]?.status = .online
+                }
+            }
+        }
+    }
+
+    // MARK: - Persistence
+
+    private func saveWorkspaces() {
+        try? dataStore.save(workspaces, key: workspacesFile)
+    }
+
+    private func saveCommits() {
+        try? dataStore.save(commits, key: commitsFile)
+    }
+
+    private func loadWorkspaces() {
+        if let loaded = try? dataStore.load([CollaborationWorkspace].self, key: workspacesFile) {
+            self.workspaces = loaded
+        }
+        if let loadedCommits = try? dataStore.load([UUID: CollaborationCommit].self, key: commitsFile) {
+            self.commits = loadedCommits
+        }
+
+        if workspaces.isEmpty {
+            _ = createWorkspace(name: "Default Workspace", description: "Your primary collaboration space", icon: "briefcase.fill")
+        }
+        activeWorkspaceID = workspaces.first?.id
+        activeChannelID = workspaces.first?.channels.first?.id
+    }
+}
+
+// Legacy Compatibility for CollaborationHomeView (temporary)
+extension CollaborationManager {
+    var spaces: [CollaborationSpace] {
+        return workspaces.map { workspace in
+            CollaborationSpace(
+                id: workspace.id,
+                name: workspace.name,
+                description: workspace.description,
+                icon: workspace.icon,
+                visibility: .privateSpace,
+                ownerID: workspace.ownerID,
+                members: [],
+                branches: [],
+                currentBranchID: UUID(),
+                activityFeed: [],
+                notebookIDs: [],
+                slideDeckIDs: [],
+                meetingIDs: [],
+                formIDs: [],
+                spreadsheetIDs: [],
+                mediaProjectIDs: [],
+                taskIDs: [],
+                decisionIDs: [],
+                createdAt: workspace.createdAt,
+                updatedAt: workspace.updatedAt
+            )
+        }
     }
 }

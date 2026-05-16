@@ -312,12 +312,14 @@ struct PersonaHomeView: View {
         case chats
         case settings
         case discovery
+        case actions
 
         var id: String {
             switch self {
             case .chats: return "chats"
             case .settings: return "settings"
             case .discovery: return "discovery"
+            case .actions: return "actions"
             }
         }
     }
@@ -497,13 +499,15 @@ private struct PersonaHomeNavigationContent: View {
                     onTapPrompt: onPromptSelection,
                     onSend: onSend,
                     onOpenDiscovery: onOpenDiscovery,
-                    onOpenChats: onOpenChats
+                    onOpenChats: onOpenChats,
+                    onOpenActions: { activeModal = .actions }
                 )
             }
 
             if agentMode {
                 PersonaAgentCommandSurface()
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(1)
             }
         }
     }
@@ -548,7 +552,7 @@ private struct PersonaAgentCommandSurface: View {
                 }
             }
             .padding(.horizontal, 14)
-            .padding(.bottom, 12)
+            .padding(.bottom, 100) // Elevated to avoid composer overlap
         }
         .animation(.spring(response: 0.45, dampingFraction: 0.82), value: isExpanded)
         .onAppear {
@@ -880,6 +884,9 @@ private struct PersonaHomeModalContent: View {
                     },
                     onContinue: onThreadSelection
                 )
+            case .actions:
+                PersonaAgentActionGalleryView()
+                    .presentationDetents([.medium, .large])
             }
         }
     }
@@ -893,19 +900,30 @@ private struct PersonaChatTimelineView: View {
 
     var body: some View {
         ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(spacing: 16) {
+            List {
+                Group {
                     if chatHistory.isEmpty {
                         PersonaEmptyStateView(onDiscoverPrompts: onDiscoverPrompts)
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
                     } else {
                         ForEach(chatHistory) { message in
-                            PersonaChatBubble(message: message).id(message.id)
+                            PersonaChatBubble(message: message)
+                                .id(message.id)
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
                         }
                     }
-                    if isThinking { ThinkingIndicator().id("thinking") }
+                    if isThinking {
+                        ThinkingIndicator()
+                            .id("thinking")
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                    }
                 }
-                .padding()
             }
+            .listStyle(.plain)
+            .background(Color.clear)
             .onChange(of: chatHistory.count) { _, _ in onNeedScroll(proxy) }
             .onChange(of: isThinking) { _, thinking in if thinking { onNeedScroll(proxy) } }
         }
@@ -920,6 +938,7 @@ private struct PersonaComposerView: View {
     let onSend: () -> Void
     let onOpenDiscovery: () -> Void
     let onOpenChats: () -> Void
+    let onOpenActions: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -928,8 +947,16 @@ private struct PersonaComposerView: View {
             if !followUpSuggestions.isEmpty {
                 PersonaFollowUpsView(suggestions: followUpSuggestions, onSelect: onTapPrompt)
             }
-            PersonaInputPanelView(query: $query, isThinking: isThinking, onSend: onSend, onOpenDiscovery: onOpenDiscovery, onOpenChats: onOpenChats)
+            PersonaInputPanelView(
+                query: $query,
+                isThinking: isThinking,
+                onSend: onSend,
+                onOpenDiscovery: onOpenDiscovery,
+                onOpenChats: onOpenChats,
+                onOpenActions: onOpenActions
+            )
         }
+        .background(.ultraThinMaterial)
     }
 }
 
@@ -1074,18 +1101,33 @@ private struct PersonaInputPanelView: View {
     let onSend: () -> Void
     let onOpenDiscovery: () -> Void
     let onOpenChats: () -> Void
+    let onOpenActions: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
-            Button(action: onOpenDiscovery) {
-                Image(systemName: "sparkles")
-                    .font(.system(size: 20))
-                    .foregroundStyle(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom))
+        HStack(spacing: 10) {
+            HStack(spacing: 8) {
+                Button(action: onOpenDiscovery) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom))
+                }
+                .help("Discover Prompts")
+
+                Button(action: onOpenActions) {
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(.orange)
+                }
+                .help("Agent Actions")
             }
+
             Button(action: onOpenChats) {
                 Image(systemName: "clock.arrow.circlepath")
                     .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(.secondary)
             }
+            .help("Chat History")
+
             TextField("Message Persona...", text: $query, axis: .vertical)
                 .padding(12)
                 .background(.white.opacity(0.08))
@@ -1382,6 +1424,62 @@ private struct PersonaChatHistorySheet: View {
                 }
             }.onDelete { threads.remove(atOffsets: $0) }
         }.navigationTitle("Chats") } }
+}
+
+struct PersonaAgentActionGalleryView: View {
+    @Environment(\.dismiss) var dismiss
+
+    let actions = [
+        ("note.text.badge.plus", "Create Note", "Draft a new workspace note", "Create a note about..."),
+        ("envelope.badge.fill", "Draft Email", "Prepare a mail response", "Draft an email to..."),
+        ("chart.bar.doc.horizontal", "Analyze Data", "Summarize spreadsheets", "Analyze my budget..."),
+        ("calendar.badge.clock", "Schedule Sync", "Update calendar events", "Schedule a meeting with...")
+    ]
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    Text("Select an agentic action to perform within your workspace.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                ForEach(actions, id: \.1) { icon, title, subtitle, prompt in
+                    Button {
+                        // In a real app, this would pre-fill the query or trigger a tool
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 16) {
+                            Image(systemName: icon)
+                                .font(.title2)
+                                .foregroundStyle(.orange)
+                                .frame(width: 32)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(title)
+                                    .font(.headline)
+                                Text(subtitle)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Agent Actions")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Close") { dismiss() }
+                }
+            }
+        }
+    }
 }
 
 private struct MarkdownSyntaxStripper {

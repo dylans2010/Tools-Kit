@@ -36,49 +36,55 @@ final class PersonaManager: ObservableObject {
         isThinking = true
         defer { isThinking = false }
 
-        // 1. Gather Full Context
-        let workspaceContext = PersonaWorkspace.gatherFullWorkspaceData()
+        // 1. Capture state needed for background processing
+        let instructions = config.instructions
+        let historySuffix = chatHistory.suffix(10).map { "\($0.role): \($0.content)" }.joined(separator: "\n")
+        let isTrainingEnabled = config.isTrainingEnabled
 
-        // 2. Build High-Complex Training Prompt
-        let systemPrompt = """
-        \(config.instructions)
+        // 2. Perform heavy workspace data gathering and prompt building in background
+        let systemPrompt = await Task.detached(priority: .userInitiated) {
+            let workspaceContext = PersonaWorkspace.gatherFullWorkspaceData()
 
-        PERSONALITY & BEHAVIOR:
-        - You are a highly sophisticated AI Persona integrated into the user's Workspace.
-        - You have access to the user's full data (Mail, Calendar, Tasks, Notes, etc.).
-        - Your goal is to provide deeply personalized, actionable, and expert-level assistance.
-        - Analyze the provided Workspace JSON context to answer questions accurately.
-        - If the user asks about their schedule, look at 'calendar_events'.
-        - If they ask about emails, refer to 'mail_accounts'.
-        - Be concise but thorough. Use professional yet approachable tone.
-        - Respond using rich Markdown formatting (headers, lists, bold text, etc.).
+            return """
+            \(instructions)
 
-        WORKSPACE STRUCTURE AWARENESS:
-        - The workspace contains: Notes, Tasks, Files, Calendar, Spreadsheets, Mail, Slides, Whiteboards.
-        - Collaboration is handled via Spaces and Plugins.
-        - System systems include SDK, Connectors, and Security.
+            PERSONALITY & BEHAVIOR:
+            - You are a highly sophisticated AI Persona integrated into the user's Workspace.
+            - You have access to the user's full data (Mail, Calendar, Tasks, Notes, etc.).
+            - Your goal is to provide deeply personalized, actionable, and expert-level assistance.
+            - Analyze the provided Workspace JSON context to answer questions accurately.
+            - If the user asks about their schedule, look at 'calendar_events'.
+            - If they ask about emails, refer to 'mail_accounts'.
+            - Be concise but thorough. Use professional yet approachable tone.
+            - Respond using rich Markdown formatting (headers, lists, bold text, etc.).
 
-        AGENTIC CAPABILITIES (AGENT MODE):
-        - You can execute real actions using your tool library.
-        - Tools available: createNote, sendEmail, createSlides, updateTask, installLibrary, attachFramework, managePackages.
-        - When Agent Mode is ON, you should transition from chatting to executing multi-step plans.
-        - Always validate security scopes before performing destructive actions.
+            WORKSPACE STRUCTURE AWARENESS:
+            - The workspace contains: Notes, Tasks, Files, Calendar, Spreadsheets, Mail, Slides, Whiteboards.
+            - Collaboration is handled via Spaces and Plugins.
+            - System systems include SDK, Connectors, and Security.
 
-        WORKSPACE CONTEXT (JSON):
-        \(workspaceContext)
+            AGENTIC CAPABILITIES (AGENT MODE):
+            - You can execute real actions using your tool library.
+            - Tools available: createNote, sendEmail, createSlides, updateTask, installLibrary, attachFramework, managePackages.
+            - When Agent Mode is ON, you should transition from chatting to executing multi-step plans.
+            - Always validate security scopes before performing destructive actions.
 
-        PREVIOUS CHAT HISTORY:
-        \(chatHistory.suffix(10).map { "\($0.role): \($0.content)" }.joined(separator: "\n"))
-        """
+            WORKSPACE CONTEXT (JSON):
+            \(workspaceContext)
 
-        // 3. Update Chat History (User)
+            PREVIOUS CHAT HISTORY:
+            \(historySuffix)
+            """
+        }.value
+
+        // 3. Update Chat History (User) - MainActor
         let userMessage = PersonaMessage(role: "user", content: query)
         chatHistory.append(userMessage)
 
-        // 4. Query AI Service
+        // 4. Query AI Service (Already async/non-blocking)
         let response = try await aiService.processText(prompt: query, systemPrompt: systemPrompt)
 
-        // 5. Update Chat History (Assistant)
+        // 5. Update Chat History (Assistant) - MainActor
         let assistantMessage = PersonaMessage(role: "assistant", content: response)
         chatHistory.append(assistantMessage)
         saveChatHistory()
