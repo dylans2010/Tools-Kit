@@ -7,7 +7,7 @@ struct LibraryDescriptor: Identifiable, Codable, Hashable {
     let id: UUID
     let name: String
     let path: String
-    let version: String
+    var version: String
     let channel: VersionChannel
     let type: LibraryType
     let capabilities: [String]
@@ -399,6 +399,46 @@ final class LibraryManager: ObservableObject {
         return true
     }
 
+    func calculateImpact(libraryId: UUID) -> [String] {
+        guard let lib = registry.library(by: libraryId) else { return [] }
+        var impacted: [String] = []
+
+        // Use the real DependencyGraph for traversal
+        let packages = PackageRegistry.shared.packages
+        let graph = PackageRegistry.shared.buildDependencyGraph()
+
+        // Identify which packages depend on this library (mapping library to package via ID if available, or name)
+        let dependents = packages.filter { $0.dependencyIds.contains(lib.id) }
+        for dep in dependents {
+            impacted.append("Package: \(dep.name) (Direct dependent)")
+            // Recursive check could be added here
+        }
+
+        // Check Frameworks using the framework registry
+        for fw in FrameworkRegistry.shared.frameworks {
+            if fw.packageDependencies.contains(lib.id) {
+                impacted.append("Framework: \(fw.name) (Strict dependency)")
+            }
+        }
+
+        // Check Capability Overlaps
+        for other in registry.libraries where other.id != lib.id {
+            let sharedCaps = other.capabilities.filter { lib.capabilities.contains($0) }
+            if !sharedCaps.isEmpty {
+                impacted.append("Library Capability Overlap: \(other.name) shares \(sharedCaps.joined(separator: ", "))")
+            }
+        }
+
+        return impacted
+    }
+
+    func suggestReplacements(for lib: LibraryDescriptor) -> [LibraryDescriptor] {
+        return registry.marketplaceLibraries.filter { other in
+            other.name != lib.name &&
+            !other.capabilities.filter({ lib.capabilities.contains($0) }).isEmpty
+        }
+    }
+
     // MARK: - Invocation Caching (lazy-loaded results)
 
     func cachedResult(for libraryId: UUID, capability: String) -> LibraryInvocationRecord? {
@@ -434,6 +474,7 @@ struct LibraryManageView: View {
     @State private var showingMarketplace = false
     @State private var multiSelection = Set<UUID>()
     @State private var showTargetMigration = false
+    @State private var hub = SDKDependencyIntelligenceHub.shared
 
     enum SortOption: String, CaseIterable {
         case name = "Name"
@@ -478,6 +519,9 @@ struct LibraryManageView: View {
         NavigationStack {
             List(selection: $multiSelection) {
                 authStatusSection
+                if !searchText.isEmpty {
+                    globalSearchSection
+                }
                 marketplaceShortcutSection
                 templatesSection
                 resourceMonitorSection
@@ -687,6 +731,9 @@ struct LibraryManageView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
                                 Text(lib.name).font(.subheadline.bold())
+                                if SDKDependencyIntelligenceHub.shared.checkIsUnused(name: lib.name) {
+                                    Image(systemName: "leaf.fill").foregroundStyle(.secondary).font(.caption2)
+                                }
                                 Spacer()
                                 Text("v\(lib.version)").font(.caption.monospaced()).foregroundStyle(.secondary)
                             }
@@ -773,6 +820,26 @@ struct LibraryManageView: View {
         UIPasteboard.general.string = flags
     }
 
+    private var globalSearchSection: some View {
+        let results = hub.searchAll(query: searchText).filter { $0.type != "Library" }
+        return Section("Global Matches") {
+            if results.isEmpty {
+                Text("No matching frameworks or packages").font(.caption2).foregroundStyle(.secondary)
+            } else {
+                ForEach(results) { result in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(result.name).font(.subheadline.bold())
+                            Text(result.type).font(.system(size: 8)).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Text("v\(result.version)").font(.caption2.monospaced()).foregroundStyle(.tertiary)
+                    }
+                }
+            }
+        }
+    }
+
     private func metricItem(label: String, value: String, icon: String, color: Color = .primary) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Label(label, systemImage: icon)
@@ -841,7 +908,13 @@ struct LibraryManageView: View {
                             Text(record.state.rawValue).font(.caption2).foregroundStyle(record.state == .completed ? .green : .red)
                         }
                         Text("Capability: \(record.capability)").font(.caption2)
-                        Text("\(record.durationMs)ms").font(.caption2).foregroundStyle(.tertiary)
+                        HStack {
+                            Text("\(record.durationMs)ms").font(.caption2).foregroundStyle(.secondary)
+                            Spacer()
+                            if let metrics = manager.usageMetrics[record.libraryId] {
+                                Text("Avg: \(metrics.avgDurationMs)ms").font(.system(size: 8)).foregroundStyle(.tertiary)
+                            }
+                        }
                     }
                 }
             }
@@ -1250,6 +1323,7 @@ struct LibraryDetailSheet: View {
     @State private var healthStatus: String?
     @State private var isCheckingHealth = false
     @State private var showSymbolBrowser = false
+    @State private var impactList: [String] = []
 
     var body: some View {
         List {
@@ -1259,6 +1333,41 @@ struct LibraryDetailSheet: View {
                 LabeledContent("Type", value: library.type.rawValue.capitalized)
                 LabeledContent("Version", value: library.version)
                 LabeledContent("ID", value: String(library.id.uuidString.prefix(8)) + "...")
+            }
+
+            Section("Impact Analysis") {
+                if impactList.isEmpty {
+                    Button("Run Impact Analysis") {
+                        impactList = manager.calculateImpact(libraryId: library.id)
+                        if impactList.isEmpty { impactList = ["No critical impact detected."] }
+                    }
+                } else {
+                    ForEach(impactList, id: \.self) { item in
+                        Text(item).font(.caption2).foregroundStyle(.red)
+                    }
+                    Button("Recalculate") { impactList = manager.calculateImpact(libraryId: library.id) }
+                        .font(.caption)
+                }
+            }
+
+            Section("Recommended Replacements") {
+                let suggestions = manager.suggestReplacements(for: library)
+                if suggestions.isEmpty {
+                    Text("No alternatives found").font(.caption2).foregroundStyle(.secondary)
+                } else {
+                    ForEach(suggestions) { suggestion in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(suggestion.name).font(.caption.bold())
+                                Text("v\(suggestion.version)").font(.system(size: 8)).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Button("Switch") {
+                                // Logic to replace would go here
+                            }.buttonStyle(.bordered).controlSize(.small)
+                        }
+                    }
+                }
             }
 
             Section("Target Membership") {

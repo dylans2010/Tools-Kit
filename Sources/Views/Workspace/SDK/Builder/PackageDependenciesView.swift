@@ -234,6 +234,10 @@ struct SemverResolver {
 
         var string: String { "\(major).\(minor).\(patch)" }
 
+        static func == (lhs: Version, rhs: Version) -> Bool {
+            return lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.patch == rhs.patch
+        }
+
         static func < (lhs: Version, rhs: Version) -> Bool {
             if lhs.major != rhs.major { return lhs.major < rhs.major }
             if lhs.minor != rhs.minor { return lhs.minor < rhs.minor }
@@ -269,6 +273,16 @@ struct SemverResolver {
         case .wildcard:
             return true
         }
+    }
+
+    static func isCompatible(installed: String, requiredRange: String) -> Bool {
+        if requiredRange.hasPrefix(">=") {
+            let version = requiredRange.replacingOccurrences(of: ">=", with: "")
+            guard let vInstalled = Version(string: installed),
+                  let vRequired = Version(string: version) else { return false }
+            return vInstalled >= vRequired
+        }
+        return isCompatible(installed: installed, requiredRange: requiredRange)
     }
 }
 
@@ -306,10 +320,34 @@ final class PackageDependencyManager: ObservableObject {
 
     func cleanupOrphans() -> Int {
         guard tokenEngine.requireScope(.sdkManagePackages) else { return 0 }
+        let orphaned = getReachablePackages()
+        let allIds = Set(registry.packages.map(\.id))
+        let orphans = allIds.subtracting(orphaned)
+
+        for id in orphans { registry.uninstall(id: id) }
+        return orphans.count
+    }
+
+    private func getReachablePackages() -> Set<UUID> {
+        var reachable = Set<UUID>()
+        let frameworks = FrameworkRegistry.shared.frameworks
+        let libraries = LibraryRegistry.shared.libraries
+
+        var queue: [UUID] = []
+        queue.append(contentsOf: frameworks.flatMap(\.packageDependencies))
+        // Assuming libraries might have dependencies in future versions, adding them here if mapped
+
         let graph = registry.buildDependencyGraph()
-        let orphaned = graph.orphans()
-        for orphan in orphaned { registry.uninstall(id: orphan.id) }
-        return orphaned.count
+
+        while !queue.isEmpty {
+            let id = queue.removeFirst()
+            if reachable.contains(id) { continue }
+            reachable.insert(id)
+            if let deps = graph.adjacency[id] {
+                queue.append(contentsOf: deps)
+            }
+        }
+        return reachable
     }
 
     func updatePackage(id: UUID, version: String) -> Bool {
@@ -403,6 +441,24 @@ final class PackageDependencyManager: ObservableObject {
         }
         isSyncing = false
     }
+
+    // MARK: - Registry Rollback System
+
+    func createSnapshot() {
+        if let data = try? JSONEncoder().encode(registry.packages) {
+            UserDefaults.standard.set(data, forKey: "PackageRegistrySnapshot_\(Date().timeIntervalSince1970)")
+            var snapshots = UserDefaults.standard.stringArray(forKey: "PackageRegistrySnapshots") ?? []
+            snapshots.append("PackageRegistrySnapshot_\(Date().timeIntervalSince1970)")
+            UserDefaults.standard.set(snapshots, forKey: "PackageRegistrySnapshots")
+        }
+    }
+
+    func rollback(to snapshotKey: String) {
+        if let data = UserDefaults.standard.data(forKey: snapshotKey),
+           let decoded = try? JSONDecoder().decode([PackageDescriptor].self, from: data) {
+            registry.packages = decoded
+        }
+    }
 }
 
 // MARK: - PackageDependenciesView
@@ -419,6 +475,8 @@ struct PackageDependenciesView: View {
     @State private var showingVisualGraph = false
     @State private var selectedLayer: PackageDependencyLayer?
     @State private var sortOption: SortOption = .name
+    @State private var showRollbackSheet = false
+    @State private var hub = SDKDependencyIntelligenceHub.shared
 
     enum SortOption: String, CaseIterable {
         case name = "Name"
@@ -453,6 +511,9 @@ struct PackageDependenciesView: View {
         NavigationStack {
             List {
                 authSection
+                if !searchText.isEmpty {
+                    globalSearchSection
+                }
                 registrySelectionSection
                 filterSection
                 overallHealthSection
@@ -462,6 +523,7 @@ struct PackageDependenciesView: View {
                 graphSection
                 integritySection
                 orphanSection
+                rollbackSection
             }
             .refreshable { await refreshPackages() }
             .listStyle(.insetGrouped)
@@ -483,6 +545,9 @@ struct PackageDependenciesView: View {
             }
             .sheet(item: $selectedPackage) { pkg in
                 NavigationStack { PackageDetailSheet(package: pkg, manager: manager) }
+            }
+            .sheet(isPresented: $showRollbackSheet) {
+                NavigationStack { PackageRollbackView(manager: manager) }
             }
             .onAppear { cycleWarning = manager.checkCycles() }
         }
@@ -590,6 +655,26 @@ struct PackageDependenciesView: View {
                     }
                 }
                 .padding(.vertical, 4)
+            }
+        }
+    }
+
+    private var globalSearchSection: some View {
+        let results = hub.searchAll(query: searchText).filter { $0.type != "Package" }
+        return Section("Global Matches") {
+            if results.isEmpty {
+                Text("No matching frameworks or libraries").font(.caption2).foregroundStyle(.secondary)
+            } else {
+                ForEach(results) { result in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(result.name).font(.subheadline.bold())
+                            Text(result.type).font(.system(size: 8)).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Text("v\(result.version)").font(.caption2.monospaced()).foregroundStyle(.tertiary)
+                    }
+                }
             }
         }
     }
@@ -741,10 +826,64 @@ struct PackageDependenciesView: View {
                     }
                 }
                 Button("Cleanup Orphans", role: .destructive) {
+                    manager.createSnapshot()
                     _ = manager.cleanupOrphans()
                 }.font(.caption)
             }
         }
+    }
+
+    private var rollbackSection: some View {
+        Section("Snapshot & Rollback") {
+            Button {
+                manager.createSnapshot()
+            } label: {
+                Label("Create Registry Snapshot", systemImage: "camera.shutter.button")
+            }
+
+            Button {
+                showRollbackSheet = true
+            } label: {
+                Label("Rollback to Previous State...", systemImage: "arrow.uturn.backward.circle")
+            }
+        }
+    }
+}
+
+// MARK: - Package Rollback View
+
+struct PackageRollbackView: View {
+    @Environment(\.dismiss) private var dismiss
+    let manager: PackageDependencyManager
+    @State private var snapshotKeys: [String] = []
+
+    var body: some View {
+        List(snapshotKeys, id: \.self) { key in
+            Button {
+                manager.rollback(to: key)
+                dismiss()
+            } label: {
+                VStack(alignment: .leading) {
+                    Text(formatKey(key)).font(.subheadline.bold())
+                    Text(key).font(.system(size: 8, design: .monospaced)).foregroundStyle(.secondary)
+                }
+            }
+        }
+        .navigationTitle("Rollback Registry")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
+        }
+        .onAppear {
+            snapshotKeys = (UserDefaults.standard.stringArray(forKey: "PackageRegistrySnapshots") ?? []).reversed()
+        }
+    }
+
+    private func formatKey(_ key: String) -> String {
+        let parts = key.split(separator: "_")
+        if parts.count == 2, let timestamp = Double(parts[1]) {
+            return Date(timeIntervalSince1970: timestamp).formatted()
+        }
+        return key
     }
 }
 
@@ -786,7 +925,7 @@ struct PackageInstallSheet: View {
 
 // MARK: - Graph Visualization UI
 
-struct DependencyGraphVisualizerView: View {
+public struct DependencyGraphVisualizerView: View {
     @Environment(\.dismiss) private var dismiss
     let packages: [PackageDescriptor]
     @State private var expandedNodes: Set<UUID> = []
@@ -964,9 +1103,16 @@ struct PackageDetailSheet: View {
     }
 
     private func healthDetailSection(for package: PackageDescriptor) -> some View {
+        let intelligenceScore = SDKDependencyIntelligenceHub.shared.calculateRiskScore(pkg: package)
         let health = DependencyHealthEngine.analyze(package: package, graph: registry.buildDependencyGraph())
+        let finalScore = (health.score + intelligenceScore) / 2
+
         return Section("Dependency Health") {
-            LabeledContent("Score", value: "\(health.score)%")
+            LabeledContent("Health Score", value: "\(health.score)%")
+            LabeledContent("Intelligence Risk Score", value: "\(intelligenceScore)%")
+            LabeledContent("Aggregate Score", value: "\(finalScore)%")
+                .bold()
+                .foregroundStyle(finalScore > 80 ? .green : (finalScore > 50 ? .orange : .red))
 
             if !health.issues.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {

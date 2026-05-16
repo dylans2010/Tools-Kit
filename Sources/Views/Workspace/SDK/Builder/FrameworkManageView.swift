@@ -20,6 +20,7 @@ struct FrameworkDescriptor: Identifiable, Codable, Hashable {
     let type: FrameworkType
     let entryPoints: [String]
     let language: FrameworkLanguage
+    var version: String
     let packageDependencies: [UUID]
     let requiredScopes: [SDKScope]
     var isEnabled: Bool
@@ -31,6 +32,13 @@ struct FrameworkDescriptor: Identifiable, Codable, Hashable {
     var architectures: [String]
     var linkType: LinkType
     var embedMode: EmbedMode
+    var tags: [String]
+    var compatibility: CompatibilityInfo
+
+    struct CompatibilityInfo: Codable, Hashable {
+        var minIOSVersion: String
+        var swiftVersion: String
+    }
 
     enum FrameworkType: String, Codable, CaseIterable {
         case appleSystem, xcframework, `static`, dynamic, embedded, broken
@@ -49,19 +57,22 @@ struct FrameworkDescriptor: Identifiable, Codable, Hashable {
     init(
         id: UUID = UUID(), name: String, path: String = "", type: FrameworkType = .xcframework,
         entryPoints: [String] = ["main"], language: FrameworkLanguage = .swift,
+        version: String = "1.0.0",
         packageDependencies: [UUID] = [], requiredScopes: [SDKScope] = [.frameworkExecute],
         isEnabled: Bool = true, sandboxProfile: SandboxProfile = .balanced,
         lifecycleState: FrameworkLifecycleState = .draft, logs: [FrameworkLogEntry] = [],
         size: Int64 = 0, lastModified: Date = Date(), architectures: [String] = ["arm64"],
-        linkType: LinkType = .required, embedMode: EmbedMode = .embedAndSign
+        linkType: LinkType = .required, embedMode: EmbedMode = .embedAndSign,
+        tags: [String] = [], compatibility: CompatibilityInfo = CompatibilityInfo(minIOSVersion: "17.0", swiftVersion: "6.0")
     ) {
         self.id = id; self.name = name; self.path = path; self.type = type
-        self.entryPoints = entryPoints; self.language = language
+        self.entryPoints = entryPoints; self.language = language; self.version = version
         self.packageDependencies = packageDependencies; self.requiredScopes = requiredScopes
         self.isEnabled = isEnabled; self.sandboxProfile = sandboxProfile
         self.lifecycleState = lifecycleState; self.logs = logs
         self.size = size; self.lastModified = lastModified; self.architectures = architectures
         self.linkType = linkType; self.embedMode = embedMode
+        self.tags = tags; self.compatibility = compatibility
     }
 }
 
@@ -253,10 +264,11 @@ final class FrameworkManager {
 
     private init() {}
 
-    func installFramework(name: String, entryPoints: [String], language: FrameworkLanguage, dependencies: [UUID]) -> Bool {
+
+    func installFramework(name: String, entryPoints: [String], language: FrameworkLanguage, version: String, dependencies: [UUID]) -> Bool {
         guard tokenEngine.requireScope(.sdkManageFrameworks) else { return false }
         guard !name.isEmpty else { return false }
-        let fw = FrameworkDescriptor(name: name, entryPoints: entryPoints.isEmpty ? ["main"] : entryPoints, language: language, packageDependencies: dependencies)
+        let fw = FrameworkDescriptor(name: name, entryPoints: entryPoints.isEmpty ? ["main"] : entryPoints, language: language, version: version, packageDependencies: dependencies)
         registry.install(fw)
         return true
     }
@@ -269,6 +281,40 @@ final class FrameworkManager {
         activeBindings.removeAll { $0.frameworkId == id }
         registry.uninstall(id: id)
         return true
+    }
+
+    func updateFrameworkVersion(id: UUID, newVersion: String) {
+        guard var fw = registry.framework(by: id) else { return }
+        let old = fw.version
+        fw.version = newVersion
+        auditLog.append(FrameworkAuditEntry(frameworkName: fw.name, action: "Update Version", oldValue: old, newValue: newVersion))
+        registry.install(fw)
+    }
+
+    func checkForUpdates(id: UUID) async -> String? {
+        guard let fw = registry.framework(by: id) else { return nil }
+        // Real logic: check remote registry URL for latest version manifest
+        let remoteURL = PackageRegistry.shared.remoteRegistryURL
+        guard let url = URL(string: "\(remoteURL)/manifests/\(fw.name).json") else { return nil }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let manifest = try JSONDecoder().decode(RemoteFrameworkManifest.self, from: data)
+
+            let current = SemverResolver.Version(string: fw.version)
+            let remote = SemverResolver.Version(string: manifest.latestVersion)
+
+            if let c = current, let r = remote, c < r {
+                return manifest.latestVersion
+            }
+        } catch {
+            print("Failed to fetch updates: \(error)")
+        }
+        return nil
+    }
+
+    struct RemoteFrameworkManifest: Codable {
+        let latestVersion: String
     }
 
     // MARK: - Dependency Binding
@@ -325,7 +371,15 @@ final class FrameworkManager {
         guard let fw = registry.framework(by: id) else { return false }
         let installedPkgIds = Set(packageRegistry.packages.map(\.id))
         let missingDeps = fw.packageDependencies.filter { !installedPkgIds.contains($0) }
-        return fw.isEnabled && missingDeps.isEmpty
+
+        let pathExists = fw.path.isEmpty || FileManager.default.fileExists(atPath: fw.path)
+        let hasRequiredArch = fw.architectures.contains("arm64")
+
+        // Compatibility check using real system version
+        let systemVersion = UIDevice.current.systemVersion
+        let isCompatible = SemverResolver.isCompatible(installed: systemVersion, requiredRange: ">=\(fw.compatibility.minIOSVersion)")
+
+        return fw.isEnabled && missingDeps.isEmpty && pathExists && hasRequiredArch && isCompatible
     }
 
     /// Execution Pipeline: Load → Validate → Resolve Dependencies → Scope Check → Sandbox → Execute → Validate Output → Commit
@@ -443,6 +497,7 @@ struct FrameworkManageView: View {
     @State private var secondarySort: SortOption = .size
     @State private var sortAscending = true
     @State private var presets: [FrameworkFilterPreset] = []
+    @State private var hub = SDKDependencyIntelligenceHub.shared
     @State private var showSavePresetAlert = false
     @State private var newPresetName = ""
     @State private var multiSelection = Set<UUID>()
@@ -496,6 +551,9 @@ struct FrameworkManageView: View {
         NavigationStack {
             List(selection: $multiSelection) {
                 authSection
+                if !searchText.isEmpty {
+                    globalSearchSection
+                }
                 filterSection
                 frameworkListSection
                 executionStateSection
@@ -557,7 +615,10 @@ struct FrameworkManageView: View {
             } message: {
                 Text("Are you sure you want to remove the selected frameworks? This action cannot be undone.")
             }
-            .onAppear { loadPresetsFromDisk() }
+            .onAppear {
+                loadPresetsFromDisk()
+                Task { await hub.refreshUsageAnalytics() }
+            }
             .sheet(isPresented: $showShareSheet) {
                 if let url = exportURL {
                     FrameworkShareSheet(activityItems: [url])
@@ -576,6 +637,26 @@ struct FrameworkManageView: View {
                     }
                 }
                 .padding(.vertical, 4)
+            }
+        }
+    }
+
+    private var globalSearchSection: some View {
+        let results = hub.searchAll(query: searchText).filter { $0.type != "Framework" }
+        return Section("Global Matches") {
+            if results.isEmpty {
+                Text("No matching libraries or packages").font(.caption2).foregroundStyle(.secondary)
+            } else {
+                ForEach(results) { result in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(result.name).font(.subheadline.bold())
+                            Text(result.type).font(.system(size: 8)).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Text("v\(result.version)").font(.caption2.monospaced()).foregroundStyle(.tertiary)
+                    }
+                }
             }
         }
     }
@@ -792,11 +873,14 @@ struct FrameworkManageView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
                                 Text(fw.name).font(.subheadline.bold())
+                                if !SDKDependencyIntelligenceHub.shared.detectedImports.contains(fw.name) {
+                                    Image(systemName: "leaf.fill").foregroundStyle(.secondary).font(.caption2)
+                                }
                                 Spacer()
                                 Text(fw.isEnabled ? "Enabled" : "Disabled").font(.caption2.bold()).foregroundStyle(fw.isEnabled ? .green : .red)
                             }
                             HStack {
-                                Text("Lang: \(fw.language.rawValue)").font(.caption2)
+                                Text("Lang: \(fw.language.rawValue) v\(fw.version)").font(.caption2)
                                 Spacer()
                                 Text("Profile: \(fw.sandboxProfile.rawValue)").font(.caption2).italic()
                             }
@@ -1233,6 +1317,7 @@ struct FrameworkInstallSheet: View {
     let manager: FrameworkManager
 
     @State private var name = ""
+    @State private var version = "1.0.0"
     @State private var entryPointsText = "main"
     @State private var language: FrameworkLanguage = .swift
     @State private var selectedTemplate: UUID?
@@ -1257,6 +1342,7 @@ struct FrameworkInstallSheet: View {
 
             Section("Framework Info") {
                 TextField("Name", text: $name)
+                TextField("Version", text: $version)
                 TextField("Entry Points (comma-separated)", text: $entryPointsText)
                 Picker("Language", selection: $language) {
                     ForEach(FrameworkLanguage.allCases) { lang in
@@ -1267,7 +1353,9 @@ struct FrameworkInstallSheet: View {
             Section {
                 Button("Create Framework") {
                     let entries = entryPointsText.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
-                    if manager.installFramework(name: name, entryPoints: entries, language: language, dependencies: []) { dismiss() }
+                    if manager.installFramework(name: name, entryPoints: entries, language: language, version: version, dependencies: []) {
+                        dismiss()
+                    }
                 }.buttonStyle(.borderedProminent).disabled(name.isEmpty)
             }
         }
@@ -1378,17 +1466,67 @@ struct FrameworkDetailSheet: View {
     @State private var teamID: String = "Unknown"
     @State private var entitlements: [String: AnyHashable] = [:]
     @State private var showStripConfirmation = false
+    @State private var showingUpdateAlert = false
+    @State private var newVersionString = ""
+    @State private var isCheckingForUpdates = false
+    @State private var availableUpdate: String?
 
     var body: some View {
         List {
             Section("Details") {
                 LabeledContent("Name", value: framework.name)
+                LabeledContent("Version", value: framework.version)
                 LabeledContent("Path", value: framework.path)
                 LabeledContent("Type", value: framework.type.rawValue.capitalized)
                 LabeledContent("ID", value: String(framework.id.uuidString.prefix(8)) + "...")
                 LabeledContent("Language", value: framework.language.rawValue)
                 LabeledContent("State", value: framework.lifecycleState.rawValue.capitalized)
                 LabeledContent("Enabled", value: framework.isEnabled ? "Yes" : "No")
+            }
+
+            Section("Maintenance") {
+                Button {
+                    newVersionString = framework.version
+                    showingUpdateAlert = true
+                } label: {
+                    Label("Update Version...", systemImage: "arrow.up.circle")
+                }
+
+                Button {
+                    isCheckingForUpdates = true
+                    Task {
+                        availableUpdate = await manager.checkForUpdates(id: framework.id)
+                        isCheckingForUpdates = false
+                    }
+                } label: {
+                    if isCheckingForUpdates {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Label("Check for Updates", systemImage: "network")
+                    }
+                }
+                .disabled(isCheckingForUpdates)
+
+                if let update = availableUpdate {
+                    HStack {
+                        Image(systemName: "exclamationmark.circle.fill").foregroundStyle(.orange)
+                        Text("Update available: \(update)").font(.caption.bold())
+                        Spacer()
+                        Button("Apply") {
+                            manager.updateFrameworkVersion(id: framework.id, newVersion: update)
+                            availableUpdate = nil
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+                }
+
+                if !framework.tags.isEmpty {
+                    VStack(alignment: .leading) {
+                        Text("Tags").font(.caption.bold())
+                        Text(framework.tags.joined(separator: ", ")).font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
             }
 
             Section("Code Signature") {
@@ -1416,6 +1554,21 @@ struct FrameworkDetailSheet: View {
                     }
                 }
             }
+
+    Section("Health & Integrity") {
+        let isHealthy = manager.preExecuteHealthCheck(id: framework.id)
+        Label(isHealthy ? "System Healthy" : "Issues Detected", systemImage: isHealthy ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
+            .foregroundStyle(isHealthy ? .green : .red)
+            .font(.subheadline.bold())
+
+        if !framework.architectures.contains("arm64") {
+            Label("Architecture Gap: Missing arm64", systemImage: "cpu").font(.caption2).foregroundStyle(.orange)
+        }
+
+        if !framework.path.isEmpty && !FileManager.default.fileExists(atPath: framework.path) {
+            Label("Broken Path: \(framework.path)", systemImage: "folder.badge.minus").font(.caption2).foregroundStyle(.red)
+        }
+    }
 
             Section("Binary Info") {
                 LabeledContent("Size", value: ByteCountFormatter.string(fromByteCount: framework.size, countStyle: .file))
@@ -1472,8 +1625,23 @@ struct FrameworkDetailSheet: View {
                 if framework.packageDependencies.isEmpty {
                     Text("No dependencies").foregroundStyle(.secondary)
                 } else {
+                    NavigationLink("View Dependency Graph") {
+                        DependencyGraphVisualizerView(packages: PackageRegistry.shared.packages.filter { pkg in
+                            framework.packageDependencies.contains(pkg.id) ||
+                            PackageRegistry.shared.packages.contains { $0.dependencyIds.contains(pkg.id) }
+                        })
+                    }
+
                     ForEach(framework.packageDependencies, id: \.self) { depId in
-                        Text(String(depId.uuidString.prefix(8)) + "...").font(.caption.monospaced())
+                        HStack {
+                            Text(String(depId.uuidString.prefix(8)) + "...").font(.caption.monospaced())
+                            Spacer()
+                            if let pkg = PackageRegistry.shared.package(by: depId) {
+                                Text(pkg.name).font(.caption2).foregroundStyle(.secondary)
+                            } else {
+                                Text("Missing").font(.caption2).foregroundStyle(.red)
+                            }
+                        }
                     }
                 }
             }
@@ -1582,6 +1750,13 @@ struct FrameworkDetailSheet: View {
             Button("Strip x86_64", role: .destructive) { stripSimulatorSlices() }
         } message: {
             Text("This will create a backup and remove the x86_64 slice from the framework binary. This action is permanent.")
+        }
+        .alert("Update Version", isPresented: $showingUpdateAlert) {
+            TextField("Version", text: $newVersionString)
+            Button("Update") {
+                manager.updateFrameworkVersion(id: framework.id, newVersion: newVersionString)
+            }
+            Button("Cancel", role: .cancel) {}
         }
         .sheet(isPresented: $showSymbolBrowser) {
             NavigationStack {
