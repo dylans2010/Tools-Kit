@@ -62,6 +62,11 @@ struct WorkspaceItemSnapshot: Identifiable, Codable, Hashable {
     var details: [String: String]
 }
 
+
+struct WhiteboardNode: Codable, Hashable {
+    let title: String
+    let content: String
+}
 enum AgentActionResult {
     case success(AgentActionPayload)
     case failure(AgentActionError)
@@ -103,7 +108,7 @@ enum AgentAction: Equatable {
     case listWorkspaceItems(filter: WorkspaceFilter)
     case createNote(title: String, content: String, notebookName: String?)
     case createSlideDeck(title: String, slideContents: [String])
-    case createWhiteboard(title: String, nodes: [(title: String, content: String)])
+    case createWhiteboard(title: String, nodes: [WhiteboardNode])
     case createSpreadsheet(name: String, headers: [String], rows: [[String]])
     case createCalendarEvent(title: String, description: String, startDate: Date, endDate: Date, location: String)
     case createTask(title: String, description: String, priority: String, dueDate: Date?)
@@ -1046,7 +1051,7 @@ actor PersonaAgentFramework {
         }
     }
 
-    private func createWhiteboard(title: String, nodes: [(title: String, content: String)]) async throws -> WorkspaceItemSnapshot {
+    private func createWhiteboard(title: String, nodes: [WhiteboardNode]) async throws -> WorkspaceItemSnapshot {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw AgentActionError.invalidParameter("Whiteboard title cannot be empty")
         }

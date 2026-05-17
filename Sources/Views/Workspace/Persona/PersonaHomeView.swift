@@ -380,7 +380,8 @@ struct PersonaHomeView: View {
                 manager: manager,
                 allPrompts: allPrompts,
                 onPromptSelection: selectPromptAndSend(_:),
-                onThreadSelection: continueChat(_:)
+                onThreadSelection: continueChat(_:),
+                activeModal: $activeModal
             )
         }
     }
@@ -525,7 +526,7 @@ struct PersonaHomeView: View {
             case .deleteNote(let id):
                 result = .from(try! await PersonaAgentFramework.shared.execute(.deleteWorkspaceItem(id: id, type: .note)))
             case .deleteEvent(let params):
-                result = .from(try! await PersonaAgentFramework.shared.execute(.deleteEvent(params)))
+                result = .from(try! await PersonaAgentFramework.shared.execute(.deleteEvent(parameters: params)))
             case .deleteTask(let id):
                 result = .from(try! await PersonaAgentFramework.shared.execute(.deleteTask(id: id)))
             default:
@@ -997,6 +998,7 @@ private struct PersonaHomeModalContent: View {
     let allPrompts: [String]
     let onPromptSelection: (String) -> Void
     let onThreadSelection: (PersonaChatThread) -> Void
+    @Binding var activeModal: PersonaHomeView.PersonaHomeModal?
 
     var body: some View {
         Group {
@@ -1754,15 +1756,4 @@ extension DateFormatter {
         formatter.dateFormat = "yyyyMMdd"
         return formatter
     }()
-}
-
-private struct MarkdownSyntaxStripper {
-    static func plainText(from markdown: String) -> String {
-        var text = markdown
-        let patterns = ["```[\\s\\S]*?```", "`([^`]*)`", "!\\[[^\\]]*\\]\\([^\\)]*\\)", "\\[[^\\]]*\\]\\([^\\)]*\\)", "(^|\\n)#{1,6}\\s*", "[*_~>#-]", "\\d+\\.\\s"]
-        for pattern in patterns {
-            text = text.replacingOccurrences(of: pattern, with: " ", options: .regularExpression)
-        }
-        return text.replacingOccurrences(of: "\\n{3,}", with: "\\n\\n", options: .regularExpression).trimmingCharacters(in: .whitespacesAndNewlines)
-    }
 }
