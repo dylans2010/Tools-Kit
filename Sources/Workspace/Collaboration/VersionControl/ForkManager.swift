@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// Manages forking of Collaboration Spaces.
+@MainActor
 final class ForkManager: ObservableObject {
     static let shared = ForkManager()
 

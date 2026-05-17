@@ -45,7 +45,7 @@ struct ActivityFeedView: View {
                 } else {
                     Section("Recent Updates") {
                         ForEach(activity) { log in
-                            ActivityRow(
+                            ActivityFeedRow(
                                 icon: iconForAction(log.action),
                                 color: colorForAction(log.action),
                                 title: log.action,
@@ -62,7 +62,7 @@ struct ActivityFeedView: View {
     }
 }
 
-private struct ActivityRow: View {
+private struct ActivityFeedRow: View {
     let icon: String
     let color: Color
     let title: String

@@ -38,6 +38,7 @@ struct PullRequest: Codable, Identifiable {
 }
 
 /// Manages the lifecycle of Pull Requests in a Collaboration Space.
+@MainActor
 final class PullRequestManager: ObservableObject {
     static let shared = PullRequestManager()
 
