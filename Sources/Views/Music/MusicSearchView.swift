@@ -1,10 +1,12 @@
 import SwiftUI
 
 struct MusicSearchView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var library = MusicLibraryManager.shared
     @StateObject private var player = MusicPlayerManager.shared
     @State private var searchText: String = ""
     @State private var showNowPlaying = false
+    @State private var recentSearches: [String] = UserDefaults.standard.stringArray(forKey: "music.recentSearches") ?? []
 
     private var filteredSongs: [Song] {
         let query = searchText.trimmingCharacters(in: .whitespaces).lowercased()
@@ -52,7 +54,18 @@ struct MusicSearchView: View {
             }
             .navigationTitle("Search")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
             .searchable(text: $searchText, prompt: "Songs or Artists")
+            .onSubmit(of: .search) {
+                addToRecentSearches(searchText)
+            }
             .animation(.spring(response: 0.38, dampingFraction: 0.85), value: player.currentSong != nil)
             .sheet(isPresented: $showNowPlaying) {
                 SimpleNowPlayingView()
@@ -64,11 +77,98 @@ struct MusicSearchView: View {
 
     private var browseGrid: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 20) {
+            LazyVStack(alignment: .leading, spacing: 28) {
+                if !recentSearches.isEmpty {
+                    recentSearchesSection
+                }
+
                 artistSection
+
+                suggestedArtistsSection
             }
-            .padding(.top, 8)
+            .padding(.top, 12)
             .padding(.bottom, 90)
+        }
+    }
+
+    private var recentSearchesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Recent Searches")
+                    .font(.system(size: 18, weight: .bold))
+                Spacer()
+                Button("Clear") {
+                    recentSearches.removeAll()
+                    UserDefaults.standard.set([], forKey: "music.recentSearches")
+                }
+                .font(.caption.bold())
+                .foregroundColor(.accentColor)
+            }
+            .padding(.horizontal)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(recentSearches, id: \.self) { query in
+                        Button {
+                            searchText = query
+                        } label: {
+                            Text(query)
+                                .font(.system(size: 14, weight: .medium))
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(Color(.secondarySystemBackground))
+                                .cornerRadius(20)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+
+    private var suggestedArtistsSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Suggested Artists")
+                .font(.system(size: 18, weight: .bold))
+                .padding(.horizontal)
+
+            let allArtists = Set(library.songs.map(\.artist))
+            let suggested = allArtists.shuffled().prefix(5)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 20) {
+                    ForEach(Array(suggested), id: \.self) { artist in
+                        VStack(spacing: 8) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color(.systemGray5))
+                                    .frame(width: 80, height: 80)
+                                if let art = library.songs.first(where: { $0.artist == artist })?.artworkData,
+                                   let img = UIImage(data: art) {
+                                    Image(uiImage: img)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 80, height: 80)
+                                        .clipShape(Circle())
+                                } else {
+                                    Image(systemName: "person.fill")
+                                        .font(.system(size: 30))
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            Text(artist)
+                                .font(.system(size: 12, weight: .semibold))
+                                .lineLimit(1)
+                                .frame(width: 80)
+                        }
+                        .onTapGesture {
+                            searchText = artist
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
         }
     }
 
@@ -224,5 +324,21 @@ struct MusicSearchView: View {
         let idx = queue.firstIndex(where: { $0.id == song.id }) ?? 0
         player.play(song: song, queue: queue, startIndex: idx)
         showNowPlaying = true
+        addToRecentSearches(song.title)
+    }
+
+    private func addToRecentSearches(_ query: String) {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        var searches = recentSearches
+        if let existing = searches.firstIndex(of: trimmed) {
+            searches.remove(at: existing)
+        }
+        searches.insert(trimmed, at: 0)
+        if searches.count > 10 { searches.removeLast() }
+
+        recentSearches = searches
+        UserDefaults.standard.set(searches, forKey: "music.recentSearches")
     }
 }

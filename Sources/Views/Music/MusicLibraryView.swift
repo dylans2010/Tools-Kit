@@ -8,72 +8,66 @@ struct MusicLibraryView: View {
     @State private var showSettings = false
     @State private var showImport = false
 
-    enum LibrarySection: String, CaseIterable {
+    enum LibrarySection: String, CaseIterable, Identifiable {
         case songs = "Songs"
         case artists = "Artists"
         case albums = "Albums"
         case playlists = "Playlists"
+        var id: String { self.rawValue }
     }
 
     var body: some View {
         ZStack(alignment: .bottom) {
             NavigationStack {
                 VStack(spacing: 0) {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            ForEach(LibrarySection.allCases, id: \.self) { section in
-                                Button {
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                        selectedTab = section
-                                    }
-                                } label: {
-                                    Text(section.rawValue)
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 8)
-                                        .background(
-                                            selectedTab == section
-                                                ? Color.accentColor
-                                                : Color(.secondarySystemBackground),
-                                            in: Capsule()
-                                        )
-                                        .foregroundColor(selectedTab == section ? .white : .primary)
-                                }
-                                .buttonStyle(.plain)
+                    // Segmented Picker Style Tabs
+                    HStack(spacing: 0) {
+                        ForEach(LibrarySection.allCases) { section in
+                            VStack(spacing: 8) {
+                                Text(section.rawValue)
+                                    .font(.system(size: 14, weight: selectedTab == section ? .bold : .medium))
+                                    .foregroundColor(selectedTab == section ? .accentColor : .secondary)
+
+                                Rectangle()
+                                    .fill(selectedTab == section ? Color.accentColor : Color.clear)
+                                    .frame(height: 2)
                             }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                    selectedTab = section
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
                         }
-                        .padding(.horizontal)
-                        .padding(.vertical, 10)
                     }
+                    .padding(.top, 10)
+                    .background(Color(uiColor: .systemBackground))
 
                     Divider()
 
-                    Group {
-                        switch selectedTab {
-                        case .songs:
-                            SongsView()
-                        case .artists:
-                            ArtistsView()
-                        case .albums:
-                            AlbumsView()
-                        case .playlists:
-                            PlaylistsListView()
-                        }
+                    TabView(selection: $selectedTab) {
+                        SongsView()
+                            .tag(LibrarySection.songs)
+                        ArtistsView()
+                            .tag(LibrarySection.artists)
+                        AlbumsView()
+                            .tag(LibrarySection.albums)
+                        PlaylistsListView()
+                            .tag(LibrarySection.playlists)
                     }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .navigationTitle("Library")
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Menu {
+                        HStack(spacing: 12) {
                             Button { showImport = true } label: {
-                                Label("Import Music", systemImage: "square.and.arrow.down")
+                                Image(systemName: "plus.circle")
                             }
                             Button { showSettings = true } label: {
-                                Label("Settings", systemImage: "gearshape")
+                                Image(systemName: "gearshape")
                             }
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
                         }
                     }
                 }
@@ -92,8 +86,8 @@ struct MusicLibraryView: View {
 
             if player.currentSong != nil {
                 MiniPlayer(showNowPlaying: $showNowPlaying)
-                    .padding(.horizontal, 10)
-                    .padding(.bottom, 6)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 8)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }

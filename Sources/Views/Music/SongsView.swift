@@ -131,6 +131,7 @@ struct SongsView: View {
                                 }
                                 guard let target = playable.first(where: { $0.id == song.id }) else { return }
                                 let idx = playable.firstIndex(where: { $0.id == target.id }) ?? 0
+                                // Always set the full playable queue to ensure predictable ordering
                                 player.play(song: target, queue: playable, startIndex: idx)
                             }
                             .swipeActions(edge: .trailing) {

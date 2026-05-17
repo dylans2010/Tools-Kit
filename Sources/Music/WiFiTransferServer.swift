@@ -98,36 +98,41 @@ final class WiFiTransferServer: ObservableObject {
                     return
                 }
 
-                let raw = String(data: buffer, encoding: .utf8) ?? ""
-            let lines = raw.components(separatedBy: "\r\n")
-            let requestLine = lines.first ?? ""
-            let parts = requestLine.components(separatedBy: " ")
-            guard parts.count >= 2 else { connection.cancel(); return }
-            let method = parts[0]
-            let path = parts[1]
+                let separator = Data([0x0D, 0x0A, 0x0D, 0x0A])
+                guard let range = buffer.range(of: separator) else {
+                    self.receiveCompleteRequest(from: connection, accumulated: buffer)
+                    return
+                }
 
-            switch (method, path) {
-            case ("GET", "/"):
-                Task { @MainActor [weak self] in self?.handleRootPage(connection: connection) }
-            case ("OPTIONS", _):
-                Task { @MainActor [weak self] in self?.sendOptionsOK(connection) }
-            case ("POST", "/validate-code"):
-                var headerEnd = 0
-                for (i, line) in lines.enumerated() where line.isEmpty {
-                    headerEnd = i
-                    break
+                let headerData = buffer.subdata(in: 0..<range.lowerBound)
+                guard let headerText = String(data: headerData, encoding: .utf8) else {
+                    connection.cancel()
+                    return
                 }
-                let bodyStr = lines.dropFirst(headerEnd + 1).joined(separator: "\r\n")
-                let body = bodyStr.data(using: .utf8) ?? Data()
-                Task { @MainActor [weak self] in self?.handleValidateCode(body: body, connection: connection) }
-            case ("POST", "/upload-chunk"):
-                Task { @MainActor [weak self] in self?.handleUploadChunk(rawRequest: buffer, connection: connection) }
-            case ("POST", "/finalize-upload"):
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
+
+                let lines = headerText.components(separatedBy: "\r\n")
+                let requestLine = lines.first ?? ""
+                let parts = requestLine.components(separatedBy: " ")
+                guard parts.count >= 2 else { connection.cancel(); return }
+                let method = parts[0]
+                let path = parts[1]
+
+                switch (method, path) {
+                case ("GET", "/"):
+                    Task { @MainActor [weak self] in self?.handleRootPage(connection: connection) }
+                case ("OPTIONS", _):
+                    Task { @MainActor [weak self] in self?.sendOptionsOK(connection) }
+                case ("POST", "/validate-code"):
                     let body = self.extractHTTPBody(from: buffer)
-                    self.handleFinalizeUpload(body: body, connection: connection)
-                }
+                    Task { @MainActor [weak self] in self?.handleValidateCode(body: body, connection: connection) }
+                case ("POST", "/upload-chunk"):
+                    Task { @MainActor [weak self] in self?.handleUploadChunk(rawRequest: buffer, connection: connection) }
+                case ("POST", "/finalize-upload"):
+                    Task { @MainActor [weak self] in
+                        guard let self else { return }
+                        let body = self.extractHTTPBody(from: buffer)
+                        self.handleFinalizeUpload(body: body, connection: connection)
+                    }
                 default:
                     self.sendNotFound(connection)
                 }
@@ -337,7 +342,15 @@ final class WiFiTransferServer: ObservableObject {
     }
 
     private func extractHeader(_ name: String, from data: Data) -> String? {
-        guard let raw = String(data: data, encoding: .utf8) else { return nil }
+        let separator = Data([0x0D, 0x0A, 0x0D, 0x0A])
+        let headerData: Data
+        if let range = data.range(of: separator) {
+            headerData = data.subdata(in: 0..<range.lowerBound)
+        } else {
+            headerData = data
+        }
+
+        guard let raw = String(data: headerData, encoding: .utf8) else { return nil }
         for line in raw.components(separatedBy: "\r\n") {
             if line.lowercased().hasPrefix(name.lowercased() + ":") {
                 return String(line.dropFirst(name.count + 1)).trimmingCharacters(in: .whitespaces)
@@ -347,24 +360,23 @@ final class WiFiTransferServer: ObservableObject {
     }
 
     private func extractHTTPBody(from data: Data) -> Data {
-        guard let raw = String(data: data, encoding: .utf8) else { return data }
-        if let range = raw.range(of: "\r\n\r\n") {
-            let bodyStart = raw.distance(from: raw.startIndex, to: range.upperBound)
-            if bodyStart < data.count {
-                return data.advanced(by: bodyStart)
-            }
+        let separator = Data([0x0D, 0x0A, 0x0D, 0x0A])
+        if let range = data.range(of: separator) {
+            return data.advanced(by: range.upperBound)
         }
         return data
     }
 
     private func requestIsComplete(_ data: Data) -> Bool {
-        guard let raw = String(data: data, encoding: .utf8),
-              let delimiter = raw.range(of: "\r\n\r\n") else {
+        let separator = Data([0x0D, 0x0A, 0x0D, 0x0A])
+        guard let range = data.range(of: separator) else {
             return false
         }
 
-        let headerBytes = raw.distance(from: raw.startIndex, to: delimiter.upperBound)
-        let headerText = String(raw[..<delimiter.lowerBound])
+        let headerBytes = range.upperBound
+        let headerData = data.subdata(in: 0..<range.lowerBound)
+        guard let headerText = String(data: headerData, encoding: .utf8) else { return false }
+
         let lengthLine = headerText
             .components(separatedBy: "\r\n")
             .first { $0.lowercased().hasPrefix("content-length:") }
