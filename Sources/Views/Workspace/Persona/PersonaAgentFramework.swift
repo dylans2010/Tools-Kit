@@ -845,10 +845,13 @@ actor PersonaAgentFramework {
             guard let original = SDKMailService.shared.getMessage(id: messageID) else {
                 throw AgentActionError.itemNotFound("No email found with id \(params.originalMessageID)")
             }
+            let recipient = original.from
+            let subject = "Re: \(original.subject)"
+            let body = params.body
             Task {
-                try? await SDKMailService.shared.send(to: original.from, subject: "Re: \(original.subject)", body: params.body)
+                try? await SDKMailService.shared.send(to: recipient, subject: subject, body: body)
             }
-            return "Replied to email from \(original.from)"
+            return "Replied to email from \(recipient)"
         }
     }
 
@@ -860,13 +863,15 @@ actor PersonaAgentFramework {
             guard let original = SDKMailService.shared.getMessage(id: messageID) else {
                 throw AgentActionError.itemNotFound("No email found with id \(params.originalMessageID)")
             }
+            let recipients = params.recipients
+            let subject = "Fwd: \(original.subject)"
             let body = params.body ?? "Forwarded message:\n\n\(original.body)"
-            for recipient in params.recipients {
+            for recipient in recipients {
                 Task {
-                    try? await SDKMailService.shared.send(to: recipient, subject: "Fwd: \(original.subject)", body: body)
+                    try? await SDKMailService.shared.send(to: recipient, subject: subject, body: body)
                 }
             }
-            return "Forwarded email to \(params.recipients.count) recipient(s)"
+            return "Forwarded email to \(recipients.count) recipient(s)"
         }
     }
 
