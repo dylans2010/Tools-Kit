@@ -17,9 +17,22 @@ final class PersonaManager: ObservableObject {
     }
     @Published var config: PersonaConfig = PersonaConfig(name: "Expert Assistant", instructions: "You are an expert AI Persona.", baseModel: "gpt-4", workspaceScope: ["All"])
     @Published var isThinking: Bool = false
+    @Published var agentModeEnabled: Bool = false
 
     private let dataStore = UnifiedDataStore.shared
     private let aiService = AIService.shared
+
+    private var agentSystemPromptCache: String?
+
+    var agentSystemPrompt: String {
+        if let cached = agentSystemPromptCache { return cached }
+        if let url = Bundle.main.url(forResource: "AgentPersonaSystem", withExtension: "md"),
+           let content = try? String(contentsOf: url, encoding: .utf8) {
+            agentSystemPromptCache = content
+            return content
+        }
+        return ""
+    }
 
     private init() {
         self.interactions = dataStore.personaInteractions
@@ -36,14 +49,28 @@ final class PersonaManager: ObservableObject {
         isThinking = true
         defer { isThinking = false }
 
+        let isAgent = agentModeEnabled
+        let agentPromptContent = isAgent ? agentSystemPrompt : ""
+
         // 1. Capture state needed for background processing
         let instructions = config.instructions
         let historySuffix = chatHistory.suffix(10).map { "\($0.role): \($0.content)" }.joined(separator: "\n")
-        let isTrainingEnabled = config.isTrainingEnabled
 
         // 2. Perform heavy workspace data gathering and prompt building in background
         let systemPrompt = await Task.detached(priority: .userInitiated) {
             let workspaceContext = await PersonaWorkspace.gatherFullWorkspaceData()
+
+            if isAgent {
+                return """
+                \(agentPromptContent)
+
+                WORKSPACE CONTEXT (JSON):
+                \(workspaceContext)
+
+                PREVIOUS CHAT HISTORY:
+                \(historySuffix)
+                """
+            }
 
             return """
             \(instructions)
@@ -63,12 +90,6 @@ final class PersonaManager: ObservableObject {
             - Collaboration is handled via Spaces and Plugins.
             - System systems include SDK, Connectors, and Security.
 
-            AGENTIC CAPABILITIES (AGENT MODE):
-            - You can execute real actions using your tool library.
-            - Tools available: createNote, sendEmail, createSlides, updateTask, installLibrary, attachFramework, managePackages.
-            - When Agent Mode is ON, you should transition from chatting to executing multi-step plans.
-            - Always validate security scopes before performing destructive actions.
-
             WORKSPACE CONTEXT (JSON):
             \(workspaceContext)
 
@@ -81,21 +102,36 @@ final class PersonaManager: ObservableObject {
         let userMessage = PersonaMessage(role: "user", content: query)
         chatHistory.append(userMessage)
 
-        // 4. Query AI Service (Already async/non-blocking)
+        // 4. If agent mode, parse and execute actions from the AI response
+        if isAgent {
+            let response = try await aiService.processText(prompt: query, systemPrompt: systemPrompt)
+            let executionResult = await executeAgentResponse(response, originalQuery: query)
+            let assistantMessage = PersonaMessage(role: "assistant", content: executionResult)
+            chatHistory.append(assistantMessage)
+            saveChatHistory()
+            saveInteraction(query: query, response: executionResult)
+            return executionResult
+        }
+
+        // 5. Query AI Service (non-agent mode)
         let response = try await aiService.processText(prompt: query, systemPrompt: systemPrompt)
 
-        // 5. Update Chat History (Assistant) - MainActor
+        // 6. Update Chat History (Assistant) - MainActor
         let assistantMessage = PersonaMessage(role: "assistant", content: response)
         chatHistory.append(assistantMessage)
         saveChatHistory()
 
-        // 6. Save Interaction for Training (if enabled)
+        // 7. Save Interaction for Training (if enabled)
+        saveInteraction(query: query, response: response)
+
+        return response
+    }
+
+    private func saveInteraction(query: String, response: String) {
         if config.isTrainingEnabled {
             let trainingEntry = PersonaModelTraining(userQuery: query, aiResponse: response)
             try? dataStore.save(trainingEntry, key: "persona_training_\(trainingEntry.id.uuidString)")
         }
-
-        // 7. Legacy Compatibility
         let interaction = PersonaInteraction(
             query: query,
             response: response,
@@ -103,8 +139,45 @@ final class PersonaManager: ObservableObject {
         )
         interactions.append(interaction)
         try? dataStore.savePersonaInteraction(interaction)
+    }
 
-        return response
+    private func executeAgentResponse(_ aiResponse: String, originalQuery: String) async -> String {
+        let actions = PersonaAgentFramework.parseAgentActions(from: aiResponse)
+        if actions.isEmpty {
+            return aiResponse
+        }
+
+        var results: [String] = []
+        for action in actions {
+            do {
+                let result = try await PersonaAgentFramework.shared.execute(action)
+                switch result {
+                case .success(let payload):
+                    switch payload {
+                    case .message(let msg):
+                        results.append(msg)
+                    case .itemSnapshot(let snapshot):
+                        results.append("Created \(snapshot.type.rawValue): **\(snapshot.title)** (id: `\(snapshot.id)`)")
+                    case .itemSummaries(let summaries):
+                        let listing = summaries.prefix(10).map { "- \($0.type.rawValue): \($0.title)" }.joined(separator: "\n")
+                        results.append("Found \(summaries.count) item(s):\n\(listing)")
+                    }
+                case .failure(let error):
+                    results.append("Action failed: \(error.localizedDescription)")
+                }
+            } catch {
+                results.append("Error: \(error.localizedDescription)")
+            }
+        }
+
+        let actionSummary = results.joined(separator: "\n\n")
+        let naturalParts = aiResponse.components(separatedBy: "[ACTION:")
+        let preamble = naturalParts.first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        if preamble.isEmpty {
+            return actionSummary
+        }
+        return "\(preamble)\n\n\(actionSummary)"
     }
 
 
