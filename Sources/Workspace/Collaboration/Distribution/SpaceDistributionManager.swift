@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// Manages publishing of Collaboration Spaces and template creation.
+@MainActor
 final class SpaceDistributionManager: ObservableObject {
     static let shared = SpaceDistributionManager()
 
@@ -28,6 +29,7 @@ final class SpaceDistributionManager: ObservableObject {
 }
 
 /// Manages guest access and temporary tokens for external collaboration.
+@MainActor
 final class ExternalCollaborationManager: ObservableObject {
     static let shared = ExternalCollaborationManager()
 

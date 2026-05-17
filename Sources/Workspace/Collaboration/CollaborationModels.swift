@@ -55,6 +55,7 @@ struct CollaborationBranch: Codable, Identifiable {
     let id: UUID
     var name: String
     var headCommitID: UUID
+    var isProtected: Bool = false
 }
 
 /// A commit within the version control system.

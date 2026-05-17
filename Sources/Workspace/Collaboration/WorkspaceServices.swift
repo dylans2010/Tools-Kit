@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// In-memory local notification service for workspace alerts.
+@MainActor
 final class WorkspaceNotificationService: ObservableObject {
     static let shared = WorkspaceNotificationService()
 
@@ -59,6 +60,7 @@ final class WorkspaceNotificationService: ObservableObject {
 }
 
 /// Indexed global search across all workspace objects.
+@MainActor
 final class GlobalSearchService: ObservableObject {
     static let shared = GlobalSearchService()
 
@@ -142,6 +144,7 @@ final class GlobalSearchService: ObservableObject {
 }
 
 /// Detects and repairs workspace data integrity issues.
+@MainActor
 final class DataIntegrityService: ObservableObject {
     static let shared = DataIntegrityService()
 

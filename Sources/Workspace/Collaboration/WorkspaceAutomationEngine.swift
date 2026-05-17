@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// Trigger → Condition → Action automation engine for collaboration workspaces.
+@MainActor
 final class WorkspaceAutomationEngine: ObservableObject {
     static let shared = WorkspaceAutomationEngine()
 

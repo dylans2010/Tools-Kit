@@ -251,6 +251,15 @@ final class CollaborationManager: ObservableObject {
         saveSpaces()
     }
 
+    func revertToCommit(spaceID: UUID, branchID: UUID, commitID: UUID) {
+        guard let wIdx = workspaces.firstIndex(where: { $0.id == spaceID }),
+              let bIdx = workspaces[wIdx].branches.firstIndex(where: { $0.id == branchID }),
+              commits[commitID] != nil else { return }
+        workspaces[wIdx].branches[bIdx].headCommitID = commitID
+        logActivity(workspaceID: spaceID, action: "Reverted to commit \(commitID.uuidString.prefix(8))")
+        saveWorkspaces()
+    }
+
     func mergeBranch(spaceID: UUID, sourceBranchID: UUID, targetBranchID: UUID) {
         guard let wIdx = workspaces.firstIndex(where: { $0.id == spaceID }),
               let sourceBranch = workspaces[wIdx].branches.first(where: { $0.id == sourceBranchID }),

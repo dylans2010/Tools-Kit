@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// Single source of truth for Space-driven collaboration.
+@MainActor
 final class SpaceCollabManager: ObservableObject {
     static let shared = SpaceCollabManager()
 

@@ -12,6 +12,7 @@ struct WorkspaceSnapshot: Codable, Identifiable {
 }
 
 /// Saves, restores, and compares full workspace snapshots.
+@MainActor
 final class WorkspaceSnapshotService: ObservableObject {
     static let shared = WorkspaceSnapshotService()
 

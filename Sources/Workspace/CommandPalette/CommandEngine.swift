@@ -64,6 +64,7 @@ struct CommandResult: Identifiable {
 // MARK: - Command Engine
 
 /// Central command routing and execution system.
+@MainActor
 final class CommandEngine: ObservableObject {
     static let shared = CommandEngine()
 

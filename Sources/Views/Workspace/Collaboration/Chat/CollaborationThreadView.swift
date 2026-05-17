@@ -9,6 +9,14 @@ struct CollaborationThreadView: View {
     @State private var replyText = ""
     @StateObject private var manager = CollaborationManager.shared
 
+    private var replies: [CollaborationMessage] {
+        manager.workspaces
+            .first(where: { $0.id == workspace.id })?
+            .channels.first(where: { $0.id == channel.id })?
+            .messages.first(where: { $0.id == parentMessage.id })?
+            .thread?.replies ?? []
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Header
@@ -54,12 +62,6 @@ struct CollaborationThreadView: View {
             // Replies List
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 16) {
-                    let replies = manager.workspaces
-                        .first(where: { $0.id == workspace.id })?
-                        .channels.first(where: { $0.id == channel.id })?
-                        .messages.first(where: { $0.id == parentMessage.id })?
-                        .thread?.replies ?? []
-
                     if replies.isEmpty {
                         Text("No replies yet")
                             .font(.caption)

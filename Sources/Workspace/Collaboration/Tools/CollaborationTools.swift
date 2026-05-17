@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// Specialized tool for group decision making and weighted voting.
+@MainActor
 final class DecisionEngineTool: ObservableObject {
     struct DecisionOption: Identifiable, Codable {
         let id: UUID
@@ -65,6 +66,7 @@ final class DecisionEngineTool: ObservableObject {
 }
 
 /// Project board with dependency tracking and Kanban-style execution.
+@MainActor
 final class ProjectExecutionBoardTool: ObservableObject {
     enum TaskStatus: String, Codable {
         case todo, inProgress, blocked, done
@@ -117,6 +119,7 @@ final class ProjectExecutionBoardTool: ObservableObject {
 }
 
 /// Interactive graph of workspace object relationships.
+@MainActor
 final class KnowledgeGraphTool: ObservableObject {
     struct GraphNode: Identifiable {
         let id: UUID
@@ -161,6 +164,7 @@ final class KnowledgeGraphTool: ObservableObject {
 }
 
 /// Real-time multi-user session management.
+@MainActor
 final class LiveCollaborationStudioTool: ObservableObject {
     @Published var activeParticipants: [SpaceMember] = []
 
@@ -176,6 +180,7 @@ final class LiveCollaborationStudioTool: ObservableObject {
 }
 
 /// Workspace-wide contribution and usage analytics.
+@MainActor
 final class WorkspaceAnalyticsTool: ObservableObject {
     @Published var totalCommits: Int = 0
     @Published var activeUsersCount: Int = 0

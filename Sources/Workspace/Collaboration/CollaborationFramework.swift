@@ -3,6 +3,7 @@ import Combine
 
 /// Central system that connects ALL workspace data.
 /// Indexes workspace objects and manages relationships between them.
+@MainActor
 final class CollaborationFramework: ObservableObject {
     static let shared = CollaborationFramework()
 
