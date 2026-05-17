@@ -11282,7 +11282,6 @@
 				AA1000000000000000000018 /* GitHubIntelligenceViews.swift in Sources */,
 				AA100000000000000000001A /* GitHubToolPanelViews.swift in Sources */,
 				CL020000000000000000000A /* WorkspaceAutomationEngine.swift in Sources */,
-				PM020000000000000000000F /* PluginManager.swift in Sources */,
 				MS02A1B2C3D4E5F600000001 /* SecureFolderModels.swift in Sources */,
 				MS02A1B2C3D4E5F600000002 /* SecureFolderManager.swift in Sources */,
 				MS02A1B2C3D4E5F600000003 /* AppLockManager.swift in Sources */,

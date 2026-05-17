@@ -11,6 +11,7 @@ struct WhiteboardGraphCluster: Identifiable, Codable {
 }
 
 struct WhiteboardGraphProcessor {
+    @MainActor
     func cluster(board: WhiteboardBoard) -> [WhiteboardGraphCluster] {
         let adjacency = adjacencyMap(edges: board.edges)
         var visited = Set<UUID>()
@@ -42,6 +43,7 @@ struct WhiteboardGraphProcessor {
         return clusters.sorted { $0.rankScore > $1.rankScore }
     }
 
+    @MainActor
     func buildSections(from board: WhiteboardBoard) -> [WhiteboardSlideSection] {
         cluster(board: board).map { cluster in
             let topic = extractTopic(from: cluster)
