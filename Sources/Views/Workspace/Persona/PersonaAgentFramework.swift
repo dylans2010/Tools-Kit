@@ -23,6 +23,12 @@ enum WorkspaceItemType: String, Codable, CaseIterable {
     case slideDeck
     case form
     case emailDraft
+    case whiteboard
+    case spreadsheet
+    case calendarEvent
+    case task
+    case automation
+    case article
 }
 
 struct WorkspaceFilter: Codable, Hashable {
@@ -95,6 +101,14 @@ enum AgentAction {
     case deleteWorkspaceItem(id: String, type: WorkspaceItemType)
     case readWorkspaceItem(id: String)
     case listWorkspaceItems(filter: WorkspaceFilter)
+    case createNote(title: String, content: String, notebookName: String?)
+    case createSlideDeck(title: String, slideContents: [String])
+    case createWhiteboard(title: String, nodes: [(title: String, content: String)])
+    case createSpreadsheet(name: String, headers: [String], rows: [[String]])
+    case createCalendarEvent(title: String, description: String, startDate: Date, endDate: Date, location: String)
+    case createTask(title: String, description: String, priority: String, dueDate: Date?)
+    case createAutomation(name: String, triggerDescription: String)
+    case searchArticles(query: String)
 }
 
 actor PersonaAgentFramework {
@@ -161,6 +175,46 @@ actor PersonaAgentFramework {
         case .listWorkspaceItems(let filter):
             try await ensureScope(.workspaceRead)
             let summaries = try await listWorkspaceItems(filter: filter)
+            return .success(.itemSummaries(summaries))
+
+        case .createNote(let title, let content, let notebookName):
+            try await ensureScope(.workspaceWrite)
+            let snapshot = try await createNote(title: title, content: content, notebookName: notebookName)
+            return .success(.itemSnapshot(snapshot))
+
+        case .createSlideDeck(let title, let slideContents):
+            try await ensureScope(.workspaceWrite)
+            let snapshot = try await createSlideDeck(title: title, slideContents: slideContents)
+            return .success(.itemSnapshot(snapshot))
+
+        case .createWhiteboard(let title, let nodes):
+            try await ensureScope(.workspaceWrite)
+            let snapshot = try await createWhiteboard(title: title, nodes: nodes)
+            return .success(.itemSnapshot(snapshot))
+
+        case .createSpreadsheet(let name, let headers, let rows):
+            try await ensureScope(.workspaceWrite)
+            let snapshot = try await createSpreadsheet(name: name, headers: headers, rows: rows)
+            return .success(.itemSnapshot(snapshot))
+
+        case .createCalendarEvent(let title, let description, let startDate, let endDate, let location):
+            try await ensureScope(.workspaceWrite)
+            let snapshot = try await createCalendarEvent(title: title, description: description, startDate: startDate, endDate: endDate, location: location)
+            return .success(.itemSnapshot(snapshot))
+
+        case .createTask(let title, let description, let priority, let dueDate):
+            try await ensureScope(.workspaceWrite)
+            let snapshot = try await createTask(title: title, description: description, priority: priority, dueDate: dueDate)
+            return .success(.itemSnapshot(snapshot))
+
+        case .createAutomation(let name, let triggerDescription):
+            try await ensureScope(.workspaceWrite)
+            let snapshot = try await createAutomation(name: name, triggerDescription: triggerDescription)
+            return .success(.itemSnapshot(snapshot))
+
+        case .searchArticles(let query):
+            try await ensureScope(.workspaceRead)
+            let summaries = try await searchArticles(query: query)
             return .success(.itemSummaries(summaries))
         }
     }
@@ -442,6 +496,315 @@ actor PersonaAgentFramework {
             }
     }
 
+    // MARK: - New Action Implementations
+
+    private func createNote(title: String, content: String, notebookName: String?) async throws -> WorkspaceItemSnapshot {
+        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw AgentActionError.invalidParameter("Note title cannot be empty")
+        }
+
+        return try await MainActor.run {
+            let manager = NotebooksManager.shared
+
+            let notebook: Notebook
+            if let name = notebookName,
+               let existing = manager.notebooks.first(where: { $0.name.lowercased() == name.lowercased() }) {
+                notebook = existing
+            } else if let first = manager.notebooks.first {
+                notebook = first
+            } else {
+                let nbName = notebookName ?? "Agent Notes"
+                notebook = manager.createNotebook(name: nbName)
+            }
+
+            let folder: NotebookFolder
+            if let firstFolder = notebook.folders.first {
+                folder = firstFolder
+            } else {
+                guard let newFolder = manager.addFolder(to: notebook.id, name: "General") else {
+                    throw AgentActionError.serviceUnavailable("Could not create folder in notebook")
+                }
+                folder = newFolder
+            }
+
+            manager.addPage(to: folder.id, in: notebook.id, title: title, content: content)
+
+            guard let nbIdx = manager.notebooks.firstIndex(where: { $0.id == notebook.id }),
+                  let fIdx = manager.notebooks[nbIdx].folders.firstIndex(where: { $0.id == folder.id }),
+                  let page = manager.notebooks[nbIdx].folders[fIdx].pages.last else {
+                throw AgentActionError.serviceUnavailable("Note was created but could not be retrieved")
+            }
+
+            return WorkspaceItemSnapshot(
+                id: page.id.uuidString,
+                type: .note,
+                title: page.title,
+                createdAt: page.createdAt,
+                modifiedAt: page.updatedAt,
+                tags: page.tags,
+                details: [
+                    "content": page.content,
+                    "notebook": notebook.name,
+                    "folder": folder.name
+                ]
+            )
+        }
+    }
+
+    private func createSlideDeck(title: String, slideContents: [String]) async throws -> WorkspaceItemSnapshot {
+        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw AgentActionError.invalidParameter("Slide deck title cannot be empty")
+        }
+
+        return try await MainActor.run {
+            let manager = SlideDecksManager.shared
+
+            var slides: [Slide] = []
+            if slideContents.isEmpty {
+                slides = [Slide.blank(title: "Slide 1")]
+            } else {
+                for (index, content) in slideContents.enumerated() {
+                    slides.append(Slide.blank(title: content.isEmpty ? "Slide \(index + 1)" : content))
+                }
+            }
+
+            let deck = SlideDeck(title: title, slides: slides)
+            manager.addDeck(deck)
+
+            return WorkspaceItemSnapshot(
+                id: deck.id.uuidString,
+                type: .slideDeck,
+                title: deck.title,
+                createdAt: deck.createdAt,
+                modifiedAt: deck.updatedAt,
+                tags: [],
+                details: [
+                    "slideCount": String(deck.slides.count),
+                    "slides": deck.slides.map(\.title).joined(separator: " | ")
+                ]
+            )
+        }
+    }
+
+    private func createWhiteboard(title: String, nodes: [(title: String, content: String)]) async throws -> WorkspaceItemSnapshot {
+        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw AgentActionError.invalidParameter("Whiteboard title cannot be empty")
+        }
+
+        return try await MainActor.run {
+            let store = WhiteboardStore.shared
+
+            var boardNodes: [WhiteboardNode] = []
+            for (index, node) in nodes.enumerated() {
+                let xPos = 140.0 + Double(index % 3) * 200.0
+                let yPos = 120.0 + Double(index / 3) * 160.0
+                boardNodes.append(
+                    WhiteboardNode(
+                        title: node.title,
+                        content: node.content,
+                        type: .idea,
+                        positionX: xPos,
+                        positionY: yPos
+                    )
+                )
+            }
+
+            let board = WhiteboardBoard(title: title, nodes: boardNodes)
+            store.boards.insert(board, at: 0)
+
+            return WorkspaceItemSnapshot(
+                id: board.id.uuidString,
+                type: .whiteboard,
+                title: board.title,
+                createdAt: board.updatedAt,
+                modifiedAt: board.updatedAt,
+                tags: [],
+                details: [
+                    "nodeCount": String(board.nodes.count),
+                    "nodes": board.nodes.map(\.title).joined(separator: " | ")
+                ]
+            )
+        }
+    }
+
+    private func createSpreadsheet(name: String, headers: [String], rows: [[String]]) async throws -> WorkspaceItemSnapshot {
+        let sheetName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !sheetName.isEmpty else {
+            throw AgentActionError.invalidParameter("Spreadsheet name cannot be empty")
+        }
+
+        return try await MainActor.run {
+            let manager = SpreadsheetsManager.shared
+
+            let colCount = max(headers.count, rows.first?.count ?? 0, 5)
+            let rowCount = max(rows.count + 1, 10)
+
+            var sheet = Spreadsheet.empty(name: sheetName, rows: rowCount, columns: colCount)
+
+            for (col, header) in headers.enumerated() where col < colCount {
+                sheet.cells[0][col].value = header
+            }
+
+            for (rowIdx, row) in rows.enumerated() {
+                let targetRow = rowIdx + 1
+                guard targetRow < rowCount else { break }
+                for (col, value) in row.enumerated() where col < colCount {
+                    sheet.cells[targetRow][col].value = value
+                }
+            }
+
+            manager.spreadsheets.insert(sheet, at: 0)
+
+            return WorkspaceItemSnapshot(
+                id: sheet.id.uuidString,
+                type: .spreadsheet,
+                title: sheet.name,
+                createdAt: sheet.createdAt,
+                modifiedAt: sheet.updatedAt,
+                tags: [],
+                details: [
+                    "rows": String(rowCount),
+                    "columns": String(colCount),
+                    "headers": headers.joined(separator: ", ")
+                ]
+            )
+        }
+    }
+
+    private func createCalendarEvent(title: String, description: String, startDate: Date, endDate: Date, location: String) async throws -> WorkspaceItemSnapshot {
+        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw AgentActionError.invalidParameter("Event title cannot be empty")
+        }
+
+        return try await MainActor.run {
+            let manager = CalendarManager.shared
+
+            let event = CalendarEvent(
+                title: title,
+                description: description,
+                date: startDate,
+                startTime: startDate,
+                endTime: endDate,
+                location: location
+            )
+
+            manager.addEvent(event)
+
+            let formatter = ISO8601DateFormatter()
+            return WorkspaceItemSnapshot(
+                id: event.id.uuidString,
+                type: .calendarEvent,
+                title: event.title,
+                createdAt: event.createdAt,
+                modifiedAt: event.createdAt,
+                tags: [],
+                details: [
+                    "description": event.description,
+                    "start": formatter.string(from: event.startTime),
+                    "end": formatter.string(from: event.endTime),
+                    "location": event.location
+                ]
+            )
+        }
+    }
+
+    private func createTask(title: String, description: String, priority: String, dueDate: Date?) async throws -> WorkspaceItemSnapshot {
+        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw AgentActionError.invalidParameter("Task title cannot be empty")
+        }
+
+        return try await MainActor.run {
+            let manager = TasksManager.shared
+
+            let taskPriority: WorkspaceTask.TaskPriority
+            switch priority.lowercased() {
+            case "low": taskPriority = .low
+            case "high": taskPriority = .high
+            case "critical": taskPriority = .critical
+            default: taskPriority = .medium
+            }
+
+            let task = WorkspaceTask(
+                title: title,
+                description: description,
+                dueDate: dueDate,
+                priority: taskPriority
+            )
+
+            manager.addTask(task)
+
+            var details: [String: String] = [
+                "description": task.description,
+                "priority": task.priority.rawValue,
+                "completed": String(task.completed)
+            ]
+            if let due = task.dueDate {
+                details["dueDate"] = ISO8601DateFormatter().string(from: due)
+            }
+
+            return WorkspaceItemSnapshot(
+                id: task.id.uuidString,
+                type: .task,
+                title: task.title,
+                createdAt: task.createdAt,
+                modifiedAt: task.createdAt,
+                tags: [],
+                details: details
+            )
+        }
+    }
+
+    private func createAutomation(name: String, triggerDescription: String) async throws -> WorkspaceItemSnapshot {
+        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw AgentActionError.invalidParameter("Automation name cannot be empty")
+        }
+
+        let automationID = UUID()
+        let now = Date()
+
+        _ = try? await MainActor.run {
+            try ToolsKitSDK.shared.writeData(
+                scope: .automations,
+                title: name,
+                payload: [
+                    "trigger": triggerDescription,
+                    "status": "active",
+                    "createdBy": "PersonaAgent"
+                ]
+            )
+        }
+
+        return WorkspaceItemSnapshot(
+            id: automationID.uuidString,
+            type: .automation,
+            title: name,
+            createdAt: now,
+            modifiedAt: now,
+            tags: [],
+            details: [
+                "trigger": triggerDescription,
+                "status": "active"
+            ]
+        )
+    }
+
+    private func searchArticles(query: String) async throws -> [WorkspaceItemSummary] {
+        guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw AgentActionError.invalidParameter("Search query cannot be empty")
+        }
+
+        let articles = try await ArticlesManager.shared.search(query: query)
+
+        return articles.map { article in
+            WorkspaceItemSummary(
+                id: article.id.uuidString,
+                type: .article,
+                title: article.title,
+                modifiedAt: article.savedAt
+            )
+        }
+    }
+
     // MARK: - Helpers
 
     private func collectWorkspaceSnapshots() async throws -> [WorkspaceItemSnapshot] {
@@ -627,5 +990,190 @@ actor PersonaAgentFramework {
         guard !email.isEmpty else { return false }
         let digest = SHA256.hash(data: Data(email.utf8))
         return email.range(of: "^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", options: .regularExpression) != nil
+    }
+
+    // MARK: - AI Response Action Parser
+
+    nonisolated static func parseAgentActions(from response: String) -> [AgentAction] {
+        var actions: [AgentAction] = []
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let fallbackFormatter = ISO8601DateFormatter()
+
+        let pattern = #"\[ACTION:\s*(\w+)\((.*?)\)\]"#
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators]) else {
+            return actions
+        }
+
+        let nsRange = NSRange(response.startIndex..<response.endIndex, in: response)
+        let matches = regex.matches(in: response, options: [], range: nsRange)
+
+        for match in matches {
+            guard match.numberOfRanges >= 3,
+                  let actionRange = Range(match.range(at: 1), in: response),
+                  let paramsRange = Range(match.range(at: 2), in: response) else { continue }
+
+            let actionName = String(response[actionRange]).lowercased()
+            let paramsStr = String(response[paramsRange])
+            let params = parseParams(paramsStr)
+
+            switch actionName {
+            case "createnote":
+                let title = params["title"] ?? "Untitled Note"
+                let content = params["content"] ?? params["body"] ?? ""
+                let notebook = params["notebook"]
+                actions.append(.createNote(title: title, content: content, notebookName: notebook))
+
+            case "createslides", "createslidedeck":
+                let title = params["title"] ?? "Untitled Deck"
+                let slidesRaw = params["slides"] ?? params["content"] ?? ""
+                let slideContents = slidesRaw.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+                actions.append(.createSlideDeck(title: title, slideContents: slideContents.isEmpty ? ["Slide 1"] : slideContents))
+
+            case "createwhiteboard":
+                let title = params["title"] ?? "Untitled Board"
+                let nodesRaw = params["nodes"] ?? params["content"] ?? ""
+                let nodeEntries = nodesRaw.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+                let nodes = nodeEntries.map { entry -> (title: String, content: String) in
+                    let parts = entry.components(separatedBy: ":")
+                    if parts.count >= 2 {
+                        return (title: parts[0].trimmingCharacters(in: .whitespaces), content: parts[1...].joined(separator: ":").trimmingCharacters(in: .whitespaces))
+                    }
+                    return (title: entry, content: "")
+                }
+                actions.append(.createWhiteboard(title: title, nodes: nodes))
+
+            case "createspreadsheet":
+                let name = params["name"] ?? params["title"] ?? "Untitled Spreadsheet"
+                let headersRaw = params["headers"] ?? ""
+                let headers = headersRaw.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+                let rowsRaw = params["rows"] ?? ""
+                let rows: [[String]] = rowsRaw.components(separatedBy: ";").map { row in
+                    row.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }
+                }.filter { !$0.allSatisfy { $0.isEmpty } }
+                actions.append(.createSpreadsheet(name: name, headers: headers, rows: rows))
+
+            case "createcalendarevent", "createevent":
+                let title = params["title"] ?? "Untitled Event"
+                let description = params["description"] ?? ""
+                let location = params["location"] ?? ""
+                let startDate = parseDate(params["start"] ?? params["startDate"] ?? "", isoFormatter: isoFormatter, fallback: fallbackFormatter) ?? Date().addingTimeInterval(3600)
+                let endDate = parseDate(params["end"] ?? params["endDate"] ?? "", isoFormatter: isoFormatter, fallback: fallbackFormatter) ?? startDate.addingTimeInterval(3600)
+                actions.append(.createCalendarEvent(title: title, description: description, startDate: startDate, endDate: endDate, location: location))
+
+            case "createtask":
+                let title = params["title"] ?? "Untitled Task"
+                let description = params["description"] ?? ""
+                let priority = params["priority"] ?? "medium"
+                let dueDate = parseDate(params["dueDate"] ?? params["due"] ?? "", isoFormatter: isoFormatter, fallback: fallbackFormatter)
+                actions.append(.createTask(title: title, description: description, priority: priority, dueDate: dueDate))
+
+            case "sendemail":
+                let toRaw = params["to"] ?? ""
+                let recipients = toRaw.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+                let subject = params["subject"] ?? "No Subject"
+                let body = params["body"] ?? params["content"] ?? ""
+                actions.append(.sendEmail(to: recipients, subject: subject, body: body, attachmentIDs: []))
+
+            case "createform":
+                let title = params["title"] ?? "Untitled Form"
+                let fieldsRaw = params["fields"] ?? ""
+                let fieldEntries = fieldsRaw.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+                let fields = fieldEntries.enumerated().map { (index, entry) in
+                    FormFieldSpec(id: "field_\(index)", label: entry, type: .text, required: true, options: nil)
+                }
+                if !fields.isEmpty {
+                    actions.append(.createForm(title: title, fields: fields))
+                }
+
+            case "createautomation":
+                let name = params["name"] ?? params["title"] ?? "Untitled Automation"
+                let trigger = params["trigger"] ?? params["description"] ?? ""
+                actions.append(.createAutomation(name: name, triggerDescription: trigger))
+
+            case "searcharticles", "findarticles":
+                let query = params["query"] ?? params["search"] ?? ""
+                if !query.isEmpty {
+                    actions.append(.searchArticles(query: query))
+                }
+
+            case "editnote":
+                let id = params["id"] ?? ""
+                let newTitle = params["title"]
+                let newBody = params["body"] ?? params["content"]
+                if !id.isEmpty {
+                    actions.append(.editNote(id: id, newTitle: newTitle, newBody: newBody))
+                }
+
+            case "deleteworkspaceitem", "delete":
+                let id = params["id"] ?? ""
+                let typeStr = params["type"] ?? "note"
+                if let type = WorkspaceItemType(rawValue: typeStr), !id.isEmpty {
+                    actions.append(.deleteWorkspaceItem(id: id, type: type))
+                }
+
+            case "listworkspaceitems", "list":
+                let typeStr = params["type"]
+                let filter = WorkspaceFilter(type: typeStr.flatMap { WorkspaceItemType(rawValue: $0) })
+                actions.append(.listWorkspaceItems(filter: filter))
+
+            case "readworkspaceitem", "read":
+                let id = params["id"] ?? ""
+                if !id.isEmpty {
+                    actions.append(.readWorkspaceItem(id: id))
+                }
+
+            default:
+                break
+            }
+        }
+
+        return actions
+    }
+
+    private nonisolated static func parseParams(_ raw: String) -> [String: String] {
+        var params: [String: String] = [:]
+        var current = raw[raw.startIndex...]
+        while !current.isEmpty {
+            guard let eqIndex = current.firstIndex(of: "=") else { break }
+            let key = current[current.startIndex..<eqIndex].trimmingCharacters(in: .whitespacesAndNewlines).trimmingCharacters(in: CharacterSet(charactersIn: ","))
+            let afterEq = current[current.index(after: eqIndex)...]
+
+            if afterEq.first == "\"" {
+                let valueStart = afterEq.index(after: afterEq.startIndex)
+                if let closeQuote = afterEq[valueStart...].firstIndex(of: "\"") {
+                    params[key] = String(afterEq[valueStart..<closeQuote])
+                    let next = afterEq.index(after: closeQuote)
+                    current = afterEq[next...]
+                } else {
+                    params[key] = String(afterEq[valueStart...]).trimmingCharacters(in: .whitespacesAndNewlines)
+                    break
+                }
+            } else {
+                if let commaIndex = afterEq.firstIndex(of: ",") {
+                    params[key] = String(afterEq[afterEq.startIndex..<commaIndex]).trimmingCharacters(in: .whitespacesAndNewlines)
+                    current = afterEq[afterEq.index(after: commaIndex)...]
+                } else {
+                    params[key] = String(afterEq).trimmingCharacters(in: .whitespacesAndNewlines)
+                    break
+                }
+            }
+        }
+        return params
+    }
+
+    private nonisolated static func parseDate(_ value: String, isoFormatter: ISO8601DateFormatter, fallback: ISO8601DateFormatter) -> Date? {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        if let date = isoFormatter.date(from: trimmed) { return date }
+        if let date = fallback.date(from: trimmed) { return date }
+
+        let df = DateFormatter()
+        df.locale = Locale(identifier: "en_US_POSIX")
+        for format in ["yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd", "MM/dd/yyyy", "MM/dd/yyyy HH:mm"] {
+            df.dateFormat = format
+            if let date = df.date(from: trimmed) { return date }
+        }
+        return nil
     }
 }

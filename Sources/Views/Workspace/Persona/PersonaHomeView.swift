@@ -437,6 +437,8 @@ struct PersonaHomeView: View {
         guard !trimmed.isEmpty else { return }
         query = ""
 
+        manager.agentModeEnabled = agentModeEnabled
+
         Task {
             await manager.queryPersonaSafely(query: trimmed)
         }
