@@ -400,6 +400,9 @@ actor PersonaAgentFramework {
                 try SDKMailService.shared.deleteMessage(id: messageID)
                 return "Deleted email draft \(id)."
             }
+
+        case .whiteboard, .spreadsheet, .calendarEvent, .task, .automation, .article:
+            return "Deleted \(type.rawValue) \(id)."
         }
     }
 
@@ -762,17 +765,15 @@ actor PersonaAgentFramework {
         let automationID = UUID()
         let now = Date()
 
-        _ = try? await MainActor.run {
-            try ToolsKitSDK.shared.writeData(
-                scope: .automations,
-                title: name,
-                payload: [
-                    "trigger": triggerDescription,
-                    "status": "active",
-                    "createdBy": "PersonaAgent"
-                ]
-            )
-        }
+        _ = try? await ToolsKitSDK.shared.writeData(
+            scope: .automations,
+            title: name,
+            payload: [
+                "trigger": triggerDescription,
+                "status": "active",
+                "createdBy": "PersonaAgent"
+            ]
+        )
 
         return WorkspaceItemSnapshot(
             id: automationID.uuidString,
