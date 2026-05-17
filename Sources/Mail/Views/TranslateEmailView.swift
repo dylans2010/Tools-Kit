@@ -7,12 +7,14 @@ struct TranslateEmailView: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    @State private var sourceLanguage = "English"
     @State private var targetLanguage = "Spanish"
     @State private var translatedText = ""
+    @State private var translatedSubject = ""
     @State private var isTranslating = false
     @State private var errorMessage: String?
     @State private var translationTone = "Natural"
-    @State private var formality = "Professional"
+    @State private var formality = "Auto"
     @State private var preserveLineBreaks = true
     @State private var keepNamesUntranslated = true
     @State private var includeLocalizedDateStyle = false
@@ -22,11 +24,48 @@ struct TranslateEmailView: View {
     @State private var localizeHonorifics = false
     @State private var showAdvancedOptions = false
 
-    private let languages = [
-        "English", "Spanish", "French", "German", "Italian", "Portuguese", "Dutch", "Japanese", "Korean", "Chinese", "Arabic", "Hindi", "Polish", "Turkish", "Swedish", "Vietnamese"
+    struct LanguageOption: Identifiable, Hashable {
+        let id = UUID()
+        let code: String
+        let displayName: String
+        let nativeName: String
+        let flag: String
+    }
+
+    private let languages: [LanguageOption] = [
+        .init(code: "en", displayName: "English", nativeName: "English", flag: "🇺🇸"),
+        .init(code: "es", displayName: "Spanish", nativeName: "Español", flag: "🇪🇸"),
+        .init(code: "fr", displayName: "French", nativeName: "Français", flag: "🇫🇷"),
+        .init(code: "de", displayName: "German", nativeName: "Deutsch", flag: "🇩🇪"),
+        .init(code: "it", displayName: "Italian", nativeName: "Italiano", flag: "🇮🇹"),
+        .init(code: "pt", displayName: "Portuguese", nativeName: "Português", flag: "🇵🇹"),
+        .init(code: "nl", displayName: "Dutch", nativeName: "Nederlands", flag: "🇳🇱"),
+        .init(code: "ja", displayName: "Japanese", nativeName: "日本語", flag: "🇯🇵"),
+        .init(code: "ko", displayName: "Korean", nativeName: "한국어", flag: "🇰🇷"),
+        .init(code: "zh", displayName: "Chinese", nativeName: "中文", flag: "🇨🇳"),
+        .init(code: "ar", displayName: "Arabic", nativeName: "العربية", flag: "🇸🇦"),
+        .init(code: "hi", displayName: "Hindi", nativeName: "हिन्दी", flag: "🇮🇳"),
+        .init(code: "pl", displayName: "Polish", nativeName: "Polski", flag: "🇵🇱"),
+        .init(code: "tr", displayName: "Turkish", nativeName: "Türkçe", flag: "🇹🇷"),
+        .init(code: "sv", displayName: "Swedish", nativeName: "Svenska", flag: "🇸🇪"),
+        .init(code: "vi", displayName: "Vietnamese", nativeName: "Tiếng Việt", flag: "🇻🇳"),
+        .init(code: "ru", displayName: "Russian", nativeName: "Русский", flag: "🇷🇺"),
+        .init(code: "id", displayName: "Indonesian", nativeName: "Bahasa Indonesia", flag: "🇮🇩"),
+        .init(code: "th", displayName: "Thai", nativeName: "ไทย", flag: "🇹🇭"),
+        .init(code: "cs", displayName: "Czech", nativeName: "Čeština", flag: "🇨🇿"),
+        .init(code: "da", displayName: "Danish", nativeName: "Dansk", flag: "🇩🇰"),
+        .init(code: "fi", displayName: "Finnish", nativeName: "Suomi", flag: "🇫🇮"),
+        .init(code: "el", displayName: "Greek", nativeName: "Ελληνικά", flag: "🇬🇷"),
+        .init(code: "hu", displayName: "Hungarian", nativeName: "Magyar", flag: "🇭🇺"),
+        .init(code: "no", displayName: "Norwegian", nativeName: "Norsk", flag: "🇳🇴"),
+        .init(code: "ro", displayName: "Romanian", nativeName: "Română", flag: "🇷🇴"),
+        .init(code: "sk", displayName: "Slovak", nativeName: "Slovenčina", flag: "🇸🇰"),
+        .init(code: "uk", displayName: "Ukrainian", nativeName: "Українська", flag: "🇺🇦"),
+        .init(code: "he", displayName: "Hebrew", nativeName: "עברית", flag: "🇮🇱"),
+        .init(code: "ms", displayName: "Malay", nativeName: "Bahasa Melayu", flag: "🇲🇾")
     ]
     private let toneOptions = ["Natural", "Business", "Friendly", "Diplomatic", "Direct", "Warm", "Concise"]
-    private let formalityOptions = ["Professional", "Neutral", "Formal", "Informal", "Executive"]
+    private let formalityOptions = ["Auto", "Formal", "Informal"]
 
     var body: some View {
         NavigationStack {
@@ -40,33 +79,82 @@ struct TranslateEmailView: View {
                         languageSection
 
                         displayCard(title: "Original", icon: "doc.text") {
-                            Text(sourceText)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(sourceText)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
                         }
 
                         if !translatedText.isEmpty && !isTranslating {
                             displayCard(title: "Translation", icon: "character.bubble", isResult: true) {
-                                VStack(alignment: .leading, spacing: 10) {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    HStack {
+                                        Text("Translated from \(sourceLanguage)")
+                                            .font(.system(size: 10, weight: .bold))
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 4)
+                                            .background(Color.blue.opacity(0.1), in: Capsule())
+                                            .foregroundStyle(.blue)
+                                        Spacer()
+                                    }
+
+                                    if !translatedSubject.isEmpty {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text("Subject")
+                                                .font(.caption2.bold())
+                                                .foregroundStyle(.secondary)
+                                            Text(translatedSubject)
+                                                .font(.subheadline.bold())
+                                        }
+                                        Divider()
+                                    }
+
                                     ScrollView {
-                                        Text(translatedText)
-                                            .font(.subheadline)
-                                            .foregroundStyle(.white)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .textSelection(.enabled)
+                                        if preserveMarkdownFormatting && detectMarkdown(translatedText) {
+                                            MailMarkdownRenderer(source: translatedText, schema: EmailTranslationTool().outputSchema)
+                                        } else {
+                                            Text(translatedText)
+                                                .font(.subheadline)
+                                                .foregroundStyle(.white)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .textSelection(.enabled)
+                                        }
                                     }
                                     .frame(minHeight: 140)
 
-                                    HStack {
-                                        Spacer()
+                                    HStack(spacing: 12) {
                                         Button {
                                             UIPasteboard.general.string = translatedText
                                         } label: {
-                                            Label("Copy Translation", systemImage: "doc.on.doc")
+                                            Label("Copy", systemImage: "doc.on.doc")
+                                                .font(.caption.bold())
+                                                .padding(.vertical, 8)
+                                                .frame(maxWidth: .infinity)
+                                                .background(Color.white.opacity(0.1), in: Capsule())
                                         }
-                                        .buttonStyle(.borderedProminent)
-                                        .controlSize(.small)
+
+                                        Button {
+                                            onApply(translatedText)
+                                            dismiss()
+                                        } label: {
+                                            Label("Insert", systemImage: "arrow.right.circle.fill")
+                                                .font(.caption.bold())
+                                                .padding(.vertical, 8)
+                                                .frame(maxWidth: .infinity)
+                                                .background(Color.blue, in: Capsule())
+                                                .foregroundStyle(.white)
+                                        }
+
+                                        Button {
+                                            Task { await translate() }
+                                        } label: {
+                                            Image(systemName: "arrow.clockwise")
+                                                .font(.caption.bold())
+                                                .padding(8)
+                                                .background(Color.white.opacity(0.1), in: Circle())
+                                        }
                                     }
                                 }
                             }
@@ -117,27 +205,39 @@ struct TranslateEmailView: View {
         )
     }
 
-    private var languageSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Target Language")
-                .font(.caption.bold())
-                .foregroundStyle(.secondary)
+    @State private var searchText = ""
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(languages, id: \.self) { lang in
-                        Button {
-                            targetLanguage = lang
-                        } label: {
-                            Text(lang)
-                                .font(.caption.bold())
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
-                                .background(targetLanguage == lang ? Color.blue : Color.white.opacity(0.1), in: Capsule())
-                                .foregroundStyle(targetLanguage == lang ? Color.white : Color.secondary)
-                        }
-                        .buttonStyle(.plain)
-                    }
+    private var languageSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Source")
+                        .font(.caption2.bold())
+                        .foregroundStyle(.secondary)
+                    languagePicker(selection: $sourceLanguage)
+                }
+
+                Button {
+                    let temp = sourceLanguage
+                    sourceLanguage = targetLanguage
+                    targetLanguage = temp
+
+                    let tempText = sourceText
+                    // In a real app we'd swap current source and translated but sourceText is let
+                    // Let's just swap state
+                } label: {
+                    Image(systemName: "arrow.left.arrow.right")
+                        .font(.caption.bold())
+                        .padding(8)
+                        .background(Color.blue.opacity(0.1), in: Circle())
+                }
+                .padding(.top, 16)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Target")
+                        .font(.caption2.bold())
+                        .foregroundStyle(.secondary)
+                    languagePicker(selection: $targetLanguage)
                 }
             }
 
@@ -163,6 +263,32 @@ struct TranslateEmailView: View {
         }
         .padding(16)
         .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func languagePicker(selection: Binding<String>) -> some View {
+        Menu {
+            ForEach(languages) { lang in
+                Button("\(lang.flag) \(lang.displayName)") {
+                    selection.wrappedValue = lang.displayName
+                }
+            }
+        } label: {
+            HStack {
+                let current = languages.first(where: { $0.displayName == selection.wrappedValue })
+                Text("\(current?.flag ?? "") \(selection.wrappedValue)")
+                    .font(.subheadline.bold())
+                Image(systemName: "chevron.down")
+                    .font(.caption2)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.white.opacity(0.1), in: Capsule())
+        }
+    }
+
+    private func detectMarkdown(_ text: String) -> Bool {
+        let patterns = ["^#", "^- ", "^\\* ", "^> ", "\\*\\*"]
+        return patterns.contains { text.range(of: $0, options: .regularExpression) != nil }
     }
 
     private func compactSelector(title: String, selection: Binding<String>, options: [String]) -> some View {
@@ -219,42 +345,40 @@ struct TranslateEmailView: View {
         isTranslating = true
         errorMessage = nil
 
+        guard let tool = MailAIToolRegistry.shared.tool(for: "email_translation") else { return }
+
         do {
             let prompt = """
-            Translate the email below into \(targetLanguage).
-            Rules:
-            - Preserve meaning, names, dates, and intent.
-            - Output MUST be in \(targetLanguage), not the source language.
-            - Tone: \(translationTone).
-            - Formality: \(formality).
-            - Preserve line breaks: \(preserveLineBreaks ? "yes" : "no").
-            - Keep names/proper nouns unchanged when possible: \(keepNamesUntranslated ? "yes" : "no").
-            - Localize dates and number formatting: \(includeLocalizedDateStyle ? "yes" : "no").
-            - Preserve markdown formatting: \(preserveMarkdownFormatting ? "yes" : "no").
-            - Translate the subject line too: \(translateSubjectLine ? "yes" : "no").
-            - Keep emoji / ASCII art: \(keepEmojiAndASCIIArt ? "yes" : "no").
-            - Localize honorifics and titles: \(localizeHonorifics ? "yes" : "no").
-            - Do not explain the translation.
-            - Return only the translated email text. DO NOT SAY ANYTHING ELSE
+            Source Language: \(sourceLanguage)
+            Target Language: \(targetLanguage)
+            Tone: \(translationTone)
+            Formality: \(formality)
 
-            Email:
+            Options:
+            - Preserve line breaks: \(preserveLineBreaks)
+            - Keep names untranslated: \(keepNamesUntranslated)
+            - Localize dates: \(includeLocalizedDateStyle)
+            - Preserve markdown: \(preserveMarkdownFormatting)
+
+            Input to translate:
             \(sourceText)
             """
-            var result = try await AIService.shared.processText(prompt: prompt)
-            let cleaned = result.trimmingCharacters(in: .whitespacesAndNewlines)
-            if cleaned.caseInsensitiveCompare(sourceText.trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame {
-                let retryPrompt = """
-                The previous output copied the source text.
-                Translate this content to \(targetLanguage) now and ensure the output language is \(targetLanguage) only.
-                Return only the final translated text:
-                \(sourceText)
-                """
-                result = try await AIService.shared.processText(prompt: retryPrompt)
-            }
 
-            await MainActor.run {
-                translatedText = result.trimmingCharacters(in: .whitespacesAndNewlines)
-                isTranslating = false
+            let result = try await AIService.shared.processText(prompt: prompt, systemPrompt: tool.systemPrompt)
+
+            if let data = result.data(using: .utf8),
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String: String] {
+                await MainActor.run {
+                    translatedSubject = json["subject"] ?? ""
+                    translatedText = json["body"] ?? ""
+                    isTranslating = false
+                }
+            } else {
+                // Fallback if AI didn't return JSON
+                await MainActor.run {
+                    translatedText = result
+                    isTranslating = false
+                }
             }
         } catch {
             await MainActor.run {

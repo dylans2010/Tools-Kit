@@ -174,10 +174,12 @@
 		AI0200000000000000000017 /* SimulationAndConsoleViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000017 /* SimulationAndConsoleViews.swift */; };
 		AI0200000000000000000018 /* WorkflowExecutionMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000018 /* WorkflowExecutionMonitor.swift */; };
 		AI0200000000000000000019 /* AdvancedMailViewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000019 /* AdvancedMailViewModels.swift */; };
+		E1020000000000000000002F /* MailMarkdownRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1010000000000000000002F /* MailMarkdownRenderer.swift */; };
+		FA12000000000000000000A0 /* PersonaChatExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11000000000000000000A0 /* PersonaChatExporter.swift */; };
 		FC0200000000000000000001 /* FilterChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0100000000000000000001 /* FilterChip.swift */; };
 		FI0200000000000000000001 /* FileImporterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FI0100000000000000000001 /* FileImporterView.swift */; };
 		8229B675224E4601A7B980CD /* MailAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF38182EF444218AFF7D2D3 /* MailAIService.swift */; };
-		B1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift */; };
+		B1B2C3D4E5F60718293A001F /* MailAIToolsSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A001F /* MailAIToolsSystem.swift */; };
 		BC63F5FE32D0419AB791F193 /* iCloudMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */; };
 		F0BE8D2657C349B7B03F24F4 /* MailProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */; };
 		AC0200000000000000000001 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0100000000000000000001 /* AppConfig.swift */; };
@@ -1624,6 +1626,8 @@
 		AI0100000000000000000017 /* SimulationAndConsoleViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulationAndConsoleViews.swift; sourceTree = "<group>"; };
 		AI0100000000000000000018 /* WorkflowExecutionMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowExecutionMonitor.swift; sourceTree = "<group>"; };
 		AI0100000000000000000019 /* AdvancedMailViewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedMailViewModels.swift; sourceTree = "<group>"; };
+		E1010000000000000000002F /* MailMarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailMarkdownRenderer.swift; sourceTree = "<group>"; };
+		FA11000000000000000000A0 /* PersonaChatExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaChatExporter.swift; sourceTree = "<group>"; };
 		FC0100000000000000000001 /* FilterChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterChip.swift; sourceTree = "<group>"; };
 		FI0100000000000000000001 /* FileImporterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileImporterView.swift; sourceTree = "<group>"; };
 		TH0100000000000000000001 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
@@ -1631,7 +1635,7 @@
 		IW0100000000000000000002 /* WorkspaceSurfaceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSurfaceCard.swift; sourceTree = "<group>"; };
 		EX0100000000000000000001 /* ExecutionBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecutionBridge.swift; sourceTree = "<group>"; };
 		7BF38182EF444218AFF7D2D3 /* MailAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailAIService.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailAIToolsSystem.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A001F /* MailAIToolsSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailAIToolsSystem.swift; sourceTree = "<group>"; };
 		E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iCloudMailProvider.swift; sourceTree = "<group>"; };
 		C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailProviderProtocol.swift; sourceTree = "<group>"; };
 		AC0100000000000000000001 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
@@ -3537,6 +3541,7 @@
 			children = (
 				ML0180133150940C4A3C83DA /* PersonaHomeView.swift */,
 				PAF100000000000000000004 /* PersonaAgentFramework.swift */,
+				FA11000000000000000000A0 /* PersonaChatExporter.swift */,
 			);
 			path = Persona;
 			sourceTree = "<group>";
@@ -3768,7 +3773,7 @@
 			isa = PBXGroup;
 			children = (
 				7BF38182EF444218AFF7D2D3 /* MailAIService.swift */,
-				A1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift */,
+				A1B2C3D4E5F60718293A001F /* MailAIToolsSystem.swift */,
 				AI0100000000000000000007 /* AdvancedAnalyticalEngines.swift */,
 				AI0100000000000000000008 /* AttachmentIntelligenceEngine.swift */,
 				AI0100000000000000000009 /* CommunicationIntelligenceEngine.swift */,
@@ -5299,6 +5304,8 @@
 				AI0100000000000000000017 /* SimulationAndConsoleViews.swift */,
 				AI0100000000000000000018 /* WorkflowExecutionMonitor.swift */,
 				AI0100000000000000000019 /* AdvancedMailViewModels.swift */,
+				A1B2C3D4E5F60718293A001F /* MailAIToolsSystem.swift */,
+				E1010000000000000000002F /* MailMarkdownRenderer.swift */,
 			);
 			path = Advanced;
 			sourceTree = "<group>";
@@ -10523,7 +10530,7 @@
 				169F73E894D6416298DC841C /* MailMessage.swift in Sources */,
 				A08E51C322934D398CFF8C14 /* MailThread.swift in Sources */,
 				8229B675224E4601A7B980CD /* MailAIService.swift in Sources */,
-				B1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift in Sources */,
+				B1B2C3D4E5F60718293A001F /* MailAIToolsSystem.swift in Sources */,
 				BC63F5FE32D0419AB791F193 /* iCloudMailProvider.swift in Sources */,
 				F0BE8D2657C349B7B03F24F4 /* MailProviderProtocol.swift in Sources */,
 				AC0200000000000000000001 /* AppConfig.swift in Sources */,
@@ -11263,6 +11270,8 @@
 				AI0200000000000000000017 /* SimulationAndConsoleViews.swift in Sources */,
 				AI0200000000000000000018 /* WorkflowExecutionMonitor.swift in Sources */,
 				AI0200000000000000000019 /* AdvancedMailViewModels.swift in Sources */,
+				E1020000000000000000002F /* MailMarkdownRenderer.swift in Sources */,
+				FA12000000000000000000A0 /* PersonaChatExporter.swift in Sources */,
 
 				AA100000000000000000000A /* WorkspaceAutomationView.swift in Sources */,
 				AA100000000000000000000C /* ContentGraphView.swift in Sources */,

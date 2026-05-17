@@ -28,8 +28,44 @@ struct DraftingEmailsView: View {
     @State private var isGenerating = false
     @State private var generatedBody = ""
 
+    @State private var aiPanelExpanded = false
+    @State private var selectedAIToolID = "email_rewrite"
+    @State private var aiResult = ""
+    @State private var subjectSuggestions: [String] = []
+    @State private var isGeneratingSuggestions = false
+    @State private var showPreview = false
+    @State private var proofreadDiff: [DiffLine] = []
+
     let currentBody: String
     let onApply: (DraftingEmailResult) -> Void
+
+    enum AIToolType: String, CaseIterable {
+        case rewrite = "Rewrite"
+        case improveTone = "Improve Tone"
+        case summarize = "Summarize"
+        case proofread = "Proofread"
+        case subjects = "Generate Subject Lines"
+
+        var toolID: String {
+            switch self {
+            case .rewrite: return "email_rewrite"
+            case .improveTone: return "tone_shift"
+            case .summarize: return "email_summarize"
+            case .proofread: return "proofread"
+            case .subjects: return "subject_line"
+            }
+        }
+    }
+
+    struct DiffLine: Identifiable {
+        let id = UUID()
+        let text: String
+        let type: DiffType
+    }
+
+    enum DiffType {
+        case original, corrected, unchanged
+    }
 
     var body: some View {
         NavigationStack {
@@ -46,21 +82,65 @@ struct DraftingEmailsView: View {
 
                         VStack(spacing: 20) {
                             modernInputField(label: "Recipient", text: $recipient, placeholder: "example@email.com", icon: "person.fill")
-                            modernInputField(label: "Subject", text: $subject, placeholder: "What is this about?", icon: "tag.fill")
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                modernInputField(label: "Subject", text: $subject, placeholder: "What is this about?", icon: "tag.fill")
+
+                                if !subjectSuggestions.isEmpty {
+                                    ScrollView(.horizontal, showsIndicators: false) {
+                                        HStack(spacing: 8) {
+                                            ForEach(subjectSuggestions, id: \.self) { suggestion in
+                                                Button {
+                                                    subject = suggestion
+                                                } label: {
+                                                    Text(suggestion)
+                                                        .font(.caption2.bold())
+                                                        .padding(.horizontal, 10)
+                                                        .padding(.vertical, 6)
+                                                        .background(Color.blue.opacity(0.15), in: Capsule())
+                                                        .overlay(Capsule().stroke(Color.blue.opacity(0.3), lineWidth: 1))
+                                                }
+                                            }
+                                        }
+                                        .padding(.horizontal, 4)
+                                    }
+                                }
+                            }
 
                             VStack(alignment: .leading, spacing: 10) {
-                                Label("Context & Details", systemImage: "text.alignleft")
-                                    .font(.caption.bold())
-                                    .foregroundStyle(.secondary)
+                                HStack {
+                                    Label("Context & Details", systemImage: "text.alignleft")
+                                        .font(.caption.bold())
+                                        .foregroundStyle(.secondary)
+                                    Spacer()
+                                    toneBadge
+                                    Button {
+                                        showPreview.toggle()
+                                    } label: {
+                                        Label(showPreview ? "Edit" : "Preview", systemImage: showPreview ? "pencil" : "eye")
+                                            .font(.caption.bold())
+                                    }
+                                }
 
-                                TextEditor(text: $context)
-                                    .frame(height: 140)
-                                    .padding(12)
-                                    .scrollContentBackground(.hidden)
-                                    .background(.ultraThinMaterial)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                                    .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                                if showPreview {
+                                    MailMarkdownRenderer(source: context, schema: EmailDraftingTool().outputSchema)
+                                        .padding(12)
+                                        .frame(minHeight: 140, alignment: .topLeading)
+                                        .background(.ultraThinMaterial)
+                                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                                } else {
+                                    TextEditor(text: $context)
+                                        .frame(height: 140)
+                                        .padding(12)
+                                        .scrollContentBackground(.hidden)
+                                        .background(.ultraThinMaterial)
+                                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                                }
                             }
+
+                            aiAssistPanel
                         }
 
                         VStack(spacing: 16) {
@@ -133,6 +213,176 @@ struct DraftingEmailsView: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
+    }
+
+    private var toneBadge: some View {
+        let (tone, color) = analyzeTone(context)
+        return Text(tone)
+            .font(.system(size: 10, weight: .bold))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.2), in: Capsule())
+            .foregroundStyle(color)
+    }
+
+    private func analyzeTone(_ text: String) -> (String, Color) {
+        let formalMarkers = ["hereby", "concerning", "sincerely", "regards", "pleasure", "appreciation"]
+        let informalMarkers = ["hey", "hi", "thanks", "awesome", "great", "deal", "cool"]
+
+        let lowerText = text.lowercased()
+        let formalCount = formalMarkers.filter { lowerText.contains($0) }.count
+        let informalCount = informalMarkers.filter { lowerText.contains($0) }.count
+
+        if formalCount > informalCount {
+            return ("Formal", .blue)
+        } else if informalCount > formalCount {
+            return ("Casual", .green)
+        } else {
+            return ("Mixed", .orange)
+        }
+    }
+
+    private var aiAssistPanel: some View {
+        VStack(spacing: 0) {
+            Button {
+                withAnimation { aiPanelExpanded.toggle() }
+            } label: {
+                HStack {
+                    Label("AI Assistant", systemImage: "sparkles")
+                        .font(.subheadline.bold())
+                    Spacer()
+                    Image(systemName: aiPanelExpanded ? "chevron.down" : "chevron.right")
+                        .font(.caption.bold())
+                }
+                .padding()
+                .background(Color.white.opacity(0.05))
+            }
+
+            if aiPanelExpanded {
+                VStack(spacing: 16) {
+                    Picker("Tool", selection: $selectedAIToolID) {
+                        ForEach(AIToolType.allCases, id: \.toolID) { tool in
+                            Text(tool.rawValue).tag(tool.toolID)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
+                    if !aiResult.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("AI Result")
+                                    .font(.caption.bold())
+                                    .foregroundStyle(.blue)
+                                Spacer()
+                                Button("Apply") {
+                                    if selectedAIToolID == "subject_line" {
+                                        subject = aiResult
+                                    } else {
+                                        context = MarkdownSyntaxStripper.plainText(from: aiResult)
+                                    }
+                                    aiResult = ""
+                                }
+                                .font(.caption.bold())
+                            }
+
+                            if selectedAIToolID == "proofread" && !proofreadDiff.isEmpty {
+                                diffView
+                            } else {
+                                MailMarkdownRenderer(source: aiResult, schema: EmailDraftingTool().outputSchema)
+                                    .padding(12)
+                                    .background(Color.black.opacity(0.2), in: RoundedRectangle(cornerRadius: 12))
+                            }
+                        }
+                        .padding()
+                        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+                    }
+
+                    Button {
+                        runAITool()
+                    } label: {
+                        if isGeneratingSuggestions {
+                            ProgressView().tint(.white)
+                        } else {
+                            Text("Run AI Assist")
+                                .font(.subheadline.bold())
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.blue, in: RoundedRectangle(cornerRadius: 12))
+                    .foregroundStyle(.white)
+                    .disabled(isGeneratingSuggestions || context.isEmpty)
+                }
+                .padding()
+                .background(Color.white.opacity(0.03))
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.1), lineWidth: 1))
+    }
+
+    private var diffView: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            ForEach(proofreadDiff) { line in
+                Text(line.text)
+                    .font(.system(.caption, design: .monospaced))
+                    .padding(.horizontal, 4)
+                    .background(line.type == .original ? Color.red.opacity(0.2) : (line.type == .corrected ? Color.green.opacity(0.2) : Color.clear))
+                    .foregroundStyle(line.type == .original ? .red : (line.type == .corrected ? .green : .primary))
+            }
+
+            Button("Accept All") {
+                context = MarkdownSyntaxStripper.plainText(from: aiResult)
+                aiResult = ""
+                proofreadDiff = []
+            }
+            .font(.caption2.bold())
+            .padding(.top, 8)
+        }
+    }
+
+    private func runAITool() {
+        Task {
+            isGeneratingSuggestions = true
+            defer { isGeneratingSuggestions = false }
+
+            guard let tool = MailAIToolRegistry.shared.tool(for: selectedAIToolID) else { return }
+
+            do {
+                let result = try await AIService.shared.processText(prompt: "Process this text:\n\(context)", systemPrompt: tool.systemPrompt)
+                await MainActor.run {
+                    aiResult = result
+                    if selectedAIToolID == "subject_line" {
+                        subjectSuggestions = result.components(separatedBy: "\n").filter { $0.contains("- ") || $0.contains("* ") }.map { $0.replacingOccurrences(of: "- ", with: "").replacingOccurrences(of: "* ", with: "").trimmingCharacters(in: .whitespaces) }
+                    } else if selectedAIToolID == "proofread" {
+                        calculateDiff(original: context, corrected: result)
+                    }
+                }
+            } catch {
+                print("AI Assist failed: \(error)")
+            }
+        }
+    }
+
+    private func calculateDiff(original: String, corrected: String) {
+        let origLines = original.components(separatedBy: "\n")
+        let corrLines = corrected.components(separatedBy: "\n")
+
+        var diff: [DiffLine] = []
+        // Minimal LCS-like diff (line by line)
+        let maxLines = max(origLines.count, corrLines.count)
+        for i in 0..<maxLines {
+            let o = i < origLines.count ? origLines[i] : ""
+            let c = i < corrLines.count ? corrLines[i] : ""
+
+            if o == c {
+                diff.append(.init(text: o, type: .unchanged))
+            } else {
+                if !o.isEmpty { diff.append(.init(text: "- \(o)", type: .original)) }
+                if !c.isEmpty { diff.append(.init(text: "+ \(c)", type: .corrected)) }
+            }
+        }
+        self.proofreadDiff = diff
     }
 
     private func modernInputField(label: String, text: Binding<String>, placeholder: String, icon: String) -> some View {

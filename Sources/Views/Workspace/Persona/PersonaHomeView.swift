@@ -9,6 +9,9 @@ struct PersonaHomeView: View {
     @State private var chatThreads: [PersonaChatThread] = []
     @State private var activeThreadID: UUID?
     @State private var agentModeEnabled = false
+    @State private var pendingAction: PersonaAgentFramework.PersonaActionPreview?
+    @State private var pendingIntent: PersonaAgentFramework.PersonaIntent?
+    @State private var clarificationMissingField: String?
 
     // Expanded Preset Prompts (500+)
     private let allPrompts = [
@@ -313,6 +316,8 @@ struct PersonaHomeView: View {
         case settings
         case discovery
         case actions
+        case exportOptions
+        case shareSheet(data: Data, filename: String)
 
         var id: String {
             switch self {
@@ -320,6 +325,8 @@ struct PersonaHomeView: View {
             case .settings: return "settings"
             case .discovery: return "discovery"
             case .actions: return "actions"
+            case .exportOptions: return "exportOptions"
+            case .shareSheet: return "shareSheet"
             }
         }
     }
@@ -346,12 +353,14 @@ struct PersonaHomeView: View {
                 agentMode: agentModeEnabled,
                 query: $query,
                 followUpSuggestions: followUpSuggestions,
+                pendingAction: pendingAction,
                 onPromptSelection: selectPromptAndSend(_:),
                 onSend: sendMessage,
                 onOpenDiscovery: openDiscovery,
                 onOpenChats: openChats,
                 onOpenActions: { activeModal = .actions },
-                onNeedScroll: scrollToBottom
+                onNeedScroll: scrollToBottom,
+                onConfirm: handleConfirmation(_:)
             )
         }
         .aiAnimationLoading(manager.isThinking)
@@ -439,8 +448,118 @@ struct PersonaHomeView: View {
 
         manager.agentModeEnabled = agentModeEnabled
 
+        if agentModeEnabled {
+            Task {
+                await processAgentMessage(trimmed)
+            }
+        } else {
+            Task {
+                await manager.queryPersonaSafely(query: trimmed)
+            }
+        }
+    }
+
+    private func processAgentMessage(_ input: String) async {
+        let history = manager.chatHistory
+        let engine = PersonaAgentFramework.PersonaIntentEngine()
+        let dispatcher = PersonaAgentFramework.PersonaActionDispatcher()
+
+        let contacts = AccountManager.shared.accounts.map { PersonaAgentFramework.PersonaContact(name: $0.displayName, email: $0.emailAddress) }
+        let context = PersonaAgentFramework.PersonaWorkspaceContext(contacts: contacts, lastAccessedNote: nil, activeDraft: nil, recentEmails: [])
+
+        let userMsg = PersonaMessage(role: "user", content: input)
+        await MainActor.run { manager.chatHistory.append(userMsg) }
+        await MainActor.run { manager.isThinking = true }
+
+        var finalIntent: PersonaAgentFramework.PersonaIntent
+
+        if let missingField = clarificationMissingField, var intent = pendingIntent {
+            // Fill missing field in existing intent
+            switch intent {
+            case .sendEmail(var params):
+                if missingField == "recipients" { params.recipients = [input] }
+                intent = .sendEmail(parameters: params)
+            case .createNote(var params):
+                if missingField == "body" { params.body = input }
+                intent = .createNote(parameters: params)
+            default: break
+            }
+            finalIntent = intent
+            await MainActor.run {
+                clarificationMissingField = nil
+                pendingIntent = nil
+            }
+        } else {
+            finalIntent = await engine.classify(input: input, conversationHistory: history, workspaceContext: context)
+        }
+
+        if case .compound(let steps) = finalIntent {
+            for step in steps {
+                let stepResult = await dispatcher.dispatch(step, in: context)
+                await handleActionResult(stepResult, intent: step)
+                if case .failed = stepResult { break }
+            }
+        } else {
+            let result = await dispatcher.dispatch(finalIntent, in: context)
+            await handleActionResult(result, intent: finalIntent)
+        }
+
+        await MainActor.run { manager.isThinking = false }
+    }
+
+    func handleConfirmation(_ confirmed: Bool) {
+        guard confirmed, let intent = pendingIntent else {
+            pendingAction = nil
+            pendingIntent = nil
+            return
+        }
+
         Task {
-            await manager.queryPersonaSafely(query: trimmed)
+            let dispatcher = PersonaAgentFramework.PersonaActionDispatcher()
+            let contacts = AccountManager.shared.accounts.map { PersonaAgentFramework.PersonaContact(name: $0.displayName, email: $0.emailAddress) }
+            let context = PersonaAgentFramework.PersonaWorkspaceContext(contacts: contacts, lastAccessedNote: nil, activeDraft: nil, recentEmails: [])
+
+            // Execute the intent directly now that it's confirmed
+            let result: PersonaAgentFramework.PersonaActionResult
+            switch intent {
+            case .deleteNote(let id):
+                result = .from(try! await PersonaAgentFramework.shared.execute(.deleteWorkspaceItem(id: id, type: .note)))
+            case .deleteEvent(let params):
+                result = .from(try! await PersonaAgentFramework.shared.execute(.deleteEvent(params)))
+            case .deleteTask(let id):
+                result = .from(try! await PersonaAgentFramework.shared.execute(.deleteTask(id: id)))
+            default:
+                result = .failed(error: .serviceUnavailable("Confirmation logic for this intent not implemented"))
+            }
+
+            await MainActor.run {
+                self.pendingAction = nil
+                self.pendingIntent = nil
+            }
+            await handleActionResult(result, intent: intent)
+        }
+    }
+
+    private func handleActionResult(_ result: PersonaAgentFramework.PersonaActionResult, intent: PersonaAgentFramework.PersonaIntent) async {
+        switch result {
+        case .success(let summary, _):
+            let msg = PersonaMessage(role: "assistant", content: summary)
+            await MainActor.run { manager.chatHistory.append(msg) }
+        case .requiresConfirmation(let preview):
+            await MainActor.run {
+                self.pendingAction = preview
+                self.pendingIntent = intent
+            }
+        case .failed(let error):
+            let msg = PersonaMessage(role: "assistant", content: "Error: \(error.localizedDescription)")
+            await MainActor.run { manager.chatHistory.append(msg) }
+        case .clarificationNeeded(let question, let missingField):
+            let msg = PersonaMessage(role: "assistant", content: question)
+            await MainActor.run {
+                manager.chatHistory.append(msg)
+                self.clarificationMissingField = missingField
+                self.pendingIntent = intent
+            }
         }
     }
 
@@ -475,12 +594,14 @@ private struct PersonaHomeNavigationContent: View {
     let agentMode: Bool
     @Binding var query: String
     let followUpSuggestions: [String]
+    let pendingAction: PersonaAgentFramework.PersonaActionPreview?
     let onPromptSelection: (String) -> Void
     let onSend: () -> Void
     let onOpenDiscovery: () -> Void
     let onOpenChats: () -> Void
     let onOpenActions: () -> Void
     let onNeedScroll: (ScrollViewProxy) -> Void
+    let onConfirm: (Bool) -> Void
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -506,6 +627,15 @@ private struct PersonaHomeNavigationContent: View {
                     onOpenChats: onOpenChats,
                     onOpenActions: onOpenActions
                 )
+            }
+
+            if let action = pendingAction {
+                PersonaActionConfirmationCard(preview: action) { confirmed in
+                    onConfirm(confirmed)
+                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .padding()
+                .zIndex(2)
             }
 
             if agentMode {
@@ -872,8 +1002,10 @@ private struct PersonaHomeModalContent: View {
         Group {
             switch modal {
             case .settings:
-                TuningSheetView(manager: manager)
-                    .presentationDetents([.medium])
+                TuningSheetView(manager: manager) {
+                    activeModal = .exportOptions
+                }
+                .presentationDetents([.medium])
             case .discovery:
                 PromptDiscoveryView(allPrompts: allPrompts, onSelect: onPromptSelection)
                     .presentationDetents([.medium])
@@ -891,6 +1023,19 @@ private struct PersonaHomeModalContent: View {
             case .actions:
                 PersonaAgentActionGalleryView()
                     .presentationDetents([.medium, .large])
+            case .exportOptions:
+                PersonaExportOptionsView(
+                    messages: manager.chatHistory,
+                    persona: manager.config,
+                    agentMode: manager.agentModeEnabled
+                ) { data, filename in
+                    activeModal = .shareSheet(data: data, filename: filename)
+                }
+                .presentationDetents([.height(300)])
+            case .shareSheet(let data, let filename):
+                let url = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
+                let _ = try? data.write(to: url)
+                ShareSheet(activityItems: [url])
             }
         }
     }
@@ -1171,6 +1316,58 @@ private struct PersonaSendButton: View {
     }
 }
 
+struct PersonaActionConfirmationCard: View {
+    let preview: PersonaAgentFramework.PersonaActionPreview
+    let onDecision: (Bool) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Image(systemName: "exclamationmark.shield.fill")
+                    .foregroundStyle(.orange)
+                Text("Confirm Action")
+                    .font(.headline)
+            }
+
+            Text(preview.intentDescription)
+                .font(.subheadline)
+
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(preview.parameterSummary.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+                    HStack {
+                        Text("\(key):")
+                            .font(.caption.bold())
+                            .foregroundStyle(.secondary)
+                        Text(value)
+                            .font(.caption)
+                    }
+                }
+            }
+
+            if let warning = preview.warningMessage {
+                Text(warning)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .padding(8)
+                    .background(Color.red.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+            }
+
+            HStack(spacing: 12) {
+                Button("Cancel", role: .cancel) { onDecision(false) }
+                    .buttonStyle(.bordered)
+
+                Button("Confirm") { onDecision(true) }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+            }
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(radius: 10)
+    }
+}
+
 private struct PersonaMarkdownBubbleText: View {
     let markdown: String
     let isUser: Bool
@@ -1347,6 +1544,7 @@ struct WelcomePersonaView: View {
 struct TuningSheetView: View {
     @ObservedObject var manager: PersonaManager
     @Environment(\.dismiss) var dismiss
+    let onExport: () -> Void
 
     var body: some View {
         NavigationStack {
@@ -1368,6 +1566,12 @@ struct TuningSheetView: View {
                 }
 
                 Section {
+                    Button {
+                        onExport()
+                    } label: {
+                        Label("Export Chat", systemImage: "square.and.arrow.up")
+                    }
+
                     Button(role: .destructive) {
                         manager.clearHistory()
                         dismiss()
@@ -1484,6 +1688,72 @@ struct PersonaAgentActionGalleryView: View {
             }
         }
     }
+}
+
+struct PersonaExportOptionsView: View {
+    let messages: [PersonaMessage]
+    let persona: PersonaConfig
+    let agentMode: Bool
+    let onExport: (Data, String) -> Void
+    @Environment(\.dismiss) var dismiss
+
+    @State private var includeActions = true
+    @State private var includeTokens = false
+    @State private var dateRange = "All time"
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Toggle("Include agent action log", isOn: $includeActions)
+                Toggle("Include token counts", isOn: $includeTokens)
+
+                Picker("Date range", selection: $dateRange) {
+                    ForEach(["All time", "Today", "Last 7 days"], id: \.self) { Text($0) }
+                }
+
+                Section {
+                    Button {
+                        do {
+                            let data = try PersonaChatExporter.export(
+                                messages: messages,
+                                actions: [], // Actions log can be integrated if stored
+                                persona: persona,
+                                agentMode: agentMode,
+                                conversationID: UUID(), // Thread ID
+                                includeTokens: includeTokens
+                            )
+                            let dateStr = DateFormatter.yyyyMMdd.string(from: Date())
+                            let filename = "\(persona.name.replacingOccurrences(of: " ", with: "_"))_Chat_\(dateStr).json"
+                            onExport(data, filename)
+                        } catch {
+                            print("Export failed: \(error)")
+                        }
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Text("Export Now").bold()
+                            Spacer()
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Export Options")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+extension DateFormatter {
+    static let yyyyMMdd: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd"
+        return formatter
+    }()
 }
 
 private struct MarkdownSyntaxStripper {

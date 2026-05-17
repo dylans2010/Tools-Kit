@@ -4,40 +4,22 @@ import Aurora
 struct AIWriteView: View {
     @Environment(\.dismiss) private var dismiss
 
-    enum EmailType: String, CaseIterable, Identifiable {
-        case general = "General", followup = "Follow Up", request = "Request", apology = "Apology", update = "Update"
-        var id: String { rawValue }
-    }
-
     enum Tone: String, CaseIterable, Identifiable {
-        case professional = "Professional", friendly = "Friendly", concise = "Concise", urgent = "Urgent", academic = "Academic"
+        case formal = "Formal", friendly = "Friendly", assertive = "Assertive", concise = "Concise", diplomatic = "Diplomatic"
         var id: String { rawValue }
     }
 
-    enum AITool: String, CaseIterable, Identifiable {
-        case write = "Write", rewrite = "Rewrite", shorten = "Shorten", expand = "Expand", formalize = "Formalize", proofread = "Proofread", suggestSubject = "Suggest Subject"
-        var id: String { rawValue }
-
-        var icon: String {
-            switch self {
-            case .write: return "pencil.and.outline"
-            case .rewrite: return "arrow.triangle.2.circlepath"
-            case .shorten: return "arrow.up.right.and.arrow.down.left.rectangle"
-            case .expand: return "arrow.down.left.and.arrow.up.right.rectangle"
-            case .formalize: return "briefcase.fill"
-            case .proofread: return "checkmark.shield.fill"
-            case .suggestSubject: return "text.quote"
-            }
-        }
-    }
-
-    @State private var emailType: EmailType = .general
-    @State private var tone: Tone = .professional
-    @State private var selectedTool: AITool = .write
+    @State private var selectedToolID: String = EmailDraftingTool().toolID
+    @State private var selectedTone: Tone = .friendly
     @State private var prompt: String = ""
     @State private var isGenerating = false
-    @State private var generatedContent = ""
+    @State private var streamBuffer: String = ""
+    @State private var generatedContent: String = ""
     @State private var errorMessage: String?
+    @State private var insufficientInputFields: [String] = []
+
+    @State private var inputTokens: Int = 0
+    @State private var outputTokens: Int = 0
 
     let onCompletion: (String) -> Void
 
@@ -66,37 +48,11 @@ struct AIWriteView: View {
                         VStack(spacing: 20) {
                             toolsGrid
 
+                            if !insufficientInputFields.isEmpty {
+                                errorBanner
+                            }
+
                             VStack(spacing: 12) {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Email Type")
-                                            .font(.caption2.bold())
-                                            .foregroundStyle(.secondary)
-                                        Picker("Type", selection: $emailType) {
-                                            ForEach(EmailType.allCases) { Text($0.rawValue).tag($0) }
-                                        }
-                                        .pickerStyle(.menu)
-                                        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
-                                    }
-
-                                    Spacer()
-
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Tone")
-                                            .font(.caption2.bold())
-                                            .foregroundStyle(.secondary)
-                                        Picker("Tone", selection: $tone) {
-                                            ForEach(Tone.allCases) { Text($0.rawValue).tag($0) }
-                                        }
-                                        .pickerStyle(.menu)
-                                        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
-                                    }
-                                }
-                                .padding()
-                                .background(.ultraThinMaterial)
-                                .clipShape(RoundedRectangle(cornerRadius: 16))
-                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.1), lineWidth: 1))
-
                                 ZStack(alignment: .topLeading) {
                                     TextEditor(text: $prompt)
                                         .frame(height: 140)
@@ -171,32 +127,70 @@ struct AIWriteView: View {
     private var toolsGrid: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                ForEach(AITool.allCases) { tool in
+                ForEach(MailAIToolRegistry.shared.allTools(), id: \.toolID) { tool in
                     Button {
                         withAnimation(.spring()) {
-                            selectedTool = tool
+                            selectedToolID = tool.toolID
                         }
                     } label: {
                         VStack(spacing: 8) {
-                            Image(systemName: tool.icon)
+                            Image(systemName: icon(for: tool.toolID))
                                 .font(.system(size: 20))
-                            Text(tool.rawValue)
+                            Text(tool.displayName)
                                 .font(.caption.bold())
                         }
                         .frame(width: 100, height: 80)
-                        .background(selectedTool == tool ? Color.blue.opacity(0.2) : Color.white.opacity(0.05))
+                        .background(selectedToolID == tool.toolID ? Color.blue.opacity(0.2) : Color.white.opacity(0.05))
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke(selectedTool == tool ? Color.blue.opacity(0.5) : Color.white.opacity(0.1), lineWidth: 1.5)
+                                .stroke(selectedToolID == tool.toolID ? Color.blue.opacity(0.5) : Color.white.opacity(0.1), lineWidth: 1.5)
                         )
-                        .foregroundStyle(selectedTool == tool ? Color.blue : Color.primary)
+                        .foregroundStyle(selectedToolID == tool.toolID ? Color.blue : Color.primary)
                     }
                 }
             }
             .padding(.horizontal, 2)
         }
+    }
+
+    private func icon(for id: String) -> String {
+        switch id {
+        case "email_drafting": return "pencil.and.outline"
+        case "email_rewrite": return "arrow.triangle.2.circlepath"
+        case "email_translation": return "character.bubble"
+        case "subject_line": return "text.quote"
+        case "tone_shift": return "paintpalette"
+        case "email_summarize": return "text.alignleft"
+        case "reply_draft": return "arrowshape.turn.up.left"
+        case "follow_up": return "clock.arrow.circlepath"
+        case "proofread": return "checkmark.shield"
+        case "bullet_to_email": return "list.bullet.indent"
+        default: return "sparkles"
+        }
+    }
+
+    private var errorBanner: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                Text("Insufficient Input")
+                    .font(.headline)
+            }
+            Text("Please provide more details for the following fields:")
+                .font(.subheadline)
+            ForEach(insufficientInputFields, id: \.self) { field in
+                Text("• \(field)")
+                    .font(.caption.bold())
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.orange.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.orange.opacity(0.3), lineWidth: 1))
     }
 
     private var generateButton: some View {
@@ -229,34 +223,86 @@ struct AIWriteView: View {
     private var outputSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Label("Generated Draft", systemImage: "wand.and.stars")
+                Label("AI Output", systemImage: "wand.and.stars")
                     .font(.subheadline.bold())
                     .foregroundStyle(.blue)
                 Spacer()
-                Button {
-                    onCompletion(generatedContent)
-                    dismiss()
-                } label: {
-                    Text("Insert Draft")
-                        .font(.caption.bold())
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.blue, in: Capsule())
-                        .foregroundStyle(.white)
-                }
             }
 
             ScrollView {
-                Text(generatedContent)
-                    .font(.subheadline)
-                    .lineSpacing(4)
-                    .padding(16)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white.opacity(0.03))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                let content = isGenerating ? streamBuffer : (generatedContent.isEmpty ? "" : generatedContent)
+                let tool = MailAIToolRegistry.shared.tool(for: selectedToolID)
+
+                Group {
+                    if let tool = tool, case .markdown = tool.responseFormat {
+                        MailMarkdownRenderer(source: content, schema: tool.outputSchema)
+                    } else {
+                        Text(content)
+                    }
+                }
+                .font(.subheadline)
+                .lineSpacing(4)
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.white.opacity(0.03))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .frame(maxHeight: 250)
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.05), lineWidth: 1))
+
+            if !isGenerating && !generatedContent.isEmpty {
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        Button {
+                            UIPasteboard.general.string = generatedContent
+                        } label: {
+                            Label("Copy", systemImage: "doc.on.doc")
+                                .font(.caption.bold())
+                                .padding(.vertical, 8)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.white.opacity(0.1), in: Capsule())
+                        }
+
+                        Button {
+                            onCompletion(generatedContent)
+                            dismiss()
+                        } label: {
+                            Label("Insert", systemImage: "arrow.right.circle.fill")
+                                .font(.caption.bold())
+                                .padding(.vertical, 8)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.blue, in: Capsule())
+                                .foregroundStyle(.white)
+                        }
+                    }
+
+                    HStack(spacing: 12) {
+                        Button {
+                            Task { await generate() }
+                        } label: {
+                            Label("Regenerate", systemImage: "arrow.clockwise")
+                                .font(.caption.bold())
+                                .padding(.vertical, 8)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.white.opacity(0.1), in: Capsule())
+                        }
+
+                        Picker("Tone", selection: $selectedTone) {
+                            ForEach(Tone.allCases) { Text($0.rawValue).tag($0) }
+                        }
+                        .pickerStyle(.menu)
+                        .font(.caption.bold())
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(Color.white.opacity(0.1), in: Capsule())
+                        .onChange(of: selectedTone) { _, _ in
+                            Task { await generate() }
+                        }
+                    }
+
+                    usageFooter
+                }
+            }
         }
         .padding()
         .background(.ultraThinMaterial)
@@ -264,56 +310,89 @@ struct AIWriteView: View {
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.1), lineWidth: 1))
     }
 
+    private var usageFooter: some View {
+        HStack {
+            Text("Tokens: \(inputTokens) in / \(outputTokens) out")
+            Spacer()
+            Text("Est. Cost: $\(String(format: "%.5f", Double(outputTokens) * MailAIToolsSystem.costPerOutputToken))")
+        }
+        .font(.system(size: 10, weight: .medium, design: .monospaced))
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 4)
+    }
+
     private var placeholderText: String {
-        switch selectedTool {
-        case .write: return "What should the email be about?"
-        case .rewrite: return "Paste the text you want to rewrite..."
-        case .shorten: return "Paste the text you want to shorten..."
-        case .expand: return "Paste the text you want to expand..."
-        case .formalize: return "Paste the text you want to make more professional..."
-        case .proofread: return "Paste the text you want to proofread..."
-        case .suggestSubject: return "Paste the email body to suggest a subject line..."
+        guard let tool = MailAIToolRegistry.shared.tool(for: selectedToolID) else { return "Enter prompt..." }
+        switch tool.toolID {
+        case "email_drafting": return "What should the email be about?"
+        case "email_rewrite": return "Paste the text you want to rewrite..."
+        case "email_translation": return "Paste text and target language..."
+        case "subject_line": return "Paste the email body..."
+        case "tone_shift": return "Paste text to change tone..."
+        case "email_summarize": return "Paste a long thread..."
+        case "reply_draft": return "Paste original email..."
+        case "follow_up": return "Who are you following up with?"
+        case "proofread": return "Paste text to proofread..."
+        case "bullet_to_email": return "List your bullet points..."
+        default: return "Enter context..."
         }
     }
 
     private var buttonLabel: String {
-        switch selectedTool {
-        case .write: return "Generate Email"
-        case .suggestSubject: return "Suggest Subject"
-        default: return "Process with AI"
-        }
+        guard let tool = MailAIToolRegistry.shared.tool(for: selectedToolID) else { return "Process" }
+        return tool.displayName
     }
 
     private func generate() async {
+        guard let tool = MailAIToolRegistry.shared.tool(for: selectedToolID) else { return }
+
         isGenerating = true
         errorMessage = nil
+        insufficientInputFields = []
+        streamBuffer = ""
+
+        inputTokens = prompt.count / 4 // Heuristic
+
         do {
-            let systemPrompt = "You are an AI writing assistant specializing in professional email communications. Help users draft, refine, and optimize their emails."
-            let fullPrompt: String
+            let fullPrompt = "Task: \(tool.displayName)\nTone: \(selectedTone.rawValue)\nInput: \(prompt)"
 
-            switch selectedTool {
-            case .write:
-                fullPrompt = "Write a \(tone.rawValue) \(emailType.rawValue) email based on this description: \(prompt)"
-            case .rewrite:
-                fullPrompt = "Rewrite the following text to be more \(tone.rawValue) and clear: \(prompt)"
-            case .shorten:
-                fullPrompt = "Make the following email text more concise and brief while maintaining a \(tone.rawValue) tone: \(prompt)"
-            case .expand:
-                fullPrompt = "Expand on the following email points to make it more detailed and comprehensive in a \(tone.rawValue) tone: \(prompt)"
-            case .formalize:
-                fullPrompt = "Transform the following text into a highly professional and formal email: \(prompt)"
-            case .proofread:
-                fullPrompt = "Proofread the following email for grammar, spelling, and flow improvements: \(prompt)"
-            case .suggestSubject:
-                fullPrompt = "Based on this email body, suggest 3 catchy and professional subject lines: \(prompt)"
-            }
+            // Simulating streaming if supported
+            if tool.supportsStreaming {
+                let result = try await AIService.shared.processText(prompt: fullPrompt, systemPrompt: tool.systemPrompt)
 
-            let result = try await AIService.shared.processText(prompt: fullPrompt, systemPrompt: systemPrompt)
-            await MainActor.run {
-                withAnimation {
-                    generatedContent = result
+                // Simulate streaming display
+                for char in result {
+                    try await Task.sleep(nanoseconds: 5_000_000)
+                    await MainActor.run {
+                        streamBuffer.append(char)
+                    }
                 }
-                isGenerating = false
+
+                await MainActor.run {
+                    generatedContent = processResult(result, for: tool)
+                    outputTokens = result.count / 4
+                    isGenerating = false
+                }
+            } else {
+                let result = try await AIService.shared.processText(prompt: fullPrompt, systemPrompt: tool.systemPrompt)
+
+                if result.contains("\"error\": \"insufficient_input\"") {
+                    if let data = result.data(using: .utf8),
+                       let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let missing = json["missing"] as? [String] {
+                        await MainActor.run {
+                            insufficientInputFields = missing
+                            isGenerating = false
+                        }
+                        return
+                    }
+                }
+
+                await MainActor.run {
+                    generatedContent = processResult(result, for: tool)
+                    outputTokens = result.count / 4
+                    isGenerating = false
+                }
             }
         } catch {
             await MainActor.run {
@@ -321,5 +400,18 @@ struct AIWriteView: View {
                 isGenerating = false
             }
         }
+    }
+
+    private func processResult(_ result: String, for tool: any MailAITool) -> String {
+        let sanitized = MarkdownOutputValidator.sanitize(result, against: tool.outputSchema)
+
+        if case .structured(let fields) = tool.responseFormat {
+            if let data = sanitized.data(using: .utf8),
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String: String] {
+                return fields.compactMap { json[$0] }.joined(separator: "\n\n")
+            }
+        }
+
+        return sanitized
     }
 }
