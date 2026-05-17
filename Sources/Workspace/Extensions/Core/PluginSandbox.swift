@@ -46,7 +46,7 @@ final class PluginSandbox {
     // MARK: - Validation Pipeline
 
     /// Validates if a plugin can execute based on capability, action, scope, and prerequisites.
-    func validateExecution(plugin: PluginDefinition, event: PluginEvent) -> ValidationResult {
+    func validateExecution(plugin: PluginDefinition, event: PluginEvent) -> PluginValidationResult {
         // 1. Capability Match
         guard plugin.capabilities.contains(event.capability) else {
             return .failure(reason: .capabilityMismatch, detail: "Plugin does not have capability: \(event.capability.rawValue)")
@@ -197,12 +197,12 @@ final class PluginSandbox {
 
 // MARK: - Helper Types
 
-enum ValidationResult {
+enum PluginValidationResult {
     case success
-    case failure(reason: ValidationFailureReason, detail: String)
+    case failure(reason: PluginValidationFailureReason, detail: String)
 }
 
-enum ValidationFailureReason: String {
+enum PluginValidationFailureReason: String {
     case capabilityMismatch = "Capability Mismatch"
     case actionMismatch = "Action Mismatch"
     case scopeInvalid = "Scope Invalid"
