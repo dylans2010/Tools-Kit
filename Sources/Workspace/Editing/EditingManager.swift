@@ -33,7 +33,9 @@ final class EditingManager: ObservableObject {
         saveProjects()
 
         // Index with Collaboration Framework
-        CollaborationFramework.shared.indexObject(id: project.id, type: .mediaProject)
+        Task { @MainActor in
+            CollaborationFramework.shared.indexObject(id: project.id, type: .mediaProject)
+        }
 
         return project
     }
@@ -41,7 +43,9 @@ final class EditingManager: ObservableObject {
     func deleteProject(id: UUID) {
         projects.removeAll { $0.id == id }
         saveProjects()
-        CollaborationFramework.shared.unindexObject(id: id)
+        Task { @MainActor in
+            CollaborationFramework.shared.unindexObject(id: id)
+        }
     }
 
     func saveProject(_ project: EditingProject) {
@@ -107,7 +111,9 @@ final class EditingManager: ObservableObject {
 
                 // Re-index all projects
                 for project in projects {
-                    CollaborationFramework.shared.indexObject(id: project.id, type: .mediaProject)
+                    Task { @MainActor in
+                        CollaborationFramework.shared.indexObject(id: project.id, type: .mediaProject)
+                    }
                 }
             }
         } catch {

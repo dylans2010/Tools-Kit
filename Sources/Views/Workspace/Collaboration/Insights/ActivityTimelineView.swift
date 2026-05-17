@@ -49,7 +49,7 @@ struct ActivityFeedView: View {
                                 icon: iconForAction(log.action),
                                 color: colorForAction(log.action),
                                 title: log.action,
-                                detail: "\(log.userName) • \(log.timestamp, style: .relative)",
+                                detail: "\(log.userName) • \(log.timestamp.formatted(.relative(presentation: .named)))",
                                 time: ""
                             )
                         }
