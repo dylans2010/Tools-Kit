@@ -43,7 +43,7 @@ final class PersonaManager: ObservableObject {
 
         // 2. Perform heavy workspace data gathering and prompt building in background
         let systemPrompt = await Task.detached(priority: .userInitiated) {
-            let workspaceContext = PersonaWorkspace.gatherFullWorkspaceData()
+            let workspaceContext = await PersonaWorkspace.gatherFullWorkspaceData()
 
             return """
             \(instructions)

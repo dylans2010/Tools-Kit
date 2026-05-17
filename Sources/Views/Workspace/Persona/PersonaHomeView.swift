@@ -350,6 +350,7 @@ struct PersonaHomeView: View {
                 onSend: sendMessage,
                 onOpenDiscovery: openDiscovery,
                 onOpenChats: openChats,
+                onOpenActions: { activeModal = .actions },
                 onNeedScroll: scrollToBottom
             )
         }
@@ -476,6 +477,7 @@ private struct PersonaHomeNavigationContent: View {
     let onSend: () -> Void
     let onOpenDiscovery: () -> Void
     let onOpenChats: () -> Void
+    let onOpenActions: () -> Void
     let onNeedScroll: (ScrollViewProxy) -> Void
 
     var body: some View {
@@ -500,7 +502,7 @@ private struct PersonaHomeNavigationContent: View {
                     onSend: onSend,
                     onOpenDiscovery: onOpenDiscovery,
                     onOpenChats: onOpenChats,
-                    onOpenActions: { activeModal = .actions }
+                    onOpenActions: onOpenActions
                 )
             }
 

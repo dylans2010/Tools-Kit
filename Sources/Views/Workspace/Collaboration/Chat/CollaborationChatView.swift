@@ -94,7 +94,7 @@ struct CollaborationChatView: View {
                     } label: {
                         Image(systemName: "paperplane.circle.fill")
                             .font(.system(size: 28))
-                            .foregroundStyle(messageText.isEmpty ? .secondary : .blue)
+                            .foregroundStyle(messageText.isEmpty ? Color.secondary : Color.blue)
                     }
                     .disabled(messageText.isEmpty)
                 }
