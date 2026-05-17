@@ -147,8 +147,9 @@ struct NowPlayingView: View {
             if let image = artworkImage {
                 Image(uiImage: image)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: coverSize, maxHeight: coverSize)
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: coverSize, height: coverSize)
+                    .clipped()
                     .background(Color.white.opacity(0.02), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
                     .cornerRadius(20)
                     .shadow(color: .black.opacity(0.5), radius: 20, x: 0, y: 12)
@@ -359,18 +360,20 @@ private struct ArtworkBackground: View {
     let image: UIImage?
 
     var body: some View {
-        ZStack {
-            if let image {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipped()
-                    .blur(radius: 50)
-                    .overlay(Color.black.opacity(0.55))
-                    .ignoresSafeArea()
-            } else {
-                Color.black.ignoresSafeArea()
+        GeometryReader { geo in
+            ZStack {
+                if let image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .clipped()
+                        .blur(radius: 60)
+                        .overlay(Color.black.opacity(0.45))
+                        .ignoresSafeArea()
+                } else {
+                    Color.black.ignoresSafeArea()
+                }
             }
         }
     }

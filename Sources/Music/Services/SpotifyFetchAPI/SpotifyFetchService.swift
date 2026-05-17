@@ -68,17 +68,42 @@ actor SpotifyFetchService {
                     request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", forHTTPHeaderField: "Accept")
                     request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36", forHTTPHeaderField: "User-Agent")
 
-                    let (data, response) = try await session.data(for: request)
+                    var data: Data?
+                    var lastError: Swift.Error?
+
+                    for attempt in 0..<3 {
+                        if Task.isCancelled { break }
+                        do {
+                            let (d, r) = try await session.data(for: request)
+                            guard let httpResponse = r as? HTTPURLResponse else {
+                                throw Error.requestFailed
+                            }
+
+                            if httpResponse.statusCode == 429 {
+                                let retryAfter = httpResponse.value(forHTTPHeaderField: "Retry-After").flatMap(Double.init) ?? 5.0
+                                try await Task.sleep(nanoseconds: UInt64(retryAfter * 1_000_000_000))
+                                continue
+                            }
+
+                            guard 200..<300 ~= httpResponse.statusCode else {
+                                throw Error.requestFailed
+                            }
+
+                            data = d
+                            break
+                        } catch {
+                            lastError = error
+                            try await Task.sleep(nanoseconds: UInt64(pow(2.0, Double(attempt)) * 1_000_000_000))
+                        }
+                    }
 
                     if Task.isCancelled {
                         continuation.finish(throwing: Error.cancelled)
                         return
                     }
 
-                    guard let httpResponse = response as? HTTPURLResponse,
-                          200..<300 ~= httpResponse.statusCode,
-                          let html = String(data: data, encoding: .utf8) else {
-                        continuation.finish(throwing: Error.requestFailed)
+                    guard let finalData = data, let html = String(data: finalData, encoding: .utf8) else {
+                        continuation.finish(throwing: lastError ?? Error.requestFailed)
                         return
                     }
 

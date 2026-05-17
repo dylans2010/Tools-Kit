@@ -40,6 +40,11 @@ actor DownloadManager {
     }
 
     private func downloadTrack(_ match: MatchedTrack) async -> URL? {
+        if match.sourceType == .external {
+            // Future improvement: implement external download here
+            return nil
+        }
+
         guard match.sourceType == .local,
               let sourceURLString = match.sourceURL,
               let sourceURL = URL(string: sourceURLString),
@@ -48,7 +53,8 @@ actor DownloadManager {
             return nil
         }
 
-        let destinationURL = musicDirectory.appendingPathComponent("\(match.original.id).\(sourceURL.pathExtension)")
+        let ext = sourceURL.pathExtension.isEmpty ? "mp3" : sourceURL.pathExtension
+        let destinationURL = musicDirectory.appendingPathComponent("\(match.original.id).\(ext)")
 
         // Resume/Integrity check: if file exists and has size > 0, consider it done
         if fileManager.fileExists(atPath: destinationURL.path) {

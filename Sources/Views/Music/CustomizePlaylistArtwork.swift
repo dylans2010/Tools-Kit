@@ -118,6 +118,10 @@ struct CustomizePlaylistArtwork: View {
     @State private var textDesign: FontDesignStyle = .rounded
     @State private var labelLayout: LabelLayoutPreset = .center
     @State private var textShadowOpacity: Double = 0.4
+    @State private var textStrokeEnabled = false
+    @State private var textStrokeWidth: CGFloat = 1
+    @State private var textStrokeColor: Color = .black
+    @State private var backgroundOpacity: Double = 1.0
     @State private var borderEnabled = false
     @State private var borderWidth: CGFloat = 3
     @State private var borderColor: Color = .white
@@ -232,17 +236,20 @@ struct CustomizePlaylistArtwork: View {
     @ViewBuilder
     private var artworkCanvas: some View {
         ZStack {
-            if let img = generatedImage {
-                Image(uiImage: img)
-                    .resizable()
-                    .scaledToFill()
-            } else if let img = uploadedBackground {
-                Image(uiImage: img)
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                gradientBackground
+            Group {
+                if let img = generatedImage {
+                    Image(uiImage: img)
+                        .resizable()
+                        .scaledToFill()
+                } else if let img = uploadedBackground {
+                    Image(uiImage: img)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    gradientBackground
+                }
             }
+            .opacity(backgroundOpacity)
 
             if let symbol = symbolOverlay.symbolName {
                 Image(systemName: symbol)
@@ -259,6 +266,15 @@ struct CustomizePlaylistArtwork: View {
                     .multilineTextAlignment(.center)
                     .padding(8)
                     .shadow(color: .black.opacity(textShadowOpacity), radius: 4, x: 0, y: 2)
+                    .overlay {
+                        if textStrokeEnabled {
+                            Text(displayLabelText)
+                                .font(.system(size: textSize, weight: textBold ? .bold : .regular, design: textDesign.fontDesign))
+                                .multilineTextAlignment(.center)
+                                .padding(8)
+                                .textStroke(textStrokeColor, lineWidth: textStrokeWidth)
+                        }
+                    }
                     .frame(maxWidth: artworkSize - 30)
                     .position(positionForLabelLayout())
             }
@@ -568,8 +584,20 @@ struct CustomizePlaylistArtwork: View {
     // MARK: - Upload Section
 
     private var uploadSection: some View {
-        cardSection("Background Image") {
+        cardSection("Background") {
             VStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text("Background Opacity")
+                        Spacer()
+                        Text("\(Int(backgroundOpacity * 100))%")
+                            .foregroundColor(.secondary)
+                    }
+                    Slider(value: $backgroundOpacity, in: 0...1)
+                }
+
+                Divider().padding(.vertical, 4)
+
                 if let img = uploadedBackground {
                     Image(uiImage: img)
                         .resizable()
@@ -649,6 +677,20 @@ struct CustomizePlaylistArtwork: View {
                                 .foregroundColor(.secondary)
                         }
                         Slider(value: $textShadowOpacity, in: 0...1)
+                    }
+
+                    Toggle("Text Outline", isOn: $textStrokeEnabled)
+                    if textStrokeEnabled {
+                        ColorPicker("Outline Color", selection: $textStrokeColor)
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Outline Width")
+                                Spacer()
+                                Text("\(Int(textStrokeWidth))")
+                                    .foregroundColor(.secondary)
+                            }
+                            Slider(value: $textStrokeWidth, in: 0.5...4, step: 0.5)
+                        }
                     }
 
                     Toggle("Border", isOn: $borderEnabled)
@@ -778,6 +820,26 @@ struct CustomizePlaylistArtwork: View {
     private func applyPlaylistUpdate(_ updated: Playlist) {
         playlist = updated
         library.updatePlaylist(updated)
+    }
+}
+
+// MARK: - View Extensions
+
+extension View {
+    func textStroke(_ color: Color, lineWidth: CGFloat) -> some View {
+        self.modifier(TextStrokeModifier(strokeColor: color, strokeWidth: lineWidth))
+    }
+}
+
+private struct TextStrokeModifier: ViewModifier {
+    let strokeColor: Color
+    let strokeWidth: CGFloat
+
+    func body(content: Content) -> some View {
+        content
+            .shadow(color: strokeColor, radius: strokeWidth, x: 0, y: 0)
+            .shadow(color: strokeColor, radius: strokeWidth, x: 0, y: 0)
+            .shadow(color: strokeColor, radius: strokeWidth, x: 0, y: 0)
     }
 }
 

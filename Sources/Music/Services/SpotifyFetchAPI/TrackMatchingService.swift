@@ -17,9 +17,13 @@ actor TrackMatchingService {
     }
 
     func match(track: SpotifyTrack, localSongs: [Song]) async -> MatchedTrack {
-        let cacheKey = "\(track.title.lowercased())|\(track.artist.lowercased())"
+        let cacheKey = "\(track.id)"
         if let cached = matchCache[cacheKey] {
-            return cached
+            // Verify local file still exists
+            if cached.sourceType == .local, let urlString = cached.sourceURL, let url = URL(string: urlString),
+               FileManager.default.fileExists(atPath: url.path) {
+                return cached
+            }
         }
 
         let normalizedTitle = normalize(track.title)
