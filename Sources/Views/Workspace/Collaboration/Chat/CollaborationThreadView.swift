@@ -92,7 +92,7 @@ struct CollaborationThreadView: View {
                     sendReply()
                 } label: {
                     Image(systemName: "paperplane.fill")
-                        .foregroundStyle(replyText.isEmpty ? .secondary : .blue)
+                        .foregroundStyle(replyText.isEmpty ? Color.secondary : Color.blue)
                 }
                 .disabled(replyText.isEmpty)
             }
