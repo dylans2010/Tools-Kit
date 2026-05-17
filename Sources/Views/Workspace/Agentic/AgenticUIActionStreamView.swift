@@ -210,7 +210,7 @@ struct AgenticUIActionStreamView: View {
             HStack {
                 Text(tool.name)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
                 Spacer()
                 Text(tool.sourceModule)
                     .font(.caption2)
@@ -250,7 +250,7 @@ struct AgenticUIActionStreamView: View {
         HStack {
             Image(systemName: icon)
                 .font(.subheadline)
-                .foregroundStyle(.accentColor)
+                .foregroundStyle(Color.accentColor)
             Text(title)
                 .font(.headline)
             Spacer()

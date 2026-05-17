@@ -26,7 +26,7 @@ struct AgenticUIDebugPanel: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "cpu")
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
                 Text("Foundation Models")
                     .font(.headline)
                 Spacer()
@@ -101,7 +101,7 @@ struct AgenticUIDebugPanel: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "gauge.with.dots.needle.33percent")
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
                 Text("System State")
                     .font(.headline)
             }
@@ -146,7 +146,7 @@ struct AgenticUIDebugPanel: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "exclamationmark.triangle")
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
                 Text("Diagnostics")
                     .font(.headline)
                 Spacer()
@@ -207,7 +207,7 @@ struct AgenticUIDebugPanel: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "text.line.first.and.arrowtriangle.forward")
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
                 Text("Token Stream")
                     .font(.headline)
                 Spacer()

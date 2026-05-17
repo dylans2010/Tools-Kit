@@ -8,6 +8,7 @@ final class CollaborationManager: ObservableObject {
     static let shared = CollaborationManager()
 
     @Published var workspaces: [CollaborationWorkspace] = []
+    @Published var spaces: [CollaborationSpace] = []
     @Published var activeWorkspaceID: UUID?
     @Published var activeChannelID: UUID?
     @Published var presence: [UUID: CollaborationPresence] = [:]
@@ -15,10 +16,12 @@ final class CollaborationManager: ObservableObject {
 
     private let workspacesFile = "collaboration_workspaces_v2.json"
     private let commitsFile = "collaboration_commits_v2.json"
+    private let spacesFile = "collaboration_spaces_v2.json"
     private let dataStore = UnifiedDataStore.shared
 
     private init() {
         loadWorkspaces()
+        loadSpaces()
     }
 
     // MARK: - Workspace & Channel Management
@@ -223,7 +226,45 @@ final class CollaborationManager: ObservableObject {
         }
     }
 
+    // MARK: - Space Management
+
+    func createSpace(name: String, description: String, icon: String, visibility: SpaceVisibility) -> CollaborationSpace {
+        let space = CollaborationSpace(
+            id: UUID(),
+            name: name,
+            description: description,
+            icon: icon,
+            visibility: visibility,
+            ownerID: UUID(),
+            members: [],
+            currentBranchID: UUID(),
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+        spaces.append(space)
+        saveSpaces()
+        return space
+    }
+
+    func deleteSpace(id: UUID) {
+        spaces.removeAll { $0.id == id }
+        saveSpaces()
+    }
+
+    func mergeBranch(spaceID: UUID, sourceBranchID: UUID, targetBranchID: UUID) {
+        guard let wIdx = workspaces.firstIndex(where: { $0.id == spaceID }),
+              let sourceBranch = workspaces[wIdx].branches.first(where: { $0.id == sourceBranchID }),
+              let tIdx = workspaces[wIdx].branches.firstIndex(where: { $0.id == targetBranchID }) else { return }
+        workspaces[wIdx].branches[tIdx].headCommitID = sourceBranch.headCommitID
+        logActivity(workspaceID: spaceID, action: "Merged branch into target")
+        saveWorkspaces()
+    }
+
     // MARK: - Persistence
+
+    func saveData() {
+        saveSpaces()
+    }
 
     private func saveWorkspaces() {
         try? dataStore.save(workspaces, key: workspacesFile)
@@ -231,6 +272,31 @@ final class CollaborationManager: ObservableObject {
 
     private func saveCommits() {
         try? dataStore.save(commits, key: commitsFile)
+    }
+
+    private func saveSpaces() {
+        try? dataStore.save(spaces, key: spacesFile)
+    }
+
+    private func loadSpaces() {
+        if let loaded = try? dataStore.load([CollaborationSpace].self, key: spacesFile) {
+            self.spaces = loaded
+        }
+        if spaces.isEmpty {
+            let defaultSpace = CollaborationSpace(
+                id: UUID(),
+                name: "Default Space",
+                description: "Your primary collaboration space",
+                icon: "briefcase.fill",
+                visibility: .privateSpace,
+                ownerID: UUID(),
+                members: [],
+                currentBranchID: UUID(),
+                createdAt: Date(),
+                updatedAt: Date()
+            )
+            spaces.append(defaultSpace)
+        }
     }
 
     private func loadWorkspaces() {
@@ -246,35 +312,5 @@ final class CollaborationManager: ObservableObject {
         }
         activeWorkspaceID = workspaces.first?.id
         activeChannelID = workspaces.first?.channels.first?.id
-    }
-}
-
-// Legacy Compatibility for CollaborationHomeView (temporary)
-extension CollaborationManager {
-    var spaces: [CollaborationSpace] {
-        return workspaces.map { workspace in
-            CollaborationSpace(
-                id: workspace.id,
-                name: workspace.name,
-                description: workspace.description,
-                icon: workspace.icon,
-                visibility: .privateSpace,
-                ownerID: workspace.ownerID,
-                members: [],
-                branches: [],
-                currentBranchID: UUID(),
-                activityFeed: [],
-                notebookIDs: [],
-                slideDeckIDs: [],
-                meetingIDs: [],
-                formIDs: [],
-                spreadsheetIDs: [],
-                mediaProjectIDs: [],
-                taskIDs: [],
-                decisionIDs: [],
-                createdAt: workspace.createdAt,
-                updatedAt: workspace.updatedAt
-            )
-        }
     }
 }

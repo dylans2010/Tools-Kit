@@ -29,7 +29,7 @@ struct AgenticUIWorkspaceInspectorView: View {
             HStack {
                 Image(systemName: "folder.badge.gearshape")
                     .font(.title2)
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Workspace Graph")
                         .font(.headline)
@@ -144,7 +144,7 @@ struct AgenticUIWorkspaceInspectorView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "square.stack.3d.up")
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
                 Text("Modules")
                     .font(.headline)
                 Spacer()
@@ -274,7 +274,7 @@ struct AgenticUIWorkspaceInspectorView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "arrow.triangle.branch")
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
                 Text("Relationships")
                     .font(.headline)
                 Spacer()
@@ -332,7 +332,7 @@ struct AgenticUIWorkspaceInspectorView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "sparkles")
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
                 Text("Detected Capabilities")
                     .font(.headline)
             }
