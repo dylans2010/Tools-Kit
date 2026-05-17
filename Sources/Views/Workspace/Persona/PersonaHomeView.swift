@@ -461,20 +461,25 @@ struct PersonaHomeView: View {
     }
 
     private func processAgentMessage(_ input: String) async {
-        let history = manager.chatHistory
+        let history = await MainActor.run { manager.chatHistory }
         let engine = PersonaAgentFramework.PersonaIntentEngine()
         let dispatcher = PersonaAgentFramework.PersonaActionDispatcher()
 
-        let contacts = AccountManager.shared.accounts.map { PersonaAgentFramework.PersonaContact(name: $0.displayName, email: $0.emailAddress) }
+        let contacts = await MainActor.run { AccountManager.shared.accounts.map { PersonaAgentFramework.PersonaContact(name: $0.displayName, email: $0.emailAddress) } }
         let context = PersonaAgentFramework.PersonaWorkspaceContext(contacts: contacts, lastAccessedNote: nil, activeDraft: nil, recentEmails: [])
 
         let userMsg = PersonaMessage(role: "user", content: input)
-        await MainActor.run { manager.chatHistory.append(userMsg) }
-        await MainActor.run { manager.isThinking = true }
+        await MainActor.run {
+            manager.chatHistory.append(userMsg)
+            manager.isThinking = true
+        }
 
         var finalIntent: PersonaAgentFramework.PersonaIntent
 
-        if let missingField = clarificationMissingField, var intent = pendingIntent {
+        let missingField = await MainActor.run { clarificationMissingField }
+        let currentPendingIntent = await MainActor.run { pendingIntent }
+
+        if let missingField = missingField, var intent = currentPendingIntent {
             // Fill missing field in existing intent
             switch intent {
             case .sendEmail(var params):
@@ -487,8 +492,8 @@ struct PersonaHomeView: View {
             }
             finalIntent = intent
             await MainActor.run {
-                clarificationMissingField = nil
-                pendingIntent = nil
+                self.clarificationMissingField = nil
+                self.pendingIntent = nil
             }
         } else {
             finalIntent = await engine.classify(input: input, conversationHistory: history, workspaceContext: context)
@@ -509,15 +514,20 @@ struct PersonaHomeView: View {
     }
 
     func handleConfirmation(_ confirmed: Bool) {
-        guard confirmed, let intent = pendingIntent else {
+        guard confirmed else {
             pendingAction = nil
             pendingIntent = nil
             return
         }
 
+        guard let intent = pendingIntent else {
+            pendingAction = nil
+            return
+        }
+
         Task {
             let dispatcher = PersonaAgentFramework.PersonaActionDispatcher()
-            let contacts = AccountManager.shared.accounts.map { PersonaAgentFramework.PersonaContact(name: $0.displayName, email: $0.emailAddress) }
+            let contacts = await MainActor.run { AccountManager.shared.accounts.map { PersonaAgentFramework.PersonaContact(name: $0.displayName, email: $0.emailAddress) } }
             let context = PersonaAgentFramework.PersonaWorkspaceContext(contacts: contacts, lastAccessedNote: nil, activeDraft: nil, recentEmails: [])
 
             // Execute the intent directly now that it's confirmed

@@ -80,7 +80,7 @@
 		CL0200000000000000000008 /* VersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000008 /* VersionHistoryView.swift */; };
 		CL0200000000000000000009 /* AddDataCollabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000009 /* AddDataCollabView.swift */; };
 		CL020000000000000000000A /* WorkspaceAutomationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000A /* WorkspaceAutomationEngine.swift */; };
-		CL020000000000000000000F /* PluginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000F /* PluginManager.swift */; };
+		PM020000000000000000000F /* PluginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = PM010000000000000000000F /* PluginManager.swift */; };
 		ED020000000000000000000A /* EditingHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000A /* EditingHomeView.swift */; };
 		ED020000000000000000000B /* FullEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000B /* FullEditorView.swift */; };
 		VT0200000000000000000001 /* ValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = VT0100000000000000000001 /* ValidationTests.swift */; };
@@ -1550,7 +1550,7 @@
 		CL0100000000000000000008 /* VersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionHistoryView.swift; sourceTree = "<group>"; };
 		CL0100000000000000000009 /* AddDataCollabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDataCollabView.swift; sourceTree = "<group>"; };
 		CL010000000000000000000A /* WorkspaceAutomationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAutomationEngine.swift; sourceTree = "<group>"; };
-		CL010000000000000000000F /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PluginManager.swift; path = Sources/Workspace/Extensions/Core/PluginManager.swift; sourceTree = SOURCE_ROOT; };
+		PM010000000000000000000F /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PluginManager.swift; path = Sources/Workspace/Extensions/Core/PluginManager.swift; sourceTree = SOURCE_ROOT; };
 		ED010000000000000000000A /* EditingHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditingHomeView.swift; sourceTree = "<group>"; };
 		ED010000000000000000000B /* FullEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullEditorView.swift; sourceTree = "<group>"; };
 		3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentResultView.swift; sourceTree = "<group>"; };
@@ -4647,7 +4647,7 @@
 		5655D7A40BFB4C95959A5E06 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				CL010000000000000000000F /* PluginManager.swift */,
+				PM010000000000000000000F /* PluginManager.swift */,
 				PL0100000000000000000001 /* PluginModels.swift */,
 				TKRF0000000000000000000006 /* PluginEventBus.swift */,
 				TKRF0000000000000000000007 /* PluginRuntime.swift */,
@@ -11282,7 +11282,7 @@
 				AA1000000000000000000018 /* GitHubIntelligenceViews.swift in Sources */,
 				AA100000000000000000001A /* GitHubToolPanelViews.swift in Sources */,
 				CL020000000000000000000A /* WorkspaceAutomationEngine.swift in Sources */,
-				CL020000000000000000000F /* PluginManager.swift in Sources */,
+				PM020000000000000000000F /* PluginManager.swift in Sources */,
 				MS02A1B2C3D4E5F600000001 /* SecureFolderModels.swift in Sources */,
 				MS02A1B2C3D4E5F600000002 /* SecureFolderManager.swift in Sources */,
 				MS02A1B2C3D4E5F600000003 /* AppLockManager.swift in Sources */,

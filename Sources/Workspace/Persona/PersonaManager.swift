@@ -54,10 +54,10 @@ final class PersonaManager: ObservableObject {
 
         // 1. Capture state needed for background processing
         let instructions = config.instructions
+        let personaName = config.name
         let historySuffix = chatHistory.suffix(10).map { "\($0.role): \($0.content)" }.joined(separator: "\n")
 
         // 2. Perform heavy workspace data gathering and prompt building in background
-        let config = self.config
         let systemPrompt = await Task.detached(priority: .userInitiated) {
             let workspaceContextJSON = await PersonaWorkspace.gatherFullWorkspaceData()
 
@@ -78,8 +78,8 @@ final class PersonaManager: ObservableObject {
 
             return """
             <PERSONA_IDENTITY>
-            You are \(config.name), an AI assistant integrated into Tools-Kit, a professional iOS productivity application.
-            \(config.instructions)
+            You are \(personaName), an AI assistant integrated into Tools-Kit, a professional iOS productivity application.
+            \(instructions)
             </PERSONA_IDENTITY>
 
             <WORKSPACE_CONTEXT>
