@@ -7,6 +7,7 @@ class WebhookTesterBackend: ObservableObject {
     @Published var isLoading = false
     @Published var error: String? = nil
 
+    @MainActor
     func send() {
         guard let url = URL(string: urlString) else {
             error = "Invalid URL"
@@ -22,20 +23,19 @@ class WebhookTesterBackend: ObservableObject {
         error = nil
         responseText = ""
 
-        URLSession.shared.dataTask(with: request) { data, response, urlError in
-            DispatchQueue.main.async {
-                self.isLoading = false
-                if let urlError = urlError {
-                    self.error = urlError.localizedDescription
-                    return
-                }
-
+        Task {
+            do {
+                let (data, response) = try await URLSession.shared.data(for: request)
+                isLoading = false
                 if let httpResponse = response as? HTTPURLResponse {
                     let status = httpResponse.statusCode
-                    let body = data.flatMap { String(data: $0, encoding: .utf8) } ?? "No Body"
+                    let body = String(data: data, encoding: .utf8) ?? "No Body"
                     self.responseText = "Status: \(status)\n\nResponse Body:\n\(body)"
                 }
+            } catch {
+                isLoading = false
+                self.error = error.localizedDescription
             }
-        }.resume()
+        }
     }
 }

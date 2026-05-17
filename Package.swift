@@ -4,8 +4,8 @@ import PackageDescription
 let package = Package(
     name: "ToolsKit",
     platforms: [
-        .iOS(.v17),
-        .macOS(.v12)
+        .iOS(.v18),
+        .macOS(.v14)
     ],
     dependencies: [
 .package(url: "https://github.com/MailCore/mailcore2", branch: "master"),

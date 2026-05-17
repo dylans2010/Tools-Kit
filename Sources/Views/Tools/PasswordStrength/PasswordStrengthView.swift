@@ -36,7 +36,7 @@ struct PasswordStrengthView: View {
                         }
 
                         ProgressView(value: min(backend.entropy, 128), total: 128)
-                            .accentColor(colorFromString(backend.strengthColor))
+                            .tint(colorFromString(backend.strengthColor))
                             .scaleEffect(x: 1, y: 2, anchor: .center)
                             .animation(.spring(), value: backend.entropy)
 

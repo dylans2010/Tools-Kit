@@ -73,7 +73,7 @@ struct NotesView: View {
                 } else if currentViewMode == .grid {
                     LazyVGrid(columns: twoColumns, spacing: 12) {
                         ForEach(notesToShow) { note in
-                            NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
+                            NavigationLink(value: note) {
                                 NoteCardView(note: note, onPin: { togglePin(note) }, onDelete: { deleteNote(note) }, onDuplicate: { duplicateNote(note) })
                             }
                             .buttonStyle(.plain)
@@ -84,7 +84,7 @@ struct NotesView: View {
                 } else {
                     LazyVStack(spacing: 0) {
                         ForEach(notesToShow) { note in
-                            NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
+                            NavigationLink(value: note) {
                                 NoteListRowView(note: note)
                             }
                             .buttonStyle(.plain)
@@ -94,6 +94,9 @@ struct NotesView: View {
                     .padding(.top, 8)
                 }
             }
+        }
+        .navigationDestination(for: Note.self) { note in
+            NoteEditorView(note: note, backend: backend)
         }
         .navigationTitle("Notes")
         .searchable(text: $searchText, prompt: "Search notes…")

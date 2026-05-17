@@ -78,7 +78,7 @@ struct AgentToolExecutionDetailView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     SectionView(title: "Request ID", content: execution.requestId, monospaced: true)

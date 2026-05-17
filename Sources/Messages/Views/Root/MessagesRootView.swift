@@ -16,7 +16,7 @@ struct MessagesRootView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 if activePayload == nil && activeAIPath == nil {
                     SegmentSwitcher(selection: $selectedTab, options: ["🎮 Games", "🤖 AI Tools"])
