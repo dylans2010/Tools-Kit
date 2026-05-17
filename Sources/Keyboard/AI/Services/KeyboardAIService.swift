@@ -1,6 +1,7 @@
 import Foundation
 
-class KeyboardAIService {
+@MainActor
+final class KeyboardAIService {
     static let shared = KeyboardAIService()
     private let framework = KeyboardAIFramework()
 

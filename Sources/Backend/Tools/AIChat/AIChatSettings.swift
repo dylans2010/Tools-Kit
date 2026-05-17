@@ -60,7 +60,8 @@ struct SystemPromptPreset: Identifiable, Codable {
     ]
 }
 
-class AIChatSettingsManager: ObservableObject {
+@MainActor
+final class AIChatSettingsManager: ObservableObject {
     static let shared = AIChatSettingsManager()
 
     @Published var settings: AIChatSettings {

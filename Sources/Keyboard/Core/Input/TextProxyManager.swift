@@ -1,6 +1,7 @@
 import Foundation
 import UIKit
 
+@MainActor
 class TextProxyManager: ObservableObject {
     weak var proxy: UITextDocumentProxy?
     private var debouncer = Debouncer(delay: 0.3)
