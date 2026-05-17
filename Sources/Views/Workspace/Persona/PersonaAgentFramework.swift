@@ -93,7 +93,7 @@ enum AgentActionError: Error, LocalizedError {
     }
 }
 
-enum AgentAction {
+enum AgentAction: Equatable {
     case editNote(id: String, newTitle: String?, newBody: String?)
     case editSlide(id: String, slideIndex: Int, newContent: String)
     case sendEmail(to: [String], subject: String, body: String, attachmentIDs: [String])
@@ -109,6 +109,35 @@ enum AgentAction {
     case createTask(title: String, description: String, priority: String, dueDate: Date?)
     case createAutomation(name: String, triggerDescription: String)
     case searchArticles(query: String)
+    case replyToEmail(parameters: ReplyEmailParameters)
+    case forwardEmail(parameters: ForwardEmailParameters)
+    case editEvent(parameters: EditEventParameters)
+    case deleteEvent(parameters: DeleteEventParameters)
+    case completeTask(id: String)
+    case deleteTask(id: String)
+}
+
+struct ReplyEmailParameters: Codable, Equatable {
+    let originalMessageID: String
+    let body: String
+}
+
+struct ForwardEmailParameters: Codable, Equatable {
+    let originalMessageID: String
+    let recipients: [String]
+    let body: String?
+}
+
+struct EditEventParameters: Codable, Equatable {
+    let id: String
+    let title: String?
+    let startDate: Date?
+    let endDate: Date?
+    let location: String?
+}
+
+struct DeleteEventParameters: Codable, Equatable {
+    let id: String
 }
 
 actor PersonaAgentFramework {
@@ -216,7 +245,338 @@ actor PersonaAgentFramework {
             try await ensureScope(.workspaceRead)
             let summaries = try await searchArticles(query: query)
             return .success(.itemSummaries(summaries))
+
+        case .replyToEmail(let params):
+            try await ensureScope(.workspaceWrite)
+            let message = try await replyToEmail(params)
+            return .success(.message(message))
+
+        case .forwardEmail(let params):
+            try await ensureScope(.workspaceWrite)
+            let message = try await forwardEmail(params)
+            return .success(.message(message))
+
+        case .editEvent(let params):
+            try await ensureScope(.workspaceWrite)
+            let snapshot = try await editEvent(params)
+            return .success(.itemSnapshot(snapshot))
+
+        case .deleteEvent(let params):
+            try await ensureScope(.workspaceWrite)
+            let message = try await deleteEvent(params)
+            return .success(.message(message))
+
+        case .completeTask(let id):
+            try await ensureScope(.workspaceWrite)
+            let message = try await completeTask(id: id)
+            return .success(.message(message))
+
+        case .deleteTask(let id):
+            try await ensureScope(.workspaceWrite)
+            let message = try await deleteTask(id: id)
+            return .success(.message(message))
         }
+    }
+
+    // MARK: - Intent Classification
+
+    enum PersonaIntent: Equatable {
+        case sendEmail(parameters: EmailActionParameters)
+        case draftEmail(parameters: EmailActionParameters)
+        case replyToEmail(parameters: ReplyEmailParameters)
+        case forwardEmail(parameters: ForwardEmailParameters)
+
+        case createNote(parameters: NoteActionParameters)
+        case editNote(id: String, title: String?, body: String?)
+        case deleteNote(id: String)
+        case searchNotes(query: String)
+
+        case createEvent(parameters: EventActionParameters)
+        case editEvent(parameters: EditEventParameters)
+        case deleteEvent(parameters: DeleteEventParameters)
+
+        case createTask(parameters: TaskActionParameters)
+        case completeTask(id: String)
+        case deleteTask(id: String)
+
+        case compound(steps: [PersonaIntent])
+        case clarificationNeeded(reason: String, missingFields: [String])
+        case unknown(rawInput: String)
+    }
+
+    struct EmailActionParameters: Codable, Equatable {
+        var recipients: [String] = []
+        var ccRecipients: [String] = []
+        var bccRecipients: [String] = []
+        var subject: String?
+        var body: String?
+        var tone: EmailTone = .professional
+        var priority: EmailPriority = .normal
+        var attachments: [String] = []
+        var scheduledSendDate: Date?
+        var replyToMessageID: String?
+        var generateSubjectIfMissing: Bool = false
+        var generateBodyFromIntent: String?
+    }
+
+    enum EmailTone: String, Codable, CaseIterable {
+        case professional, friendly, formal, assertive, concise, apologetic, urgent
+    }
+
+    enum EmailPriority: String, Codable, CaseIterable {
+        case low, normal, high, urgent
+    }
+
+    struct NoteActionParameters: Codable, Equatable {
+        var title: String?
+        var body: String
+        var tags: [String] = []
+        var folder: String?
+        var isPinned: Bool = false
+        var color: String? // NoteColor enum if exists, using String for now
+        var linkedEmailID: String?
+        var generateTitleFromBody: Bool = false
+    }
+
+    struct EventActionParameters: Codable, Equatable {
+        var title: String
+        var description: String = ""
+        var startDate: Date
+        var endDate: Date
+        var location: String = ""
+    }
+
+    struct TaskActionParameters: Codable, Equatable {
+        var title: String
+        var description: String = ""
+        var priority: String = "medium"
+        var dueDate: Date?
+    }
+
+    struct PersonaWorkspaceContext {
+        var contacts: [PersonaContact]
+        var lastAccessedNote: WorkspaceItemSnapshot?
+        var activeDraft: WorkspaceItemSnapshot?
+        var recentEmails: [WorkspaceItemSnapshot]
+    }
+
+    struct PersonaContact: Codable, Equatable {
+        let name: String
+        let email: String
+    }
+
+    final class PersonaIntentEngine {
+        private let nlpProcessor = PersonaNLPProcessor()
+        private let contextResolver = PersonaContextResolver()
+        private let parameterExtractor = PersonaParameterExtractor()
+
+        func classify(input: String, conversationHistory: [PersonaMessage], workspaceContext: PersonaWorkspaceContext) async -> PersonaIntent {
+            let candidates = nlpProcessor.score(input: input)
+            guard let top = candidates.first, top.score >= 0.6 else {
+                return .unknown(rawInput: input)
+            }
+
+            switch top.category {
+            case .emailSend:
+                var params = EmailActionParameters()
+                parameterExtractor.extractEmailParams(from: input, params: &params)
+                contextResolver.resolveRecipients(params: &params, history: conversationHistory, context: workspaceContext)
+                if params.recipients.isEmpty {
+                    return .clarificationNeeded(reason: "Who should I send this email to?", missingFields: ["recipients"])
+                }
+                return .sendEmail(parameters: params)
+
+            case .noteCreate:
+                let body = parameterExtractor.extractNoteBody(from: input)
+                if body.isEmpty {
+                    return .clarificationNeeded(reason: "What should the note say?", missingFields: ["body"])
+                }
+                return .createNote(parameters: .init(title: nil, body: body))
+
+            case .noteDelete:
+                if let id = contextResolver.resolveNoteID(from: input, context: workspaceContext) {
+                    return .deleteNote(id: id)
+                }
+                return .clarificationNeeded(reason: "Which note would you like to delete?", missingFields: ["id"])
+
+            default:
+                return .unknown(rawInput: input)
+            }
+        }
+    }
+
+    private enum IntentCategory: String {
+        case emailSend = "email_send"
+        case emailDraft = "email_draft"
+        case noteCreate = "note_create"
+        case noteDelete = "note_delete"
+        case eventCreate = "event_create"
+        case taskCreate = "task_create"
+    }
+
+    private struct PersonaNLPProcessor {
+        private let keywords: [IntentCategory: [String]] = [
+            .emailSend: ["send", "email", "write to", "reach out to", "message", "shoot an email", "drop a line"],
+            .emailDraft: ["draft", "compose", "prepare email"],
+            .noteCreate: ["create note", "take a note", "write down", "new note", "remember"],
+            .noteDelete: ["delete note", "remove note", "discard note"],
+            .eventCreate: ["schedule", "meeting", "calendar", "event", "set a meeting"],
+            .taskCreate: ["create task", "add task", "remind me to", "new task"]
+        ]
+
+        func score(input: String) -> [(category: IntentCategory, score: Double)] {
+            let lower = input.lowercased()
+            var results: [(IntentCategory, Double)] = []
+            for (category, list) in keywords {
+                var score = 0.0
+                for keyword in list {
+                    if let range = lower.range(of: keyword) {
+                        let positionWeight = 1.0 - (Double(lower.distance(from: lower.startIndex, to: range.lowerBound)) / Double(lower.count))
+                        score += (1.0 + positionWeight)
+                    }
+                }
+                if score > 0 { results.append((category, score)) }
+            }
+            return results.sorted { $0.1 > $1.1 }
+        }
+    }
+
+    private struct PersonaContextResolver {
+        func resolveRecipients(params: inout EmailActionParameters, history: [PersonaMessage], context: PersonaWorkspaceContext) {
+            if params.recipients.isEmpty {
+                if let lastPerson = context.contacts.last?.email {
+                    params.recipients.append(lastPerson)
+                }
+            }
+        }
+
+        func resolveNoteID(from text: String, context: PersonaWorkspaceContext) -> String? {
+            if text.lowercased().contains("that note") || text.lowercased().contains("last note") {
+                return context.lastAccessedNote?.id
+            }
+            return nil
+        }
+    }
+
+    private struct PersonaParameterExtractor {
+        func extractEmailParams(from text: String, params: inout EmailActionParameters) {
+            let emailPattern = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+            if let regex = try? NSRegularExpression(pattern: emailPattern, options: []) {
+                let range = NSRange(text.startIndex..., in: text)
+                let matches = regex.matches(in: text, options: [], range: range)
+                params.recipients = matches.map { String(text[Range($0.range, in: text)!]) }
+            }
+
+            let lower = text.lowercased()
+            if lower.contains("urgent") || lower.contains("asap") { params.priority = .urgent }
+            if lower.contains("polite") || lower.contains("friendly") { params.tone = .friendly }
+        }
+
+        func extractNoteBody(from text: String) -> String {
+            var body = text
+            let markers = ["create note", "take a note", "write down", "new note"]
+            for marker in markers {
+                if let range = body.range(of: marker, options: .caseInsensitive) {
+                    body.removeSubrange(text.startIndex..<range.upperBound)
+                }
+            }
+            return body.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+    }
+
+    final class PersonaActionDispatcher {
+        func dispatch(_ intent: PersonaIntent, in context: PersonaWorkspaceContext) async -> PersonaActionResult {
+            switch intent {
+            case .sendEmail(let params):
+                var finalParams = params
+                if params.body == nil || params.body?.isEmpty == true {
+                    let genBody = try? await AIService.shared.processText(prompt: "Generate an email body for this intent: \(params.subject ?? "send email")", systemPrompt: EmailDraftingTool().systemPrompt)
+                    finalParams.body = genBody
+                }
+                if params.subject == nil || params.subject?.isEmpty == true {
+                    let genSub = try? await AIService.shared.processText(prompt: "Generate a subject line for this email body: \(finalParams.body ?? "")", systemPrompt: SubjectLineTool().systemPrompt)
+                    finalParams.subject = genSub
+                }
+                let action = AgentAction.sendEmail(to: finalParams.recipients, subject: finalParams.subject ?? "No Subject", body: finalParams.body ?? "", attachmentIDs: [])
+                return .from(try! await PersonaAgentFramework.shared.execute(action))
+
+            case .replyToEmail(let params):
+                return .from(try! await PersonaAgentFramework.shared.execute(.replyToEmail(parameters: params)))
+
+            case .forwardEmail(let params):
+                return .from(try! await PersonaAgentFramework.shared.execute(.forwardEmail(parameters: params)))
+
+            case .createNote(let params):
+                var finalParams = params
+                if params.title == nil {
+                    let genTitle = try? await AIService.shared.processText(prompt: "Generate a 3-5 word title for this note: \(params.body)", systemPrompt: "You are a title generator. Return only the title text.")
+                    finalParams.title = genTitle
+                }
+                let action = AgentAction.createNote(title: finalParams.title ?? "New Note", content: finalParams.body, notebookName: finalParams.folder)
+                return .from(try! await PersonaAgentFramework.shared.execute(action))
+
+            case .editNote(let id, let title, let body):
+                return .from(try! await PersonaAgentFramework.shared.execute(.editNote(id: id, newTitle: title, newBody: body)))
+
+            case .deleteNote(let id):
+                return .requiresConfirmation(preview: .init(intentDescription: "I'm about to delete a note.", parameterSummary: ["Note ID": id], warningMessage: "This action is permanent and cannot be undone."))
+
+            case .createEvent(let params):
+                let action = AgentAction.createCalendarEvent(title: params.title, description: params.description, startDate: params.startDate, endDate: params.endDate, location: params.location)
+                return .from(try! await PersonaAgentFramework.shared.execute(action))
+
+            case .editEvent(let params):
+                return .from(try! await PersonaAgentFramework.shared.execute(.editEvent(parameters: params)))
+
+            case .deleteEvent(let params):
+                return .requiresConfirmation(preview: .init(intentDescription: "I'm about to delete a calendar event.", parameterSummary: ["Event ID": params.id], warningMessage: "This will remove it from your calendar."))
+
+            case .createTask(let params):
+                let action = AgentAction.createTask(title: params.title, description: params.description, priority: params.priority, dueDate: params.dueDate)
+                return .from(try! await PersonaAgentFramework.shared.execute(action))
+
+            case .completeTask(let id):
+                return .from(try! await PersonaAgentFramework.shared.execute(.completeTask(id: id)))
+
+            case .deleteTask(let id):
+                return .requiresConfirmation(preview: .init(intentDescription: "I'm about to delete a task.", parameterSummary: ["Task ID": id], warningMessage: "This will permanently remove the task."))
+
+            case .clarificationNeeded(let reason, let fields):
+                return .clarificationNeeded(question: reason, missingField: fields.first ?? "")
+
+            case .searchNotes(let query):
+                return .from(try! await PersonaAgentFramework.shared.execute(.listWorkspaceItems(filter: .init(type: .note, tag: query))))
+
+            default:
+                return .failed(error: .serviceUnavailable("Intent not yet supported in dispatcher."))
+            }
+        }
+    }
+
+    enum PersonaActionResult {
+        case success(summary: String, affectedItems: [WorkspaceItemSummary])
+        case requiresConfirmation(preview: PersonaActionPreview)
+        case failed(error: AgentActionError)
+        case clarificationNeeded(question: String, missingField: String)
+
+        // Mapping existing AgentActionResult for internal use
+        static func from(_ result: AgentActionResult) -> PersonaActionResult {
+            switch result {
+            case .success(let payload):
+                switch payload {
+                case .message(let msg): return .success(summary: msg, affectedItems: [])
+                case .itemSnapshot(let snap): return .success(summary: "Action successful", affectedItems: [.init(id: snap.id, type: snap.type, title: snap.title, modifiedAt: snap.modifiedAt)])
+                case .itemSummaries(let sums): return .success(summary: "Found items", affectedItems: sums)
+                }
+            case .failure(let err): return .failed(error: err)
+            }
+        }
+    }
+
+    struct PersonaActionPreview: Equatable {
+        let intentDescription: String
+        let parameterSummary: [String: String]
+        let warningMessage: String?
     }
 
     // MARK: - Action Implementations
@@ -470,6 +830,103 @@ actor PersonaAgentFramework {
         }
 
         throw AgentActionError.itemNotFound("No workspace item found with id \(id)")
+    }
+
+    private func replyToEmail(_ params: ReplyEmailParameters) async throws -> String {
+        guard let messageID = UUID(uuidString: params.originalMessageID) else {
+            throw AgentActionError.invalidParameter("originalMessageID must be a UUID")
+        }
+        return try await MainActor.run {
+            guard let original = SDKMailService.shared.getMessage(id: messageID) else {
+                throw AgentActionError.itemNotFound("No email found with id \(params.originalMessageID)")
+            }
+            Task {
+                try? await SDKMailService.shared.send(to: original.from, subject: "Re: \(original.subject)", body: params.body)
+            }
+            return "Replied to email from \(original.from)"
+        }
+    }
+
+    private func forwardEmail(_ params: ForwardEmailParameters) async throws -> String {
+        guard let messageID = UUID(uuidString: params.originalMessageID) else {
+            throw AgentActionError.invalidParameter("originalMessageID must be a UUID")
+        }
+        return try await MainActor.run {
+            guard let original = SDKMailService.shared.getMessage(id: messageID) else {
+                throw AgentActionError.itemNotFound("No email found with id \(params.originalMessageID)")
+            }
+            let body = params.body ?? "Forwarded message:\n\n\(original.body)"
+            for recipient in params.recipients {
+                Task {
+                    try? await SDKMailService.shared.send(to: recipient, subject: "Fwd: \(original.subject)", body: body)
+                }
+            }
+            return "Forwarded email to \(params.recipients.count) recipient(s)"
+        }
+    }
+
+    private func editEvent(_ params: EditEventParameters) async throws -> WorkspaceItemSnapshot {
+        guard let eventID = UUID(uuidString: params.id) else {
+            throw AgentActionError.invalidParameter("id must be a UUID")
+        }
+        return try await MainActor.run {
+            guard var event = CalendarManager.shared.events.first(where: { $0.id == eventID }) else {
+                throw AgentActionError.itemNotFound("No event found with id \(params.id)")
+            }
+            if let title = params.title { event.title = title }
+            if let start = params.startDate { event.startTime = start; event.date = start }
+            if let end = params.endDate { event.endTime = end }
+            if let loc = params.location { event.location = loc }
+            CalendarManager.shared.updateEvent(event)
+            return WorkspaceItemSnapshot(
+                id: event.id.uuidString,
+                type: .calendarEvent,
+                title: event.title,
+                createdAt: event.createdAt,
+                modifiedAt: Date(),
+                tags: [],
+                details: [:]
+            )
+        }
+    }
+
+    private func deleteEvent(_ params: DeleteEventParameters) async throws -> String {
+        guard let eventID = UUID(uuidString: params.id) else {
+            throw AgentActionError.invalidParameter("id must be a UUID")
+        }
+        return try await MainActor.run {
+            guard let event = CalendarManager.shared.events.first(where: { $0.id == eventID }) else {
+                throw AgentActionError.itemNotFound("No event found with id \(params.id)")
+            }
+            CalendarManager.shared.deleteEvent(event)
+            return "Deleted event: \(event.title)"
+        }
+    }
+
+    private func completeTask(id: String) async throws -> String {
+        guard let taskID = UUID(uuidString: id) else {
+            throw AgentActionError.invalidParameter("id must be a UUID")
+        }
+        return try await MainActor.run {
+            guard let task = TasksManager.shared.tasks.first(where: { $0.id == taskID }) else {
+                throw AgentActionError.itemNotFound("No task found with id \(id)")
+            }
+            TasksManager.shared.toggleComplete(task)
+            return "Task marked as complete: \(task.title)"
+        }
+    }
+
+    private func deleteTask(id: String) async throws -> String {
+        guard let taskID = UUID(uuidString: id) else {
+            throw AgentActionError.invalidParameter("id must be a UUID")
+        }
+        return try await MainActor.run {
+            guard let task = TasksManager.shared.tasks.first(where: { $0.id == taskID }) else {
+                throw AgentActionError.itemNotFound("No task found with id \(id)")
+            }
+            TasksManager.shared.deleteTask(task)
+            return "Deleted task: \(task.title)"
+        }
     }
 
     private func listWorkspaceItems(filter: WorkspaceFilter) async throws -> [WorkspaceItemSummary] {
