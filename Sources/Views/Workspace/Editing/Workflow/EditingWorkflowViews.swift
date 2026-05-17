@@ -48,7 +48,7 @@ struct ExportQueueView: View {
                     }
 
                     ProgressView(value: job.progress)
-                        .accentColor(.blue)
+                        .tint(.blue)
                 }
                 .padding(.vertical, 4)
             }

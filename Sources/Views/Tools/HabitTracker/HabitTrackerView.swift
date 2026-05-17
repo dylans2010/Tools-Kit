@@ -97,7 +97,7 @@ struct HabitCard: View {
                 }
 
                 ProgressView(value: Double(min(habit.completedThisWeek, habit.targetPerWeek)), total: Double(habit.targetPerWeek))
-                    .accentColor(color(for: habit.color))
+                    .tint(color(for: habit.color))
             }
 
             // Simple Sparkline Chart
@@ -168,7 +168,7 @@ struct AddHabitSheet: View {
     let colors = ["blue", "red", "green", "orange", "purple"]
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
                     TextField("e.g. Drink Water", text: $name)

@@ -73,7 +73,7 @@ struct LogViewerView: View {
         }
         .navigationTitle("Log Viewer")
         .sheet(isPresented: $showingAddLog) {
-            NavigationView {
+            NavigationStack {
                 Form {
                     Picker("Level", selection: $newLogLevel) {
                         ForEach(LogViewerLevel.allCases) { level in

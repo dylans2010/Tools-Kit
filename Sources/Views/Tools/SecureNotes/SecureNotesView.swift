@@ -80,7 +80,7 @@ struct SecureNotesView: View {
     }
 
     private var addNoteSheet: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 TextField("Title", text: $newTitle)
                 TextEditor(text: $newContent)

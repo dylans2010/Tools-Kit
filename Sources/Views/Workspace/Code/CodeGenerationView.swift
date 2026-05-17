@@ -9,12 +9,12 @@ struct CodeGenerationView: View {
     @State private var isComplete = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 // Header
                 VStack {
                     ProgressView(value: progress)
-                        .accentColor(.purple)
+                        .tint(.purple)
 
                     HStack {
                         Text("\(Int(progress * 100))%")

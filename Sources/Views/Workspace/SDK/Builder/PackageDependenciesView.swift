@@ -130,7 +130,7 @@ struct DependencyHealthEngine {
 
 struct DependencyGraph {
     let packages: [PackageDescriptor]
-    static var resolutionCache: [String: [PackageDescriptor]] = [:]
+    @MainActor static var resolutionCache: [String: [PackageDescriptor]] = [:]
 
     var adjacency: [UUID: [UUID]] {
         var map: [UUID: [UUID]] = [:]

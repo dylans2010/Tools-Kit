@@ -135,7 +135,7 @@ struct AddVaultEntrySheet: View {
     @State private var showSecret = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
                     TextField("Label (e.g. GitHub Token)", text: $label)

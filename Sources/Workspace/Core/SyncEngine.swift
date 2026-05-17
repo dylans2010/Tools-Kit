@@ -21,18 +21,18 @@ final class SyncEngine: ObservableObject {
     }
 
     /// Trigger a full workspace synchronization.
+    @MainActor
     func sync() {
         guard !isSyncing else { return }
         isSyncing = true
 
         // Simulate sync process
-        DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) {
-            DispatchQueue.main.async {
-                self.isSyncing = false
-                self.lastSyncedAt = Date()
-                self.pendingChangesCount = 0
-                print("Workspace synchronization complete.")
-            }
+        Task {
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            self.isSyncing = false
+            self.lastSyncedAt = Date()
+            self.pendingChangesCount = 0
+            print("Workspace synchronization complete.")
         }
     }
 

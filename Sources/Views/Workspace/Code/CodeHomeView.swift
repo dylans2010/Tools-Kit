@@ -5,7 +5,7 @@ struct CodeHomeView: View {
     @State private var showAudit = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 Section {
                     HStack {
