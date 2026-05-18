@@ -89,37 +89,7 @@ export async function onEvent(event, ctx) {
                 .pickerStyle(.menu)
             }
 
-            switch selectedSection {
-            case .identity:
-                BuildIdentitySection(name: $name, description: $description, author: $author, version: $version, identifier: $identifier, isLocked: isIdentifierLocked) {
-                    if isIdentifierLocked { showingIdentifierLockAlert = true }
-                }
-            case .capabilities:
-                BuildCapabilitiesSection(selectedCapabilities: $selectedCapabilities, selectedActions: $selectedActions)
-            case .security:
-                BuildSecuritySection(selectedCapabilities: selectedCapabilities, apiKey: apiKey, privacyNote: privacyNote, plugin: currentPluginSnapshot) { updated in
-                    self.apiKey = updated.apiKey
-                    self.privacyNote = updated.privacyNote
-                    self.dataUsageExplanation = updated.dataUsageExplanation
-                    self.retentionPolicy = updated.retentionPolicy
-                }
-            case .endpoints:
-                BuildEndpointsSection(endpoints: $endpoints) { showingAddEndpoint = true } onEdit: { selectedEndpointForEdit = $0 }
-            case .logic:
-                BuildLogicSection(sourceCode: $sourceCode)
-            case .mapping:
-                BuildMappingSection(dataMappings: $dataMappings)
-            case .rules:
-                BuildRulesSection(executionRules: $executionRules)
-            case .ui:
-                BuildUIInjectionSection(uiExtensions: $uiExtensions, toolkitTools: $toolkitTools)
-            case .toolkit:
-                BuildToolkitSection(toolkitTools: $toolkitTools)
-            case .testing:
-                BuildTestingSection(testEventPayload: $testEventPayload, simulatedBuildOutput: simulatedBuildOutput) { runLocalValidation() }
-            case .release:
-                BuildReleaseSection(version: $version, releaseNotes: $releaseNotes, endpointsCount: endpoints.count, uiExtensionsCount: uiExtensions.count, plugin: currentPluginSnapshot)
-            }
+            formContent
 
             BuildSubmitSection(errors: performStrictValidation(), errorMessage: errorMessage) { buildAndInstall() }
         }
@@ -154,6 +124,41 @@ export async function onEvent(event, ctx) {
             Button("OK", role: .cancel) { }
         } message: {
             Text("The identifier 'com.toolskit.\(identifier)' cannot be changed after creation.")
+        }
+    }
+
+    @ViewBuilder
+    private var formContent: some View {
+        switch selectedSection {
+        case .identity:
+            BuildIdentitySection(name: $name, description: $description, author: $author, version: $version, identifier: $identifier, isLocked: isIdentifierLocked) {
+                if isIdentifierLocked { showingIdentifierLockAlert = true }
+            }
+        case .capabilities:
+            BuildCapabilitiesSection(selectedCapabilities: $selectedCapabilities, selectedActions: $selectedActions)
+        case .security:
+            BuildSecuritySection(selectedCapabilities: selectedCapabilities, apiKey: apiKey, privacyNote: privacyNote, plugin: currentPluginSnapshot) { updated in
+                self.apiKey = updated.apiKey
+                self.privacyNote = updated.privacyNote
+                self.dataUsageExplanation = updated.dataUsageExplanation
+                self.retentionPolicy = updated.retentionPolicy
+            }
+        case .endpoints:
+            BuildEndpointsSection(endpoints: $endpoints) { showingAddEndpoint = true } onEdit: { selectedEndpointForEdit = $0 }
+        case .logic:
+            BuildLogicSection(sourceCode: $sourceCode)
+        case .mapping:
+            BuildMappingSection(dataMappings: $dataMappings)
+        case .rules:
+            BuildRulesSection(executionRules: $executionRules)
+        case .ui:
+            BuildUIInjectionSection(uiExtensions: $uiExtensions, toolkitTools: $toolkitTools)
+        case .toolkit:
+            BuildToolkitSection(toolkitTools: $toolkitTools)
+        case .testing:
+            BuildTestingSection(testEventPayload: $testEventPayload, simulatedBuildOutput: simulatedBuildOutput) { runLocalValidation() }
+        case .release:
+            BuildReleaseSection(version: $version, releaseNotes: $releaseNotes, endpointsCount: endpoints.count, uiExtensionsCount: uiExtensions.count, plugin: currentPluginSnapshot)
         }
     }
 
@@ -659,7 +664,7 @@ struct AddEndpointView: View {
     @State private var baseURL = ""
     @State private var path = ""
     @State private var method: HTTPMethod = .get
-    @State private var authType: AuthType = .none
+    @State private var authType: PluginModelsAuthType = .none
 
     var body: some View {
         NavigationStack {
@@ -671,7 +676,7 @@ struct AddEndpointView: View {
                     Picker("Method", selection: $method) { ForEach(HTTPMethod.allCases, id: \.self) { Text($0.rawValue).tag($0) } }.pickerStyle(.menu)
                 }
                 Section("Authentication") {
-                    Picker("Auth Type", selection: $authType) { ForEach(AuthType.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) } }.pickerStyle(.menu)
+                    Picker("Auth Type", selection: $authType) { ForEach(PluginModelsAuthType.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) } }.pickerStyle(.menu)
                 }
                 Section { Text("Headers and Schema can be configured after creation.").font(.caption).foregroundStyle(.secondary) }
             }

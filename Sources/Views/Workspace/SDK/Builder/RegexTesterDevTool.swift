@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct RegexTesterDevTool: DevTool {
+struct RegexTesterDevTool: View, DevTool {
     let id = "regex-tester"
     let name = "Regex Tester"
     let category = DevToolCategory.utilities
@@ -8,11 +8,9 @@ struct RegexTesterDevTool: DevTool {
     let description = "Test regular expressions against strings"
 
     func render() -> some View {
-        RegexTesterView()
+        self
     }
-}
 
-struct RegexTesterView: View {
     @StateObject private var viewModel = RegexTesterViewModel()
 
     var body: some View {

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct MarkdownPreviewDevTool: DevTool {
+struct MarkdownPreviewDevTool: View, DevTool {
     let id = "markdown-preview"
     let name = "Markdown Preview"
     let category = DevToolCategory.utilities
@@ -8,11 +8,9 @@ struct MarkdownPreviewDevTool: DevTool {
     let description = "Live preview of Markdown content"
 
     func render() -> some View {
-        MarkdownPreviewView()
+        self
     }
-}
 
-struct MarkdownPreviewView: View {
     @StateObject private var viewModel = MarkdownPreviewViewModel()
 
     var body: some View {

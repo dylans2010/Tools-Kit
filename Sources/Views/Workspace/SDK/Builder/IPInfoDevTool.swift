@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct IPInfoDevTool: DevTool {
+struct IPInfoDevTool: View, DevTool {
     let id = "ip-info"
     let name = "IP Info"
     let category = DevToolCategory.networking
@@ -8,11 +8,9 @@ struct IPInfoDevTool: DevTool {
     let description = "Geolocate and inspect IP addresses"
 
     func render() -> some View {
-        IPInfoView()
+        self
     }
-}
 
-struct IPInfoView: View {
     @StateObject private var viewModel = IPInfoViewModel()
 
     var body: some View {

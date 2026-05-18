@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct URLParserDevTool: DevTool {
+struct URLParserDevTool: View, DevTool {
     let id = "url-parser"
     let name = "URL Parser"
     let category = DevToolCategory.encoding
@@ -8,11 +8,9 @@ struct URLParserDevTool: DevTool {
     let description = "Break down URLs into components"
 
     func render() -> some View {
-        URLParserView()
+        self
     }
-}
 
-struct URLParserView: View {
     @StateObject private var viewModel = URLParserViewModel()
 
     var body: some View {

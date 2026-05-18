@@ -110,7 +110,14 @@ struct ProjectDetailsView: View {
                         Text(currentProject.name)
                             .font(.title2)
                             .fontWeight(.bold)
-                        StatusBadge(status: currentProject.status)
+                        StatusBadge(text: currentProject.status.rawValue, color: {
+                            switch currentProject.status {
+                            case .active: return .green
+                            case .paused: return .orange
+                            case .completed: return .blue
+                            case .archived: return .gray
+                            }
+                        }())
                     }
                     Spacer()
                 }

@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct ScopeInspectorView: View {
-    @StateObject private var authorizationManager = AuthorizationManager.shared
-    @StateObject private var moduleRegistry = SDKModuleRegistry.shared
-    @StateObject private var pluginManager = SDKPluginManager.shared
-    @StateObject private var connectorManager = SDKConnectorManager.shared
+    @ObservedObject private var authorizationManager = AuthorizationManager.shared
+    @ObservedObject private var moduleRegistry = SDKModuleRegistry.shared
+    @ObservedObject private var pluginManager = SDKPluginManager.shared
+    @ObservedObject private var connectorManager = SDKConnectorManager.shared
 
     @State private var query = ""
     @State private var showOnlyBlocked = false

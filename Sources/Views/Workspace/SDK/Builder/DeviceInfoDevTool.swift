@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct DeviceInfoDevTool: DevTool {
+struct DeviceInfoDevTool: View, DevTool {
     let id = "device-info"
     let name = "Device Info"
     let category = DevToolCategory.system
@@ -8,11 +8,9 @@ struct DeviceInfoDevTool: DevTool {
     let description = "Detailed hardware and software info"
 
     func render() -> some View {
-        DeviceInfoView()
+        self
     }
-}
 
-struct DeviceInfoView: View {
     @StateObject private var viewModel = DeviceInfoViewModel()
 
     var body: some View {

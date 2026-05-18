@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct XMLFormatterDevTool: DevTool {
+struct XMLFormatterDevTool: View, DevTool {
     let id = "xml-formatter"
     let name = "XML Formatter"
     let category = DevToolCategory.data
@@ -8,11 +8,9 @@ struct XMLFormatterDevTool: DevTool {
     let description = "Prettify and validate XML data"
 
     func render() -> some View {
-        XMLFormatterView()
+        self
     }
-}
 
-struct XMLFormatterView: View {
     @StateObject private var viewModel = XMLFormatterViewModel()
 
     var body: some View {

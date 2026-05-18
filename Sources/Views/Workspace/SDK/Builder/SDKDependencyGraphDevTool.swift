@@ -13,7 +13,7 @@ struct SDKDependencyGraphDevTool: DevTool {
 }
 
 struct SDKDependencyGraphView: View {
-    @StateObject private var registry = SDKModuleRegistry.shared
+    @ObservedObject private var registry = SDKModuleRegistry.shared
 
     var body: some View {
         let orderedModules = registry.resolvedLoadOrder()

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TimezoneConverterDevTool: DevTool {
+struct TimezoneConverterDevTool: View, DevTool {
     let id = "timezone-converter"
     let name = "Timezone Converter"
     let category = DevToolCategory.data
@@ -8,11 +8,9 @@ struct TimezoneConverterDevTool: DevTool {
     let description = "Convert times between different timezones"
 
     func render() -> some View {
-        TimezoneConverterView()
+        self
     }
-}
 
-struct TimezoneConverterView: View {
     @StateObject private var viewModel = TimezoneConverterViewModel()
 
     var body: some View {

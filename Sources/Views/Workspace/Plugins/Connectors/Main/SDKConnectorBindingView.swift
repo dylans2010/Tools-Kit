@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct SDKConnectorBindingView: View {
-    @StateObject private var binder = SDKConnectorRuntimeBinder.shared
-    @StateObject private var connectorManager = SDKConnectorManager.shared
-    @StateObject private var moduleRegistry = SDKModuleRegistry.shared
+    @ObservedObject private var binder = SDKConnectorRuntimeBinder.shared
+    @ObservedObject private var connectorManager = SDKConnectorManager.shared
+    @ObservedObject private var moduleRegistry = SDKModuleRegistry.shared
     @State private var showingAddBinding = false
     @State private var showingTemplates = false
     @State private var selectedBinding: ConnectorBinding?

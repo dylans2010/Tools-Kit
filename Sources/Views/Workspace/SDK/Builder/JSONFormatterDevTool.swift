@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct JSONFormatterDevTool: DevTool {
+struct JSONFormatterDevTool: View, DevTool {
     let id = "json-formatter"
     let name = "JSON Formatter"
     let category = DevToolCategory.data
@@ -8,11 +8,9 @@ struct JSONFormatterDevTool: DevTool {
     let description = "Prettify and minify JSON data"
 
     func render() -> some View {
-        JSONFormatterView()
+        self
     }
-}
 
-struct JSONFormatterView: View {
     @StateObject private var viewModel = JSONFormatterViewModel()
 
     var body: some View {

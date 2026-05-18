@@ -3,10 +3,10 @@
 import SwiftUI
 
 struct SDKProjectDashboardView: View {
-    @StateObject private var projectManager = SDKProjectManager.shared
-    @StateObject private var connectorManager = SDKConnectorManager.shared
-    @StateObject private var automationEngine = SDKAutomationEngine.shared
-    @StateObject private var logStore = SDKLogStore.shared
+    @ObservedObject private var projectManager = SDKProjectManager.shared
+    @ObservedObject private var connectorManager = SDKConnectorManager.shared
+    @ObservedObject private var automationEngine = SDKAutomationEngine.shared
+    @ObservedObject private var logStore = SDKLogStore.shared
     @State private var navPath = NavigationPath()
 
     var body: some View {

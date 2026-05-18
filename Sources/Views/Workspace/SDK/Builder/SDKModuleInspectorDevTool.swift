@@ -13,7 +13,7 @@ struct SDKModuleInspectorDevTool: DevTool {
 }
 
 struct SDKModuleInspectorView: View {
-    @StateObject private var registry = SDKModuleRegistry.shared
+    @ObservedObject private var registry = SDKModuleRegistry.shared
     @State private var selectedModule: SDKModuleDescriptor?
 
     var body: some View {

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct JWTDecoderDevTool: DevTool {
+struct JWTDecoderDevTool: View, DevTool {
     let id = "jwt-decoder"
     let name = "JWT Decoder"
     let category = DevToolCategory.security
@@ -8,11 +8,9 @@ struct JWTDecoderDevTool: DevTool {
     let description = "Decode and inspect JSON Web Tokens"
 
     func render() -> some View {
-        JWTDecoderView()
+        self
     }
-}
 
-struct JWTDecoderView: View {
     @StateObject private var viewModel = JWTDecoderViewModel()
 
     var body: some View {

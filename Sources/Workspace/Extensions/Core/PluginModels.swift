@@ -397,6 +397,7 @@ enum HTTPMethod: String, Codable, CaseIterable {
     case get = "GET", post = "POST", put = "PUT", delete = "DELETE"
 }
 
+typealias PluginModelsAuthType = AuthType
 enum AuthType: String, Codable, CaseIterable {
     case none, apiKey, bearer, oauth
 }

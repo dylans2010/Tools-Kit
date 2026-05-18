@@ -1,7 +1,7 @@
 import SwiftUI
 import CryptoKit
 
-struct HashGeneratorDevTool: DevTool {
+struct HashGeneratorDevTool: View, DevTool {
     let id = "hash-generator"
     let name = "Hash Generator"
     let category = DevToolCategory.security
@@ -9,11 +9,9 @@ struct HashGeneratorDevTool: DevTool {
     let description = "Generate cryptographic hashes"
 
     func render() -> some View {
-        HashGeneratorView()
+        self
     }
-}
 
-struct HashGeneratorView: View {
     @StateObject private var viewModel = HashGeneratorViewModel()
 
     var body: some View {

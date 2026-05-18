@@ -1,7 +1,7 @@
 import SwiftUI
 import Darwin
 
-struct DNSLookupDevTool: DevTool {
+struct DNSLookupDevTool: View, DevTool {
     let id = "dns-lookup"
     let name = "DNS Lookup"
     let category = DevToolCategory.networking
@@ -9,11 +9,9 @@ struct DNSLookupDevTool: DevTool {
     let description = "Resolve hostnames and inspect DNS records"
 
     func render() -> some View {
-        DNSLookupView()
+        self
     }
-}
 
-struct DNSLookupView: View {
     @StateObject private var viewModel = DNSLookupViewModel()
 
     var body: some View {

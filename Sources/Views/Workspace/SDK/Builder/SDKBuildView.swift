@@ -3,7 +3,7 @@ import SwiftUI
 struct SDKBuildView: View {
     @StateObject private var projectManager = SDKProjectManager.shared
     @StateObject private var telemetry = SDKTelemetryEngine.shared
-    @StateObject private var logStore = SDKLogStore.shared
+    @ObservedObject private var logStore = SDKLogStore.shared
     @StateObject private var pluginManager = SDKPluginManager.shared
     @StateObject private var connectorManager = SDKConnectorManager.shared
     @StateObject private var toolManager = SDKToolManager.shared

@@ -13,7 +13,7 @@ struct SDKConfigValidatorDevTool: DevTool {
 }
 
 struct SDKConfigValidatorView: View {
-    @StateObject private var configManager = SDKConfigManager.shared
+    @ObservedObject private var configManager = SDKConfigManager.shared
 
     var body: some View {
         let sortedConfigurations = Array(configManager.configurations.values).sorted { lhs, rhs in

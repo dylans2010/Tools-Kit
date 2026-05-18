@@ -244,6 +244,3 @@ struct HTTPResponse {
     let duration: TimeInterval
 }
 
-enum AuthType: String, Codable {
-    case none, bearer, apiKey
-}

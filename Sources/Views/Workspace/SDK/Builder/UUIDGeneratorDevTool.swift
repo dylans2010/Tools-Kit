@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct UUIDGeneratorDevTool: DevTool {
+struct UUIDGeneratorDevTool: View, DevTool {
     let id = "uuid-generator"
     let name = "UUID Generator"
     let category = DevToolCategory.data
@@ -8,11 +8,9 @@ struct UUIDGeneratorDevTool: DevTool {
     let description = "Generate unique identifiers (UUID v4)"
 
     func render() -> some View {
-        UUIDGeneratorView()
+        self
     }
-}
 
-struct UUIDGeneratorView: View {
     @StateObject private var viewModel = UUIDGeneratorViewModel()
 
     var body: some View {

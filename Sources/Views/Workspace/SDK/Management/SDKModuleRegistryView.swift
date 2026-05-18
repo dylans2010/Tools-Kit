@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SDKModuleRegistryView: View {
-    @StateObject private var registry = SDKModuleRegistry.shared
+    @ObservedObject private var registry = SDKModuleRegistry.shared
     @State private var showingAddModule = false
     @State private var showingDependencyGraph = false
     @State private var selectedModule: SDKModuleDescriptor?
@@ -25,7 +25,7 @@ struct SDKModuleRegistryView: View {
     var body: some View {
         List {
             overviewSection
-            if !filteredModules.isEmpty { modulesSection }
+            if !filteredModules.isEmpty { modulesSection() }
             actionsSection
             if !registry.registrationLog.isEmpty { logSection }
         }
@@ -67,7 +67,8 @@ struct SDKModuleRegistryView: View {
         }
     }
 
-    private var modulesSection: some View {
+    @ViewBuilder
+    private func modulesSection() -> some View {
         Section {
             ForEach(filteredModules) { mod in
                 Button { selectedModule = mod } label: {
