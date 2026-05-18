@@ -5,7 +5,7 @@ struct ContrastCheckerDevTool: DevTool {
     let name = "Contrast Checker"
     let category = DevToolCategory.uiDesign
     let icon = "circle.lefthalf.filled"
-    let description = "Check color contrast ratio (WCAG)"
+    let description = "Validate color contrast for accessibility"
 
     func render() -> some View {
         ContrastCheckerView()
@@ -16,36 +16,41 @@ struct ContrastCheckerView: View {
     @StateObject private var viewModel = ContrastCheckerViewModel()
 
     var body: some View {
-        Form {
-            Section("Colors") {
-                ColorPicker("Background", selection: $viewModel.backgroundColor)
-                ColorPicker("Foreground", selection: $viewModel.foregroundColor)
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Contrast Checker",
+                description: "Check text and background color contrast ratios against WCAG accessibility standards.",
+                icon: "circle.lefthalf.filled"
+            )
+            .padding()
 
-            Section("Result") {
-                HStack {
-                    Text("Ratio")
-                    Spacer()
-                    Text(String(format: "%.2f:1", viewModel.ratio))
-                        .font(.headline.monospaced())
+            Form {
+                Section("Colors") {
+                    ColorPicker("Background", selection: $viewModel.backgroundColor)
+                    ColorPicker("Foreground (Text)", selection: $viewModel.foregroundColor)
                 }
 
-                LabeledContent("WCAG AA", value: viewModel.ratio >= 4.5 ? "Pass" : "Fail")
-                    .foregroundStyle(viewModel.ratio >= 4.5 ? .green : .red)
-
-                LabeledContent("WCAG AAA", value: viewModel.ratio >= 7.0 ? "Pass" : "Fail")
-                    .foregroundStyle(viewModel.ratio >= 7.0 ? .green : .red)
-            }
-
-            Section("Preview") {
-                ZStack {
-                    viewModel.backgroundColor
+                Section("Preview") {
                     Text("Sample Text")
+                        .font(.title.bold())
                         .foregroundStyle(viewModel.foregroundColor)
-                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(viewModel.backgroundColor)
+                        .cornerRadius(8)
                 }
-                .frame(height: 60)
-                .cornerRadius(8)
+
+                Section("WCAG Results") {
+                    HStack {
+                        Text("Ratio: \(String(format: "%.2f", viewModel.contrastRatio)):1")
+                            .font(.headline)
+                        Spacer()
+                        StatusBadge(
+                            text: viewModel.contrastRatio >= 4.5 ? "PASS (AA)" : "FAIL (AA)",
+                            color: viewModel.contrastRatio >= 4.5 ? .green : .red
+                        )
+                    }
+                }
             }
         }
     }
@@ -55,22 +60,18 @@ class ContrastCheckerViewModel: ObservableObject {
     @Published var backgroundColor: Color = .white
     @Published var foregroundColor: Color = .black
 
-    var ratio: Double {
-        let lum1 = backgroundColor.getLuminance()
-        let lum2 = foregroundColor.getLuminance()
-        let l1 = max(lum1, lum2)
-        let l2 = min(lum1, lum2)
-        return (l1 + 0.05) / (l2 + 0.05)
+    var contrastRatio: Double {
+        let l1 = luminance(color: foregroundColor)
+        let l2 = luminance(color: backgroundColor)
+        return (max(l1, l2) + 0.05) / (min(l1, l2) + 0.05)
     }
-}
 
-extension Color {
-    func getLuminance() -> Double {
-        let components = self.getComponents()
-        func adjust(_ val: CGFloat) -> Double {
-            let v = Double(val)
-            return v <= 0.03928 ? v / 12.92 : pow((v + 0.055) / 1.055, 2.4)
+    private func luminance(color: Color) -> Double {
+        let c = color.getComponents()
+        func adjust(_ v: CGFloat) -> Double {
+            let d = Double(v)
+            return d <= 0.03928 ? d / 12.92 : pow((d + 0.055) / 1.055, 2.4)
         }
-        return 0.2126 * adjust(components.r) + 0.7152 * adjust(components.g) + 0.0722 * adjust(components.b)
+        return 0.2126 * adjust(c.r) + 0.7152 * adjust(c.g) + 0.0722 * adjust(c.b)
     }
 }

@@ -5,8 +5,8 @@ struct HashGeneratorDevTool: DevTool {
     let id = "hash-generator"
     let name = "Hash Generator"
     let category = DevToolCategory.security
-    let icon = "number"
-    let description = "Generate SHA-256 and MD5 hashes"
+    let icon = "lock.rotation"
+    let description = "Generate cryptographic hashes"
 
     func render() -> some View {
         HashGeneratorView()
@@ -17,32 +17,71 @@ struct HashGeneratorView: View {
     @StateObject private var viewModel = HashGeneratorViewModel()
 
     var body: some View {
-        Form {
-            Section("Input Text") {
-                TextEditor(text: $viewModel.inputText)
-                    .frame(height: 100)
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Hash Generator",
+                description: "Compute secure cryptographic hashes using SHA256, SHA512, and MD5 algorithms.",
+                icon: "lock.rotation"
+            )
+            .padding()
 
-            Section("Hashes") {
-                LabeledContent("MD5", value: viewModel.md5Hash)
-                LabeledContent("SHA-256", value: viewModel.sha256Hash)
+            Form {
+                Section("Input Content") {
+                    TextEditor(text: $viewModel.input)
+                        .frame(height: 100)
+                }
+
+                Section("Algorithms") {
+                    VStack(alignment: .leading, spacing: 12) {
+                        hashRow(title: "SHA-256", value: viewModel.sha256)
+                        hashRow(title: "SHA-512", value: viewModel.sha512)
+                        hashRow(title: "MD5", value: viewModel.md5)
+                    }
+                }
+            }
+        }
+    }
+
+    private func hashRow(title: String, value: String) -> some View {
+        VStack(alignment: .leading) {
+            Text(title).font(.caption.bold()).foregroundStyle(.accent)
+            HStack {
+                Text(value)
+                    .font(.system(.caption2, design: .monospaced))
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .textSelection(.enabled)
+                Spacer()
+                Button {
+                    UIPasteboard.general.string = value
+                } label: {
+                    Image(systemName: "doc.on.doc").font(.caption)
+                }
             }
         }
     }
 }
 
 class HashGeneratorViewModel: ObservableObject {
-    @Published var inputText = ""
-
-    var md5Hash: String {
-        guard let data = inputText.data(using: .utf8) else { return "" }
-        let hash = Insecure.MD5.hash(data: data)
-        return hash.map { String(format: "%02x", $0) }.joined()
+    @Published var input = "" {
+        didSet { generate() }
     }
+    @Published var sha256 = ""
+    @Published var sha512 = ""
+    @Published var md5 = ""
 
-    var sha256Hash: String {
-        guard let data = inputText.data(using: .utf8) else { return "" }
-        let hash = SHA256.hash(data: data)
-        return hash.map { String(format: "%02x", $0) }.joined()
+    private func generate() {
+        guard let data = input.data(using: .utf8) else { return }
+
+        let s256 = SHA256.hash(data: data)
+        sha256 = s256.map { String(format: "%02x", $0) }.joined()
+
+        let s512 = SHA512.hash(data: data)
+        sha512 = s512.map { String(format: "%02x", $0) }.joined()
+
+        // Simple Insecure MD5 (using Apple CryptoKit doesn't support MD5 directly for security reasons,
+        // but we can mock it or use a library. For this tool we will use Insecure.MD5)
+        let m5 = Insecure.MD5.hash(data: data)
+        md5 = m5.map { String(format: "%02x", $0) }.joined()
     }
 }

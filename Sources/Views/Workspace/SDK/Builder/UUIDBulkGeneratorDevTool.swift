@@ -13,34 +13,44 @@ struct UUIDBulkGeneratorDevTool: DevTool {
 }
 
 struct UUIDBulkGeneratorView: View {
-    @State private var count = 10.0
-    @State private var results: [String] = []
+    @StateObject private var viewModel = UUIDBulkGeneratorViewModel()
 
     var body: some View {
-        Form {
-            Section("Settings") {
-                HStack {
-                    Text("Count: \(Int(count))")
-                    Slider(value: $count, in: 1...100, step: 1)
-                }
-                Button("Generate") {
-                    results = (0..<Int(count)).map { _ in UUID().uuidString }
-                }
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "UUID Bulk Generator",
+                description: "Create batches of unique identifiers for seeding data or load testing.",
+                icon: "barcode.viewfinder"
+            )
+            .padding()
 
-            if !results.isEmpty {
-                Section("Results") {
-                    Text(results.joined(separator: "\n"))
-                        .font(.monospaced(.caption2)())
-                        .textSelection(.enabled)
+            Form {
+                Section("Quantity") {
+                    Stepper("Count: \(viewModel.count)", value: $viewModel.count, in: 1...1000)
+                    Button("Generate Batch") { viewModel.generateBatch() }
+                }
 
-                    Button {
-                        UIPasteboard.general.string = results.joined(separator: "\n")
-                    } label: {
-                        Label("Copy All", systemImage: "doc.on.doc")
-                    }
+                Section("Batch Output") {
+                    TextEditor(text: .constant(viewModel.output))
+                        .frame(height: 200)
+                        .font(.system(.caption, design: .monospaced))
+
+                    ExportPanel(content: viewModel.output, filename: "uuids.txt")
                 }
             }
         }
+    }
+}
+
+class UUIDBulkGeneratorViewModel: ObservableObject {
+    @Published var count = 10
+    @Published var output = ""
+
+    func generateBatch() {
+        var results: [String] = []
+        for _ in 0..<count {
+            results.append(UUID().uuidString)
+        }
+        output = results.joined(separator: "\n")
     }
 }

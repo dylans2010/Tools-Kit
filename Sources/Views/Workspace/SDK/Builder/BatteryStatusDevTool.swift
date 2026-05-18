@@ -5,7 +5,7 @@ struct BatteryStatusDevTool: DevTool {
     let name = "Battery Status"
     let category = DevToolCategory.system
     let icon = "battery.100"
-    let description = "View battery level and state"
+    let description = "Real-time battery level and state"
 
     func render() -> some View {
         BatteryStatusView()
@@ -13,30 +13,74 @@ struct BatteryStatusDevTool: DevTool {
 }
 
 struct BatteryStatusView: View {
-    @State private var level = UIDevice.current.batteryLevel
-    @State private var state = UIDevice.current.batteryState
+    @StateObject private var viewModel = BatteryStatusViewModel()
 
     var body: some View {
-        Form {
-            Section("Battery Info") {
-                LabeledContent("Level", value: "\(Int(level * 100))%")
-                LabeledContent("State", value: stateString)
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Battery Status",
+                description: "Monitor device battery level, charging state, and energy consumption trends.",
+                icon: "battery.100"
+            )
+            .padding()
+
+            VStack(spacing: 30) {
+                ZStack {
+                    Circle()
+                        .stroke(Color.secondary.opacity(0.2), lineWidth: 20)
+                    Circle()
+                        .trim(from: 0, to: CGFloat(viewModel.level))
+                        .stroke(viewModel.level > 0.2 ? Color.green : Color.red, style: StrokeStyle(lineWidth: 20, lineCap: .round))
+                        .rotationEffect(.degrees(-90))
+
+                    VStack {
+                        Text("\(Int(viewModel.level * 100))%")
+                            .font(.system(size: 40, weight: .bold))
+                        Text(viewModel.state)
+                            .font(.caption.bold())
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .frame(width: 200, height: 200)
+                .padding()
+
+                Form {
+                    Section("Power Details") {
+                        LabeledContent("Charging State", value: viewModel.state)
+                        LabeledContent("Level", value: String(format: "%.0f%%", viewModel.level * 100))
+                    }
+                }
             }
         }
-        .onAppear {
-            UIDevice.current.isBatteryMonitoringEnabled = true
-            level = UIDevice.current.batteryLevel
-            state = UIDevice.current.batteryState
+        .onAppear { viewModel.start() }
+        .onDisappear { viewModel.stop() }
+    }
+}
+
+class BatteryStatusViewModel: ObservableObject {
+    @Published var level: Float = 0
+    @Published var state = "Unknown"
+    private var timer: Timer?
+
+    func start() {
+        UIDevice.current.isBatteryMonitoringEnabled = true
+        update()
+        timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+            self?.update()
         }
     }
 
-    var stateString: String {
-        switch state {
-        case .unknown: return "Unknown"
-        case .unplugged: return "Unplugged"
-        case .charging: return "Charging"
-        case .full: return "Full"
-        @unknown default: return "Unknown"
+    func stop() {
+        timer?.invalidate()
+    }
+
+    private func update() {
+        level = UIDevice.current.batteryLevel
+        switch UIDevice.current.batteryState {
+        case .unplugged: state = "Unplugged"
+        case .charging: state = "Charging"
+        case .full: state = "Full"
+        default: state = "Unknown"
         }
     }
 }

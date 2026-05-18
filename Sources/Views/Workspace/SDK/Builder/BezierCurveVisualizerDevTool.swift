@@ -4,8 +4,8 @@ struct BezierCurveVisualizerDevTool: DevTool {
     let id = "bezier-curve-visualizer"
     let name = "Bezier Curve Visualizer"
     let category = DevToolCategory.uiDesign
-    let icon = "curve.dotted"
-    let description = "Visualize Cubic Bezier curves"
+    let icon = "point.topleft.down.curvedto.point.bottomright.up"
+    let description = "Interactive cubic Bezier curve editor"
 
     func render() -> some View {
         BezierCurveVisualizerView()
@@ -13,33 +13,32 @@ struct BezierCurveVisualizerDevTool: DevTool {
 }
 
 struct BezierCurveVisualizerView: View {
-    @StateObject private var viewModel = BezierCurveViewModel()
+    @StateObject private var viewModel = BezierCurveVisualizerViewModel()
 
     var body: some View {
-        VStack {
-            BezierCanvas(p0: viewModel.p0, p1: viewModel.p1, p2: viewModel.p2, p3: viewModel.p3)
-                .frame(height: 300)
-                .background(Color.secondary.opacity(0.1))
-                .cornerRadius(12)
-                .padding()
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Bezier Curve Visualizer",
+                description: "Interactively adjust control points to design custom cubic Bezier paths for animations or shapes.",
+                icon: "point.topleft.down.curvedto.point.bottomright.up"
+            )
+            .padding()
 
-            Form {
-                Section("Control Points") {
-                    HStack {
-                        Text("P1 X: \(Int(viewModel.p1.x))")
-                        Slider(value: $viewModel.p1.x, in: 0...300)
-                    }
-                    HStack {
-                        Text("P1 Y: \(Int(viewModel.p1.y))")
-                        Slider(value: $viewModel.p1.y, in: 0...300)
-                    }
-                    HStack {
-                        Text("P2 X: \(Int(viewModel.p2.x))")
-                        Slider(value: $viewModel.p2.x, in: 0...300)
-                    }
-                    HStack {
-                        Text("P2 Y: \(Int(viewModel.p2.y))")
-                        Slider(value: $viewModel.p2.y, in: 0...300)
+            VStack {
+                BezierCanvas(points: $viewModel.points)
+                    .frame(height: 300)
+                    .background(Color(uiColor: .secondarySystemBackground))
+                    .cornerRadius(12)
+                    .padding()
+
+                Form {
+                    Section("SwiftUI Code") {
+                        Text(viewModel.codeSnippet)
+                            .font(.system(.caption2, design: .monospaced))
+                            .padding()
+                            .background(Color.secondary.opacity(0.1))
+
+                        ExportPanel(content: viewModel.codeSnippet, filename: "bezier_path.swift")
                     }
                 }
             }
@@ -48,34 +47,54 @@ struct BezierCurveVisualizerView: View {
 }
 
 struct BezierCanvas: View {
-    let p0: CGPoint
-    let p1: CGPoint
-    let p2: CGPoint
-    let p3: CGPoint
+    @Binding var points: [CGPoint]
 
     var body: some View {
-        Canvas { context, size in
-            var path = Path()
-            path.move(to: p0)
-            path.addCurve(to: p3, control1: p1, control2: p2)
-            context.stroke(path, with: .color(.blue), lineWidth: 3)
+        GeometryReader { geo in
+            ZStack {
+                // Path
+                Path { path in
+                    path.move(to: points[0])
+                    path.addCurve(to: points[3], control1: points[1], control2: points[2])
+                }
+                .stroke(Color.accentColor, lineWidth: 3)
 
-            var controlPath = Path()
-            controlPath.move(to: p0)
-            controlPath.addLine(to: p1)
-            controlPath.move(to: p3)
-            controlPath.addLine(to: p2)
-            context.stroke(controlPath, with: .color(.gray), style: StrokeStyle(lineWidth: 1, dash: [5]))
+                // Control lines
+                Path { path in
+                    path.move(to: points[0])
+                    path.addLine(to: points[1])
+                    path.move(to: points[3])
+                    path.addLine(to: points[2])
+                }
+                .stroke(Color.gray, style: StrokeStyle(lineWidth: 1, dash: [5]))
 
-            context.fill(Path(ellipseIn: CGRect(x: p1.x-4, y: p1.y-4, width: 8, height: 8)), with: .color(.red))
-            context.fill(Path(ellipseIn: CGRect(x: p2.x-4, y: p2.y-4, width: 8, height: 8)), with: .color(.red))
+                // Points
+                ForEach(0..<4) { index in
+                    Circle()
+                        .fill(index == 1 || index == 2 ? Color.orange : Color.blue)
+                        .frame(width: 12, height: 12)
+                        .position(points[index])
+                        .gesture(DragGesture().onChanged { value in
+                            points[index] = value.location
+                        })
+                }
+            }
         }
     }
 }
 
-class BezierCurveViewModel: ObservableObject {
-    @Published var p0 = CGPoint(x: 50, y: 250)
-    @Published var p1 = CGPoint(x: 100, y: 50)
-    @Published var p2 = CGPoint(x: 200, y: 50)
-    @Published var p3 = CGPoint(x: 250, y: 250)
+class BezierCurveVisualizerViewModel: ObservableObject {
+    @Published var points: [CGPoint] = [
+        CGPoint(x: 50, y: 250),
+        CGPoint(x: 100, y: 50),
+        CGPoint(x: 200, y: 50),
+        CGPoint(x: 250, y: 250)
+    ]
+
+    var codeSnippet: String {
+        "path.move(to: CGPoint(x: \(Int(points[0].x)), y: \(Int(points[0].y))))\n" +
+        "path.addCurve(to: CGPoint(x: \(Int(points[3].x)), y: \(Int(points[3].y))),\n" +
+        "              control1: CGPoint(x: \(Int(points[1].x)), y: \(Int(points[1].y))),\n" +
+        "              control2: CGPoint(x: \(Int(points[2].x)), y: \(Int(points[2].y))))"
+    }
 }

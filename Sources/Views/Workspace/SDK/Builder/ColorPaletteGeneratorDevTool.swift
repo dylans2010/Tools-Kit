@@ -5,7 +5,7 @@ struct ColorPaletteGeneratorDevTool: DevTool {
     let name = "Color Palette Generator"
     let category = DevToolCategory.uiDesign
     let icon = "swatchpalette"
-    let description = "Generate color schemes"
+    let description = "Generate harmonious color schemes"
 
     func render() -> some View {
         ColorPaletteGeneratorView()
@@ -16,66 +16,77 @@ struct ColorPaletteGeneratorView: View {
     @StateObject private var viewModel = ColorPaletteGeneratorViewModel()
 
     var body: some View {
-        Form {
-            Section("Base Color") {
-                ColorPicker("Select Color", selection: $viewModel.baseColor)
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Color Palette Generator",
+                description: "Create monochromatic, analogous, or complementary color schemes from a base color.",
+                icon: "swatchpalette"
+            )
+            .padding()
 
-            Section("Monochromatic") {
-                HStack(spacing: 0) {
-                    ForEach(viewModel.monochromatic, id: \.self) { color in
-                        Rectangle()
-                            .fill(color)
-                            .frame(height: 50)
+            Form {
+                Section("Base Color") {
+                    ColorPicker("Primary", selection: $viewModel.baseColor)
+                }
+
+                Section("Scheme Type") {
+                    Picker("Harmony", selection: $viewModel.type) {
+                        Text("Monochromatic").tag(PaletteType.monochromatic)
+                        Text("Analogous").tag(PaletteType.analogous)
+                        Text("Complementary").tag(PaletteType.complementary)
+                    }
+                    .pickerStyle(.segmented)
+                }
+
+                Section("Generated Palette") {
+                    HStack(spacing: 4) {
+                        ForEach(viewModel.palette, id: \.self) { color in
+                            Rectangle()
+                                .fill(color)
+                                .frame(height: 60)
+                                .overlay(Text(hex(color)).font(.caption2).foregroundStyle(.white).shadow(radius: 1))
+                        }
                     }
                 }
-            }
-
-            Section("Analogous") {
-                HStack(spacing: 0) {
-                    ForEach(viewModel.analogous, id: \.self) { color in
-                        Rectangle()
-                            .fill(color)
-                            .frame(height: 50)
-                    }
-                }
-            }
-
-            Button("Generate New Palette") {
-                viewModel.generate()
             }
         }
     }
+
+    private func hex(_ color: Color) -> String {
+        let c = color.getComponents()
+        return String(format: "#%02X%02X%02X", Int(c.r*255), Int(c.g*255), Int(c.b*255))
+    }
+}
+
+enum PaletteType {
+    case monochromatic, analogous, complementary
 }
 
 class ColorPaletteGeneratorViewModel: ObservableObject {
-    @Published var baseColor: Color = .blue {
-        didSet { generate() }
-    }
-    @Published var monochromatic: [Color] = []
-    @Published var analogous: [Color] = []
+    @Published var baseColor: Color = .blue
+    @Published var type = PaletteType.monochromatic
 
-    init() {
-        generate()
-    }
-
-    func generate() {
-        let uiColor = UIColor(baseColor)
-        var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-        uiColor.getHue(&h, saturation: &s, brightness: &b, alpha: &a)
-
-        monochromatic = [
-            Color(hue: Double(h), saturation: Double(s), brightness: Double(max(0, b - 0.4))),
-            Color(hue: Double(h), saturation: Double(s), brightness: Double(max(0, b - 0.2))),
-            baseColor,
-            Color(hue: Double(h), saturation: Double(max(0, s - 0.2)), brightness: Double(b)),
-            Color(hue: Double(h), saturation: Double(max(0, s - 0.4)), brightness: Double(b))
-        ]
-
-        analogous = [
-            Color(hue: Double((h + 0.08).truncatingRemainder(dividingBy: 1.0)), saturation: Double(s), brightness: Double(b)),
-            baseColor,
-            Color(hue: Double((h - 0.08 + 1.0).truncatingRemainder(dividingBy: 1.0)), saturation: Double(s), brightness: Double(b))
-        ]
+    var palette: [Color] {
+        let c = baseColor.getComponents()
+        switch type {
+        case .monochromatic:
+            return [
+                Color(red: c.r * 0.4, green: c.g * 0.4, blue: c.b * 0.4),
+                Color(red: c.r * 0.7, green: c.g * 0.7, blue: c.b * 0.7),
+                baseColor,
+                Color(red: min(1.0, c.r * 1.3), green: min(1.0, c.g * 1.3), blue: min(1.0, c.b * 1.3))
+            ]
+        case .analogous:
+            return [
+                Color(red: c.r, green: c.g * 0.8, blue: c.b),
+                baseColor,
+                Color(red: c.r * 0.8, green: c.g, blue: c.b)
+            ]
+        case .complementary:
+            return [
+                baseColor,
+                Color(red: 1.0 - c.r, green: 1.0 - c.g, blue: 1.0 - c.b)
+            ]
+        }
     }
 }

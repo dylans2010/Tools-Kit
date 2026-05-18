@@ -4,8 +4,8 @@ struct JWTDecoderDevTool: DevTool {
     let id = "jwt-decoder"
     let name = "JWT Decoder"
     let category = DevToolCategory.security
-    let icon = "badge.plus.radiowaves.right"
-    let description = "Decode JSON Web Tokens"
+    let icon = "key.horizontal"
+    let description = "Decode and inspect JSON Web Tokens"
 
     func render() -> some View {
         JWTDecoderView()
@@ -16,47 +16,79 @@ struct JWTDecoderView: View {
     @StateObject private var viewModel = JWTDecoderViewModel()
 
     var body: some View {
-        Form {
-            Section("JWT Token") {
-                TextEditor(text: $viewModel.inputText)
-                    .frame(height: 100)
-                    .font(.monospaced(.body)())
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "JWT Decoder",
+                description: "Parse JSON Web Tokens to inspect header, payload, and signature components.",
+                icon: "key.horizontal"
+            )
+            .padding()
 
-            Section("Payload") {
-                Text(viewModel.payload)
-                    .font(.monospaced(.caption)())
-                    .textSelection(.enabled)
+            Form {
+                Section("Input JWT") {
+                    TextEditor(text: $viewModel.input)
+                        .frame(height: 100)
+                        .font(.system(.caption2, design: .monospaced))
+                }
+
+                if !viewModel.header.isEmpty {
+                    Section("Header") {
+                        JSONView(json: viewModel.header)
+                            .frame(height: 100)
+                    }
+
+                    Section("Payload") {
+                        JSONView(json: viewModel.payload)
+                            .frame(height: 200)
+                    }
+
+                    Section("Signature") {
+                        Text(viewModel.signature)
+                            .font(.system(.caption2, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
         }
     }
 }
 
 class JWTDecoderViewModel: ObservableObject {
-    @Published var inputText = ""
+    @Published var input = "" {
+        didSet { decode() }
+    }
+    @Published var header = ""
+    @Published var payload = ""
+    @Published var signature = ""
 
-    var payload: String {
-        let parts = inputText.components(separatedBy: ".")
-        guard parts.count >= 2 else { return "Invalid JWT" }
+    private func decode() {
+        let segments = input.components(separatedBy: ".")
+        guard segments.count == 3 else {
+            header = ""
+            payload = ""
+            signature = ""
+            return
+        }
 
-        let payloadPart = parts[1]
-        var base64 = payloadPart
-            .replacingOccurrences(of: "-", with: "+")
-            .replacingOccurrences(of: "_", with: "/")
+        header = decodeSegment(segments[0])
+        payload = decodeSegment(segments[1])
+        signature = segments[2]
+    }
 
-        let length = Double(base64.lengthOfBytes(using: .utf8))
-        let requiredLength = 4 * ceil(length / 4.0)
-        let paddingLength = Int(requiredLength) - Int(length)
-        if paddingLength > 0 {
-            base64 += String(repeating: "=", count: paddingLength)
+    private func decodeSegment(_ segment: String) -> String {
+        var base64 = segment.replacingOccurrences(of: "-", with: "+")
+                            .replacingOccurrences(of: "_", with: "/")
+        let remainder = base64.count % 4
+        if remainder > 0 {
+            base64 = base64.padding(toLength: base64.count + (4 - remainder), withPad: "=", startingAt: 0)
         }
 
         guard let data = Data(base64Encoded: base64),
-              let json = try? JSONSerialization.jsonObject(with: data),
-              let prettyData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) else {
-            return "Failed to decode payload"
+              let json = try? JSONSerialization.jsonObject(with: data, options: []),
+              let prettyData = try? JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted]),
+              let prettyString = String(data: prettyData, encoding: .utf8) else {
+            return "Invalid Segment"
         }
-
-        return String(data: prettyData, encoding: .utf8) ?? "Failed to decode payload"
+        return prettyString
     }
 }

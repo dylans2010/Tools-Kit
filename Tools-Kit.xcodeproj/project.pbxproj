@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FC335125304A4830BFC09FE0 /* DevToolSharedUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5802738C69834F1BBAAA2C66 /* DevToolSharedUtils.swift */; };
+		4493B4F7B7264E1587EBEA36 /* SDKModuleInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B6C5F74C541E188C9AF53 /* SDKModuleInspectorDevTool.swift */; };
+		D11E98ED67F642419A3A23FB /* SDKConfigValidatorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1600644375C34AE78E169D60 /* SDKConfigValidatorDevTool.swift */; };
+		1970D9D8550E4BA4AAE4F97F /* SDKEventLoggerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9FF9C6F2A14E52815A572D /* SDKEventLoggerDevTool.swift */; };
+		FDBC20CE109040A7B92BCFD3 /* SDKRuntimeStateDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6C8BDE4FA24F0CB81F3DD5 /* SDKRuntimeStateDevTool.swift */; };
+		104490A6DB0547939DA483B4 /* SDKDependencyGraphDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C5305DF640347AAB5FC7E8D /* SDKDependencyGraphDevTool.swift */; };
+		D4FEDB1E90F2441D922BDFE3 /* SDKIntegrationValidatorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF10124F56334442B7557D3F /* SDKIntegrationValidatorDevTool.swift */; };
 		MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018A4E8FF9A0449D039277 /* JSONCoder.swift */; };
 		MS026A2894802C56D5AB5FC3 /* SegmentSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */; };
 		MS028F0C9AC0045039A23CD0 /* MessageBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */; };
@@ -1550,6 +1557,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5802738C69834F1BBAAA2C66 /* DevToolSharedUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DevToolSharedUtils.swift; sourceTree = "<group>"; };
+		F61B6C5F74C541E188C9AF53 /* SDKModuleInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKModuleInspectorDevTool.swift; sourceTree = "<group>"; };
+		1600644375C34AE78E169D60 /* SDKConfigValidatorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKConfigValidatorDevTool.swift; sourceTree = "<group>"; };
+		2B9FF9C6F2A14E52815A572D /* SDKEventLoggerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKEventLoggerDevTool.swift; sourceTree = "<group>"; };
+		CE6C8BDE4FA24F0CB81F3DD5 /* SDKRuntimeStateDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKRuntimeStateDevTool.swift; sourceTree = "<group>"; };
+		5C5305DF640347AAB5FC7E8D /* SDKDependencyGraphDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKDependencyGraphDevTool.swift; sourceTree = "<group>"; };
+		FF10124F56334442B7557D3F /* SDKIntegrationValidatorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKIntegrationValidatorDevTool.swift; sourceTree = "<group>"; };
 		MS018A4E8FF9A0449D039277 /* JSONCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONCoder.swift; sourceTree = "<group>"; };
 		MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentSwitcher.swift; sourceTree = "<group>"; };
 		MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleView.swift; sourceTree = "<group>"; };
@@ -7790,6 +7804,13 @@
 				25AECACC30C14716B3013901 /* PermissionInspectorDevTool.swift */,
 				2208A9C0CF904CB4B32C0FBE /* JWTDecoderDevTool.swift */,
 				93C1AA20141840DF8DAC155B /* Base64EncoderDevTool.swift */,
+				5802738C69834F1BBAAA2C66 /* DevToolSharedUtils.swift */,
+				F61B6C5F74C541E188C9AF53 /* SDKModuleInspectorDevTool.swift */,
+				1600644375C34AE78E169D60 /* SDKConfigValidatorDevTool.swift */,
+				2B9FF9C6F2A14E52815A572D /* SDKEventLoggerDevTool.swift */,
+				CE6C8BDE4FA24F0CB81F3DD5 /* SDKRuntimeStateDevTool.swift */,
+				5C5305DF640347AAB5FC7E8D /* SDKDependencyGraphDevTool.swift */,
+				FF10124F56334442B7557D3F /* SDKIntegrationValidatorDevTool.swift */,
 				A6543C98EF1144CCAFB951E3 /* ColorConverterDevTool.swift */,
 				7101221B94664FF6A2A16415 /* TimezoneConverterDevTool.swift */,
 				FBFBC7A30FEC46858DE6A09D /* APIResponseViewerDevTool.swift */,
@@ -11639,6 +11660,13 @@
 				ABB00809F5814D2BACB28E80 /* PermissionInspectorDevTool.swift in Sources */,
 				096FA3D6396F4067881183B7 /* JWTDecoderDevTool.swift in Sources */,
 				713E0533E5E542B3860C049B /* Base64EncoderDevTool.swift in Sources */,
+				FC335125304A4830BFC09FE0 /* DevToolSharedUtils.swift in Sources */,
+				4493B4F7B7264E1587EBEA36 /* SDKModuleInspectorDevTool.swift in Sources */,
+				D11E98ED67F642419A3A23FB /* SDKConfigValidatorDevTool.swift in Sources */,
+				1970D9D8550E4BA4AAE4F97F /* SDKEventLoggerDevTool.swift in Sources */,
+				FDBC20CE109040A7B92BCFD3 /* SDKRuntimeStateDevTool.swift in Sources */,
+				104490A6DB0547939DA483B4 /* SDKDependencyGraphDevTool.swift in Sources */,
+				D4FEDB1E90F2441D922BDFE3 /* SDKIntegrationValidatorDevTool.swift in Sources */,
 				91EDD00757C94E1290B9C798 /* ColorConverterDevTool.swift in Sources */,
 				412F48260334428A8AFD5FB0 /* TimezoneConverterDevTool.swift in Sources */,
 				286434D0455549E996B295D6 /* APIResponseViewerDevTool.swift in Sources */,
@@ -11746,6 +11774,13 @@
 				ABB00809F5814D2BACB28E80 /* PermissionInspectorDevTool.swift in Sources */,
 				096FA3D6396F4067881183B7 /* JWTDecoderDevTool.swift in Sources */,
 				713E0533E5E542B3860C049B /* Base64EncoderDevTool.swift in Sources */,
+				FC335125304A4830BFC09FE0 /* DevToolSharedUtils.swift in Sources */,
+				4493B4F7B7264E1587EBEA36 /* SDKModuleInspectorDevTool.swift in Sources */,
+				D11E98ED67F642419A3A23FB /* SDKConfigValidatorDevTool.swift in Sources */,
+				1970D9D8550E4BA4AAE4F97F /* SDKEventLoggerDevTool.swift in Sources */,
+				FDBC20CE109040A7B92BCFD3 /* SDKRuntimeStateDevTool.swift in Sources */,
+				104490A6DB0547939DA483B4 /* SDKDependencyGraphDevTool.swift in Sources */,
+				D4FEDB1E90F2441D922BDFE3 /* SDKIntegrationValidatorDevTool.swift in Sources */,
 				91EDD00757C94E1290B9C798 /* ColorConverterDevTool.swift in Sources */,
 				412F48260334428A8AFD5FB0 /* TimezoneConverterDevTool.swift in Sources */,
 				286434D0455549E996B295D6 /* APIResponseViewerDevTool.swift in Sources */,
@@ -11865,6 +11900,13 @@
 				ABB00809F5814D2BACB28E80 /* PermissionInspectorDevTool.swift in Sources */,
 				096FA3D6396F4067881183B7 /* JWTDecoderDevTool.swift in Sources */,
 				713E0533E5E542B3860C049B /* Base64EncoderDevTool.swift in Sources */,
+				FC335125304A4830BFC09FE0 /* DevToolSharedUtils.swift in Sources */,
+				4493B4F7B7264E1587EBEA36 /* SDKModuleInspectorDevTool.swift in Sources */,
+				D11E98ED67F642419A3A23FB /* SDKConfigValidatorDevTool.swift in Sources */,
+				1970D9D8550E4BA4AAE4F97F /* SDKEventLoggerDevTool.swift in Sources */,
+				FDBC20CE109040A7B92BCFD3 /* SDKRuntimeStateDevTool.swift in Sources */,
+				104490A6DB0547939DA483B4 /* SDKDependencyGraphDevTool.swift in Sources */,
+				D4FEDB1E90F2441D922BDFE3 /* SDKIntegrationValidatorDevTool.swift in Sources */,
 				91EDD00757C94E1290B9C798 /* ColorConverterDevTool.swift in Sources */,
 				412F48260334428A8AFD5FB0 /* TimezoneConverterDevTool.swift in Sources */,
 				286434D0455549E996B295D6 /* APIResponseViewerDevTool.swift in Sources */,

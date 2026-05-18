@@ -5,7 +5,7 @@ struct DateFormatterDevTool: DevTool {
     let name = "Date Formatter"
     let category = DevToolCategory.data
     let icon = "calendar"
-    let description = "Format dates and timestamps"
+    let description = "Convert between dates and strings"
 
     func render() -> some View {
         DateFormatterView()
@@ -16,22 +16,40 @@ struct DateFormatterView: View {
     @StateObject private var viewModel = DateFormatterViewModel()
 
     var body: some View {
-        Form {
-            Section("Current Date") {
-                LabeledContent("Now", value: viewModel.nowFormatted)
-                LabeledContent("Timestamp", value: viewModel.nowTimestamp)
-                Button("Refresh") { viewModel.refresh() }
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Date Formatter",
+                description: "Test date formatting strings and convert timestamps into human-readable formats.",
+                icon: "calendar"
+            )
+            .padding()
 
-            Section("Custom Format") {
-                TextField("yyyy-MM-dd HH:mm:ss", text: $viewModel.formatString)
-                LabeledContent("Result", value: viewModel.customFormatted)
-            }
+            Form {
+                Section("Input Date") {
+                    DatePicker("Select Date", selection: $viewModel.date)
+                    LabeledContent("Timestamp", value: "\(Int(viewModel.date.timeIntervalSince1970))")
+                }
 
-            Section("ISO 8601") {
-                Text(viewModel.iso8601)
-                    .font(.monospaced(.caption)())
-                    .textSelection(.enabled)
+                Section("Format") {
+                    TextField("yyyy-MM-dd HH:mm:ss", text: $viewModel.formatString)
+
+                    Picker("Style", selection: $viewModel.dateStyle) {
+                        Text("Short").tag(DateFormatter.Style.short)
+                        Text("Medium").tag(DateFormatter.Style.medium)
+                        Text("Long").tag(DateFormatter.Style.long)
+                        Text("Full").tag(DateFormatter.Style.full)
+                    }
+                }
+
+                Section("Output") {
+                    Text(viewModel.formattedDate)
+                        .font(.headline)
+                        .textSelection(.enabled)
+
+                    Text(viewModel.iso8601Date)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                }
             }
         }
     }
@@ -40,30 +58,20 @@ struct DateFormatterView: View {
 class DateFormatterViewModel: ObservableObject {
     @Published var date = Date()
     @Published var formatString = "yyyy-MM-dd HH:mm:ss"
+    @Published var dateStyle = DateFormatter.Style.medium
 
-    var nowFormatted: String {
-        let formatter = Foundation.DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .medium
+    var formattedDate: String {
+        let formatter = DateFormatter()
+        if !formatString.isEmpty {
+            formatter.dateFormat = formatString
+        } else {
+            formatter.dateStyle = dateStyle
+            formatter.timeStyle = dateStyle
+        }
         return formatter.string(from: date)
     }
 
-    var nowTimestamp: String {
-        "\(Int(date.timeIntervalSince1970))"
-    }
-
-    var customFormatted: String {
-        let formatter = Foundation.DateFormatter()
-        formatter.dateFormat = formatString
-        return formatter.string(from: date)
-    }
-
-    var iso8601: String {
-        let formatter = ISO8601DateFormatter()
-        return formatter.string(from: date)
-    }
-
-    func refresh() {
-        date = Date()
+    var iso8601Date: String {
+        ISO8601DateFormatter().string(from: date)
     }
 }

@@ -5,7 +5,7 @@ struct HeaderInspectorDevTool: DevTool {
     let name = "Header Inspector"
     let category = DevToolCategory.networking
     let icon = "list.bullet.indent"
-    let description = "Inspect HTTP Headers"
+    let description = "Inspect and analyze HTTP headers"
 
     func render() -> some View {
         HeaderInspectorView()
@@ -14,26 +14,49 @@ struct HeaderInspectorDevTool: DevTool {
 
 struct HeaderInspectorView: View {
     @StateObject private var viewModel = HeaderInspectorViewModel()
+    @State private var rawHeaders = ""
 
     var body: some View {
-        Form {
-            Section("URL to Fetch Headers") {
-                TextField("https://example.com", text: $viewModel.urlString)
-                Button("Fetch Headers") {
-                    Task { await viewModel.fetch() }
-                }
-                .disabled(viewModel.isLoading)
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Header Inspector",
+                description: "Paste raw HTTP headers to parse and analyze security and caching policies.",
+                icon: "list.bullet.indent"
+            )
+            .padding()
 
-            Section("Headers") {
-                if viewModel.headers.isEmpty {
-                    Text("No headers fetched")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(viewModel.headers.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                        VStack(alignment: .leading) {
-                            Text(key).font(.caption.bold())
-                            Text(value).font(.caption).foregroundStyle(.secondary)
+            Form {
+                Section("Input Raw Headers") {
+                    TextEditor(text: $rawHeaders)
+                        .frame(height: 150)
+                        .font(.system(.caption, design: .monospaced))
+
+                    Button("Analyze Headers") {
+                        viewModel.analyze(rawHeaders)
+                    }
+                    .disabled(rawHeaders.isEmpty)
+                }
+
+                if !viewModel.headers.isEmpty {
+                    Section("Analysis") {
+                        ForEach(viewModel.analysisResults) { result in
+                            HStack {
+                                Image(systemName: result.isPositive ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                                    .foregroundStyle(result.isPositive ? .green : .orange)
+                                VStack(alignment: .leading) {
+                                    Text(result.title).font(.subheadline.bold())
+                                    Text(result.description).font(.caption).foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+
+                    Section("Parsed Headers") {
+                        ForEach(viewModel.headers, id: \.key) { header in
+                            VStack(alignment: .leading) {
+                                Text(header.key).font(.caption.bold()).foregroundStyle(.accent)
+                                Text(header.value).font(.caption2).textSelection(.enabled)
+                            }
                         }
                     }
                 }
@@ -42,27 +65,45 @@ struct HeaderInspectorView: View {
     }
 }
 
+struct HeaderAnalysisResult: Identifiable {
+    let id = UUID()
+    let title: String
+    let description: String
+    let isPositive: Bool
+}
+
 class HeaderInspectorViewModel: ObservableObject {
-    @Published var urlString = "https://example.com"
     @Published var headers: [String: String] = [:]
-    @Published var isLoading = false
+    @Published var analysisResults: [HeaderAnalysisResult] = []
 
-    func fetch() async {
-        guard let url = URL(string: urlString) else { return }
-        await MainActor.run { isLoading = true; headers = [:] }
+    func analyze(_ raw: String) {
+        headers = [:]
+        analysisResults = []
 
-        do {
-            var request = URLRequest(url: url)
-            request.httpMethod = "HEAD"
-            let (_, response) = try await URLSession.shared.data(for: request)
-            if let httpResponse = response as? HTTPURLResponse {
-                await MainActor.run {
-                    self.headers = httpResponse.allHeaderFields as? [String: String] ?? [:]
-                    self.isLoading = false
-                }
+        let lines = raw.components(separatedBy: .newlines)
+        for line in lines {
+            let parts = line.split(separator: ":", maxSplits: 1).map { String($0).trimmingCharacters(in: .whitespaces) }
+            if parts.count == 2 {
+                headers[parts[0]] = parts[1]
             }
-        } catch {
-            await MainActor.run { self.isLoading = false }
+        }
+
+        // Basic Security Analysis
+        checkHeader("Strict-Transport-Security", positiveDesc: "HSTS is enabled.", negativeDesc: "HSTS is missing. Risk of man-in-the-middle attacks.")
+        checkHeader("Content-Security-Policy", positiveDesc: "CSP is defined.", negativeDesc: "CSP is missing. Risk of XSS attacks.")
+        checkHeader("X-Content-Type-Options", positiveDesc: "MIME sniffing is disabled.", negativeDesc: "MIME sniffing might be enabled.")
+
+        // Caching Analysis
+        if let cache = headers["Cache-Control"] {
+            analysisResults.append(HeaderAnalysisResult(title: "Cache Policy", description: "Found: \(cache)", isPositive: true))
+        }
+    }
+
+    private func checkHeader(_ key: String, positiveDesc: String, negativeDesc: String) {
+        if headers[key] != nil {
+            analysisResults.append(HeaderAnalysisResult(title: key, description: positiveDesc, isPositive: true))
+        } else {
+            analysisResults.append(HeaderAnalysisResult(title: key, description: negativeDesc, isPositive: false))
         }
     }
 }

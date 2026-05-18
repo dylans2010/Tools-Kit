@@ -4,8 +4,8 @@ struct MarkdownPreviewDevTool: DevTool {
     let id = "markdown-preview"
     let name = "Markdown Preview"
     let category = DevToolCategory.utilities
-    let icon = "text.below.photo"
-    let description = "Preview Markdown rendered text"
+    let icon = "text.bubble"
+    let description = "Live preview of Markdown content"
 
     func render() -> some View {
         MarkdownPreviewView()
@@ -13,22 +13,40 @@ struct MarkdownPreviewDevTool: DevTool {
 }
 
 struct MarkdownPreviewView: View {
-    @State private var inputText = "# Hello\n\nThis is **Markdown** preview."
+    @StateObject private var viewModel = MarkdownPreviewViewModel()
 
     var body: some View {
-        VStack {
-            TextEditor(text: $inputText)
-                .frame(height: 150)
-                .padding()
-                .background(Color.secondary.opacity(0.1))
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Markdown Preview",
+                description: "Write Markdown and see it rendered in real-time as formatted text.",
+                icon: "text.bubble"
+            )
+            .padding()
 
-            Divider()
+            HStack {
+                VStack {
+                    Text("Editor").font(.caption.bold())
+                    TextEditor(text: $viewModel.input)
+                        .font(.system(.caption, design: .monospaced))
+                }
 
-            ScrollView {
-                Text(LocalizedStringKey(inputText))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
+                Divider()
+
+                VStack {
+                    Text("Preview").font(.caption.bold())
+                    ScrollView {
+                        Text(LocalizedStringKey(viewModel.input))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                    }
+                }
             }
+            .padding()
         }
     }
+}
+
+class MarkdownPreviewViewModel: ObservableObject {
+    @Published var input = "# Title\n\n- Item 1\n- Item 2\n\n**Bold Text**"
 }

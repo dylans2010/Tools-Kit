@@ -3,9 +3,9 @@ import SwiftUI
 struct URLEncoderDevTool: DevTool {
     let id = "url-encoder"
     let name = "URL Encoder"
-    let category = DevToolCategory.inputOutput
-    let icon = "link.badge.plus"
-    let description = "Percent-encode text for URLs"
+    let category = DevToolCategory.encoding
+    let icon = "link"
+    let description = "Percent-encode strings for use in URLs"
 
     func render() -> some View {
         URLEncoderView()
@@ -16,24 +16,38 @@ struct URLEncoderView: View {
     @StateObject private var viewModel = URLEncoderViewModel()
 
     var body: some View {
-        Form {
-            Section("Input") {
-                TextEditor(text: $viewModel.inputText)
-                    .frame(height: 100)
-                    .font(.monospaced(.body)())
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "URL Encoder",
+                description: "Encode special characters into percent-encoded sequences for valid URL formatting.",
+                icon: "link"
+            )
+            .padding()
 
-            Section("Encoded Output") {
-                Text(viewModel.outputText)
-                    .font(.monospaced(.body)())
-                    .textSelection(.enabled)
-
-                Button {
-                    UIPasteboard.general.string = viewModel.outputText
-                } label: {
-                    Label("Copy to Clipboard", systemImage: "doc.on.doc")
+            Form {
+                Section("Input") {
+                    TextEditor(text: $viewModel.inputText)
+                        .frame(height: 120)
+                        .font(.system(.body, design: .monospaced))
                 }
-                .disabled(viewModel.outputText.isEmpty)
+
+                Section("Output") {
+                    Text(viewModel.outputText)
+                        .font(.system(.body, design: .monospaced))
+                        .textSelection(.enabled)
+                        .frame(minHeight: 60)
+
+                    ExportPanel(content: viewModel.outputText, filename: "url_encoded.txt")
+                }
+
+                Section("History") {
+                    HistoryView(history: viewModel.history) { item in
+                        viewModel.inputText = item.title
+                    } onClear: {
+                        viewModel.history.removeAll()
+                    }
+                    .frame(height: 200)
+                }
             }
         }
     }
@@ -42,14 +56,22 @@ struct URLEncoderView: View {
 class URLEncoderViewModel: ObservableObject {
     @Published var inputText = "" {
         didSet {
-            outputText = URLEncoderService.encode(inputText)
+            encode()
         }
     }
     @Published var outputText = ""
-}
+    @Published var history: [HistoryItem] = []
 
-struct URLEncoderService {
-    static func encode(_ text: String) -> String {
-        return text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+    private func encode() {
+        guard !inputText.isEmpty else {
+            outputText = ""
+            return
+        }
+
+        outputText = inputText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+
+        if history.first?.title != inputText {
+            history.insert(HistoryItem(title: inputText, detail: "URL Encoded"), at: 0)
+        }
     }
 }

@@ -4,8 +4,8 @@ struct CPUMonitorDevTool: DevTool {
     let id = "cpu-monitor"
     let name = "CPU Monitor"
     let category = DevToolCategory.performance
-    let icon = "cpu.fill"
-    let description = "Monitor CPU utilization"
+    let icon = "cpu"
+    let description = "Real-time CPU usage monitoring"
 
     func render() -> some View {
         CPUMonitorView()
@@ -16,57 +16,83 @@ struct CPUMonitorView: View {
     @StateObject private var viewModel = CPUMonitorViewModel()
 
     var body: some View {
-        Form {
-            Section("System CPU Load") {
-                VStack {
-                    ProgressView(value: viewModel.cpuUsage, total: 100)
-                    Text("\(Int(viewModel.cpuUsage))%")
-                        .font(.headline)
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "CPU Monitor",
+                description: "Monitor real-time CPU utilization and per-core performance metrics.",
+                icon: "cpu"
+            )
+            .padding()
+
+            VStack(spacing: 20) {
+                UsageChart(data: viewModel.usageHistory)
+                    .frame(height: 200)
+                    .padding()
+
+                Form {
+                    Section("Live Metrics") {
+                        LabeledContent("Current Usage", value: String(format: "%.1f%%", viewModel.currentUsage))
+                        LabeledContent("Peak Usage", value: String(format: "%.1f%%", viewModel.peakUsage))
+                        LabeledContent("Cores Detected", value: "\(ProcessInfo.processInfo.processorCount)")
+                    }
+
+                    Section("System State") {
+                        LabeledContent("Low Power Mode", value: ProcessInfo.processInfo.isLowPowerModeEnabled ? "On" : "Off")
+                        LabeledContent("Thermal State", value: viewModel.thermalState)
+                    }
                 }
             }
-
-            Section("Process Stats") {
-                LabeledContent("Active Processors", value: "\(ProcessInfo.processInfo.activeProcessorCount)")
-                LabeledContent("Physical Memory", value: "\(ProcessInfo.processInfo.physicalMemory / 1024 / 1024 / 1024) GB")
-            }
         }
-        .onAppear {
-            viewModel.startMonitoring()
-        }
-        .onDisappear {
-            viewModel.stopMonitoring()
-        }
+        .onAppear { viewModel.start() }
+        .onDisappear { viewModel.stop() }
     }
 }
 
 class CPUMonitorViewModel: ObservableObject {
-    @Published var cpuUsage: Double = 0.0
+    @Published var currentUsage: Double = 0
+    @Published var peakUsage: Double = 0
+    @Published var usageHistory: [Double] = Array(repeating: 0, count: 50)
+    @Published var thermalState = "Fair"
+
     private var timer: Timer?
 
-    func startMonitoring() {
+    func start() {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.update()
         }
     }
 
-    func stopMonitoring() {
+    func stop() {
         timer?.invalidate()
     }
 
     private func update() {
-        var loadInfo = host_cpu_load_info()
-        var count = mach_msg_type_number_t(MemoryLayout<host_cpu_load_info>.size) / 4
-        let result = withUnsafeMutablePointer(to: &loadInfo) {
+        var cpuLoad: host_cpu_load_info = host_cpu_load_info()
+        var count = mach_msg_type_number_t(MemoryLayout<host_cpu_load_info>.size / MemoryLayout<integer_t>.size)
+        let result = withUnsafeMutablePointer(to: &cpuLoad) {
             $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
                 host_statistics(mach_host_self(), HOST_CPU_LOAD_INFO, $0, &count)
             }
         }
 
         if result == KERN_SUCCESS {
-            // Simplified load representation
-            DispatchQueue.main.async {
-                self.cpuUsage = Double.random(in: 5...15) // Fallback for host stats calculation complexity
-            }
+            let totalTicks = Double(cpuLoad.cpu_ticks.0 + cpuLoad.cpu_ticks.1 + cpuLoad.cpu_ticks.2 + cpuLoad.cpu_ticks.3)
+            let idleTicks = Double(cpuLoad.cpu_ticks.3)
+            let usage = (1.0 - (idleTicks / totalTicks)) * 100.0
+
+            currentUsage = usage
+            if usage > peakUsage { peakUsage = usage }
+
+            usageHistory.removeFirst()
+            usageHistory.append(usage)
+        }
+
+        switch ProcessInfo.processInfo.thermalState {
+        case .nominal: thermalState = "Nominal"
+        case .fair: thermalState = "Fair"
+        case .serious: thermalState = "Serious"
+        case .critical: thermalState = "Critical"
+        @unknown default: thermalState = "Unknown"
         }
     }
 }

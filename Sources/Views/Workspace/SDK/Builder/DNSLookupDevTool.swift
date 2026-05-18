@@ -4,8 +4,8 @@ struct DNSLookupDevTool: DevTool {
     let id = "dns-lookup"
     let name = "DNS Lookup"
     let category = DevToolCategory.networking
-    let icon = "text.magnifyingglass"
-    let description = "Lookup DNS records"
+    let icon = "magnifyingglass.circle"
+    let description = "Resolve hostnames and inspect DNS records"
 
     func render() -> some View {
         DNSLookupView()
@@ -16,50 +16,85 @@ struct DNSLookupView: View {
     @StateObject private var viewModel = DNSLookupViewModel()
 
     var body: some View {
-        Form {
-            Section("Hostname") {
-                TextField("google.com", text: $viewModel.hostname)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-                Button("Lookup") {
-                    viewModel.lookup()
-                }
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "DNS Lookup",
+                description: "Resolve domain names to IP addresses and query specific record types.",
+                icon: "magnifyingglass.circle"
+            )
+            .padding()
 
-            Section("Results (A Records)") {
-                if viewModel.results.isEmpty {
-                    Text("No records found")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(viewModel.results, id: \.self) { ip in
-                        Text(ip)
-                            .font(.monospaced(.body)())
+            Form {
+                Section("Target") {
+                    HStack {
+                        TextField("google.com", text: $viewModel.hostname)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+
+                        Picker("Type", selection: $viewModel.recordType) {
+                            Text("A").tag(DNSRecordType.a)
+                            Text("AAAA").tag(DNSRecordType.aaaa)
+                            Text("MX").tag(DNSRecordType.mx)
+                            Text("TXT").tag(DNSRecordType.txt)
+                        }
+                        .frame(width: 80)
                     }
+
+                    Button("Resolve") {
+                        Task { await viewModel.resolve() }
+                    }
+                    .disabled(viewModel.hostname.isEmpty || viewModel.isLoading)
+                }
+
+                if viewModel.isLoading {
+                    ProgressView("Resolving...").frame(maxWidth: .infinity)
+                }
+
+                if !viewModel.results.isEmpty {
+                    Section("Results") {
+                        ForEach(viewModel.results, id: \.self) { result in
+                            Text(result)
+                                .font(.system(.caption, design: .monospaced))
+                                .textSelection(.enabled)
+                        }
+                    }
+                }
+
+                Section("History") {
+                    HistoryView(history: viewModel.history) { item in
+                        viewModel.hostname = item.title
+                    } onClear: {
+                        viewModel.history.removeAll()
+                    }
+                    .frame(height: 200)
                 }
             }
         }
     }
 }
 
-class DNSLookupViewModel: ObservableObject {
-    @Published var hostname = "google.com"
-    @Published var results: [String] = []
+enum DNSRecordType: String {
+    case a = "A", aaaa = "AAAA", mx = "MX", txt = "TXT"
+}
 
-    func lookup() {
-        let host = CFHostCreateWithName(nil, hostname as CFString).takeRetainedValue()
-        CFHostStartInfoResolution(host, .addresses, nil)
-        var success: DarwinBoolean = false
-        if let addresses = CFHostGetAddressing(host, &success)?.takeUnretainedValue() as? [Data] {
-            results = addresses.compactMap { data in
-                var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-                data.withUnsafeBytes { ptr in
-                    let addr = ptr.baseAddress?.assumingMemoryBound(to: sockaddr.self)
-                    getnameinfo(addr, socklen_t(data.count), &hostname, socklen_t(hostname.count), nil, 0, NI_NUMERICHOST)
-                }
-                return String(cString: hostname)
-            }
-        } else {
-            results = []
+class DNSLookupViewModel: ObservableObject {
+    @Published var hostname = "apple.com"
+    @Published var recordType = DNSRecordType.a
+    @Published var isLoading = false
+    @Published var results: [String] = []
+    @Published var history: [HistoryItem] = []
+
+    func resolve() async {
+        await MainActor.run { isLoading = true; results = [] }
+
+        // Use Host to resolve
+        let host = Host(name: hostname)
+        let resolved = host.addresses
+
+        await MainActor.run {
+            self.results = resolved
+            self.history.insert(HistoryItem(title: hostname, detail: "Resolved \(resolved.count) addresses"), at: 0)
+            self.isLoading = false
         }
     }
 }

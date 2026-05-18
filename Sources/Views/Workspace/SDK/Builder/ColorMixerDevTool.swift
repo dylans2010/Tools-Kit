@@ -4,8 +4,8 @@ struct ColorMixerDevTool: DevTool {
     let id = "color-mixer"
     let name = "Color Mixer"
     let category = DevToolCategory.uiDesign
-    let icon = "paintbrush.pointed.fill"
-    let description = "Mix two colors together"
+    let icon = "drop.fill"
+    let description = "Blend two colors together"
 
     func render() -> some View {
         ColorMixerView()
@@ -16,25 +16,37 @@ struct ColorMixerView: View {
     @StateObject private var viewModel = ColorMixerViewModel()
 
     var body: some View {
-        Form {
-            Section("Source Colors") {
-                ColorPicker("Color A", selection: $viewModel.colorA)
-                ColorPicker("Color B", selection: $viewModel.colorB)
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Color Mixer",
+                description: "Mix two colors using different ratios to create unique gradients and transitions.",
+                icon: "drop.fill"
+            )
+            .padding()
 
-            Section("Mix Ratio") {
-                Slider(value: $viewModel.ratio, in: 0...1)
-                Text("\(Int(viewModel.ratio * 100))% Color B")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
+            Form {
+                Section("Base Colors") {
+                    ColorPicker("Color A", selection: $viewModel.colorA)
+                    ColorPicker("Color B", selection: $viewModel.colorB)
+                }
 
-            Section("Result") {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(viewModel.mixedColor)
-                    .frame(height: 100)
+                Section("Ratio: \(Int(viewModel.ratio * 100))%") {
+                    Slider(value: $viewModel.ratio)
+                }
 
-                LabeledContent("Result Hex", value: viewModel.mixedHex)
+                Section("Result") {
+                    HStack(spacing: 12) {
+                        Rectangle()
+                            .fill(viewModel.mixedColor)
+                            .frame(height: 80)
+                            .cornerRadius(12)
+
+                        VStack(alignment: .leading) {
+                            Text("Mixed Result").font(.headline)
+                            Text(viewModel.hexValue).font(.caption.monospaced())
+                        }
+                    }
+                }
             }
         }
     }
@@ -46,16 +58,19 @@ class ColorMixerViewModel: ObservableObject {
     @Published var ratio: Double = 0.5
 
     var mixedColor: Color {
-        let c1 = colorA.getComponents()
-        let c2 = colorB.getComponents()
-        let r = Double(c1.r) * (1 - ratio) + Double(c2.r) * ratio
-        let g = Double(c1.g) * (1 - ratio) + Double(c2.g) * ratio
-        let b = Double(c1.b) * (1 - ratio) + Double(c2.b) * ratio
-        return Color(red: r, green: g, blue: b)
+        let cA = colorA.getComponents()
+        let cB = colorB.getComponents()
+
+        return Color(red: cA.r * (1 - ratio) + cB.r * ratio,
+                     green: cA.g * (1 - ratio) + cB.g * ratio,
+                     blue: cA.b * (1 - ratio) + cB.b * ratio)
     }
 
-    var mixedHex: String {
-        let c = mixedColor.getComponents()
-        return String(format: "#%02X%02X%02X", Int(c.r * 255), Int(c.g * 255), Int(c.b * 255))
+    var hexValue: String {
+        let components = mixedColor.getComponents()
+        return String(format: "#%02X%02X%02X",
+                      Int(components.r * 255),
+                      Int(components.g * 255),
+                      Int(components.b * 255))
     }
 }

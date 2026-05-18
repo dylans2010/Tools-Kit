@@ -174,6 +174,12 @@ final class DevToolRegistry: ObservableObject {
         register(LogStreamViewerDevTool())
         register(BreakpointManagerDevTool())
         register(RuntimeInspectorDevTool())
+        register(SDKModuleInspectorDevTool())
+        register(SDKConfigValidatorDevTool())
+        register(SDKEventLoggerDevTool())
+        register(SDKRuntimeStateDevTool())
+        register(SDKDependencyGraphDevTool())
+        register(SDKIntegrationValidatorDevTool())
 
         // System
         register(DeviceInfoDevTool())

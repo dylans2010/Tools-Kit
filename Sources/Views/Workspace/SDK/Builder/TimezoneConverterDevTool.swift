@@ -4,8 +4,8 @@ struct TimezoneConverterDevTool: DevTool {
     let id = "timezone-converter"
     let name = "Timezone Converter"
     let category = DevToolCategory.data
-    let icon = "globe"
-    let description = "Convert time between timezones"
+    let icon = "clock.badge.checkmark"
+    let description = "Convert times between different timezones"
 
     func render() -> some View {
         TimezoneConverterView()
@@ -16,37 +16,61 @@ struct TimezoneConverterView: View {
     @StateObject private var viewModel = TimezoneConverterViewModel()
 
     var body: some View {
-        Form {
-            Section("Source Time") {
-                DatePicker("Time", selection: $viewModel.sourceTime)
-                Picker("Timezone", selection: $viewModel.sourceTimeZone) {
-                    ForEach(TimeZone.knownTimeZoneIdentifiers, id: \.self) { id in
-                        Text(id).tag(id)
-                    }
-                }
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Timezone Converter",
+                description: "Compare times across global timezones and calculate offsets.",
+                icon: "clock.badge.checkmark"
+            )
+            .padding()
 
-            Section("Destination Time") {
-                Picker("Timezone", selection: $viewModel.destTimeZone) {
-                    ForEach(TimeZone.knownTimeZoneIdentifiers, id: \.self) { id in
-                        Text(id).tag(id)
+            Form {
+                Section("Base Time") {
+                    DatePicker("Local Time", selection: $viewModel.baseDate)
+                }
+
+                Section("Target Timezones") {
+                    ForEach(viewModel.targetTimezones, id: \.self) { tzName in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(tzName).font(.subheadline.bold())
+                                Text(viewModel.format(tzName)).font(.caption.monospaced())
+                            }
+                            Spacer()
+                            Text(viewModel.offset(tzName))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .onDelete { viewModel.targetTimezones.remove(atOffsets: $0) }
+
+                    Button("Add Timezone") {
+                         // Selection logic would go here
+                         if let random = TimeZone.knownTimeZoneIdentifiers.randomElement() {
+                             viewModel.targetTimezones.append(random)
+                         }
                     }
                 }
-                LabeledContent("Converted", value: viewModel.convertedTime)
             }
         }
     }
 }
 
 class TimezoneConverterViewModel: ObservableObject {
-    @Published var sourceTime = Date()
-    @Published var sourceTimeZone = TimeZone.current.identifier
-    @Published var destTimeZone = "UTC"
+    @Published var baseDate = Date()
+    @Published var targetTimezones = ["UTC", "America/New_York", "Europe/London", "Asia/Tokyo"]
 
-    var convertedTime: String {
-        let formatter = Foundation.DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        formatter.timeZone = TimeZone(identifier: destTimeZone)
-        return formatter.string(from: sourceTime)
+    func format(_ tzName: String) -> String {
+        let formatter = DateFormatter()
+        formatter.timeZone = TimeZone(identifier: tzName)
+        formatter.dateFormat = "HH:mm:ss (MMM d)"
+        return formatter.string(from: baseDate)
+    }
+
+    func offset(_ tzName: String) -> String {
+        guard let tz = TimeZone(identifier: tzName) else { return "" }
+        let seconds = tz.secondsFromGMT(for: baseDate)
+        let hours = seconds / 3600
+        return String(format: "GMT%+d", hours)
     }
 }

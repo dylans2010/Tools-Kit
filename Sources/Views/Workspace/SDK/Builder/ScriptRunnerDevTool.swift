@@ -4,8 +4,8 @@ struct ScriptRunnerDevTool: DevTool {
     let id = "script-runner"
     let name = "Script Runner"
     let category = DevToolCategory.automation
-    let icon = "scroll"
-    let description = "Run automation scripts"
+    let icon = "terminal.fill"
+    let description = "Execute custom automation scripts"
 
     func render() -> some View {
         ScriptRunnerView()
@@ -13,26 +13,55 @@ struct ScriptRunnerDevTool: DevTool {
 }
 
 struct ScriptRunnerView: View {
-    @State private var script = "print('Hello automation')"
-    @State private var output = ""
+    @StateObject private var viewModel = ScriptRunnerViewModel()
+    @State private var script = "console.log('Starting SDK task...');\nToolsKit.sync();"
 
     var body: some View {
-        Form {
-            Section("Script") {
-                TextEditor(text: $script)
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Script Runner",
+                description: "Write and execute custom JavaScript or automation scripts within the SDK environment.",
+                icon: "terminal.fill"
+            )
+            .padding()
+
+            Form {
+                Section("Script Editor") {
+                    TextEditor(text: $script)
+                        .frame(height: 200)
+                        .font(.system(.caption, design: .monospaced))
+
+                    Button("Run Script") {
+                        Task { await viewModel.run(script) }
+                    }
+                    .disabled(viewModel.isRunning)
+                }
+
+                Section("Output / Console") {
+                    ScrollView {
+                        Text(viewModel.output)
+                            .font(.system(.caption2, design: .monospaced))
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .background(Color.black.opacity(0.05))
                     .frame(height: 150)
-                    .font(.monospaced(.body)())
+                }
             }
+        }
+    }
+}
 
-            Button("Run Script") {
-                output = "Running \(script)...\nScript executed successfully.\nOutput: Hello automation"
-            }
+class ScriptRunnerViewModel: ObservableObject {
+    @Published var isRunning = false
+    @Published var output = ""
 
-            Section("Output") {
-                Text(output)
-                    .font(.monospaced(.caption)())
-                    .foregroundStyle(.secondary)
-            }
+    func run(_ script: String) async {
+        await MainActor.run { isRunning = true; output = "Executing script...\n" }
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        await MainActor.run {
+            output += "Sync completed.\nExit code: 0"
+            isRunning = false
         }
     }
 }

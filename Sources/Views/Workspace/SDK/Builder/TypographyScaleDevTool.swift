@@ -5,7 +5,7 @@ struct TypographyScaleDevTool: DevTool {
     let name = "Typography Scale"
     let category = DevToolCategory.uiDesign
     let icon = "textformat.size"
-    let description = "Preview different typography scales"
+    let description = "Generate and preview typographic scales"
 
     func render() -> some View {
         TypographyScaleView()
@@ -16,45 +16,72 @@ struct TypographyScaleView: View {
     @StateObject private var viewModel = TypographyScaleViewModel()
 
     var body: some View {
-        List {
-            Section("Scale Settings") {
-                HStack {
-                    Text("Base Size: \(Int(viewModel.baseSize))")
-                    Slider(value: $viewModel.baseSize, in: 12...24)
-                }
-                Picker("Ratio", selection: $viewModel.ratio) {
-                    Text("Minor Second (1.067)").tag(1.067)
-                    Text("Major Second (1.125)").tag(1.125)
-                    Text("Perfect Fourth (1.333)").tag(1.333)
-                    Text("Golden Ratio (1.618)").tag(1.618)
-                }
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Typography Scale",
+                description: "Design harmonious font size hierarchies using musical scales like the Golden Ratio or Major Third.",
+                icon: "textformat.size"
+            )
+            .padding()
 
-            Section("Preview") {
-                ForEach(0..<6) { index in
-                    let size = viewModel.calculateSize(for: 5 - index)
-                    VStack(alignment: .leading) {
-                        Text("Heading \(5 - index)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text("The quick brown fox")
-                            .font(.system(size: size))
-                        Text("\(Int(size))px")
-                            .font(.caption2.monospaced())
-                            .foregroundStyle(.secondary)
+            Form {
+                Section("Configuration") {
+                    TextField("Base Size (pt)", text: $viewModel.baseSize)
+                        .keyboardType(.numberPad)
+
+                    Picker("Scale Ratio", selection: $viewModel.scaleRatio) {
+                        Text("Minor Second (1.067)").tag(1.067)
+                        Text("Major Third (1.250)").tag(1.25)
+                        Text("Perfect Fourth (1.333)").tag(1.333)
+                        Text("Golden Ratio (1.618)").tag(1.618)
                     }
-                    .padding(.vertical, 4)
+                }
+
+                Section("Scale Preview") {
+                    ForEach(viewModel.scaleItems) { item in
+                        HStack(alignment: .bottom) {
+                            VStack(alignment: .leading) {
+                                Text(item.label).font(.caption2).foregroundStyle(.secondary)
+                                Text("Sample Text")
+                                    .font(.system(size: item.size))
+                            }
+                            Spacer()
+                            Text("\(Int(item.size))pt")
+                                .font(.caption.monospaced())
+                                .foregroundStyle(.tertiary)
+                        }
+                        .padding(.vertical, 4)
+                    }
                 }
             }
         }
     }
 }
 
-class TypographyScaleViewModel: ObservableObject {
-    @Published var baseSize: CGFloat = 16
-    @Published var ratio: Double = 1.333
+struct ScaleItem: Identifiable {
+    let id = UUID()
+    let label: String
+    let size: CGFloat
+}
 
-    func calculateSize(for level: Int) -> CGFloat {
-        return baseSize * CGFloat(pow(ratio, Double(level)))
+class TypographyScaleViewModel: ObservableObject {
+    @Published var baseSize = "16"
+    @Published var scaleRatio = 1.25
+
+    var scaleItems: [ScaleItem] {
+        guard let base = Double(baseSize) else { return [] }
+        let labels = ["H1", "H2", "H3", "H4", "Body", "Small"]
+        var items: [ScaleItem] = []
+
+        // H1 to H4
+        for i in (1...4).reversed() {
+            let size = base * pow(scaleRatio, Double(i))
+            items.append(ScaleItem(label: "Heading \(5-i)", size: CGFloat(size)))
+        }
+
+        items.append(ScaleItem(label: "Body", size: CGFloat(base)))
+        items.append(ScaleItem(label: "Small", size: CGFloat(base / scaleRatio)))
+
+        return items
     }
 }
