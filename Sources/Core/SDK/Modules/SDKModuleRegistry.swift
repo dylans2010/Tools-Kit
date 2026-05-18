@@ -19,6 +19,7 @@ public struct SDKModuleDescriptor: Identifiable, Codable, Hashable {
     public var isEnabled: Bool
     public var loadPriority: Int
     public var registeredAt: Date
+    public var requiredScopes: [String]
 
     public init(
         id: UUID = UUID(),
@@ -30,7 +31,8 @@ public struct SDKModuleDescriptor: Identifiable, Codable, Hashable {
         dependencies: [String] = [],
         exportedServices: [String] = [],
         isEnabled: Bool = true,
-        loadPriority: Int = 100
+        loadPriority: Int = 100,
+        requiredScopes: [String] = []
     ) {
         self.id = id
         self.identifier = identifier
@@ -43,6 +45,7 @@ public struct SDKModuleDescriptor: Identifiable, Codable, Hashable {
         self.isEnabled = isEnabled
         self.loadPriority = loadPriority
         self.registeredAt = Date()
+        self.requiredScopes = requiredScopes
     }
 }
 

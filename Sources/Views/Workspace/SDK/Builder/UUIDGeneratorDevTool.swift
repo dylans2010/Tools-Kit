@@ -8,11 +8,11 @@ struct UUIDGeneratorDevTool: DevTool {
     let description = "Generate unique identifiers (UUID v4)"
 
     func render() -> some View {
-        UUIDGeneratorView()
+        UUIDGeneratorDevToolView()
     }
 }
 
-struct UUIDGeneratorView: View {
+struct UUIDGeneratorDevToolView: View {
     @StateObject private var viewModel = UUIDGeneratorViewModel()
 
     var body: some View {

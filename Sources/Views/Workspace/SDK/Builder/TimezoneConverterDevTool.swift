@@ -8,11 +8,11 @@ struct TimezoneConverterDevTool: DevTool {
     let description = "Convert times between different timezones"
 
     func render() -> some View {
-        TimezoneConverterView()
+        TimezoneConverterDevToolView()
     }
 }
 
-struct TimezoneConverterView: View {
+struct TimezoneConverterDevToolView: View {
     @StateObject private var viewModel = TimezoneConverterViewModel()
 
     var body: some View {

@@ -8,11 +8,11 @@ struct JWTDecoderDevTool: DevTool {
     let description = "Decode and inspect JSON Web Tokens"
 
     func render() -> some View {
-        JWTDecoderView()
+        JWTDecoderDevToolView()
     }
 }
 
-struct JWTDecoderView: View {
+struct JWTDecoderDevToolView: View {
     @StateObject private var viewModel = JWTDecoderViewModel()
 
     var body: some View {

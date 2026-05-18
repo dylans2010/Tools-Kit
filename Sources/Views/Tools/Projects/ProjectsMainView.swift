@@ -151,7 +151,14 @@ struct ProjectRowView: View {
 
                 Spacer()
 
-                StatusBadge(status: project.status)
+                StatusBadge(text: project.status.rawValue, color: {
+                    switch project.status {
+                    case .active: return .green
+                    case .paused: return .orange
+                    case .completed: return .blue
+                    case .archived: return .gray
+                    }
+                }())
             }
 
             if taskCount > 0 {
@@ -184,29 +191,5 @@ struct ProjectRowView: View {
             .foregroundColor(.secondary)
         }
         .padding(.vertical, 8)
-    }
-}
-
-struct StatusBadge: View {
-    let status: ProjectStatus
-
-    var color: Color {
-        switch status {
-        case .active: return .green
-        case .paused: return .orange
-        case .completed: return .blue
-        case .archived: return .gray
-        }
-    }
-
-    var body: some View {
-        Text(status.rawValue)
-            .font(.caption2)
-            .fontWeight(.medium)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(color.opacity(0.15))
-            .foregroundColor(color)
-            .cornerRadius(6)
     }
 }

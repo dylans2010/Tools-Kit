@@ -8,11 +8,11 @@ struct MarkdownPreviewDevTool: DevTool {
     let description = "Live preview of Markdown content"
 
     func render() -> some View {
-        MarkdownPreviewView()
+        MarkdownPreviewDevToolView()
     }
 }
 
-struct MarkdownPreviewView: View {
+struct MarkdownPreviewDevToolView: View {
     @StateObject private var viewModel = MarkdownPreviewViewModel()
 
     var body: some View {
