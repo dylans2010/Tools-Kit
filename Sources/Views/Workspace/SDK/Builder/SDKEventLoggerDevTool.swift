@@ -13,12 +13,8 @@ struct SDKEventLoggerDevTool: DevTool {
 }
 
 struct SDKEventLoggerView: View {
-    typealias SDKLogStore = Tools_Kit.SDKLogStore
-    typealias LogLevel = Tools_Kit.LogLevel
-    typealias SDKLogEntry = Tools_Kit.SDKLogEntry
-
-    @StateObject private var logStore = Self.SDKLogStore.shared
-    @State private var selectedLevel: Self.LogLevel?
+    @StateObject private var logStore = SDKLogStore.shared
+    @State private var selectedLevel: LogLevel?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -31,9 +27,9 @@ struct SDKEventLoggerView: View {
 
             VStack {
                 Picker("Level", selection: $selectedLevel) {
-                    Text("All").tag(nil as Self.LogLevel?)
-                    ForEach(Self.LogLevel.allCases, id: \.self) { level in
-                        Text(level.rawValue.capitalized).tag(level as Self.LogLevel?)
+                    Text("All").tag(nil as LogLevel?)
+                    ForEach(LogLevel.allCases, id: \.self) { level in
+                        Text(level.rawValue.capitalized).tag(level as LogLevel?)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -57,14 +53,14 @@ struct SDKEventLoggerView: View {
         }
     }
 
-    private var filteredEntries: [Self.SDKLogEntry] {
+    private var filteredEntries: [SDKLogEntry] {
         if let level = selectedLevel {
             return logStore.entries.filter { $0.level == level }
         }
         return logStore.entries
     }
 
-    private func color(for level: Self.LogLevel) -> Color {
+    private func color(for level: LogLevel) -> Color {
         switch level {
         case .debug: return .secondary
         case .info: return .blue
