@@ -19,7 +19,7 @@ final class PluginRuntime {
     }
 
     private func processEvent(_ event: PluginEvent) {
-        let enabledPlugins = PluginManager.shared.installedPlugins.filter { $0.isEnabled }
+        let enabledPlugins = SDKPluginManager.shared.installedPlugins.filter { $0.isEnabled }
 
         for plugin in enabledPlugins {
             // Check if plugin is subscribed to this event

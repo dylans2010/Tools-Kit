@@ -4,7 +4,7 @@ import SwiftUI
 import Combine
 
 struct PluginDevConsoleView: View {
-    @StateObject private var manager = PluginManager.shared
+    @StateObject private var manager = SDKPluginManager.shared
     @State private var logs: [PluginLog] = []
     @State private var cancellables = Set<AnyCancellable>()
     @State private var selectedFilter: LogFilter = .all

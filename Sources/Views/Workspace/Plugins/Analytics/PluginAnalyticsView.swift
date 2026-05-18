@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PluginAnalyticsView: View {
-    @StateObject private var manager = PluginManager.shared
+    @StateObject private var manager = SDKPluginManager.shared
     @State private var selectedTimeRange: TimeRange = .week
     @State private var selectedPlugin: PluginDefinition?
 

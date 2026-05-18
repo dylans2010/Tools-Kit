@@ -62,6 +62,11 @@ struct WorkspaceItemSnapshot: Identifiable, Codable, Hashable {
     var details: [String: String]
 }
 
+private struct PersonaWhiteboardNode: Codable, Hashable {
+    var title: String
+    var content: String
+}
+
 
 enum AgentActionResult {
     case success(AgentActionPayload)
@@ -104,7 +109,7 @@ enum AgentAction: Equatable {
     case listWorkspaceItems(filter: WorkspaceFilter)
     case createNote(title: String, content: String, notebookName: String?)
     case createSlideDeck(title: String, slideContents: [String])
-    case createWhiteboard(title: String, nodes: [WhiteboardNode])
+    case createWhiteboard(title: String, nodes: [PersonaWhiteboardNode])
     case createSpreadsheet(name: String, headers: [String], rows: [[String]])
     case createCalendarEvent(title: String, description: String, startDate: Date, endDate: Date, location: String)
     case createTask(title: String, description: String, priority: String, dueDate: Date?)
@@ -1052,7 +1057,7 @@ actor PersonaAgentFramework {
         }
     }
 
-    private func createWhiteboard(title: String, nodes: [WhiteboardNode]) async throws -> WorkspaceItemSnapshot {
+    private func createWhiteboard(title: String, nodes: [PersonaWhiteboardNode]) async throws -> WorkspaceItemSnapshot {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw AgentActionError.invalidParameter("Whiteboard title cannot be empty")
         }
@@ -1498,12 +1503,12 @@ actor PersonaAgentFramework {
                 let title = params["title"] ?? "Untitled Board"
                 let nodesRaw = params["nodes"] ?? params["content"] ?? ""
                 let nodeEntries = nodesRaw.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
-                let nodes = nodeEntries.map { entry -> (title: String, content: String) in
+                let nodes = nodeEntries.map { entry -> PersonaWhiteboardNode in
                     let parts = entry.components(separatedBy: ":")
                     if parts.count >= 2 {
-                        return (title: parts[0].trimmingCharacters(in: .whitespaces), content: parts[1...].joined(separator: ":").trimmingCharacters(in: .whitespaces))
+                        return PersonaWhiteboardNode(title: parts[0].trimmingCharacters(in: .whitespaces), content: parts[1...].joined(separator: ":").trimmingCharacters(in: .whitespaces))
                     }
-                    return (title: entry, content: "")
+                    return PersonaWhiteboardNode(title: entry, content: "")
                 }
                 actions.append(.createWhiteboard(title: title, nodes: nodes))
 

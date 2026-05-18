@@ -2,12 +2,12 @@ import SwiftUI
 import Combine
 
 struct PluginsMainView: View {
-    @StateObject private var manager = PluginManager.shared
+    @StateObject private var manager = SDKPluginManager.shared
     @State private var recentEvents: [PluginEvent] = []
     @State private var cancellables = Set<AnyCancellable>()
 
     @State private var blockedPlugin: PluginDefinition?
-    @State private var blockedReason: ValidationFailureReason = .capabilityMismatch
+    @State private var blockedReason: PluginValidationFailureReason = .capabilityMismatch
     @State private var blockedDetail = ""
     @State private var showingLimitedView = false
     @State private var showingConfigSheet = false
@@ -133,7 +133,7 @@ struct PluginsMainView: View {
             .sink { notification in
                 if let pluginID = notification.userInfo?["pluginID"] as? UUID,
                    let plugin = manager.installedPlugins.first(where: { $0.id == pluginID }),
-                   let reason = notification.userInfo?["reason"] as? ValidationFailureReason,
+                   let reason = notification.userInfo?["reason"] as? PluginValidationFailureReason,
                    let detail = notification.userInfo?["detail"] as? String {
                     blockedPlugin = plugin
                     blockedReason = reason
@@ -196,7 +196,7 @@ private struct PluginStateRow: View {
 
 private struct PluginConfigurationView: View {
     let plugin: PluginDefinition
-    let manager: PluginManager
+    let manager: SDKPluginManager
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {

@@ -4,7 +4,7 @@ import SwiftUI
 
 struct PluginLimitedView: View {
     let plugin: PluginDefinition
-    let reason: ValidationFailureReason
+    let reason: PluginValidationFailureReason
     let detail: String
 
     @Environment(\.dismiss) private var dismiss

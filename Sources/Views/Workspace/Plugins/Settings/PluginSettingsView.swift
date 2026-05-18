@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PluginSettingsView: View {
-    @StateObject private var manager = PluginManager.shared
+    @StateObject private var manager = SDKPluginManager.shared
     @State private var autoUpdateEnabled = true
     @State private var sandboxMode = true
     @State private var maxConcurrent = 5

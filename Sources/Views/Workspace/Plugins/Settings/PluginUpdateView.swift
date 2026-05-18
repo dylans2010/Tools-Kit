@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PluginUpdateView: View {
-    @StateObject private var manager = PluginManager.shared
+    @StateObject private var manager = SDKPluginManager.shared
     @State private var isChecking = false
     @State private var availableUpdates: [PluginUpdate] = []
     @State private var isUpdatingAll = false

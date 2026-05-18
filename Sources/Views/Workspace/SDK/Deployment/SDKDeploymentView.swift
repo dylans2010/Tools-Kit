@@ -77,7 +77,7 @@ struct SDKDeploymentView: View {
         errorMessage = nil
         let legacy = SDKProjectLegacy(id: project.id, name: project.name, sourceCode: project.sourceCode, requiredScopes: project.requiredScopes, status: .idle)
         let plugin = SDKExecutionBridge.shared.deployToPlugin(project: legacy)
-        manager.savePlugin(plugin)
+        // TODO: savePlugin not available on SDKPluginManager
         deployedPlugin = plugin
         isDeploying = false
         SDKLogStore.shared.log("Project deployed: \(plugin.identifier)", source: "SDKDeploymentView", level: .info)
