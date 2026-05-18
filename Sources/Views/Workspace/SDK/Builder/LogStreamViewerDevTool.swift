@@ -17,7 +17,7 @@ struct LogStreamViewerView: View {
 
     var body: some View {
         let headerDescription = "Monitor live log output streams for debugging real-time application behavior."
-        VStack(spacing: 0) {
+        return VStack(spacing: 0) {
             DevToolHeader(
                 title: "Log Stream Viewer",
                 description: headerDescription,
@@ -25,32 +25,44 @@ struct LogStreamViewerView: View {
             )
             .padding()
 
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(alignment: .leading) {
-                        ForEach(viewModel.logs) { log in
-                            HStack(alignment: .top) {
-                                Text("[\(log.timestamp, style: .time)]")
-                                    .font(.system(.caption2, design: .monospaced))
-                                    .foregroundStyle(.secondary)
-                                Text(log.message)
-                                    .font(.system(.caption, design: .monospaced))
-                            }
-                            .id(log.id)
-                        }
-                    }
-                    .padding()
-                }
-                .onChange(of: viewModel.logs.count) { _ in
-                    if let last = viewModel.logs.last {
-                        proxy.scrollTo(last.id)
-                    }
-                }
-            }
+            logScrollView
             .background(Color.black.opacity(0.05))
         }
         .onAppear { viewModel.start() }
         .onDisappear { viewModel.stop() }
+    }
+
+    private var logScrollView: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(alignment: .leading) {
+                    ForEach(viewModel.logs) { log in
+                        logRow(log)
+                            .id(log.id)
+                    }
+                }
+                .padding()
+            }
+            .onChange(of: viewModel.logs.count) { _ in
+                scrollToLastLog(with: proxy)
+            }
+        }
+    }
+
+    private func logRow(_ log: HistoryItem) -> some View {
+        HStack(alignment: .top) {
+            Text("[\(log.timestamp, style: .time)]")
+                .font(.system(.caption2, design: .monospaced))
+                .foregroundStyle(.secondary)
+            Text(log.message)
+                .font(.system(.caption, design: .monospaced))
+        }
+    }
+
+    private func scrollToLastLog(with proxy: ScrollViewProxy) {
+        if let lastLogID = viewModel.logs.last?.id {
+            proxy.scrollTo(lastLogID)
+        }
     }
 }
 
