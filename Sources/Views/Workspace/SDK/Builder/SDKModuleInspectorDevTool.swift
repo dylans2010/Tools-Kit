@@ -13,8 +13,11 @@ struct SDKModuleInspectorDevTool: DevTool {
 }
 
 struct SDKModuleInspectorView: View {
-    @StateObject private var registry = SDKModuleRegistry.shared
-    @State private var selectedModule: SDKModuleDescriptor?
+    typealias SDKModuleDescriptor = Tools_Kit.SDKModuleDescriptor
+    typealias SDKModuleRegistry = Tools_Kit.SDKModuleRegistry
+
+    @StateObject private var registry = Self.SDKModuleRegistry.shared
+    @State private var selectedModule: Self.SDKModuleDescriptor?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -52,7 +55,9 @@ struct SDKModuleInspectorView: View {
 }
 
 struct ModuleDetailView: View {
-    let module: SDKModuleDescriptor
+    typealias SDKModuleDescriptor = Tools_Kit.SDKModuleDescriptor
+
+    let module: Self.SDKModuleDescriptor
     @Environment(\.dismiss) var dismiss
 
     var body: some View {

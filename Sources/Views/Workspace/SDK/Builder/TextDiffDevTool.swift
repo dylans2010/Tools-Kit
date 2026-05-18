@@ -13,6 +13,13 @@ struct TextDiffDevTool: DevTool {
 }
 
 struct TextDiffView: View {
+    struct DiffLine: Identifiable {
+        let id = UUID()
+        let text: String
+        let color: Color
+        let bgColor: Color
+    }
+
     @StateObject private var viewModel = TextDiffViewModel()
 
     var body: some View {
@@ -44,7 +51,7 @@ struct TextDiffView: View {
                 Section("Diff Result") {
                     ScrollView {
                         VStack(alignment: .leading) {
-                            ForEach(viewModel.diffLines) { line in
+                            ForEach(viewModel.diffLines) { (line: TextDiffView.DiffLine) in
                                 Text(line.text)
                                     .font(.system(.caption2, design: .monospaced))
                                     .foregroundStyle(line.color)
@@ -60,13 +67,6 @@ struct TextDiffView: View {
     }
 }
 
-struct DiffLine: Identifiable {
-    let id = UUID()
-    let text: String
-    let color: Color
-    let bgColor: Color
-}
-
 class TextDiffViewModel: ObservableObject {
     @Published var textA = "Hello World\nThis is a test" {
         didSet { compare() }
@@ -74,14 +74,14 @@ class TextDiffViewModel: ObservableObject {
     @Published var textB = "Hello World\nThis is an updated test" {
         didSet { compare() }
     }
-    @Published var diffLines: [DiffLine] = []
+    @Published var diffLines: [TextDiffView.DiffLine] = []
 
     private func compare() {
         // Simple line-by-line diff
         let linesA = textA.components(separatedBy: .newlines)
         let linesB = textB.components(separatedBy: .newlines)
 
-        var results: [DiffLine] = []
+        var results: [TextDiffView.DiffLine] = []
         let maxCount = max(linesA.count, linesB.count)
 
         for i in 0..<maxCount {
@@ -89,13 +89,13 @@ class TextDiffViewModel: ObservableObject {
             let b = i < linesB.count ? linesB[i] : nil
 
             if a == b {
-                results.append(DiffLine(text: "  " + (a ?? ""), color: .secondary, bgColor: .clear))
+                results.append(TextDiffView.DiffLine(text: "  " + (a ?? ""), color: .secondary, bgColor: .clear))
             } else {
                 if let a = a {
-                    results.append(DiffLine(text: "- " + a, color: .red, bgColor: .red.opacity(0.1)))
+                    results.append(TextDiffView.DiffLine(text: "- " + a, color: .red, bgColor: .red.opacity(0.1)))
                 }
                 if let b = b {
-                    results.append(DiffLine(text: "+ " + b, color: .green, bgColor: .green.opacity(0.1)))
+                    results.append(TextDiffView.DiffLine(text: "+ " + b, color: .green, bgColor: .green.opacity(0.1)))
                 }
             }
         }

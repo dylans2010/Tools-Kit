@@ -13,6 +13,13 @@ struct SDKIntegrationValidatorDevTool: DevTool {
 }
 
 struct SDKIntegrationValidatorView: View {
+    struct ValidationResult: Identifiable {
+        let id = UUID()
+        let testName: String
+        let message: String
+        let isPassed: Bool
+    }
+
     @StateObject private var viewModel = SDKIntegrationValidatorViewModel()
 
     var body: some View {
@@ -26,7 +33,7 @@ struct SDKIntegrationValidatorView: View {
 
             List {
                 Section("Validation Results") {
-                    ForEach(viewModel.results) { result in
+                    ForEach(viewModel.results) { (result: SDKIntegrationValidatorView.ValidationResult) in
                         HStack {
                             Image(systemName: result.isPassed ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
                                 .foregroundStyle(result.isPassed ? .green : .red)
@@ -48,15 +55,8 @@ struct SDKIntegrationValidatorView: View {
     }
 }
 
-struct ValidationResult: Identifiable {
-    let id = UUID()
-    let testName: String
-    let message: String
-    let isPassed: Bool
-}
-
 class SDKIntegrationValidatorViewModel: ObservableObject {
-    @Published var results: [ValidationResult] = []
+    @Published var results: [SDKIntegrationValidatorView.ValidationResult] = []
     @Published var isRunning = false
 
     @MainActor
@@ -65,10 +65,10 @@ class SDKIntegrationValidatorViewModel: ObservableObject {
         let sdk = ToolsKitSDK.shared
         let registry = SDKModuleRegistry.shared
 
-        var checks: [ValidationResult] = []
+        var checks: [SDKIntegrationValidatorView.ValidationResult] = []
 
         // 1. Initialization check
-        checks.append(ValidationResult(
+        checks.append(SDKIntegrationValidatorView.ValidationResult(
             testName: "Core Initialization",
             message: sdk.isInitialized ? "SDK is fully initialized" : "SDK is not yet initialized",
             isPassed: sdk.isInitialized
@@ -77,7 +77,7 @@ class SDKIntegrationValidatorViewModel: ObservableObject {
         // 2. Module check
         let activeCount = registry.activeModuleIDs.count
         let totalCount = registry.modules.count
-        checks.append(ValidationResult(
+        checks.append(SDKIntegrationValidatorView.ValidationResult(
             testName: "Module Integrity",
             message: "\(activeCount) / \(totalCount) modules active",
             isPassed: activeCount > 0 || totalCount == 0
@@ -86,7 +86,7 @@ class SDKIntegrationValidatorViewModel: ObservableObject {
         // 3. Storage check
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         let storageOk = FileManager.default.isWritableFile(atPath: appSupport.path)
-        checks.append(ValidationResult(
+        checks.append(SDKIntegrationValidatorView.ValidationResult(
             testName: "Data Persistence",
             message: storageOk ? "Storage directory is writable" : "Storage directory access denied",
             isPassed: storageOk
@@ -94,7 +94,7 @@ class SDKIntegrationValidatorViewModel: ObservableObject {
 
         // 4. Security check
         let noSandbox = sdk.developer.noSandbox.isEnabled
-        checks.append(ValidationResult(
+        checks.append(SDKIntegrationValidatorView.ValidationResult(
             testName: "Policy Enforcement",
             message: noSandbox ? "Sandbox mode: BYPASSED (Caution)" : "Sandbox mode: ENFORCED",
             isPassed: !noSandbox
