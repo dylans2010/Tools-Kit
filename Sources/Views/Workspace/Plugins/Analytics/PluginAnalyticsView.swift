@@ -7,8 +7,8 @@ struct PluginAnalyticsView: View {
 
     private var totalPlugins: Int { manager.plugins.count }
     private var activePlugins: Int { manager.plugins.filter(\.isEnabled).count }
-    private var totalErrors: Int { manager.plugins.reduce(0) { $0 + 0 /* TODO: errorCount unavailable on SDKPluginManager */ } }
-    private var totalExecutions: Int { manager.plugins.reduce(0) { $0 + 0 /* TODO: executionCount unavailable on SDKPluginManager */ } }
+    private var totalErrors: Int { manager.plugins.reduce(0) { acc, _ in acc + 0 /* TODO: errorCount unavailable on SDKPluginManager */ } }
+    private var totalExecutions: Int { manager.plugins.reduce(0) { acc, _ in acc + 0 /* TODO: executionCount unavailable on SDKPluginManager */ } }
 
     var body: some View {
         List {

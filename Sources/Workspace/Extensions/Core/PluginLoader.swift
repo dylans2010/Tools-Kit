@@ -8,6 +8,7 @@ final class PluginLoader {
 
     private init() {}
 
+    @MainActor
     func loadAllPlugins() {
         print("[PluginLoader] Initializing plugin ecosystem...")
         // SDKPluginManager already loads in its init

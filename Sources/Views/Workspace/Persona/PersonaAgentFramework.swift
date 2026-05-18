@@ -62,7 +62,7 @@ struct WorkspaceItemSnapshot: Identifiable, Codable, Hashable {
     var details: [String: String]
 }
 
-fileprivate struct PersonaWhiteboardNode: Codable, Hashable {
+struct PersonaWhiteboardNode: Codable, Hashable {
     var title: String
     var content: String
 }
