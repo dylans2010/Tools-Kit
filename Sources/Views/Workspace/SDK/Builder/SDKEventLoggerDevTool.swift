@@ -13,7 +13,7 @@ struct SDKEventLoggerDevTool: DevTool {
 }
 
 struct SDKEventLoggerView: View {
-    @StateObject private var logStore = SDKLogStore.shared
+    @StateObject private var store = SDKLogStore.shared
     @State private var selectedLevel: LogLevel?
 
     var body: some View {
@@ -55,9 +55,9 @@ struct SDKEventLoggerView: View {
 
     private var filteredEntries: [SDKLogEntry] {
         if let level = selectedLevel {
-            return logStore.entries.filter { $0.level == level }
+            return store.entries.filter { $0.level == level }
         }
-        return logStore.entries
+        return store.entries
     }
 
     private func color(for level: LogLevel) -> Color {

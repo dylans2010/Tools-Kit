@@ -13,10 +13,10 @@ struct SDKConfigValidatorDevTool: DevTool {
 }
 
 struct SDKConfigValidatorView: View {
-    @StateObject private var configManager = SDKConfigManager.shared
+    @StateObject private var config = SDKConfigManager.shared
 
     var body: some View {
-        let sortedConfigurations = Array(configManager.configurations.values).sorted { lhs, rhs in
+        let sortedConfigurations = config.entries.sorted { lhs, rhs in
             lhs.key < rhs.key
         }
         VStack(spacing: 0) {
@@ -42,7 +42,7 @@ struct SDKConfigValidatorView: View {
                 }
 
                 Section("Configuration Change Log") {
-                    ForEach(configManager.changeLog.reversed()) { change in
+                    ForEach(config.changes.reversed(), id: \.self) { change in
                         VStack(alignment: .leading, spacing: 4) {
                             Text(change.key).font(.caption.bold())
                             HStack {
@@ -53,9 +53,6 @@ struct SDKConfigValidatorView: View {
                             .font(.caption2)
                             .foregroundStyle(.secondary)
 
-                            Text(change.timestamp, style: .relative)
-                                .font(.system(size: 8))
-                                .foregroundStyle(.tertiary)
                         }
                         .padding(.vertical, 2)
                     }

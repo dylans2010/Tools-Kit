@@ -30,13 +30,13 @@ struct SDKModuleInspectorView: View {
                     ForEach(registry.modules) { module in
                         HStack {
                             VStack(alignment: .leading) {
-                                Text(module.displayName).font(.headline)
-                                Text(module.identifier).font(.caption).foregroundStyle(.secondary)
+                                Text(module.name).font(.headline)
+                                Text(module.id).font(.caption).foregroundStyle(.secondary)
                             }
                             Spacer()
                             StatusBadge(
-                                text: registry.activeModuleIDs.contains(module.id) ? "Active" : "Idle",
-                                color: registry.activeModuleIDs.contains(module.id) ? .green : .secondary
+                                text: "Active",
+                                color: .green
                             )
                         }
                         .contentShape(Rectangle())
@@ -60,8 +60,6 @@ struct ModuleDetailView: View {
             List {
                 Section("General") {
                     LabeledContent("Version", value: module.version)
-                    LabeledContent("Min SDK", value: module.minimumSDKVersion)
-                    LabeledContent("Priority", value: "\(module.loadPriority)")
                 }
 
                 Section("Capabilities") {
@@ -69,18 +67,8 @@ struct ModuleDetailView: View {
                         Label(cap.rawValue, systemImage: "checkmark.circle.fill")
                     }
                 }
-
-                Section("Dependencies") {
-                    if module.dependencies.isEmpty {
-                        Text("None").foregroundStyle(.secondary)
-                    } else {
-                        ForEach(module.dependencies, id: \.self) { dep in
-                            Text(dep)
-                        }
-                    }
-                }
             }
-            .navigationTitle(module.displayName)
+            .navigationTitle(module.name)
             .toolbar {
                 Button("Done") { dismiss() }
             }

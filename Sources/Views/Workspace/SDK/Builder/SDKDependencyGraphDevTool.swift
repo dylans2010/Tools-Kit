@@ -16,7 +16,7 @@ struct SDKDependencyGraphView: View {
     @StateObject private var registry = SDKModuleRegistry.shared
 
     var body: some View {
-        let orderedModules = registry.resolvedLoadOrder()
+        let orderedModules = registry.modules
         VStack(spacing: 0) {
             DevToolHeader(
                 title: "SDK Dependency Graph",
@@ -31,15 +31,9 @@ struct SDKDependencyGraphView: View {
                         HStack(alignment: .top) {
                             Circle().fill(Color.accentColor).frame(width: 8, height: 8).padding(.top, 6)
                             VStack(alignment: .leading) {
-                                Text(module.displayName).font(.headline)
-                                if !module.dependencies.isEmpty {
-                                    Text("Depends on: \(module.dependencies.joined(separator: ", "))")
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                }
+                                Text(module.name).font(.headline)
                             }
                         }
-                        .padding(.leading, CGFloat(module.loadPriority / 10))
                     }
                 }
                 .padding()
