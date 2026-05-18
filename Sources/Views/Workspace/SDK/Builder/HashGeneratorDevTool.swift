@@ -44,7 +44,7 @@ struct HashGeneratorView: View {
 
     private func hashRow(title: String, value: String) -> some View {
         VStack(alignment: .leading) {
-            Text(title).font(.caption.bold()).foregroundStyle(.accent)
+            Text(title).font(.caption.bold()).foregroundStyle(Color.accentColor)
             HStack {
                 Text(value)
                     .font(.system(.caption2, design: .monospaced))

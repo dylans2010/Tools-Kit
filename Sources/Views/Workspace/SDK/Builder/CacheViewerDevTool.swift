@@ -79,7 +79,10 @@ class CacheViewerViewModel: ObservableObject {
 
     private func calculateSize(at url: URL) -> String {
         let resources = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [.fileSizeKey], options: [])
-        let total = resources?.reduce(0) { $0 + (try? $1.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0) } ?? 0
+        let total: Int = resources?.reduce(0) { partialResult, fileURL in
+            let fileSize = (try? fileURL.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+            return partialResult + fileSize
+        } ?? 0
         return ByteCountFormatter.string(fromByteCount: Int64(total), countStyle: .file)
     }
 }

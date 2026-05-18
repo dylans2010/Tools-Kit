@@ -52,10 +52,10 @@ struct HeaderInspectorView: View {
                     }
 
                     Section("Parsed Headers") {
-                        ForEach(viewModel.headers, id: \.key) { header in
+                        ForEach(viewModel.headers.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
                             VStack(alignment: .leading) {
-                                Text(header.key).font(.caption.bold()).foregroundStyle(.accent)
-                                Text(header.value).font(.caption2).textSelection(.enabled)
+                                Text(key).font(.caption.bold()).foregroundStyle(Color.accentColor)
+                                Text(value).font(.caption2).textSelection(.enabled)
                             }
                         }
                     }

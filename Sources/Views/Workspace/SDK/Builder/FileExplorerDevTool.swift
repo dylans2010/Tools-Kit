@@ -25,7 +25,7 @@ struct FileExplorerView: View {
             .padding()
 
             List {
-                Section("Current Directory: \(viewModel.currentPath.lastPathComponent)") {
+                Section {
                     if !viewModel.isAtRoot {
                         Button { viewModel.navigateUp() } label: {
                             Label("..", systemImage: "arrow.up.doc")
@@ -35,7 +35,7 @@ struct FileExplorerView: View {
                     ForEach(viewModel.files) { file in
                         HStack {
                             Image(systemName: file.isDirectory ? "folder.fill" : "doc.fill")
-                                .foregroundStyle(file.isDirectory ? .accent : .secondary)
+                                .foregroundStyle(file.isDirectory ? Color.accentColor : .secondary)
 
                             VStack(alignment: .leading) {
                                 Text(file.name).font(.subheadline)
@@ -55,6 +55,8 @@ struct FileExplorerView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Current Directory: \(viewModel.currentPath.lastPathComponent)")
                 }
             }
             .refreshable { viewModel.load() }

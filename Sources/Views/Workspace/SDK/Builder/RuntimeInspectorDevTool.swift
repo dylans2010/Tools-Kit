@@ -16,10 +16,11 @@ struct RuntimeInspectorView: View {
     @StateObject private var viewModel = RuntimeInspectorViewModel()
 
     var body: some View {
+        let headerDescription = "Deeply inspect live objects, their property values, and internal states during execution."
         VStack(spacing: 0) {
             DevToolHeader(
                 title: "Runtime Inspector",
-                description: "Deeply inspect live objects, their property values, and internal states during execution.",
+                description: headerDescription,
                 icon: "magnifyingglass"
             )
             .padding()

@@ -16,10 +16,11 @@ struct LogStreamViewerView: View {
     @StateObject private var viewModel = LogStreamViewerViewModel()
 
     var body: some View {
+        let headerDescription = "Monitor live log output streams for debugging real-time application behavior."
         VStack(spacing: 0) {
             DevToolHeader(
                 title: "Log Stream Viewer",
-                description: "Monitor live log output streams for debugging real-time application behavior.",
+                description: headerDescription,
                 icon: "list.bullet.rectangle"
             )
             .padding()

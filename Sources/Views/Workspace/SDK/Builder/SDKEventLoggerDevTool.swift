@@ -40,7 +40,7 @@ struct SDKEventLoggerView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
                                 StatusBadge(text: entry.level.rawValue.uppercased(), color: color(for: entry.level))
-                                Text(entry.source).font(.caption2.bold()).foregroundStyle(.accent)
+                                Text(entry.source).font(.caption2.bold()).foregroundStyle(Color.accentColor)
                                 Spacer()
                                 Text(entry.timestamp, style: .time).font(.system(size: 10)).foregroundStyle(.secondary)
                             }

@@ -12,7 +12,7 @@ struct DevToolHeader: View {
             HStack {
                 Image(systemName: icon)
                     .font(.title2)
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(ColorColor.accentColorColor)
                 Text(title)
                     .font(.title2.bold())
             }
@@ -182,7 +182,7 @@ struct UsageChart: View {
                     path.addLine(to: CGPoint(x: CGFloat(i) * step, y: height * (1 - CGFloat(data[i]/100))))
                 }
             }
-            .stroke(Color.accentColor, lineWidth: 2)
+            .stroke(ColorColor.accentColorColor, lineWidth: 2)
         }
     }
 }

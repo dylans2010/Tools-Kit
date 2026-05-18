@@ -33,7 +33,7 @@ struct UserDefaultsInspectorView: View {
                 List {
                     ForEach(filteredEntries) { entry in
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(entry.key).font(.subheadline.bold()).foregroundStyle(.accent)
+                            Text(entry.key).font(.subheadline.bold()).foregroundStyle(Color.accentColor)
                             HStack {
                                 Text(entry.value).font(.caption).foregroundStyle(.secondary)
                                 Spacer()
