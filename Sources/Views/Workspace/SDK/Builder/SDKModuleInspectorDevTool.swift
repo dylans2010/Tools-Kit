@@ -45,7 +45,7 @@ struct SDKModuleInspectorView: View {
                 }
             }
         }
-        .sheet(item: $selectedModule) { module in
+        .sheet(item: $selectedModule) { (module: SDKModuleDescriptor) in
             ModuleDetailView(module: module)
         }
     }
