@@ -18,6 +18,7 @@ final class PluginRuntime {
         }
     }
 
+    @MainActor
     private func processEvent(_ event: PluginEvent) {
         let enabledPlugins = SDKPluginManager.shared.plugins.filter { $0.isEnabled }
 

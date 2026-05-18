@@ -3,7 +3,7 @@
 import SwiftUI
 
 struct PluginLimitedView: View {
-    let plugin: PluginDefinition
+    let plugin: SDKPlugin
     let reason: PluginValidationFailureReason
     let detail: String
 
@@ -13,7 +13,7 @@ struct PluginLimitedView: View {
         List {
             Section {
                 VStack(spacing: 16) {
-                    Image(systemName: plugin.icon)
+                    Image(systemName: "puzzlepiece.extension")
                         .font(.system(size: 44))
                         .foregroundStyle(Color.accentColor)
                         .frame(width: 80, height: 80)
@@ -21,7 +21,7 @@ struct PluginLimitedView: View {
 
                     VStack(spacing: 4) {
                         Text(plugin.name).font(.headline)
-                        Text(plugin.identifier).font(.caption.monospaced()).foregroundStyle(.secondary)
+                        Text(plugin.id.uuidString).font(.caption.monospaced()).foregroundStyle(.secondary)
                     }
                 }
                 .frame(maxWidth: .infinity)
