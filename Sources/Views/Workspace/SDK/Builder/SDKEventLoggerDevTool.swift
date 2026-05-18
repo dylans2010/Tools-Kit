@@ -28,7 +28,7 @@ struct SDKEventLoggerView: View {
             VStack {
                 Picker("Level", selection: $selectedLevel) {
                     Text("All").tag(nil as LogLevel?)
-                    ForEach(LogLevel.allCases, id: \.self) { level in
+                    ForEach(LogLevel.allCases, id: \.self) { (level: LogLevel) in
                         Text(level.rawValue.capitalized).tag(level as LogLevel?)
                     }
                 }
