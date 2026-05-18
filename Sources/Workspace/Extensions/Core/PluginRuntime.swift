@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 /// Handles the execution of plugin logic within the system.
 /// Orchestrates the execution pipeline: capture, evaluate, and execute or block.
@@ -7,14 +8,17 @@ final class PluginRuntime {
 
     private let sandbox = PluginSandbox.shared
     private let eventBus = PluginEventBus.shared
+    private var cancellable: AnyCancellable?
 
     private init() {
         setupGlobalSubscribers()
     }
 
     private func setupGlobalSubscribers() {
-        eventBus.subscribe { [weak self] event in
-            self?.processEvent(event)
+        cancellable = eventBus.subscribe { [weak self] event in
+            Task { @MainActor in
+                self?.processEvent(event)
+            }
         }
     }
 
