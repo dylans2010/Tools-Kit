@@ -63,10 +63,6 @@ struct WorkspaceItemSnapshot: Identifiable, Codable, Hashable {
 }
 
 
-struct WhiteboardNode: Codable, Hashable {
-    let title: String
-    let content: String
-}
 enum AgentActionResult {
     case success(AgentActionPayload)
     case failure(AgentActionError)
