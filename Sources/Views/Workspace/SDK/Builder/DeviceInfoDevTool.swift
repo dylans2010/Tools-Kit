@@ -8,11 +8,11 @@ struct DeviceInfoDevTool: DevTool {
     let description = "Detailed hardware and software info"
 
     func render() -> some View {
-        DeviceInfoView()
+        DeviceInfoDevToolView()
     }
 }
 
-struct DeviceInfoView: View {
+struct DeviceInfoDevToolView: View {
     @StateObject private var viewModel = DeviceInfoViewModel()
 
     var body: some View {

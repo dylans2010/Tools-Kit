@@ -153,7 +153,7 @@ private struct FilterMenu: View {
     }
 }
 
-private enum ConsoleLogLevel: String, CaseIterable {
+private enum ConsoleLogLevel: String, CaseIterable, Decodable {
     case info, warning, error, critical
     init(from level: LogLevel) {
         switch level { case .debug, .info: self = .info; case .warning: self = .warning; case .error: self = .error }

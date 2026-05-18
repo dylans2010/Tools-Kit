@@ -8,11 +8,11 @@ struct XMLFormatterDevTool: DevTool {
     let description = "Prettify and validate XML data"
 
     func render() -> some View {
-        XMLFormatterView()
+        XMLFormatterDevToolView()
     }
 }
 
-struct XMLFormatterView: View {
+struct XMLFormatterDevToolView: View {
     @StateObject private var viewModel = XMLFormatterViewModel()
 
     var body: some View {

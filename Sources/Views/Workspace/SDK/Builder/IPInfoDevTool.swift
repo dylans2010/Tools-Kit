@@ -8,11 +8,11 @@ struct IPInfoDevTool: DevTool {
     let description = "Geolocate and inspect IP addresses"
 
     func render() -> some View {
-        IPInfoView()
+        IPInfoDevToolView()
     }
 }
 
-struct IPInfoView: View {
+struct IPInfoDevToolView: View {
     @StateObject private var viewModel = IPInfoViewModel()
 
     var body: some View {

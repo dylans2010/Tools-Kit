@@ -9,11 +9,11 @@ struct HashGeneratorDevTool: DevTool {
     let description = "Generate cryptographic hashes"
 
     func render() -> some View {
-        HashGeneratorView()
+        HashGeneratorDevToolView()
     }
 }
 
-struct HashGeneratorView: View {
+struct HashGeneratorDevToolView: View {
     @StateObject private var viewModel = HashGeneratorViewModel()
 
     var body: some View {

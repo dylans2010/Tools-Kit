@@ -9,11 +9,11 @@ struct DNSLookupDevTool: DevTool {
     let description = "Resolve hostnames and inspect DNS records"
 
     func render() -> some View {
-        DNSLookupView()
+        DNSLookupDevToolView()
     }
 }
 
-struct DNSLookupView: View {
+struct DNSLookupDevToolView: View {
     @StateObject private var viewModel = DNSLookupViewModel()
 
     var body: some View {

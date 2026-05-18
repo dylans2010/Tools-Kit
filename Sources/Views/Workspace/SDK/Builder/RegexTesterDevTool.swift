@@ -8,11 +8,11 @@ struct RegexTesterDevTool: DevTool {
     let description = "Test regular expressions against strings"
 
     func render() -> some View {
-        RegexTesterView()
+        RegexTesterDevToolView()
     }
 }
 
-struct RegexTesterView: View {
+struct RegexTesterDevToolView: View {
     @StateObject private var viewModel = RegexTesterViewModel()
 
     var body: some View {

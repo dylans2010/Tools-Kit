@@ -8,11 +8,11 @@ struct URLParserDevTool: DevTool {
     let description = "Break down URLs into components"
 
     func render() -> some View {
-        URLParserView()
+        URLParserDevToolView()
     }
 }
 
-struct URLParserView: View {
+struct URLParserDevToolView: View {
     @StateObject private var viewModel = URLParserViewModel()
 
     var body: some View {

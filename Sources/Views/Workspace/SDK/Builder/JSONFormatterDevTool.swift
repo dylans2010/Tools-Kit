@@ -8,11 +8,11 @@ struct JSONFormatterDevTool: DevTool {
     let description = "Prettify and minify JSON data"
 
     func render() -> some View {
-        JSONFormatterView()
+        JSONFormatterDevToolView()
     }
 }
 
-struct JSONFormatterView: View {
+struct JSONFormatterDevToolView: View {
     @StateObject private var viewModel = JSONFormatterViewModel()
 
     var body: some View {
