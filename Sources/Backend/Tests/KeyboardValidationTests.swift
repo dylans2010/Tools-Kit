@@ -1,5 +1,5 @@
 import XCTest
-@testable import Tools_Kit
+@testable import ToolsKit
 
 final class KeyboardValidationTests: XCTestCase {
     func testContextAnalyzer() {
