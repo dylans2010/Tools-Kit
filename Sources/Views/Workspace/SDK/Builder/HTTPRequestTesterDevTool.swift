@@ -175,7 +175,7 @@ class HTTPRequestTesterViewModel: ObservableObject {
     @Published var method = "GET"
     @Published var body = ""
     @Published var headers: [HTTPRequestHeader] = [HTTPRequestHeader(key: "Content-Type", value: "application/json")]
-    @Published var authType = _DTAuthType.none
+    @Published fileprivate var authType = _DTAuthType.none
     @Published var authToken = ""
     @Published var apiKeyName = ""
     @Published var apiKeyValue = ""
