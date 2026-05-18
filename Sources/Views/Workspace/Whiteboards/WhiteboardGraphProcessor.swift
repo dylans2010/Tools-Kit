@@ -11,7 +11,6 @@ struct WhiteboardGraphCluster: Identifiable, Codable {
 }
 
 struct WhiteboardGraphProcessor {
-    @MainActor
     func cluster(board: WhiteboardBoard) -> [WhiteboardGraphCluster] {
         let nodes = board.nodes
         let edges = board.edges
@@ -28,10 +27,28 @@ struct WhiteboardGraphProcessor {
             } else {
                 connected = bfs(start: node.id, adjacency: adjacency, visited: &visited)
             }
-            let clusterNodes = nodes.filter { connected.contains($0.id) }
-            let clusterEdges = edges.filter { connected.contains($0.fromNodeID) && connected.contains($0.toNodeID) }
+
+            var clusterNodes: [WhiteboardNode] = []
+            for n in nodes {
+                if connected.contains(n.id) {
+                    clusterNodes.append(n)
+                }
+            }
+
+            var clusterEdges: [WhiteboardEdge] = []
+            for e in edges {
+                if connected.contains(e.fromNodeID) && connected.contains(e.toNodeID) {
+                    clusterEdges.append(e)
+                }
+            }
+
             let density = densityScore(nodeCount: clusterNodes.count, edgeCount: clusterEdges.count)
-            let importance = clusterNodes.reduce(0) { $0 + $1.type.importanceWeight }
+
+            var importance = 0.0
+            for n in clusterNodes {
+                importance += n.type.importanceWeight
+            }
+
             clusters.append(
                 WhiteboardGraphCluster(
                     nodes: clusterNodes,
@@ -42,36 +59,88 @@ struct WhiteboardGraphProcessor {
             )
         }
 
-        return clusters.sorted { $0.rankScore > $1.rankScore }
+        var sortedClusters = clusters
+        for i in 0..<sortedClusters.count {
+            for j in i+1..<sortedClusters.count {
+                if sortedClusters[i].rankScore < sortedClusters[j].rankScore {
+                    sortedClusters.swapAt(i, j)
+                }
+            }
+        }
+        return sortedClusters
     }
 
-    @MainActor
     func buildSections(from board: WhiteboardBoard) -> [WhiteboardSlideSection] {
         let clusters = cluster(board: board)
-        return clusters.map { cluster in
+        var sections: [WhiteboardSlideSection] = []
+
+        for cluster in clusters {
             let clusterNodes = cluster.nodes
             let topic = extractTopic(from: cluster)
-            let summary = clusterNodes.map { $0.content }.prefix(4).joined(separator: " • ")
-            return WhiteboardSlideSection(
-                title: topic,
-                summary: summary,
-                nodeIDs: clusterNodes.map(\.id)
+
+            var contents: [String] = []
+            for n in clusterNodes {
+                contents.append(n.content)
+            }
+            let summary = contents.prefix(4).joined(separator: " • ")
+
+            var nodeIDs: [UUID] = []
+            for n in clusterNodes {
+                nodeIDs.append(n.id)
+            }
+
+            sections.append(
+                WhiteboardSlideSection(
+                    title: topic,
+                    summary: summary,
+                    nodeIDs: nodeIDs
+                )
             )
         }
+        return sections
     }
 
     private func extractTopic(from cluster: WhiteboardGraphCluster) -> String {
         let nodes = cluster.nodes
-        let titleTokens = nodes
-            .map(\.title)
-            .flatMap { $0.split(separator: " ") }
-            .map(String.init)
-            .filter { $0.count > 2 }
+        var titleTokens: [String] = []
+        for n in nodes {
+            let words = n.title.split(separator: " ")
+            for word in words {
+                let token = String(word)
+                if token.count > 2 {
+                    titleTokens.append(token)
+                }
+            }
+        }
 
         guard !titleTokens.isEmpty else { return "Topic" }
-        let frequencies = Dictionary(grouping: titleTokens.map { $0.lowercased() }, by: { $0 }).mapValues(\.count)
-        let ranked = frequencies.sorted { $0.value > $1.value }.prefix(3).map(\.key)
-        return ranked.map { $0.capitalized }.joined(separator: " ")
+
+        var frequencies: [String: Int] = [:]
+        for token in titleTokens {
+            let lower = token.lowercased()
+            frequencies[lower, default: 0] += 1
+        }
+
+        var freqList: [(key: String, value: Int)] = []
+        for (key, value) in frequencies {
+            freqList.append((key, value))
+        }
+
+        for i in 0..<freqList.count {
+            for j in i+1..<freqList.count {
+                if freqList[i].value < freqList[j].value {
+                    freqList.swapAt(i, j)
+                }
+            }
+        }
+
+        let ranked = freqList.prefix(3)
+        var capitalizedRanked: [String] = []
+        for item in ranked {
+            capitalizedRanked.append(item.key.capitalized)
+        }
+
+        return capitalizedRanked.joined(separator: " ")
     }
 
     private func adjacencyMap(edges: [WhiteboardEdge]) -> [UUID: Set<UUID>] {
