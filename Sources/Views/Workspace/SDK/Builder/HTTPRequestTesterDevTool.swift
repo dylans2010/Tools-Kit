@@ -1,5 +1,13 @@
 import SwiftUI
 
+private enum _DTAuthType: String, CaseIterable, Hashable {
+    case none
+    case apiKey
+    case bearer
+    case basic
+    case oauth2
+}
+
 struct HTTPRequestTesterDevTool: DevTool {
     let id = "http-request-tester"
     let name = "HTTP Request Tester"
@@ -101,11 +109,11 @@ struct HTTPRequestTesterView: View {
     private var authTab: some View {
         Form {
             Picker("Auth Type", selection: $viewModel.authType) {
-                Text("None").tag(AuthType.none)
-                Text("Bearer Token").tag(AuthType.bearer)
-                Text("API Key").tag(AuthType.apiKey)
-                Text("Basic").tag(AuthType.basic)
-                Text("OAuth2").tag(AuthType.oauth2)
+                Text("None").tag(_DTAuthType.none)
+                Text("Bearer Token").tag(_DTAuthType.bearer)
+                Text("API Key").tag(_DTAuthType.apiKey)
+                Text("Basic").tag(_DTAuthType.basic)
+                Text("OAuth2").tag(_DTAuthType.oauth2)
             }
 
             if viewModel.authType == .bearer {
@@ -167,7 +175,7 @@ class HTTPRequestTesterViewModel: ObservableObject {
     @Published var method = "GET"
     @Published var body = ""
     @Published var headers: [HTTPRequestHeader] = [HTTPRequestHeader(key: "Content-Type", value: "application/json")]
-    @Published var authType = AuthType.none
+    @Published var authType = _DTAuthType.none
     @Published var authToken = ""
     @Published var apiKeyName = ""
     @Published var apiKeyValue = ""

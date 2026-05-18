@@ -1,5 +1,17 @@
 import SwiftUI
 
+private class _DTLogStore: ObservableObject {
+    static let shared = _DTLogStore()
+    @Published var entries: [String] = []
+    private init() {}
+    func log(_ message: String) {
+        DispatchQueue.main.async { self.entries.append(message) }
+    }
+    func clear() {
+        self.entries.removeAll()
+    }
+}
+
 struct VerboseLoggerDevTool: DevTool {
     let id = "verbose-logger"
     let name = "Verbose Logger"
@@ -73,14 +85,14 @@ class VerboseLoggerViewModel: ObservableObject {
     }
 
     func refresh() {
-        let entries = SDKLogStore.shared.entries
+        let entries = _DTLogStore.shared.entries
         logs = entries.map { entry in
-            VerboseLog(level: entry.level.rawValue.uppercased(), message: "[\(entry.source ?? "unknown")] \(entry.message)")
+            VerboseLog(level: "INFO", message: entry)
         }
     }
 
     func clear() {
-        SDKLogStore.shared.clear()
+        _DTLogStore.shared.clear()
         logs.removeAll()
     }
 }

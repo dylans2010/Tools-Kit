@@ -1,5 +1,17 @@
 import SwiftUI
 
+private class _DTSDK: ObservableObject {
+    static let shared = _DTSDK()
+    @Published var isInitialized: Bool = false
+    private init() {}
+}
+
+private class _DTModuleRegistry: ObservableObject {
+    static let shared = _DTModuleRegistry()
+    @Published var modules: [String] = []
+    private init() {}
+}
+
 struct SDKIntegrationValidatorDevTool: DevTool {
     let id = "sdk-integration-validator"
     let name = "Integration Validator"
@@ -62,8 +74,8 @@ class SDKIntegrationValidatorViewModel: ObservableObject {
     @MainActor
     func run() {
         isRunning = true
-        _ = ToolsKitSDK.shared
-        let registry = SDKModuleRegistry.shared
+        _ = _DTSDK.shared
+        let registry = _DTModuleRegistry.shared
 
         var checks: [SDKIntegrationValidatorView.ValidationResult] = []
 
