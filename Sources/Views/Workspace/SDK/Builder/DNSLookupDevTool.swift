@@ -1,4 +1,5 @@
 import SwiftUI
+import Darwin
 
 struct DNSLookupDevTool: DevTool {
     let id = "dns-lookup"
@@ -87,14 +88,50 @@ class DNSLookupViewModel: ObservableObject {
     func resolve() async {
         await MainActor.run { isLoading = true; results = [] }
 
-        // Use Host to resolve
-        let host = Host(name: hostname)
-        let resolved = host.addresses
+        let resolved = await resolve(hostname: hostname)
 
         await MainActor.run {
             self.results = resolved
             self.history.insert(HistoryItem(title: hostname, detail: "Resolved \(resolved.count) addresses"), at: 0)
             self.isLoading = false
+        }
+    }
+
+    private func resolve(hostname: String) async -> [String] {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global().async {
+                var results: [String] = []
+                var hints = addrinfo()
+                hints.ai_family = AF_UNSPEC
+                hints.ai_socktype = SOCK_STREAM
+
+                var res: UnsafeMutablePointer<addrinfo>?
+                let status = getaddrinfo(hostname, nil, &hints, &res)
+                if status == 0, let head = res {
+                    var current: UnsafeMutablePointer<addrinfo>? = head
+                    while let info = current {
+                        var hostBuffer = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                        let nameInfoStatus = getnameinfo(
+                            info.pointee.ai_addr,
+                            socklen_t(info.pointee.ai_addrlen),
+                            &hostBuffer,
+                            socklen_t(hostBuffer.count),
+                            nil,
+                            0,
+                            NI_NUMERICHOST
+                        )
+                        if nameInfoStatus == 0 {
+                            let address = String(cString: hostBuffer)
+                            if !results.contains(address) {
+                                results.append(address)
+                            }
+                        }
+                        current = info.pointee.ai_next
+                    }
+                    freeaddrinfo(head)
+                }
+                continuation.resume(returning: results)
+            }
         }
     }
 }

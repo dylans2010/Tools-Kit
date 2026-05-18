@@ -36,7 +36,7 @@ struct LaunchTimeTrackerView: View {
                         Text("Total Launch Time").font(.headline)
                         Text(viewModel.totalTime)
                             .font(.system(size: 34, weight: .bold, design: .monospaced))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
                     }
                 }
             }

@@ -28,7 +28,7 @@ struct PermissionInspectorView: View {
                 ForEach(viewModel.permissions) { perm in
                     HStack {
                         Image(systemName: perm.icon)
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
                             .frame(width: 30)
                         VStack(alignment: .leading) {
                             Text(perm.name).font(.subheadline.bold())

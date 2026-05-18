@@ -37,7 +37,7 @@ struct URLParserView: View {
                             HStack {
                                 Text(component.key)
                                     .font(.caption.bold())
-                                    .foregroundStyle(.accent)
+                                    .foregroundStyle(Color.accentColor)
                                 Spacer()
                                 Text(component.value)
                                     .font(.caption)

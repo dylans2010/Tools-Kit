@@ -16,6 +16,7 @@ struct SDKDependencyGraphView: View {
     @StateObject private var registry = SDKModuleRegistry.shared
 
     var body: some View {
+        let orderedModules = registry.resolvedLoadOrder()
         VStack(spacing: 0) {
             DevToolHeader(
                 title: "SDK Dependency Graph",
@@ -26,7 +27,7 @@ struct SDKDependencyGraphView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    ForEach(registry.resolvedLoadOrder()) { module in
+                    ForEach(orderedModules) { module in
                         HStack(alignment: .top) {
                             Circle().fill(Color.accentColor).frame(width: 8, height: 8).padding(.top, 6)
                             VStack(alignment: .leading) {

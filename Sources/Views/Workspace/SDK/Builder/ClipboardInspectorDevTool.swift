@@ -28,7 +28,7 @@ struct ClipboardInspectorView: View {
                 Section("Current Clipboard") {
                     Text(viewModel.currentContent)
                         .font(.subheadline)
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(Color.accentColor)
                         .textSelection(.enabled)
                 }
 

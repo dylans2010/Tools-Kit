@@ -219,7 +219,10 @@ struct DevToolsMainView: View {
             ForEach(DevToolCategory.allCases) { category in
                 if let tools = toolsByCategory[category], !tools.isEmpty {
                     Section(isExpanded: Binding(
-                        get: { expandedCategories.contains(category) },
+                        get: {
+                            let containsCategory = expandedCategories.contains(category)
+                            return containsCategory
+                        },
                         set: { isExpanded in
                             if isExpanded {
                                 expandedCategories.insert(category)
@@ -240,7 +243,7 @@ struct DevToolsMainView: View {
                                     }
                                 } icon: {
                                     Image(systemName: tool.icon)
-                                        .foregroundStyle(.accent)
+                                        .foregroundStyle(Color.accentColor)
                                 }
                             }
                         }

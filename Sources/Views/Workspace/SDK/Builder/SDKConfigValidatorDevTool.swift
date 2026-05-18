@@ -16,6 +16,9 @@ struct SDKConfigValidatorView: View {
     @StateObject private var configManager = SDKConfigManager.shared
 
     var body: some View {
+        let sortedConfigurations = Array(configManager.configurations.values).sorted { lhs, rhs in
+            lhs.key < rhs.key
+        }
         VStack(spacing: 0) {
             DevToolHeader(
                 title: "SDK Config Validator",
@@ -26,7 +29,7 @@ struct SDKConfigValidatorView: View {
 
             List {
                 Section("Active Configurations") {
-                    ForEach(Array(configManager.configurations.values).sorted(by: { $0.key < $1.key })) { entry in
+                    ForEach(sortedConfigurations) { entry in
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(entry.key).font(.subheadline.bold())
