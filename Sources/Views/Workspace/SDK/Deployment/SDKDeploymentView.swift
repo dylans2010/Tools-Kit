@@ -4,7 +4,7 @@ import SwiftUI
 
 struct SDKDeploymentView: View {
     let project: SDKProject
-    @StateObject private var manager = PluginManager.shared
+    @StateObject private var manager = SDKPluginManager.shared
     @State private var deploymentTarget: DeploymentTarget = .plugin
     @State private var isDeploying = false
     @State private var deployedPlugin: PluginDefinition?
