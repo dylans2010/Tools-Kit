@@ -36,8 +36,8 @@ struct GradientBuilderView: View {
                 }
 
                 Section("Colors") {
-                    ForEach(0..<viewModel.colors.count, id: \.self) { index in
-                        ColorPicker("Color \(index + 1)", selection: $viewModel.colors[index])
+                    ForEach($viewModel.colors, id: \.self) { $color in
+                        ColorPicker("Color", selection: $color)
                     }
                     .onDelete { viewModel.colors.remove(atOffsets: $0) }
 

@@ -18,6 +18,13 @@ class SDKLogStore: ObservableObject {
     static let shared = SDKLogStore()
     @Published var entries: [SDKLogEntry] = []
     func clear() { entries.removeAll() }
+
+    func log(_ message: String, source: String, level: LogLevel) {
+        let entry = SDKLogEntry(id: UUID(), level: level, message: message, timestamp: Date(), source: source)
+        DispatchQueue.main.async {
+            self.entries.insert(entry, at: 0)
+        }
+    }
 }
 
 enum SDKModuleCapability: String, CaseIterable {

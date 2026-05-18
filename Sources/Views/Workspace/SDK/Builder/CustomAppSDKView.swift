@@ -99,7 +99,7 @@ struct CustomAppSDKView: View {
 
     private var importedAppsSection: some View {
         Section {
-            ForEach(importedApps) { app in
+            ForEach($importedApps) { $app in
                 Button {
                     selectedApp = app
                     showingValidationDetail = true

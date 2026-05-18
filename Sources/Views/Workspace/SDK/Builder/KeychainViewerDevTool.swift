@@ -29,7 +29,7 @@ struct KeychainViewerView: View {
                     if viewModel.items.isEmpty {
                         Text("No items found").foregroundStyle(.secondary)
                     } else {
-                        ForEach(viewModel.items) { item in
+                        ForEach($viewModel.items) { $item in
                             VStack(alignment: .leading) {
                                 Text(item.account).font(.headline)
                                 Text(item.service).font(.caption).foregroundStyle(.secondary)

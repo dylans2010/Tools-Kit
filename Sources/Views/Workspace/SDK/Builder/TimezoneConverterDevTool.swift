@@ -30,7 +30,7 @@ struct TimezoneConverterView: View {
                 }
 
                 Section("Target Timezones") {
-                    ForEach(viewModel.targetTimezones, id: \.self) { tzName in
+                    ForEach($viewModel.targetTimezones, id: \.self) { $tzName in
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(tzName).font(.subheadline.bold())
