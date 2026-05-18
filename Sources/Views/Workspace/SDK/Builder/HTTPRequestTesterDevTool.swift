@@ -104,6 +104,8 @@ struct HTTPRequestTesterView: View {
                 Text("None").tag(AuthType.none)
                 Text("Bearer Token").tag(AuthType.bearer)
                 Text("API Key").tag(AuthType.apiKey)
+                Text("Basic").tag(AuthType.basic)
+                Text("OAuth2").tag(AuthType.oauth2)
             }
 
             if viewModel.authType == .bearer {
@@ -111,6 +113,9 @@ struct HTTPRequestTesterView: View {
             } else if viewModel.authType == .apiKey {
                 TextField("Key Name", text: $viewModel.apiKeyName)
                 SecureField("Key Value", text: $viewModel.apiKeyValue)
+            } else if viewModel.authType == .basic {
+                TextField("Username", text: $viewModel.apiKeyName)
+                SecureField("Password", text: $viewModel.apiKeyValue)
             }
         }
     }
@@ -189,7 +194,13 @@ class HTTPRequestTesterViewModel: ObservableObject {
             request.addValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
         case .apiKey:
             request.addValue(apiKeyValue, forHTTPHeaderField: apiKeyName)
-        case .none: break
+        case .basic:
+            let authString = "\(apiKeyName):\(apiKeyValue)"
+            if let authData = authString.data(using: .utf8) {
+                let base64Auth = authData.base64EncodedString()
+                request.addValue("Basic \(base64Auth)", forHTTPHeaderField: "Authorization")
+            }
+        case .none, .oauth2: break
         }
 
         if !body.isEmpty && method != "GET" {

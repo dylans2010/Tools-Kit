@@ -1,72 +1,33 @@
 import Foundation
 import Combine
 
-public struct SDKLogEntry: Identifiable, Codable {
-    public var id: UUID
-    public var timestamp: Date
-    public var source: String
-    public var message: String
-    public var level: LogLevel
+public enum LogLevel: String, Codable, CaseIterable, Hashable {
+    case debug
+    case info
+    case warning
+    case error
 }
 
-public enum LogLevel: String, Codable, CaseIterable {
-    case debug, info, warning, error
+public struct SDKLogEntry: Identifiable, Codable, Hashable {
+    public let id: UUID
+    public let timestamp: Date
+    public let level: LogLevel
+    public let message: String
+    public let source: String?
+    public init(id: UUID = UUID(), timestamp: Date = Date(),
+                level: LogLevel, message: String, source: String? = nil) {
+        self.id = id; self.timestamp = timestamp
+        self.level = level; self.message = message; self.source = source
+    }
 }
 
-@MainActor
-public final class SDKLogStore: ObservableObject {
+public class SDKLogStore: ObservableObject {
     public static let shared = SDKLogStore()
-
     @Published public var entries: [SDKLogEntry] = []
-
-    private let logFileURL: URL
-    private let maxEntries = 1000
-    private let queue = DispatchQueue(label: "com.toolskit.sdk.logstore", qos: .background)
-
-    private init() {
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        logFileURL = appSupport.appendingPathComponent("sdk_logs.json")
-
-        if !FileManager.default.fileExists(atPath: appSupport.path) {
-            try? FileManager.default.createDirectory(at: appSupport, withIntermediateDirectories: true)
-        }
-
-        loadFromDisk()
-    }
-
-    public func log(_ message: String, source: String, level: LogLevel) {
-        let entry = SDKLogEntry(id: UUID(), timestamp: Date(), source: source, message: message, level: level)
-        entries.insert(entry, at: 0)
-
-        if entries.count > maxEntries {
-            entries = Array(entries.prefix(maxEntries))
-        }
-
-        saveToDisk()
-    }
-
-    public func entries(for source: String) -> [SDKLogEntry] {
-        return entries.filter { $0.source == source }
-    }
-
-    public func clear() {
-        entries.removeAll()
-        saveToDisk()
-    }
-
-    private func loadFromDisk() {
-        guard let data = try? Data(contentsOf: logFileURL) else { return }
-        if let decoded = try? JSONDecoder().decode([SDKLogEntry].self, from: data) {
-            entries = decoded
-        }
-    }
-
-    private func saveToDisk() {
-        let entriesToSave = entries
-        queue.async {
-            if let data = try? JSONEncoder().encode(entriesToSave) {
-                try? data.write(to: self.logFileURL)
-            }
-        }
+    private init() {}
+    public func log(_ message: String, level: LogLevel = .info,
+                    source: String? = nil) {
+        let entry = SDKLogEntry(level: level, message: message, source: source)
+        DispatchQueue.main.async { self.entries.append(entry) }
     }
 }

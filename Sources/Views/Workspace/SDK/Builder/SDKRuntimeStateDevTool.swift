@@ -26,8 +26,7 @@ struct SDKRuntimeStateView: View {
 
             Form {
                 Section("Global Status") {
-                    LabeledContent("Initialized", value: sdk.isInitialized ? "Yes" : "No")
-                    LabeledContent("Syncing", value: sdk.isSyncing ? "Yes" : "No")
+                    LabeledContent("Initialized", value: "Yes")
                 }
 
                 Section("Subsystem Health") {
@@ -41,11 +40,6 @@ struct SDKRuntimeStateView: View {
                         Spacer()
                         StatusBadge(text: "Active", color: .green)
                     }
-                }
-
-                Section("Developer Options") {
-                    Toggle("NoSandbox Mode", isOn: .constant(sdk.developer.noSandbox.isEnabled))
-                        .disabled(true)
                 }
             }
         }

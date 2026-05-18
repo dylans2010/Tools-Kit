@@ -78,12 +78,8 @@ struct FrameworkDescriptor: Identifiable, Codable, Hashable {
 struct FrameworkLogEntry: Identifiable, Codable, Hashable {
     let id: UUID
     let timestamp: Date
-    let level: Self.LogLevel
+    let level: LogLevel
     let message: String
-
-    enum LogLevel: String, Codable {
-        case info, warning, error, debug
-    }
 }
 
 enum SandboxProfile: String, CaseIterable, Codable {
@@ -309,7 +305,7 @@ final class FrameworkManager {
         registry.install(fw)
     }
 
-    func log(to frameworkId: UUID, level: FrameworkLogEntry.LogLevel, message: String) {
+    func log(to frameworkId: UUID, level: LogLevel, message: String) {
         guard var fw = registry.framework(by: frameworkId) else { return }
         fw.logs.append(FrameworkLogEntry(id: UUID(), timestamp: Date(), level: level, message: message))
         registry.install(fw)

@@ -397,8 +397,12 @@ enum HTTPMethod: String, Codable, CaseIterable {
     case get = "GET", post = "POST", put = "PUT", delete = "DELETE"
 }
 
-enum AuthType: String, Codable, CaseIterable {
-    case none, apiKey, bearer, oauth
+public enum AuthType: String, Codable, CaseIterable, Hashable {
+    case none
+    case apiKey
+    case bearer
+    case basic
+    case oauth2
 }
 
 struct RetryPolicy: Codable {

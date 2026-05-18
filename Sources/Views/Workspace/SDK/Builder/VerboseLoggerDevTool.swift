@@ -75,7 +75,7 @@ class VerboseLoggerViewModel: ObservableObject {
     func refresh() {
         let entries = SDKLogStore.shared.entries
         logs = entries.map { entry in
-            VerboseLog(level: entry.level.rawValue.uppercased(), message: "[\(entry.source)] \(entry.message)")
+            VerboseLog(level: entry.level.rawValue.uppercased(), message: "[\(entry.source ?? "unknown")] \(entry.message)")
         }
     }
 
