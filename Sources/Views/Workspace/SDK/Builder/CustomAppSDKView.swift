@@ -2,16 +2,6 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct CustomAppSDKView: View {
-    @StateObject private var projectManager = SDKProjectManager.shared
-    @State private var importedApps: [ImportedSDKApp] = []
-    @State private var isImporting = false
-    @State private var isValidating = false
-    @State private var validationResult: ValidationResult?
-    @State private var showingFilePicker = false
-    @State private var showingValidationDetail = false
-    @State private var selectedApp: ImportedSDKApp?
-    @State private var errorMessage: String?
-
     struct ImportedSDKApp: Identifiable {
         let id = UUID()
         var name: String
@@ -40,6 +30,16 @@ struct CustomAppSDKView: View {
         var issues: [String]
         var warnings: [String]
     }
+
+    @StateObject private var projectManager = SDKProjectManager.shared
+    @State private var importedApps: [CustomAppSDKView.ImportedSDKApp] = []
+    @State private var isImporting = false
+    @State private var isValidating = false
+    @State private var validationResult: CustomAppSDKView.ValidationResult?
+    @State private var showingFilePicker = false
+    @State private var showingValidationDetail = false
+    @State private var selectedApp: CustomAppSDKView.ImportedSDKApp?
+    @State private var errorMessage: String?
 
     var body: some View {
         List {
@@ -140,7 +140,7 @@ struct CustomAppSDKView: View {
     }
 
     @ViewBuilder
-    private func validationSection(_ result: ValidationResult) -> some View {
+    private func validationSection(_ result: CustomAppSDKView.ValidationResult) -> some View {
         Section {
             HStack {
                 Image(systemName: result.isCompatible ? "checkmark.seal.fill" : "xmark.seal.fill")
@@ -200,7 +200,7 @@ struct CustomAppSDKView: View {
     }
 
     @ViewBuilder
-    private func appValidationDetailSheet(_ app: ImportedSDKApp) -> some View {
+    private func appValidationDetailSheet(_ app: CustomAppSDKView.ImportedSDKApp) -> some View {
         List {
             Section("App Details") {
                 LabeledContent("Name", value: app.name)
@@ -229,7 +229,7 @@ struct CustomAppSDKView: View {
         }
     }
 
-    private func statusColor(_ status: ImportedSDKApp.AppStatus) -> Color {
+    private func statusColor(_ status: CustomAppSDKView.ImportedSDKApp.AppStatus) -> Color {
         switch status {
         case .pending: return .secondary
         case .validated: return .green
@@ -246,7 +246,7 @@ struct CustomAppSDKView: View {
         Task {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
             await MainActor.run {
-                let app = ImportedSDKApp(
+                let app = CustomAppSDKView.ImportedSDKApp(
                     name: "My Custom App",
                     version: "1.0.0",
                     sdkCompatibility: "2.0.0+",
@@ -272,12 +272,12 @@ struct CustomAppSDKView: View {
         simulateImport()
     }
 
-    private func validateApp(_ app: ImportedSDKApp) {
+    private func validateApp(_ app: CustomAppSDKView.ImportedSDKApp) {
         isValidating = true
         Task {
             try? await Task.sleep(nanoseconds: 800_000_000)
             await MainActor.run {
-                let result = ValidationResult(
+                let result = CustomAppSDKView.ValidationResult(
                     appName: app.name,
                     isCompatible: true,
                     sdkVersionMatch: true,
@@ -296,7 +296,7 @@ struct CustomAppSDKView: View {
         }
     }
 
-    private func registerApp(_ app: ImportedSDKApp) {
+    private func registerApp(_ app: CustomAppSDKView.ImportedSDKApp) {
         if let index = importedApps.firstIndex(where: { $0.id == app.id }) {
             importedApps[index].status = .registered
         }
@@ -307,7 +307,7 @@ struct CustomAppSDKView: View {
         ))
     }
 
-    private func executeApp(_ app: ImportedSDKApp) {
+    private func executeApp(_ app: CustomAppSDKView.ImportedSDKApp) {
         if let index = importedApps.firstIndex(where: { $0.id == app.id }) {
             importedApps[index].status = .running
         }

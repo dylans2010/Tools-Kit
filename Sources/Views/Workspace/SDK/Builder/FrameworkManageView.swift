@@ -78,7 +78,7 @@ struct FrameworkDescriptor: Identifiable, Codable, Hashable {
 struct FrameworkLogEntry: Identifiable, Codable, Hashable {
     let id: UUID
     let timestamp: Date
-    let level: LogLevel
+    let level: Self.LogLevel
     let message: String
 
     enum LogLevel: String, Codable {
