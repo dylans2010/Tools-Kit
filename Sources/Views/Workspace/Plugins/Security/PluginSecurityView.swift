@@ -4,7 +4,7 @@ import SwiftUI
 
 struct PluginSecurityView: View {
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var manager = PluginManager.shared
+    @StateObject private var manager = SDKPluginManager.shared
 
     @State private var permissions: [PluginSecurityPermission] = [
         PluginSecurityPermission(name: "Network Access", description: "Allow plugins to make external API calls.", isEnabled: true, icon: "network"),

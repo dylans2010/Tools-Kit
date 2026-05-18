@@ -3,7 +3,7 @@
 import SwiftUI
 
 struct MarketplaceView: View {
-    @StateObject private var manager = PluginManager.shared
+    @StateObject private var manager = SDKPluginManager.shared
     @StateObject private var sdkRuntime = PluginRuntimeEngine.shared
     @State private var searchText = ""
     @State private var selectedCategory: PluginCapability?

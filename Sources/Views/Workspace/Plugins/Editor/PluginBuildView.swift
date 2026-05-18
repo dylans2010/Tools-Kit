@@ -4,7 +4,7 @@ import SwiftUI
 
 struct PluginBuildView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var manager = PluginManager.shared
+    @StateObject private var manager = SDKPluginManager.shared
 
     // Identity
     @State private var name = ""

@@ -25,7 +25,7 @@ class MailAIService {
 
     private func processMailPrompt(
         prompt: String,
-        systemPrompt: String = MailAIToolsSystem.catchUpSystemPrompt
+        systemPrompt: String = ""
     ) async throws -> String {
         try await aiService.processText(
             prompt: prompt,
@@ -112,7 +112,7 @@ class MailAIService {
         let json = try await aiService.generateStructuredJSON(
             prompt: prompt,
             jsonSchema: schema,
-            systemPrompt: MailAIToolsSystem.prioritySystemPrompt
+            systemPrompt: ""
         )
 
         let decoded = try JSONDecoder().decode(PriorityDigestResponse.self, from: json.data(using: .utf8)!)
@@ -151,7 +151,7 @@ class MailAIService {
         Additional context for the reply:
         \(context)
         """
-        return try await processMailPrompt(prompt: prompt, systemPrompt: MailAIToolsSystem.draftingSystemPrompt)
+        return try await processMailPrompt(prompt: prompt, systemPrompt: "")
     }
 
     // MARK: - Advanced Intelligence

@@ -3,7 +3,7 @@
 import SwiftUI
 
 struct PluginsInstalledView: View {
-    @StateObject private var manager = PluginManager.shared
+    @StateObject private var manager = SDKPluginManager.shared
 
     var body: some View {
         List {
@@ -34,7 +34,7 @@ struct PluginsInstalledView: View {
 
 private struct PluginInstalledRow: View {
     let plugin: PluginDefinition
-    @ObservedObject var manager: PluginManager
+    @ObservedObject var manager: SDKPluginManager
 
     var body: some View {
         HStack(spacing: 12) {

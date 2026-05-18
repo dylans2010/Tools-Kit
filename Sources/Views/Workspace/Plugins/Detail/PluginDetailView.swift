@@ -4,7 +4,7 @@ import SwiftUI
 
 struct PluginDetailView: View {
     let pluginID: UUID
-    @StateObject private var manager = PluginManager.shared
+    @StateObject private var manager = SDKPluginManager.shared
     @Environment(\.dismiss) var dismiss
 
     private var plugin: PluginDefinition? {

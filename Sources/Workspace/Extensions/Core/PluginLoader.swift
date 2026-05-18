@@ -4,13 +4,13 @@ import Foundation
 final class PluginLoader {
     static let shared = PluginLoader()
 
-    private let pluginManager = PluginManager.shared
+    private let pluginManager = SDKPluginManager.shared
 
     private init() {}
 
     func loadAllPlugins() {
         print("[PluginLoader] Initializing plugin ecosystem...")
-        // PluginManager already loads in its init
+        // SDKPluginManager already loads in its init
 
         let plugins = pluginManager.installedPlugins
         for plugin in plugins where plugin.isEnabled {
