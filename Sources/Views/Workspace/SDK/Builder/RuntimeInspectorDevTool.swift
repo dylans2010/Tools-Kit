@@ -17,7 +17,7 @@ struct RuntimeInspectorView: View {
 
     var body: some View {
         let headerDescription = "Deeply inspect live objects, their property values, and internal states during execution."
-        VStack(spacing: 0) {
+        return VStack(spacing: 0) {
             DevToolHeader(
                 title: "Runtime Inspector",
                 description: headerDescription,
@@ -25,27 +25,39 @@ struct RuntimeInspectorView: View {
             )
             .padding()
 
-            List {
-                Section("Live Objects") {
-                    ForEach(viewModel.objects) { obj in
-                        NavigationLink {
-                            List {
-                                ForEach(obj.properties, id: \.key) { key, val in
-                                    LabeledContent(key, value: val)
-                                }
-                            }
-                            .navigationTitle(obj.name)
-                        } label: {
-                            HStack {
-                                Text(obj.name).font(.headline)
-                                Spacer()
-                                Text(obj.type).font(.caption).foregroundStyle(.secondary)
-                            }
-                        }
-                    }
+            objectsList
+        }
+    }
+
+    private var objectsList: some View {
+        List {
+            Section("Live Objects") {
+                ForEach(viewModel.objects) { object in
+                    objectRow(for: object)
                 }
             }
         }
+    }
+
+    private func objectRow(for object: RuntimeObject) -> some View {
+        NavigationLink {
+            objectPropertiesList(for: object)
+        } label: {
+            HStack {
+                Text(object.name).font(.headline)
+                Spacer()
+                Text(object.type).font(.caption).foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func objectPropertiesList(for object: RuntimeObject) -> some View {
+        List {
+            ForEach(Array(object.properties.sorted(by: { $0.key < $1.key })), id: \.key) { property in
+                LabeledContent(property.key, value: property.value)
+            }
+        }
+        .navigationTitle(object.name)
     }
 }
 
