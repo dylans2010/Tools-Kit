@@ -28,13 +28,13 @@ struct PluginSettingsView: View {
                 NavigationLink(destination: PluginSecurityView()) {
                     Label("Security Settings", systemImage: "lock.shield")
                 }
-                LabeledContent("Installed Plugins", value: "\(manager.installedPlugins.count)")
-                LabeledContent("Enabled Plugins", value: "\(manager.installedPlugins.filter(\.isEnabled).count)")
+                LabeledContent("Installed Plugins", value: "\(manager.plugins.count)")
+                LabeledContent("Enabled Plugins", value: "\(manager.plugins.filter(\.isEnabled).count)")
             }
 
             Section("Data") {
                 Button("Clear Plugin Cache") {
-                    manager.clearCache()
+                    // manager.clearCache() // TODO: unavailable on SDKPluginManager
                 }
                 Button("Reset All Plugin Settings", role: .destructive) {
                     showConfirmReset = true

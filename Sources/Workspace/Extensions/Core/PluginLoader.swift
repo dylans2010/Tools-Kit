@@ -12,7 +12,7 @@ final class PluginLoader {
         print("[PluginLoader] Initializing plugin ecosystem...")
         // SDKPluginManager already loads in its init
 
-        let plugins = pluginManager.installedPlugins
+        let plugins = pluginManager.plugins
         for plugin in plugins where plugin.isEnabled {
             registerPlugin(plugin)
         }
@@ -20,7 +20,7 @@ final class PluginLoader {
         print("[PluginLoader] \(plugins.count) plugins loaded and ready.")
     }
 
-    func registerPlugin(_ plugin: PluginDefinition) {
+    func registerPlugin(_ plugin: SDKPlugin) {
         print("[PluginLoader] Registered: \(plugin.name)")
     }
 }

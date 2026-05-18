@@ -14,14 +14,11 @@ struct MarketplaceView: View {
         case projects = "Projects"
     }
 
-    private var filteredPlugins: [PluginDefinition] {
-        manager.availablePlugins.filter { plugin in
+    private var filteredPlugins: [SDKPlugin] {
+        manager.plugins.filter { plugin in
             let matchesSearch = searchText.isEmpty ||
-                               plugin.name.localizedCaseInsensitiveContains(searchText) ||
-                               plugin.description.localizedCaseInsensitiveContains(searchText)
-            let matchesCategory = selectedCategory == nil ||
-                                 plugin.capabilities.contains(selectedCategory!)
-            return matchesSearch && matchesCategory
+                               plugin.name.localizedCaseInsensitiveContains(searchText)
+            return matchesSearch
         }
     }
 
@@ -37,8 +34,8 @@ struct MarketplaceView: View {
         List {
             Section {
                 MarketplaceStatHeader(
-                    available: manager.availablePlugins.count,
-                    installed: manager.installedPlugins.count,
+                    available: manager.plugins.count,
+                    installed: manager.plugins.count,
                     apps: sdkRuntime.loadedApps.count
                 )
             }
@@ -133,10 +130,10 @@ private struct FilterCategorySection: View {
 }
 
 struct MarketplacePluginRow: View {
-    let plugin: PluginDefinition
+    let plugin: SDKPlugin
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: plugin.icon)
+            Image(systemName: "puzzlepiece.extension") // TODO: icon unavailable on SDKPlugin
                 .font(.title3)
                 .foregroundStyle(Color.accentColor)
                 .frame(width: 44, height: 44)
@@ -145,15 +142,13 @@ struct MarketplacePluginRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
                     Text(plugin.name).font(.subheadline.bold())
-                    if plugin.isInstalled {
-                        Image(systemName: "checkmark.seal.fill").font(.caption2).foregroundStyle(.sdkSuccess)
-                    }
+                    Image(systemName: "checkmark.seal.fill").font(.caption2).foregroundStyle(.sdkSuccess) // All in 'plugins' are considered installed
                 }
-                Text(plugin.description).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+                Text("No description available").font(.caption2).foregroundStyle(.secondary).lineLimit(1) // TODO: description unavailable on SDKPlugin
                 HStack(spacing: 4) {
                     Text("v\(plugin.version)").monospaced()
                     Text("·")
-                    Text(plugin.author)
+                    Text("Unknown Author") // TODO: author unavailable on SDKPlugin
                 }.font(.system(size: 8, weight: .medium)).foregroundStyle(.tertiary)
             }
         }
