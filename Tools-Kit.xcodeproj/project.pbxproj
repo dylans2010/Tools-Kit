@@ -1239,6 +1239,80 @@
 		DV0200000000000000000012 /* SDKPermissionGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000012 /* SDKPermissionGate.swift */; };
 		DV0200000000000000000013 /* SDKSandboxController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000013 /* SDKSandboxController.swift */; };
 		DV0200000000000000000014 /* SDKNoSandboxOverrideController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000014 /* SDKNoSandboxOverrideController.swift */; };
+		DT020000000000000000001 /* APIResponseViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000001 /* APIResponseViewerDevTool.swift */; };
+		DT020000000000000000002 /* ASCIIHexConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000002 /* ASCIIHexConverterDevTool.swift */; };
+		DT020000000000000000003 /* AppStateInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000003 /* AppStateInspectorDevTool.swift */; };
+		DT020000000000000000004 /* Base64DecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000004 /* Base64DecoderDevTool.swift */; };
+		DT020000000000000000005 /* Base64EncoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000005 /* Base64EncoderDevTool.swift */; };
+		DT020000000000000000006 /* BatteryStatusDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000006 /* BatteryStatusDevTool.swift */; };
+		DT020000000000000000007 /* BezierCurveVisualizerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000007 /* BezierCurveVisualizerDevTool.swift */; };
+		DT020000000000000000008 /* BreakpointManagerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000008 /* BreakpointManagerDevTool.swift */; };
+		DT020000000000000000009 /* CPUMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000009 /* CPUMonitorDevTool.swift */; };
+		DT020000000000000000010 /* CSVParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000010 /* CSVParserDevTool.swift */; };
+		DT020000000000000000011 /* CacheViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000011 /* CacheViewerDevTool.swift */; };
+		DT020000000000000000012 /* ClipboardInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000012 /* ClipboardInspectorDevTool.swift */; };
+		DT020000000000000000013 /* ColorConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000013 /* ColorConverterDevTool.swift */; };
+		DT020000000000000000014 /* ColorMixerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000014 /* ColorMixerDevTool.swift */; };
+		DT020000000000000000015 /* ColorPaletteGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000015 /* ColorPaletteGeneratorDevTool.swift */; };
+		DT020000000000000000016 /* ContrastCheckerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000016 /* ContrastCheckerDevTool.swift */; };
+		DT020000000000000000017 /* CrashLogViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000017 /* CrashLogViewerDevTool.swift */; };
+		DT020000000000000000018 /* DNSLookupDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000018 /* DNSLookupDevTool.swift */; };
+		DT020000000000000000019 /* DateFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000019 /* DateFormatterDevTool.swift */; };
+		DT020000000000000000020 /* DevToolProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000020 /* DevToolProtocol.swift */; };
+		DT020000000000000000021 /* DevToolsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000021 /* DevToolsMainView.swift */; };
+		DT020000000000000000022 /* DeviceInfoDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000022 /* DeviceInfoDevTool.swift */; };
+		DT020000000000000000023 /* DiskUsageAnalyzerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000023 /* DiskUsageAnalyzerDevTool.swift */; };
+		DT020000000000000000024 /* EncryptionToolDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000024 /* EncryptionToolDevTool.swift */; };
+		DT020000000000000000025 /* EnergyImpactMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000025 /* EnergyImpactMonitorDevTool.swift */; };
+		DT020000000000000000026 /* FPSMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000026 /* FPSMonitorDevTool.swift */; };
+		DT020000000000000000027 /* FileExplorerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000027 /* FileExplorerDevTool.swift */; };
+		DT020000000000000000028 /* GradientBuilderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000028 /* GradientBuilderDevTool.swift */; };
+		DT020000000000000000029 /* HTMLEntityDecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000029 /* HTMLEntityDecoderDevTool.swift */; };
+		DT020000000000000000030 /* HTMLEntityEncoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000030 /* HTMLEntityEncoderDevTool.swift */; };
+		DT020000000000000000031 /* HTTPRequestTesterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000031 /* HTTPRequestTesterDevTool.swift */; };
+		DT020000000000000000032 /* HashGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000032 /* HashGeneratorDevTool.swift */; };
+		DT020000000000000000033 /* HeaderInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000033 /* HeaderInspectorDevTool.swift */; };
+		DT020000000000000000034 /* IPInfoDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000034 /* IPInfoDevTool.swift */; };
+		DT020000000000000000035 /* JSONDiffDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000035 /* JSONDiffDevTool.swift */; };
+		DT020000000000000000036 /* JSONFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000036 /* JSONFormatterDevTool.swift */; };
+		DT020000000000000000037 /* JSONValidatorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000037 /* JSONValidatorDevTool.swift */; };
+		DT020000000000000000038 /* JWTDecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000038 /* JWTDecoderDevTool.swift */; };
+		DT020000000000000000039 /* KeychainViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000039 /* KeychainViewerDevTool.swift */; };
+		DT020000000000000000040 /* LaunchTimeTrackerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000040 /* LaunchTimeTrackerDevTool.swift */; };
+		DT020000000000000000041 /* LayoutGridPreviewDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000041 /* LayoutGridPreviewDevTool.swift */; };
+		DT020000000000000000042 /* LogStreamViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000042 /* LogStreamViewerDevTool.swift */; };
+		DT020000000000000000043 /* LoremIpsumGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000043 /* LoremIpsumGeneratorDevTool.swift */; };
+		DT020000000000000000044 /* MarkdownPreviewDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000044 /* MarkdownPreviewDevTool.swift */; };
+		DT020000000000000000045 /* MemoryMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000045 /* MemoryMonitorDevTool.swift */; };
+		DT020000000000000000046 /* NetworkReachabilityDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000046 /* NetworkReachabilityDevTool.swift */; };
+		DT020000000000000000047 /* NumberFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000047 /* NumberFormatterDevTool.swift */; };
+		DT020000000000000000048 /* OSVersionInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000048 /* OSVersionInspectorDevTool.swift */; };
+		DT020000000000000000049 /* PermissionInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000049 /* PermissionInspectorDevTool.swift */; };
+		DT020000000000000000050 /* QueryStringParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000050 /* QueryStringParserDevTool.swift */; };
+		DT020000000000000000051 /* RegexTesterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000051 /* RegexTesterDevTool.swift */; };
+		DT020000000000000000052 /* RuntimeInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000052 /* RuntimeInspectorDevTool.swift */; };
+		DT020000000000000000053 /* SFSymbolsBrowserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000053 /* SFSymbolsBrowserDevTool.swift */; };
+		DT020000000000000000054 /* SQLiteBrowserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000054 /* SQLiteBrowserDevTool.swift */; };
+		DT020000000000000000055 /* ScriptRunnerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000055 /* ScriptRunnerDevTool.swift */; };
+		DT020000000000000000056 /* ShadowGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000056 /* ShadowGeneratorDevTool.swift */; };
+		DT020000000000000000057 /* TaskAutomationDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000057 /* TaskAutomationDevTool.swift */; };
+		DT020000000000000000058 /* TextCaseConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000058 /* TextCaseConverterDevTool.swift */; };
+		DT020000000000000000059 /* TextDiffDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000059 /* TextDiffDevTool.swift */; };
+		DT020000000000000000060 /* ThreadInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000060 /* ThreadInspectorDevTool.swift */; };
+		DT020000000000000000061 /* TimezoneConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000061 /* TimezoneConverterDevTool.swift */; };
+		DT020000000000000000062 /* TypographyScaleDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000062 /* TypographyScaleDevTool.swift */; };
+		DT020000000000000000063 /* URLDecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000063 /* URLDecoderDevTool.swift */; };
+		DT020000000000000000064 /* URLEncoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000064 /* URLEncoderDevTool.swift */; };
+		DT020000000000000000065 /* URLParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000065 /* URLParserDevTool.swift */; };
+		DT020000000000000000066 /* UUIDBulkGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000066 /* UUIDBulkGeneratorDevTool.swift */; };
+		DT020000000000000000067 /* UUIDGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000067 /* UUIDGeneratorDevTool.swift */; };
+		DT020000000000000000068 /* UnicodeInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000068 /* UnicodeInspectorDevTool.swift */; };
+		DT020000000000000000069 /* UserDefaultsInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000069 /* UserDefaultsInspectorDevTool.swift */; };
+		DT020000000000000000070 /* VerboseLoggerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000070 /* VerboseLoggerDevTool.swift */; };
+		DT020000000000000000071 /* ViewHierarchyInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000071 /* ViewHierarchyInspectorDevTool.swift */; };
+		DT020000000000000000072 /* WebSocketMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000072 /* WebSocketMonitorDevTool.swift */; };
+		DT020000000000000000073 /* XMLFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000073 /* XMLFormatterDevTool.swift */; };
+		DT020000000000000000074 /* YAMLParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000074 /* YAMLParserDevTool.swift */; };
 		PL020000000000000000000007 /* SDKBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000007 /* SDKBuildView.swift */; };
 		PL020000000000000000000008 /* SDKProjectDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000008 /* SDKProjectDashboardView.swift */; };
 		PL020000000000000000000009 /* SDKDeploymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000009 /* SDKDeploymentView.swift */; };
@@ -2695,6 +2769,80 @@
 		DV0100000000000000000012 /* SDKPermissionGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPermissionGate.swift; sourceTree = "<group>"; };
 		DV0100000000000000000013 /* SDKSandboxController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKSandboxController.swift; sourceTree = "<group>"; };
 		DV0100000000000000000014 /* SDKNoSandboxOverrideController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNoSandboxOverrideController.swift; sourceTree = "<group>"; };
+		DT010000000000000000001 /* APIResponseViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/APIResponseViewerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000002 /* ASCIIHexConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ASCIIHexConverterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000003 /* AppStateInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/AppStateInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000004 /* Base64DecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/Base64DecoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000005 /* Base64EncoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/Base64EncoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000006 /* BatteryStatusDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/BatteryStatusDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000007 /* BezierCurveVisualizerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/BezierCurveVisualizerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000008 /* BreakpointManagerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/BreakpointManagerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000009 /* CPUMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/CPUMonitorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000010 /* CSVParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/CSVParserDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000011 /* CacheViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/CacheViewerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000012 /* ClipboardInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ClipboardInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000013 /* ColorConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ColorConverterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000014 /* ColorMixerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ColorMixerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000015 /* ColorPaletteGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ColorPaletteGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000016 /* ContrastCheckerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ContrastCheckerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000017 /* CrashLogViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/CrashLogViewerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000018 /* DNSLookupDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/DNSLookupDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000019 /* DateFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/DateFormatterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000020 /* DevToolProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/DevToolProtocol.swift; sourceTree = "<group>"; };
+		DT010000000000000000021 /* DevToolsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/DevToolsMainView.swift; sourceTree = "<group>"; };
+		DT010000000000000000022 /* DeviceInfoDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/DeviceInfoDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000023 /* DiskUsageAnalyzerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/DiskUsageAnalyzerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000024 /* EncryptionToolDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/EncryptionToolDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000025 /* EnergyImpactMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/EnergyImpactMonitorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000026 /* FPSMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/FPSMonitorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000027 /* FileExplorerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/FileExplorerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000028 /* GradientBuilderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/GradientBuilderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000029 /* HTMLEntityDecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/HTMLEntityDecoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000030 /* HTMLEntityEncoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/HTMLEntityEncoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000031 /* HTTPRequestTesterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/HTTPRequestTesterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000032 /* HashGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/HashGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000033 /* HeaderInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/HeaderInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000034 /* IPInfoDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/IPInfoDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000035 /* JSONDiffDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/JSONDiffDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000036 /* JSONFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/JSONFormatterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000037 /* JSONValidatorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/JSONValidatorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000038 /* JWTDecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/JWTDecoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000039 /* KeychainViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/KeychainViewerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000040 /* LaunchTimeTrackerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/LaunchTimeTrackerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000041 /* LayoutGridPreviewDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/LayoutGridPreviewDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000042 /* LogStreamViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/LogStreamViewerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000043 /* LoremIpsumGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/LoremIpsumGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000044 /* MarkdownPreviewDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/MarkdownPreviewDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000045 /* MemoryMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/MemoryMonitorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000046 /* NetworkReachabilityDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/NetworkReachabilityDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000047 /* NumberFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/NumberFormatterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000048 /* OSVersionInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/OSVersionInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000049 /* PermissionInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/PermissionInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000050 /* QueryStringParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/QueryStringParserDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000051 /* RegexTesterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/RegexTesterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000052 /* RuntimeInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/RuntimeInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000053 /* SFSymbolsBrowserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/SFSymbolsBrowserDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000054 /* SQLiteBrowserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/SQLiteBrowserDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000055 /* ScriptRunnerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ScriptRunnerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000056 /* ShadowGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ShadowGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000057 /* TaskAutomationDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/TaskAutomationDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000058 /* TextCaseConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/TextCaseConverterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000059 /* TextDiffDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/TextDiffDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000060 /* ThreadInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ThreadInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000061 /* TimezoneConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/TimezoneConverterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000062 /* TypographyScaleDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/TypographyScaleDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000063 /* URLDecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/URLDecoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000064 /* URLEncoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/URLEncoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000065 /* URLParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/URLParserDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000066 /* UUIDBulkGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/UUIDBulkGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000067 /* UUIDGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/UUIDGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000068 /* UnicodeInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/UnicodeInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000069 /* UserDefaultsInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/UserDefaultsInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000070 /* VerboseLoggerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/VerboseLoggerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000071 /* ViewHierarchyInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ViewHierarchyInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000072 /* WebSocketMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/WebSocketMonitorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000073 /* XMLFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/XMLFormatterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000074 /* YAMLParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/YAMLParserDevTool.swift; sourceTree = "<group>"; };
 		PL010000000000000000000007 /* SDKBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKBuildView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000008 /* SDKProjectDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKProjectDashboardView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000009 /* SDKDeploymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deployment/SDKDeploymentView.swift; sourceTree = "<group>"; };
@@ -7530,16 +7678,172 @@
 			path = URLParser;
 			sourceTree = "<group>";
 		};
+		DT03000000000000000000 /* DevTools */ = {
+			isa = PBXGroup;
+			children = (
+				DT010000000000000000001 /* APIResponseViewerDevTool.swift */,
+				DT010000000000000000002 /* ASCIIHexConverterDevTool.swift */,
+				DT010000000000000000003 /* AppStateInspectorDevTool.swift */,
+				DT010000000000000000004 /* Base64DecoderDevTool.swift */,
+				DT010000000000000000005 /* Base64EncoderDevTool.swift */,
+				DT010000000000000000006 /* BatteryStatusDevTool.swift */,
+				DT010000000000000000007 /* BezierCurveVisualizerDevTool.swift */,
+				DT010000000000000000008 /* BreakpointManagerDevTool.swift */,
+				DT010000000000000000009 /* CPUMonitorDevTool.swift */,
+				DT010000000000000000010 /* CSVParserDevTool.swift */,
+				DT010000000000000000011 /* CacheViewerDevTool.swift */,
+				DT010000000000000000012 /* ClipboardInspectorDevTool.swift */,
+				DT010000000000000000013 /* ColorConverterDevTool.swift */,
+				DT010000000000000000014 /* ColorMixerDevTool.swift */,
+				DT010000000000000000015 /* ColorPaletteGeneratorDevTool.swift */,
+				DT010000000000000000016 /* ContrastCheckerDevTool.swift */,
+				DT010000000000000000017 /* CrashLogViewerDevTool.swift */,
+				DT010000000000000000018 /* DNSLookupDevTool.swift */,
+				DT010000000000000000019 /* DateFormatterDevTool.swift */,
+				DT010000000000000000020 /* DevToolProtocol.swift */,
+				DT010000000000000000021 /* DevToolsMainView.swift */,
+				DT010000000000000000022 /* DeviceInfoDevTool.swift */,
+				DT010000000000000000023 /* DiskUsageAnalyzerDevTool.swift */,
+				DT010000000000000000024 /* EncryptionToolDevTool.swift */,
+				DT010000000000000000025 /* EnergyImpactMonitorDevTool.swift */,
+				DT010000000000000000026 /* FPSMonitorDevTool.swift */,
+				DT010000000000000000027 /* FileExplorerDevTool.swift */,
+				DT010000000000000000028 /* GradientBuilderDevTool.swift */,
+				DT010000000000000000029 /* HTMLEntityDecoderDevTool.swift */,
+				DT010000000000000000030 /* HTMLEntityEncoderDevTool.swift */,
+				DT010000000000000000031 /* HTTPRequestTesterDevTool.swift */,
+				DT010000000000000000032 /* HashGeneratorDevTool.swift */,
+				DT010000000000000000033 /* HeaderInspectorDevTool.swift */,
+				DT010000000000000000034 /* IPInfoDevTool.swift */,
+				DT010000000000000000035 /* JSONDiffDevTool.swift */,
+				DT010000000000000000036 /* JSONFormatterDevTool.swift */,
+				DT010000000000000000037 /* JSONValidatorDevTool.swift */,
+				DT010000000000000000038 /* JWTDecoderDevTool.swift */,
+				DT010000000000000000039 /* KeychainViewerDevTool.swift */,
+				DT010000000000000000040 /* LaunchTimeTrackerDevTool.swift */,
+				DT010000000000000000041 /* LayoutGridPreviewDevTool.swift */,
+				DT010000000000000000042 /* LogStreamViewerDevTool.swift */,
+				DT010000000000000000043 /* LoremIpsumGeneratorDevTool.swift */,
+				DT010000000000000000044 /* MarkdownPreviewDevTool.swift */,
+				DT010000000000000000045 /* MemoryMonitorDevTool.swift */,
+				DT010000000000000000046 /* NetworkReachabilityDevTool.swift */,
+				DT010000000000000000047 /* NumberFormatterDevTool.swift */,
+				DT010000000000000000048 /* OSVersionInspectorDevTool.swift */,
+				DT010000000000000000049 /* PermissionInspectorDevTool.swift */,
+				DT010000000000000000050 /* QueryStringParserDevTool.swift */,
+				DT010000000000000000051 /* RegexTesterDevTool.swift */,
+				DT010000000000000000052 /* RuntimeInspectorDevTool.swift */,
+				DT010000000000000000053 /* SFSymbolsBrowserDevTool.swift */,
+				DT010000000000000000054 /* SQLiteBrowserDevTool.swift */,
+				DT010000000000000000055 /* ScriptRunnerDevTool.swift */,
+				DT010000000000000000056 /* ShadowGeneratorDevTool.swift */,
+				DT010000000000000000057 /* TaskAutomationDevTool.swift */,
+				DT010000000000000000058 /* TextCaseConverterDevTool.swift */,
+				DT010000000000000000059 /* TextDiffDevTool.swift */,
+				DT010000000000000000060 /* ThreadInspectorDevTool.swift */,
+				DT010000000000000000061 /* TimezoneConverterDevTool.swift */,
+				DT010000000000000000062 /* TypographyScaleDevTool.swift */,
+				DT010000000000000000063 /* URLDecoderDevTool.swift */,
+				DT010000000000000000064 /* URLEncoderDevTool.swift */,
+				DT010000000000000000065 /* URLParserDevTool.swift */,
+				DT010000000000000000066 /* UUIDBulkGeneratorDevTool.swift */,
+				DT010000000000000000067 /* UUIDGeneratorDevTool.swift */,
+				DT010000000000000000068 /* UnicodeInspectorDevTool.swift */,
+				DT010000000000000000069 /* UserDefaultsInspectorDevTool.swift */,
+				DT010000000000000000070 /* VerboseLoggerDevTool.swift */,
+				DT010000000000000000071 /* ViewHierarchyInspectorDevTool.swift */,
+				DT010000000000000000072 /* WebSocketMonitorDevTool.swift */,
+				DT010000000000000000073 /* XMLFormatterDevTool.swift */,
+				DT010000000000000000074 /* YAMLParserDevTool.swift */,
+			);
+			path = DevTools;
+			sourceTree = "<group>";
+		};
 		C61258594D3446E9B05A3F73 /* SDK */ = {
 			isa = PBXGroup;
 			children = (
+				DT03000000000000000000 /* DevTools */,
 				06C00EFEC47F4EFA82E82DD7 /* SDKLogsView.swift */,
 				57F836A766414E69B1E15432 /* SDKPluginsView.swift */,
 				73D12F91040E4F5EBF1520B1 /* SDKToolsView.swift */,
 				862B9D21ECC745D8AB7D01C3 /* SDKDiagnosticsView.swift */,
 				94F7CA9EB7294F5194434142 /* SDKAppBuilderView.swift */,
 				D09A5B508388459689A2623D /* SDKAutomationView.swift */,
-				PL010000000000000000000007 /* SDKBuildView.swift */,
+				DT010000000000000000001 /* APIResponseViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/APIResponseViewerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000002 /* ASCIIHexConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ASCIIHexConverterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000003 /* AppStateInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/AppStateInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000004 /* Base64DecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/Base64DecoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000005 /* Base64EncoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/Base64EncoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000006 /* BatteryStatusDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/BatteryStatusDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000007 /* BezierCurveVisualizerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/BezierCurveVisualizerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000008 /* BreakpointManagerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/BreakpointManagerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000009 /* CPUMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/CPUMonitorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000010 /* CSVParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/CSVParserDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000011 /* CacheViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/CacheViewerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000012 /* ClipboardInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ClipboardInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000013 /* ColorConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ColorConverterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000014 /* ColorMixerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ColorMixerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000015 /* ColorPaletteGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ColorPaletteGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000016 /* ContrastCheckerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ContrastCheckerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000017 /* CrashLogViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/CrashLogViewerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000018 /* DNSLookupDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/DNSLookupDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000019 /* DateFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/DateFormatterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000020 /* DevToolProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/DevToolProtocol.swift; sourceTree = "<group>"; };
+		DT010000000000000000021 /* DevToolsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/DevToolsMainView.swift; sourceTree = "<group>"; };
+		DT010000000000000000022 /* DeviceInfoDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/DeviceInfoDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000023 /* DiskUsageAnalyzerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/DiskUsageAnalyzerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000024 /* EncryptionToolDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/EncryptionToolDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000025 /* EnergyImpactMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/EnergyImpactMonitorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000026 /* FPSMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/FPSMonitorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000027 /* FileExplorerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/FileExplorerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000028 /* GradientBuilderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/GradientBuilderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000029 /* HTMLEntityDecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/HTMLEntityDecoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000030 /* HTMLEntityEncoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/HTMLEntityEncoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000031 /* HTTPRequestTesterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/HTTPRequestTesterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000032 /* HashGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/HashGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000033 /* HeaderInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/HeaderInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000034 /* IPInfoDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/IPInfoDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000035 /* JSONDiffDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/JSONDiffDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000036 /* JSONFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/JSONFormatterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000037 /* JSONValidatorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/JSONValidatorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000038 /* JWTDecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/JWTDecoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000039 /* KeychainViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/KeychainViewerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000040 /* LaunchTimeTrackerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/LaunchTimeTrackerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000041 /* LayoutGridPreviewDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/LayoutGridPreviewDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000042 /* LogStreamViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/LogStreamViewerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000043 /* LoremIpsumGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/LoremIpsumGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000044 /* MarkdownPreviewDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/MarkdownPreviewDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000045 /* MemoryMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/MemoryMonitorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000046 /* NetworkReachabilityDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/NetworkReachabilityDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000047 /* NumberFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/NumberFormatterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000048 /* OSVersionInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/OSVersionInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000049 /* PermissionInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/PermissionInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000050 /* QueryStringParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/QueryStringParserDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000051 /* RegexTesterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/RegexTesterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000052 /* RuntimeInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/RuntimeInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000053 /* SFSymbolsBrowserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/SFSymbolsBrowserDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000054 /* SQLiteBrowserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/SQLiteBrowserDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000055 /* ScriptRunnerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ScriptRunnerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000056 /* ShadowGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ShadowGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000057 /* TaskAutomationDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/TaskAutomationDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000058 /* TextCaseConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/TextCaseConverterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000059 /* TextDiffDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/TextDiffDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000060 /* ThreadInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ThreadInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000061 /* TimezoneConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/TimezoneConverterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000062 /* TypographyScaleDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/TypographyScaleDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000063 /* URLDecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/URLDecoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000064 /* URLEncoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/URLEncoderDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000065 /* URLParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/URLParserDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000066 /* UUIDBulkGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/UUIDBulkGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000067 /* UUIDGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/UUIDGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000068 /* UnicodeInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/UnicodeInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000069 /* UserDefaultsInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/UserDefaultsInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000070 /* VerboseLoggerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/VerboseLoggerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000071 /* ViewHierarchyInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/ViewHierarchyInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000072 /* WebSocketMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/WebSocketMonitorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000073 /* XMLFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/XMLFormatterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000074 /* YAMLParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTools/YAMLParserDevTool.swift; sourceTree = "<group>"; };
+		PL010000000000000000000007 /* SDKBuildView.swift */,
 				PL010000000000000000000008 /* SDKProjectDashboardView.swift */,
 				PL010000000000000000000009 /* SDKDeploymentView.swift */,
 				PL01000000000000000000000A /* SDKSystemExplorerView.swift */,
@@ -11311,7 +11615,81 @@
 				DV0200000000000000000012 /* SDKPermissionGate.swift in Sources */,
 				DV0200000000000000000013 /* SDKSandboxController.swift in Sources */,
 				DV0200000000000000000014 /* SDKNoSandboxOverrideController.swift in Sources */,
-				PL020000000000000000000007 /* SDKBuildView.swift in Sources */,
+				DT020000000000000000001 /* APIResponseViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000001 /* APIResponseViewerDevTool.swift */; };
+		DT020000000000000000002 /* ASCIIHexConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000002 /* ASCIIHexConverterDevTool.swift */; };
+		DT020000000000000000003 /* AppStateInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000003 /* AppStateInspectorDevTool.swift */; };
+		DT020000000000000000004 /* Base64DecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000004 /* Base64DecoderDevTool.swift */; };
+		DT020000000000000000005 /* Base64EncoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000005 /* Base64EncoderDevTool.swift */; };
+		DT020000000000000000006 /* BatteryStatusDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000006 /* BatteryStatusDevTool.swift */; };
+		DT020000000000000000007 /* BezierCurveVisualizerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000007 /* BezierCurveVisualizerDevTool.swift */; };
+		DT020000000000000000008 /* BreakpointManagerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000008 /* BreakpointManagerDevTool.swift */; };
+		DT020000000000000000009 /* CPUMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000009 /* CPUMonitorDevTool.swift */; };
+		DT020000000000000000010 /* CSVParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000010 /* CSVParserDevTool.swift */; };
+		DT020000000000000000011 /* CacheViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000011 /* CacheViewerDevTool.swift */; };
+		DT020000000000000000012 /* ClipboardInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000012 /* ClipboardInspectorDevTool.swift */; };
+		DT020000000000000000013 /* ColorConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000013 /* ColorConverterDevTool.swift */; };
+		DT020000000000000000014 /* ColorMixerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000014 /* ColorMixerDevTool.swift */; };
+		DT020000000000000000015 /* ColorPaletteGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000015 /* ColorPaletteGeneratorDevTool.swift */; };
+		DT020000000000000000016 /* ContrastCheckerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000016 /* ContrastCheckerDevTool.swift */; };
+		DT020000000000000000017 /* CrashLogViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000017 /* CrashLogViewerDevTool.swift */; };
+		DT020000000000000000018 /* DNSLookupDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000018 /* DNSLookupDevTool.swift */; };
+		DT020000000000000000019 /* DateFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000019 /* DateFormatterDevTool.swift */; };
+		DT020000000000000000020 /* DevToolProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000020 /* DevToolProtocol.swift */; };
+		DT020000000000000000021 /* DevToolsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000021 /* DevToolsMainView.swift */; };
+		DT020000000000000000022 /* DeviceInfoDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000022 /* DeviceInfoDevTool.swift */; };
+		DT020000000000000000023 /* DiskUsageAnalyzerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000023 /* DiskUsageAnalyzerDevTool.swift */; };
+		DT020000000000000000024 /* EncryptionToolDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000024 /* EncryptionToolDevTool.swift */; };
+		DT020000000000000000025 /* EnergyImpactMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000025 /* EnergyImpactMonitorDevTool.swift */; };
+		DT020000000000000000026 /* FPSMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000026 /* FPSMonitorDevTool.swift */; };
+		DT020000000000000000027 /* FileExplorerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000027 /* FileExplorerDevTool.swift */; };
+		DT020000000000000000028 /* GradientBuilderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000028 /* GradientBuilderDevTool.swift */; };
+		DT020000000000000000029 /* HTMLEntityDecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000029 /* HTMLEntityDecoderDevTool.swift */; };
+		DT020000000000000000030 /* HTMLEntityEncoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000030 /* HTMLEntityEncoderDevTool.swift */; };
+		DT020000000000000000031 /* HTTPRequestTesterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000031 /* HTTPRequestTesterDevTool.swift */; };
+		DT020000000000000000032 /* HashGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000032 /* HashGeneratorDevTool.swift */; };
+		DT020000000000000000033 /* HeaderInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000033 /* HeaderInspectorDevTool.swift */; };
+		DT020000000000000000034 /* IPInfoDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000034 /* IPInfoDevTool.swift */; };
+		DT020000000000000000035 /* JSONDiffDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000035 /* JSONDiffDevTool.swift */; };
+		DT020000000000000000036 /* JSONFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000036 /* JSONFormatterDevTool.swift */; };
+		DT020000000000000000037 /* JSONValidatorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000037 /* JSONValidatorDevTool.swift */; };
+		DT020000000000000000038 /* JWTDecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000038 /* JWTDecoderDevTool.swift */; };
+		DT020000000000000000039 /* KeychainViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000039 /* KeychainViewerDevTool.swift */; };
+		DT020000000000000000040 /* LaunchTimeTrackerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000040 /* LaunchTimeTrackerDevTool.swift */; };
+		DT020000000000000000041 /* LayoutGridPreviewDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000041 /* LayoutGridPreviewDevTool.swift */; };
+		DT020000000000000000042 /* LogStreamViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000042 /* LogStreamViewerDevTool.swift */; };
+		DT020000000000000000043 /* LoremIpsumGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000043 /* LoremIpsumGeneratorDevTool.swift */; };
+		DT020000000000000000044 /* MarkdownPreviewDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000044 /* MarkdownPreviewDevTool.swift */; };
+		DT020000000000000000045 /* MemoryMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000045 /* MemoryMonitorDevTool.swift */; };
+		DT020000000000000000046 /* NetworkReachabilityDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000046 /* NetworkReachabilityDevTool.swift */; };
+		DT020000000000000000047 /* NumberFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000047 /* NumberFormatterDevTool.swift */; };
+		DT020000000000000000048 /* OSVersionInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000048 /* OSVersionInspectorDevTool.swift */; };
+		DT020000000000000000049 /* PermissionInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000049 /* PermissionInspectorDevTool.swift */; };
+		DT020000000000000000050 /* QueryStringParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000050 /* QueryStringParserDevTool.swift */; };
+		DT020000000000000000051 /* RegexTesterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000051 /* RegexTesterDevTool.swift */; };
+		DT020000000000000000052 /* RuntimeInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000052 /* RuntimeInspectorDevTool.swift */; };
+		DT020000000000000000053 /* SFSymbolsBrowserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000053 /* SFSymbolsBrowserDevTool.swift */; };
+		DT020000000000000000054 /* SQLiteBrowserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000054 /* SQLiteBrowserDevTool.swift */; };
+		DT020000000000000000055 /* ScriptRunnerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000055 /* ScriptRunnerDevTool.swift */; };
+		DT020000000000000000056 /* ShadowGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000056 /* ShadowGeneratorDevTool.swift */; };
+		DT020000000000000000057 /* TaskAutomationDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000057 /* TaskAutomationDevTool.swift */; };
+		DT020000000000000000058 /* TextCaseConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000058 /* TextCaseConverterDevTool.swift */; };
+		DT020000000000000000059 /* TextDiffDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000059 /* TextDiffDevTool.swift */; };
+		DT020000000000000000060 /* ThreadInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000060 /* ThreadInspectorDevTool.swift */; };
+		DT020000000000000000061 /* TimezoneConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000061 /* TimezoneConverterDevTool.swift */; };
+		DT020000000000000000062 /* TypographyScaleDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000062 /* TypographyScaleDevTool.swift */; };
+		DT020000000000000000063 /* URLDecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000063 /* URLDecoderDevTool.swift */; };
+		DT020000000000000000064 /* URLEncoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000064 /* URLEncoderDevTool.swift */; };
+		DT020000000000000000065 /* URLParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000065 /* URLParserDevTool.swift */; };
+		DT020000000000000000066 /* UUIDBulkGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000066 /* UUIDBulkGeneratorDevTool.swift */; };
+		DT020000000000000000067 /* UUIDGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000067 /* UUIDGeneratorDevTool.swift */; };
+		DT020000000000000000068 /* UnicodeInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000068 /* UnicodeInspectorDevTool.swift */; };
+		DT020000000000000000069 /* UserDefaultsInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000069 /* UserDefaultsInspectorDevTool.swift */; };
+		DT020000000000000000070 /* VerboseLoggerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000070 /* VerboseLoggerDevTool.swift */; };
+		DT020000000000000000071 /* ViewHierarchyInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000071 /* ViewHierarchyInspectorDevTool.swift */; };
+		DT020000000000000000072 /* WebSocketMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000072 /* WebSocketMonitorDevTool.swift */; };
+		DT020000000000000000073 /* XMLFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000073 /* XMLFormatterDevTool.swift */; };
+		DT020000000000000000074 /* YAMLParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000074 /* YAMLParserDevTool.swift */; };
+		PL020000000000000000000007 /* SDKBuildView.swift in Sources */,
 				PL020000000000000000000008 /* SDKProjectDashboardView.swift in Sources */,
 				PL020000000000000000000009 /* SDKDeploymentView.swift in Sources */,
 				PL02000000000000000000000A /* SDKSystemExplorerView.swift in Sources */,
@@ -11376,6 +11754,80 @@
 				D2493764F3B55CB73F0BCC14 /* SDKPluginRegistryView.swift in Sources */,
 				A635DCE822B6300B2142EE01 /* SDKConnectorHealthView.swift in Sources */,
 				C0B0B0B0B0B0B0B0B0B0B003 /* Color+Hex.swift in Sources */,
+				DT020000000000000000001 /* APIResponseViewerDevTool.swift in Sources */,
+				DT020000000000000000002 /* ASCIIHexConverterDevTool.swift in Sources */,
+				DT020000000000000000003 /* AppStateInspectorDevTool.swift in Sources */,
+				DT020000000000000000004 /* Base64DecoderDevTool.swift in Sources */,
+				DT020000000000000000005 /* Base64EncoderDevTool.swift in Sources */,
+				DT020000000000000000006 /* BatteryStatusDevTool.swift in Sources */,
+				DT020000000000000000007 /* BezierCurveVisualizerDevTool.swift in Sources */,
+				DT020000000000000000008 /* BreakpointManagerDevTool.swift in Sources */,
+				DT020000000000000000009 /* CPUMonitorDevTool.swift in Sources */,
+				DT020000000000000000010 /* CSVParserDevTool.swift in Sources */,
+				DT020000000000000000011 /* CacheViewerDevTool.swift in Sources */,
+				DT020000000000000000012 /* ClipboardInspectorDevTool.swift in Sources */,
+				DT020000000000000000013 /* ColorConverterDevTool.swift in Sources */,
+				DT020000000000000000014 /* ColorMixerDevTool.swift in Sources */,
+				DT020000000000000000015 /* ColorPaletteGeneratorDevTool.swift in Sources */,
+				DT020000000000000000016 /* ContrastCheckerDevTool.swift in Sources */,
+				DT020000000000000000017 /* CrashLogViewerDevTool.swift in Sources */,
+				DT020000000000000000018 /* DNSLookupDevTool.swift in Sources */,
+				DT020000000000000000019 /* DateFormatterDevTool.swift in Sources */,
+				DT020000000000000000020 /* DevToolProtocol.swift in Sources */,
+				DT020000000000000000021 /* DevToolsMainView.swift in Sources */,
+				DT020000000000000000022 /* DeviceInfoDevTool.swift in Sources */,
+				DT020000000000000000023 /* DiskUsageAnalyzerDevTool.swift in Sources */,
+				DT020000000000000000024 /* EncryptionToolDevTool.swift in Sources */,
+				DT020000000000000000025 /* EnergyImpactMonitorDevTool.swift in Sources */,
+				DT020000000000000000026 /* FPSMonitorDevTool.swift in Sources */,
+				DT020000000000000000027 /* FileExplorerDevTool.swift in Sources */,
+				DT020000000000000000028 /* GradientBuilderDevTool.swift in Sources */,
+				DT020000000000000000029 /* HTMLEntityDecoderDevTool.swift in Sources */,
+				DT020000000000000000030 /* HTMLEntityEncoderDevTool.swift in Sources */,
+				DT020000000000000000031 /* HTTPRequestTesterDevTool.swift in Sources */,
+				DT020000000000000000032 /* HashGeneratorDevTool.swift in Sources */,
+				DT020000000000000000033 /* HeaderInspectorDevTool.swift in Sources */,
+				DT020000000000000000034 /* IPInfoDevTool.swift in Sources */,
+				DT020000000000000000035 /* JSONDiffDevTool.swift in Sources */,
+				DT020000000000000000036 /* JSONFormatterDevTool.swift in Sources */,
+				DT020000000000000000037 /* JSONValidatorDevTool.swift in Sources */,
+				DT020000000000000000038 /* JWTDecoderDevTool.swift in Sources */,
+				DT020000000000000000039 /* KeychainViewerDevTool.swift in Sources */,
+				DT020000000000000000040 /* LaunchTimeTrackerDevTool.swift in Sources */,
+				DT020000000000000000041 /* LayoutGridPreviewDevTool.swift in Sources */,
+				DT020000000000000000042 /* LogStreamViewerDevTool.swift in Sources */,
+				DT020000000000000000043 /* LoremIpsumGeneratorDevTool.swift in Sources */,
+				DT020000000000000000044 /* MarkdownPreviewDevTool.swift in Sources */,
+				DT020000000000000000045 /* MemoryMonitorDevTool.swift in Sources */,
+				DT020000000000000000046 /* NetworkReachabilityDevTool.swift in Sources */,
+				DT020000000000000000047 /* NumberFormatterDevTool.swift in Sources */,
+				DT020000000000000000048 /* OSVersionInspectorDevTool.swift in Sources */,
+				DT020000000000000000049 /* PermissionInspectorDevTool.swift in Sources */,
+				DT020000000000000000050 /* QueryStringParserDevTool.swift in Sources */,
+				DT020000000000000000051 /* RegexTesterDevTool.swift in Sources */,
+				DT020000000000000000052 /* RuntimeInspectorDevTool.swift in Sources */,
+				DT020000000000000000053 /* SFSymbolsBrowserDevTool.swift in Sources */,
+				DT020000000000000000054 /* SQLiteBrowserDevTool.swift in Sources */,
+				DT020000000000000000055 /* ScriptRunnerDevTool.swift in Sources */,
+				DT020000000000000000056 /* ShadowGeneratorDevTool.swift in Sources */,
+				DT020000000000000000057 /* TaskAutomationDevTool.swift in Sources */,
+				DT020000000000000000058 /* TextCaseConverterDevTool.swift in Sources */,
+				DT020000000000000000059 /* TextDiffDevTool.swift in Sources */,
+				DT020000000000000000060 /* ThreadInspectorDevTool.swift in Sources */,
+				DT020000000000000000061 /* TimezoneConverterDevTool.swift in Sources */,
+				DT020000000000000000062 /* TypographyScaleDevTool.swift in Sources */,
+				DT020000000000000000063 /* URLDecoderDevTool.swift in Sources */,
+				DT020000000000000000064 /* URLEncoderDevTool.swift in Sources */,
+				DT020000000000000000065 /* URLParserDevTool.swift in Sources */,
+				DT020000000000000000066 /* UUIDBulkGeneratorDevTool.swift in Sources */,
+				DT020000000000000000067 /* UUIDGeneratorDevTool.swift in Sources */,
+				DT020000000000000000068 /* UnicodeInspectorDevTool.swift in Sources */,
+				DT020000000000000000069 /* UserDefaultsInspectorDevTool.swift in Sources */,
+				DT020000000000000000070 /* VerboseLoggerDevTool.swift in Sources */,
+				DT020000000000000000071 /* ViewHierarchyInspectorDevTool.swift in Sources */,
+				DT020000000000000000072 /* WebSocketMonitorDevTool.swift in Sources */,
+				DT020000000000000000073 /* XMLFormatterDevTool.swift in Sources */,
+				DT020000000000000000074 /* YAMLParserDevTool.swift in Sources */,
 				04494BFF858161E110044905 /* SDKConnectorMetricsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

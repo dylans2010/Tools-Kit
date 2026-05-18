@@ -266,6 +266,9 @@ struct SDKBuildView: View {
 
     private var sdkSystemsSection: some View {
         Section {
+            NavigationLink(destination: DevToolsMainView()) {
+                Label("Dev Tools", systemImage: "wrench.and.screwdriver.fill")
+            }
             NavigationLink("SDK Download & Export", destination: SDKDownloadView())
             NavigationLink("Import Custom App", destination: CustomAppSDKView())
             NavigationLink("AI Help Assistant", destination: SDKHelpView())
