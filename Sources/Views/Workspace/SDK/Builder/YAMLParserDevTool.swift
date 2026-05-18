@@ -4,8 +4,8 @@ struct YAMLParserDevTool: DevTool {
     let id = "yaml-parser"
     let name = "YAML Parser"
     let category = DevToolCategory.data
-    let icon = "doc.text.fill"
-    let description = "Parse YAML into JSON"
+    let icon = "text.badge.star"
+    let description = "Parse YAML and convert to JSON"
 
     func render() -> some View {
         YAMLParserView()
@@ -16,48 +16,56 @@ struct YAMLParserView: View {
     @StateObject private var viewModel = YAMLParserViewModel()
 
     var body: some View {
-        Form {
-            Section("YAML Input") {
-                TextEditor(text: $viewModel.inputText)
-                    .frame(height: 150)
-                    .font(.monospaced(.body)())
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "YAML Parser",
+                description: "Inspect YAML documents and convert them to JSON format for better compatibility.",
+                icon: "text.badge.star"
+            )
+            .padding()
 
-            Section("Parsed JSON (Simple)") {
-                Text(viewModel.outputText)
-                    .font(.monospaced(.body)())
-                    .textSelection(.enabled)
+            Form {
+                Section("YAML Input") {
+                    TextEditor(text: $viewModel.input)
+                        .frame(height: 150)
+                        .font(.system(.caption, design: .monospaced))
+                }
 
-                Text("Note: Basic line-based YAML parsing implementation.")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                Section("JSON Output") {
+                    JSONView(json: viewModel.output)
+                        .frame(minHeight: 200)
+
+                    ExportPanel(content: viewModel.output, filename: "converted.json")
+                }
             }
         }
     }
 }
 
 class YAMLParserViewModel: ObservableObject {
-    @Published var inputText = "" {
-        didSet {
-            parse()
-        }
+    @Published var input = "name: SDK\nversion: 2.0\nfeatures:\n  - monitoring\n  - debugging" {
+        didSet { parse() }
     }
-    @Published var outputText = ""
+    @Published var output = ""
 
     private func parse() {
-        var dict: [String: String] = [:]
-        let lines = inputText.components(separatedBy: .newlines)
+        // Simple manual YAML-to-JSON conversion for basic structures
+        // In a real app, use a YAMLLib
+        var result = "{\n"
+        let lines = input.components(separatedBy: .newlines)
         for line in lines {
-            let parts = line.components(separatedBy: ":")
+            let parts = line.split(separator: ":", maxSplits: 1)
             if parts.count == 2 {
-                dict[parts[0].trimmingCharacters(in: .whitespaces)] = parts[1].trimmingCharacters(in: .whitespaces)
+                let key = parts[0].trimmingCharacters(in: .whitespaces)
+                let val = parts[1].trimmingCharacters(in: .whitespaces)
+                result += "  \"\(key)\": \"\(val)\",\n"
             }
         }
-
-        if let data = try? JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted) {
-            outputText = String(data: data, encoding: .utf8) ?? "{}"
-        } else {
-            outputText = "{}"
+        if result.hasSuffix(",\n") {
+            result.removeLast(2)
+            result += "\n"
         }
+        result += "}"
+        output = result
     }
 }

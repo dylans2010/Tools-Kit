@@ -4,8 +4,8 @@ struct JSONFormatterDevTool: DevTool {
     let id = "json-formatter"
     let name = "JSON Formatter"
     let category = DevToolCategory.data
-    let icon = "curlybraces"
-    let description = "Prettify and format JSON strings"
+    let icon = "text.badge.checkmark"
+    let description = "Prettify and minify JSON data"
 
     func render() -> some View {
         JSONFormatterView()
@@ -16,62 +16,71 @@ struct JSONFormatterView: View {
     @StateObject private var viewModel = JSONFormatterViewModel()
 
     var body: some View {
-        Form {
-            Section("JSON Input") {
-                TextEditor(text: $viewModel.inputText)
-                    .frame(height: 150)
-                    .font(.monospaced(.body)())
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "JSON Formatter",
+                description: "Clean up messy JSON, minify it for transmission, or format it for readability.",
+                icon: "text.badge.checkmark"
+            )
+            .padding()
 
-            Section("Formatted Output") {
-                if let error = viewModel.errorMessage {
-                    Text(error)
-                        .foregroundStyle(.red)
-                } else {
-                    Text(viewModel.outputText)
-                        .font(.monospaced(.body)())
-                        .textSelection(.enabled)
+            Form {
+                Section("Input") {
+                    TextEditor(text: $viewModel.input)
+                        .frame(height: 150)
+                        .font(.system(.caption, design: .monospaced))
+                }
 
-                    Button {
-                        UIPasteboard.general.string = viewModel.outputText
-                    } label: {
-                        Label("Copy to Clipboard", systemImage: "doc.on.doc")
+                Section("Options") {
+                    Picker("Format", selection: $viewModel.formatType) {
+                        Text("Prettify").tag(JSONFormatType.prettify)
+                        Text("Minify").tag(JSONFormatType.minify)
                     }
-                    .disabled(viewModel.outputText.isEmpty)
+                    .pickerStyle(.segmented)
+
+                    Stepper("Indentation: \(viewModel.indentSize)", value: $viewModel.indentSize, in: 1...8)
+                        .disabled(viewModel.formatType == .minify)
+                }
+
+                Section("Output") {
+                    JSONView(json: viewModel.output)
+                        .frame(minHeight: 200)
+
+                    ExportPanel(content: viewModel.output, filename: "formatted.json")
                 }
             }
         }
     }
 }
 
+enum JSONFormatType {
+    case prettify, minify
+}
+
 class JSONFormatterViewModel: ObservableObject {
-    @Published var inputText = "" {
-        didSet {
-            format()
-        }
+    @Published var input = "{\"id\":1,\"name\":\"Test\",\"tags\":[\"swift\",\"ios\"]}" {
+        didSet { process() }
     }
-    @Published var outputText = ""
-    @Published var errorMessage: String?
+    @Published var output = ""
+    @Published var formatType = JSONFormatType.prettify {
+        didSet { process() }
+    }
+    @Published var indentSize = 2 {
+        didSet { process() }
+    }
 
-    private func format() {
-        guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            outputText = ""
-            errorMessage = nil
+    private func process() {
+        guard let data = input.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data, options: []) else {
+            output = "Invalid JSON"
             return
         }
 
-        guard let data = inputText.data(using: .utf8) else {
-            errorMessage = "Invalid encoding"
-            return
-        }
+        let options: JSONSerialization.WritingOptions = formatType == .prettify ? [.prettyPrinted, .sortedKeys] : [.sortedKeys]
 
-        do {
-            let json = try JSONSerialization.jsonObject(with: data, options: [])
-            let prettyData = try JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted, .sortedKeys])
-            outputText = String(data: prettyData, encoding: .utf8) ?? ""
-            errorMessage = nil
-        } catch {
-            errorMessage = error.localizedDescription
+        if let formattedData = try? JSONSerialization.data(withJSONObject: json, options: options),
+           let result = String(data: formattedData, encoding: .utf8) {
+            output = result
         }
     }
 }

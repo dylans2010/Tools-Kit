@@ -2,10 +2,10 @@ import SwiftUI
 
 struct ASCIIHexConverterDevTool: DevTool {
     let id = "ascii-hex-converter"
-    let name = "ASCII/Hex Converter"
-    let category = DevToolCategory.inputOutput
-    let icon = "number.square"
-    let description = "Convert between ASCII and Hex"
+    let name = "ASCII / Hex Converter"
+    let category = DevToolCategory.encoding
+    let icon = "number"
+    let description = "Convert between text and hexadecimal"
 
     func render() -> some View {
         ASCIIHexConverterView()
@@ -16,23 +16,30 @@ struct ASCIIHexConverterView: View {
     @StateObject private var viewModel = ASCIIHexConverterViewModel()
 
     var body: some View {
-        Form {
-            Section("ASCII Text") {
-                TextEditor(text: $viewModel.asciiText)
-                    .frame(height: 80)
-                    .font(.monospaced(.body)())
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "ASCII / Hex Converter",
+                description: "Seamlessly convert plain text to hexadecimal representation and back.",
+                icon: "number"
+            )
+            .padding()
 
-            Section("Hexadecimal") {
-                TextEditor(text: $viewModel.hexText)
-                    .frame(height: 80)
-                    .font(.monospaced(.body)())
-            }
+            Form {
+                Section("Text (ASCII/UTF-8)") {
+                    TextEditor(text: $viewModel.textInput)
+                        .frame(height: 100)
+                        .font(.system(.body, design: .monospaced))
+                }
 
-            Section {
-                Button("Clear") {
-                    viewModel.asciiText = ""
-                    viewModel.hexText = ""
+                Section("Hexadecimal") {
+                    TextEditor(text: $viewModel.hexInput)
+                        .frame(height: 100)
+                        .font(.system(.body, design: .monospaced))
+                }
+
+                Section("Configuration") {
+                    Toggle("Add Spaces", isOn: $viewModel.addSpaces)
+                    Toggle("Uppercase Hex", isOn: $viewModel.isUppercase)
                 }
             }
         }
@@ -40,43 +47,55 @@ struct ASCIIHexConverterView: View {
 }
 
 class ASCIIHexConverterViewModel: ObservableObject {
-    @Published var asciiText = "" {
+    @Published var textInput = "" {
         didSet {
-            guard !isUpdating else { return }
-            isUpdating = true
-            hexText = ASCIIHexService.toHex(asciiText)
-            isUpdating = false
+            if !isProcessingHex {
+                isProcessingText = true
+                convertToHex()
+                isProcessingText = false
+            }
+        }
+    }
+    @Published var hexInput = "" {
+        didSet {
+            if !isProcessingText {
+                isProcessingHex = true
+                convertToText()
+                isProcessingHex = false
+            }
         }
     }
 
-    @Published var hexText = "" {
-        didSet {
-            guard !isUpdating else { return }
-            isUpdating = true
-            asciiText = ASCIIHexService.toASCII(hexText)
-            isUpdating = false
-        }
+    @Published var addSpaces = true
+    @Published var isUppercase = true
+
+    private var isProcessingText = false
+    private var isProcessingHex = false
+
+    private func convertToHex() {
+        guard let data = textInput.data(using: .utf8) else { return }
+        let format = isUppercase ? "%02X" : "%02x"
+        let hex = data.map { String(format: format, $0) }.joined(separator: addSpaces ? " " : "")
+        hexInput = hex
     }
 
-    private var isUpdating = false
-}
+    private func convertToText() {
+        let cleanedHex = hexInput.replacingOccurrences(of: " ", with: "")
+                                .replacingOccurrences(of: "0x", with: "")
 
-struct ASCIIHexService {
-    static func toHex(_ ascii: String) -> String {
-        return ascii.data(using: .utf8)?.map { String(format: "%02x", $0) }.joined(separator: " ") ?? ""
-    }
-
-    static func toASCII(_ hex: String) -> String {
-        let cleaned = hex.replacingOccurrences(of: " ", with: "")
         var data = Data()
-        var index = cleaned.startIndex
-        while index < cleaned.endIndex {
-            let nextIndex = cleaned.index(index, offsetBy: 2, limitedBy: cleaned.endIndex) ?? cleaned.endIndex
-            if let byte = UInt8(cleaned[index..<nextIndex], radix: 16) {
+        var startIndex = cleanedHex.startIndex
+        while startIndex < cleanedHex.endIndex {
+            let endIndex = cleanedHex.index(startIndex, offsetBy: 2, limitedBy: cleanedHex.endIndex) ?? cleanedHex.endIndex
+            let hexByte = String(cleanedHex[startIndex..<endIndex])
+            if let byte = UInt8(hexByte, radix: 16) {
                 data.append(byte)
             }
-            index = nextIndex
+            startIndex = endIndex
         }
-        return String(data: data, encoding: .utf8) ?? ""
+
+        if let decoded = String(data: data, encoding: .utf8) {
+            textInput = decoded
+        }
     }
 }

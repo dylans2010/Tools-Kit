@@ -5,7 +5,7 @@ struct DeviceInfoDevTool: DevTool {
     let name = "Device Info"
     let category = DevToolCategory.system
     let icon = "iphone"
-    let description = "View hardware and system information"
+    let description = "Detailed hardware and software info"
 
     func render() -> some View {
         DeviceInfoView()
@@ -13,18 +13,35 @@ struct DeviceInfoDevTool: DevTool {
 }
 
 struct DeviceInfoView: View {
-    var body: some View {
-        List {
-            Section("Hardware") {
-                LabeledContent("Model", value: UIDevice.current.model)
-                LabeledContent("Name", value: UIDevice.current.name)
-                LabeledContent("System Name", value: UIDevice.current.systemName)
-            }
+    @StateObject private var viewModel = DeviceInfoViewModel()
 
-            Section("Screen") {
-                LabeledContent("Scale", value: "\(UIScreen.main.scale)")
-                LabeledContent("Bounds", value: "\(Int(UIScreen.main.bounds.width))x\(Int(UIScreen.main.bounds.height))")
+    var body: some View {
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Device Info",
+                description: "Comprehensive overview of the current hardware specifications and system environment.",
+                icon: "iphone"
+            )
+            .padding()
+
+            Form {
+                Section("Hardware") {
+                    LabeledContent("Model", value: viewModel.model)
+                    LabeledContent("Processor", value: "\(ProcessInfo.processInfo.processorCount) Cores")
+                    LabeledContent("Physical Memory", value: viewModel.memory)
+                }
+
+                Section("Software") {
+                    LabeledContent("System Name", value: UIDevice.current.systemName)
+                    LabeledContent("System Version", value: UIDevice.current.systemVersion)
+                    LabeledContent("Language", value: Locale.current.language.languageCode?.identifier ?? "Unknown")
+                }
             }
         }
     }
+}
+
+class DeviceInfoViewModel: ObservableObject {
+    var model: String = UIDevice.current.model
+    var memory: String = ByteCountFormatter.string(fromByteCount: Int64(ProcessInfo.processInfo.physicalMemory), countStyle: .memory)
 }

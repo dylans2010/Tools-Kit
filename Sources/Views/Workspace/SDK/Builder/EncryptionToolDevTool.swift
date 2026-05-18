@@ -5,8 +5,8 @@ struct EncryptionToolDevTool: DevTool {
     let id = "encryption-tool"
     let name = "Encryption Tool"
     let category = DevToolCategory.security
-    let icon = "lock.rectangle.stack"
-    let description = "AES-GCM Encryption/Decryption"
+    let icon = "key.fill"
+    let description = "Encrypt and decrypt data using AES-GCM"
 
     func render() -> some View {
         EncryptionToolView()
@@ -17,40 +17,94 @@ struct EncryptionToolView: View {
     @StateObject private var viewModel = EncryptionToolViewModel()
 
     var body: some View {
-        Form {
-            Section("Plaintext") {
-                TextEditor(text: $viewModel.plaintext)
-                    .frame(height: 80)
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Encryption Tool",
+                description: "Securely encrypt and decrypt text using industry-standard AES-GCM algorithms.",
+                icon: "key.fill"
+            )
+            .padding()
 
-            Section("Encryption Key (32 bytes)") {
-                TextField("Key (Hex)", text: $viewModel.keyHex)
-                    .font(.monospaced(.caption)())
-            }
+            Form {
+                Section("Keys") {
+                    HStack {
+                        SecureField("Password / Key", text: $viewModel.key)
+                        Button("Gen") { viewModel.generateKey() }
+                    }
+                }
 
-            Section("Ciphertext (Base64)") {
-                Text(viewModel.ciphertext)
-                    .font(.monospaced(.caption)())
-                    .textSelection(.enabled)
+                Section("Input") {
+                    TextEditor(text: $viewModel.input)
+                        .frame(height: 100)
+                }
 
-                Button("Encrypt") { viewModel.encrypt() }
+                Section("Actions") {
+                    HStack {
+                        Button("Encrypt") { viewModel.encrypt() }
+                            .buttonStyle(.borderedProminent)
+                        Button("Decrypt") { viewModel.decrypt() }
+                            .buttonStyle(.bordered)
+                    }
+                }
+
+                Section("Output") {
+                    Text(viewModel.output)
+                        .font(.system(.caption2, design: .monospaced))
+                        .textSelection(.enabled)
+                        .frame(minHeight: 60)
+
+                    if !viewModel.error.isEmpty {
+                        Text(viewModel.error).font(.caption).foregroundStyle(.red)
+                    }
+                }
             }
         }
     }
 }
 
 class EncryptionToolViewModel: ObservableObject {
-    @Published var plaintext = ""
-    @Published var keyHex = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
-    @Published var ciphertext = ""
+    @Published var key = "secret-key-32-chars-long-!!!!!!"
+    @Published var input = "Sensitive data"
+    @Published var output = ""
+    @Published var error = ""
+
+    func generateKey() {
+        let key = SymmetricKey(size: .bits256)
+        self.key = key.withUnsafeBytes { Data($0).base64EncodedString() }
+    }
 
     func encrypt() {
-        guard let keyData = Data(hexString: keyHex),
-              let plainData = plaintext.data(using: .utf8) else { return }
+        error = ""
+        guard let data = input.data(using: .utf8),
+              let keyData = Data(base64Encoded: key) ?? key.data(using: .utf8) else {
+            error = "Invalid Key"
+            return
+        }
 
-        let key = SymmetricKey(data: keyData)
-        if let sealedBox = try? AES.GCM.seal(plainData, using: key) {
-            ciphertext = sealedBox.combined?.base64EncodedString() ?? ""
+        do {
+            let symmetricKey = SymmetricKey(data: keyData.prefix(32))
+            let sealedBox = try AES.GCM.seal(data, using: symmetricKey)
+            output = sealedBox.combined?.base64EncodedString() ?? ""
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func decrypt() {
+        error = ""
+        guard let combinedData = Data(base64Encoded: input),
+              let keyData = Data(base64Encoded: key) ?? key.data(using: .utf8) else {
+            error = "Invalid Data or Key"
+            return
+        }
+
+        do {
+            let symmetricKey = SymmetricKey(data: keyData.prefix(32))
+            let sealedBox = try AES.GCM.SealedBox(combined: combinedData)
+            let decryptedData = try AES.GCM.open(sealedBox, using: symmetricKey)
+            output = String(data: decryptedData, encoding: .utf8) ?? "Decrypted data is not UTF8"
+        } catch {
+            self.error = error.localizedDescription
         }
     }
 }

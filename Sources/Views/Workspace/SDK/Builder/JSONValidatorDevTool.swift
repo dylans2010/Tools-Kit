@@ -5,7 +5,7 @@ struct JSONValidatorDevTool: DevTool {
     let name = "JSON Validator"
     let category = DevToolCategory.data
     let icon = "checkmark.seal"
-    let description = "Validate JSON syntax"
+    let description = "Validate JSON syntax and structure"
 
     func render() -> some View {
         JSONValidatorView()
@@ -16,29 +16,40 @@ struct JSONValidatorView: View {
     @StateObject private var viewModel = JSONValidatorViewModel()
 
     var body: some View {
-        Form {
-            Section("JSON Input") {
-                TextEditor(text: $viewModel.inputText)
-                    .frame(height: 200)
-                    .font(.monospaced(.body)())
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "JSON Validator",
+                description: "Check JSON strings for syntax errors and structural integrity.",
+                icon: "checkmark.seal"
+            )
+            .padding()
 
-            Section("Validation Result") {
-                if viewModel.inputText.isEmpty {
-                    Text("Enter JSON to validate")
-                        .foregroundStyle(.secondary)
-                } else if viewModel.isValid {
-                    Label("Valid JSON", systemImage: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                } else {
-                    VStack(alignment: .leading) {
-                        Label("Invalid JSON", systemImage: "xmark.circle.fill")
-                            .foregroundStyle(.red)
-                        if let error = viewModel.errorMessage {
-                            Text(error)
-                                .font(.caption.monospaced())
+            Form {
+                Section("Input JSON") {
+                    TextEditor(text: $viewModel.input)
+                        .frame(height: 200)
+                        .font(.system(.caption, design: .monospaced))
+                }
+
+                Section("Status") {
+                    HStack {
+                        StatusBadge(
+                            text: viewModel.isValid ? "Valid JSON" : "Invalid JSON",
+                            color: viewModel.isValid ? .green : .red
+                        )
+                        Spacer()
+                        if !viewModel.isValid {
+                            Text(viewModel.errorMessage)
+                                .font(.caption)
                                 .foregroundStyle(.red)
                         }
+                    }
+                }
+
+                if viewModel.isValid {
+                    Section("Metadata") {
+                        LabeledContent("Type", value: viewModel.rootType)
+                        LabeledContent("Key Count", value: "\(viewModel.keyCount)")
                     }
                 }
             }
@@ -47,31 +58,39 @@ struct JSONValidatorView: View {
 }
 
 class JSONValidatorViewModel: ObservableObject {
-    @Published var inputText = "" {
-        didSet {
-            validate()
-        }
+    @Published var input = "{\n  \"status\": \"success\",\n  \"code\": 200\n}" {
+        didSet { validate() }
     }
-    @Published var isValid = false
-    @Published var errorMessage: String?
+    @Published var isValid = true
+    @Published var errorMessage = ""
+    @Published var rootType = "Object"
+    @Published var keyCount = 0
 
     private func validate() {
-        guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            isValid = false
-            errorMessage = nil
+        guard !input.isEmpty else {
+            isValid = true
+            errorMessage = ""
             return
         }
 
-        guard let data = inputText.data(using: .utf8) else {
+        guard let data = input.data(using: .utf8) else {
             isValid = false
-            errorMessage = "Invalid encoding"
+            errorMessage = "Unable to convert to UTF-8"
             return
         }
 
         do {
-            _ = try JSONSerialization.jsonObject(with: data, options: [])
+            let json = try JSONSerialization.jsonObject(with: data, options: [])
             isValid = true
-            errorMessage = nil
+            errorMessage = ""
+
+            if let dict = json as? [String: Any] {
+                rootType = "Object"
+                keyCount = dict.keys.count
+            } else if let array = json as? [Any] {
+                rootType = "Array"
+                keyCount = array.count
+            }
         } catch {
             isValid = false
             errorMessage = error.localizedDescription

@@ -4,8 +4,8 @@ struct ShadowGeneratorDevTool: DevTool {
     let id = "shadow-generator"
     let name = "Shadow Generator"
     let category = DevToolCategory.uiDesign
-    let icon = "shadow"
-    let description = "Generate and preview SwiftUI shadows"
+    let icon = "sun.max"
+    let description = "Live shadow design and code export"
 
     func render() -> some View {
         ShadowGeneratorView()
@@ -16,37 +16,43 @@ struct ShadowGeneratorView: View {
     @StateObject private var viewModel = ShadowGeneratorViewModel()
 
     var body: some View {
-        Form {
-            Section("Properties") {
-                HStack {
-                    Text("Radius: \(Int(viewModel.radius))")
-                    Slider(value: $viewModel.radius, in: 0...50)
-                }
-                HStack {
-                    Text("X Offset: \(Int(viewModel.xOffset))")
-                    Slider(value: $viewModel.xOffset, in: -50...50)
-                }
-                HStack {
-                    Text("Y Offset: \(Int(viewModel.yOffset))")
-                    Slider(value: $viewModel.yOffset, in: -50...50)
-                }
-                ColorPicker("Shadow Color", selection: $viewModel.shadowColor)
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Shadow Generator",
+                description: "Interactively design box shadows with control over blur, spread, and opacity.",
+                icon: "sun.max"
+            )
+            .padding()
 
-            Section("Preview") {
-                VStack {
+            Form {
+                Section("Preview") {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color(uiColor: .systemBackground))
-                        .frame(width: 100, height: 100)
-                        .shadow(color: viewModel.shadowColor, radius: viewModel.radius, x: viewModel.xOffset, y: viewModel.yOffset)
+                        .frame(width: 150, height: 100)
+                        .shadow(
+                            color: viewModel.shadowColor.opacity(viewModel.opacity),
+                            radius: viewModel.radius,
+                            x: viewModel.offsetX,
+                            y: viewModel.offsetY
+                        )
+                        .padding(40)
+                        .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity, minHeight: 150)
-            }
 
-            Section("SwiftUI Code") {
-                Text(viewModel.swiftUICode)
-                    .font(.monospaced(.caption)())
-                    .textSelection(.enabled)
+                Section("Parameters") {
+                    Slider(value: $viewModel.radius, in: 0...50) { Text("Radius") }
+                    Slider(value: $viewModel.offsetX, in: -50...50) { Text("X Offset") }
+                    Slider(value: $viewModel.offsetY, in: -50...50) { Text("Y Offset") }
+                    Slider(value: $viewModel.opacity, in: 0...1) { Text("Opacity") }
+                    ColorPicker("Shadow Color", selection: $viewModel.shadowColor)
+                }
+
+                Section("SwiftUI Code") {
+                    Text(viewModel.codeSnippet)
+                        .font(.system(.caption2, design: .monospaced))
+                        .padding()
+                        .background(Color.secondary.opacity(0.1))
+                }
             }
         }
     }
@@ -54,11 +60,13 @@ struct ShadowGeneratorView: View {
 
 class ShadowGeneratorViewModel: ObservableObject {
     @Published var radius: CGFloat = 10
-    @Published var xOffset: CGFloat = 0
-    @Published var yOffset: CGFloat = 5
-    @Published var shadowColor: Color = .black.opacity(0.3)
+    @Published var offsetX: CGFloat = 0
+    @Published var offsetY: CGFloat = 5
+    @Published var opacity: Double = 0.3
+    @Published var shadowColor: Color = .black
 
-    var swiftUICode: String {
-        ".shadow(color: \(shadowColor.description), radius: \(radius), x: \(xOffset), y: \(yOffset))"
+    var codeSnippet: String {
+        let comp = shadowColor.getComponents()
+        return ".shadow(\n  color: Color(red: \(String(format: "%.2f", comp.r)), green: \(String(format: "%.2f", comp.g)), blue: \(String(format: "%.2f", comp.b))).opacity(\(String(format: "%.2f", opacity))),\n  radius: \(Int(radius)),\n  x: \(Int(offsetX)),\n  y: \(Int(offsetY))\n)"
     }
 }

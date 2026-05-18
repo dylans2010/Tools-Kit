@@ -4,8 +4,8 @@ struct TextDiffDevTool: DevTool {
     let id = "text-diff"
     let name = "Text Diff"
     let category = DevToolCategory.utilities
-    let icon = "text.badge.minus"
-    let description = "Compare two text blocks"
+    let icon = "rectangle.2.swap"
+    let description = "Compare two text blocks for changes"
 
     func render() -> some View {
         TextDiffView()
@@ -13,28 +13,92 @@ struct TextDiffDevTool: DevTool {
 }
 
 struct TextDiffView: View {
-    @State private var text1 = ""
-    @State private var text2 = ""
+    @StateObject private var viewModel = TextDiffViewModel()
 
     var body: some View {
-        Form {
-            Section("Text A") {
-                TextEditor(text: $text1)
-                    .frame(height: 100)
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Text Diff",
+                description: "Compare two blocks of text side-by-side to visualize additions and removals.",
+                icon: "rectangle.2.swap"
+            )
+            .padding()
+
+            HStack {
+                VStack {
+                    Text("Original").font(.caption.bold())
+                    TextEditor(text: $viewModel.textA)
+                        .frame(height: 150)
+                        .font(.system(.caption2, design: .monospaced))
+                }
+                VStack {
+                    Text("Modified").font(.caption.bold())
+                    TextEditor(text: $viewModel.textB)
+                        .frame(height: 150)
+                        .font(.system(.caption2, design: .monospaced))
+                }
             }
-            Section("Text B") {
-                TextEditor(text: $text2)
-                    .frame(height: 100)
-            }
-            Section("Comparison") {
-                if text1 == text2 {
-                    Label("Texts are identical", systemImage: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                } else {
-                    Label("Texts differ", systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
+            .padding(.horizontal)
+
+            Form {
+                Section("Diff Result") {
+                    ScrollView {
+                        VStack(alignment: .leading) {
+                            ForEach(viewModel.diffLines) { line in
+                                Text(line.text)
+                                    .font(.system(.caption2, design: .monospaced))
+                                    .foregroundStyle(line.color)
+                                    .padding(.horizontal, 4)
+                                    .background(line.bgColor)
+                            }
+                        }
+                    }
+                    .frame(height: 200)
                 }
             }
         }
+    }
+}
+
+struct DiffLine: Identifiable {
+    let id = UUID()
+    let text: String
+    let color: Color
+    let bgColor: Color
+}
+
+class TextDiffViewModel: ObservableObject {
+    @Published var textA = "Hello World\nThis is a test" {
+        didSet { compare() }
+    }
+    @Published var textB = "Hello World\nThis is an updated test" {
+        didSet { compare() }
+    }
+    @Published var diffLines: [DiffLine] = []
+
+    private func compare() {
+        // Simple line-by-line diff
+        let linesA = textA.components(separatedBy: .newlines)
+        let linesB = textB.components(separatedBy: .newlines)
+
+        var results: [DiffLine] = []
+        let maxCount = max(linesA.count, linesB.count)
+
+        for i in 0..<maxCount {
+            let a = i < linesA.count ? linesA[i] : nil
+            let b = i < linesB.count ? linesB[i] : nil
+
+            if a == b {
+                results.append(DiffLine(text: "  " + (a ?? ""), color: .secondary, bgColor: .clear))
+            } else {
+                if let a = a {
+                    results.append(DiffLine(text: "- " + a, color: .red, bgColor: .red.opacity(0.1)))
+                }
+                if let b = b {
+                    results.append(DiffLine(text: "+ " + b, color: .green, bgColor: .green.opacity(0.1)))
+                }
+            }
+        }
+        diffLines = results
     }
 }

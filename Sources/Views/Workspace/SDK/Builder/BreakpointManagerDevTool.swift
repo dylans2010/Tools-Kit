@@ -5,7 +5,7 @@ struct BreakpointManagerDevTool: DevTool {
     let name = "Breakpoint Manager"
     let category = DevToolCategory.debugging
     let icon = "pause.fill"
-    let description = "Manage runtime breakpoints"
+    let description = "Manage and toggle application breakpoints"
 
     func render() -> some View {
         BreakpointManagerView()
@@ -13,22 +13,51 @@ struct BreakpointManagerDevTool: DevTool {
 }
 
 struct BreakpointManagerView: View {
-    @State private var breakpoints = [
-        "SDKBuildView.swift:150",
-        "NetworkReachability.swift:45"
-    ]
+    @StateObject private var viewModel = BreakpointManagerViewModel()
 
     var body: some View {
-        List {
-            Section("Active Breakpoints") {
-                ForEach(breakpoints, id: \.self) { bp in
-                    HStack {
-                        Image(systemName: "circle.fill").foregroundStyle(.blue)
-                        Text(bp)
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Breakpoint Manager",
+                description: "Monitor and control code execution breakpoints to pause and inspect application flow.",
+                icon: "pause.fill"
+            )
+            .padding()
+
+            List {
+                Section("Active Breakpoints") {
+                    if viewModel.breakpoints.isEmpty {
+                        Text("No breakpoints defined").foregroundStyle(.secondary)
+                    } else {
+                        ForEach($viewModel.breakpoints) { $bp in
+                            HStack {
+                                Image(systemName: "circle.fill")
+                                    .foregroundStyle(bp.isActive ? .red : .secondary)
+                                VStack(alignment: .leading) {
+                                    Text(bp.location).font(.subheadline.bold())
+                                    Text(bp.condition).font(.caption2).foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Toggle("", isOn: $bp.isActive).labelsHidden()
+                            }
+                        }
                     }
                 }
-                .onDelete { breakpoints.remove(atOffsets: $0) }
             }
         }
     }
+}
+
+struct Breakpoint: Identifiable {
+    let id = UUID()
+    var location: String
+    var condition: String
+    var isActive: Bool
+}
+
+class BreakpointManagerViewModel: ObservableObject {
+    @Published var breakpoints: [Breakpoint] = [
+        Breakpoint(location: "ToolsKitSDK.swift:150", condition: "scope == .notes", isActive: true),
+        Breakpoint(location: "SDKDataEngine.swift:42", condition: "None", isActive: false)
+    ]
 }

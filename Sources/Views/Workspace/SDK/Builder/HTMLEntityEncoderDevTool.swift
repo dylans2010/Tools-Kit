@@ -3,9 +3,9 @@ import SwiftUI
 struct HTMLEntityEncoderDevTool: DevTool {
     let id = "html-entity-encoder"
     let name = "HTML Entity Encoder"
-    let category = DevToolCategory.inputOutput
+    let category = DevToolCategory.encoding
     let icon = "chevron.left.forwardslash.chevron.right"
-    let description = "Encode text to HTML entities"
+    let description = "Encode characters to HTML entities"
 
     func render() -> some View {
         HTMLEntityEncoderView()
@@ -16,62 +16,61 @@ struct HTMLEntityEncoderView: View {
     @StateObject private var viewModel = HTMLEntityEncoderViewModel()
 
     var body: some View {
-        Form {
-            Section("Input") {
-                TextEditor(text: $viewModel.inputText)
-                    .frame(height: 100)
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "HTML Entity Encoder",
+                description: "Escape special characters into HTML entities for safe inclusion in web content.",
+                icon: "chevron.left.forwardslash.chevron.right"
+            )
+            .padding()
 
-            Section("Encoded Output") {
-                Text(viewModel.outputText)
-                    .font(.monospaced(.body)())
-                    .textSelection(.enabled)
-
-                Button {
-                    UIPasteboard.general.string = viewModel.outputText
-                } label: {
-                    Label("Copy to Clipboard", systemImage: "doc.on.doc")
+            Form {
+                Section("Plain Text") {
+                    TextEditor(text: $viewModel.input)
+                        .frame(height: 120)
                 }
-                .disabled(viewModel.outputText.isEmpty)
+
+                Section("HTML Entities") {
+                    Text(viewModel.output)
+                        .font(.system(.body, design: .monospaced))
+                        .textSelection(.enabled)
+                        .frame(minHeight: 60)
+
+                    ExportPanel(content: viewModel.output, filename: "html_encoded.txt")
+                }
+
+                Section("Options") {
+                    Toggle("Encode All Non-ASCII", isOn: $viewModel.encodeNonASCII)
+                }
             }
         }
     }
 }
 
 class HTMLEntityEncoderViewModel: ObservableObject {
-    @Published var inputText = "" {
-        didSet {
-            outputText = HTMLEntityService.encode(inputText)
-        }
+    @Published var input = "<b>Hello & World</b>" {
+        didSet { encode() }
     }
-    @Published var outputText = ""
-}
+    @Published var output = ""
+    @Published var encodeNonASCII = false {
+        didSet { encode() }
+    }
 
-struct HTMLEntityService {
-    static func encode(_ text: String) -> String {
+    private func encode() {
         var result = ""
-        for scalar in text.unicodeScalars {
-            if scalar.value > 127 || "<>&\"'".contains(Character(scalar)) {
-                result.append("&#\(scalar.value);")
-            } else {
-                result.append(Character(scalar))
+        for scalar in input.unicodeScalars {
+            switch scalar.value {
+            case 38: result += "&amp;"
+            case 60: result += "&lt;"
+            case 62: result += "&gt;"
+            case 34: result += "&quot;"
+            case 39: result += "&apos;"
+            case let v where v > 127 && encodeNonASCII:
+                result += "&#\(v);"
+            default:
+                result += String(scalar)
             }
         }
-        return result
-    }
-
-    static func decode(_ text: String) -> String {
-        var result = text
-        let mapping = [
-            "&quot;": "\"",
-            "&amp;": "&",
-            "&lt;": "<",
-            "&gt;": ">",
-            "&apos;": "'"
-        ]
-        for (entity, char) in mapping {
-            result = result.replacingOccurrences(of: entity, with: char)
-        }
-        return result
+        output = result
     }
 }

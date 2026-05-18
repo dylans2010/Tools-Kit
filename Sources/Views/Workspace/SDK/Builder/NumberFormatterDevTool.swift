@@ -4,8 +4,8 @@ struct NumberFormatterDevTool: DevTool {
     let id = "number-formatter"
     let name = "Number Formatter"
     let category = DevToolCategory.data
-    let icon = "number"
-    let description = "Format numbers (Currency, Decimal, etc.)"
+    let icon = "number.circle"
+    let description = "Format numbers into currency, percent, or scientific notation"
 
     func render() -> some View {
         NumberFormatterView()
@@ -16,51 +16,52 @@ struct NumberFormatterView: View {
     @StateObject private var viewModel = NumberFormatterViewModel()
 
     var body: some View {
-        Form {
-            Section("Input Number") {
-                TextField("1234.56", text: $viewModel.inputText)
-                    .keyboardType(.decimalPad)
-            }
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Number Formatter",
+                description: "Apply locale-aware formatting to numbers, including currency symbols and grouping separators.",
+                icon: "number.circle"
+            )
+            .padding()
 
-            Section("Formats") {
-                LabeledContent("Decimal", value: viewModel.decimalFormatted)
-                LabeledContent("Currency (USD)", value: viewModel.currencyFormatted)
-                LabeledContent("Percent", value: viewModel.percentFormatted)
-                LabeledContent("Scientific", value: viewModel.scientificFormatted)
+            Form {
+                Section("Input Number") {
+                    TextField("12345.67", text: $viewModel.input)
+                        .keyboardType(.decimalPad)
+                }
+
+                Section("Configuration") {
+                    Picker("Style", selection: $viewModel.style) {
+                        Text("Decimal").tag(NumberFormatter.Style.decimal)
+                        Text("Currency").tag(NumberFormatter.Style.currency)
+                        Text("Percent").tag(NumberFormatter.Style.percent)
+                        Text("Scientific").tag(NumberFormatter.Style.scientific)
+                        Text("Spell Out").tag(NumberFormatter.Style.spellOut)
+                    }
+
+                    TextField("Locale (e.g. en_US, fr_FR)", text: $viewModel.localeIdentifier)
+                }
+
+                Section("Output") {
+                    Text(viewModel.formattedNumber)
+                        .font(.title2.bold())
+                        .textSelection(.enabled)
+                }
             }
         }
     }
 }
 
 class NumberFormatterViewModel: ObservableObject {
-    @Published var inputText = "1234.56"
+    @Published var input = "12345.67"
+    @Published var style = NumberFormatter.Style.decimal
+    @Published var localeIdentifier = Locale.current.identifier
 
-    private var number: Double {
-        Double(inputText) ?? 0
-    }
-
-    var decimalFormatted: String {
-        let formatter = Foundation.NumberFormatter()
-        formatter.numberStyle = .decimal
-        return formatter.string(from: NSNumber(value: number)) ?? "Error"
-    }
-
-    var currencyFormatted: String {
-        let formatter = Foundation.NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencyCode = "USD"
-        return formatter.string(from: NSNumber(value: number)) ?? "Error"
-    }
-
-    var percentFormatted: String {
-        let formatter = Foundation.NumberFormatter()
-        formatter.numberStyle = .percent
-        return formatter.string(from: NSNumber(value: number)) ?? "Error"
-    }
-
-    var scientificFormatted: String {
-        let formatter = Foundation.NumberFormatter()
-        formatter.numberStyle = .scientific
-        return formatter.string(from: NSNumber(value: number)) ?? "Error"
+    var formattedNumber: String {
+        guard let num = Double(input) else { return "Invalid Number" }
+        let formatter = NumberFormatter()
+        formatter.numberStyle = style
+        formatter.locale = Locale(identifier: localeIdentifier)
+        return formatter.string(from: NSNumber(value: num)) ?? "Error"
     }
 }

@@ -4,8 +4,8 @@ struct FPSMonitorDevTool: DevTool {
     let id = "fps-monitor"
     let name = "FPS Monitor"
     let category = DevToolCategory.performance
-    let icon = "gauge.with.needle"
-    let description = "Monitor frames per second"
+    let icon = "speedometer"
+    let description = "Monitor UI frame rate and drop frames"
 
     func render() -> some View {
         FPSMonitorView()
@@ -16,40 +16,44 @@ struct FPSMonitorView: View {
     @StateObject private var viewModel = FPSMonitorViewModel()
 
     var body: some View {
-        VStack(spacing: 20) {
-            ZStack {
-                Circle()
-                    .stroke(Color.secondary.opacity(0.2), lineWidth: 20)
-                Circle()
-                    .trim(from: 0, to: CGFloat(viewModel.fps) / 60.0)
-                    .stroke(viewModel.fps > 55 ? Color.green : (viewModel.fps > 30 ? Color.orange : Color.red), lineWidth: 20)
-                    .rotationEffect(.degrees(-90))
-
-                VStack {
-                    Text("\(Int(viewModel.fps))")
-                        .font(.system(size: 60, weight: .bold, design: .monospaced))
-                    Text("FPS")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .frame(width: 200, height: 200)
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "FPS Monitor",
+                description: "Track frame rate consistency and detect dropped frames for smooth UI interactions.",
+                icon: "speedometer"
+            )
             .padding()
 
-            Text("Real-time Main Thread Frame Rate")
-                .foregroundStyle(.secondary)
+            VStack {
+                ZStack {
+                    UsageChart(data: viewModel.fpsHistory)
+                        .frame(height: 150)
+                        .padding()
+
+                    Text("\(Int(viewModel.currentFPS)) FPS")
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(viewModel.currentFPS < 50 ? .red : .green)
+                }
+
+                Form {
+                    Section("Statistics") {
+                        LabeledContent("Min FPS", value: "\(Int(viewModel.minFPS))")
+                        LabeledContent("Max FPS", value: "\(Int(viewModel.maxFPS))")
+                    }
+                }
+            }
         }
-        .onAppear {
-            viewModel.start()
-        }
-        .onDisappear {
-            viewModel.stop()
-        }
+        .onAppear { viewModel.start() }
+        .onDisappear { viewModel.stop() }
     }
 }
 
 class FPSMonitorViewModel: ObservableObject {
-    @Published var fps: Double = 0
+    @Published var currentFPS: Double = 60
+    @Published var minFPS: Double = 60
+    @Published var maxFPS: Double = 0
+    @Published var fpsHistory: [Double] = Array(repeating: 60, count: 50)
+
     private var displayLink: CADisplayLink?
     private var lastTimestamp: TimeInterval = 0
 
@@ -60,6 +64,7 @@ class FPSMonitorViewModel: ObservableObject {
 
     func stop() {
         displayLink?.invalidate()
+        displayLink = nil
     }
 
     @objc private func update(link: CADisplayLink) {
@@ -67,8 +72,16 @@ class FPSMonitorViewModel: ObservableObject {
             lastTimestamp = link.timestamp
             return
         }
+
         let delta = link.timestamp - lastTimestamp
-        fps = 1.0 / delta
+        let fps = 1.0 / delta
         lastTimestamp = link.timestamp
+
+        currentFPS = fps
+        if fps < minFPS { minFPS = fps }
+        if fps > maxFPS { maxFPS = fps }
+
+        fpsHistory.removeFirst()
+        fpsHistory.append(fps)
     }
 }

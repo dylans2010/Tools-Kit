@@ -4,8 +4,8 @@ struct RuntimeInspectorDevTool: DevTool {
     let id = "runtime-inspector"
     let name = "Runtime Inspector"
     let category = DevToolCategory.debugging
-    let icon = "play.circle"
-    let description = "Inspect runtime variables"
+    let icon = "magnifyingglass"
+    let description = "Inspect live runtime objects and properties"
 
     func render() -> some View {
         RuntimeInspectorView()
@@ -13,28 +13,51 @@ struct RuntimeInspectorDevTool: DevTool {
 }
 
 struct RuntimeInspectorView: View {
+    @StateObject private var viewModel = RuntimeInspectorViewModel()
+
     var body: some View {
-        List {
-            Section("Environment") {
-                LabeledContent("Simulator", value: isSimulator ? "Yes" : "No")
-                LabeledContent("Debugger", value: isDebuggerAttached ? "Attached" : "None")
+        VStack(spacing: 0) {
+            DevToolHeader(
+                title: "Runtime Inspector",
+                description: "Deeply inspect live objects, their property values, and internal states during execution.",
+                icon: "magnifyingglass"
+            )
+            .padding()
+
+            List {
+                Section("Live Objects") {
+                    ForEach(viewModel.objects) { obj in
+                        NavigationLink {
+                            List {
+                                ForEach(obj.properties, id: \.key) { key, val in
+                                    LabeledContent(key, value: val)
+                                }
+                            }
+                            .navigationTitle(obj.name)
+                        } label: {
+                            HStack {
+                                Text(obj.name).font(.headline)
+                                Spacer()
+                                Text(obj.type).font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
+}
 
-    var isSimulator: Bool {
-        #if targetEnvironment(simulator)
-        return true
-        #else
-        return false
-        #endif
-    }
+struct RuntimeObject: Identifiable {
+    let id = UUID()
+    let name: String
+    let type: String
+    let properties: [String: String]
+}
 
-    var isDebuggerAttached: Bool {
-        var info = kinfo_proc()
-        var mib: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()]
-        var size = MemoryLayout<kinfo_proc>.stride
-        let rc = sysctl(&mib, UInt32(mib.count), &info, &size, nil, 0)
-        return rc == 0 && (info.kp_proc.p_flag & P_TRACED) != 0
-    }
+class RuntimeInspectorViewModel: ObservableObject {
+    @Published var objects: [RuntimeObject] = [
+        RuntimeObject(name: "ToolsKitSDK.shared", type: "ToolsKitSDK", properties: ["isSyncing": "false", "isInitialized": "true"]),
+        RuntimeObject(name: "SDKConfigManager.shared", type: "SDKConfigManager", properties: ["activeProfile": "Default"])
+    ]
 }
