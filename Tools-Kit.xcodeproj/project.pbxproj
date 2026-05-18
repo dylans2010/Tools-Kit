@@ -1474,6 +1474,79 @@
 		AS186026B1FB112C9A490D7A /* AgenticUIActionStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS1AE27E255AB74D5E10B24A /* AgenticUIActionStreamView.swift */; };
 		DP4D8FE86D988A869476EF7B /* AgenticUIDebugPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DP510A93DE07E084C71BAD96 /* AgenticUIDebugPanel.swift */; };
 		WI2C4E253F126849AEC87D1F /* AgenticUIWorkspaceInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WI2584A4C5CC1DFC9C844D30 /* AgenticUIWorkspaceInspectorView.swift */; };
+		ED1AB19FBD8A4AFA9E6A46DC /* DNSLookupDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 136AC1CC47A94BDFA3CA14EC /* DNSLookupDevTool.swift */; };
+		0D46F6A690CC4DF0AF6E6A2E /* XMLFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B11523AC4E14CE488290B0B /* XMLFormatterDevTool.swift */; };
+		71B11BC1C1D245B0A07447FA /* JSONDiffDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = E705DC3E3CC9462C8ACE76C4 /* JSONDiffDevTool.swift */; };
+		28ADF54F26984B3C8B68D2AA /* SFSymbolsBrowserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE8DDE6A31B4B2EB00D6FF4 /* SFSymbolsBrowserDevTool.swift */; };
+		42E388FC9A374CC0955891C5 /* UUIDBulkGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EB435CC44146329894F9F2 /* UUIDBulkGeneratorDevTool.swift */; };
+		20DD481ED0E945F49CD92768 /* IPInfoDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCD95B771504B62BA5FAFF8 /* IPInfoDevTool.swift */; };
+		97E108EB013F49199E5DEE80 /* RegexTesterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 971500E96B7F42ECBD228DC9 /* RegexTesterDevTool.swift */; };
+		C4B1CC0FD9F641F68A4DA2F8 /* HashGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBC50D898A614F24819AD94D /* HashGeneratorDevTool.swift */; };
+		2240473323064CDF9C050884 /* KeychainViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68633FC4718402FB2CFF2B5 /* KeychainViewerDevTool.swift */; };
+		21F88283FE684B77AD310DEB /* MemoryMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AFD0001A06477F8013C77D /* MemoryMonitorDevTool.swift */; };
+		FC9161E6F50E480D81CB8E06 /* OSVersionInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90600279236049AB979A8D8B /* OSVersionInspectorDevTool.swift */; };
+		DEB7E864D5CE43E9A3B251DE /* CPUMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EAF6A38D524468A461D19E /* CPUMonitorDevTool.swift */; };
+		FE1DEC260CD747F19B73FD0E /* WebSocketMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09942C8E1AD041C4B2760EC1 /* WebSocketMonitorDevTool.swift */; };
+		FFFF693F6AE54F029914271D /* CacheViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF190B6F66654D6A924DA973 /* CacheViewerDevTool.swift */; };
+		39BDFC31FA2844F48B8D5D76 /* CSVParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F741DB42E174FDAA365A743 /* CSVParserDevTool.swift */; };
+		CCCE149428844A32BA4744B8 /* URLParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B68E789341648359E57B071 /* URLParserDevTool.swift */; };
+		D8B1C7623F1D43BDA3C7A8A0 /* BatteryStatusDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A9463152D74BC595211C68 /* BatteryStatusDevTool.swift */; };
+		BAE2E551E11D48F8A161A389 /* DateFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6191C3E507C84008B365ABB3 /* DateFormatterDevTool.swift */; };
+		8E0A491D9A6E4C8685DBCB8D /* ScriptRunnerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EBEB1A24794A09B89E71B0 /* ScriptRunnerDevTool.swift */; };
+		5E01FF2BF539408A8BEF750B /* BreakpointManagerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0874E50FE1EF4BE5B39E7DAF /* BreakpointManagerDevTool.swift */; };
+		5D873D36F51148BC9365C62C /* MarkdownPreviewDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D692C44B0E2494C9A372E1E /* MarkdownPreviewDevTool.swift */; };
+		7A19E85841104ED68A8DC2E0 /* VerboseLoggerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AEDAD4198C4F26B1EE9FBE /* VerboseLoggerDevTool.swift */; };
+		FF383AC1D4C24BDA8DD22E14 /* FileExplorerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422F0D2914544286B538952F /* FileExplorerDevTool.swift */; };
+		2FD0897DB32D40AE8D618DC1 /* EnergyImpactMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F16C911D000492AB9FCA89E /* EnergyImpactMonitorDevTool.swift */; };
+		F2C0EB90D01949BABF3BDE96 /* RuntimeInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41BA841940D34636B5B2C8E1 /* RuntimeInspectorDevTool.swift */; };
+		DE739BEEF3004AC6AC1C5642 /* UserDefaultsInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A4C03E2CB647EB9647803E /* UserDefaultsInspectorDevTool.swift */; };
+		81716F71A9784DA085DDE24E /* ViewHierarchyInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A6BA5485404F33B5B720AE /* ViewHierarchyInspectorDevTool.swift */; };
+		A0E236942FA74C48AA29FD2C /* JSONValidatorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2358F356DB7041889AF27A3F /* JSONValidatorDevTool.swift */; };
+		0D0E80E93D984FE2B04B56B7 /* UUIDGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D28B6E1645410F8BBB519B /* UUIDGeneratorDevTool.swift */; };
+		DD6EF973ACFA422FB4E188DA /* DeviceInfoDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32C827A87804F77945EAB69 /* DeviceInfoDevTool.swift */; };
+		DDF855E26E4F4CCBBA702016 /* DiskUsageAnalyzerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6DBF7F7F0D84A30A22ECBF7 /* DiskUsageAnalyzerDevTool.swift */; };
+		C7075BE22621453AB028BD03 /* AppStateInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B31BBC89F04385AF4A969B /* AppStateInspectorDevTool.swift */; };
+		694070CB68E24C13AEB67444 /* LayoutGridPreviewDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27CA7C4F3874EF2B3E715DF /* LayoutGridPreviewDevTool.swift */; };
+		A919A0A4BDBC470AA7C7D746 /* HTTPRequestTesterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775C21DC04C543489C875010 /* HTTPRequestTesterDevTool.swift */; };
+		CE59FCA9737F4C019685672E /* ShadowGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5655E1BCF54D94A8A588C4 /* ShadowGeneratorDevTool.swift */; };
+		E268F89B32FB49AE879E1250 /* ClipboardInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA5AC72F2984AE3B9A838BA /* ClipboardInspectorDevTool.swift */; };
+		973BFEDF813E4DA3A1F1F73E /* GradientBuilderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 838C3113082E49CDAF657EAC /* GradientBuilderDevTool.swift */; };
+		603DBB721B0A4948BFB55AAA /* HTMLEntityEncoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5DCBEC031E464D8EC3C4AE /* HTMLEntityEncoderDevTool.swift */; };
+		DECB39F447004B598EE21A75 /* YAMLParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A88A7CA8B64675B4AFE539 /* YAMLParserDevTool.swift */; };
+		E6C67F296FA04BDCB74DDBE5 /* LoremIpsumGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E877FDF7CA6427595E3BB8C /* LoremIpsumGeneratorDevTool.swift */; };
+		ABB00809F5814D2BACB28E80 /* PermissionInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25AECACC30C14716B3013901 /* PermissionInspectorDevTool.swift */; };
+		096FA3D6396F4067881183B7 /* JWTDecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2208A9C0CF904CB4B32C0FBE /* JWTDecoderDevTool.swift */; };
+		713E0533E5E542B3860C049B /* Base64EncoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C1AA20141840DF8DAC155B /* Base64EncoderDevTool.swift */; };
+		91EDD00757C94E1290B9C798 /* ColorConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6543C98EF1144CCAFB951E3 /* ColorConverterDevTool.swift */; };
+		412F48260334428A8AFD5FB0 /* TimezoneConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7101221B94664FF6A2A16415 /* TimezoneConverterDevTool.swift */; };
+		286434D0455549E996B295D6 /* APIResponseViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBFBC7A30FEC46858DE6A09D /* APIResponseViewerDevTool.swift */; };
+		F8B6C0E9AD5F41CB8F62B97E /* TextCaseConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FF499222AB430DB80AA39C /* TextCaseConverterDevTool.swift */; };
+		CABBB807363A40E4A47EA995 /* URLEncoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 247CDBA4B2E44FA9BF7BF691 /* URLEncoderDevTool.swift */; };
+		0B00347173954E3C8B35B0C4 /* HeaderInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB0226F977E4DBFB7DBD1A2 /* HeaderInspectorDevTool.swift */; };
+		06B8202E869F49A1A5B53993 /* UnicodeInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = A287036E72D94290A7A9A8A1 /* UnicodeInspectorDevTool.swift */; };
+		68795524235641ACB5E2FE21 /* EncryptionToolDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F10842016474037952C1522 /* EncryptionToolDevTool.swift */; };
+		B53340373D2843B59FE0F5C4 /* LaunchTimeTrackerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02F131BC564D658E668F0F /* LaunchTimeTrackerDevTool.swift */; };
+		44896C6269FE4C4B9D3D238A /* SQLiteBrowserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDA83B03E20414B8A822A7B /* SQLiteBrowserDevTool.swift */; };
+		EF1D47D690D248348EF35A87 /* Base64DecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D4A5F0DE4384EAFA7DC3B2F /* Base64DecoderDevTool.swift */; };
+		57B11F6819304C2A9A1A6F51 /* JSONFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38A0627442E140C99D2C19AE /* JSONFormatterDevTool.swift */; };
+		344B9B374DA945B6B825A46B /* FPSMonitorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE892A63C6B84F66A3D99713 /* FPSMonitorDevTool.swift */; };
+		E9A6D245BD7F48EFAE76AD96 /* ColorPaletteGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08F4918FF5664AC4881D460F /* ColorPaletteGeneratorDevTool.swift */; };
+		D37FD0C9C9E44EB8AD034EDC /* TaskAutomationDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB502848264CE89E114708 /* TaskAutomationDevTool.swift */; };
+		36AE11CC78F44F24950A4C0B /* ThreadInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637B4943AE2D404097B93977 /* ThreadInspectorDevTool.swift */; };
+		E0E13F12D52E4ED096946FAB /* BezierCurveVisualizerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BD76C77E74423F820E9DD6 /* BezierCurveVisualizerDevTool.swift */; };
+		F698D02D289D4D13A2B10FFD /* LogStreamViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A8AE66F4F14C2E8EC01377 /* LogStreamViewerDevTool.swift */; };
+		25D8C4FF832B4C6190D19009 /* URLDecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849ACEC3A4384BA4B4EBA3DD /* URLDecoderDevTool.swift */; };
+		F7933A1A179942D990E817EA /* QueryStringParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A16D674599438B8A4ED3B8 /* QueryStringParserDevTool.swift */; };
+		1A357B7704DE48D4B63D1216 /* ContrastCheckerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64E095985CD4714994C21B0 /* ContrastCheckerDevTool.swift */; };
+		A2C6459A3F04486AA6D4E826 /* ASCIIHexConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F8419FDCC094CA7BF3CF6A9 /* ASCIIHexConverterDevTool.swift */; };
+		D288D29B004347BB9549CD13 /* NumberFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = E955F71105B64199B3EFFE55 /* NumberFormatterDevTool.swift */; };
+		7D74185EED73411D82CFD77E /* HTMLEntityDecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1029B32F0F44FA1A27B6034 /* HTMLEntityDecoderDevTool.swift */; };
+		52C2DB224C394C79B0F196F3 /* TextDiffDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157040D1A63C4478B8682D79 /* TextDiffDevTool.swift */; };
+		86E3529AA8304F859D947AE9 /* NetworkReachabilityDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215A77C096184D66825989D2 /* NetworkReachabilityDevTool.swift */; };
+		E5A4F4933C484DEBBE959EFB /* CrashLogViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4C55C8AA714E04A9AD84BB /* CrashLogViewerDevTool.swift */; };
+		3ACD485C621F41389BE35DB5 /* TypographyScaleDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7702CF69F348E4BC0B7488 /* TypographyScaleDevTool.swift */; };
+		DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E813EF936284C389651EA24 /* ColorMixerDevTool.swift */; };
+		21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5619C319AF314C56B15BA1E5 /* DevToolsMainView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2928,6 +3001,79 @@
 		AS1AE27E255AB74D5E10B24A /* AgenticUIActionStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIActionStreamView.swift; sourceTree = "<group>"; };
 		DP510A93DE07E084C71BAD96 /* AgenticUIDebugPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIDebugPanel.swift; sourceTree = "<group>"; };
 		WI2584A4C5CC1DFC9C844D30 /* AgenticUIWorkspaceInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIWorkspaceInspectorView.swift; sourceTree = "<group>"; };
+		136AC1CC47A94BDFA3CA14EC /* DNSLookupDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DNSLookupDevTool.swift; sourceTree = "<group>"; };
+		7B11523AC4E14CE488290B0B /* XMLFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/XMLFormatterDevTool.swift; sourceTree = "<group>"; };
+		E705DC3E3CC9462C8ACE76C4 /* JSONDiffDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/JSONDiffDevTool.swift; sourceTree = "<group>"; };
+		5AE8DDE6A31B4B2EB00D6FF4 /* SFSymbolsBrowserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SFSymbolsBrowserDevTool.swift; sourceTree = "<group>"; };
+		F6EB435CC44146329894F9F2 /* UUIDBulkGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/UUIDBulkGeneratorDevTool.swift; sourceTree = "<group>"; };
+		CCCD95B771504B62BA5FAFF8 /* IPInfoDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/IPInfoDevTool.swift; sourceTree = "<group>"; };
+		971500E96B7F42ECBD228DC9 /* RegexTesterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/RegexTesterDevTool.swift; sourceTree = "<group>"; };
+		BBC50D898A614F24819AD94D /* HashGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/HashGeneratorDevTool.swift; sourceTree = "<group>"; };
+		B68633FC4718402FB2CFF2B5 /* KeychainViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/KeychainViewerDevTool.swift; sourceTree = "<group>"; };
+		05AFD0001A06477F8013C77D /* MemoryMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/MemoryMonitorDevTool.swift; sourceTree = "<group>"; };
+		90600279236049AB979A8D8B /* OSVersionInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/OSVersionInspectorDevTool.swift; sourceTree = "<group>"; };
+		50EAF6A38D524468A461D19E /* CPUMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/CPUMonitorDevTool.swift; sourceTree = "<group>"; };
+		09942C8E1AD041C4B2760EC1 /* WebSocketMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/WebSocketMonitorDevTool.swift; sourceTree = "<group>"; };
+		FF190B6F66654D6A924DA973 /* CacheViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/CacheViewerDevTool.swift; sourceTree = "<group>"; };
+		0F741DB42E174FDAA365A743 /* CSVParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/CSVParserDevTool.swift; sourceTree = "<group>"; };
+		8B68E789341648359E57B071 /* URLParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/URLParserDevTool.swift; sourceTree = "<group>"; };
+		86A9463152D74BC595211C68 /* BatteryStatusDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/BatteryStatusDevTool.swift; sourceTree = "<group>"; };
+		6191C3E507C84008B365ABB3 /* DateFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DateFormatterDevTool.swift; sourceTree = "<group>"; };
+		72EBEB1A24794A09B89E71B0 /* ScriptRunnerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ScriptRunnerDevTool.swift; sourceTree = "<group>"; };
+		0874E50FE1EF4BE5B39E7DAF /* BreakpointManagerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/BreakpointManagerDevTool.swift; sourceTree = "<group>"; };
+		9D692C44B0E2494C9A372E1E /* MarkdownPreviewDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/MarkdownPreviewDevTool.swift; sourceTree = "<group>"; };
+		18AEDAD4198C4F26B1EE9FBE /* VerboseLoggerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/VerboseLoggerDevTool.swift; sourceTree = "<group>"; };
+		422F0D2914544286B538952F /* FileExplorerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/FileExplorerDevTool.swift; sourceTree = "<group>"; };
+		6F16C911D000492AB9FCA89E /* EnergyImpactMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/EnergyImpactMonitorDevTool.swift; sourceTree = "<group>"; };
+		41BA841940D34636B5B2C8E1 /* RuntimeInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/RuntimeInspectorDevTool.swift; sourceTree = "<group>"; };
+		99A4C03E2CB647EB9647803E /* UserDefaultsInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/UserDefaultsInspectorDevTool.swift; sourceTree = "<group>"; };
+		98A6BA5485404F33B5B720AE /* ViewHierarchyInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ViewHierarchyInspectorDevTool.swift; sourceTree = "<group>"; };
+		2358F356DB7041889AF27A3F /* JSONValidatorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/JSONValidatorDevTool.swift; sourceTree = "<group>"; };
+		B0D28B6E1645410F8BBB519B /* UUIDGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/UUIDGeneratorDevTool.swift; sourceTree = "<group>"; };
+		D32C827A87804F77945EAB69 /* DeviceInfoDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DeviceInfoDevTool.swift; sourceTree = "<group>"; };
+		C6DBF7F7F0D84A30A22ECBF7 /* DiskUsageAnalyzerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DiskUsageAnalyzerDevTool.swift; sourceTree = "<group>"; };
+		82B31BBC89F04385AF4A969B /* AppStateInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/AppStateInspectorDevTool.swift; sourceTree = "<group>"; };
+		C27CA7C4F3874EF2B3E715DF /* LayoutGridPreviewDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/LayoutGridPreviewDevTool.swift; sourceTree = "<group>"; };
+		775C21DC04C543489C875010 /* HTTPRequestTesterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/HTTPRequestTesterDevTool.swift; sourceTree = "<group>"; };
+		BF5655E1BCF54D94A8A588C4 /* ShadowGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ShadowGeneratorDevTool.swift; sourceTree = "<group>"; };
+		6EA5AC72F2984AE3B9A838BA /* ClipboardInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ClipboardInspectorDevTool.swift; sourceTree = "<group>"; };
+		838C3113082E49CDAF657EAC /* GradientBuilderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/GradientBuilderDevTool.swift; sourceTree = "<group>"; };
+		1F5DCBEC031E464D8EC3C4AE /* HTMLEntityEncoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/HTMLEntityEncoderDevTool.swift; sourceTree = "<group>"; };
+		64A88A7CA8B64675B4AFE539 /* YAMLParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/YAMLParserDevTool.swift; sourceTree = "<group>"; };
+		3E877FDF7CA6427595E3BB8C /* LoremIpsumGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/LoremIpsumGeneratorDevTool.swift; sourceTree = "<group>"; };
+		25AECACC30C14716B3013901 /* PermissionInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/PermissionInspectorDevTool.swift; sourceTree = "<group>"; };
+		2208A9C0CF904CB4B32C0FBE /* JWTDecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/JWTDecoderDevTool.swift; sourceTree = "<group>"; };
+		93C1AA20141840DF8DAC155B /* Base64EncoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/Base64EncoderDevTool.swift; sourceTree = "<group>"; };
+		A6543C98EF1144CCAFB951E3 /* ColorConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ColorConverterDevTool.swift; sourceTree = "<group>"; };
+		7101221B94664FF6A2A16415 /* TimezoneConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/TimezoneConverterDevTool.swift; sourceTree = "<group>"; };
+		FBFBC7A30FEC46858DE6A09D /* APIResponseViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/APIResponseViewerDevTool.swift; sourceTree = "<group>"; };
+		74FF499222AB430DB80AA39C /* TextCaseConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/TextCaseConverterDevTool.swift; sourceTree = "<group>"; };
+		247CDBA4B2E44FA9BF7BF691 /* URLEncoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/URLEncoderDevTool.swift; sourceTree = "<group>"; };
+		2DB0226F977E4DBFB7DBD1A2 /* HeaderInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/HeaderInspectorDevTool.swift; sourceTree = "<group>"; };
+		A287036E72D94290A7A9A8A1 /* UnicodeInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/UnicodeInspectorDevTool.swift; sourceTree = "<group>"; };
+		8F10842016474037952C1522 /* EncryptionToolDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/EncryptionToolDevTool.swift; sourceTree = "<group>"; };
+		4B02F131BC564D658E668F0F /* LaunchTimeTrackerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/LaunchTimeTrackerDevTool.swift; sourceTree = "<group>"; };
+		FFDA83B03E20414B8A822A7B /* SQLiteBrowserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SQLiteBrowserDevTool.swift; sourceTree = "<group>"; };
+		9D4A5F0DE4384EAFA7DC3B2F /* Base64DecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/Base64DecoderDevTool.swift; sourceTree = "<group>"; };
+		38A0627442E140C99D2C19AE /* JSONFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/JSONFormatterDevTool.swift; sourceTree = "<group>"; };
+		AE892A63C6B84F66A3D99713 /* FPSMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/FPSMonitorDevTool.swift; sourceTree = "<group>"; };
+		08F4918FF5664AC4881D460F /* ColorPaletteGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ColorPaletteGeneratorDevTool.swift; sourceTree = "<group>"; };
+		E4EB502848264CE89E114708 /* TaskAutomationDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/TaskAutomationDevTool.swift; sourceTree = "<group>"; };
+		637B4943AE2D404097B93977 /* ThreadInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ThreadInspectorDevTool.swift; sourceTree = "<group>"; };
+		01BD76C77E74423F820E9DD6 /* BezierCurveVisualizerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/BezierCurveVisualizerDevTool.swift; sourceTree = "<group>"; };
+		69A8AE66F4F14C2E8EC01377 /* LogStreamViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/LogStreamViewerDevTool.swift; sourceTree = "<group>"; };
+		849ACEC3A4384BA4B4EBA3DD /* URLDecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/URLDecoderDevTool.swift; sourceTree = "<group>"; };
+		32A16D674599438B8A4ED3B8 /* QueryStringParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/QueryStringParserDevTool.swift; sourceTree = "<group>"; };
+		A64E095985CD4714994C21B0 /* ContrastCheckerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ContrastCheckerDevTool.swift; sourceTree = "<group>"; };
+		3F8419FDCC094CA7BF3CF6A9 /* ASCIIHexConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ASCIIHexConverterDevTool.swift; sourceTree = "<group>"; };
+		E955F71105B64199B3EFFE55 /* NumberFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/NumberFormatterDevTool.swift; sourceTree = "<group>"; };
+		C1029B32F0F44FA1A27B6034 /* HTMLEntityDecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/HTMLEntityDecoderDevTool.swift; sourceTree = "<group>"; };
+		157040D1A63C4478B8682D79 /* TextDiffDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/TextDiffDevTool.swift; sourceTree = "<group>"; };
+		215A77C096184D66825989D2 /* NetworkReachabilityDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/NetworkReachabilityDevTool.swift; sourceTree = "<group>"; };
+		4B4C55C8AA714E04A9AD84BB /* CrashLogViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/CrashLogViewerDevTool.swift; sourceTree = "<group>"; };
+		2D7702CF69F348E4BC0B7488 /* TypographyScaleDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/TypographyScaleDevTool.swift; sourceTree = "<group>"; };
+		8E813EF936284C389651EA24 /* ColorMixerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ColorMixerDevTool.swift; sourceTree = "<group>"; };
+		5619C319AF314C56B15BA1E5 /* DevToolsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DevToolsMainView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -7601,7 +7747,80 @@
 				NG0500000000000000000004 /* Versioning */,
 				NG0500000000000000000005 /* Testing */,
 				NG0500000000000000000006 /* Changelog */,
-			);
+							136AC1CC47A94BDFA3CA14EC /* DNSLookupDevTool.swift */,
+				7B11523AC4E14CE488290B0B /* XMLFormatterDevTool.swift */,
+				E705DC3E3CC9462C8ACE76C4 /* JSONDiffDevTool.swift */,
+				5AE8DDE6A31B4B2EB00D6FF4 /* SFSymbolsBrowserDevTool.swift */,
+				F6EB435CC44146329894F9F2 /* UUIDBulkGeneratorDevTool.swift */,
+				CCCD95B771504B62BA5FAFF8 /* IPInfoDevTool.swift */,
+				971500E96B7F42ECBD228DC9 /* RegexTesterDevTool.swift */,
+				BBC50D898A614F24819AD94D /* HashGeneratorDevTool.swift */,
+				B68633FC4718402FB2CFF2B5 /* KeychainViewerDevTool.swift */,
+				05AFD0001A06477F8013C77D /* MemoryMonitorDevTool.swift */,
+				90600279236049AB979A8D8B /* OSVersionInspectorDevTool.swift */,
+				50EAF6A38D524468A461D19E /* CPUMonitorDevTool.swift */,
+				09942C8E1AD041C4B2760EC1 /* WebSocketMonitorDevTool.swift */,
+				FF190B6F66654D6A924DA973 /* CacheViewerDevTool.swift */,
+				0F741DB42E174FDAA365A743 /* CSVParserDevTool.swift */,
+				8B68E789341648359E57B071 /* URLParserDevTool.swift */,
+				86A9463152D74BC595211C68 /* BatteryStatusDevTool.swift */,
+				6191C3E507C84008B365ABB3 /* DateFormatterDevTool.swift */,
+				72EBEB1A24794A09B89E71B0 /* ScriptRunnerDevTool.swift */,
+				0874E50FE1EF4BE5B39E7DAF /* BreakpointManagerDevTool.swift */,
+				9D692C44B0E2494C9A372E1E /* MarkdownPreviewDevTool.swift */,
+				18AEDAD4198C4F26B1EE9FBE /* VerboseLoggerDevTool.swift */,
+				422F0D2914544286B538952F /* FileExplorerDevTool.swift */,
+				6F16C911D000492AB9FCA89E /* EnergyImpactMonitorDevTool.swift */,
+				41BA841940D34636B5B2C8E1 /* RuntimeInspectorDevTool.swift */,
+				99A4C03E2CB647EB9647803E /* UserDefaultsInspectorDevTool.swift */,
+				98A6BA5485404F33B5B720AE /* ViewHierarchyInspectorDevTool.swift */,
+				2358F356DB7041889AF27A3F /* JSONValidatorDevTool.swift */,
+				B0D28B6E1645410F8BBB519B /* UUIDGeneratorDevTool.swift */,
+				D32C827A87804F77945EAB69 /* DeviceInfoDevTool.swift */,
+				C6DBF7F7F0D84A30A22ECBF7 /* DiskUsageAnalyzerDevTool.swift */,
+				82B31BBC89F04385AF4A969B /* AppStateInspectorDevTool.swift */,
+				C27CA7C4F3874EF2B3E715DF /* LayoutGridPreviewDevTool.swift */,
+				775C21DC04C543489C875010 /* HTTPRequestTesterDevTool.swift */,
+				BF5655E1BCF54D94A8A588C4 /* ShadowGeneratorDevTool.swift */,
+				6EA5AC72F2984AE3B9A838BA /* ClipboardInspectorDevTool.swift */,
+				838C3113082E49CDAF657EAC /* GradientBuilderDevTool.swift */,
+				1F5DCBEC031E464D8EC3C4AE /* HTMLEntityEncoderDevTool.swift */,
+				64A88A7CA8B64675B4AFE539 /* YAMLParserDevTool.swift */,
+				3E877FDF7CA6427595E3BB8C /* LoremIpsumGeneratorDevTool.swift */,
+				25AECACC30C14716B3013901 /* PermissionInspectorDevTool.swift */,
+				2208A9C0CF904CB4B32C0FBE /* JWTDecoderDevTool.swift */,
+				93C1AA20141840DF8DAC155B /* Base64EncoderDevTool.swift */,
+				A6543C98EF1144CCAFB951E3 /* ColorConverterDevTool.swift */,
+				7101221B94664FF6A2A16415 /* TimezoneConverterDevTool.swift */,
+				FBFBC7A30FEC46858DE6A09D /* APIResponseViewerDevTool.swift */,
+				74FF499222AB430DB80AA39C /* TextCaseConverterDevTool.swift */,
+				247CDBA4B2E44FA9BF7BF691 /* URLEncoderDevTool.swift */,
+				2DB0226F977E4DBFB7DBD1A2 /* HeaderInspectorDevTool.swift */,
+				A287036E72D94290A7A9A8A1 /* UnicodeInspectorDevTool.swift */,
+				8F10842016474037952C1522 /* EncryptionToolDevTool.swift */,
+				4B02F131BC564D658E668F0F /* LaunchTimeTrackerDevTool.swift */,
+				FFDA83B03E20414B8A822A7B /* SQLiteBrowserDevTool.swift */,
+				9D4A5F0DE4384EAFA7DC3B2F /* Base64DecoderDevTool.swift */,
+				38A0627442E140C99D2C19AE /* JSONFormatterDevTool.swift */,
+				AE892A63C6B84F66A3D99713 /* FPSMonitorDevTool.swift */,
+				08F4918FF5664AC4881D460F /* ColorPaletteGeneratorDevTool.swift */,
+				E4EB502848264CE89E114708 /* TaskAutomationDevTool.swift */,
+				637B4943AE2D404097B93977 /* ThreadInspectorDevTool.swift */,
+				01BD76C77E74423F820E9DD6 /* BezierCurveVisualizerDevTool.swift */,
+				69A8AE66F4F14C2E8EC01377 /* LogStreamViewerDevTool.swift */,
+				849ACEC3A4384BA4B4EBA3DD /* URLDecoderDevTool.swift */,
+				32A16D674599438B8A4ED3B8 /* QueryStringParserDevTool.swift */,
+				A64E095985CD4714994C21B0 /* ContrastCheckerDevTool.swift */,
+				3F8419FDCC094CA7BF3CF6A9 /* ASCIIHexConverterDevTool.swift */,
+				E955F71105B64199B3EFFE55 /* NumberFormatterDevTool.swift */,
+				C1029B32F0F44FA1A27B6034 /* HTMLEntityDecoderDevTool.swift */,
+				157040D1A63C4478B8682D79 /* TextDiffDevTool.swift */,
+				215A77C096184D66825989D2 /* NetworkReachabilityDevTool.swift */,
+				4B4C55C8AA714E04A9AD84BB /* CrashLogViewerDevTool.swift */,
+				2D7702CF69F348E4BC0B7488 /* TypographyScaleDevTool.swift */,
+				8E813EF936284C389651EA24 /* ColorMixerDevTool.swift */,
+				5619C319AF314C56B15BA1E5 /* DevToolsMainView.swift */,
+);
 			path = SDK;
 			sourceTree = "<group>";
 		};
@@ -11377,7 +11596,80 @@
 				A635DCE822B6300B2142EE01 /* SDKConnectorHealthView.swift in Sources */,
 				C0B0B0B0B0B0B0B0B0B0B003 /* Color+Hex.swift in Sources */,
 				04494BFF858161E110044905 /* SDKConnectorMetricsView.swift in Sources */,
-			);
+							ED1AB19FBD8A4AFA9E6A46DC /* DNSLookupDevTool.swift in Sources */,
+				0D46F6A690CC4DF0AF6E6A2E /* XMLFormatterDevTool.swift in Sources */,
+				71B11BC1C1D245B0A07447FA /* JSONDiffDevTool.swift in Sources */,
+				28ADF54F26984B3C8B68D2AA /* SFSymbolsBrowserDevTool.swift in Sources */,
+				42E388FC9A374CC0955891C5 /* UUIDBulkGeneratorDevTool.swift in Sources */,
+				20DD481ED0E945F49CD92768 /* IPInfoDevTool.swift in Sources */,
+				97E108EB013F49199E5DEE80 /* RegexTesterDevTool.swift in Sources */,
+				C4B1CC0FD9F641F68A4DA2F8 /* HashGeneratorDevTool.swift in Sources */,
+				2240473323064CDF9C050884 /* KeychainViewerDevTool.swift in Sources */,
+				21F88283FE684B77AD310DEB /* MemoryMonitorDevTool.swift in Sources */,
+				FC9161E6F50E480D81CB8E06 /* OSVersionInspectorDevTool.swift in Sources */,
+				DEB7E864D5CE43E9A3B251DE /* CPUMonitorDevTool.swift in Sources */,
+				FE1DEC260CD747F19B73FD0E /* WebSocketMonitorDevTool.swift in Sources */,
+				FFFF693F6AE54F029914271D /* CacheViewerDevTool.swift in Sources */,
+				39BDFC31FA2844F48B8D5D76 /* CSVParserDevTool.swift in Sources */,
+				CCCE149428844A32BA4744B8 /* URLParserDevTool.swift in Sources */,
+				D8B1C7623F1D43BDA3C7A8A0 /* BatteryStatusDevTool.swift in Sources */,
+				BAE2E551E11D48F8A161A389 /* DateFormatterDevTool.swift in Sources */,
+				8E0A491D9A6E4C8685DBCB8D /* ScriptRunnerDevTool.swift in Sources */,
+				5E01FF2BF539408A8BEF750B /* BreakpointManagerDevTool.swift in Sources */,
+				5D873D36F51148BC9365C62C /* MarkdownPreviewDevTool.swift in Sources */,
+				7A19E85841104ED68A8DC2E0 /* VerboseLoggerDevTool.swift in Sources */,
+				FF383AC1D4C24BDA8DD22E14 /* FileExplorerDevTool.swift in Sources */,
+				2FD0897DB32D40AE8D618DC1 /* EnergyImpactMonitorDevTool.swift in Sources */,
+				F2C0EB90D01949BABF3BDE96 /* RuntimeInspectorDevTool.swift in Sources */,
+				DE739BEEF3004AC6AC1C5642 /* UserDefaultsInspectorDevTool.swift in Sources */,
+				81716F71A9784DA085DDE24E /* ViewHierarchyInspectorDevTool.swift in Sources */,
+				A0E236942FA74C48AA29FD2C /* JSONValidatorDevTool.swift in Sources */,
+				0D0E80E93D984FE2B04B56B7 /* UUIDGeneratorDevTool.swift in Sources */,
+				DD6EF973ACFA422FB4E188DA /* DeviceInfoDevTool.swift in Sources */,
+				DDF855E26E4F4CCBBA702016 /* DiskUsageAnalyzerDevTool.swift in Sources */,
+				C7075BE22621453AB028BD03 /* AppStateInspectorDevTool.swift in Sources */,
+				694070CB68E24C13AEB67444 /* LayoutGridPreviewDevTool.swift in Sources */,
+				A919A0A4BDBC470AA7C7D746 /* HTTPRequestTesterDevTool.swift in Sources */,
+				CE59FCA9737F4C019685672E /* ShadowGeneratorDevTool.swift in Sources */,
+				E268F89B32FB49AE879E1250 /* ClipboardInspectorDevTool.swift in Sources */,
+				973BFEDF813E4DA3A1F1F73E /* GradientBuilderDevTool.swift in Sources */,
+				603DBB721B0A4948BFB55AAA /* HTMLEntityEncoderDevTool.swift in Sources */,
+				DECB39F447004B598EE21A75 /* YAMLParserDevTool.swift in Sources */,
+				E6C67F296FA04BDCB74DDBE5 /* LoremIpsumGeneratorDevTool.swift in Sources */,
+				ABB00809F5814D2BACB28E80 /* PermissionInspectorDevTool.swift in Sources */,
+				096FA3D6396F4067881183B7 /* JWTDecoderDevTool.swift in Sources */,
+				713E0533E5E542B3860C049B /* Base64EncoderDevTool.swift in Sources */,
+				91EDD00757C94E1290B9C798 /* ColorConverterDevTool.swift in Sources */,
+				412F48260334428A8AFD5FB0 /* TimezoneConverterDevTool.swift in Sources */,
+				286434D0455549E996B295D6 /* APIResponseViewerDevTool.swift in Sources */,
+				F8B6C0E9AD5F41CB8F62B97E /* TextCaseConverterDevTool.swift in Sources */,
+				CABBB807363A40E4A47EA995 /* URLEncoderDevTool.swift in Sources */,
+				0B00347173954E3C8B35B0C4 /* HeaderInspectorDevTool.swift in Sources */,
+				06B8202E869F49A1A5B53993 /* UnicodeInspectorDevTool.swift in Sources */,
+				68795524235641ACB5E2FE21 /* EncryptionToolDevTool.swift in Sources */,
+				B53340373D2843B59FE0F5C4 /* LaunchTimeTrackerDevTool.swift in Sources */,
+				44896C6269FE4C4B9D3D238A /* SQLiteBrowserDevTool.swift in Sources */,
+				EF1D47D690D248348EF35A87 /* Base64DecoderDevTool.swift in Sources */,
+				57B11F6819304C2A9A1A6F51 /* JSONFormatterDevTool.swift in Sources */,
+				344B9B374DA945B6B825A46B /* FPSMonitorDevTool.swift in Sources */,
+				E9A6D245BD7F48EFAE76AD96 /* ColorPaletteGeneratorDevTool.swift in Sources */,
+				D37FD0C9C9E44EB8AD034EDC /* TaskAutomationDevTool.swift in Sources */,
+				36AE11CC78F44F24950A4C0B /* ThreadInspectorDevTool.swift in Sources */,
+				E0E13F12D52E4ED096946FAB /* BezierCurveVisualizerDevTool.swift in Sources */,
+				F698D02D289D4D13A2B10FFD /* LogStreamViewerDevTool.swift in Sources */,
+				25D8C4FF832B4C6190D19009 /* URLDecoderDevTool.swift in Sources */,
+				F7933A1A179942D990E817EA /* QueryStringParserDevTool.swift in Sources */,
+				1A357B7704DE48D4B63D1216 /* ContrastCheckerDevTool.swift in Sources */,
+				A2C6459A3F04486AA6D4E826 /* ASCIIHexConverterDevTool.swift in Sources */,
+				D288D29B004347BB9549CD13 /* NumberFormatterDevTool.swift in Sources */,
+				7D74185EED73411D82CFD77E /* HTMLEntityDecoderDevTool.swift in Sources */,
+				52C2DB224C394C79B0F196F3 /* TextDiffDevTool.swift in Sources */,
+				86E3529AA8304F859D947AE9 /* NetworkReachabilityDevTool.swift in Sources */,
+				E5A4F4933C484DEBBE959EFB /* CrashLogViewerDevTool.swift in Sources */,
+				3ACD485C621F41389BE35DB5 /* TypographyScaleDevTool.swift in Sources */,
+				DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */,
+				21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		KB0400000000000000000201 /* Sources */ = {
@@ -11411,7 +11703,80 @@
 				KB02OPENRT00000000000001 /* OpenRouterService.swift in Sources */,
 				KB02AIPROTO0000000000001 /* AIProviderProtocol.swift in Sources */,
 				KB02AICHAT00000000000001 /* AIChatSettings.swift in Sources */,
-			);
+							ED1AB19FBD8A4AFA9E6A46DC /* DNSLookupDevTool.swift in Sources */,
+				0D46F6A690CC4DF0AF6E6A2E /* XMLFormatterDevTool.swift in Sources */,
+				71B11BC1C1D245B0A07447FA /* JSONDiffDevTool.swift in Sources */,
+				28ADF54F26984B3C8B68D2AA /* SFSymbolsBrowserDevTool.swift in Sources */,
+				42E388FC9A374CC0955891C5 /* UUIDBulkGeneratorDevTool.swift in Sources */,
+				20DD481ED0E945F49CD92768 /* IPInfoDevTool.swift in Sources */,
+				97E108EB013F49199E5DEE80 /* RegexTesterDevTool.swift in Sources */,
+				C4B1CC0FD9F641F68A4DA2F8 /* HashGeneratorDevTool.swift in Sources */,
+				2240473323064CDF9C050884 /* KeychainViewerDevTool.swift in Sources */,
+				21F88283FE684B77AD310DEB /* MemoryMonitorDevTool.swift in Sources */,
+				FC9161E6F50E480D81CB8E06 /* OSVersionInspectorDevTool.swift in Sources */,
+				DEB7E864D5CE43E9A3B251DE /* CPUMonitorDevTool.swift in Sources */,
+				FE1DEC260CD747F19B73FD0E /* WebSocketMonitorDevTool.swift in Sources */,
+				FFFF693F6AE54F029914271D /* CacheViewerDevTool.swift in Sources */,
+				39BDFC31FA2844F48B8D5D76 /* CSVParserDevTool.swift in Sources */,
+				CCCE149428844A32BA4744B8 /* URLParserDevTool.swift in Sources */,
+				D8B1C7623F1D43BDA3C7A8A0 /* BatteryStatusDevTool.swift in Sources */,
+				BAE2E551E11D48F8A161A389 /* DateFormatterDevTool.swift in Sources */,
+				8E0A491D9A6E4C8685DBCB8D /* ScriptRunnerDevTool.swift in Sources */,
+				5E01FF2BF539408A8BEF750B /* BreakpointManagerDevTool.swift in Sources */,
+				5D873D36F51148BC9365C62C /* MarkdownPreviewDevTool.swift in Sources */,
+				7A19E85841104ED68A8DC2E0 /* VerboseLoggerDevTool.swift in Sources */,
+				FF383AC1D4C24BDA8DD22E14 /* FileExplorerDevTool.swift in Sources */,
+				2FD0897DB32D40AE8D618DC1 /* EnergyImpactMonitorDevTool.swift in Sources */,
+				F2C0EB90D01949BABF3BDE96 /* RuntimeInspectorDevTool.swift in Sources */,
+				DE739BEEF3004AC6AC1C5642 /* UserDefaultsInspectorDevTool.swift in Sources */,
+				81716F71A9784DA085DDE24E /* ViewHierarchyInspectorDevTool.swift in Sources */,
+				A0E236942FA74C48AA29FD2C /* JSONValidatorDevTool.swift in Sources */,
+				0D0E80E93D984FE2B04B56B7 /* UUIDGeneratorDevTool.swift in Sources */,
+				DD6EF973ACFA422FB4E188DA /* DeviceInfoDevTool.swift in Sources */,
+				DDF855E26E4F4CCBBA702016 /* DiskUsageAnalyzerDevTool.swift in Sources */,
+				C7075BE22621453AB028BD03 /* AppStateInspectorDevTool.swift in Sources */,
+				694070CB68E24C13AEB67444 /* LayoutGridPreviewDevTool.swift in Sources */,
+				A919A0A4BDBC470AA7C7D746 /* HTTPRequestTesterDevTool.swift in Sources */,
+				CE59FCA9737F4C019685672E /* ShadowGeneratorDevTool.swift in Sources */,
+				E268F89B32FB49AE879E1250 /* ClipboardInspectorDevTool.swift in Sources */,
+				973BFEDF813E4DA3A1F1F73E /* GradientBuilderDevTool.swift in Sources */,
+				603DBB721B0A4948BFB55AAA /* HTMLEntityEncoderDevTool.swift in Sources */,
+				DECB39F447004B598EE21A75 /* YAMLParserDevTool.swift in Sources */,
+				E6C67F296FA04BDCB74DDBE5 /* LoremIpsumGeneratorDevTool.swift in Sources */,
+				ABB00809F5814D2BACB28E80 /* PermissionInspectorDevTool.swift in Sources */,
+				096FA3D6396F4067881183B7 /* JWTDecoderDevTool.swift in Sources */,
+				713E0533E5E542B3860C049B /* Base64EncoderDevTool.swift in Sources */,
+				91EDD00757C94E1290B9C798 /* ColorConverterDevTool.swift in Sources */,
+				412F48260334428A8AFD5FB0 /* TimezoneConverterDevTool.swift in Sources */,
+				286434D0455549E996B295D6 /* APIResponseViewerDevTool.swift in Sources */,
+				F8B6C0E9AD5F41CB8F62B97E /* TextCaseConverterDevTool.swift in Sources */,
+				CABBB807363A40E4A47EA995 /* URLEncoderDevTool.swift in Sources */,
+				0B00347173954E3C8B35B0C4 /* HeaderInspectorDevTool.swift in Sources */,
+				06B8202E869F49A1A5B53993 /* UnicodeInspectorDevTool.swift in Sources */,
+				68795524235641ACB5E2FE21 /* EncryptionToolDevTool.swift in Sources */,
+				B53340373D2843B59FE0F5C4 /* LaunchTimeTrackerDevTool.swift in Sources */,
+				44896C6269FE4C4B9D3D238A /* SQLiteBrowserDevTool.swift in Sources */,
+				EF1D47D690D248348EF35A87 /* Base64DecoderDevTool.swift in Sources */,
+				57B11F6819304C2A9A1A6F51 /* JSONFormatterDevTool.swift in Sources */,
+				344B9B374DA945B6B825A46B /* FPSMonitorDevTool.swift in Sources */,
+				E9A6D245BD7F48EFAE76AD96 /* ColorPaletteGeneratorDevTool.swift in Sources */,
+				D37FD0C9C9E44EB8AD034EDC /* TaskAutomationDevTool.swift in Sources */,
+				36AE11CC78F44F24950A4C0B /* ThreadInspectorDevTool.swift in Sources */,
+				E0E13F12D52E4ED096946FAB /* BezierCurveVisualizerDevTool.swift in Sources */,
+				F698D02D289D4D13A2B10FFD /* LogStreamViewerDevTool.swift in Sources */,
+				25D8C4FF832B4C6190D19009 /* URLDecoderDevTool.swift in Sources */,
+				F7933A1A179942D990E817EA /* QueryStringParserDevTool.swift in Sources */,
+				1A357B7704DE48D4B63D1216 /* ContrastCheckerDevTool.swift in Sources */,
+				A2C6459A3F04486AA6D4E826 /* ASCIIHexConverterDevTool.swift in Sources */,
+				D288D29B004347BB9549CD13 /* NumberFormatterDevTool.swift in Sources */,
+				7D74185EED73411D82CFD77E /* HTMLEntityDecoderDevTool.swift in Sources */,
+				52C2DB224C394C79B0F196F3 /* TextDiffDevTool.swift in Sources */,
+				86E3529AA8304F859D947AE9 /* NetworkReachabilityDevTool.swift in Sources */,
+				E5A4F4933C484DEBBE959EFB /* CrashLogViewerDevTool.swift in Sources */,
+				3ACD485C621F41389BE35DB5 /* TypographyScaleDevTool.swift in Sources */,
+				DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */,
+				21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		MS0400000000000000000201 /* Sources */ = {
@@ -11457,7 +11822,80 @@
 				A00200000000000000000114 /* PaletteGalleryDemo.swift in Sources */,
 				A00200000000000000000116 /* MoodDemo.swift in Sources */,
 				A00200000000000000000118 /* LoadingDemo.swift in Sources */,
-			);
+							ED1AB19FBD8A4AFA9E6A46DC /* DNSLookupDevTool.swift in Sources */,
+				0D46F6A690CC4DF0AF6E6A2E /* XMLFormatterDevTool.swift in Sources */,
+				71B11BC1C1D245B0A07447FA /* JSONDiffDevTool.swift in Sources */,
+				28ADF54F26984B3C8B68D2AA /* SFSymbolsBrowserDevTool.swift in Sources */,
+				42E388FC9A374CC0955891C5 /* UUIDBulkGeneratorDevTool.swift in Sources */,
+				20DD481ED0E945F49CD92768 /* IPInfoDevTool.swift in Sources */,
+				97E108EB013F49199E5DEE80 /* RegexTesterDevTool.swift in Sources */,
+				C4B1CC0FD9F641F68A4DA2F8 /* HashGeneratorDevTool.swift in Sources */,
+				2240473323064CDF9C050884 /* KeychainViewerDevTool.swift in Sources */,
+				21F88283FE684B77AD310DEB /* MemoryMonitorDevTool.swift in Sources */,
+				FC9161E6F50E480D81CB8E06 /* OSVersionInspectorDevTool.swift in Sources */,
+				DEB7E864D5CE43E9A3B251DE /* CPUMonitorDevTool.swift in Sources */,
+				FE1DEC260CD747F19B73FD0E /* WebSocketMonitorDevTool.swift in Sources */,
+				FFFF693F6AE54F029914271D /* CacheViewerDevTool.swift in Sources */,
+				39BDFC31FA2844F48B8D5D76 /* CSVParserDevTool.swift in Sources */,
+				CCCE149428844A32BA4744B8 /* URLParserDevTool.swift in Sources */,
+				D8B1C7623F1D43BDA3C7A8A0 /* BatteryStatusDevTool.swift in Sources */,
+				BAE2E551E11D48F8A161A389 /* DateFormatterDevTool.swift in Sources */,
+				8E0A491D9A6E4C8685DBCB8D /* ScriptRunnerDevTool.swift in Sources */,
+				5E01FF2BF539408A8BEF750B /* BreakpointManagerDevTool.swift in Sources */,
+				5D873D36F51148BC9365C62C /* MarkdownPreviewDevTool.swift in Sources */,
+				7A19E85841104ED68A8DC2E0 /* VerboseLoggerDevTool.swift in Sources */,
+				FF383AC1D4C24BDA8DD22E14 /* FileExplorerDevTool.swift in Sources */,
+				2FD0897DB32D40AE8D618DC1 /* EnergyImpactMonitorDevTool.swift in Sources */,
+				F2C0EB90D01949BABF3BDE96 /* RuntimeInspectorDevTool.swift in Sources */,
+				DE739BEEF3004AC6AC1C5642 /* UserDefaultsInspectorDevTool.swift in Sources */,
+				81716F71A9784DA085DDE24E /* ViewHierarchyInspectorDevTool.swift in Sources */,
+				A0E236942FA74C48AA29FD2C /* JSONValidatorDevTool.swift in Sources */,
+				0D0E80E93D984FE2B04B56B7 /* UUIDGeneratorDevTool.swift in Sources */,
+				DD6EF973ACFA422FB4E188DA /* DeviceInfoDevTool.swift in Sources */,
+				DDF855E26E4F4CCBBA702016 /* DiskUsageAnalyzerDevTool.swift in Sources */,
+				C7075BE22621453AB028BD03 /* AppStateInspectorDevTool.swift in Sources */,
+				694070CB68E24C13AEB67444 /* LayoutGridPreviewDevTool.swift in Sources */,
+				A919A0A4BDBC470AA7C7D746 /* HTTPRequestTesterDevTool.swift in Sources */,
+				CE59FCA9737F4C019685672E /* ShadowGeneratorDevTool.swift in Sources */,
+				E268F89B32FB49AE879E1250 /* ClipboardInspectorDevTool.swift in Sources */,
+				973BFEDF813E4DA3A1F1F73E /* GradientBuilderDevTool.swift in Sources */,
+				603DBB721B0A4948BFB55AAA /* HTMLEntityEncoderDevTool.swift in Sources */,
+				DECB39F447004B598EE21A75 /* YAMLParserDevTool.swift in Sources */,
+				E6C67F296FA04BDCB74DDBE5 /* LoremIpsumGeneratorDevTool.swift in Sources */,
+				ABB00809F5814D2BACB28E80 /* PermissionInspectorDevTool.swift in Sources */,
+				096FA3D6396F4067881183B7 /* JWTDecoderDevTool.swift in Sources */,
+				713E0533E5E542B3860C049B /* Base64EncoderDevTool.swift in Sources */,
+				91EDD00757C94E1290B9C798 /* ColorConverterDevTool.swift in Sources */,
+				412F48260334428A8AFD5FB0 /* TimezoneConverterDevTool.swift in Sources */,
+				286434D0455549E996B295D6 /* APIResponseViewerDevTool.swift in Sources */,
+				F8B6C0E9AD5F41CB8F62B97E /* TextCaseConverterDevTool.swift in Sources */,
+				CABBB807363A40E4A47EA995 /* URLEncoderDevTool.swift in Sources */,
+				0B00347173954E3C8B35B0C4 /* HeaderInspectorDevTool.swift in Sources */,
+				06B8202E869F49A1A5B53993 /* UnicodeInspectorDevTool.swift in Sources */,
+				68795524235641ACB5E2FE21 /* EncryptionToolDevTool.swift in Sources */,
+				B53340373D2843B59FE0F5C4 /* LaunchTimeTrackerDevTool.swift in Sources */,
+				44896C6269FE4C4B9D3D238A /* SQLiteBrowserDevTool.swift in Sources */,
+				EF1D47D690D248348EF35A87 /* Base64DecoderDevTool.swift in Sources */,
+				57B11F6819304C2A9A1A6F51 /* JSONFormatterDevTool.swift in Sources */,
+				344B9B374DA945B6B825A46B /* FPSMonitorDevTool.swift in Sources */,
+				E9A6D245BD7F48EFAE76AD96 /* ColorPaletteGeneratorDevTool.swift in Sources */,
+				D37FD0C9C9E44EB8AD034EDC /* TaskAutomationDevTool.swift in Sources */,
+				36AE11CC78F44F24950A4C0B /* ThreadInspectorDevTool.swift in Sources */,
+				E0E13F12D52E4ED096946FAB /* BezierCurveVisualizerDevTool.swift in Sources */,
+				F698D02D289D4D13A2B10FFD /* LogStreamViewerDevTool.swift in Sources */,
+				25D8C4FF832B4C6190D19009 /* URLDecoderDevTool.swift in Sources */,
+				F7933A1A179942D990E817EA /* QueryStringParserDevTool.swift in Sources */,
+				1A357B7704DE48D4B63D1216 /* ContrastCheckerDevTool.swift in Sources */,
+				A2C6459A3F04486AA6D4E826 /* ASCIIHexConverterDevTool.swift in Sources */,
+				D288D29B004347BB9549CD13 /* NumberFormatterDevTool.swift in Sources */,
+				7D74185EED73411D82CFD77E /* HTMLEntityDecoderDevTool.swift in Sources */,
+				52C2DB224C394C79B0F196F3 /* TextDiffDevTool.swift in Sources */,
+				86E3529AA8304F859D947AE9 /* NetworkReachabilityDevTool.swift in Sources */,
+				E5A4F4933C484DEBBE959EFB /* CrashLogViewerDevTool.swift in Sources */,
+				3ACD485C621F41389BE35DB5 /* TypographyScaleDevTool.swift in Sources */,
+				DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */,
+				21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */

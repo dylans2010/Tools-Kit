@@ -257,6 +257,7 @@ struct SDKBuildView: View {
             NavigationLink(destination: SDKDebugView()) { Label("Debug Inspector", systemImage: "ladybug.fill") }
             NavigationLink(destination: SDKLogsView()) { Label("System Logs", systemImage: "doc.text.magnifyingglass") }
             NavigationLink(destination: SDKEventStreamView()) { Label("Event Stream", systemImage: "waveform.path.ecg.rectangle") }
+            NavigationLink(destination: DevToolsMainView()) { Label("Dev Tools", systemImage: "hammer.fill") }
                 } header: {
             Text("Development")
         }
