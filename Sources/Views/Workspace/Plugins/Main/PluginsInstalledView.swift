@@ -7,7 +7,7 @@ struct PluginsInstalledView: View {
 
     var body: some View {
         List {
-            if manager.installedPlugins.isEmpty {
+            if manager.plugins.isEmpty {
                 Section {
                     ContentUnavailableView(
                         "No Plugins Installed",
@@ -18,11 +18,11 @@ struct PluginsInstalledView: View {
                 .listRowBackground(Color.clear)
             } else {
                 Section {
-                    ForEach(manager.installedPlugins) { plugin in
+                    ForEach(manager.plugins) { plugin in
                         PluginInstalledRow(plugin: plugin, manager: manager)
                     }
                 } header: {
-                    Text("Installed Extensions (\(manager.installedPlugins.count))")
+                    Text("Installed Extensions (\(manager.plugins.count))")
                 }
             }
         }
@@ -33,12 +33,12 @@ struct PluginsInstalledView: View {
 }
 
 private struct PluginInstalledRow: View {
-    let plugin: PluginDefinition
+    let plugin: SDKPlugin
     @ObservedObject var manager: SDKPluginManager
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: plugin.icon)
+            Image(systemName: "puzzlepiece.extension") // TODO: icon unavailable on SDKPlugin
                 .font(.headline)
                 .foregroundStyle(Color.accentColor)
                 .frame(width: 36, height: 36)
@@ -49,7 +49,7 @@ private struct PluginInstalledRow: View {
                 HStack(spacing: 4) {
                     Text("v\(plugin.version)").monospaced()
                     Text("·")
-                    Text(plugin.author)
+                    Text("Unknown Author") // TODO: author unavailable on SDKPlugin
                 }.font(.caption2).foregroundStyle(.secondary)
             }
 
@@ -57,7 +57,13 @@ private struct PluginInstalledRow: View {
 
             Toggle("", isOn: Binding(
                 get: { plugin.isEnabled },
-                set: { _ in manager.toggle(pluginID: plugin.id) }
+                set: { _ in
+                    if plugin.isEnabled {
+                        manager.disable(id: plugin.id)
+                    } else {
+                        manager.enable(id: plugin.id)
+                    }
+                }
             ))
             .labelsHidden()
         }
@@ -72,7 +78,7 @@ private struct PluginInstalledRow: View {
         )
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             Button(role: .destructive) {
-                manager.uninstall(pluginID: plugin.id)
+                manager.remove(id: plugin.id)
             } label: {
                 Label("Uninstall", systemImage: "trash")
             }

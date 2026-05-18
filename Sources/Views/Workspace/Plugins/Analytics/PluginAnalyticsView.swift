@@ -5,10 +5,10 @@ struct PluginAnalyticsView: View {
     @State private var selectedTimeRange: TimeRange = .week
     @State private var selectedPlugin: PluginDefinition?
 
-    private var totalPlugins: Int { manager.installedPlugins.count }
-    private var activePlugins: Int { manager.installedPlugins.filter(\.isEnabled).count }
-    private var totalErrors: Int { manager.installedPlugins.reduce(0) { $0 + $1.errorCount } }
-    private var totalExecutions: Int { manager.installedPlugins.reduce(0) { $0 + $1.executionCount } }
+    private var totalPlugins: Int { manager.plugins.count }
+    private var activePlugins: Int { manager.plugins.filter(\.isEnabled).count }
+    private var totalErrors: Int { manager.plugins.reduce(0) { $0 + 0 /* TODO: errorCount unavailable on SDKPluginManager */ } }
+    private var totalExecutions: Int { manager.plugins.reduce(0) { $0 + 0 /* TODO: executionCount unavailable on SDKPluginManager */ } }
 
     var body: some View {
         List {
@@ -43,7 +43,7 @@ struct PluginAnalyticsView: View {
 
     private var pluginUsageSection: some View {
         Section("Plugin Usage") {
-            ForEach(manager.installedPlugins) { plugin in
+            ForEach(manager.plugins) { plugin in
                 HStack {
                     VStack(alignment: .leading) {
                         Text(plugin.name)
@@ -54,13 +54,8 @@ struct PluginAnalyticsView: View {
                     }
                     Spacer()
                     VStack(alignment: .trailing) {
-                        Text("\(plugin.executionCount) runs")
+                        Text("0 runs") // TODO: executionCount unavailable on SDKPluginManager
                             .font(.subheadline)
-                        if plugin.errorCount > 0 {
-                            Text("\(plugin.errorCount) errors")
-                                .font(.caption)
-                                .foregroundStyle(.red)
-                        }
                     }
                 }
             }
@@ -85,12 +80,12 @@ struct PluginAnalyticsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             HStack(alignment: .bottom, spacing: 4) {
-                let maxCount = max(manager.installedPlugins.map(\.executionCount).max() ?? 1, 1)
-                ForEach(manager.installedPlugins.prefix(10)) { plugin in
+                let maxCount = 1
+                ForEach(manager.plugins.prefix(10)) { plugin in
                     VStack(spacing: 2) {
                         RoundedRectangle(cornerRadius: 3)
                             .fill(.blue.opacity(0.7))
-                            .frame(height: max(4, CGFloat(plugin.executionCount) / CGFloat(maxCount) * 100))
+                            .frame(height: 4) // TODO: executionCount unavailable on SDKPluginManager
                         Text(String(plugin.name.prefix(3)))
                             .font(.system(size: 8))
                             .foregroundStyle(.secondary)

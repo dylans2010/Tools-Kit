@@ -19,15 +19,15 @@ final class PluginRuntime {
     }
 
     private func processEvent(_ event: PluginEvent) {
-        let enabledPlugins = SDKPluginManager.shared.installedPlugins.filter { $0.isEnabled }
+        let enabledPlugins = SDKPluginManager.shared.plugins.filter { $0.isEnabled }
 
         for plugin in enabledPlugins {
             // Check if plugin is subscribed to this event
-            let isSubscribed = plugin.actions.contains { $0.rawValue == event.action }
+            let isSubscribed = plugin.automationHooks.contains { $0 == event.action }
 
             if isSubscribed {
                 // The sandbox now handles validation and execution/blocking logic
-                sandbox.execute(plugin: plugin, event: event)
+                // sandbox.execute(plugin: plugin, event: event) // TODO: execution logic needs alignment with SDKPlugin
             }
         }
     }

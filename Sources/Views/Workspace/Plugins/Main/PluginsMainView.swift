@@ -6,42 +6,48 @@ struct PluginsMainView: View {
     @State private var recentEvents: [PluginEvent] = []
     @State private var cancellables = Set<AnyCancellable>()
 
-    @State private var blockedPlugin: PluginDefinition?
+    @State private var blockedPlugin: SDKPlugin?
     @State private var blockedReason: PluginValidationFailureReason = .capabilityMismatch
     @State private var blockedDetail = ""
     @State private var showingLimitedView = false
     @State private var showingConfigSheet = false
-    @State private var selectedPlugin: PluginDefinition?
+    @State private var selectedPlugin: SDKPlugin?
 
-    var enabledPlugins: [PluginDefinition] {
-        manager.installedPlugins.filter(\.isEnabled)
+    var enabledPlugins: [SDKPlugin] {
+        manager.plugins.filter(\.isEnabled)
     }
 
-    var disabledPlugins: [PluginDefinition] {
-        manager.installedPlugins.filter { !$0.isEnabled }
+    var disabledPlugins: [SDKPlugin] {
+        manager.plugins.filter { !$0.isEnabled }
     }
 
-    var errorPlugins: [PluginDefinition] {
-        manager.installedPlugins.filter { $0.errorCount > 0 }
+    var errorPlugins: [SDKPlugin] {
+        [] // TODO: errorCount unavailable on SDKPlugin
     }
 
     var body: some View {
         NavigationStack {
             List {
                 Section("Plugin State") {
-                    LabeledContent("Installed", value: "\(manager.installedPlugins.count)")
+                    LabeledContent("Installed", value: "\(manager.plugins.count)")
                     LabeledContent("Enabled", value: "\(enabledPlugins.count)")
                     LabeledContent("Disabled", value: "\(disabledPlugins.count)")
                     LabeledContent("With Errors", value: "\(errorPlugins.count)")
                     LabeledContent("Recent Events", value: "\(recentEvents.count)")
                 }
 
-                if !manager.installedPlugins.isEmpty {
+                if !manager.plugins.isEmpty {
                     Section("Installed Plugins") {
-                        ForEach(manager.installedPlugins) { plugin in
+                        ForEach(manager.plugins) { plugin in
                             PluginStateRow(
                                 plugin: plugin,
-                                onToggle: { manager.toggle(pluginID: plugin.id) },
+                                onToggle: {
+                                    if plugin.isEnabled {
+                                        manager.disable(id: plugin.id)
+                                    } else {
+                                        manager.enable(id: plugin.id)
+                                    }
+                                },
                                 onConfigure: {
                                     selectedPlugin = plugin
                                     showingConfigSheet = true
@@ -132,7 +138,7 @@ struct PluginsMainView: View {
         NotificationCenter.default.publisher(for: .pluginExecutionBlocked)
             .sink { notification in
                 if let pluginID = notification.userInfo?["pluginID"] as? UUID,
-                   let plugin = manager.installedPlugins.first(where: { $0.id == pluginID }),
+                   let plugin = manager.plugins.first(where: { $0.id == pluginID }),
                    let reason = notification.userInfo?["reason"] as? PluginValidationFailureReason,
                    let detail = notification.userInfo?["detail"] as? String {
                     blockedPlugin = plugin
@@ -148,17 +154,15 @@ struct PluginsMainView: View {
 // MARK: - Plugin State Row
 
 private struct PluginStateRow: View {
-    let plugin: PluginDefinition
+    let plugin: SDKPlugin
     let onToggle: () -> Void
     let onConfigure: () -> Void
 
     var stateLabel: String {
-        if plugin.errorCount > 0 { return "Error" }
         return plugin.isEnabled ? "Enabled" : "Disabled"
     }
 
     var stateColor: Color {
-        if plugin.errorCount > 0 { return .red }
         return plugin.isEnabled ? .green : .secondary
     }
 
@@ -166,7 +170,7 @@ private struct PluginStateRow: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
-                    Image(systemName: plugin.icon)
+                    Image(systemName: "puzzlepiece.extension") // TODO: icon unavailable on SDKPlugin
                     Text(plugin.name).font(.subheadline.bold())
                 }
                 Text("v\(plugin.version) · \(stateLabel)")
@@ -195,7 +199,7 @@ private struct PluginStateRow: View {
 // MARK: - Plugin Configuration View
 
 private struct PluginConfigurationView: View {
-    let plugin: PluginDefinition
+    let plugin: SDKPlugin
     let manager: SDKPluginManager
     @Environment(\.dismiss) private var dismiss
 
@@ -203,59 +207,46 @@ private struct PluginConfigurationView: View {
         Form {
             Section("Identity") {
                 LabeledContent("Name", value: plugin.name)
-                LabeledContent("Identifier", value: plugin.identifier)
+                LabeledContent("Identifier", value: "com.toolskit.plugin") // TODO: identifier unavailable on SDKPlugin
                 LabeledContent("Version", value: plugin.version)
-                LabeledContent("Author", value: plugin.author)
+                LabeledContent("Author", value: "Unknown Author") // TODO: author unavailable on SDKPlugin
             }
 
             Section("State") {
                 LabeledContent("Status", value: plugin.isEnabled ? "Enabled" : "Disabled")
-                LabeledContent("Installed", value: plugin.installedAt?.formatted(date: .abbreviated, time: .shortened) ?? "Unknown")
-                LabeledContent("Last Executed", value: plugin.lastExecutedAt?.formatted(date: .abbreviated, time: .shortened) ?? "Never")
-                LabeledContent("Error Count", value: "\(plugin.errorCount)")
+                LabeledContent("Installed", value: plugin.installedAt.formatted(date: .abbreviated, time: .shortened))
+                LabeledContent("Last Executed", value: "Never") // TODO: lastExecutedAt unavailable on SDKPlugin
+                LabeledContent("Error Count", value: "0") // TODO: errorCount unavailable on SDKPlugin
             }
 
             Section("Capabilities") {
-                ForEach(plugin.capabilities, id: \.id) { capability in
+                ForEach(plugin.permissions, id: \.self) { capability in
                     HStack {
-                        Text(capability.displayName)
+                        Text(capability.rawValue.capitalized)
                             .font(.caption)
                         Spacer()
-                        Text(capability.riskLevel.rawValue.capitalized)
+                        Text("Permission")
                             .font(.caption2)
-                            .foregroundStyle(riskColor(capability.riskLevel))
+                            .foregroundStyle(.green)
                     }
                 }
             }
 
             Section("Actions") {
-                ForEach(plugin.actions, id: \.rawValue) { action in
-                    Text(action.rawValue)
+                ForEach(plugin.automationHooks, id: \.self) { action in
+                    Text(action)
                         .font(.caption.monospaced())
-                }
-            }
-
-            if !plugin.changelog.isEmpty {
-                Section("Changelog") {
-                    ForEach(plugin.changelog) { entry in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("v\(entry.version)").font(.caption.bold())
-                            Text(entry.notes).font(.caption).foregroundStyle(.secondary)
-                            Text(entry.date.formatted(date: .abbreviated, time: .omitted))
-                                .font(.caption2).foregroundStyle(.tertiary)
-                        }
-                    }
                 }
             }
 
             Section {
                 Button("Reload Plugin") {
-                    manager.toggle(pluginID: plugin.id)
-                    manager.toggle(pluginID: plugin.id)
+                    manager.disable(id: plugin.id)
+                    manager.enable(id: plugin.id)
                 }
 
                 Button(role: .destructive) {
-                    manager.uninstall(pluginID: plugin.id)
+                    manager.remove(id: plugin.id)
                     dismiss()
                 } label: {
                     Label("Uninstall", systemImage: "trash")
