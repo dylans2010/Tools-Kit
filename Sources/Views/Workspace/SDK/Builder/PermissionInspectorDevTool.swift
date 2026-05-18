@@ -25,7 +25,7 @@ struct PermissionInspectorView: View {
             .padding()
 
             List {
-                ForEach(viewModel.permissions) { perm in
+                ForEach($viewModel.permissions) { $perm in
                     HStack {
                         Image(systemName: perm.icon)
                             .foregroundStyle(Color.accentColor)
@@ -53,7 +53,7 @@ struct PermissionInspectorView: View {
     }
 }
 
-struct PermissionItem: Identifiable {
+struct PermissionInspectorItem: Identifiable {
     let id = UUID()
     let name: String
     let icon: String
@@ -62,14 +62,14 @@ struct PermissionItem: Identifiable {
 }
 
 class PermissionInspectorViewModel: ObservableObject {
-    @Published var permissions: [PermissionItem] = []
+    @Published var permissions: [PermissionInspectorItem] = []
 
     func load() {
         permissions = [
-            PermissionItem(name: "Camera", icon: "camera.fill", description: "Access for scanning and video", status: "Authorized"),
-            PermissionItem(name: "Location", icon: "location.fill", description: "GPS and navigation", status: "Denied"),
-            PermissionItem(name: "Notifications", icon: "bell.fill", description: "Push alerts and updates", status: "Authorized"),
-            PermissionItem(name: "Microphone", icon: "mic.fill", description: "Audio recording", status: "Not Determined")
+            PermissionInspectorItem(name: "Camera", icon: "camera.fill", description: "Access for scanning and video", status: "Authorized"),
+            PermissionInspectorItem(name: "Location", icon: "location.fill", description: "GPS and navigation", status: "Denied"),
+            PermissionInspectorItem(name: "Notifications", icon: "bell.fill", description: "Push alerts and updates", status: "Authorized"),
+            PermissionInspectorItem(name: "Microphone", icon: "mic.fill", description: "Audio recording", status: "Not Determined")
         ]
     }
 }

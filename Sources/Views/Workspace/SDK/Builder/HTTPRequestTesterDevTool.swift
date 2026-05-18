@@ -93,7 +93,7 @@ struct HTTPRequestTesterView: View {
             .onDelete { viewModel.headers.remove(atOffsets: $0) }
 
             Button("Add Header") {
-                viewModel.headers.append(HTTPHeader(key: "", value: ""))
+                viewModel.headers.append(HTTPRequestHeader(key: "", value: ""))
             }
         }
     }
@@ -161,7 +161,7 @@ class HTTPRequestTesterViewModel: ObservableObject {
     @Published var url = "https://api.github.com/zen"
     @Published var method = "GET"
     @Published var body = ""
-    @Published var headers: [HTTPHeader] = [HTTPHeader(key: "Content-Type", value: "application/json")]
+    @Published var headers: [HTTPRequestHeader] = [HTTPRequestHeader(key: "Content-Type", value: "application/json")]
     @Published var authType = AuthType.none
     @Published var authToken = ""
     @Published var apiKeyName = ""
@@ -230,8 +230,8 @@ class HTTPRequestTesterViewModel: ObservableObject {
     }
 }
 
-struct HTTPHeader: Identifiable, Codable {
-    let id = UUID()
+struct HTTPRequestHeader: Identifiable, Codable {
+    var id = UUID()
     var key: String
     var value: String
 }
