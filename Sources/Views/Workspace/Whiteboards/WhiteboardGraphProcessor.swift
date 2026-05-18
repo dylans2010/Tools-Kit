@@ -13,11 +13,13 @@ struct WhiteboardGraphCluster: Identifiable, Codable {
 struct WhiteboardGraphProcessor {
     @MainActor
     func cluster(board: WhiteboardBoard) -> [WhiteboardGraphCluster] {
-        let adjacency = adjacencyMap(edges: board.edges)
+        let nodes = board.nodes
+        let edges = board.edges
+        let adjacency = adjacencyMap(edges: edges)
         var visited = Set<UUID>()
         var clusters: [WhiteboardGraphCluster] = []
 
-        for node in board.nodes {
+        for node in nodes {
             guard !visited.contains(node.id) else { continue }
             let connected: Set<UUID>
             if node.type == .group {
@@ -26,8 +28,8 @@ struct WhiteboardGraphProcessor {
             } else {
                 connected = bfs(start: node.id, adjacency: adjacency, visited: &visited)
             }
-            let clusterNodes = board.nodes.filter { connected.contains($0.id) }
-            let clusterEdges = board.edges.filter { connected.contains($0.fromNodeID) && connected.contains($0.toNodeID) }
+            let clusterNodes = nodes.filter { connected.contains($0.id) }
+            let clusterEdges = edges.filter { connected.contains($0.fromNodeID) && connected.contains($0.toNodeID) }
             let density = densityScore(nodeCount: clusterNodes.count, edgeCount: clusterEdges.count)
             let importance = clusterNodes.reduce(0) { $0 + $1.type.importanceWeight }
             clusters.append(
@@ -45,19 +47,22 @@ struct WhiteboardGraphProcessor {
 
     @MainActor
     func buildSections(from board: WhiteboardBoard) -> [WhiteboardSlideSection] {
-        cluster(board: board).map { cluster in
+        let clusters = cluster(board: board)
+        return clusters.map { cluster in
+            let clusterNodes = cluster.nodes
             let topic = extractTopic(from: cluster)
-            let summary = cluster.nodes.map { $0.content }.prefix(4).joined(separator: " • ")
+            let summary = clusterNodes.map { $0.content }.prefix(4).joined(separator: " • ")
             return WhiteboardSlideSection(
                 title: topic,
                 summary: summary,
-                nodeIDs: cluster.nodes.map(\.id)
+                nodeIDs: clusterNodes.map(\.id)
             )
         }
     }
 
     private func extractTopic(from cluster: WhiteboardGraphCluster) -> String {
-        let titleTokens = cluster.nodes
+        let nodes = cluster.nodes
+        let titleTokens = nodes
             .map(\.title)
             .flatMap { $0.split(separator: " ") }
             .map(String.init)
