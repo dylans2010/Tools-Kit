@@ -54,7 +54,7 @@ struct LogStreamViewerView: View {
             Text("[\(log.timestamp, style: .time)]")
                 .font(.system(.caption2, design: .monospaced))
                 .foregroundStyle(.secondary)
-            Text(log.message)
+            Text(log.detail)
                 .font(.system(.caption, design: .monospaced))
         }
     }
