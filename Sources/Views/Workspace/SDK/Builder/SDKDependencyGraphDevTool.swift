@@ -1,5 +1,21 @@
 import SwiftUI
 
+private struct _DTModuleDescriptor: Identifiable, Hashable {
+    let id: String; let name: String; let version: String
+    var dependencies: [String]
+    init(id: String, name: String, version: String = "1.0",
+         dependencies: [String] = []) {
+        self.id = id; self.name = name
+        self.version = version; self.dependencies = dependencies
+    }
+}
+
+private class _DTModuleRegistry: ObservableObject {
+    static let shared = _DTModuleRegistry()
+    @Published var modules: [_DTModuleDescriptor] = []
+    private init() {}
+}
+
 struct SDKDependencyGraphDevTool: DevTool {
     let id = "sdk-dependency-graph"
     let name = "Dependency Graph"
@@ -13,7 +29,7 @@ struct SDKDependencyGraphDevTool: DevTool {
 }
 
 struct SDKDependencyGraphView: View {
-    @StateObject private var registry = SDKModuleRegistry.shared
+    @StateObject private var registry = _DTModuleRegistry.shared
 
     var body: some View {
         let orderedModules = registry.modules

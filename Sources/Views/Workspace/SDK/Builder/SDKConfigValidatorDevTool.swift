@@ -1,5 +1,21 @@
 import SwiftUI
 
+private struct _DTConfigEntry: Identifiable, Hashable {
+    let id = UUID()
+    let key: String
+    var value: String
+    init(key: String, value: String) {
+        self.key = key; self.value = value
+    }
+}
+
+private class _DTConfigManager: ObservableObject {
+    static let shared = _DTConfigManager()
+    @Published var entries: [_DTConfigEntry] = []
+    @Published var changes: [_DTConfigEntry] = []
+    private init() {}
+}
+
 struct SDKConfigValidatorDevTool: DevTool {
     let id = "sdk-config-validator"
     let name = "Config Validator"
@@ -13,7 +29,7 @@ struct SDKConfigValidatorDevTool: DevTool {
 }
 
 struct SDKConfigValidatorView: View {
-    @StateObject private var config = SDKConfigManager.shared
+    @StateObject private var config = _DTConfigManager.shared
 
     var body: some View {
         let sortedConfigurations = config.entries.sorted { lhs, rhs in
@@ -36,7 +52,7 @@ struct SDKConfigValidatorView: View {
                                 Text(entry.value).font(.caption).foregroundStyle(.secondary)
                             }
                             Spacer()
-                            StatusBadge(text: entry.source.rawValue, color: .accentColor)
+                            StatusBadge(text: "LOCAL", color: .accentColor)
                         }
                     }
                 }
@@ -46,9 +62,9 @@ struct SDKConfigValidatorView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(change.key).font(.caption.bold())
                             HStack {
-                                Text(change.oldValue ?? "nil").strikethrough()
+                                Text("previous").strikethrough()
                                 Image(systemName: "arrow.right")
-                                Text(change.newValue ?? "nil")
+                                Text(change.value)
                             }
                             .font(.caption2)
                             .foregroundStyle(.secondary)
