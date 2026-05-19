@@ -143,7 +143,7 @@ class HashGeneratorViewModel: ObservableObject {
         }
     }
 
-    private func format<H: HashFunction>(_ digest: H.Digest) -> String {
+    private func format<H: HashFunction>(_ digest: H.Digest, _ type: H.Type) -> String {
         switch outputFormat {
         case .hex: return digest.map { String(format: "%02x", $0) }.joined()
         case .upperHex: return digest.map { String(format: "%02X", $0) }.joined()
@@ -162,9 +162,9 @@ class HashGeneratorViewModel: ObservableObject {
     private func generate() {
         guard let data = inputData() else { return }
 
-        sha256 = format(SHA256.hash(data: data) as SHA256.Digest)
-        sha384 = format(SHA384.hash(data: data) as SHA384.Digest)
-        sha512 = format(SHA512.hash(data: data) as SHA512.Digest)
+        sha256 = format(SHA256.hash(data: data), SHA256.self)
+        sha384 = format(SHA384.hash(data: data), SHA384.self)
+        sha512 = format(SHA512.hash(data: data), SHA512.self)
         md5 = formatInsecure(Insecure.MD5.hash(data: data))
 
         if let keyData = hmacKey.data(using: .utf8), !hmacKey.isEmpty {
