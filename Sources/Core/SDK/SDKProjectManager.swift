@@ -5,6 +5,7 @@ public struct SDKProject: Identifiable, Codable {
     public enum ProjectStatus: String, Codable, CaseIterable {
         case active
         case draft
+        case archived
     }
 
     public var id: UUID
@@ -16,9 +17,9 @@ public struct SDKProject: Identifiable, Codable {
     public var version: Int
     public var status: ProjectStatus
     public var enabledScopes: [String]
-    public var enabledPluginIDs: [UUID]
-    public var enabledToolIDs: [UUID]
-    public var enabledConnectorIDs: [UUID]
+    public var enabledPluginIDs: [String]
+    public var enabledToolIDs: [String]
+    public var enabledConnectorIDs: [String]
     public var automationRules: [SDKAutomationRule]
     public var healthStatus: HealthStatus
     public var sourceCode: String
@@ -42,9 +43,9 @@ public struct SDKProject: Identifiable, Codable {
         version: Int = 1,
         status: ProjectStatus = .draft,
         enabledScopes: [String] = [],
-        enabledPluginIDs: [UUID] = [],
-        enabledToolIDs: [UUID] = [],
-        enabledConnectorIDs: [UUID] = [],
+        enabledPluginIDs: [String] = [],
+        enabledToolIDs: [String] = [],
+        enabledConnectorIDs: [String] = [],
         automationRules: [SDKAutomationRule] = [],
         healthStatus: HealthStatus = .healthy,
         sourceCode: String = "",
@@ -81,9 +82,9 @@ public struct SDKProject: Identifiable, Codable {
         version = try c.decodeIfPresent(Int.self, forKey: .version) ?? 1
         status = try c.decodeIfPresent(ProjectStatus.self, forKey: .status) ?? .draft
         enabledScopes = try c.decodeIfPresent([String].self, forKey: .enabledScopes) ?? []
-        enabledPluginIDs = try c.decodeIfPresent([UUID].self, forKey: .enabledPluginIDs) ?? []
-        enabledToolIDs = try c.decodeIfPresent([UUID].self, forKey: .enabledToolIDs) ?? []
-        enabledConnectorIDs = try c.decodeIfPresent([UUID].self, forKey: .enabledConnectorIDs) ?? []
+        enabledPluginIDs = try c.decodeIfPresent([String].self, forKey: .enabledPluginIDs) ?? []
+        enabledToolIDs = try c.decodeIfPresent([String].self, forKey: .enabledToolIDs) ?? []
+        enabledConnectorIDs = try c.decodeIfPresent([String].self, forKey: .enabledConnectorIDs) ?? []
         automationRules = try c.decodeIfPresent([SDKAutomationRule].self, forKey: .automationRules) ?? []
         healthStatus = try c.decodeIfPresent(HealthStatus.self, forKey: .healthStatus) ?? .healthy
         sourceCode = try c.decodeIfPresent(String.self, forKey: .sourceCode) ?? ""

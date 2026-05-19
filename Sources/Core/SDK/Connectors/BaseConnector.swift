@@ -6,6 +6,8 @@ public protocol BaseConnector: AnyObject, ObservableObject, Identifiable {
     var name: String { get }
     var type: ConnectorType { get }
     var status: ConnectorStatus { get set }
+    var isConnected: Bool { get }
+    var identifier: String { get }
     var requiredScopes: [String] { get }
     var authFields: [AuthField] { get }
     var activityLog: [ConnectorEvent] { get }
@@ -18,6 +20,8 @@ public protocol BaseConnector: AnyObject, ObservableObject, Identifiable {
 
 public extension BaseConnector {
     var requiredScopes: [String] { [] }
+    var isConnected: Bool { status == .connected }
+    var identifier: String { id.uuidString }
 }
 
 public enum ConnectorType: String, CaseIterable, Codable {

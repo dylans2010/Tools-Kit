@@ -3,6 +3,7 @@ import Combine
 
 public struct SDKTool: Identifiable, Codable {
     public var id: UUID
+    public var identifier: String { id.uuidString }
     public var name: String
     public var category: SDKToolCategory
     public var inputSchema: [ToolParameter]

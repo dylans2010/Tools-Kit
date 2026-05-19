@@ -518,8 +518,13 @@ struct MarkdownOutputValidator {
 
 // MARK: - Constants
 
+class MailAIToolsSystem: ObservableObject {
+    static let shared = MailAIToolsSystem()
+    static let costPerOutputToken: Double = 0.00002
+    private init() {}
+}
+
 extension MailAIToolsSystem {
-    static let costPerOutputToken: Double = 0.00002 // Example rate
 }
 
 struct MarkdownSyntaxStripper {

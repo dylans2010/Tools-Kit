@@ -101,6 +101,15 @@ struct SDKBuildView: View {
         }
     }
 
+    private var pluginSelector: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Plugins").font(.caption).foregroundStyle(.secondary)
+            ForEach(pluginManager.plugins, id: \.id) { plugin in
+                Toggle(plugin.name, isOn: toggleBinding(for: plugin.identifier, keyPath: \.enabledPluginIDs))
+            }
+        }
+    }
+
     private var buildProgressView: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
@@ -330,6 +339,7 @@ struct SDKBuildView: View {
                 }
             }
             Section("Access Scopes") { scopeSelector }
+            Section("Plugin Assignments") { pluginSelector }
             Section("Assignments") { connectorAndToolAssignment }
         }
         .navigationTitle("Project Metadata")
@@ -370,7 +380,7 @@ struct SDKBuildView: View {
         return formatter.string(fromByteCount: Int64(size))
     }
 
-    private func log(_ message: String, level: SDKLogStore.LogLevel = .info) {
+    private func log(_ message: String, level: LogLevel = .info) {
         guard verboseLogging else { return }
         SDKLogStore.shared.log(message, source: "SDKBuildView", level: level)
     }
@@ -504,11 +514,11 @@ struct SDKBuildView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Connectors").font(.caption).foregroundStyle(.secondary)
             ForEach(connectorManager.connectors, id: \.id) { connector in
-                Toggle(connector.name, isOn: toggleBinding(for: connector.id, keyPath: \.enabledConnectorIDs))
+                Toggle(connector.name, isOn: toggleBinding(for: connector.identifier, keyPath: \.enabledConnectorIDs))
             }
             Text("Tools").font(.caption).foregroundStyle(.secondary)
             ForEach(toolManager.tools, id: \.id) { tool in
-                Toggle(tool.name, isOn: toggleBinding(for: tool.id, keyPath: \.enabledToolIDs))
+                Toggle(tool.name, isOn: toggleBinding(for: tool.identifier, keyPath: \.enabledToolIDs))
             }
         }
     }

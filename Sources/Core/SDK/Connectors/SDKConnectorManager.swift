@@ -68,7 +68,7 @@ public final class SDKConnectorManager: ObservableObject {
     }
 
     private func saveConnectors() {
-        SDKProjectManager.shared.currentProject?.enabledConnectorIDs = connectors.map { $0.id }
+        SDKProjectManager.shared.currentProject?.enabledConnectorIDs = connectors.map { $0.identifier }
         try? SDKProjectManager.shared.save()
 
         let configs = connectors.map { ConnectorConfig(id: $0.id, name: $0.name, type: $0.type) }

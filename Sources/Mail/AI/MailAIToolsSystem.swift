@@ -1,6 +1,6 @@
 import Foundation
 
-enum MailAIToolsSystem {
+extension MailAIToolsSystem {
     static let catchUpSystemPrompt = """
     [ROLE]
     You are the Inbox Summarization Engine for MailAIToolsSystem. Operate as a senior executive briefing assistant who converts noisy inbox streams into decision-ready insight.

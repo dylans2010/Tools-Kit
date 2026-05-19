@@ -1,5 +1,19 @@
 import SwiftUI
 
+private struct AIChatSettingsRouter: View {
+    var body: some View {
+        EmptyView()
+    }
+}
+
+private class GitHubTokenStore: ObservableObject {
+    static let shared = GitHubTokenStore()
+    private init() {}
+    func getToken() -> String? { nil }
+    func saveToken(_ token: String) {}
+    func validate(_ token: String) async throws {}
+}
+
 struct WorkspaceNavItem: Identifiable, Codable, Equatable {
     let id: String
     let label: String

@@ -3,6 +3,7 @@ import Combine
 
 public struct SDKPlugin: Identifiable, Codable {
     public var id: UUID
+    public var identifier: String { id.uuidString }
     public var name: String
     public var version: String
     public var permissions: [PluginPermission]
@@ -120,7 +121,7 @@ public final class SDKPluginManager: ObservableObject {
     }
 
     private func savePlugins() {
-        SDKProjectManager.shared.currentProject?.enabledPluginIDs = plugins.map { $0.id }
+        SDKProjectManager.shared.currentProject?.enabledPluginIDs = plugins.map { $0.identifier }
         try? SDKProjectManager.shared.save()
 
         if let data = try? JSONEncoder().encode(plugins) {

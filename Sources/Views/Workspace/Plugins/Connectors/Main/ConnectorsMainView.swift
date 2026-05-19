@@ -1,5 +1,30 @@
 import SwiftUI
 
+private struct SDKConnector: Identifiable, Hashable {
+    let id: UUID
+    var name: String
+    var isConnected: Bool
+}
+
+private struct ConnectorDetailRouter: View {
+    let connector: any BaseConnector
+    var body: some View {
+        if let c = connector as? GmailConnector { ConnectorDetailView(connector: c) }
+        else if let c = connector as? GitHubConnector { ConnectorDetailView(connector: c) }
+        else if let c = connector as? WebhookConnector { ConnectorDetailView(connector: c) }
+        else if let c = connector as? CalendarConnector { ConnectorDetailView(connector: c) }
+        else if let c = connector as? LocalFileConnector { ConnectorDetailView(connector: c) }
+        else if let c = connector as? RESTConnector { ConnectorDetailView(connector: c) }
+        else if let c = connector as? RESTAPIConnector { ConnectorDetailView(connector: c) }
+        else if let c = connector as? MQTTConnector { ConnectorDetailView(connector: c) }
+        else if let c = connector as? SlackConnector { ConnectorDetailView(connector: c) }
+        else {
+            Text(connector.name)
+                .navigationTitle(connector.name)
+        }
+    }
+}
+
 struct ConnectorsMainView: View {
     @StateObject private var connectorManager = SDKConnectorManager.shared
     @StateObject private var toolManager = SDKToolManager.shared
@@ -13,7 +38,7 @@ struct ConnectorsMainView: View {
     }
 
     private var filteredConnectors: [SDKConnector] {
-        var results = connectorManager.connectors
+        var results = connectorManager.connectors.map { SDKConnector(id: $0.id, name: $0.name, isConnected: $0.isConnected) }
         if !searchText.isEmpty {
             results = results.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
         }
@@ -72,7 +97,9 @@ struct ConnectorsMainView: View {
                 } else {
                     ForEach(filteredConnectors) { connector in
                         NavigationLink {
-                            ConnectorDetailView(connector: connector, manager: connectorManager)
+                            if let actual = connectorManager.connectors.first(where: { $0.id == connector.id }) {
+                                ConnectorDetailRouter(connector: actual)
+                            }
                         } label: {
                             HStack {
                                 Image(systemName: connector.isConnected ? "checkmark.circle.fill" : "circle")
@@ -110,57 +137,3 @@ struct ConnectorsMainView: View {
     }
 }
 
-// MARK: - Connector Detail
-
-struct ConnectorDetailView: View {
-    let connector: SDKConnector
-    let manager: SDKConnectorManager
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        Form {
-            Section("Identity") {
-                LabeledContent("Name", value: connector.name)
-                LabeledContent("Status", value: connector.isConnected ? "Connected" : "Disconnected")
-                HStack {
-                    Text("Connection")
-                    Spacer()
-                    Circle()
-                        .fill(connector.isConnected ? Color.green : Color.red)
-                        .frame(width: 8, height: 8)
-                }
-            }
-
-            if !connector.capabilities.isEmpty {
-                Section("Capabilities") {
-                    ForEach(connector.capabilities, id: \.self) { cap in
-                        Label(cap, systemImage: "checkmark.seal")
-                            .font(.caption)
-                    }
-                }
-            }
-
-            Section("Actions") {
-                if connector.isConnected {
-                    Button("Disconnect") {
-                        manager.disconnect(id: connector.id)
-                        dismiss()
-                    }
-                    .foregroundStyle(.red)
-
-                    Button("Sync Now") {
-                        manager.sync(id: connector.id)
-                    }
-                } else {
-                    Button("Connect") {
-                        manager.connect(id: connector.id)
-                        dismiss()
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-            }
-        }
-        .navigationTitle(connector.name)
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}
