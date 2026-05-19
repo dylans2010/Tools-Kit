@@ -112,3 +112,7 @@ public enum SDKScope: String, Codable, CaseIterable, Hashable {
         }
     }
 }
+
+extension SDKScope: Identifiable {
+    public var id: Self { self }
+}

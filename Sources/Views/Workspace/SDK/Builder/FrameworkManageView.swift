@@ -244,7 +244,7 @@ final class FrameworkManager {
 
     struct FrameworkAuditEntry: Identifiable, Codable {
         let id = UUID()
-        let timestamp = Date()
+        var timestamp = Date()
         let frameworkName: String
         let action: String
         let oldValue: String

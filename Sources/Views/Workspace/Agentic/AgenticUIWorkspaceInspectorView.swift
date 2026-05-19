@@ -140,6 +140,7 @@ struct AgenticUIWorkspaceInspectorView: View {
 
     // MARK: - Modules
 
+    @ViewBuilder
     private var modulesSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {

@@ -70,7 +70,6 @@ class TypographyScaleViewModel: ObservableObject {
 
     var scaleItems: [ScaleItem] {
         guard let base = Double(baseSize) else { return [] }
-        let labels = ["H1", "H2", "H3", "H4", "Body", "Small"]
         var items: [ScaleItem] = []
 
         // H1 to H4

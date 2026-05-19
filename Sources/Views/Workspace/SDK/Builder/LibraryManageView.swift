@@ -236,7 +236,7 @@ final class LibraryManager: ObservableObject {
 
     struct RegistrySnapshot: Identifiable, Codable {
         let id = UUID()
-        let timestamp = Date()
+        var timestamp = Date()
         let libraryCount: Int
         let encodedData: Data
     }
