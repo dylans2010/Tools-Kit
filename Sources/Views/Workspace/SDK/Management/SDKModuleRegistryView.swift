@@ -207,7 +207,7 @@ struct SDKModuleRegistryView: View {
                 LabeledContent("Status", value: registry.activeModuleIDs.contains(mod.id) ? "Active" : "Inactive")
             }
             Section("Capabilities") {
-                ForEach(Array(mod.capabilities).sorted(by: { $0.rawValue < $1.rawValue }), id: \.self) { cap in
+                ForEach(mod.capabilities.sorted(by: { $0.rawValue < $1.rawValue }), id: \.self) { cap in
                     Button { filterCapability = cap; selectedModule = nil } label: {
                         Label(cap.rawValue, systemImage: "cpu")
                     }
