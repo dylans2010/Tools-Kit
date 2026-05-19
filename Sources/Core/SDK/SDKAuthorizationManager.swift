@@ -164,7 +164,7 @@ public final class AuthorizationManager: ObservableObject {
 
     public func canAccessModule(id: String) -> Bool {
         guard ensureActiveSession() else { return false }
-        guard let module = SDKModuleRegistry.shared.module(for: id) else { return false }
+        guard let module = SDKModuleRegistry.shared.modules.first(where: { $0.identifier == id }) else { return false }
         return hasAllScopes(module.requiredScopes)
     }
 
