@@ -349,7 +349,7 @@ struct DraftingEmailsView: View {
             guard let tool = MailAIToolRegistry.shared.tool(for: selectedAIToolID) else { return }
 
             do {
-                let result = try await AIService.shared.processText(prompt: "Process this text:\n\(context)", systemPrompt: tool.systemPrompt)
+                let result = try await AIService.shared.processText(prompt: context, systemPrompt: tool.systemPrompt)
                 await MainActor.run {
                     aiResult = result
                     if selectedAIToolID == "subject_line" {
@@ -463,15 +463,11 @@ struct DraftingEmailsView: View {
         isGenerating = true
         do {
             let prompt = """
-            Write a highly effective, \(selectedStyle.rawValue) email.
+            Style: \(selectedStyle.rawValue)
             Goal: \(selectedGoal.rawValue)
             Context: \(context)
-
-            Ensure the tone is perfectly aligned with \(selectedStyle.rawValue) expectations.
-            Include a clear subject line and a strong call to action.
-            Use professional formatting and structure.
             """
-            let result = try await AIService.shared.processText(prompt: prompt, systemPrompt: "You are an expert executive communications assistant. Your emails are clear, impactful, and follow industry best practices for professional correspondence.")
+            let result = try await AIService.shared.processText(prompt: prompt, systemPrompt: MailAIToolsSystem.draftingSystemPrompt)
             await MainActor.run {
                 withAnimation {
                     generatedBody = result
