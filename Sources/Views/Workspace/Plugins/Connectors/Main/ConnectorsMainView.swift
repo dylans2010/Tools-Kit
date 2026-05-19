@@ -103,12 +103,12 @@ struct ConnectorsMainView: View {
             Section(header: Text("Platform Tools")) {
                 ForEach(toolManager.tools, id: \.id) { tool in
                     HStack(alignment: .top, spacing: 12) {
-                        Label(tool.name, systemImage: tool.icon ?? "wrench")
+                        Label(tool.name, systemImage: "wrench")
                             .font(.subheadline)
                         Spacer()
-                        Text(tool.isEnabled ? "Active" : "Inactive")
+                        Text(tool.category.rawValue.capitalized)
                             .font(.caption2)
-                            .foregroundStyle(tool.isEnabled ? Color.green : Color.secondary)
+                            .foregroundStyle(Color.secondary)
                             .padding(.top, 2)
                     }
                     .padding(.vertical, 4)
@@ -129,9 +129,15 @@ struct ConnectorsMainView: View {
         .searchable(text: $searchText, prompt: "Search Connectors")
         .navigationDestination(for: UUID.self) { id in
             if let connector = connectorManager.connectors.first(where: { $0.id == id }) {
-                ConnectorDetailView(connector: connector)
+                Self.openDetailView(connector)
             }
         }
+    }
+    private static func openDetailView(_ connector: any BaseConnector) -> AnyView {
+        func open<C: BaseConnector>(_ c: C) -> AnyView {
+            AnyView(ConnectorDetailView(connector: c))
+        }
+        return open(connector)
     }
 }
 
