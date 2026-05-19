@@ -259,7 +259,7 @@ struct AIChatSettingsView: View {
     }
 
     private var modelSectionContent: some View {
-        Group {
+        VStack(alignment: .leading, spacing: 12) {
             let availableModels = modelCatalog.models(for: settings.selectedProviderID)
             if !availableModels.isEmpty {
                 Picker("Active Model", selection: $settings.modelID) {
@@ -281,6 +281,22 @@ struct AIChatSettingsView: View {
                         .foregroundColor(.secondary)
                 }
             }
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Model ID / Endpoint")
+                    .font(.caption.bold())
+                TextField("e.g. gemini-2.0-flash, gpt-4o, or a full URL", text: $settings.modelID)
+                    .textFieldStyle(.roundedBorder)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+
+                Text("This model will be used by all AI-powered features including CraftRead, inline suggestions, and any other AI tools.")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.top, 4)
         }
     }
 

@@ -1205,6 +1205,14 @@
 		ML02B06DC3006D57495DB2DC /* SpatialWhiteboardsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML01742CECDC03174132BEBE /* SpatialWhiteboardsHomeView.swift */; };
 		ML028FFC6949369149FA8496 /* SpatialWhiteboardCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML01A8B623046E0549E89D14 /* SpatialWhiteboardCanvasView.swift */; };
 		ML022F1EBBD1C64D48F4A5F8 /* CitationFormatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */; };
+		WA0200000000000000000001 /* WritingAnalyticsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA0100000000000000000001 /* WritingAnalyticsModels.swift */; };
+		WA0200000000000000000002 /* WritingAnalyticsEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA0100000000000000000002 /* WritingAnalyticsEngine.swift */; };
+		WA0200000000000000000003 /* WritingAnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA0100000000000000000003 /* WritingAnalyticsViewModel.swift */; };
+		WA0200000000000000000004 /* WritingAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA0100000000000000000004 /* WritingAnalyticsView.swift */; };
+		DV0200000000000000000001 /* DictionaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000001 /* DictionaryViewModel.swift */; };
+		DV0200000000000000000002 /* DictionaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000002 /* DictionaryView.swift */; };
+		SG0200000000000000000001 /* WordSuggestionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = SG0100000000000000000001 /* WordSuggestionsViewModel.swift */; };
+		SG0200000000000000000002 /* WordSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SG0100000000000000000002 /* WordSuggestionsView.swift */; };
 		ML02B9C001F45A2E4FCA868D /* NotebookVersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */; };
 		ML020000000000000000000011 /* NotebookSearchPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000011 /* NotebookSearchPageView.swift */; };
 		ML020000000000000000000012 /* NotebookComparePagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000012 /* NotebookComparePagesView.swift */; };
@@ -2754,6 +2762,14 @@
 		ML01742CECDC03174132BEBE /* SpatialWhiteboardsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialWhiteboardsHomeView.swift; sourceTree = "<group>"; };
 		ML01A8B623046E0549E89D14 /* SpatialWhiteboardCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialWhiteboardCanvasView.swift; sourceTree = "<group>"; };
 		ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CitationFormatsView.swift; sourceTree = "<group>"; };
+		WA0100000000000000000001 /* WritingAnalyticsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsModels.swift; sourceTree = "<group>"; };
+		WA0100000000000000000002 /* WritingAnalyticsEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsEngine.swift; sourceTree = "<group>"; };
+		WA0100000000000000000003 /* WritingAnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsViewModel.swift; sourceTree = "<group>"; };
+		WA0100000000000000000004 /* WritingAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsView.swift; sourceTree = "<group>"; };
+		DV0100000000000000000001 /* DictionaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryViewModel.swift; sourceTree = "<group>"; };
+		DV0100000000000000000002 /* DictionaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryView.swift; sourceTree = "<group>"; };
+		SG0100000000000000000001 /* WordSuggestionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSuggestionsViewModel.swift; sourceTree = "<group>"; };
+		SG0100000000000000000002 /* WordSuggestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSuggestionsView.swift; sourceTree = "<group>"; };
 		ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookVersionHistoryView.swift; sourceTree = "<group>"; };
 		ML010000000000000000000011 /* NotebookSearchPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookSearchPageView.swift; sourceTree = "<group>"; };
 		ML010000000000000000000012 /* NotebookComparePagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookComparePagesView.swift; sourceTree = "<group>"; };
@@ -5129,6 +5145,14 @@
 				ML010000000000000000000014 /* NotebookAuditLogsView.swift */,
 				ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */,
 				ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */,
+				WA0100000000000000000001 /* WritingAnalyticsModels.swift */,
+				WA0100000000000000000002 /* WritingAnalyticsEngine.swift */,
+				WA0100000000000000000003 /* WritingAnalyticsViewModel.swift */,
+				WA0100000000000000000004 /* WritingAnalyticsView.swift */,
+				DV0100000000000000000001 /* DictionaryViewModel.swift */,
+				DV0100000000000000000002 /* DictionaryView.swift */,
+				SG0100000000000000000001 /* WordSuggestionsViewModel.swift */,
+				SG0100000000000000000002 /* WordSuggestionsView.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -10452,6 +10476,14 @@
 				ML02B06DC3006D57495DB2DC /* SpatialWhiteboardsHomeView.swift in Sources */,
 				ML028FFC6949369149FA8496 /* SpatialWhiteboardCanvasView.swift in Sources */,
 				ML022F1EBBD1C64D48F4A5F8 /* CitationFormatsView.swift in Sources */,
+				WA0200000000000000000001 /* WritingAnalyticsModels.swift in Sources */,
+				WA0200000000000000000002 /* WritingAnalyticsEngine.swift in Sources */,
+				WA0200000000000000000003 /* WritingAnalyticsViewModel.swift in Sources */,
+				WA0200000000000000000004 /* WritingAnalyticsView.swift in Sources */,
+				DV0200000000000000000001 /* DictionaryViewModel.swift in Sources */,
+				DV0200000000000000000002 /* DictionaryView.swift in Sources */,
+				SG0200000000000000000001 /* WordSuggestionsViewModel.swift in Sources */,
+				SG0200000000000000000002 /* WordSuggestionsView.swift in Sources */,
 				ML02B9C001F45A2E4FCA868D /* NotebookVersionHistoryView.swift in Sources */,
 				ML020000000000000000000011 /* NotebookSearchPageView.swift in Sources */,
 				ML020000000000000000000012 /* NotebookComparePagesView.swift in Sources */,
