@@ -110,7 +110,7 @@ struct ProjectDetailsView: View {
                         Text(currentProject.name)
                             .font(.title2)
                             .fontWeight(.bold)
-                        StatusBadge(text: currentProject.status.rawValue, color: {
+                        StatusBadgeProjectDetails(text: currentProject.status.rawValue, color: {
                             switch currentProject.status {
                             case .active: return .green
                             case .paused: return .orange
@@ -544,5 +544,20 @@ struct ContentUnavailableLabel: View {
         .frame(maxWidth: .infinity)
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
+    }
+}
+
+struct StatusBadgeProjectDetails: View {
+    let text: String
+    let color: Color
+
+    var body: some View {
+        Text(text)
+            .font(.caption.weight(.semibold))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.14))
+            .foregroundStyle(color)
+            .clipShape(Capsule())
     }
 }

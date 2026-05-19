@@ -151,7 +151,7 @@ struct ProjectRowView: View {
 
                 Spacer()
 
-                StatusBadge(text: project.status.rawValue, color: {
+                StatusBadgeMainView(text: project.status.rawValue, color: {
                     switch project.status {
                     case .active: return .green
                     case .paused: return .orange
@@ -191,5 +191,20 @@ struct ProjectRowView: View {
             .foregroundColor(.secondary)
         }
         .padding(.vertical, 8)
+    }
+}
+
+struct StatusBadgeMainView: View {
+    let text: String
+    let color: Color
+
+    var body: some View {
+        Text(text)
+            .font(.caption.weight(.semibold))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.14))
+            .foregroundStyle(color)
+            .clipShape(Capsule())
     }
 }
