@@ -18,7 +18,7 @@ struct EncryptionToolView: View {
 
     var body: some View {
         Form {
-            Section {
+            Section("Key Configuration") {
                 Picker("Key Source", selection: $viewModel.keySource) {
                     Text("Password").tag(EncryptKeySource.password)
                     Text("Base64 Key").tag(EncryptKeySource.base64)
@@ -45,21 +45,17 @@ struct EncryptionToolView: View {
                     Button("Generate Key") { viewModel.generateKey() }
                         .buttonStyle(.bordered).controlSize(.small)
                 }
-            } header: {
-                Text("Key Configuration")
             }
 
-            Section {
+            Section("Encryption") {
                 Picker("Algorithm", selection: $viewModel.algorithm) {
                     Text("AES-GCM").tag(EncryptAlgorithm.aesGCM)
                     Text("ChaChaPoly").tag(EncryptAlgorithm.chaChaPoly)
                 }
                 .pickerStyle(.segmented)
-            } header: {
-                Text("Encryption")
             }
 
-            Section {
+            Section("Input") {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 100)
                     .font(.system(.caption, design: .monospaced))
@@ -71,11 +67,9 @@ struct EncryptionToolView: View {
                     Button("Clear") { viewModel.input = ""; viewModel.output = "" }
                         .buttonStyle(.bordered).controlSize(.small)
                 }
-            } header: {
-                Text("Input")
             }
 
-            Section {
+            Section("Actions") {
                 HStack(spacing: 12) {
                     Button {
                         viewModel.encrypt()
@@ -91,11 +85,9 @@ struct EncryptionToolView: View {
                     }
                     .buttonStyle(.bordered)
                 }
-            } header: {
-                Text("Actions")
             }
 
-            Section {
+            Section("Output") {
                 if !viewModel.output.isEmpty {
                     Text(viewModel.output)
                         .font(.system(.caption2, design: .monospaced))
@@ -122,11 +114,9 @@ struct EncryptionToolView: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                 }
-            } header: {
-                Text("Output")
             }
 
-            Section {
+            Section("Key Info") {
                 if !viewModel.activeKeyBase64.isEmpty {
                     LabeledContent("Active Key (Base64)") {
                         Text(viewModel.activeKeyBase64)
@@ -141,8 +131,6 @@ struct EncryptionToolView: View {
                     }
                     .buttonStyle(.bordered).controlSize(.small)
                 }
-            } header: {
-                Text("Key Info")
             }
         }
     }
@@ -175,7 +163,7 @@ class EncryptionToolViewModel: ObservableObject {
             guard let passData = password.data(using: .utf8), !password.isEmpty else { return nil }
             let derived = HKDF<SHA256>.deriveKey(
                 inputKeyMaterial: SymmetricKey(data: passData),
-                outputByteCount: keySize == .bits256 ? 32 : 16
+                outputByteCount: keySize.bitCount == 256 ? 32 : 16
             )
             activeKeyBase64 = derived.withUnsafeBytes { Data($0).base64EncodedString() }
             return derived
