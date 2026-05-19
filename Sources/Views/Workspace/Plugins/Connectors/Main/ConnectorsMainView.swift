@@ -84,23 +84,7 @@ struct ConnectorsMainView: View {
                 } else {
                     ForEach(filteredConnectors, id: \.id) { connector in
                         NavigationLink(value: connector.id) {
-                            HStack(alignment: .top, spacing: 12) {
-                                Image(systemName: connector.isConnected ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(connector.isConnected ? Color.green : Color.secondary)
-                                    .font(.caption)
-                                    .padding(.top, 2)
-
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(connector.name)
-                                        .font(.subheadline.bold())
-                                    Text(connector.isConnected ? "Connected" : "Disconnected")
-                                        .font(.caption2)
-                                        .foregroundStyle(Color.secondary)
-                                }
-
-                                Spacer()
-                            }
-                            .padding(.vertical, 4)
+                            ConnectorRow(connector: connector)
                         }
                     }
                 }
@@ -131,5 +115,29 @@ struct ConnectorsMainView: View {
                 ConnectorDetailView(connector: connector)
             }
         }
+    }
+}
+
+private struct ConnectorRow: View {
+    let connector: any BaseConnector
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: connector.isConnected ? "checkmark.circle.fill" : "circle")
+                .foregroundStyle(connector.isConnected ? Color.green : Color.secondary)
+                .font(.caption)
+                .padding(.top, 2)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(connector.name)
+                    .font(.subheadline.bold())
+                Text(connector.isConnected ? "Connected" : "Disconnected")
+                    .font(.caption2)
+                    .foregroundStyle(Color.secondary)
+            }
+
+            Spacer()
+        }
+        .padding(.vertical, 4)
     }
 }
