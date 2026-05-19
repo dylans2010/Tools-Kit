@@ -16,41 +16,32 @@ struct RegexTesterDevToolView: View {
     @StateObject private var viewModel = RegexTesterViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Regex Tester",
-                description: "Validate and debug regular expressions with live highlighting of matches.",
-                icon: "asterisk"
-            )
-            .padding()
+        Form {
+            Section("Regex Pattern") {
+                TextField("^([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$", text: $viewModel.pattern)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                    .font(.system(.body, design: .monospaced))
+            }
 
-            Form {
-                Section("Regex Pattern") {
-                    TextField("^([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$", text: $viewModel.pattern)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
-                        .font(.system(.body, design: .monospaced))
-                }
+            Section("Input Text") {
+                TextEditor(text: $viewModel.inputText)
+                    .frame(height: 100)
+                    .font(.system(.body, design: .monospaced))
+            }
 
-                Section("Input Text") {
-                    TextEditor(text: $viewModel.inputText)
-                        .frame(height: 100)
-                        .font(.system(.body, design: .monospaced))
-                }
-
-                Section("Matches: \(viewModel.matches.count)") {
-                    if !viewModel.isValid {
-                        Text("Invalid Regex Pattern").foregroundStyle(.red).font(.caption)
-                    } else if viewModel.matches.isEmpty {
-                        Text("No matches found").foregroundStyle(.secondary).font(.caption)
-                    } else {
-                        ForEach(viewModel.matches, id: \.self) { match in
-                            Text(match)
-                                .font(.system(.caption, design: .monospaced))
-                                .padding(4)
-                                .background(Color.yellow.opacity(0.3))
-                                .cornerRadius(4)
-                        }
+            Section("Matches: \(viewModel.matches.count)") {
+                if !viewModel.isValid {
+                    Text("Invalid Regex Pattern").foregroundStyle(.red).font(.caption)
+                } else if viewModel.matches.isEmpty {
+                    Text("No matches found").foregroundStyle(.secondary).font(.caption)
+                } else {
+                    ForEach(viewModel.matches, id: \.self) { match in
+                        Text(match)
+                            .font(.system(.caption, design: .monospaced))
+                            .padding(4)
+                            .background(Color.yellow.opacity(0.3))
+                            .cornerRadius(4)
                     }
                 }
             }
@@ -90,4 +81,8 @@ class RegexTesterViewModel: ObservableObject {
             matches = []
         }
     }
+}
+
+#Preview {
+    RegexTesterDevToolView()
 }

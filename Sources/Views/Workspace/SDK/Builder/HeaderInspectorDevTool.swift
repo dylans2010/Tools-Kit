@@ -17,46 +17,37 @@ struct HeaderInspectorView: View {
     @State private var rawHeaders = ""
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Header Inspector",
-                description: "Paste raw HTTP headers to parse and analyze security and caching policies.",
-                icon: "list.bullet.indent"
-            )
-            .padding()
+        Form {
+            Section("Input Raw Headers") {
+                TextEditor(text: $rawHeaders)
+                    .frame(height: 150)
+                    .font(.system(.caption, design: .monospaced))
 
-            Form {
-                Section("Input Raw Headers") {
-                    TextEditor(text: $rawHeaders)
-                        .frame(height: 150)
-                        .font(.system(.caption, design: .monospaced))
-
-                    Button("Analyze Headers") {
-                        viewModel.analyze(rawHeaders)
-                    }
-                    .disabled(rawHeaders.isEmpty)
+                Button("Analyze Headers") {
+                    viewModel.analyze(rawHeaders)
                 }
+                .disabled(rawHeaders.isEmpty)
+            }
 
-                if !viewModel.headers.isEmpty {
-                    Section("Analysis") {
-                        ForEach(viewModel.analysisResults) { result in
-                            HStack {
-                                Image(systemName: result.isPositive ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                                    .foregroundStyle(result.isPositive ? .green : .orange)
-                                VStack(alignment: .leading) {
-                                    Text(result.title).font(.subheadline.bold())
-                                    Text(result.description).font(.caption).foregroundStyle(.secondary)
-                                }
+            if !viewModel.headers.isEmpty {
+                Section("Analysis") {
+                    ForEach(viewModel.analysisResults) { result in
+                        HStack {
+                            Image(systemName: result.isPositive ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                                .foregroundStyle(result.isPositive ? .green : .orange)
+                            VStack(alignment: .leading) {
+                                Text(result.title).font(.subheadline.bold())
+                                Text(result.description).font(.caption).foregroundStyle(.secondary)
                             }
                         }
                     }
+                }
 
-                    Section("Parsed Headers") {
-                        ForEach(viewModel.headers.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                            VStack(alignment: .leading) {
-                                Text(key).font(.caption.bold()).foregroundStyle(Color.accentColor)
-                                Text(value).font(.caption2).textSelection(.enabled)
-                            }
+                Section("Parsed Headers") {
+                    ForEach(viewModel.headers.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+                        VStack(alignment: .leading) {
+                            Text(key).font(.caption.bold()).foregroundStyle(Color.accentColor)
+                            Text(value).font(.caption2).textSelection(.enabled)
                         }
                     }
                 }
@@ -106,4 +97,8 @@ class HeaderInspectorViewModel: ObservableObject {
             analysisResults.append(HeaderAnalysisResult(title: key, description: negativeDesc, isPositive: false))
         }
     }
+}
+
+#Preview {
+    HeaderInspectorView()
 }

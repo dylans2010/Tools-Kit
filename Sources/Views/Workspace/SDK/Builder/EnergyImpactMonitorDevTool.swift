@@ -16,32 +16,25 @@ struct EnergyImpactMonitorView: View {
     @StateObject private var viewModel = EnergyImpactMonitorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Energy Impact",
-                description: "Assess the power efficiency of your app by monitoring active background tasks and hardware usage.",
-                icon: "bolt.fill"
-            )
-            .padding()
-
-            Form {
-                Section("Impact Score") {
-                    HStack {
-                        Text("\(Int(viewModel.impactScore))")
-                            .font(.system(size: 40, weight: .bold))
-                        Spacer()
-                        StatusBadge(
-                            text: viewModel.impactScore < 50 ? "Efficient" : "High Usage",
-                            color: viewModel.impactScore < 50 ? .green : .orange
-                        )
-                    }
+        Form {
+            Section("Impact Score") {
+                HStack {
+                    Text("\(Int(viewModel.impactScore))")
+                        .font(.system(size: 40, weight: .bold))
+                    Spacer()
+                    Text(viewModel.impactScore < 50 ? "Efficient" : "High Usage")
+                        .font(.caption2.bold())
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .foregroundStyle(.white)
+                        .background(viewModel.impactScore < 50 ? Color.green : Color.orange, in: RoundedRectangle(cornerRadius: 4))
                 }
+            }
 
-                Section("Contributors") {
-                    LabeledContent("CPU Intensity", value: viewModel.cpuIntensity)
-                    LabeledContent("Network Activity", value: viewModel.networkActivity)
-                    LabeledContent("Location Updates", value: viewModel.locationActive ? "Active" : "Idle")
-                }
+            Section("Contributors") {
+                LabeledContent("CPU Intensity", value: viewModel.cpuIntensity)
+                LabeledContent("Network Activity", value: viewModel.networkActivity)
+                LabeledContent("Location Updates", value: viewModel.locationActive ? "Active" : "Idle")
             }
         }
     }
@@ -52,4 +45,8 @@ class EnergyImpactMonitorViewModel: ObservableObject {
     @Published var cpuIntensity = "Low"
     @Published var networkActivity = "None"
     @Published var locationActive = false
+}
+
+#Preview {
+    EnergyImpactMonitorView()
 }

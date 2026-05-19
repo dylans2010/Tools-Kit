@@ -17,45 +17,36 @@ struct EncryptionToolView: View {
     @StateObject private var viewModel = EncryptionToolViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Encryption Tool",
-                description: "Securely encrypt and decrypt text using industry-standard AES-GCM algorithms.",
-                icon: "key.fill"
-            )
-            .padding()
-
-            Form {
-                Section("Keys") {
-                    HStack {
-                        SecureField("Password / Key", text: $viewModel.key)
-                        Button("Gen") { viewModel.generateKey() }
-                    }
+        Form {
+            Section("Keys") {
+                HStack {
+                    SecureField("Password / Key", text: $viewModel.key)
+                    Button("Gen") { viewModel.generateKey() }
                 }
+            }
 
-                Section("Input") {
-                    TextEditor(text: $viewModel.input)
-                        .frame(height: 100)
+            Section("Input") {
+                TextEditor(text: $viewModel.input)
+                    .frame(height: 100)
+            }
+
+            Section("Actions") {
+                HStack {
+                    Button("Encrypt") { viewModel.encrypt() }
+                        .buttonStyle(.borderedProminent)
+                    Button("Decrypt") { viewModel.decrypt() }
+                        .buttonStyle(.bordered)
                 }
+            }
 
-                Section("Actions") {
-                    HStack {
-                        Button("Encrypt") { viewModel.encrypt() }
-                            .buttonStyle(.borderedProminent)
-                        Button("Decrypt") { viewModel.decrypt() }
-                            .buttonStyle(.bordered)
-                    }
-                }
+            Section("Output") {
+                Text(viewModel.output)
+                    .font(.system(.caption2, design: .monospaced))
+                    .textSelection(.enabled)
+                    .frame(minHeight: 60)
 
-                Section("Output") {
-                    Text(viewModel.output)
-                        .font(.system(.caption2, design: .monospaced))
-                        .textSelection(.enabled)
-                        .frame(minHeight: 60)
-
-                    if !viewModel.error.isEmpty {
-                        Text(viewModel.error).font(.caption).foregroundStyle(.red)
-                    }
+                if !viewModel.error.isEmpty {
+                    Text(viewModel.error).font(.caption).foregroundStyle(.red)
                 }
             }
         }
@@ -107,4 +98,8 @@ class EncryptionToolViewModel: ObservableObject {
             self.error = error.localizedDescription
         }
     }
+}
+
+#Preview {
+    EncryptionToolView()
 }

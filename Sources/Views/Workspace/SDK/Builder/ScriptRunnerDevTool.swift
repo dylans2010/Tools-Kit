@@ -17,36 +17,27 @@ struct ScriptRunnerView: View {
     @State private var script = "console.log('Starting SDK task...');\nToolsKit.sync();"
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Script Runner",
-                description: "Write and execute custom JavaScript or automation scripts within the SDK environment.",
-                icon: "terminal.fill"
-            )
-            .padding()
+        Form {
+            Section("Script Editor") {
+                TextEditor(text: $script)
+                    .frame(height: 200)
+                    .font(.system(.caption, design: .monospaced))
 
-            Form {
-                Section("Script Editor") {
-                    TextEditor(text: $script)
-                        .frame(height: 200)
-                        .font(.system(.caption, design: .monospaced))
-
-                    Button("Run Script") {
-                        Task { await viewModel.run(script) }
-                    }
-                    .disabled(viewModel.isRunning)
+                Button("Run Script") {
+                    Task { await viewModel.run(script) }
                 }
+                .disabled(viewModel.isRunning)
+            }
 
-                Section("Output / Console") {
-                    ScrollView {
-                        Text(viewModel.output)
-                            .font(.system(.caption2, design: .monospaced))
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .background(Color.black.opacity(0.05))
-                    .frame(height: 150)
+            Section("Output / Console") {
+                ScrollView {
+                    Text(viewModel.output)
+                        .font(.system(.caption2, design: .monospaced))
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
+                .background(Color.black.opacity(0.05))
+                .frame(height: 150)
             }
         }
     }
@@ -64,4 +55,8 @@ class ScriptRunnerViewModel: ObservableObject {
             isRunning = false
         }
     }
+}
+
+#Preview {
+    ScriptRunnerView()
 }

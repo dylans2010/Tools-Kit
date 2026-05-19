@@ -16,26 +16,33 @@ struct LoremIpsumGeneratorView: View {
     @StateObject private var viewModel = LoremIpsumGeneratorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Lorem Ipsum Generator",
-                description: "Generate mock paragraphs or sentences for UI prototyping and design testing.",
-                icon: "text.alignleft"
-            )
-            .padding()
+        Form {
+            Section("Configuration") {
+                Stepper("Paragraphs: \(viewModel.paragraphs)", value: $viewModel.paragraphs, in: 1...10)
+                Button("Generate") { viewModel.generate() }
+            }
 
-            Form {
-                Section("Configuration") {
-                    Stepper("Paragraphs: \(viewModel.paragraphs)", value: $viewModel.paragraphs, in: 1...10)
-                    Button("Generate") { viewModel.generate() }
-                }
+            Section("Result") {
+                TextEditor(text: .constant(viewModel.output))
+                    .frame(height: 200)
+                    .font(.system(.body))
 
-                Section("Result") {
-                    TextEditor(text: .constant(viewModel.output))
-                        .frame(height: 200)
-                        .font(.system(.body))
+                HStack {
+                    Button {
+                        UIPasteboard.general.string = viewModel.output
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
 
-                    ExportPanel(content: viewModel.output, filename: "lorem_ipsum.txt")
+                    Button {
+                        let tempDir = FileManager.default.temporaryDirectory
+                        let fileURL = tempDir.appendingPathComponent("lorem_ipsum.txt")
+                        try? viewModel.output.write(to: fileURL, atomically: true, encoding: .utf8)
+                    } label: {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
                 }
             }
         }
@@ -50,4 +57,8 @@ class LoremIpsumGeneratorViewModel: ObservableObject {
         let text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\n\n"
         output = String(repeating: text, count: paragraphs)
     }
+}
+
+#Preview {
+    LoremIpsumGeneratorView()
 }

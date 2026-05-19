@@ -16,52 +16,59 @@ struct QueryStringParserView: View {
     @StateObject private var viewModel = QueryStringParserViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Query String Parser",
-                description: "Deconstruct URL query strings into editable key-value pairs.",
-                icon: "text.badge.plus"
-            )
-            .padding()
+        Form {
+            Section("Input URL / Query String") {
+                TextEditor(text: $viewModel.input)
+                    .frame(height: 100)
+                    .font(.system(.caption, design: .monospaced))
+            }
 
-            Form {
-                Section("Input URL / Query String") {
-                    TextEditor(text: $viewModel.input)
-                        .frame(height: 100)
-                        .font(.system(.caption, design: .monospaced))
-                }
-
-                Section("Parameters") {
-                    if viewModel.parameters.isEmpty {
-                        Text("No parameters detected").foregroundStyle(.secondary)
-                    } else {
-                        ForEach($viewModel.parameters) { $param in
-                            HStack {
-                                TextField("Key", text: $param.key)
-                                    .font(.caption.bold())
-                                Divider()
-                                TextField("Value", text: $param.value)
-                                    .font(.caption)
-                            }
+            Section("Parameters") {
+                if viewModel.parameters.isEmpty {
+                    Text("No parameters detected").foregroundStyle(.secondary)
+                } else {
+                    ForEach($viewModel.parameters) { $param in
+                        HStack {
+                            TextField("Key", text: $param.key)
+                                .font(.caption.bold())
+                            Divider()
+                            TextField("Value", text: $param.value)
+                                .font(.caption)
                         }
-                        .onDelete { viewModel.parameters.remove(atOffsets: $0) }
                     }
-
-                    Button("Add Parameter") {
-                        viewModel.parameters.append(QueryParameter(key: "key", value: "value"))
-                    }
+                    .onDelete { viewModel.parameters.remove(atOffsets: $0) }
                 }
 
-                Section("Generated Output") {
-                    Text(viewModel.output)
-                        .font(.system(.caption2, design: .monospaced))
-                        .padding(8)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(uiColor: .secondarySystemBackground))
-                        .cornerRadius(4)
-                        .textSelection(.enabled)
+                Button("Add Parameter") {
+                    viewModel.parameters.append(QueryParameter(key: "key", value: "value"))
+                }
+            }
 
-                    ExportPanel(content: viewModel.output, filename: "query_string.txt")
+            Section("Generated Output") {
+                Text(viewModel.output)
+                    .font(.system(.caption2, design: .monospaced))
+                    .padding(8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(uiColor: .secondarySystemBackground))
+                    .cornerRadius(4)
+                    .textSelection(.enabled)
+
+                HStack {
+                    Button {
+                        UIPasteboard.general.string = viewModel.output
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        let tempDir = FileManager.default.temporaryDirectory
+                        let fileURL = tempDir.appendingPathComponent("query_string.txt")
+                        try? viewModel.output.write(to: fileURL, atomically: true, encoding: .utf8)
+                    } label: {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
                 }
             }
         }
@@ -105,4 +112,8 @@ class QueryStringParserViewModel: ObservableObject {
 
         parameters = queryItems.map { QueryParameter(key: $0.name, value: $0.value ?? "") }
     }
+}
+
+#Preview {
+    QueryStringParserView()
 }

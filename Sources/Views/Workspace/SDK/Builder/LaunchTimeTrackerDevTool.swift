@@ -16,28 +16,19 @@ struct LaunchTimeTrackerView: View {
     @StateObject private var viewModel = LaunchTimeTrackerViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Launch Time Tracker",
-                description: "Measure cold and warm start durations to optimize application responsiveness.",
-                icon: "timer"
-            )
-            .padding()
+        Form {
+            Section("Metrics") {
+                LabeledContent("Process Start", value: viewModel.processStartTime)
+                LabeledContent("Main Initialized", value: viewModel.mainInitTime)
+                LabeledContent("First Frame", value: viewModel.firstFrameTime)
+            }
 
-            Form {
-                Section("Metrics") {
-                    LabeledContent("Process Start", value: viewModel.processStartTime)
-                    LabeledContent("Main Initialized", value: viewModel.mainInitTime)
-                    LabeledContent("First Frame", value: viewModel.firstFrameTime)
-                }
-
-                Section("Analysis") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Total Launch Time").font(.headline)
-                        Text(viewModel.totalTime)
-                            .font(.system(size: 34, weight: .bold, design: .monospaced))
-                            .foregroundStyle(Color.accentColor)
-                    }
+            Section("Analysis") {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Total Launch Time").font(.headline)
+                    Text(viewModel.totalTime)
+                        .font(.system(size: 34, weight: .bold, design: .monospaced))
+                        .foregroundStyle(Color.accentColor)
                 }
             }
         }
@@ -72,4 +63,8 @@ class LaunchTimeTrackerViewModel: ObservableObject {
         mainInitTime = "\(Int(Double(uptimeMs) * 0.1))ms"
         firstFrameTime = "\(Int(Double(uptimeMs) * 0.2))ms"
     }
+}
+
+#Preview {
+    LaunchTimeTrackerView()
 }

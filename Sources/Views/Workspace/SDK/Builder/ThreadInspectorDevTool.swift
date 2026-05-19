@@ -16,30 +16,26 @@ struct ThreadInspectorView: View {
     @StateObject private var viewModel = ThreadInspectorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Thread Inspector",
-                description: "Inspect active application threads and GCD queues to identify deadlocks or performance bottlenecks.",
-                icon: "line.3.horizontal"
-            )
-            .padding()
-
-            List {
-                Section("Active Threads") {
-                    ForEach(viewModel.threads) { thread in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(thread.name).font(.subheadline.bold())
-                                Text(thread.details).font(.caption2).foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            StatusBadge(text: thread.priority, color: .blue)
+        List {
+            Section("Active Threads") {
+                ForEach(viewModel.threads) { thread in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(thread.name).font(.subheadline.bold())
+                            Text(thread.details).font(.caption2).foregroundStyle(.secondary)
                         }
+                        Spacer()
+                        Text(thread.priority)
+                            .font(.caption2.bold())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .foregroundStyle(.white)
+                            .background(Color.blue, in: RoundedRectangle(cornerRadius: 4))
                     }
                 }
             }
-            .refreshable { viewModel.refresh() }
         }
+        .refreshable { viewModel.refresh() }
         .onAppear { viewModel.refresh() }
     }
 }
@@ -61,4 +57,8 @@ class ThreadInspectorViewModel: ObservableObject {
             ThreadInfo(name: "com.toolskit.sdk.logstore", details: "Background persistence", priority: "Background")
         ]
     }
+}
+
+#Preview {
+    ThreadInspectorView()
 }

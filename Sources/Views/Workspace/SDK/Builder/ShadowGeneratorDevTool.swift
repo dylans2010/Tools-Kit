@@ -16,43 +16,34 @@ struct ShadowGeneratorView: View {
     @StateObject private var viewModel = ShadowGeneratorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Shadow Generator",
-                description: "Interactively design box shadows with control over blur, spread, and opacity.",
-                icon: "sun.max"
-            )
-            .padding()
+        Form {
+            Section("Preview") {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(uiColor: .systemBackground))
+                    .frame(width: 150, height: 100)
+                    .shadow(
+                        color: viewModel.shadowColor.opacity(viewModel.opacity),
+                        radius: viewModel.radius,
+                        x: viewModel.offsetX,
+                        y: viewModel.offsetY
+                    )
+                    .padding(40)
+                    .frame(maxWidth: .infinity)
+            }
 
-            Form {
-                Section("Preview") {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(uiColor: .systemBackground))
-                        .frame(width: 150, height: 100)
-                        .shadow(
-                            color: viewModel.shadowColor.opacity(viewModel.opacity),
-                            radius: viewModel.radius,
-                            x: viewModel.offsetX,
-                            y: viewModel.offsetY
-                        )
-                        .padding(40)
-                        .frame(maxWidth: .infinity)
-                }
+            Section("Parameters") {
+                Slider(value: $viewModel.radius, in: 0...50) { Text("Radius") }
+                Slider(value: $viewModel.offsetX, in: -50...50) { Text("X Offset") }
+                Slider(value: $viewModel.offsetY, in: -50...50) { Text("Y Offset") }
+                Slider(value: $viewModel.opacity, in: 0...1) { Text("Opacity") }
+                ColorPicker("Shadow Color", selection: $viewModel.shadowColor)
+            }
 
-                Section("Parameters") {
-                    Slider(value: $viewModel.radius, in: 0...50) { Text("Radius") }
-                    Slider(value: $viewModel.offsetX, in: -50...50) { Text("X Offset") }
-                    Slider(value: $viewModel.offsetY, in: -50...50) { Text("Y Offset") }
-                    Slider(value: $viewModel.opacity, in: 0...1) { Text("Opacity") }
-                    ColorPicker("Shadow Color", selection: $viewModel.shadowColor)
-                }
-
-                Section("SwiftUI Code") {
-                    Text(viewModel.codeSnippet)
-                        .font(.system(.caption2, design: .monospaced))
-                        .padding()
-                        .background(Color.secondary.opacity(0.1))
-                }
+            Section("SwiftUI Code") {
+                Text(viewModel.codeSnippet)
+                    .font(.system(.caption2, design: .monospaced))
+                    .padding()
+                    .background(Color.secondary.opacity(0.1))
             }
         }
     }
@@ -69,4 +60,8 @@ class ShadowGeneratorViewModel: ObservableObject {
         let comp = shadowColor.getComponents()
         return ".shadow(\n  color: Color(red: \(String(format: "%.2f", comp.r)), green: \(String(format: "%.2f", comp.g)), blue: \(String(format: "%.2f", comp.b))).opacity(\(String(format: "%.2f", opacity))),\n  radius: \(Int(radius)),\n  x: \(Int(offsetX)),\n  y: \(Int(offsetY))\n)"
     }
+}
+
+#Preview {
+    ShadowGeneratorView()
 }

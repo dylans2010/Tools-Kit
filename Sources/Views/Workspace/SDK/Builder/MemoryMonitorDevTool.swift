@@ -16,28 +16,32 @@ struct MemoryMonitorView: View {
     @StateObject private var viewModel = MemoryMonitorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Memory Monitor",
-                description: "Track application memory footprint, including heap allocation and resident set size.",
-                icon: "memorychip"
-            )
+        VStack {
+            GeometryReader { geo in
+                Path { path in
+                    guard viewModel.usageHistory.count > 1 else { return }
+                    let step = geo.size.width / CGFloat(viewModel.usageHistory.count - 1)
+                    let height = geo.size.height
+
+                    path.move(to: CGPoint(x: 0, y: height * (1 - CGFloat((viewModel.usageHistory.first ?? 0)/100))))
+
+                    for i in 1..<viewModel.usageHistory.count {
+                        path.addLine(to: CGPoint(x: CGFloat(i) * step, y: height * (1 - CGFloat(viewModel.usageHistory[i]/100))))
+                    }
+                }
+                .stroke(Color.accentColor, lineWidth: 2)
+            }
+            .frame(height: 200)
             .padding()
 
-            VStack {
-                UsageChart(data: viewModel.usageHistory)
-                    .frame(height: 200)
-                    .padding()
+            Form {
+                Section("Usage") {
+                    LabeledContent("Current", value: viewModel.currentMemory)
+                    LabeledContent("Peak", value: viewModel.peakMemory)
+                }
 
-                Form {
-                    Section("Usage") {
-                        LabeledContent("Current", value: viewModel.currentMemory)
-                        LabeledContent("Peak", value: viewModel.peakMemory)
-                    }
-
-                    Section("System") {
-                        LabeledContent("Physical Memory", value: viewModel.totalMemory)
-                    }
+                Section("System") {
+                    LabeledContent("Physical Memory", value: viewModel.totalMemory)
                 }
             }
         }
@@ -92,4 +96,8 @@ class MemoryMonitorViewModel: ObservableObject {
             usageHistory.append(percent)
         }
     }
+}
+
+#Preview {
+    MemoryMonitorView()
 }

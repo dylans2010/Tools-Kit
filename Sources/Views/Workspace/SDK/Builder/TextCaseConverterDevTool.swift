@@ -16,28 +16,19 @@ struct TextCaseConverterView: View {
     @StateObject private var viewModel = TextCaseConverterViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Text Case Converter",
-                description: "Quickly convert text between CamelCase, snake_case, UPPERCASE, and more.",
-                icon: "textformat.abc"
-            )
-            .padding()
+        Form {
+            Section("Input") {
+                TextEditor(text: $viewModel.input)
+                    .frame(height: 100)
+            }
 
-            Form {
-                Section("Input") {
-                    TextEditor(text: $viewModel.input)
-                        .frame(height: 100)
-                }
-
-                Section("Transformed") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        caseRow(title: "UPPERCASE", value: viewModel.input.uppercased())
-                        caseRow(title: "lowercase", value: viewModel.input.lowercased())
-                        caseRow(title: "Capitalized", value: viewModel.input.capitalized)
-                        caseRow(title: "snake_case", value: viewModel.toSnakeCase())
-                        caseRow(title: "CamelCase", value: viewModel.toCamelCase())
-                    }
+            Section("Transformed") {
+                VStack(alignment: .leading, spacing: 12) {
+                    caseRow(title: "UPPERCASE", value: viewModel.input.uppercased())
+                    caseRow(title: "lowercase", value: viewModel.input.lowercased())
+                    caseRow(title: "Capitalized", value: viewModel.input.capitalized)
+                    caseRow(title: "snake_case", value: viewModel.toSnakeCase())
+                    caseRow(title: "CamelCase", value: viewModel.toCamelCase())
                 }
             }
         }
@@ -69,4 +60,8 @@ class TextCaseConverterViewModel: ObservableObject {
     func toCamelCase() -> String {
         input.capitalized.replacingOccurrences(of: " ", with: "")
     }
+}
+
+#Preview {
+    TextCaseConverterView()
 }

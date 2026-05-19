@@ -26,13 +26,6 @@ struct HTTPRequestTesterView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            DevToolHeader(
-                title: "HTTP Request Tester",
-                description: "Configure and execute HTTP requests with detailed analytics.",
-                icon: "network"
-            )
-            .padding()
-
             Picker("Mode", selection: $selectedTab) {
                 Text("Request").tag(0)
                 Text("Headers").tag(1)
@@ -134,7 +127,12 @@ struct HTTPRequestTesterView: View {
                 List {
                     Section("Status") {
                         HStack {
-                            StatusBadge(text: "\(response.statusCode)", color: response.statusCode < 400 ? .green : .red)
+                            Text("\(response.statusCode)")
+                                .font(.caption2.bold())
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .foregroundStyle(.white)
+                                .background(response.statusCode < 400 ? Color.green : Color.red, in: RoundedRectangle(cornerRadius: 4))
                             Text(response.statusDescription)
                             Spacer()
                             Text("\(Int(response.duration * 1000))ms")
@@ -150,8 +148,16 @@ struct HTTPRequestTesterView: View {
                     }
 
                     Section("Body") {
-                        JSONView(json: response.body)
-                            .frame(minHeight: 200)
+                        ScrollView {
+                            Text(response.body)
+                                .font(.system(.caption2, design: .monospaced))
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .textSelection(.enabled)
+                        }
+                        .background(Color(uiColor: .systemGray6))
+                        .cornerRadius(8)
+                        .frame(minHeight: 200)
                     }
                 }
             } else {
@@ -161,11 +167,46 @@ struct HTTPRequestTesterView: View {
     }
 
     private var historyTab: some View {
-        HistoryView(history: viewModel.history) { item in
-            viewModel.loadHistory(item)
-            selectedTab = 0
-        } onClear: {
-            viewModel.history.removeAll()
+        Section {
+            HStack {
+                Text("History")
+                    .font(.headline)
+                Spacer()
+                Button("Clear") {
+                    viewModel.history.removeAll()
+                }
+                .font(.caption)
+                .disabled(viewModel.history.isEmpty)
+            }
+            .padding(.horizontal)
+
+            if viewModel.history.isEmpty {
+                ContentUnavailableView("No History", systemImage: "clock", description: Text("Your activity will appear here."))
+                    .frame(height: 200)
+            } else {
+                List {
+                    ForEach(viewModel.history) { item in
+                        Button {
+                            viewModel.loadHistory(item)
+                            selectedTab = 0
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(item.title)
+                                    .font(.subheadline.bold())
+                                Text(item.detail)
+                                    .font(.caption)
+                                    .lineLimit(2)
+                                    .foregroundStyle(.secondary)
+                                Text(item.timestamp, style: .relative)
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                    }
+                }
+                .listStyle(.plain)
+                .frame(height: 300)
+            }
         }
     }
 }
@@ -261,4 +302,8 @@ struct HTTPResponse {
     let headers: [String: String]
     let body: String
     let duration: TimeInterval
+}
+
+#Preview {
+    HTTPRequestTesterView()
 }

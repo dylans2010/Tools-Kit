@@ -16,26 +16,41 @@ struct YAMLParserView: View {
     @StateObject private var viewModel = YAMLParserViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "YAML Parser",
-                description: "Inspect YAML documents and convert them to JSON format for better compatibility.",
-                icon: "text.badge.star"
-            )
-            .padding()
+        Form {
+            Section("YAML Input") {
+                TextEditor(text: $viewModel.input)
+                    .frame(height: 150)
+                    .font(.system(.caption, design: .monospaced))
+            }
 
-            Form {
-                Section("YAML Input") {
-                    TextEditor(text: $viewModel.input)
-                        .frame(height: 150)
-                        .font(.system(.caption, design: .monospaced))
+            Section("JSON Output") {
+                ScrollView {
+                    Text(viewModel.output)
+                        .font(.system(.caption2, design: .monospaced))
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
                 }
+                .background(Color(uiColor: .systemGray6))
+                .cornerRadius(8)
+                .frame(minHeight: 200)
 
-                Section("JSON Output") {
-                    JSONView(json: viewModel.output)
-                        .frame(minHeight: 200)
+                HStack {
+                    Button {
+                        UIPasteboard.general.string = viewModel.output
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
 
-                    ExportPanel(content: viewModel.output, filename: "converted.json")
+                    Button {
+                        let tempDir = FileManager.default.temporaryDirectory
+                        let fileURL = tempDir.appendingPathComponent("converted.json")
+                        try? viewModel.output.write(to: fileURL, atomically: true, encoding: .utf8)
+                    } label: {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
                 }
             }
         }
@@ -68,4 +83,8 @@ class YAMLParserViewModel: ObservableObject {
         result += "}"
         output = result
     }
+}
+
+#Preview {
+    YAMLParserView()
 }

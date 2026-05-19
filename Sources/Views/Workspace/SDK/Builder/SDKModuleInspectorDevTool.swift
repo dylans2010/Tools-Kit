@@ -35,31 +35,24 @@ struct SDKModuleInspectorView: View {
     @State private var selectedModule: _DTModuleDescriptor?
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "SDK Module Inspector",
-                description: "Deep dive into the registered SDK modules, their capabilities, and activation status.",
-                icon: "puzzlepiece.fill"
-            )
-            .padding()
-
-            List {
-                Section("Registered Modules") {
-                    ForEach(registry.modules) { module in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(module.name).font(.headline)
-                                Text(module.id).font(.caption).foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            StatusBadge(
-                                text: "Active",
-                                color: .green
-                            )
+        List {
+            Section("Registered Modules") {
+                ForEach(registry.modules) { module in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(module.name).font(.headline)
+                            Text(module.id).font(.caption).foregroundStyle(.secondary)
                         }
-                        .contentShape(Rectangle())
-                        .onTapGesture { selectedModule = module }
+                        Spacer()
+                        Text("Active")
+                            .font(.caption2.bold())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .foregroundStyle(.white)
+                            .background(Color.green, in: RoundedRectangle(cornerRadius: 4))
                     }
+                    .contentShape(Rectangle())
+                    .onTapGesture { selectedModule = module }
                 }
             }
         }
@@ -92,4 +85,8 @@ struct ModuleDetailView: View {
             }
         }
     }
+}
+
+#Preview {
+    SDKModuleInspectorView()
 }

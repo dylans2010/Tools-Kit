@@ -17,58 +17,82 @@ struct DNSLookupDevToolView: View {
     @StateObject private var viewModel = DNSLookupViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "DNS Lookup",
-                description: "Resolve domain names to IP addresses and query specific record types.",
-                icon: "magnifyingglass.circle"
-            )
-            .padding()
+        Form {
+            Section("Target") {
+                HStack {
+                    TextField("google.com", text: $viewModel.hostname)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
 
-            Form {
-                Section("Target") {
-                    HStack {
-                        TextField("google.com", text: $viewModel.hostname)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
-
-                        Picker("Type", selection: $viewModel.recordType) {
-                            Text("A").tag(DNSRecordType.a)
-                            Text("AAAA").tag(DNSRecordType.aaaa)
-                            Text("MX").tag(DNSRecordType.mx)
-                            Text("TXT").tag(DNSRecordType.txt)
-                        }
-                        .frame(width: 80)
+                    Picker("Type", selection: $viewModel.recordType) {
+                        Text("A").tag(DNSRecordType.a)
+                        Text("AAAA").tag(DNSRecordType.aaaa)
+                        Text("MX").tag(DNSRecordType.mx)
+                        Text("TXT").tag(DNSRecordType.txt)
                     }
-
-                    Button("Resolve") {
-                        Task { await viewModel.resolve() }
-                    }
-                    .disabled(viewModel.hostname.isEmpty || viewModel.isLoading)
+                    .frame(width: 80)
                 }
 
-                if viewModel.isLoading {
-                    ProgressView("Resolving...").frame(maxWidth: .infinity)
+                Button("Resolve") {
+                    Task { await viewModel.resolve() }
                 }
+                .disabled(viewModel.hostname.isEmpty || viewModel.isLoading)
+            }
 
-                if !viewModel.results.isEmpty {
-                    Section("Results") {
-                        ForEach(viewModel.results, id: \.self) { result in
-                            Text(result)
-                                .font(.system(.caption, design: .monospaced))
-                                .textSelection(.enabled)
-                        }
+            if viewModel.isLoading {
+                ProgressView("Resolving...").frame(maxWidth: .infinity)
+            }
+
+            if !viewModel.results.isEmpty {
+                Section("Results") {
+                    ForEach(viewModel.results, id: \.self) { result in
+                        Text(result)
+                            .font(.system(.caption, design: .monospaced))
+                            .textSelection(.enabled)
                     }
                 }
+            }
 
-                Section("History") {
-                    HistoryView(history: viewModel.history) { item in
-                        viewModel.hostname = item.title
-                    } onClear: {
+            Section {
+                HStack {
+                    Text("History")
+                        .font(.headline)
+                    Spacer()
+                    Button("Clear") {
                         viewModel.history.removeAll()
                     }
-                    .frame(height: 200)
+                    .font(.caption)
+                    .disabled(viewModel.history.isEmpty)
                 }
+
+                if viewModel.history.isEmpty {
+                    ContentUnavailableView("No History", systemImage: "clock", description: Text("Your activity will appear here."))
+                        .frame(height: 200)
+                } else {
+                    List {
+                        ForEach(viewModel.history) { item in
+                            Button {
+                                viewModel.hostname = item.title
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(item.title)
+                                        .font(.subheadline.bold())
+                                    Text(item.detail)
+                                        .font(.caption)
+                                        .lineLimit(2)
+                                        .foregroundStyle(.secondary)
+                                    Text(item.timestamp, style: .relative)
+                                        .font(.caption2)
+                                        .foregroundStyle(.tertiary)
+                                }
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                    .frame(height: 300)
+                }
+            } header: {
+                Text("History")
             }
         }
     }
@@ -134,4 +158,8 @@ class DNSLookupViewModel: ObservableObject {
             }
         }
     }
+}
+
+#Preview {
+    DNSLookupDevToolView()
 }

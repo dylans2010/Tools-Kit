@@ -35,45 +35,45 @@ struct SDKConfigValidatorView: View {
         let sortedConfigurations = config.entries.sorted { lhs, rhs in
             lhs.key < rhs.key
         }
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "SDK Config Validator",
-                description: "Validate active configurations and inspect the change log for auditing purposes.",
-                icon: "checkmark.shield.fill"
-            )
-            .padding()
-
-            List {
-                Section("Active Configurations") {
-                    ForEach(sortedConfigurations) { entry in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(entry.key).font(.subheadline.bold())
-                                Text(entry.value).font(.caption).foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            StatusBadge(text: "LOCAL", color: .accentColor)
+        List {
+            Section("Active Configurations") {
+                ForEach(sortedConfigurations) { entry in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(entry.key).font(.subheadline.bold())
+                            Text(entry.value).font(.caption).foregroundStyle(.secondary)
                         }
+                        Spacer()
+                        Text("LOCAL")
+                            .font(.caption2.bold())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .foregroundStyle(.white)
+                            .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 4))
                     }
                 }
+            }
 
-                Section("Configuration Change Log") {
-                    ForEach(config.changes.reversed(), id: \.self) { change in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(change.key).font(.caption.bold())
-                            HStack {
-                                Text("previous").strikethrough()
-                                Image(systemName: "arrow.right")
-                                Text(change.value)
-                            }
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-
+            Section("Configuration Change Log") {
+                ForEach(config.changes.reversed(), id: \.self) { change in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(change.key).font(.caption.bold())
+                        HStack {
+                            Text("previous").strikethrough()
+                            Image(systemName: "arrow.right")
+                            Text(change.value)
                         }
-                        .padding(.vertical, 2)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+
                     }
+                    .padding(.vertical, 2)
                 }
             }
         }
     }
+}
+
+#Preview {
+    SDKConfigValidatorView()
 }

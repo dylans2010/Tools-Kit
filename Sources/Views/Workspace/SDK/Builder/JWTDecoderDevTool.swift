@@ -16,37 +16,44 @@ struct JWTDecoderDevToolView: View {
     @StateObject private var viewModel = JWTDecoderViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "JWT Decoder",
-                description: "Parse JSON Web Tokens to inspect header, payload, and signature components.",
-                icon: "key.horizontal"
-            )
-            .padding()
+        Form {
+            Section("Input JWT") {
+                TextEditor(text: $viewModel.input)
+                    .frame(height: 100)
+                    .font(.system(.caption2, design: .monospaced))
+            }
 
-            Form {
-                Section("Input JWT") {
-                    TextEditor(text: $viewModel.input)
-                        .frame(height: 100)
-                        .font(.system(.caption2, design: .monospaced))
+            if !viewModel.header.isEmpty {
+                Section("Header") {
+                    ScrollView {
+                        Text(viewModel.header)
+                            .font(.system(.caption2, design: .monospaced))
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                    }
+                    .background(Color(uiColor: .systemGray6))
+                    .cornerRadius(8)
+                    .frame(height: 100)
                 }
 
-                if !viewModel.header.isEmpty {
-                    Section("Header") {
-                        JSONView(json: viewModel.header)
-                            .frame(height: 100)
-                    }
-
-                    Section("Payload") {
-                        JSONView(json: viewModel.payload)
-                            .frame(height: 200)
-                    }
-
-                    Section("Signature") {
-                        Text(viewModel.signature)
+                Section("Payload") {
+                    ScrollView {
+                        Text(viewModel.payload)
                             .font(.system(.caption2, design: .monospaced))
-                            .foregroundStyle(.secondary)
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
                     }
+                    .background(Color(uiColor: .systemGray6))
+                    .cornerRadius(8)
+                    .frame(height: 200)
+                }
+
+                Section("Signature") {
+                    Text(viewModel.signature)
+                        .font(.system(.caption2, design: .monospaced))
+                        .foregroundStyle(.secondary)
                 }
             }
         }
@@ -91,4 +98,8 @@ class JWTDecoderViewModel: ObservableObject {
         }
         return prettyString
     }
+}
+
+#Preview {
+    JWTDecoderDevToolView()
 }

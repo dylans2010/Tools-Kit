@@ -16,14 +16,7 @@ struct JSONDiffView: View {
     @StateObject private var viewModel = JSONDiffViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "JSON Diff",
-                description: "Compare two JSON objects side-by-side to identify additions, deletions, and modifications.",
-                icon: "square.split.2x1"
-            )
-            .padding()
-
+        VStack {
             HStack {
                 VStack {
                     Text("Left JSON").font(.caption.bold())
@@ -128,4 +121,8 @@ class JSONDiffViewModel: ObservableObject {
 
         diffResults = results
     }
+}
+
+#Preview {
+    JSONDiffView()
 }

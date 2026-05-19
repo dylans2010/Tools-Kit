@@ -16,42 +16,33 @@ struct TypographyScaleView: View {
     @StateObject private var viewModel = TypographyScaleViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Typography Scale",
-                description: "Design harmonious font size hierarchies using musical scales like the Golden Ratio or Major Third.",
-                icon: "textformat.size"
-            )
-            .padding()
+        Form {
+            Section("Configuration") {
+                TextField("Base Size (pt)", text: $viewModel.baseSize)
+                    .keyboardType(.numberPad)
 
-            Form {
-                Section("Configuration") {
-                    TextField("Base Size (pt)", text: $viewModel.baseSize)
-                        .keyboardType(.numberPad)
-
-                    Picker("Scale Ratio", selection: $viewModel.scaleRatio) {
-                        Text("Minor Second (1.067)").tag(1.067)
-                        Text("Major Third (1.250)").tag(1.25)
-                        Text("Perfect Fourth (1.333)").tag(1.333)
-                        Text("Golden Ratio (1.618)").tag(1.618)
-                    }
+                Picker("Scale Ratio", selection: $viewModel.scaleRatio) {
+                    Text("Minor Second (1.067)").tag(1.067)
+                    Text("Major Third (1.250)").tag(1.25)
+                    Text("Perfect Fourth (1.333)").tag(1.333)
+                    Text("Golden Ratio (1.618)").tag(1.618)
                 }
+            }
 
-                Section("Scale Preview") {
-                    ForEach(viewModel.scaleItems) { item in
-                        HStack(alignment: .bottom) {
-                            VStack(alignment: .leading) {
-                                Text(item.label).font(.caption2).foregroundStyle(.secondary)
-                                Text("Sample Text")
-                                    .font(.system(size: item.size))
-                            }
-                            Spacer()
-                            Text("\(Int(item.size))pt")
-                                .font(.caption.monospaced())
-                                .foregroundStyle(.tertiary)
+            Section("Scale Preview") {
+                ForEach(viewModel.scaleItems) { item in
+                    HStack(alignment: .bottom) {
+                        VStack(alignment: .leading) {
+                            Text(item.label).font(.caption2).foregroundStyle(.secondary)
+                            Text("Sample Text")
+                                .font(.system(size: item.size))
                         }
-                        .padding(.vertical, 4)
+                        Spacer()
+                        Text("\(Int(item.size))pt")
+                            .font(.caption.monospaced())
+                            .foregroundStyle(.tertiary)
                     }
+                    .padding(.vertical, 4)
                 }
             }
         }
@@ -83,4 +74,8 @@ class TypographyScaleViewModel: ObservableObject {
 
         return items
     }
+}
+
+#Preview {
+    TypographyScaleView()
 }

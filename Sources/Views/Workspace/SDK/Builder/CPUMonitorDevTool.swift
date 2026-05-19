@@ -16,30 +16,34 @@ struct CPUMonitorView: View {
     @StateObject private var viewModel = CPUMonitorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "CPU Monitor",
-                description: "Monitor real-time CPU utilization and per-core performance metrics.",
-                icon: "cpu"
-            )
+        VStack(spacing: 20) {
+            GeometryReader { geo in
+                Path { path in
+                    guard viewModel.usageHistory.count > 1 else { return }
+                    let step = geo.size.width / CGFloat(viewModel.usageHistory.count - 1)
+                    let height = geo.size.height
+
+                    path.move(to: CGPoint(x: 0, y: height * (1 - CGFloat((viewModel.usageHistory.first ?? 0)/100))))
+
+                    for i in 1..<viewModel.usageHistory.count {
+                        path.addLine(to: CGPoint(x: CGFloat(i) * step, y: height * (1 - CGFloat(viewModel.usageHistory[i]/100))))
+                    }
+                }
+                .stroke(Color.accentColor, lineWidth: 2)
+            }
+            .frame(height: 200)
             .padding()
 
-            VStack(spacing: 20) {
-                UsageChart(data: viewModel.usageHistory)
-                    .frame(height: 200)
-                    .padding()
+            Form {
+                Section("Live Metrics") {
+                    LabeledContent("Current Usage", value: String(format: "%.1f%%", viewModel.currentUsage))
+                    LabeledContent("Peak Usage", value: String(format: "%.1f%%", viewModel.peakUsage))
+                    LabeledContent("Cores Detected", value: "\(ProcessInfo.processInfo.processorCount)")
+                }
 
-                Form {
-                    Section("Live Metrics") {
-                        LabeledContent("Current Usage", value: String(format: "%.1f%%", viewModel.currentUsage))
-                        LabeledContent("Peak Usage", value: String(format: "%.1f%%", viewModel.peakUsage))
-                        LabeledContent("Cores Detected", value: "\(ProcessInfo.processInfo.processorCount)")
-                    }
-
-                    Section("System State") {
-                        LabeledContent("Low Power Mode", value: ProcessInfo.processInfo.isLowPowerModeEnabled ? "On" : "Off")
-                        LabeledContent("Thermal State", value: viewModel.thermalState)
-                    }
+                Section("System State") {
+                    LabeledContent("Low Power Mode", value: ProcessInfo.processInfo.isLowPowerModeEnabled ? "On" : "Off")
+                    LabeledContent("Thermal State", value: viewModel.thermalState)
                 }
             }
         }
@@ -95,4 +99,8 @@ class CPUMonitorViewModel: ObservableObject {
         @unknown default: thermalState = "Unknown"
         }
     }
+}
+
+#Preview {
+    CPUMonitorView()
 }

@@ -16,31 +16,22 @@ struct ASCIIHexConverterView: View {
     @StateObject private var viewModel = ASCIIHexConverterViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "ASCII / Hex Converter",
-                description: "Seamlessly convert plain text to hexadecimal representation and back.",
-                icon: "number"
-            )
-            .padding()
+        Form {
+            Section("Text (ASCII/UTF-8)") {
+                TextEditor(text: $viewModel.textInput)
+                    .frame(height: 100)
+                    .font(.system(.body, design: .monospaced))
+            }
 
-            Form {
-                Section("Text (ASCII/UTF-8)") {
-                    TextEditor(text: $viewModel.textInput)
-                        .frame(height: 100)
-                        .font(.system(.body, design: .monospaced))
-                }
+            Section("Hexadecimal") {
+                TextEditor(text: $viewModel.hexInput)
+                    .frame(height: 100)
+                    .font(.system(.body, design: .monospaced))
+            }
 
-                Section("Hexadecimal") {
-                    TextEditor(text: $viewModel.hexInput)
-                        .frame(height: 100)
-                        .font(.system(.body, design: .monospaced))
-                }
-
-                Section("Configuration") {
-                    Toggle("Add Spaces", isOn: $viewModel.addSpaces)
-                    Toggle("Uppercase Hex", isOn: $viewModel.isUppercase)
-                }
+            Section("Configuration") {
+                Toggle("Add Spaces", isOn: $viewModel.addSpaces)
+                Toggle("Uppercase Hex", isOn: $viewModel.isUppercase)
             }
         }
     }
@@ -98,4 +89,8 @@ class ASCIIHexConverterViewModel: ObservableObject {
             textInput = decoded
         }
     }
+}
+
+#Preview {
+    ASCIIHexConverterView()
 }

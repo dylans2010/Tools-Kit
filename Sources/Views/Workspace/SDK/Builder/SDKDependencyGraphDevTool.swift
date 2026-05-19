@@ -33,27 +33,22 @@ struct SDKDependencyGraphView: View {
 
     var body: some View {
         let orderedModules = registry.modules
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "SDK Dependency Graph",
-                description: "Visualize the load order and inter-module dependencies of the SDK architecture.",
-                icon: "circle.grid.cross.fill"
-            )
-            .padding()
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    ForEach(orderedModules) { module in
-                        HStack(alignment: .top) {
-                            Circle().fill(Color.accentColor).frame(width: 8, height: 8).padding(.top, 6)
-                            VStack(alignment: .leading) {
-                                Text(module.name).font(.headline)
-                            }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                ForEach(orderedModules) { module in
+                    HStack(alignment: .top) {
+                        Circle().fill(Color.accentColor).frame(width: 8, height: 8).padding(.top, 6)
+                        VStack(alignment: .leading) {
+                            Text(module.name).font(.headline)
                         }
                     }
                 }
-                .padding()
             }
+            .padding()
         }
     }
+}
+
+#Preview {
+    SDKDependencyGraphView()
 }

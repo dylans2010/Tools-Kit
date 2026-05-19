@@ -16,35 +16,26 @@ struct ColorMixerView: View {
     @StateObject private var viewModel = ColorMixerViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Color Mixer",
-                description: "Mix two colors using different ratios to create unique gradients and transitions.",
-                icon: "drop.fill"
-            )
-            .padding()
+        Form {
+            Section("Base Colors") {
+                ColorPicker("Color A", selection: $viewModel.colorA)
+                ColorPicker("Color B", selection: $viewModel.colorB)
+            }
 
-            Form {
-                Section("Base Colors") {
-                    ColorPicker("Color A", selection: $viewModel.colorA)
-                    ColorPicker("Color B", selection: $viewModel.colorB)
-                }
+            Section("Ratio: \(Int(viewModel.ratio * 100))%") {
+                Slider(value: $viewModel.ratio)
+            }
 
-                Section("Ratio: \(Int(viewModel.ratio * 100))%") {
-                    Slider(value: $viewModel.ratio)
-                }
+            Section("Result") {
+                HStack(spacing: 12) {
+                    Rectangle()
+                        .fill(viewModel.mixedColor)
+                        .frame(height: 80)
+                        .cornerRadius(12)
 
-                Section("Result") {
-                    HStack(spacing: 12) {
-                        Rectangle()
-                            .fill(viewModel.mixedColor)
-                            .frame(height: 80)
-                            .cornerRadius(12)
-
-                        VStack(alignment: .leading) {
-                            Text("Mixed Result").font(.headline)
-                            Text(viewModel.hexValue).font(.caption.monospaced())
-                        }
+                    VStack(alignment: .leading) {
+                        Text("Mixed Result").font(.headline)
+                        Text(viewModel.hexValue).font(.caption.monospaced())
                     }
                 }
             }
@@ -73,4 +64,8 @@ class ColorMixerViewModel: ObservableObject {
                       Int(components.g * 255),
                       Int(components.b * 255))
     }
+}
+
+#Preview {
+    ColorMixerView()
 }

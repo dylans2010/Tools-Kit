@@ -16,33 +16,24 @@ struct ClipboardInspectorView: View {
     @StateObject private var viewModel = ClipboardInspectorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Clipboard Inspector",
-                description: "Inspect the current clipboard contents and maintain a history of copied items.",
-                icon: "list.bullet.clipboard"
-            )
-            .padding()
+        List {
+            Section("Current Clipboard") {
+                Text(viewModel.currentContent)
+                    .font(.subheadline)
+                    .foregroundStyle(Color.accentColor)
+                    .textSelection(.enabled)
+            }
 
-            List {
-                Section("Current Clipboard") {
-                    Text(viewModel.currentContent)
-                        .font(.subheadline)
-                        .foregroundStyle(Color.accentColor)
-                        .textSelection(.enabled)
-                }
-
-                Section("History") {
-                    ForEach(viewModel.history) { item in
-                        VStack(alignment: .leading) {
-                            Text(item.title).font(.caption.bold())
-                            Text(item.timestamp, style: .time).font(.caption2).foregroundStyle(.secondary)
-                        }
+            Section("History") {
+                ForEach(viewModel.history) { item in
+                    VStack(alignment: .leading) {
+                        Text(item.title).font(.caption.bold())
+                        Text(item.timestamp, style: .time).font(.caption2).foregroundStyle(.secondary)
                     }
                 }
             }
-            .refreshable { viewModel.refresh() }
         }
+        .refreshable { viewModel.refresh() }
         .onAppear { viewModel.refresh() }
     }
 }
@@ -59,4 +50,8 @@ class ClipboardInspectorViewModel: ObservableObject {
             }
         }
     }
+}
+
+#Preview {
+    ClipboardInspectorView()
 }
