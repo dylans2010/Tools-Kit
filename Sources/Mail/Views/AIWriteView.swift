@@ -354,7 +354,7 @@ struct AIWriteView: View {
         inputTokens = prompt.count / 4 // Heuristic
 
         do {
-            let fullPrompt = "Task: \(tool.displayName)\nTone: \(selectedTone.rawValue)\nInput: \(prompt)"
+            let fullPrompt = "Tone: \(selectedTone.rawValue)\n\n\(prompt)"
 
             // Simulating streaming if supported
             if tool.supportsStreaming {
