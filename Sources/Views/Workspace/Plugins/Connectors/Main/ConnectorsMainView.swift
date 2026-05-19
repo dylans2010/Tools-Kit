@@ -70,7 +70,7 @@ struct ConnectorsMainView: View {
                         description: Text(searchText.isEmpty ? "No connectors registered." : "No matches for \"\(searchText)\".")
                     )
                 } else {
-                    ForEach(filteredConnectors) { connector in
+                    ForEach(filteredConnectors, id: \.id) { connector in
                         NavigationLink {
                             ConnectorDetailView(connector: connector)
                         } label: {
