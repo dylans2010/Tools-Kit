@@ -78,7 +78,7 @@ struct SDKAppBuilderView: View {
         List {
             Section {
                 ForEach(SDKScope.allCases, id: \.self) { scope in
-                    Toggle(String(describing: scope).capitalized, isOn: binding(for: scope))
+                    Toggle(String(describing: scope).capitalized, isOn: binding(for: scope, in: \.selectedScopes))
                 }
             } header: {
                 Label("Scopes", systemImage: "lock.shield")
@@ -162,27 +162,14 @@ struct SDKAppBuilderView: View {
         .padding()
     }
 
-    private func binding(for scope: SDKScope) -> Binding<Bool> {
-        Binding(
-            get: { viewModel.selectedScopes.contains(scope) },
-            set: { (inserted: Bool) in
-                if inserted {
-                    _ = viewModel.selectedScopes.insert(scope)
-                } else {
-                    viewModel.selectedScopes.remove(scope)
-                }
-            }
-        )
-    }
-
-    private func binding(for id: UUID, in keyPath: ReferenceWritableKeyPath<SDKAppBuilderViewModel, Set<UUID>>) -> Binding<Bool> {
+    private func binding<T: Hashable>(for item: T, in keyPath: ReferenceWritableKeyPath<SDKAppBuilderViewModel, Set<T>>) -> Binding<Bool> {
         Binding<Bool>(
-            get: { viewModel[keyPath: keyPath].contains(id) },
+            get: { viewModel[keyPath: keyPath].contains(where: { $0 == item }) },
             set: { (inserted: Bool) in
                 if inserted {
-                    _ = viewModel[keyPath: keyPath].insert(id)
+                    _ = viewModel[keyPath: keyPath].insert(item)
                 } else {
-                    viewModel[keyPath: keyPath].remove(id)
+                    viewModel[keyPath: keyPath].remove(item)
                 }
             }
         )

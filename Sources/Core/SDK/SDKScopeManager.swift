@@ -112,6 +112,12 @@ public final class SDKScopeManager: ObservableObject {
         case .libraryInvoke: scopeName = "library.invoke"
         case .agentExecute: scopeName = "agent.execute"
         case .agentTakeover: scopeName = "agent.takeover"
+        case .execute: scopeName = "execute"
+        case .backgroundExecution: scopeName = "background"
+        case .dataAccess: scopeName = "data.access"
+        case .externalAPICall: scopeName = "external.api"
+        case .read: scopeName = "read"
+        case .write: scopeName = "write"
         }
         return "\(scopeName).\(operation.rawValue)"
     }

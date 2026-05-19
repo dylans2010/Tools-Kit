@@ -21,8 +21,8 @@ struct AccessControlOverviewView: View {
                     Text("No modules")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(modules, id: \.id) { module in
-                        row(name: module.identifier, requiredScopes: module.requiredScopes, allowed: authorizationManager.canAccessModule(id: module.identifier))
+                    ForEach(modules, id: \.identifier) { module in
+                        row(name: module.displayName, requiredScopes: module.requiredScopes, allowed: authorizationManager.canAccessModule(id: module.identifier))
                     }
                 }
             }

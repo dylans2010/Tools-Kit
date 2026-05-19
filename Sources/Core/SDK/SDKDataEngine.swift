@@ -1,6 +1,103 @@
 import Foundation
 import Combine
 
+public struct SDKDataItem: Identifiable, Codable, Hashable {
+    public let id: UUID
+    public var key: String
+    public var value: String
+    public var scope: SDKScope
+    public var title: String { key }
+    public var timestamp: Date
+    public var codablePayload: [String: String] = [:]
+
+    public init(id: UUID = UUID(), key: String, value: String,
+                scope: SDKScope = .dataAccess, timestamp: Date = Date(),
+                payload: [String: String] = [:]) {
+        self.id = id; self.key = key; self.value = value; self.scope = scope
+        self.timestamp = timestamp; self.codablePayload = payload
+    }
+
+    public init(id: UUID = UUID(), scope: SDKScope, title: String,
+                payload: [String: String], timestamp: Date) {
+        self.id = id; self.key = title; self.value = ""; self.scope = scope
+        self.timestamp = timestamp; self.codablePayload = payload
+    }
+}
+
+public struct SDKQuery: Codable, Hashable {
+    public var scope: SDKScope
+    public var predicate: String?
+    public var filters: [SDKFilter] = []
+    public var pagination: SDKPagination?
+
+    public init(scope: SDKScope, predicate: String? = nil, filters: [SDKFilter] = [], pagination: SDKPagination? = nil) {
+        self.scope = scope; self.predicate = predicate; self.filters = filters; self.pagination = pagination
+    }
+
+    public struct SDKPagination: Codable, Hashable {
+        public var page: Int
+        public var pageSize: Int
+        public init(page: Int, pageSize: Int) {
+            self.page = page; self.pageSize = pageSize
+        }
+    }
+}
+
+public struct SDKFilter: Codable, Hashable {
+    public var key: String?
+    public var scope: SDKScope?
+    public var type: FilterType
+
+    public enum FilterType: Codable, Hashable {
+        case date(from: Date?, to: Date?)
+        case tags([String])
+        case ownership(String)
+        case type(String)
+        case keyword(String)
+    }
+
+    public init(key: String? = nil, scope: SDKScope? = nil, type: FilterType = .keyword("")) {
+        self.key = key; self.scope = scope; self.type = type
+    }
+}
+
+public enum SDKWriteResult: Codable, Hashable {
+    case success
+    case failure(String)
+}
+
+public struct SDKCacheInfo: Codable, Hashable {
+    public var key: String
+    public var expiresAt: Date?
+    public var scope: SDKScope
+    public var itemCount: Int
+    public var lastRefreshed: Date?
+    public var isValid: Bool
+    public var ttlRemaining: TimeInterval
+
+    public init(key: String, expiresAt: Date? = nil, scope: SDKScope = .all,
+                itemCount: Int = 0, lastRefreshed: Date? = nil,
+                isValid: Bool = false, ttlRemaining: TimeInterval = 0) {
+        self.key = key; self.expiresAt = expiresAt; self.scope = scope
+        self.itemCount = itemCount; self.lastRefreshed = lastRefreshed
+        self.isValid = isValid; self.ttlRemaining = ttlRemaining
+    }
+
+    public init(scope: SDKScope, itemCount: Int, lastRefreshed: Date?, isValid: Bool, ttlRemaining: TimeInterval) {
+        self.key = scope.rawValue
+        self.expiresAt = lastRefreshed?.addingTimeInterval(ttlRemaining)
+        self.scope = scope
+        self.itemCount = itemCount
+        self.lastRefreshed = lastRefreshed
+        self.isValid = isValid
+        self.ttlRemaining = ttlRemaining
+    }
+}
+
+extension SDKScope {
+    var cacheKey: String { rawValue }
+}
+
 @MainActor
 public final class SDKDataEngine: ObservableObject {
     public static let shared = SDKDataEngine()
@@ -79,8 +176,8 @@ public final class SDKDataEngine: ObservableObject {
         }
 
         invalidateCache(scope: scope)
-        SDKLogStore.shared.log("writeData scope=\(scope) title=\(title)", source: "SDKDataEngine", level: LogLevel.info)
-        return SDKWriteResult(id: id, scope: scope, success: true)
+        SDKLogStore.shared.log("writeData scope=\(scope) title=\(title)", source: "SDKDataEngine", level: .info)
+        return .success
     }
 
     // MARK: - Delete

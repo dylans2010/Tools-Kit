@@ -37,7 +37,7 @@ struct SDKModuleRegistryView: View {
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }
-        .sheet(item: $selectedModule) { mod in
+        .sheet(item: $selectedModule) { (mod: SDKModuleDescriptor) in
             NavigationStack { moduleDetailSheet(mod) }
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
@@ -247,14 +247,20 @@ struct SDKModuleRegistryView: View {
 
     private var dependencyGraphSheet: some View {
         let resolution = SDKDependencyGraph().resolve(modules: registry.modules)
+        let cleanText = resolution.isClean ? "Yes" : "No"
+        let countText = "\(resolution.orderedModules.count)"
+        let conflicts = resolution.conflicts
+        let orderedModules = resolution.orderedModules
+        let warnings = resolution.warnings
+
         return List {
             Section("Resolution") {
-                LabeledContent("Clean", value: resolution.isClean ? "Yes" : "No")
-                LabeledContent("Ordered Modules", value: "\(resolution.orderedModules.count)")
+                LabeledContent("Clean", value: cleanText)
+                LabeledContent("Ordered Modules", value: countText)
             }
-            if !resolution.conflicts.isEmpty {
+            if !conflicts.isEmpty {
                 Section("Conflicts") {
-                    ForEach(resolution.conflicts) { conflict in
+                    ForEach(conflicts) { conflict in
                         Label {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(conflict.description).font(.caption)
@@ -267,7 +273,7 @@ struct SDKModuleRegistryView: View {
                 }
             }
             Section("Load Order") {
-                ForEach(Array(resolution.orderedModules.enumerated()), id: \.element.id) { index, mod in
+                ForEach(Array(orderedModules.enumerated()), id: \.element.id) { index, mod in
                     HStack {
                         Text("\(index + 1)").font(.caption.monospaced()).foregroundStyle(.tertiary)
                         Text(mod.displayName).font(.caption.bold())
@@ -276,9 +282,9 @@ struct SDKModuleRegistryView: View {
                     }
                 }
             }
-            if !resolution.warnings.isEmpty {
+            if !warnings.isEmpty {
                 Section("Warnings") {
-                    ForEach(resolution.warnings, id: \.self) { warning in
+                    ForEach(warnings, id: \.self) { warning in
                         Text(warning).font(.caption).foregroundStyle(.orange)
                     }
                 }

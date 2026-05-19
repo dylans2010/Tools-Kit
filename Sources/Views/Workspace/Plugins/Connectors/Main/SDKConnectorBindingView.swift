@@ -158,7 +158,7 @@ struct SDKConnectorBindingView: View {
     }
 
     @State private var selectedConnectorID: UUID?
-    @State private var selectedModuleID: String = ""
+    @State private var selectedModuleIdentifier: String = ""
     @State private var selectedBindingType: ConnectorBinding.BindingType = .dataSource
 
     private var addBindingSheet: some View {
@@ -172,7 +172,7 @@ struct SDKConnectorBindingView: View {
                 }
             }
             Section("Module") {
-                Picker("Module", selection: $selectedModuleID) {
+                Picker("Module", selection: $selectedModuleIdentifier) {
                     Text("Select...").tag("")
                     ForEach(moduleRegistry.modules) { mod in
                         Text(mod.displayName).tag(mod.identifier)
@@ -194,12 +194,12 @@ struct SDKConnectorBindingView: View {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddBinding = false } }
             ToolbarItem(placement: .confirmationAction) {
                 Button("Create") {
-                    if let connID = selectedConnectorID, !selectedModuleID.isEmpty {
-                        _ = try? binder.bind(connectorID: connID, to: selectedModuleID, type: selectedBindingType)
+                    if let connID = selectedConnectorID, !selectedModuleIdentifier.isEmpty {
+                        _ = try? binder.bind(connectorID: connID, to: selectedModuleIdentifier, type: selectedBindingType)
                     }
                     showingAddBinding = false
                 }
-                .disabled(selectedConnectorID == nil || selectedModuleID.isEmpty)
+                .disabled(selectedConnectorID == nil || selectedModuleIdentifier.isEmpty)
             }
         }
     }

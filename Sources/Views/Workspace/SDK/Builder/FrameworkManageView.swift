@@ -4,12 +4,17 @@ import Observation
 // MARK: - Framework Descriptor
 
 enum FrameworkLanguage: String, CaseIterable, Codable, Identifiable {
-    case swift, python, javascript, typescript, cpp
+    case swift, python, javascript, typescript, objectiveC
     var id: String { rawValue }
 }
 
 enum FrameworkLifecycleState: String, CaseIterable, Codable, Identifiable {
     case draft, validated, ready, running, failed
+    var id: String { rawValue }
+}
+
+enum ReleaseChannel: String, CaseIterable, Codable, Identifiable {
+    case stable, beta, experimental
     var id: String { rawValue }
 }
 
@@ -174,7 +179,7 @@ struct FrameworkSandboxRunner {
         case .swift: layer = SwiftExecutionLayer()
         case .python: layer = PythonExecutionLayer()
         case .javascript, .typescript: layer = JSExecutionLayer()
-        case .cpp: layer = SwiftExecutionLayer() // Abstracted C++ binding through Swift
+        case .objectiveC: layer = SwiftExecutionLayer() // Abstracted ObjC binding through Swift
         }
 
         return layer.execute(framework: framework, params: params, config: config)

@@ -75,7 +75,7 @@ struct ScopeInspectorView: View {
             Text("No resources depend on this scope")
                 .foregroundStyle(.secondary)
         } else {
-            ForEach(modules, id: \.id) { module in
+            ForEach(modules, id: \.identifier) { module in
                 let allowed = authorizationManager.canAccessModule(id: module.identifier)
                 if !showOnlyBlocked || !allowed {
                     scopeRow("Module", name: module.displayName, allowed: allowed)

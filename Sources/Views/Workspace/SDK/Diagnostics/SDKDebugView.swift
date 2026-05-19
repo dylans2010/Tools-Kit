@@ -55,7 +55,7 @@ struct SDKDebugView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(entry.message).font(.caption.monospaced()).foregroundStyle(.red).lineLimit(2)
                             HStack {
-                                Text(entry.source).bold()
+                                Text(entry.source ?? "").bold()
                                 Spacer()
                                 Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
                             }

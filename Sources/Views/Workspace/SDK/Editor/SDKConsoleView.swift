@@ -21,8 +21,8 @@ struct SDKConsoleView: View {
     private var filteredEntries: [SDKLogEntry] {
         logStore.entries.filter { entry in
             let levelMatches = selectedLevel == nil || selectedLevel?.matches(entry.level) == true
-            let pluginMatches = pluginFilter == "All" || entry.source.localizedCaseInsensitiveContains(pluginFilter)
-            let connectorMatches = connectorFilter == "All" || entry.source.localizedCaseInsensitiveContains(connectorFilter)
+            let pluginMatches = pluginFilter == "All" || (entry.source ?? "").localizedCaseInsensitiveContains(pluginFilter)
+            let connectorMatches = connectorFilter == "All" || (entry.source ?? "").localizedCaseInsensitiveContains(connectorFilter)
             return levelMatches && pluginMatches && connectorMatches
         }
     }
@@ -111,7 +111,7 @@ private struct ConsoleLogRow: View {
                     .background(ConsoleLogLevel(from: entry.level).color.opacity(0.1), in: RoundedRectangle(cornerRadius: 3))
                     .foregroundStyle(ConsoleLogLevel(from: entry.level).color)
 
-                Text(entry.source).font(.caption2.bold()).foregroundStyle(.secondary)
+                Text(entry.source ?? "").font(.caption2.bold()).foregroundStyle(.secondary)
                 Spacer()
                 if showTimeline {
                     Text("+\(Int(entry.timestamp.timeIntervalSince1970.truncatingRemainder(dividingBy: 1000) * 1000))ms")
