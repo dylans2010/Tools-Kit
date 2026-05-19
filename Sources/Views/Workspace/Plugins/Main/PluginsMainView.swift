@@ -12,87 +12,90 @@ struct PluginsMainView: View {
     @State private var showingLimitedView = false
     @State private var showingConfigSheet = false
     @State private var selectedPlugin: SDKPlugin?
+    @State private var searchText = ""
 
-    var enabledPlugins: [SDKPlugin] {
-        manager.plugins.filter(\.isEnabled)
+    var filteredPlugins: [SDKPlugin] {
+        if searchText.isEmpty { return manager.plugins }
+        return manager.plugins.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
     }
 
-    var disabledPlugins: [SDKPlugin] {
-        manager.plugins.filter { !$0.isEnabled }
-    }
-
-    var errorPlugins: [SDKPlugin] {
-        [] // TODO: errorCount unavailable on SDKPlugin
-    }
+    var enabledPlugins: [SDKPlugin] { filteredPlugins.filter(\.isEnabled) }
+    var disabledPlugins: [SDKPlugin] { filteredPlugins.filter { !$0.isEnabled } }
 
     var body: some View {
-        NavigationStack {
-            List {
-                Section("Plugin State") {
-                    LabeledContent("Installed", value: "\(manager.plugins.count)")
-                    LabeledContent("Enabled", value: "\(enabledPlugins.count)")
-                    LabeledContent("Disabled", value: "\(disabledPlugins.count)")
-                    LabeledContent("With Errors", value: "\(errorPlugins.count)")
-                    LabeledContent("Recent Events", value: "\(recentEvents.count)")
+        List {
+            Section {
+                HStack(spacing: 16) {
+                    StatBadge(value: "\(manager.plugins.count)", label: "Installed", color: .blue)
+                    StatBadge(value: "\(enabledPlugins.count)", label: "Enabled", color: .green)
+                    StatBadge(value: "\(disabledPlugins.count)", label: "Disabled", color: .secondary)
                 }
+                .padding(.vertical, 4)
+            } header: {
+                Text("Overview")
+            }
 
-                if !manager.plugins.isEmpty {
-                    Section("Installed Plugins") {
-                        ForEach(manager.plugins) { plugin in
-                            PluginStateRow(
-                                plugin: plugin,
-                                onToggle: {
-                                    if plugin.isEnabled {
-                                        manager.disable(id: plugin.id)
-                                    } else {
-                                        manager.enable(id: plugin.id)
-                                    }
-                                },
-                                onConfigure: {
-                                    selectedPlugin = plugin
-                                    showingConfigSheet = true
-                                }
-                            )
-                        }
+            if !enabledPlugins.isEmpty {
+                Section("Active Plugins") {
+                    ForEach(enabledPlugins) { plugin in
+                        PluginStateRow(
+                            plugin: plugin,
+                            onToggle: { manager.disable(id: plugin.id) },
+                            onConfigure: {
+                                selectedPlugin = plugin
+                                showingConfigSheet = true
+                            }
+                        )
                     }
                 }
+            }
 
-                Section("Plugin Development") {
-                    NavigationLink(destination: PluginBuildView()) {
-                        Label("Plugin Builder", systemImage: "wrench.and.screwdriver")
-                    }
-                    NavigationLink(destination: PluginDevConsoleView()) {
-                        Label("Developer Console", systemImage: "terminal")
-                    }
-                    NavigationLink(destination: MarketplaceView()) {
-                        Label("Marketplace", systemImage: "storefront")
+            if !disabledPlugins.isEmpty {
+                Section("Inactive Plugins") {
+                    ForEach(disabledPlugins) { plugin in
+                        PluginStateRow(
+                            plugin: plugin,
+                            onToggle: { manager.enable(id: plugin.id) },
+                            onConfigure: {
+                                selectedPlugin = plugin
+                                showingConfigSheet = true
+                            }
+                        )
                     }
                 }
+            }
 
-                Section("Plugin Management") {
-                    NavigationLink(destination: PluginsInstalledView()) {
-                        Label("Installed Plugins", systemImage: "square.stack.3d.up")
-                    }
-                    NavigationLink(destination: ConnectorsMainView()) {
-                        Label("Plugin Connectors", systemImage: "cable.connector")
-                    }
-                    NavigationLink(destination: SDKHomeView()) {
-                        Label("SDK Workspace", systemImage: "hammer")
-                    }
-                    NavigationLink(destination: SDKBuildView()) {
-                        Label("SDK Build", systemImage: "shippingbox")
-                    }
+            Section("Development") {
+                NavigationLink(destination: PluginBuildView()) {
+                    Label("Plugin Builder", systemImage: "wrench.and.screwdriver")
                 }
-
-                Section("Security") {
-                    NavigationLink(destination: PluginSecurityView()) {
-                        Label("Plugin Security", systemImage: "lock.shield")
-                    }
+                NavigationLink(destination: PluginDevConsoleView()) {
+                    Label("Developer Console", systemImage: "terminal")
                 }
+                NavigationLink(destination: MarketplaceView()) {
+                    Label("Marketplace", systemImage: "storefront")
+                }
+            }
 
-                if !recentEvents.isEmpty {
-                    Section("Recent Activity") {
-                        ForEach(recentEvents.prefix(10)) { event in
+            Section("Management") {
+                NavigationLink(destination: PluginsInstalledView()) {
+                    Label("All Installed", systemImage: "square.stack.3d.up")
+                }
+                NavigationLink(destination: ConnectorsMainView()) {
+                    Label("Plugin Connectors", systemImage: "cable.connector")
+                }
+                NavigationLink(destination: PluginSecurityView()) {
+                    Label("Security", systemImage: "lock.shield")
+                }
+            }
+
+            if !recentEvents.isEmpty {
+                Section("Recent Activity") {
+                    ForEach(recentEvents.prefix(8)) { event in
+                        HStack {
+                            Circle()
+                                .fill(Color.blue.opacity(0.3))
+                                .frame(width: 6, height: 6)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(event.description)
                                     .font(.caption)
@@ -104,24 +107,26 @@ struct PluginsMainView: View {
                     }
                 }
             }
-            .navigationTitle("Plugins")
-            .onAppear(perform: setupActivityStream)
-            .onAppear(perform: setupBlockedExecutionListener)
-            .sheet(isPresented: $showingLimitedView) {
-                if let plugin = blockedPlugin {
-                    NavigationStack {
-                        PluginLimitedView(plugin: plugin, reason: blockedReason, detail: blockedDetail)
-                    }
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Plugins")
+        .searchable(text: $searchText, prompt: "Search Plugins")
+        .onAppear(perform: setupActivityStream)
+        .onAppear(perform: setupBlockedExecutionListener)
+        .sheet(isPresented: $showingLimitedView) {
+            if let plugin = blockedPlugin {
+                NavigationStack {
+                    PluginLimitedView(plugin: plugin, reason: blockedReason, detail: blockedDetail)
                 }
             }
-            .sheet(isPresented: $showingConfigSheet) {
-                if let plugin = selectedPlugin {
-                    NavigationStack {
-                        PluginConfigurationView(plugin: plugin, manager: manager)
-                    }
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showingConfigSheet) {
+            if let plugin = selectedPlugin {
+                NavigationStack {
+                    PluginConfigurationView(plugin: plugin, manager: manager)
                 }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
             }
         }
     }
@@ -151,6 +156,26 @@ struct PluginsMainView: View {
     }
 }
 
+// MARK: - Stat Badge
+
+private struct StatBadge: View {
+    let value: String
+    let label: String
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.title3.bold())
+                .foregroundStyle(color)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
 // MARK: - Plugin State Row
 
 private struct PluginStateRow: View {
@@ -158,24 +183,18 @@ private struct PluginStateRow: View {
     let onToggle: () -> Void
     let onConfigure: () -> Void
 
-    var stateLabel: String {
-        return plugin.isEnabled ? "Enabled" : "Disabled"
-    }
-
-    var stateColor: Color {
-        return plugin.isEnabled ? .green : .secondary
-    }
-
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                HStack {
-                    Image(systemName: "puzzlepiece.extension") // TODO: icon unavailable on SDKPlugin
+                HStack(spacing: 6) {
+                    Image(systemName: "puzzlepiece.extension")
+                        .font(.caption)
+                        .foregroundStyle(plugin.isEnabled ? .blue : .secondary)
                     Text(plugin.name).font(.subheadline.bold())
                 }
-                Text("v\(plugin.version) · \(stateLabel)")
-                    .font(.caption)
-                    .foregroundStyle(stateColor)
+                Text("v\(plugin.version)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
             }
 
             Spacer()
@@ -183,6 +202,7 @@ private struct PluginStateRow: View {
             Button { onConfigure() } label: {
                 Image(systemName: "gearshape")
                     .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
 
@@ -207,35 +227,28 @@ private struct PluginConfigurationView: View {
         Form {
             Section("Identity") {
                 LabeledContent("Name", value: plugin.name)
-                LabeledContent("Identifier", value: "com.toolskit.plugin") // TODO: identifier unavailable on SDKPlugin
                 LabeledContent("Version", value: plugin.version)
-                LabeledContent("Author", value: "Unknown Author") // TODO: author unavailable on SDKPlugin
-            }
-
-            Section("State") {
                 LabeledContent("Status", value: plugin.isEnabled ? "Enabled" : "Disabled")
                 LabeledContent("Installed", value: plugin.installedAt.formatted(date: .abbreviated, time: .shortened))
-                LabeledContent("Last Executed", value: "Never") // TODO: lastExecutedAt unavailable on SDKPlugin
-                LabeledContent("Error Count", value: "0") // TODO: errorCount unavailable on SDKPlugin
             }
 
-            Section("Capabilities") {
+            Section("Permissions") {
                 ForEach(plugin.permissions, id: \.self) { capability in
                     HStack {
-                        Text(capability.rawValue.capitalized)
-                            .font(.caption)
+                        Text(capability.rawValue.capitalized).font(.caption)
                         Spacer()
-                        Text("Permission")
+                        Image(systemName: "checkmark.shield")
                             .font(.caption2)
                             .foregroundStyle(.green)
                     }
                 }
             }
 
-            Section("Actions") {
-                ForEach(plugin.automationHooks, id: \.self) { action in
-                    Text(action)
-                        .font(.caption.monospaced())
+            if !plugin.automationHooks.isEmpty {
+                Section("Automation Hooks") {
+                    ForEach(plugin.automationHooks, id: \.self) { action in
+                        Text(action).font(.caption.monospaced())
+                    }
                 }
             }
 
@@ -256,18 +269,9 @@ private struct PluginConfigurationView: View {
         .navigationTitle("Plugin Settings")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .confirmationAction) {
                 Button("Done") { dismiss() }
             }
-        }
-    }
-
-    private func riskColor(_ level: RiskLevel) -> Color {
-        switch level {
-        case .low: return .green
-        case .medium: return .orange
-        case .high: return .red
-        case .critical: return .red
         }
     }
 }

@@ -25,6 +25,14 @@ struct SDKDeveloperGuideView: View {
         case constraints = "Constraints & Rules"
         case bestPractices = "Best Practices"
         case definitionsReference = "Definitions Reference"
+        case featureModules = "Feature Modules"
+        case caching = "Caching & Performance"
+        case migration = "Migration & Versioning"
+        case localization = "Localization"
+        case featureFlags = "Feature Flags"
+        case realtimeSync = "Realtime Sync"
+        case aiIntegration = "AI & Slides"
+        case toolSystem = "Tool System"
 
         var id: String { rawValue }
         var icon: String {
@@ -49,6 +57,14 @@ struct SDKDeveloperGuideView: View {
             case .constraints: return "exclamationmark.shield"
             case .bestPractices: return "star"
             case .definitionsReference: return "doc.text.magnifyingglass"
+            case .featureModules: return "app.badge"
+            case .caching: return "memorychip"
+            case .migration: return "arrow.up.doc"
+            case .localization: return "globe"
+            case .featureFlags: return "flag"
+            case .realtimeSync: return "arrow.triangle.2.circlepath.circle"
+            case .aiIntegration: return "brain.head.profile"
+            case .toolSystem: return "wrench.and.screwdriver"
             }
         }
     }
@@ -87,6 +103,14 @@ struct SDKDeveloperGuideView: View {
             case .constraints: ConstraintsSection()
             case .bestPractices: BestPracticesSection()
             case .definitionsReference: DefinitionsReferenceSection()
+            case .featureModules: FeatureModulesSection()
+            case .caching: CachingSection()
+            case .migration: MigrationSection()
+            case .localization: LocalizationSection()
+            case .featureFlags: FeatureFlagsSection()
+            case .realtimeSync: RealtimeSyncSection()
+            case .aiIntegration: AIIntegrationSection()
+            case .toolSystem: ToolSystemSection()
             }
         }
         .listStyle(.insetGrouped)
@@ -125,6 +149,18 @@ private struct TableOfContentsSection: View {
             tocRow(.swiftUIIntegration, "Observable patterns, singleton access, view architecture")
             tocRow(.packaging, "SDK export, bundle structure, import validation")
             tocRow(.deployment, "Versioning, build configuration, integration tests")
+        }
+        Section("Feature Modules") {
+            tocRow(.featureModules, "Mail, Meet, Notebooks, Articles — domain service APIs")
+            tocRow(.aiIntegration, "AI slide generation, image providers, prompt pipelines")
+            tocRow(.toolSystem, "Tool runtime, DevTool protocol, tool registration")
+        }
+        Section("Platform Services") {
+            tocRow(.caching, "Cache management, memory policies, eviction strategies")
+            tocRow(.migration, "Schema migration, version management, data upgrades")
+            tocRow(.localization, "Internationalization, locale management, string catalogs")
+            tocRow(.featureFlags, "Feature flag service, A/B testing, progressive rollouts")
+            tocRow(.realtimeSync, "Real-time synchronization, conflict resolution, sync engine")
         }
         Section("Reference") {
             tocRow(.constraints, "System constraints, prohibited interactions, security boundaries")
@@ -1128,6 +1164,388 @@ private struct DefinitionsReferenceSection: View {
                 ("error", "String?", "Error message if failed"),
                 ("latency", "TimeInterval", "Request processing time"),
             ], notes: "Returned by all router handlers")
+        }
+    }
+}
+
+// MARK: - Feature Modules
+
+private struct FeatureModulesSection: View {
+    var body: some View {
+        Section("Mail Service") {
+            Text("SDKMailService provides a full email management system with sending, receiving, folder organization, and draft management.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "sendEmail(to:subject:body:)", description: "Compose and send emails with HTML body support", icon: "envelope")
+            GuideDefRow(name: "fetchInbox()", description: "Retrieve all inbox emails with pagination support", icon: "tray")
+            GuideDefRow(name: "moveTo(folder:)", description: "Move emails between folders (inbox, archive, trash)", icon: "folder")
+            GuideDefRow(name: "createDraft()", description: "Save email drafts for later editing and sending", icon: "square.and.pencil")
+        }
+        Section("Mail Code Example") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("""
+                let mail = WorkspaceSDK.shared.mail
+                let email = SDKEmail(
+                    to: "user@example.com",
+                    subject: "Hello",
+                    body: "<h1>Welcome</h1>",
+                    isHTML: true
+                )
+                await mail.send(email)
+                """)
+                    .font(.system(size: 10, design: .monospaced)).padding(8).background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+            }.padding(.vertical, 4)
+        }
+        Section("Notebooks Service") {
+            Text("SDKNotebookService handles rich notebook documents with sections, blocks, and collaborative editing support.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "createNotebook(title:)", description: "Create a new notebook with a title", icon: "book")
+            GuideDefRow(name: "addSection(to:)", description: "Add sections to organize notebook content", icon: "rectangle.split.3x1")
+            GuideDefRow(name: "addBlock(type:content:)", description: "Add text, code, image, or checklist blocks", icon: "plus.rectangle")
+            GuideDefRow(name: "exportAsPDF()", description: "Export notebook as formatted PDF document", icon: "doc.richtext")
+        }
+        Section("Meet Service") {
+            Text("SDKMeetService manages video and audio meeting sessions with participant tracking and scheduling.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "createMeeting(title:date:)", description: "Schedule a new meeting with title and time", icon: "video")
+            GuideDefRow(name: "joinMeeting(id:)", description: "Join an existing meeting session by ID", icon: "person.2")
+            GuideDefRow(name: "addParticipant(user:)", description: "Invite participants to a meeting", icon: "person.badge.plus")
+            GuideDefRow(name: "recordSession()", description: "Start recording the active meeting session", icon: "record.circle")
+            GuideDefRow(name: "endMeeting()", description: "End the active meeting and clean up resources", icon: "phone.down")
+        }
+        Section("Articles Service") {
+            Text("SDKArticlesService provides content publishing with drafts, categories, and rich media support.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "createArticle(title:body:)", description: "Create a new article with rich text content", icon: "doc.text")
+            GuideDefRow(name: "publish(article:)", description: "Publish a draft article to make it public", icon: "arrow.up.circle")
+            GuideDefRow(name: "setCategory(_:for:)", description: "Assign categories and tags to articles", icon: "tag")
+            GuideDefRow(name: "addMedia(image:to:)", description: "Attach images and media to article content", icon: "photo.on.rectangle")
+        }
+    }
+}
+
+// MARK: - Caching
+
+private struct CachingSection: View {
+    var body: some View {
+        Section("Cache Architecture") {
+            Text("SDKCacheManager provides a multi-tier caching system with memory and disk storage, automatic eviction policies, and TTL-based expiration.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "MemoryCache", description: "Fast in-memory NSCache-backed storage with size limits", icon: "memorychip")
+            GuideDefRow(name: "DiskCache", description: "Persistent file-based cache with automatic cleanup", icon: "internaldrive")
+            GuideDefRow(name: "CachePolicy", description: "LRU, LFU, FIFO, and TTL eviction strategies", icon: "arrow.counterclockwise")
+        }
+        Section("Cache API") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("""
+                let cache = SDKCacheManager.shared
+
+                // Store with TTL
+                cache.set("key", value: data, ttl: 3600)
+
+                // Retrieve
+                if let cached: Data = cache.get("key") {
+                    // Use cached data
+                }
+
+                // Invalidate
+                cache.remove("key")
+                cache.clearAll()
+
+                // Statistics
+                let stats = cache.statistics
+                print("Hit rate: \\(stats.hitRate)%")
+                """)
+                    .font(.system(size: 10, design: .monospaced)).padding(8).background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+            }.padding(.vertical, 4)
+        }
+        Section("Cancellation Manager") {
+            Text("SDKCancellationManager tracks and manages cancellable async operations, preventing resource leaks.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "track(operation:)", description: "Register a cancellable operation for lifecycle tracking", icon: "xmark.circle")
+            GuideDefRow(name: "cancelAll()", description: "Cancel all tracked operations at once", icon: "xmark.octagon")
+            GuideDefRow(name: "cancelGroup(_:)", description: "Cancel operations by group identifier", icon: "folder.badge.minus")
+        }
+    }
+}
+
+// MARK: - Migration
+
+private struct MigrationSection: View {
+    var body: some View {
+        Section("Migration System") {
+            Text("SDKMigrationManager handles data schema migrations when the SDK version changes, ensuring backward compatibility and data integrity.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "checkPendingMigrations()", description: "Scan for schema changes requiring migration", icon: "magnifyingglass")
+            GuideDefRow(name: "migrate(from:to:)", description: "Run migrations between specific versions", icon: "arrow.right")
+            GuideDefRow(name: "rollback(to:)", description: "Revert to a previous schema version", icon: "arrow.uturn.left")
+        }
+        Section("Version Management") {
+            Text("SDKVersionManager tracks SDK versions, build numbers, and compatibility matrices.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "currentVersion", description: "The currently running SDK version string", icon: "number")
+            GuideDefRow(name: "buildNumber", description: "Incremental build number for tracking releases", icon: "hammer")
+            GuideDefRow(name: "isCompatible(with:)", description: "Check if a plugin/module is compatible with current SDK", icon: "checkmark.circle")
+            GuideDefRow(name: "changelog", description: "Access the version changelog and release notes", icon: "doc.text")
+        }
+        Section("Migration Code Example") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("""
+                let migrator = SDKMigrationManager.shared
+
+                // Check and run pending migrations
+                if migrator.hasPendingMigrations {
+                    try await migrator.runAll()
+                }
+
+                // Register custom migration
+                migrator.register(
+                    from: "1.0",
+                    to: "2.0"
+                ) { store in
+                    // Transform data as needed
+                    store.renameField("old", to: "new")
+                }
+                """)
+                    .font(.system(size: 10, design: .monospaced)).padding(8).background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+            }.padding(.vertical, 4)
+        }
+    }
+}
+
+// MARK: - Localization
+
+private struct LocalizationSection: View {
+    var body: some View {
+        Section("Localization System") {
+            Text("SDKLocalizationManager provides internationalization support with dynamic locale switching, string catalogs, and pluralization rules.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "currentLocale", description: "The active locale used for formatting and translations", icon: "globe")
+            GuideDefRow(name: "setLocale(_:)", description: "Switch the active locale at runtime", icon: "arrow.left.arrow.right")
+            GuideDefRow(name: "supportedLocales", description: "List of all available locale identifiers", icon: "list.bullet")
+        }
+        Section("String Resolution") {
+            GuideDefRow(name: "localized(_:)", description: "Look up a localized string by key", icon: "text.magnifyingglass")
+            GuideDefRow(name: "localized(_:args:)", description: "Look up with format arguments for interpolation", icon: "textformat.abc.dottedunderline")
+            GuideDefRow(name: "pluralized(_:count:)", description: "Handle pluralization rules per locale", icon: "textformat.123")
+        }
+        Section("Localization Code Example") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("""
+                let l10n = SDKLocalizationManager.shared
+
+                // Get localized string
+                let title = l10n.localized("welcome_title")
+
+                // With arguments
+                let greeting = l10n.localized(
+                    "hello_user",
+                    args: userName
+                )
+
+                // Pluralization
+                let items = l10n.pluralized(
+                    "item_count",
+                    count: 5
+                ) // "5 items"
+
+                // Switch locale
+                l10n.setLocale("fr_FR")
+                """)
+                    .font(.system(size: 10, design: .monospaced)).padding(8).background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+            }.padding(.vertical, 4)
+        }
+    }
+}
+
+// MARK: - Feature Flags
+
+private struct FeatureFlagsSection: View {
+    var body: some View {
+        Section("Feature Flag Service") {
+            Text("SDKFeatureFlagService manages feature toggles with support for progressive rollouts, A/B testing, and environment-based configuration.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "isEnabled(_:)", description: "Check if a feature flag is currently enabled", icon: "flag")
+            GuideDefRow(name: "setFlag(_:enabled:)", description: "Enable or disable a feature flag at runtime", icon: "flag.fill")
+            GuideDefRow(name: "registerFlag(_:default:)", description: "Register a new flag with a default value", icon: "flag.badge.ellipsis")
+            GuideDefRow(name: "allFlags", description: "Dictionary of all registered flags and their states", icon: "list.clipboard")
+        }
+        Section("Flag Types") {
+            GuideDefRow(name: "Boolean Flag", description: "Simple on/off toggle for features", icon: "switch.2")
+            GuideDefRow(name: "Percentage Flag", description: "Enable for a percentage of users (rollout)", icon: "percent")
+            GuideDefRow(name: "Variant Flag", description: "A/B testing with multiple variants", icon: "rectangle.split.2x1")
+            GuideDefRow(name: "Environment Flag", description: "Different values per environment (dev/staging/prod)", icon: "globe.americas")
+        }
+        Section("Feature Flag Code Example") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("""
+                let flags = SDKFeatureFlagService.shared
+
+                // Check flag
+                if flags.isEnabled("new_editor") {
+                    showNewEditor()
+                }
+
+                // Register with default
+                flags.registerFlag(
+                    "dark_mode",
+                    default: true
+                )
+
+                // Toggle at runtime
+                flags.setFlag("beta_features",
+                    enabled: true)
+                """)
+                    .font(.system(size: 10, design: .monospaced)).padding(8).background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+            }.padding(.vertical, 4)
+        }
+    }
+}
+
+// MARK: - Realtime Sync
+
+private struct RealtimeSyncSection: View {
+    var body: some View {
+        Section("Sync Engine") {
+            Text("SDKRealtimeSync enables real-time data synchronization across devices with conflict resolution and offline support.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "startSync()", description: "Begin real-time synchronization for all collections", icon: "arrow.triangle.2.circlepath")
+            GuideDefRow(name: "pauseSync()", description: "Temporarily pause synchronization", icon: "pause.circle")
+            GuideDefRow(name: "syncStatus", description: "Current sync state (syncing, synced, error, offline)", icon: "wifi")
+        }
+        Section("Conflict Resolution") {
+            Text("SDKConflictResolver handles data conflicts when multiple devices modify the same record.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "lastWriteWins", description: "Latest timestamp overwrites earlier changes", icon: "clock.arrow.circlepath")
+            GuideDefRow(name: "mergeFields", description: "Merge non-conflicting fields from both versions", icon: "arrow.triangle.merge")
+            GuideDefRow(name: "manual", description: "Flag conflict for user resolution", icon: "hand.raised")
+        }
+        Section("Sync Code Example") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("""
+                let sync = SDKRealtimeSync.shared
+
+                // Start syncing
+                await sync.startSync()
+
+                // Monitor status
+                sync.onStatusChange { status in
+                    switch status {
+                    case .synced: print("Up to date")
+                    case .syncing: print("Syncing...")
+                    case .offline: print("Working offline")
+                    case .error(let e): print(e)
+                    }
+                }
+
+                // Configure conflict resolution
+                let resolver = SDKConflictResolver.shared
+                resolver.strategy = .mergeFields
+                """)
+                    .font(.system(size: 10, design: .monospaced)).padding(8).background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+            }.padding(.vertical, 4)
+        }
+    }
+}
+
+// MARK: - AI Integration
+
+private struct AIIntegrationSection: View {
+    var body: some View {
+        Section("AI Slides System") {
+            Text("The AI Slides system in Sources/Core/SDK/AI/Slides provides AI-powered presentation generation with multiple image providers and customizable themes.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "AISlidesGenerator", description: "Core engine that generates slide decks from text prompts", icon: "wand.and.stars")
+            GuideDefRow(name: "SlideModel", description: "Data model for individual slides (title, body, images, layout)", icon: "rectangle.on.rectangle")
+            GuideDefRow(name: "SlideTheme", description: "Visual theme configuration (colors, fonts, spacing)", icon: "paintpalette")
+        }
+        Section("Image Providers") {
+            Text("Pluggable image provider architecture in AISlidesImageProviders allows different sources for slide visuals.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "UnsplashProvider", description: "Fetch high-quality photos from Unsplash API", icon: "photo")
+            GuideDefRow(name: "SFSymbolProvider", description: "Use system SF Symbols as slide graphics", icon: "star.square")
+            GuideDefRow(name: "AIGeneratedProvider", description: "Generate custom images using AI models", icon: "brain")
+            GuideDefRow(name: "LocalAssetProvider", description: "Use locally bundled image assets", icon: "folder.fill")
+        }
+        Section("AI Slides Code Example") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("""
+                let generator = AISlidesGenerator()
+
+                // Generate from prompt
+                let slides = try await generator.generate(
+                    prompt: "Quarterly business review",
+                    slideCount: 10,
+                    theme: .corporate,
+                    imageProvider: .unsplash
+                )
+
+                // Customize individual slides
+                slides[0].layout = .titleOnly
+                slides[1].layout = .twoColumn
+                slides[2].addImage(from: .sfSymbol("chart.bar"))
+
+                // Export
+                let pdfData = slides.exportAsPDF()
+                """)
+                    .font(.system(size: 10, design: .monospaced)).padding(8).background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+            }.padding(.vertical, 4)
+        }
+        Section("Slides Extensions") {
+            GuideDefRow(name: "MarkdownParser", description: "Parse markdown content into slide blocks", icon: "text.badge.checkmark")
+            GuideDefRow(name: "AnimationEngine", description: "Add transitions and animations between slides", icon: "wind")
+            GuideDefRow(name: "PresenterMode", description: "Full-screen presentation with speaker notes", icon: "play.rectangle")
+            GuideDefRow(name: "CollaborativeEditing", description: "Multiple users editing slides simultaneously", icon: "person.2.fill")
+        }
+    }
+}
+
+// MARK: - Tool System
+
+private struct ToolSystemSection: View {
+    var body: some View {
+        Section("Tool Architecture") {
+            Text("The SDK Tool system provides a plugin-based architecture for developer tools. Each tool conforms to the DevTool protocol and is registered through SDKToolManager.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "DevTool Protocol", description: "Base protocol requiring id, name, category, icon, description, render()", icon: "wrench")
+            GuideDefRow(name: "SDKToolManager", description: "Central registry for discovering and launching tools", icon: "tray.2")
+            GuideDefRow(name: "SDKToolRuntime", description: "Execution environment for tools with state management", icon: "play.rectangle")
+            GuideDefRow(name: "DevToolCategory", description: "Categorization system: data, encoding, security, utilities, etc.", icon: "square.grid.3x3")
+        }
+        Section("Creating a Custom Tool") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("""
+                struct MyCustomTool: DevTool {
+                    let id = "my-custom-tool"
+                    let name = "My Tool"
+                    let category = DevToolCategory.utilities
+                    let icon = "star"
+                    let description = "My custom tool"
+
+                    func render() -> some View {
+                        MyCustomToolView()
+                    }
+                }
+
+                // Register with the SDK
+                SDKToolManager.shared.register(MyCustomTool())
+                """)
+                    .font(.system(size: 10, design: .monospaced)).padding(8).background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+            }.padding(.vertical, 4)
+        }
+        Section("Built-in Tool Categories") {
+            GuideDefRow(name: "Data Tools", description: "JSON Formatter, CSV Parser, Date Formatter, Number Formatter, UUID Generator", icon: "cylinder.split.1x2")
+            GuideDefRow(name: "Encoding Tools", description: "Base64 Encoder/Decoder, URL Encoder/Decoder, HTML Entity tools", icon: "lock.rectangle")
+            GuideDefRow(name: "Security Tools", description: "Hash Generator, JWT Decoder, Encryption Tool, Password Generator", icon: "shield.lefthalf.filled")
+            GuideDefRow(name: "Utility Tools", description: "Text Case Converter, Lorem Ipsum Generator, Markdown Preview, Regex Tester", icon: "ellipsis.rectangle")
+            GuideDefRow(name: "Networking Tools", description: "HTTP Request Tester, Timezone Converter, IP Address Info", icon: "network")
+            GuideDefRow(name: "Visual Tools", description: "Color Converter, Image Converter, QR Code Generator, Text Diff", icon: "paintbrush")
+        }
+        Section("Tool Lifecycle") {
+            GuideDefRow(name: "Registration", description: "Tool registers via SDKToolManager.register() at SDK boot", icon: "1.circle")
+            GuideDefRow(name: "Discovery", description: "Users browse tools by category or search by name", icon: "2.circle")
+            GuideDefRow(name: "Rendering", description: "Tool's render() returns SwiftUI view displayed in workspace", icon: "3.circle")
+            GuideDefRow(name: "State", description: "Each tool manages its own @StateObject view model", icon: "4.circle")
+            GuideDefRow(name: "Cleanup", description: "Tool views are deallocated when navigating away", icon: "5.circle")
         }
     }
 }

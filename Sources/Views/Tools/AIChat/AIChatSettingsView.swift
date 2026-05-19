@@ -85,15 +85,23 @@ struct AIChatSettingsView: View {
                     }
 
                     Section {
+                        systemPromptToolsSectionContent
+                    } header: {
+                        Label("Prompt Tools", systemImage: "wrench.and.screwdriver")
+                    }
+
+                    Section {
                         personalitySectionContent
                         expertiseSectionContent
                         styleSectionContent
+                        personalityToolsSectionContent
                     } header: {
                         Label("AI Personality & Tone", systemImage: "person.fill")
                     }
 
                     Section {
                         contextSectionContent
+                        contextToolsSectionContent
                     } header: {
                         Label("Knowledge & Context", systemImage: "book.fill")
                     }
@@ -154,6 +162,12 @@ struct AIChatSettingsView: View {
                     } header: {
                         Label("Developer Settings", systemImage: "hammer.fill")
                     }
+
+                    Section {
+                        aboutSectionContent
+                    } header: {
+                        Label("About", systemImage: "info.circle.fill")
+                    }
                 }
             }
             .task {
@@ -165,12 +179,6 @@ struct AIChatSettingsView: View {
             }
             .navigationTitle("AI Settings")
             .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .fontWeight(.bold)
-                }
-            }
         }
     }
 
@@ -335,8 +343,140 @@ struct AIChatSettingsView: View {
     }
 
     private var contextSectionContent: some View {
-        TextEditor(text: $settings.knowledgeContext)
-            .frame(minHeight: 80)
+        Group {
+            TextEditor(text: $settings.knowledgeContext)
+                .frame(minHeight: 80)
+
+            Toggle("Auto-Inject App Context", isOn: $settings.autoInjectContext)
+            Toggle("Include Conversation History", isOn: $settings.includeConversationHistory)
+        }
+    }
+
+    private var contextToolsSectionContent: some View {
+        Group {
+            NavigationLink {
+                FileContextManagerView()
+            } label: {
+                Label("File Context Sources", systemImage: "doc.badge.plus")
+            }
+
+            NavigationLink {
+                WebContextManagerView()
+            } label: {
+                Label("Web Context Sources", systemImage: "globe")
+            }
+
+            NavigationLink {
+                RAGSettingsView()
+            } label: {
+                Label("RAG Settings", systemImage: "magnifyingglass.circle")
+            }
+
+            NavigationLink {
+                EmbeddingConfigView()
+            } label: {
+                Label("Embedding Configuration", systemImage: "point.3.connected.trianglepath.dotted")
+            }
+
+            NavigationLink {
+                ContextWindowView()
+            } label: {
+                Label("Context Window Manager", systemImage: "rectangle.split.3x1")
+            }
+        }
+    }
+
+    private var systemPromptToolsSectionContent: some View {
+        Group {
+            NavigationLink {
+                PromptTemplateLibraryView()
+            } label: {
+                Label("Prompt Template Library", systemImage: "doc.text.below.ecg")
+            }
+
+            NavigationLink {
+                PromptVariablesView()
+            } label: {
+                Label("Dynamic Variables", systemImage: "curlybraces")
+            }
+
+            NavigationLink {
+                PromptChainEditorView()
+            } label: {
+                Label("Prompt Chain Editor", systemImage: "link.badge.plus")
+            }
+
+            NavigationLink {
+                PromptVersionHistoryView()
+            } label: {
+                Label("Version History", systemImage: "clock.arrow.circlepath")
+            }
+        }
+    }
+
+    private var personalityToolsSectionContent: some View {
+        Group {
+            NavigationLink {
+                ResponseFormatterView()
+            } label: {
+                Label("Response Formatting Rules", systemImage: "textformat.abc")
+            }
+
+            NavigationLink {
+                LanguageSettingsView()
+            } label: {
+                Label("Language & Locale", systemImage: "globe.americas")
+            }
+
+            NavigationLink {
+                OutputConstraintsView()
+            } label: {
+                Label("Output Constraints", systemImage: "ruler")
+            }
+
+            NavigationLink {
+                PersonalityPresetsView()
+            } label: {
+                Label("Personality Presets", systemImage: "person.2.crop.square.stack")
+            }
+
+            NavigationLink {
+                ToneSamplerView()
+            } label: {
+                Label("Tone Sampler", systemImage: "waveform")
+            }
+        }
+    }
+
+    private var aboutSectionContent: some View {
+        Group {
+            LabeledContent("App Name", value: "Tools Kit")
+            LabeledContent("Version", value: "1.0.0")
+            LabeledContent("Build", value: "2026.5")
+            LabeledContent("Platform", value: "iOS / iPadOS")
+            LabeledContent("Developer", value: "Dylan")
+            LabeledContent("Framework", value: "SwiftUI")
+
+            NavigationLink {
+                LicensesView()
+            } label: {
+                Label("Open Source Licenses", systemImage: "doc.plaintext")
+            }
+
+            NavigationLink {
+                ChangelogView()
+            } label: {
+                Label("Changelog", systemImage: "list.bullet.rectangle")
+            }
+
+            Link(destination: URL(string: "https://toolskit.io/privacy")!) {
+                Label("Privacy Policy", systemImage: "hand.raised")
+            }
+
+            Link(destination: URL(string: "https://toolskit.io/terms")!) {
+                Label("Terms of Service", systemImage: "doc.text")
+            }
+        }
     }
 
     private var memorySectionContent: some View {
@@ -897,5 +1037,427 @@ struct ColorPickerRow: View {
             ), supportsOpacity: false)
             .labelsHidden()
         }
+    }
+}
+
+// MARK: - Context Tool Views
+
+struct FileContextManagerView: View {
+    @State private var fileSources: [String] = []
+    @State private var newSource = ""
+
+    var body: some View {
+        Form {
+            Section("Active File Sources") {
+                if fileSources.isEmpty {
+                    Text("No file sources configured").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(fileSources, id: \.self) { source in
+                        Label(source, systemImage: "doc.fill")
+                    }
+                    .onDelete { fileSources.remove(atOffsets: $0) }
+                }
+            }
+            Section("Add Source") {
+                HStack {
+                    TextField("File path or bundle resource", text: $newSource)
+                    Button("Add") {
+                        guard !newSource.isEmpty else { return }
+                        fileSources.append(newSource)
+                        newSource = ""
+                    }
+                    .disabled(newSource.isEmpty)
+                }
+            }
+            Section("Options") {
+                Toggle("Auto-refresh on file change", isOn: .constant(true))
+                Toggle("Include subdirectories", isOn: .constant(false))
+                Picker("File type filter", selection: .constant("All")) {
+                    Text("All").tag("All")
+                    Text("Text").tag("Text")
+                    Text("JSON").tag("JSON")
+                    Text("Markdown").tag("Markdown")
+                }
+            }
+        }
+        .navigationTitle("File Context")
+    }
+}
+
+struct WebContextManagerView: View {
+    @State private var urls: [String] = []
+    @State private var newURL = ""
+
+    var body: some View {
+        Form {
+            Section("Web Sources") {
+                if urls.isEmpty {
+                    Text("No web sources configured").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(urls, id: \.self) { url in
+                        Label(url, systemImage: "globe")
+                    }
+                    .onDelete { urls.remove(atOffsets: $0) }
+                }
+            }
+            Section("Add URL") {
+                HStack {
+                    TextField("https://example.com/docs", text: $newURL)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                    Button("Add") {
+                        guard !newURL.isEmpty else { return }
+                        urls.append(newURL)
+                        newURL = ""
+                    }
+                    .disabled(newURL.isEmpty)
+                }
+            }
+            Section("Crawl Settings") {
+                Toggle("Auto-crawl linked pages", isOn: .constant(false))
+                Stepper("Max depth: 2", value: .constant(2), in: 1...5)
+                Toggle("Strip HTML tags", isOn: .constant(true))
+                Toggle("Cache pages locally", isOn: .constant(true))
+            }
+        }
+        .navigationTitle("Web Context")
+    }
+}
+
+struct RAGSettingsView: View {
+    var body: some View {
+        Form {
+            Section("Retrieval Settings") {
+                Stepper("Top K results: 5", value: .constant(5), in: 1...20)
+                VStack(alignment: .leading) {
+                    Text("Similarity threshold: 0.75")
+                    Slider(value: .constant(0.75), in: 0.1...1.0)
+                }
+                Picker("Search strategy", selection: .constant("Hybrid")) {
+                    Text("Semantic").tag("Semantic")
+                    Text("Keyword").tag("Keyword")
+                    Text("Hybrid").tag("Hybrid")
+                }
+            }
+            Section("Chunking") {
+                Stepper("Chunk size: 512 tokens", value: .constant(512), in: 128...2048, step: 128)
+                Stepper("Chunk overlap: 64 tokens", value: .constant(64), in: 0...256, step: 32)
+                Picker("Chunking strategy", selection: .constant("Sentence")) {
+                    Text("Fixed").tag("Fixed")
+                    Text("Sentence").tag("Sentence")
+                    Text("Paragraph").tag("Paragraph")
+                }
+            }
+            Section("Index") {
+                Button("Rebuild Index") {}
+                    .foregroundStyle(.blue)
+                Button("Clear Index", role: .destructive) {}
+                LabeledContent("Documents indexed", value: "0")
+                LabeledContent("Total chunks", value: "0")
+            }
+        }
+        .navigationTitle("RAG Settings")
+    }
+}
+
+struct EmbeddingConfigView: View {
+    var body: some View {
+        Form {
+            Section("Embedding Model") {
+                Picker("Model", selection: .constant("default")) {
+                    Text("Built-in (Local)").tag("default")
+                    Text("OpenAI text-embedding-3-small").tag("openai-small")
+                    Text("OpenAI text-embedding-3-large").tag("openai-large")
+                }
+                LabeledContent("Dimensions", value: "1536")
+                Toggle("Normalize vectors", isOn: .constant(true))
+            }
+            Section("Storage") {
+                LabeledContent("Vector store size", value: "0 KB")
+                Toggle("Compress embeddings", isOn: .constant(false))
+                Button("Export Vectors") {}
+                Button("Import Vectors") {}
+            }
+        }
+        .navigationTitle("Embedding Config")
+    }
+}
+
+struct ContextWindowView: View {
+    var body: some View {
+        Form {
+            Section("Token Budget") {
+                LabeledContent("Max context window", value: "128K")
+                VStack(alignment: .leading) {
+                    Text("System prompt allocation: 20%")
+                    Slider(value: .constant(0.2), in: 0.05...0.5)
+                }
+                VStack(alignment: .leading) {
+                    Text("History allocation: 40%")
+                    Slider(value: .constant(0.4), in: 0.1...0.8)
+                }
+                VStack(alignment: .leading) {
+                    Text("RAG context allocation: 30%")
+                    Slider(value: .constant(0.3), in: 0.05...0.5)
+                }
+            }
+            Section("Overflow Strategy") {
+                Picker("When context exceeds limit", selection: .constant("Truncate oldest")) {
+                    Text("Truncate oldest messages").tag("Truncate oldest")
+                    Text("Summarize history").tag("Summarize")
+                    Text("Drop RAG context first").tag("Drop RAG")
+                }
+                Toggle("Show warning on overflow", isOn: .constant(true))
+            }
+        }
+        .navigationTitle("Context Window")
+    }
+}
+
+// MARK: - System Prompt Tool Views
+
+struct PromptTemplateLibraryView: View {
+    let templates = [
+        ("Code Assistant", "Specialized for code review and generation"),
+        ("Creative Writer", "Fiction, poetry, and creative content"),
+        ("Data Analyst", "SQL, statistics, and data visualization"),
+        ("Technical Writer", "Documentation and technical guides"),
+        ("Tutor", "Patient explanations with examples"),
+        ("Translator", "Multi-language translation assistant"),
+        ("Summarizer", "Concise summaries of long content"),
+        ("Debate Coach", "Structured argumentation practice"),
+    ]
+
+    var body: some View {
+        List {
+            ForEach(templates, id: \.0) { name, desc in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(name).font(.subheadline.bold())
+                    Text(desc).font(.caption).foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .navigationTitle("Prompt Templates")
+    }
+}
+
+struct PromptVariablesView: View {
+    var body: some View {
+        Form {
+            Section("Built-in Variables") {
+                LabeledContent("{{date}}", value: "Current date")
+                LabeledContent("{{time}}", value: "Current time")
+                LabeledContent("{{user_name}}", value: "User's name")
+                LabeledContent("{{app_version}}", value: "App version")
+                LabeledContent("{{device_model}}", value: "Device model")
+                LabeledContent("{{os_version}}", value: "OS version")
+                LabeledContent("{{language}}", value: "System language")
+            }
+            Section("Custom Variables") {
+                Text("No custom variables defined").font(.caption).foregroundStyle(.secondary)
+                Button("Add Variable") {}
+            }
+        }
+        .navigationTitle("Dynamic Variables")
+    }
+}
+
+struct PromptChainEditorView: View {
+    var body: some View {
+        Form {
+            Section("Prompt Chains") {
+                Text("Chain multiple prompts together for complex workflows. Each step's output feeds into the next.")
+                    .font(.caption).foregroundStyle(.secondary)
+                Button("Create New Chain") {}
+                    .buttonStyle(.borderedProminent)
+            }
+            Section("Examples") {
+                Label("Research → Summarize → Format", systemImage: "arrow.right.circle")
+                Label("Translate → Review → Polish", systemImage: "arrow.right.circle")
+                Label("Analyze → Recommend → Draft", systemImage: "arrow.right.circle")
+            }
+        }
+        .navigationTitle("Prompt Chains")
+    }
+}
+
+struct PromptVersionHistoryView: View {
+    var body: some View {
+        List {
+            Text("No prompt versions saved yet.").font(.caption).foregroundStyle(.secondary)
+        }
+        .navigationTitle("Version History")
+    }
+}
+
+// MARK: - Personality Tool Views
+
+struct ResponseFormatterView: View {
+    var body: some View {
+        Form {
+            Section("Formatting Rules") {
+                Toggle("Use Markdown formatting", isOn: .constant(true))
+                Toggle("Include code blocks with syntax highlighting", isOn: .constant(true))
+                Toggle("Use bullet points for lists", isOn: .constant(true))
+                Toggle("Add section headers", isOn: .constant(false))
+                Toggle("Include table of contents for long responses", isOn: .constant(false))
+            }
+            Section("Code Style") {
+                Picker("Default language", selection: .constant("Swift")) {
+                    Text("Swift").tag("Swift")
+                    Text("Python").tag("Python")
+                    Text("JavaScript").tag("JavaScript")
+                    Text("TypeScript").tag("TypeScript")
+                    Text("Auto-detect").tag("Auto")
+                }
+                Toggle("Show line numbers", isOn: .constant(false))
+            }
+        }
+        .navigationTitle("Response Formatting")
+    }
+}
+
+struct LanguageSettingsView: View {
+    var body: some View {
+        Form {
+            Section("Response Language") {
+                Picker("Primary language", selection: .constant("English")) {
+                    Text("English").tag("English")
+                    Text("Spanish").tag("Spanish")
+                    Text("French").tag("French")
+                    Text("German").tag("German")
+                    Text("Japanese").tag("Japanese")
+                    Text("Chinese").tag("Chinese")
+                    Text("Korean").tag("Korean")
+                    Text("Portuguese").tag("Portuguese")
+                    Text("Arabic").tag("Arabic")
+                }
+                Toggle("Auto-detect input language", isOn: .constant(true))
+                Toggle("Match response language to input", isOn: .constant(true))
+            }
+            Section("Locale") {
+                Picker("Date format", selection: .constant("System")) {
+                    Text("System Default").tag("System")
+                    Text("MM/DD/YYYY").tag("US")
+                    Text("DD/MM/YYYY").tag("EU")
+                    Text("YYYY-MM-DD").tag("ISO")
+                }
+                Picker("Number format", selection: .constant("System")) {
+                    Text("System Default").tag("System")
+                    Text("1,000.00").tag("US")
+                    Text("1.000,00").tag("EU")
+                }
+            }
+        }
+        .navigationTitle("Language & Locale")
+    }
+}
+
+struct OutputConstraintsView: View {
+    var body: some View {
+        Form {
+            Section("Length Constraints") {
+                Stepper("Max paragraphs: 10", value: .constant(10), in: 1...50)
+                Stepper("Max sentences per paragraph: 5", value: .constant(5), in: 1...20)
+                Toggle("Enforce word count limits", isOn: .constant(false))
+            }
+            Section("Content Filters") {
+                Toggle("Avoid technical jargon", isOn: .constant(false))
+                Toggle("Family-friendly content only", isOn: .constant(true))
+                Toggle("Cite sources when possible", isOn: .constant(false))
+                Toggle("Avoid opinions", isOn: .constant(false))
+            }
+        }
+        .navigationTitle("Output Constraints")
+    }
+}
+
+struct PersonalityPresetsView: View {
+    let presets = [
+        ("Professional", "person.crop.rectangle", Color.blue),
+        ("Friendly", "face.smiling", Color.green),
+        ("Academic", "graduationcap", Color.purple),
+        ("Creative", "paintbrush.pointed", Color.orange),
+        ("Concise", "text.alignleft", Color.gray),
+        ("Socratic", "questionmark.circle", Color.indigo),
+    ]
+
+    var body: some View {
+        List {
+            ForEach(presets, id: \.0) { name, icon, color in
+                HStack(spacing: 12) {
+                    Image(systemName: icon)
+                        .font(.title3)
+                        .foregroundStyle(color)
+                        .frame(width: 36, height: 36)
+                        .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+                    Text(name).font(.subheadline.bold())
+                    Spacer()
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .navigationTitle("Personality Presets")
+    }
+}
+
+struct ToneSamplerView: View {
+    @State private var sampleText = "Explain what an API is."
+    @State private var selectedTone = "Neutral"
+
+    var body: some View {
+        Form {
+            Section("Sample Prompt") {
+                TextEditor(text: $sampleText)
+                    .frame(height: 60)
+            }
+            Section("Tone") {
+                Picker("Select tone", selection: $selectedTone) {
+                    ForEach(["Neutral", "Formal", "Casual", "Humorous", "Empathetic", "Technical"], id: \.self) {
+                        Text($0).tag($0)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }
+            Section("Preview") {
+                Text("Send the sample prompt above to preview how the AI would respond in the selected tone.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Button("Generate Preview") {}
+                    .buttonStyle(.borderedProminent)
+            }
+        }
+        .navigationTitle("Tone Sampler")
+    }
+}
+
+// MARK: - About Views
+
+struct LicensesView: View {
+    var body: some View {
+        List {
+            Section("Open Source Libraries") {
+                LabeledContent("SwiftUI", value: "Apple")
+                LabeledContent("CryptoKit", value: "Apple")
+                LabeledContent("Foundation", value: "Apple")
+                LabeledContent("Combine", value: "Apple")
+            }
+        }
+        .navigationTitle("Licenses")
+    }
+}
+
+struct ChangelogView: View {
+    var body: some View {
+        List {
+            Section("v1.0.0 — May 2026") {
+                Label("Initial release with full Workspace SDK", systemImage: "sparkles")
+                Label("AI Chat with multi-provider support", systemImage: "bubble.left.and.bubble.right")
+                Label("Plugin and Connector architecture", systemImage: "puzzlepiece.extension")
+                Label("Complete Developer Guide", systemImage: "book")
+            }
+        }
+        .navigationTitle("Changelog")
     }
 }
