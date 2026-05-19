@@ -93,7 +93,7 @@ public enum SDKPermission: String, Codable, CaseIterable {
 
 public struct AISlidesScope: Codable, Equatable {
     public let identifier: String = "sdk.AI.generateSlides"
-    public let permissions: [SDKPermission] = [
+    public var permissions: [SDKPermission] = [
         .readNotes,
         .readWhiteboards,
         .readDocuments,
