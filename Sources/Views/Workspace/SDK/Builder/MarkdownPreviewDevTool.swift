@@ -16,37 +16,32 @@ struct MarkdownPreviewDevToolView: View {
     @StateObject private var viewModel = MarkdownPreviewViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Markdown Preview",
-                description: "Write Markdown and see it rendered in real-time as formatted text.",
-                icon: "text.bubble"
-            )
-            .padding()
+        HStack {
+            VStack {
+                Text("Editor").font(.caption.bold())
+                TextEditor(text: $viewModel.input)
+                    .font(.system(.caption, design: .monospaced))
+            }
 
-            HStack {
-                VStack {
-                    Text("Editor").font(.caption.bold())
-                    TextEditor(text: $viewModel.input)
-                        .font(.system(.caption, design: .monospaced))
-                }
+            Divider()
 
-                Divider()
-
-                VStack {
-                    Text("Preview").font(.caption.bold())
-                    ScrollView {
-                        Text(LocalizedStringKey(viewModel.input))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding()
-                    }
+            VStack {
+                Text("Preview").font(.caption.bold())
+                ScrollView {
+                    Text(LocalizedStringKey(viewModel.input))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
                 }
             }
-            .padding()
         }
+        .padding()
     }
 }
 
 class MarkdownPreviewViewModel: ObservableObject {
     @Published var input = "# Title\n\n- Item 1\n- Item 2\n\n**Bold Text**"
+}
+
+#Preview {
+    MarkdownPreviewDevToolView()
 }

@@ -16,27 +16,23 @@ struct PermissionInspectorView: View {
     @StateObject private var viewModel = PermissionInspectorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Permission Inspector",
-                description: "Monitor and request authorization for system services like Camera, Location, and Notifications.",
-                icon: "hand.raised.fill"
-            )
-            .padding()
-
-            List {
-                ForEach($viewModel.permissions) { $perm in
-                    HStack {
-                        Image(systemName: perm.icon)
-                            .foregroundStyle(Color.accentColor)
-                            .frame(width: 30)
-                        VStack(alignment: .leading) {
-                            Text(perm.name).font(.subheadline.bold())
-                            Text(perm.description).font(.caption2).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        StatusBadge(text: perm.status, color: statusColor(perm.status))
+        List {
+            ForEach($viewModel.permissions) { $perm in
+                HStack {
+                    Image(systemName: perm.icon)
+                        .foregroundStyle(Color.accentColor)
+                        .frame(width: 30)
+                    VStack(alignment: .leading) {
+                        Text(perm.name).font(.subheadline.bold())
+                        Text(perm.description).font(.caption2).foregroundStyle(.secondary)
                     }
+                    Spacer()
+                    Text(perm.status)
+                        .font(.caption2.bold())
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .foregroundStyle(.white)
+                        .background(statusColor(perm.status), in: RoundedRectangle(cornerRadius: 4))
                 }
             }
         }
@@ -72,4 +68,8 @@ class PermissionInspectorViewModel: ObservableObject {
             PermissionInspectorItem(name: "Microphone", icon: "mic.fill", description: "Audio recording", status: "Not Determined")
         ]
     }
+}
+
+#Preview {
+    PermissionInspectorView()
 }

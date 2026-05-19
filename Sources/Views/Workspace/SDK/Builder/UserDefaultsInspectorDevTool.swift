@@ -17,33 +17,24 @@ struct UserDefaultsInspectorView: View {
     @State private var searchText = ""
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "UserDefaults Inspector",
-                description: "Inspect persisted user preferences and modify settings for testing purposes.",
-                icon: "externaldrive.badge.person.ivory"
-            )
-            .padding()
+        VStack {
+            TextField("Search keys...", text: $searchText)
+                .textFieldStyle(.roundedBorder)
+                .padding(.horizontal)
 
-            VStack {
-                TextField("Search keys...", text: $searchText)
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.horizontal)
-
-                List {
-                    ForEach(filteredEntries) { entry in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(entry.key).font(.subheadline.bold()).foregroundStyle(Color.accentColor)
-                            HStack {
-                                Text(entry.value).font(.caption).foregroundStyle(.secondary)
-                                Spacer()
-                                Button("Edit") { viewModel.startEditing(entry) }
-                                    .font(.caption)
-                            }
+            List {
+                ForEach(filteredEntries) { entry in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(entry.key).font(.subheadline.bold()).foregroundStyle(Color.accentColor)
+                        HStack {
+                            Text(entry.value).font(.caption).foregroundStyle(.secondary)
+                            Spacer()
+                            Button("Edit") { viewModel.startEditing(entry) }
+                                .font(.caption)
                         }
                     }
-                    .onDelete(perform: viewModel.delete)
                 }
+                .onDelete(perform: viewModel.delete)
             }
         }
         .onAppear { viewModel.load() }
@@ -120,4 +111,8 @@ struct EditEntryView: View {
             }
         }
     }
+}
+
+#Preview {
+    UserDefaultsInspectorView()
 }

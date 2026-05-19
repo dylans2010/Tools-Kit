@@ -45,36 +45,32 @@ struct SDKEventLoggerView: View {
     @State private var selectedLevel: _DTLogLevel?
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "SDK Event Logger",
-                description: "Live monitoring of internal SDK events, audit logs, and diagnostic messages.",
-                icon: "bolt.horizontal.icloud.fill"
-            )
-            .padding()
-
-            VStack {
-                Picker("Level", selection: $selectedLevel) {
-                    Text("All").tag(nil as _DTLogLevel?)
-                    ForEach(_DTLogLevel.allCases, id: \.self) { (level: _DTLogLevel) in
-                        Text(level.rawValue.capitalized).tag(level as _DTLogLevel?)
-                    }
+        VStack {
+            Picker("Level", selection: $selectedLevel) {
+                Text("All").tag(nil as _DTLogLevel?)
+                ForEach(_DTLogLevel.allCases, id: \.self) { (level: _DTLogLevel) in
+                    Text(level.rawValue.capitalized).tag(level as _DTLogLevel?)
                 }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
 
-                List {
-                    ForEach(filteredEntries) { entry in
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                StatusBadge(text: entry.level.rawValue.uppercased(), color: color(for: entry.level))
-                                Text(entry.source ?? "unknown").font(.caption2.bold()).foregroundStyle(Color.accentColor)
-                                Spacer()
-                                Text(entry.timestamp, style: .time).font(.system(size: 10)).foregroundStyle(.secondary)
-                            }
-                            Text(entry.message)
-                                .font(.system(.caption, design: .monospaced))
+            List {
+                ForEach(filteredEntries) { entry in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(entry.level.rawValue.uppercased())
+                                .font(.caption2.bold())
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .foregroundStyle(.white)
+                                .background(color(for: entry.level), in: RoundedRectangle(cornerRadius: 4))
+                            Text(entry.source ?? "unknown").font(.caption2.bold()).foregroundStyle(Color.accentColor)
+                            Spacer()
+                            Text(entry.timestamp, style: .time).font(.system(size: 10)).foregroundStyle(.secondary)
                         }
+                        Text(entry.message)
+                            .font(.system(.caption, design: .monospaced))
                     }
                 }
             }
@@ -96,4 +92,8 @@ struct SDKEventLoggerView: View {
         case .error: return .red
         }
     }
+}
+
+#Preview {
+    SDKEventLoggerView()
 }

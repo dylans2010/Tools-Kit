@@ -17,26 +17,17 @@ struct HashGeneratorDevToolView: View {
     @StateObject private var viewModel = HashGeneratorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Hash Generator",
-                description: "Compute secure cryptographic hashes using SHA256, SHA512, and MD5 algorithms.",
-                icon: "lock.rotation"
-            )
-            .padding()
+        Form {
+            Section("Input Content") {
+                TextEditor(text: $viewModel.input)
+                    .frame(height: 100)
+            }
 
-            Form {
-                Section("Input Content") {
-                    TextEditor(text: $viewModel.input)
-                        .frame(height: 100)
-                }
-
-                Section("Algorithms") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        hashRow(title: "SHA-256", value: viewModel.sha256)
-                        hashRow(title: "SHA-512", value: viewModel.sha512)
-                        hashRow(title: "MD5", value: viewModel.md5)
-                    }
+            Section("Algorithms") {
+                VStack(alignment: .leading, spacing: 12) {
+                    hashRow(title: "SHA-256", value: viewModel.sha256)
+                    hashRow(title: "SHA-512", value: viewModel.sha512)
+                    hashRow(title: "MD5", value: viewModel.md5)
                 }
             }
         }
@@ -84,4 +75,8 @@ class HashGeneratorViewModel: ObservableObject {
         let m5 = Insecure.MD5.hash(data: data)
         md5 = m5.map { String(format: "%02x", $0) }.joined()
     }
+}
+
+#Preview {
+    HashGeneratorDevToolView()
 }

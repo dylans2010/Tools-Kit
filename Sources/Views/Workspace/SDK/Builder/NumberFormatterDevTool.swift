@@ -16,37 +16,28 @@ struct NumberFormatterView: View {
     @StateObject private var viewModel = NumberFormatterViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Number Formatter",
-                description: "Apply locale-aware formatting to numbers, including currency symbols and grouping separators.",
-                icon: "number.circle"
-            )
-            .padding()
+        Form {
+            Section("Input Number") {
+                TextField("12345.67", text: $viewModel.input)
+                    .keyboardType(.decimalPad)
+            }
 
-            Form {
-                Section("Input Number") {
-                    TextField("12345.67", text: $viewModel.input)
-                        .keyboardType(.decimalPad)
+            Section("Configuration") {
+                Picker("Style", selection: $viewModel.style) {
+                    Text("Decimal").tag(NumberFormatter.Style.decimal)
+                    Text("Currency").tag(NumberFormatter.Style.currency)
+                    Text("Percent").tag(NumberFormatter.Style.percent)
+                    Text("Scientific").tag(NumberFormatter.Style.scientific)
+                    Text("Spell Out").tag(NumberFormatter.Style.spellOut)
                 }
 
-                Section("Configuration") {
-                    Picker("Style", selection: $viewModel.style) {
-                        Text("Decimal").tag(NumberFormatter.Style.decimal)
-                        Text("Currency").tag(NumberFormatter.Style.currency)
-                        Text("Percent").tag(NumberFormatter.Style.percent)
-                        Text("Scientific").tag(NumberFormatter.Style.scientific)
-                        Text("Spell Out").tag(NumberFormatter.Style.spellOut)
-                    }
+                TextField("Locale (e.g. en_US, fr_FR)", text: $viewModel.localeIdentifier)
+            }
 
-                    TextField("Locale (e.g. en_US, fr_FR)", text: $viewModel.localeIdentifier)
-                }
-
-                Section("Output") {
-                    Text(viewModel.formattedNumber)
-                        .font(.title2.bold())
-                        .textSelection(.enabled)
-                }
+            Section("Output") {
+                Text(viewModel.formattedNumber)
+                    .font(.title2.bold())
+                    .textSelection(.enabled)
             }
         }
     }
@@ -64,4 +55,8 @@ class NumberFormatterViewModel: ObservableObject {
         formatter.locale = Locale(identifier: localeIdentifier)
         return formatter.string(from: NSNumber(value: num)) ?? "Error"
     }
+}
+
+#Preview {
+    NumberFormatterView()
 }

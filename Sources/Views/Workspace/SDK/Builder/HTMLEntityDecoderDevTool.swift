@@ -16,27 +16,34 @@ struct HTMLEntityDecoderView: View {
     @StateObject private var viewModel = HTMLEntityDecoderViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "HTML Entity Decoder",
-                description: "Convert HTML entity sequences like &amp; back into their corresponding characters.",
-                icon: "chevron.left.chevron.right"
-            )
-            .padding()
+        Form {
+            Section("HTML Entities") {
+                TextEditor(text: $viewModel.input)
+                    .frame(height: 120)
+            }
 
-            Form {
-                Section("HTML Entities") {
-                    TextEditor(text: $viewModel.input)
-                        .frame(height: 120)
-                }
+            Section("Plain Text") {
+                Text(viewModel.output)
+                    .font(.system(.body, design: .monospaced))
+                    .textSelection(.enabled)
+                    .frame(minHeight: 60)
 
-                Section("Plain Text") {
-                    Text(viewModel.output)
-                        .font(.system(.body, design: .monospaced))
-                        .textSelection(.enabled)
-                        .frame(minHeight: 60)
+                HStack {
+                    Button {
+                        UIPasteboard.general.string = viewModel.output
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
 
-                    ExportPanel(content: viewModel.output, filename: "html_decoded.txt")
+                    Button {
+                        let tempDir = FileManager.default.temporaryDirectory
+                        let fileURL = tempDir.appendingPathComponent("html_decoded.txt")
+                        try? viewModel.output.write(to: fileURL, atomically: true, encoding: .utf8)
+                    } label: {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
                 }
             }
         }
@@ -77,4 +84,8 @@ class HTMLEntityDecoderViewModel: ObservableObject {
 
         output = result
     }
+}
+
+#Preview {
+    HTMLEntityDecoderView()
 }

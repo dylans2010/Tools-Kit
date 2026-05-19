@@ -16,14 +16,7 @@ struct BatteryStatusView: View {
     @StateObject private var viewModel = BatteryStatusViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Battery Status",
-                description: "Monitor device battery level, charging state, and energy consumption trends.",
-                icon: "battery.100"
-            )
-            .padding()
-
+        ScrollView {
             VStack(spacing: 30) {
                 ZStack {
                     Circle()
@@ -50,6 +43,7 @@ struct BatteryStatusView: View {
                         LabeledContent("Level", value: String(format: "%.0f%%", viewModel.level * 100))
                     }
                 }
+                .frame(height: 200) // Form in ScrollView needs height
             }
         }
         .onAppear { viewModel.start() }
@@ -83,4 +77,8 @@ class BatteryStatusViewModel: ObservableObject {
         default: state = "Unknown"
         }
     }
+}
+
+#Preview {
+    BatteryStatusView()
 }

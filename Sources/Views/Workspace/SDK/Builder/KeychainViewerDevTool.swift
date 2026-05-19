@@ -16,39 +16,30 @@ struct KeychainViewerView: View {
     @StateObject private var viewModel = KeychainViewerViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Keychain Viewer",
-                description: "Browse and manage secure entries stored in the application keychain.",
-                icon: "key.viewfinder"
-            )
-            .padding()
-
-            List {
-                Section("Keychain Items") {
-                    if viewModel.items.isEmpty {
-                        Text("No items found").foregroundStyle(.secondary)
-                    } else {
-                        ForEach($viewModel.items) { $item in
-                            VStack(alignment: .leading) {
-                                Text(item.account).font(.headline)
-                                Text(item.service).font(.caption).foregroundStyle(.secondary)
-                            }
+        List {
+            Section("Keychain Items") {
+                if viewModel.items.isEmpty {
+                    Text("No items found").foregroundStyle(.secondary)
+                } else {
+                    ForEach($viewModel.items) { $item in
+                        VStack(alignment: .leading) {
+                            Text(item.account).font(.headline)
+                            Text(item.service).font(.caption).foregroundStyle(.secondary)
                         }
-                        .onDelete(perform: viewModel.delete)
                     }
-                }
-
-                Section("Add Entry") {
-                    TextField("Service", text: $viewModel.newService)
-                    TextField("Account", text: $viewModel.newAccount)
-                    SecureField("Value", text: $viewModel.newValue)
-                    Button("Save Entry") { viewModel.save() }
-                        .disabled(viewModel.newService.isEmpty || viewModel.newAccount.isEmpty)
+                    .onDelete(perform: viewModel.delete)
                 }
             }
-            .refreshable { viewModel.load() }
+
+            Section("Add Entry") {
+                TextField("Service", text: $viewModel.newService)
+                TextField("Account", text: $viewModel.newAccount)
+                SecureField("Value", text: $viewModel.newValue)
+                Button("Save Entry") { viewModel.save() }
+                    .disabled(viewModel.newService.isEmpty || viewModel.newAccount.isEmpty)
+            }
         }
+        .refreshable { viewModel.load() }
         .onAppear { viewModel.load() }
     }
 }
@@ -94,4 +85,8 @@ class KeychainViewerViewModel: ObservableObject {
     func delete(at offsets: IndexSet) {
         items.remove(atOffsets: offsets)
     }
+}
+
+#Preview {
+    KeychainViewerView()
 }

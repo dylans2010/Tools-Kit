@@ -16,24 +16,15 @@ struct ViewHierarchyInspectorView: View {
     @StateObject private var viewModel = ViewHierarchyInspectorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "View Hierarchy Inspector",
-                description: "Traverse and inspect the current SwiftUI view tree to debug layout and state propagation.",
-                icon: "layers"
-            )
-            .padding()
-
-            List(viewModel.viewNodes, children: \.children) { node in
-                HStack {
-                    Image(systemName: "square.stack.3d.up")
-                        .foregroundStyle(.secondary)
-                    Text(node.name)
-                        .font(.caption.bold())
-                    Spacer()
-                    if let type = node.type {
-                        Text(type).font(.caption2).foregroundStyle(.tertiary)
-                    }
+        List(viewModel.viewNodes, children: \.children) { node in
+            HStack {
+                Image(systemName: "square.stack.3d.up")
+                    .foregroundStyle(.secondary)
+                Text(node.name)
+                    .font(.caption.bold())
+                Spacer()
+                if let type = node.type {
+                    Text(type).font(.caption2).foregroundStyle(.tertiary)
                 }
             }
         }
@@ -58,4 +49,8 @@ class ViewHierarchyInspectorViewModel: ObservableObject {
             ])
         ])
     ]
+}
+
+#Preview {
+    ViewHierarchyInspectorView()
 }

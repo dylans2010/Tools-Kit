@@ -16,37 +16,52 @@ struct JSONFormatterDevToolView: View {
     @StateObject private var viewModel = JSONFormatterViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "JSON Formatter",
-                description: "Clean up messy JSON, minify it for transmission, or format it for readability.",
-                icon: "text.badge.checkmark"
-            )
-            .padding()
+        Form {
+            Section("Input") {
+                TextEditor(text: $viewModel.input)
+                    .frame(height: 150)
+                    .font(.system(.caption, design: .monospaced))
+            }
 
-            Form {
-                Section("Input") {
-                    TextEditor(text: $viewModel.input)
-                        .frame(height: 150)
-                        .font(.system(.caption, design: .monospaced))
+            Section("Options") {
+                Picker("Format", selection: $viewModel.formatType) {
+                    Text("Prettify").tag(JSONFormatType.prettify)
+                    Text("Minify").tag(JSONFormatType.minify)
                 }
+                .pickerStyle(.segmented)
 
-                Section("Options") {
-                    Picker("Format", selection: $viewModel.formatType) {
-                        Text("Prettify").tag(JSONFormatType.prettify)
-                        Text("Minify").tag(JSONFormatType.minify)
+                Stepper("Indentation: \(viewModel.indentSize)", value: $viewModel.indentSize, in: 1...8)
+                    .disabled(viewModel.formatType == .minify)
+            }
+
+            Section("Output") {
+                ScrollView {
+                    Text(viewModel.output)
+                        .font(.system(.caption2, design: .monospaced))
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
+                }
+                .background(Color(uiColor: .systemGray6))
+                .cornerRadius(8)
+                .frame(minHeight: 200)
+
+                HStack {
+                    Button {
+                        UIPasteboard.general.string = viewModel.output
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
                     }
-                    .pickerStyle(.segmented)
+                    .buttonStyle(.bordered)
 
-                    Stepper("Indentation: \(viewModel.indentSize)", value: $viewModel.indentSize, in: 1...8)
-                        .disabled(viewModel.formatType == .minify)
-                }
-
-                Section("Output") {
-                    JSONView(json: viewModel.output)
-                        .frame(minHeight: 200)
-
-                    ExportPanel(content: viewModel.output, filename: "formatted.json")
+                    Button {
+                        let tempDir = FileManager.default.temporaryDirectory
+                        let fileURL = tempDir.appendingPathComponent("formatted.json")
+                        try? viewModel.output.write(to: fileURL, atomically: true, encoding: .utf8)
+                    } label: {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
                 }
             }
         }
@@ -83,4 +98,8 @@ class JSONFormatterViewModel: ObservableObject {
             output = result
         }
     }
+}
+
+#Preview {
+    JSONFormatterDevToolView()
 }

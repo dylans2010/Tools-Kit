@@ -17,37 +17,28 @@ struct APIResponseViewerView: View {
     @State private var viewMode: APIViewMode = .pretty
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "API Response Viewer",
-                description: "Paste raw API response data to format, inspect, and analyze its structure.",
-                icon: "doc.text.magnifyingglass"
-            )
-            .padding()
+        Form {
+            Section("Input Raw Data") {
+                TextEditor(text: $viewModel.rawInput)
+                    .frame(height: 150)
+                    .font(.system(.caption, design: .monospaced))
+            }
 
-            Form {
-                Section("Input Raw Data") {
-                    TextEditor(text: $viewModel.rawInput)
-                        .frame(height: 150)
-                        .font(.system(.caption, design: .monospaced))
+            Section("Analysis & Formatting") {
+                Picker("View Mode", selection: $viewMode) {
+                    Text("Pretty").tag(APIViewMode.pretty)
+                    Text("Raw").tag(APIViewMode.raw)
+                    Text("Structure").tag(APIViewMode.structure)
                 }
+                .pickerStyle(.segmented)
 
-                Section("Analysis & Formatting") {
-                    Picker("View Mode", selection: $viewMode) {
-                        Text("Pretty").tag(APIViewMode.pretty)
-                        Text("Raw").tag(APIViewMode.raw)
-                        Text("Structure").tag(APIViewMode.structure)
-                    }
-                    .pickerStyle(.segmented)
+                contentView
+                    .frame(minHeight: 250)
+            }
 
-                    contentView
-                        .frame(minHeight: 250)
-                }
-
-                Section("Metrics") {
-                    LabeledContent("Data Size", value: viewModel.dataSize)
-                    LabeledContent("Format Detected", value: viewModel.formatDetected)
-                }
+            Section("Metrics") {
+                LabeledContent("Data Size", value: viewModel.dataSize)
+                LabeledContent("Format Detected", value: viewModel.formatDetected)
             }
         }
     }
@@ -56,7 +47,15 @@ struct APIResponseViewerView: View {
     private var contentView: some View {
         switch viewMode {
         case .pretty:
-            JSONView(json: viewModel.prettyOutput)
+            ScrollView {
+                Text(viewModel.prettyOutput)
+                    .font(.system(.caption2, design: .monospaced))
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+            .background(Color(uiColor: .systemGray6))
+            .cornerRadius(8)
         case .raw:
             ScrollView {
                 Text(viewModel.rawInput)
@@ -146,4 +145,8 @@ class APIResponseViewerViewModel: ObservableObject {
             return [StructureItem(key: key, value: "\(object)", icon: "tag")]
         }
     }
+}
+
+#Preview {
+    APIResponseViewerView()
 }

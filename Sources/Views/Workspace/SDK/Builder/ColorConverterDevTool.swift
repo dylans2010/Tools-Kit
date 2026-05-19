@@ -16,38 +16,29 @@ struct ColorConverterView: View {
     @StateObject private var viewModel = ColorConverterViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Color Converter",
-                description: "Translate color values between different formats for UI development.",
-                icon: "paintpalette.fill"
-            )
-            .padding()
+        Form {
+            Section("Color Selection") {
+                ColorPicker("Choose Color", selection: $viewModel.selectedColor)
 
-            Form {
-                Section("Color Selection") {
-                    ColorPicker("Choose Color", selection: $viewModel.selectedColor)
+                Rectangle()
+                    .fill(viewModel.selectedColor)
+                    .frame(height: 60)
+                    .cornerRadius(8)
+            }
 
-                    Rectangle()
-                        .fill(viewModel.selectedColor)
-                        .frame(height: 60)
-                        .cornerRadius(8)
-                }
+            Section("Formats") {
+                LabeledContent("HEX", value: viewModel.hexValue)
+                LabeledContent("RGB", value: viewModel.rgbValue)
+                LabeledContent("HSL", value: viewModel.hslValue)
+            }
 
-                Section("Formats") {
-                    LabeledContent("HEX", value: viewModel.hexValue)
-                    LabeledContent("RGB", value: viewModel.rgbValue)
-                    LabeledContent("HSL", value: viewModel.hslValue)
-                }
-
-                Section("Code Snippets") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("SwiftUI").font(.caption.bold())
-                        Text(viewModel.swiftUISnippet)
-                            .font(.system(.caption2, design: .monospaced))
-                            .padding(4)
-                            .background(Color.secondary.opacity(0.1))
-                    }
+            Section("Code Snippets") {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("SwiftUI").font(.caption.bold())
+                    Text(viewModel.swiftUISnippet)
+                        .font(.system(.caption2, design: .monospaced))
+                        .padding(4)
+                        .background(Color.secondary.opacity(0.1))
                 }
             }
         }
@@ -103,4 +94,8 @@ class ColorConverterViewModel: ObservableObject {
     var swiftUISnippet: String {
         "Color(red: \(String(format: "%.2f", selectedColor.getComponents().r)), green: \(String(format: "%.2f", selectedColor.getComponents().g)), blue: \(String(format: "%.2f", selectedColor.getComponents().b)))"
     }
+}
+
+#Preview {
+    ColorConverterView()
 }

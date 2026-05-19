@@ -16,31 +16,40 @@ struct XMLFormatterDevToolView: View {
     @StateObject private var viewModel = XMLFormatterViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "XML Formatter",
-                description: "Clean up and format XML documents for better readability and structure validation.",
-                icon: "code.circle"
-            )
-            .padding()
+        Form {
+            Section("Input XML") {
+                TextEditor(text: $viewModel.input)
+                    .frame(height: 150)
+                    .font(.system(.caption, design: .monospaced))
+            }
 
-            Form {
-                Section("Input XML") {
-                    TextEditor(text: $viewModel.input)
-                        .frame(height: 150)
-                        .font(.system(.caption, design: .monospaced))
-                }
-
-                Section("Output") {
+            Section("Output") {
+                ScrollView {
                     Text(viewModel.output)
                         .font(.system(.caption2, design: .monospaced))
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(uiColor: .secondarySystemBackground))
-                        .cornerRadius(8)
                         .textSelection(.enabled)
+                }
+                .background(Color(uiColor: .secondarySystemBackground))
+                .cornerRadius(8)
 
-                    ExportPanel(content: viewModel.output, filename: "formatted.xml")
+                HStack {
+                    Button {
+                        UIPasteboard.general.string = viewModel.output
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        let tempDir = FileManager.default.temporaryDirectory
+                        let fileURL = tempDir.appendingPathComponent("formatted.xml")
+                        try? viewModel.output.write(to: fileURL, atomically: true, encoding: .utf8)
+                    } label: {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
                 }
             }
         }
@@ -71,4 +80,8 @@ class XMLFormatterViewModel: ObservableObject {
         }
         output = result
     }
+}
+
+#Preview {
+    XMLFormatterDevToolView()
 }

@@ -17,38 +17,29 @@ struct SQLiteBrowserView: View {
     @State private var query = "SELECT * FROM sqlite_master"
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "SQLite Browser",
-                description: "Inspect local database tables and execute raw SQL queries for debugging.",
-                icon: "cylinder.split.1x2"
-            )
-            .padding()
+        Form {
+            Section("Query Editor") {
+                TextEditor(text: $query)
+                    .frame(height: 100)
+                    .font(.system(.caption, design: .monospaced))
 
-            Form {
-                Section("Query Editor") {
-                    TextEditor(text: $query)
-                        .frame(height: 100)
-                        .font(.system(.caption, design: .monospaced))
-
-                    Button("Execute Query") {
-                        viewModel.execute(query)
-                    }
+                Button("Execute Query") {
+                    viewModel.execute(query)
                 }
+            }
 
-                if !viewModel.results.isEmpty {
-                    Section("Results") {
-                        ScrollView(.horizontal) {
-                            VStack(alignment: .leading) {
-                                ForEach(viewModel.results, id: \.self) { row in
-                                    HStack {
-                                        ForEach(row, id: \.self) { cell in
-                                            Text(cell)
-                                                .font(.caption2)
-                                                .padding(4)
-                                                .frame(width: 100, alignment: .leading)
-                                                .border(Color.secondary.opacity(0.1))
-                                        }
+            if !viewModel.results.isEmpty {
+                Section("Results") {
+                    ScrollView(.horizontal) {
+                        VStack(alignment: .leading) {
+                            ForEach(viewModel.results, id: \.self) { row in
+                                HStack {
+                                    ForEach(row, id: \.self) { cell in
+                                        Text(cell)
+                                            .font(.caption2)
+                                            .padding(4)
+                                            .frame(width: 100, alignment: .leading)
+                                            .border(Color.secondary.opacity(0.1))
                                     }
                                 }
                             }
@@ -83,4 +74,8 @@ class SQLiteBrowserViewModel: ObservableObject {
             results = rows
         }
     }
+}
+
+#Preview {
+    SQLiteBrowserView()
 }

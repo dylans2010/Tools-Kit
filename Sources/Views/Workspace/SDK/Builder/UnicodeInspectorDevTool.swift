@@ -16,37 +16,33 @@ struct UnicodeInspectorView: View {
     @StateObject private var viewModel = UnicodeInspectorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Unicode Inspector",
-                description: "Deep dive into character properties, including scalar values, categories, and encoding blocks.",
-                icon: "character.cursor.ibeam"
-            )
-            .padding()
+        Form {
+            Section("Input Text") {
+                TextField("Enter characters...", text: $viewModel.input)
+            }
 
-            Form {
-                Section("Input Text") {
-                    TextField("Enter characters...", text: $viewModel.input)
-                }
-
-                if !viewModel.characters.isEmpty {
-                    Section("Analysis") {
-                        ForEach(viewModel.characters) { item in
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack {
-                                    Text(item.character)
-                                        .font(.title2)
-                                        .frame(width: 40)
-                                    VStack(alignment: .leading) {
-                                        Text(item.name).font(.caption.bold())
-                                        Text("U+\(item.scalar)").font(.caption2.monospaced())
-                                    }
-                                    Spacer()
-                                    StatusBadge(text: item.category, color: .accentColor)
+            if !viewModel.characters.isEmpty {
+                Section("Analysis") {
+                    ForEach(viewModel.characters) { item in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(item.character)
+                                    .font(.title2)
+                                    .frame(width: 40)
+                                VStack(alignment: .leading) {
+                                    Text(item.name).font(.caption.bold())
+                                    Text("U+\(item.scalar)").font(.caption2.monospaced())
                                 }
+                                Spacer()
+                                Text(item.category)
+                                    .font(.caption2.bold())
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .foregroundStyle(.white)
+                                    .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 4))
                             }
-                            .padding(.vertical, 4)
                         }
+                        .padding(.vertical, 4)
                     }
                 }
             }
@@ -82,4 +78,8 @@ class UnicodeInspectorViewModel: ObservableObject {
             )
         }
     }
+}
+
+#Preview {
+    UnicodeInspectorView()
 }

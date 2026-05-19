@@ -17,38 +17,29 @@ struct SFSymbolsBrowserView: View {
     @State private var searchText = ""
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "SF Symbols Browser",
-                description: "Quickly find and preview system icons for your application UI.",
-                icon: "square.grid.2x2"
-            )
-            .padding()
+        VStack {
+            TextField("Search symbols...", text: $searchText)
+                .textFieldStyle(.roundedBorder)
+                .padding(.horizontal)
 
-            VStack {
-                TextField("Search symbols...", text: $searchText)
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.horizontal)
-
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 20) {
-                        ForEach(filteredSymbols, id: \.self) { symbol in
-                            VStack {
-                                Image(systemName: symbol)
-                                    .font(.title)
-                                    .frame(width: 40, height: 40)
-                                Text(symbol)
-                                    .font(.caption2)
-                                    .lineLimit(1)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .onTapGesture {
-                                UIPasteboard.general.string = symbol
-                            }
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 20) {
+                    ForEach(filteredSymbols, id: \.self) { symbol in
+                        VStack {
+                            Image(systemName: symbol)
+                                .font(.title)
+                                .frame(width: 40, height: 40)
+                            Text(symbol)
+                                .font(.caption2)
+                                .lineLimit(1)
+                                .foregroundStyle(.secondary)
+                        }
+                        .onTapGesture {
+                            UIPasteboard.general.string = symbol
                         }
                     }
-                    .padding()
                 }
+                .padding()
             }
         }
     }
@@ -67,4 +58,8 @@ class SFSymbolsBrowserViewModel: ObservableObject {
         "star.fill", "heart.fill", "envelope.fill", "phone.fill",
         "camera.fill", "video.fill", "bubble.left.fill", "cloud.fill"
     ]
+}
+
+#Preview {
+    SFSymbolsBrowserView()
 }

@@ -16,40 +16,33 @@ struct ContrastCheckerView: View {
     @StateObject private var viewModel = ContrastCheckerViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Contrast Checker",
-                description: "Check text and background color contrast ratios against WCAG accessibility standards.",
-                icon: "circle.lefthalf.filled"
-            )
-            .padding()
+        Form {
+            Section("Colors") {
+                ColorPicker("Background", selection: $viewModel.backgroundColor)
+                ColorPicker("Foreground (Text)", selection: $viewModel.foregroundColor)
+            }
 
-            Form {
-                Section("Colors") {
-                    ColorPicker("Background", selection: $viewModel.backgroundColor)
-                    ColorPicker("Foreground (Text)", selection: $viewModel.foregroundColor)
-                }
+            Section("Preview") {
+                Text("Sample Text")
+                    .font(.title.bold())
+                    .foregroundStyle(viewModel.foregroundColor)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(viewModel.backgroundColor)
+                    .cornerRadius(8)
+            }
 
-                Section("Preview") {
-                    Text("Sample Text")
-                        .font(.title.bold())
-                        .foregroundStyle(viewModel.foregroundColor)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(viewModel.backgroundColor)
-                        .cornerRadius(8)
-                }
-
-                Section("WCAG Results") {
-                    HStack {
-                        Text("Ratio: \(String(format: "%.2f", viewModel.contrastRatio)):1")
-                            .font(.headline)
-                        Spacer()
-                        StatusBadge(
-                            text: viewModel.contrastRatio >= 4.5 ? "PASS (AA)" : "FAIL (AA)",
-                            color: viewModel.contrastRatio >= 4.5 ? .green : .red
-                        )
-                    }
+            Section("WCAG Results") {
+                HStack {
+                    Text("Ratio: \(String(format: "%.2f", viewModel.contrastRatio)):1")
+                        .font(.headline)
+                    Spacer()
+                    Text(viewModel.contrastRatio >= 4.5 ? "PASS (AA)" : "FAIL (AA)")
+                        .font(.caption2.bold())
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .foregroundStyle(.white)
+                        .background(viewModel.contrastRatio >= 4.5 ? Color.green : Color.red, in: RoundedRectangle(cornerRadius: 4))
                 }
             }
         }
@@ -74,4 +67,8 @@ class ContrastCheckerViewModel: ObservableObject {
         }
         return 0.2126 * adjust(c.r) + 0.7152 * adjust(c.g) + 0.0722 * adjust(c.b)
     }
+}
+
+#Preview {
+    ContrastCheckerView()
 }

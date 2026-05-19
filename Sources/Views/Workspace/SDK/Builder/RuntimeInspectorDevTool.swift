@@ -16,17 +16,7 @@ struct RuntimeInspectorView: View {
     @StateObject private var viewModel = RuntimeInspectorViewModel()
 
     var body: some View {
-        let headerDescription = "Deeply inspect live objects, their property values, and internal states during execution."
-        return VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Runtime Inspector",
-                description: headerDescription,
-                icon: "magnifyingglass"
-            )
-            .padding()
-
-            objectsList
-        }
+        objectsList
     }
 
     private var objectsList: some View {
@@ -73,4 +63,8 @@ class RuntimeInspectorViewModel: ObservableObject {
         RuntimeObject(name: "ToolsKitSDK.shared", type: "ToolsKitSDK", properties: ["isSyncing": "false", "isInitialized": "true"]),
         RuntimeObject(name: "SDKConfigManager.shared", type: "SDKConfigManager", properties: ["activeProfile": "Default"])
     ]
+}
+
+#Preview {
+    RuntimeInspectorView()
 }

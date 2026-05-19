@@ -23,14 +23,7 @@ struct TextDiffView: View {
     @StateObject private var viewModel = TextDiffViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Text Diff",
-                description: "Compare two blocks of text side-by-side to visualize additions and removals.",
-                icon: "rectangle.2.swap"
-            )
-            .padding()
-
+        VStack {
             HStack {
                 VStack {
                     Text("Original").font(.caption.bold())
@@ -101,4 +94,8 @@ class TextDiffViewModel: ObservableObject {
         }
         diffLines = results
     }
+}
+
+#Preview {
+    TextDiffView()
 }

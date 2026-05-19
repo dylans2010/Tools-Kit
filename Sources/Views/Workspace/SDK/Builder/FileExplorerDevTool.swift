@@ -16,51 +16,42 @@ struct FileExplorerView: View {
     @StateObject private var viewModel = FileExplorerViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "File Explorer",
-                description: "Inspect the application's local file system including Documents, Library, and Cache directories.",
-                icon: "folder.badge.gearshape"
-            )
-            .padding()
-
-            List {
-                Section {
-                    if !viewModel.isAtRoot {
-                        Button { viewModel.navigateUp() } label: {
-                            Label("..", systemImage: "arrow.up.doc")
-                        }
+        List {
+            Section {
+                if !viewModel.isAtRoot {
+                    Button { viewModel.navigateUp() } label: {
+                        Label("..", systemImage: "arrow.up.doc")
                     }
-
-                    ForEach(viewModel.files) { file in
-                        HStack {
-                            Image(systemName: file.isDirectory ? "folder.fill" : "doc.fill")
-                                .foregroundStyle(file.isDirectory ? Color.accentColor : .secondary)
-
-                            VStack(alignment: .leading) {
-                                Text(file.name).font(.subheadline)
-                                Text(file.size).font(.caption2).foregroundStyle(.secondary)
-                            }
-
-                            Spacer()
-
-                            if !file.isDirectory {
-                                Button { viewModel.deleteFile(file) } label: {
-                                    Image(systemName: "trash").foregroundStyle(.red)
-                                }
-                            } else {
-                                Button { viewModel.navigateInto(file) } label: {
-                                    Image(systemName: "chevron.right")
-                                }
-                            }
-                        }
-                    }
-                } header: {
-                    Text("Current Directory: \(viewModel.currentPath.lastPathComponent)")
                 }
+
+                ForEach(viewModel.files) { file in
+                    HStack {
+                        Image(systemName: file.isDirectory ? "folder.fill" : "doc.fill")
+                            .foregroundStyle(file.isDirectory ? Color.accentColor : .secondary)
+
+                        VStack(alignment: .leading) {
+                            Text(file.name).font(.subheadline)
+                            Text(file.size).font(.caption2).foregroundStyle(.secondary)
+                        }
+
+                        Spacer()
+
+                        if !file.isDirectory {
+                            Button { viewModel.deleteFile(file) } label: {
+                                Image(systemName: "trash").foregroundStyle(.red)
+                            }
+                        } else {
+                            Button { viewModel.navigateInto(file) } label: {
+                                Image(systemName: "chevron.right")
+                            }
+                        }
+                    }
+                }
+            } header: {
+                Text("Current Directory: \(viewModel.currentPath.lastPathComponent)")
             }
-            .refreshable { viewModel.load() }
         }
+        .refreshable { viewModel.load() }
         .onAppear { viewModel.load() }
     }
 }
@@ -110,4 +101,8 @@ class FileExplorerViewModel: ObservableObject {
         try? FileManager.default.removeItem(at: file.path)
         load()
     }
+}
+
+#Preview {
+    FileExplorerView()
 }

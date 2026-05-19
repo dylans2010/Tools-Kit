@@ -16,41 +16,34 @@ struct JSONValidatorView: View {
     @StateObject private var viewModel = JSONValidatorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "JSON Validator",
-                description: "Check JSON strings for syntax errors and structural integrity.",
-                icon: "checkmark.seal"
-            )
-            .padding()
+        Form {
+            Section("Input JSON") {
+                TextEditor(text: $viewModel.input)
+                    .frame(height: 200)
+                    .font(.system(.caption, design: .monospaced))
+            }
 
-            Form {
-                Section("Input JSON") {
-                    TextEditor(text: $viewModel.input)
-                        .frame(height: 200)
-                        .font(.system(.caption, design: .monospaced))
-                }
-
-                Section("Status") {
-                    HStack {
-                        StatusBadge(
-                            text: viewModel.isValid ? "Valid JSON" : "Invalid JSON",
-                            color: viewModel.isValid ? .green : .red
-                        )
-                        Spacer()
-                        if !viewModel.isValid {
-                            Text(viewModel.errorMessage)
-                                .font(.caption)
-                                .foregroundStyle(.red)
-                        }
+            Section("Status") {
+                HStack {
+                    Text(viewModel.isValid ? "Valid JSON" : "Invalid JSON")
+                        .font(.caption2.bold())
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .foregroundStyle(.white)
+                        .background(viewModel.isValid ? Color.green : Color.red, in: RoundedRectangle(cornerRadius: 4))
+                    Spacer()
+                    if !viewModel.isValid {
+                        Text(viewModel.errorMessage)
+                            .font(.caption)
+                            .foregroundStyle(.red)
                     }
                 }
+            }
 
-                if viewModel.isValid {
-                    Section("Metadata") {
-                        LabeledContent("Type", value: viewModel.rootType)
-                        LabeledContent("Key Count", value: "\(viewModel.keyCount)")
-                    }
+            if viewModel.isValid {
+                Section("Metadata") {
+                    LabeledContent("Type", value: viewModel.rootType)
+                    LabeledContent("Key Count", value: "\(viewModel.keyCount)")
                 }
             }
         }
@@ -96,4 +89,8 @@ class JSONValidatorViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
+}
+
+#Preview {
+    JSONValidatorView()
 }

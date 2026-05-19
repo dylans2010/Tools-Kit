@@ -35,34 +35,25 @@ struct SDKIntegrationValidatorView: View {
     @StateObject private var viewModel = SDKIntegrationValidatorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "SDK Integration Validator",
-                description: "Execute a suite of automated checks to ensure the SDK is correctly integrated and configured.",
-                icon: "checkmark.seal.fill"
-            )
-            .padding()
-
-            List {
-                Section("Validation Results") {
-                    ForEach(viewModel.results) { (result: SDKIntegrationValidatorView.ValidationResult) in
-                        HStack {
-                            Image(systemName: result.isPassed ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                                .foregroundStyle(result.isPassed ? .green : .red)
-                            VStack(alignment: .leading) {
-                                Text(result.testName).font(.subheadline.bold())
-                                Text(result.message).font(.caption2).foregroundStyle(.secondary)
-                            }
+        List {
+            Section("Validation Results") {
+                ForEach(viewModel.results) { (result: SDKIntegrationValidatorView.ValidationResult) in
+                    HStack {
+                        Image(systemName: result.isPassed ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                            .foregroundStyle(result.isPassed ? .green : .red)
+                        VStack(alignment: .leading) {
+                            Text(result.testName).font(.subheadline.bold())
+                            Text(result.message).font(.caption2).foregroundStyle(.secondary)
                         }
                     }
                 }
-
-                Button("Run Full Validation Suite") {
-                    viewModel.run()
-                }
-                .disabled(viewModel.isRunning)
-                .frame(maxWidth: .infinity)
             }
+
+            Button("Run Full Validation Suite") {
+                viewModel.run()
+            }
+            .disabled(viewModel.isRunning)
+            .frame(maxWidth: .infinity)
         }
     }
 }
@@ -106,4 +97,8 @@ class SDKIntegrationValidatorViewModel: ObservableObject {
         results = checks
         isRunning = false
     }
+}
+
+#Preview {
+    SDKIntegrationValidatorView()
 }

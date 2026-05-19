@@ -16,15 +16,7 @@ struct LogStreamViewerView: View {
     @StateObject private var viewModel = LogStreamViewerViewModel()
 
     var body: some View {
-        let headerDescription = "Monitor live log output streams for debugging real-time application behavior."
-        return VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Log Stream Viewer",
-                description: headerDescription,
-                icon: "list.bullet.rectangle"
-            )
-            .padding()
-
+        VStack(spacing: 0) {
             logScrollView
             .background(Color.black.opacity(0.05))
         }
@@ -80,4 +72,8 @@ class LogStreamViewerViewModel: ObservableObject {
     func stop() {
         timer?.invalidate()
     }
+}
+
+#Preview {
+    LogStreamViewerView()
 }

@@ -16,30 +16,21 @@ struct CacheViewerView: View {
     @StateObject private var viewModel = CacheViewerViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Cache Viewer",
-                description: "Monitor cached data size and clear various cache buckets to free up space.",
-                icon: "archivebox"
-            )
-            .padding()
+        List {
+            Section("Cache Summary") {
+                LabeledContent("Total Cache Size", value: viewModel.totalCacheSize)
+                Button("Clear All Cache", role: .destructive) { viewModel.clearAll() }
+            }
 
-            List {
-                Section("Cache Summary") {
-                    LabeledContent("Total Cache Size", value: viewModel.totalCacheSize)
-                    Button("Clear All Cache", role: .destructive) { viewModel.clearAll() }
-                }
-
-                Section("Cache Buckets") {
-                    ForEach(viewModel.buckets) { bucket in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(bucket.name).font(.subheadline.bold())
-                                Text(bucket.path).font(.caption2).foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            Text(bucket.size).font(.caption.monospaced())
+            Section("Cache Buckets") {
+                ForEach(viewModel.buckets) { bucket in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(bucket.name).font(.subheadline.bold())
+                            Text(bucket.path).font(.caption2).foregroundStyle(.secondary)
                         }
+                        Spacer()
+                        Text(bucket.size).font(.caption.monospaced())
                     }
                 }
             }
@@ -85,4 +76,8 @@ class CacheViewerViewModel: ObservableObject {
         } ?? 0
         return ByteCountFormatter.string(fromByteCount: Int64(total), countStyle: .file)
     }
+}
+
+#Preview {
+    CacheViewerView()
 }

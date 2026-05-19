@@ -16,26 +16,33 @@ struct UUIDBulkGeneratorView: View {
     @StateObject private var viewModel = UUIDBulkGeneratorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "UUID Bulk Generator",
-                description: "Create batches of unique identifiers for seeding data or load testing.",
-                icon: "barcode.viewfinder"
-            )
-            .padding()
+        Form {
+            Section("Quantity") {
+                Stepper("Count: \(viewModel.count)", value: $viewModel.count, in: 1...1000)
+                Button("Generate Batch") { viewModel.generateBatch() }
+            }
 
-            Form {
-                Section("Quantity") {
-                    Stepper("Count: \(viewModel.count)", value: $viewModel.count, in: 1...1000)
-                    Button("Generate Batch") { viewModel.generateBatch() }
-                }
+            Section("Batch Output") {
+                TextEditor(text: .constant(viewModel.output))
+                    .frame(height: 200)
+                    .font(.system(.caption, design: .monospaced))
 
-                Section("Batch Output") {
-                    TextEditor(text: .constant(viewModel.output))
-                        .frame(height: 200)
-                        .font(.system(.caption, design: .monospaced))
+                HStack {
+                    Button {
+                        UIPasteboard.general.string = viewModel.output
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
 
-                    ExportPanel(content: viewModel.output, filename: "uuids.txt")
+                    Button {
+                        let tempDir = FileManager.default.temporaryDirectory
+                        let fileURL = tempDir.appendingPathComponent("uuids.txt")
+                        try? viewModel.output.write(to: fileURL, atomically: true, encoding: .utf8)
+                    } label: {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
                 }
             }
         }
@@ -53,4 +60,8 @@ class UUIDBulkGeneratorViewModel: ObservableObject {
         }
         output = results.joined(separator: "\n")
     }
+}
+
+#Preview {
+    UUIDBulkGeneratorView()
 }

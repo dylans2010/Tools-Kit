@@ -18,67 +18,89 @@ struct WebSocketMonitorView: View {
     @State private var messageToSend = ""
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "WebSocket Monitor",
-                description: "Connect to WebSocket servers, send messages, and monitor live traffic.",
-                icon: "bolt.horizontal.circle"
-            )
-            .padding()
+        Form {
+            Section("Connection") {
+                HStack {
+                    TextField("wss://echo.websocket.org", text: $viewModel.url)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
 
-            Form {
-                Section("Connection") {
-                    HStack {
-                        TextField("wss://echo.websocket.org", text: $viewModel.url)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
-
-                        Button(viewModel.isConnected ? "Disconnect" : "Connect") {
-                            if viewModel.isConnected {
-                                viewModel.disconnect()
-                            } else {
-                                viewModel.connect()
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(viewModel.isConnected ? .red : .accentColor)
-                    }
-
-                    HStack {
-                        StatusBadge(
-                            text: viewModel.isConnected ? "Connected" : "Disconnected",
-                            color: viewModel.isConnected ? .green : .secondary
-                        )
-                        Spacer()
+                    Button(viewModel.isConnected ? "Disconnect" : "Connect") {
                         if viewModel.isConnected {
-                            Text("Latency: \(viewModel.latency)ms")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                            viewModel.disconnect()
+                        } else {
+                            viewModel.connect()
                         }
                     }
+                    .buttonStyle(.borderedProminent)
+                    .tint(viewModel.isConnected ? .red : .accentColor)
                 }
 
-                if viewModel.isConnected {
-                    Section("Send Message") {
-                        HStack {
-                            TextField("Message content...", text: $messageToSend)
-                            Button("Send") {
-                                viewModel.send(messageToSend)
-                                messageToSend = ""
-                            }
-                            .disabled(messageToSend.isEmpty)
-                        }
+                HStack {
+                    Text(viewModel.isConnected ? "Connected" : "Disconnected")
+                        .font(.caption2.bold())
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .foregroundStyle(.white)
+                        .background(viewModel.isConnected ? Color.green : Color.secondary, in: RoundedRectangle(cornerRadius: 4))
+                    Spacer()
+                    if viewModel.isConnected {
+                        Text("Latency: \(viewModel.latency)ms")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
                     }
                 }
+            }
 
-                Section("Messages") {
-                    HistoryView(history: viewModel.messageHistory) { item in
-                        // Message details
-                    } onClear: {
+            if viewModel.isConnected {
+                Section("Send Message") {
+                    HStack {
+                        TextField("Message content...", text: $messageToSend)
+                        Button("Send") {
+                            viewModel.send(messageToSend)
+                            messageToSend = ""
+                        }
+                        .disabled(messageToSend.isEmpty)
+                    }
+                }
+            }
+
+            Section {
+                HStack {
+                    Text("Messages")
+                        .font(.headline)
+                    Spacer()
+                    Button("Clear") {
                         viewModel.messageHistory.removeAll()
                     }
+                    .font(.caption)
+                    .disabled(viewModel.messageHistory.isEmpty)
+                }
+
+                if viewModel.messageHistory.isEmpty {
+                    ContentUnavailableView("No History", systemImage: "clock", description: Text("Your activity will appear here."))
+                        .frame(height: 200)
+                } else {
+                    List {
+                        ForEach(viewModel.messageHistory) { item in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(item.title)
+                                    .font(.subheadline.bold())
+                                Text(item.detail)
+                                    .font(.caption)
+                                    .lineLimit(2)
+                                    .foregroundStyle(.secondary)
+                                Text(item.timestamp, style: .relative)
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
                     .frame(height: 300)
                 }
+            } header: {
+                Text("Messages")
             }
         }
     }
@@ -152,4 +174,8 @@ class WebSocketMonitorViewModel: ObservableObject {
             }
         }
     }
+}
+
+#Preview {
+    WebSocketMonitorView()
 }

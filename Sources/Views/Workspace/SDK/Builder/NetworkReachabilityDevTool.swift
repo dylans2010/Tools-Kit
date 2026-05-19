@@ -17,49 +17,78 @@ struct NetworkReachabilityView: View {
     @StateObject private var viewModel = NetworkReachabilityViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Network Reachability",
-                description: "Real-time monitoring of network interfaces, connectivity status, and data usage paths.",
-                icon: "wifi"
-            )
-            .padding()
-
-            Form {
-                Section("Status") {
-                    HStack {
-                        StatusBadge(
-                            text: viewModel.status.description,
-                            color: viewModel.status == .satisfied ? .green : .red
-                        )
-                        Spacer()
-                        if viewModel.isExpensive {
-                            StatusBadge(text: "Expensive Connection", color: .orange)
-                        }
-                    }
-
-                    LabeledContent("Interface Type", value: viewModel.interfaceType)
-                }
-
-                Section("Capabilities") {
-                    Toggle("DNS Required", isOn: .constant(true)).disabled(true)
-                    Toggle("IPv4 Supported", isOn: .constant(viewModel.supportsIPv4)).disabled(true)
-                    Toggle("IPv6 Supported", isOn: .constant(viewModel.supportsIPv6)).disabled(true)
-                    Toggle("VPN Active", isOn: .constant(viewModel.isVPNActive)).disabled(true)
-                }
-
-                Section("Active Interfaces") {
-                    ForEach(viewModel.interfaces, id: \.self) { interface in
-                        Label(interface, systemImage: interfaceIcon(for: interface))
+        Form {
+            Section("Status") {
+                HStack {
+                    Text(viewModel.status.description)
+                        .font(.caption2.bold())
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .foregroundStyle(.white)
+                        .background(viewModel.status == .satisfied ? Color.green : Color.red, in: RoundedRectangle(cornerRadius: 4))
+                    Spacer()
+                    if viewModel.isExpensive {
+                        Text("Expensive Connection")
+                            .font(.caption2.bold())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .foregroundStyle(.white)
+                            .background(Color.orange, in: RoundedRectangle(cornerRadius: 4))
                     }
                 }
 
-                Section("Log") {
-                    HistoryView(history: viewModel.history) { _ in } onClear: {
+                LabeledContent("Interface Type", value: viewModel.interfaceType)
+            }
+
+            Section("Capabilities") {
+                Toggle("DNS Required", isOn: .constant(true)).disabled(true)
+                Toggle("IPv4 Supported", isOn: .constant(viewModel.supportsIPv4)).disabled(true)
+                Toggle("IPv6 Supported", isOn: .constant(viewModel.supportsIPv6)).disabled(true)
+                Toggle("VPN Active", isOn: .constant(viewModel.isVPNActive)).disabled(true)
+            }
+
+            Section("Active Interfaces") {
+                ForEach(viewModel.interfaces, id: \.self) { interface in
+                    Label(interface, systemImage: interfaceIcon(for: interface))
+                }
+            }
+
+            Section {
+                HStack {
+                    Text("History")
+                        .font(.headline)
+                    Spacer()
+                    Button("Clear") {
                         viewModel.history.removeAll()
                     }
-                    .frame(height: 200)
+                    .font(.caption)
+                    .disabled(viewModel.history.isEmpty)
                 }
+
+                if viewModel.history.isEmpty {
+                    ContentUnavailableView("No History", systemImage: "clock", description: Text("Your activity will appear here."))
+                        .frame(height: 200)
+                } else {
+                    List {
+                        ForEach(viewModel.history) { item in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(item.title)
+                                    .font(.subheadline.bold())
+                                Text(item.detail)
+                                    .font(.caption)
+                                    .lineLimit(2)
+                                    .foregroundStyle(.secondary)
+                                Text(item.timestamp, style: .relative)
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                    .frame(height: 300)
+                }
+            } header: {
+                Text("Log")
             }
         }
     }
@@ -126,4 +155,8 @@ extension NWPath.Status: CustomStringConvertible {
         @unknown default: return "Unknown"
         }
     }
+}
+
+#Preview {
+    NetworkReachabilityView()
 }

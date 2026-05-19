@@ -16,29 +16,36 @@ struct BezierCurveVisualizerView: View {
     @StateObject private var viewModel = BezierCurveVisualizerViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Bezier Curve Visualizer",
-                description: "Interactively adjust control points to design custom cubic Bezier paths for animations or shapes.",
-                icon: "point.topleft.down.curvedto.point.bottomright.up"
-            )
-            .padding()
+        VStack {
+            BezierCanvas(points: $viewModel.points)
+                .frame(height: 300)
+                .background(Color(uiColor: .secondarySystemBackground))
+                .cornerRadius(12)
+                .padding()
 
-            VStack {
-                BezierCanvas(points: $viewModel.points)
-                    .frame(height: 300)
-                    .background(Color(uiColor: .secondarySystemBackground))
-                    .cornerRadius(12)
-                    .padding()
+            Form {
+                Section("SwiftUI Code") {
+                    Text(viewModel.codeSnippet)
+                        .font(.system(.caption2, design: .monospaced))
+                        .padding()
+                        .background(Color.secondary.opacity(0.1))
 
-                Form {
-                    Section("SwiftUI Code") {
-                        Text(viewModel.codeSnippet)
-                            .font(.system(.caption2, design: .monospaced))
-                            .padding()
-                            .background(Color.secondary.opacity(0.1))
+                    HStack {
+                        Button {
+                            UIPasteboard.general.string = viewModel.codeSnippet
+                        } label: {
+                            Label("Copy", systemImage: "doc.on.doc")
+                        }
+                        .buttonStyle(.bordered)
 
-                        ExportPanel(content: viewModel.codeSnippet, filename: "bezier_path.swift")
+                        Button {
+                            let tempDir = FileManager.default.temporaryDirectory
+                            let fileURL = tempDir.appendingPathComponent("bezier_path.swift")
+                            try? viewModel.codeSnippet.write(to: fileURL, atomically: true, encoding: .utf8)
+                        } label: {
+                            Label("Export", systemImage: "square.and.arrow.up")
+                        }
+                        .buttonStyle(.bordered)
                     }
                 }
             }
@@ -97,4 +104,8 @@ class BezierCurveVisualizerViewModel: ObservableObject {
         "              control1: CGPoint(x: \(Int(points[1].x)), y: \(Int(points[1].y))),\n" +
         "              control2: CGPoint(x: \(Int(points[2].x)), y: \(Int(points[2].y))))"
     }
+}
+
+#Preview {
+    BezierCurveVisualizerView()
 }

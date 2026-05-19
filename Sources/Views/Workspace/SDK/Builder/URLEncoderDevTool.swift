@@ -16,38 +16,78 @@ struct URLEncoderView: View {
     @StateObject private var viewModel = URLEncoderViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "URL Encoder",
-                description: "Encode special characters into percent-encoded sequences for valid URL formatting.",
-                icon: "link"
-            )
-            .padding()
+        Form {
+            Section("Input") {
+                TextEditor(text: $viewModel.inputText)
+                    .frame(height: 120)
+                    .font(.system(.body, design: .monospaced))
+            }
 
-            Form {
-                Section("Input") {
-                    TextEditor(text: $viewModel.inputText)
-                        .frame(height: 120)
-                        .font(.system(.body, design: .monospaced))
+            Section("Output") {
+                Text(viewModel.outputText)
+                    .font(.system(.body, design: .monospaced))
+                    .textSelection(.enabled)
+                    .frame(minHeight: 60)
+
+                HStack {
+                    Button {
+                        UIPasteboard.general.string = viewModel.outputText
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        let tempDir = FileManager.default.temporaryDirectory
+                        let fileURL = tempDir.appendingPathComponent("url_encoded.txt")
+                        try? viewModel.outputText.write(to: fileURL, atomically: true, encoding: .utf8)
+                    } label: {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
                 }
+            }
 
-                Section("Output") {
-                    Text(viewModel.outputText)
-                        .font(.system(.body, design: .monospaced))
-                        .textSelection(.enabled)
-                        .frame(minHeight: 60)
-
-                    ExportPanel(content: viewModel.outputText, filename: "url_encoded.txt")
-                }
-
-                Section("History") {
-                    HistoryView(history: viewModel.history) { item in
-                        viewModel.inputText = item.title
-                    } onClear: {
+            Section {
+                HStack {
+                    Text("History")
+                        .font(.headline)
+                    Spacer()
+                    Button("Clear") {
                         viewModel.history.removeAll()
                     }
-                    .frame(height: 200)
+                    .font(.caption)
+                    .disabled(viewModel.history.isEmpty)
                 }
+
+                if viewModel.history.isEmpty {
+                    ContentUnavailableView("No History", systemImage: "clock", description: Text("Your activity will appear here."))
+                        .frame(height: 200)
+                } else {
+                    List {
+                        ForEach(viewModel.history) { item in
+                            Button {
+                                viewModel.inputText = item.title
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(item.title)
+                                        .font(.subheadline.bold())
+                                    Text(item.detail)
+                                        .font(.caption)
+                                        .lineLimit(2)
+                                        .foregroundStyle(.secondary)
+                                    Text(item.timestamp, style: .relative)
+                                        .font(.caption2)
+                                        .foregroundStyle(.tertiary)
+                                }
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                    .frame(height: 300)
+                }
+            } header: {
+                Text("History")
             }
         }
     }
@@ -74,4 +114,8 @@ class URLEncoderViewModel: ObservableObject {
             history.insert(HistoryItem(title: inputText, detail: "URL Encoded"), at: 0)
         }
     }
+}
+
+#Preview {
+    URLEncoderView()
 }

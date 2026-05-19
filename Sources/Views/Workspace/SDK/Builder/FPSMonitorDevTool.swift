@@ -16,30 +16,34 @@ struct FPSMonitorView: View {
     @StateObject private var viewModel = FPSMonitorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "FPS Monitor",
-                description: "Track frame rate consistency and detect dropped frames for smooth UI interactions.",
-                icon: "speedometer"
-            )
-            .padding()
+        VStack {
+            ZStack {
+                GeometryReader { geo in
+                    Path { path in
+                        guard viewModel.fpsHistory.count > 1 else { return }
+                        let step = geo.size.width / CGFloat(viewModel.fpsHistory.count - 1)
+                        let height = geo.size.height
 
-            VStack {
-                ZStack {
-                    UsageChart(data: viewModel.fpsHistory)
-                        .frame(height: 150)
-                        .padding()
+                        path.move(to: CGPoint(x: 0, y: height * (1 - CGFloat((viewModel.fpsHistory.first ?? 0)/100))))
 
-                    Text("\(Int(viewModel.currentFPS)) FPS")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                        .foregroundStyle(viewModel.currentFPS < 50 ? .red : .green)
-                }
-
-                Form {
-                    Section("Statistics") {
-                        LabeledContent("Min FPS", value: "\(Int(viewModel.minFPS))")
-                        LabeledContent("Max FPS", value: "\(Int(viewModel.maxFPS))")
+                        for i in 1..<viewModel.fpsHistory.count {
+                            path.addLine(to: CGPoint(x: CGFloat(i) * step, y: height * (1 - CGFloat(viewModel.fpsHistory[i]/100))))
+                        }
                     }
+                    .stroke(Color.accentColor, lineWidth: 2)
+                }
+                .frame(height: 150)
+                .padding()
+
+                Text("\(Int(viewModel.currentFPS)) FPS")
+                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                    .foregroundStyle(viewModel.currentFPS < 50 ? .red : .green)
+            }
+
+            Form {
+                Section("Statistics") {
+                    LabeledContent("Min FPS", value: "\(Int(viewModel.minFPS))")
+                    LabeledContent("Max FPS", value: "\(Int(viewModel.maxFPS))")
                 }
             }
         }
@@ -84,4 +88,8 @@ class FPSMonitorViewModel: ObservableObject {
         fpsHistory.removeFirst()
         fpsHistory.append(fps)
     }
+}
+
+#Preview {
+    FPSMonitorView()
 }

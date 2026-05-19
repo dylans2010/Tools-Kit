@@ -16,36 +16,27 @@ struct ColorPaletteGeneratorView: View {
     @StateObject private var viewModel = ColorPaletteGeneratorViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Color Palette Generator",
-                description: "Create monochromatic, analogous, or complementary color schemes from a base color.",
-                icon: "swatchpalette"
-            )
-            .padding()
+        Form {
+            Section("Base Color") {
+                ColorPicker("Primary", selection: $viewModel.baseColor)
+            }
 
-            Form {
-                Section("Base Color") {
-                    ColorPicker("Primary", selection: $viewModel.baseColor)
+            Section("Scheme Type") {
+                Picker("Harmony", selection: $viewModel.type) {
+                    Text("Monochromatic").tag(PaletteType.monochromatic)
+                    Text("Analogous").tag(PaletteType.analogous)
+                    Text("Complementary").tag(PaletteType.complementary)
                 }
+                .pickerStyle(.segmented)
+            }
 
-                Section("Scheme Type") {
-                    Picker("Harmony", selection: $viewModel.type) {
-                        Text("Monochromatic").tag(PaletteType.monochromatic)
-                        Text("Analogous").tag(PaletteType.analogous)
-                        Text("Complementary").tag(PaletteType.complementary)
-                    }
-                    .pickerStyle(.segmented)
-                }
-
-                Section("Generated Palette") {
-                    HStack(spacing: 4) {
-                        ForEach(viewModel.palette, id: \.self) { color in
-                            Rectangle()
-                                .fill(color)
-                                .frame(height: 60)
-                                .overlay(Text(hex(color)).font(.caption2).foregroundStyle(.white).shadow(radius: 1))
-                        }
+            Section("Generated Palette") {
+                HStack(spacing: 4) {
+                    ForEach(viewModel.palette, id: \.self) { color in
+                        Rectangle()
+                            .fill(color)
+                            .frame(height: 60)
+                            .overlay(Text(hex(color)).font(.caption2).foregroundStyle(.white).shadow(radius: 1))
                     }
                 }
             }
@@ -89,4 +80,8 @@ class ColorPaletteGeneratorViewModel: ObservableObject {
             ]
         }
     }
+}
+
+#Preview {
+    ColorPaletteGeneratorView()
 }

@@ -16,32 +16,39 @@ struct HTMLEntityEncoderView: View {
     @StateObject private var viewModel = HTMLEntityEncoderViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "HTML Entity Encoder",
-                description: "Escape special characters into HTML entities for safe inclusion in web content.",
-                icon: "chevron.left.forwardslash.chevron.right"
-            )
-            .padding()
+        Form {
+            Section("Plain Text") {
+                TextEditor(text: $viewModel.input)
+                    .frame(height: 120)
+            }
 
-            Form {
-                Section("Plain Text") {
-                    TextEditor(text: $viewModel.input)
-                        .frame(height: 120)
+            Section("HTML Entities") {
+                Text(viewModel.output)
+                    .font(.system(.body, design: .monospaced))
+                    .textSelection(.enabled)
+                    .frame(minHeight: 60)
+
+                HStack {
+                    Button {
+                        UIPasteboard.general.string = viewModel.output
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        let tempDir = FileManager.default.temporaryDirectory
+                        let fileURL = tempDir.appendingPathComponent("html_encoded.txt")
+                        try? viewModel.output.write(to: fileURL, atomically: true, encoding: .utf8)
+                    } label: {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
                 }
+            }
 
-                Section("HTML Entities") {
-                    Text(viewModel.output)
-                        .font(.system(.body, design: .monospaced))
-                        .textSelection(.enabled)
-                        .frame(minHeight: 60)
-
-                    ExportPanel(content: viewModel.output, filename: "html_encoded.txt")
-                }
-
-                Section("Options") {
-                    Toggle("Encode All Non-ASCII", isOn: $viewModel.encodeNonASCII)
-                }
+            Section("Options") {
+                Toggle("Encode All Non-ASCII", isOn: $viewModel.encodeNonASCII)
             }
         }
     }
@@ -73,4 +80,8 @@ class HTMLEntityEncoderViewModel: ObservableObject {
         }
         output = result
     }
+}
+
+#Preview {
+    HTMLEntityEncoderView()
 }

@@ -16,43 +16,50 @@ struct GradientBuilderView: View {
     @StateObject private var viewModel = GradientBuilderViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Gradient Builder",
-                description: "Design linear gradients with multiple color stops and export the SwiftUI code.",
-                icon: "lineargradient"
-            )
-            .padding()
+        Form {
+            Section("Gradient Preview") {
+                LinearGradient(
+                    gradient: Gradient(colors: viewModel.colors),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .frame(height: 120)
+                .cornerRadius(12)
+            }
 
-            Form {
-                Section("Gradient Preview") {
-                    LinearGradient(
-                        gradient: Gradient(colors: viewModel.colors),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    .frame(height: 120)
-                    .cornerRadius(12)
+            Section("Colors") {
+                ForEach($viewModel.colors, id: \.self) { $color in
+                    ColorPicker("Color", selection: $color)
                 }
+                .onDelete { viewModel.colors.remove(atOffsets: $0) }
 
-                Section("Colors") {
-                    ForEach($viewModel.colors, id: \.self) { $color in
-                        ColorPicker("Color", selection: $color)
-                    }
-                    .onDelete { viewModel.colors.remove(atOffsets: $0) }
-
-                    if viewModel.colors.count < 5 {
-                        Button("Add Color") { viewModel.colors.append(.gray) }
-                    }
+                if viewModel.colors.count < 5 {
+                    Button("Add Color") { viewModel.colors.append(.gray) }
                 }
+            }
 
-                Section("SwiftUI Code") {
-                    Text(viewModel.codeSnippet)
-                        .font(.system(.caption2, design: .monospaced))
-                        .padding()
-                        .background(Color.secondary.opacity(0.1))
+            Section("SwiftUI Code") {
+                Text(viewModel.codeSnippet)
+                    .font(.system(.caption2, design: .monospaced))
+                    .padding()
+                    .background(Color.secondary.opacity(0.1))
 
-                    ExportPanel(content: viewModel.codeSnippet, filename: "gradient.swift")
+                HStack {
+                    Button {
+                        UIPasteboard.general.string = viewModel.codeSnippet
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        let tempDir = FileManager.default.temporaryDirectory
+                        let fileURL = tempDir.appendingPathComponent("gradient.swift")
+                        try? viewModel.codeSnippet.write(to: fileURL, atomically: true, encoding: .utf8)
+                    } label: {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
                 }
             }
         }
@@ -69,4 +76,8 @@ class GradientBuilderViewModel: ObservableObject {
         }
         return "LinearGradient(\n  gradient: Gradient(colors: [\n    \(colorStrings.joined(separator: ",\n    "))\n  ]),\n  startPoint: .topLeading,\n  endPoint: .bottomTrailing\n)"
     }
+}
+
+#Preview {
+    GradientBuilderView()
 }

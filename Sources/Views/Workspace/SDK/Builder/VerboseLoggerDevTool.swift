@@ -29,38 +29,34 @@ struct VerboseLoggerView: View {
     @State private var filter = ""
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "Verbose Logger",
-                description: "Real-time streaming and filtering of internal SDK and application logs.",
-                icon: "text.badge.plus"
-            )
-            .padding()
+        VStack {
+            HStack {
+                TextField("Filter logs...", text: $filter)
+                    .textFieldStyle(.roundedBorder)
 
-            VStack {
-                HStack {
-                    TextField("Filter logs...", text: $filter)
-                        .textFieldStyle(.roundedBorder)
+                Button("Clear") { viewModel.clear() }
+                    .buttonStyle(.bordered)
+            }
+            .padding(.horizontal)
 
-                    Button("Clear") { viewModel.clear() }
-                        .buttonStyle(.bordered)
-                }
-                .padding(.horizontal)
-
-                List {
-                    ForEach(viewModel.logs.filter { filter.isEmpty || $0.message.localizedCaseInsensitiveContains(filter) }) { log in
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack {
-                                StatusBadge(text: log.level, color: levelColor(log.level))
-                                Text(log.timestamp, style: .time)
-                                    .font(.caption2)
-                                    .foregroundStyle(.tertiary)
-                            }
-                            Text(log.message)
-                                .font(.system(.caption, design: .monospaced))
+            List {
+                ForEach(viewModel.logs.filter { filter.isEmpty || $0.message.localizedCaseInsensitiveContains(filter) }) { log in
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack {
+                            Text(log.level)
+                                .font(.caption2.bold())
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .foregroundStyle(.white)
+                                .background(levelColor(log.level), in: RoundedRectangle(cornerRadius: 4))
+                            Text(log.timestamp, style: .time)
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
                         }
-                        .padding(.vertical, 2)
+                        Text(log.message)
+                            .font(.system(.caption, design: .monospaced))
                     }
+                    .padding(.vertical, 2)
                 }
             }
         }
@@ -95,4 +91,8 @@ class VerboseLoggerViewModel: ObservableObject {
         _DTLogStore.shared.clear()
         logs.removeAll()
     }
+}
+
+#Preview {
+    VerboseLoggerView()
 }

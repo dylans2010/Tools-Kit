@@ -16,45 +16,69 @@ struct URLParserDevToolView: View {
     @StateObject private var viewModel = URLParserViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            DevToolHeader(
-                title: "URL Parser",
-                description: "Inspect and modify individual components of a URL such as scheme, host, path, and query.",
-                icon: "link.circle"
-            )
-            .padding()
+        Form {
+            Section("Input URL") {
+                TextEditor(text: $viewModel.input)
+                    .frame(height: 80)
+                    .font(.system(.caption, design: .monospaced))
+            }
 
-            Form {
-                Section("Input URL") {
-                    TextEditor(text: $viewModel.input)
-                        .frame(height: 80)
-                        .font(.system(.caption, design: .monospaced))
-                }
-
-                if !viewModel.components.isEmpty {
-                    Section("Components") {
-                        ForEach(viewModel.components) { component in
-                            HStack {
-                                Text(component.key)
-                                    .font(.caption.bold())
-                                    .foregroundStyle(Color.accentColor)
-                                Spacer()
-                                Text(component.value)
-                                    .font(.caption)
-                                    .textSelection(.enabled)
-                            }
+            if !viewModel.components.isEmpty {
+                Section("Components") {
+                    ForEach(viewModel.components) { component in
+                        HStack {
+                            Text(component.key)
+                                .font(.caption.bold())
+                                .foregroundStyle(Color.accentColor)
+                            Spacer()
+                            Text(component.value)
+                                .font(.caption)
+                                .textSelection(.enabled)
                         }
                     }
                 }
+            }
 
-                Section("History") {
-                    HistoryView(history: viewModel.history) { item in
-                        viewModel.input = item.title
-                    } onClear: {
+            Section {
+                HStack {
+                    Text("History")
+                        .font(.headline)
+                    Spacer()
+                    Button("Clear") {
                         viewModel.history.removeAll()
                     }
-                    .frame(height: 200)
+                    .font(.caption)
+                    .disabled(viewModel.history.isEmpty)
                 }
+
+                if viewModel.history.isEmpty {
+                    ContentUnavailableView("No History", systemImage: "clock", description: Text("Your activity will appear here."))
+                        .frame(height: 200)
+                } else {
+                    List {
+                        ForEach(viewModel.history) { item in
+                            Button {
+                                viewModel.input = item.title
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(item.title)
+                                        .font(.subheadline.bold())
+                                    Text(item.detail)
+                                        .font(.caption)
+                                        .lineLimit(2)
+                                        .foregroundStyle(.secondary)
+                                    Text(item.timestamp, style: .relative)
+                                        .font(.caption2)
+                                        .foregroundStyle(.tertiary)
+                                }
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                    .frame(height: 300)
+                }
+            } header: {
+                Text("History")
             }
         }
     }
@@ -98,4 +122,8 @@ class URLParserViewModel: ObservableObject {
             history.insert(HistoryItem(title: input, detail: "Parsed into \(items.count) components"), at: 0)
         }
     }
+}
+
+#Preview {
+    URLParserDevToolView()
 }
