@@ -30,30 +30,42 @@ struct ConnectorsMainView: View {
 
     var body: some View {
         List {
-            Section {
+            Section(header: Text("Overview")) {
                 HStack(spacing: 16) {
                     VStack(spacing: 2) {
-                        Text("\(totalCount)").font(.title3.bold()).foregroundStyle(.blue)
-                        Text("Total").font(.caption2).foregroundStyle(.secondary)
+                        Text("\(totalCount)")
+                            .font(.title3.bold())
+                            .foregroundStyle(Color.blue)
+                        Text("Total")
+                            .font(.caption2)
+                            .foregroundStyle(Color.secondary)
                     }
                     .frame(maxWidth: .infinity)
+
                     VStack(spacing: 2) {
-                        Text("\(connectedCount)").font(.title3.bold()).foregroundStyle(.green)
-                        Text("Connected").font(.caption2).foregroundStyle(.secondary)
+                        Text("\(connectedCount)")
+                            .font(.title3.bold())
+                            .foregroundStyle(Color.green)
+                        Text("Connected")
+                            .font(.caption2)
+                            .foregroundStyle(Color.secondary)
                     }
                     .frame(maxWidth: .infinity)
+
                     VStack(spacing: 2) {
-                        Text("\(toolManager.tools.count)").font(.title3.bold()).foregroundStyle(.orange)
-                        Text("Tools").font(.caption2).foregroundStyle(.secondary)
+                        Text("\(toolManager.tools.count)")
+                            .font(.title3.bold())
+                            .foregroundStyle(Color.orange)
+                        Text("Tools")
+                            .font(.caption2)
+                            .foregroundStyle(Color.secondary)
                     }
                     .frame(maxWidth: .infinity)
                 }
                 .padding(.vertical, 4)
-            } header: {
-                Text("Overview")
             }
 
-            Section {
+            Section(header: Text("Filter")) {
                 Picker("Filter", selection: $filterCategory) {
                     ForEach(ConnectorCategory.allCases, id: \.self) { category in
                         Text(category.rawValue).tag(category)
@@ -62,7 +74,7 @@ struct ConnectorsMainView: View {
                 .pickerStyle(.segmented)
             }
 
-            Section("Connectors") {
+            Section(header: Text("Connectors")) {
                 if filteredConnectors.isEmpty {
                     ContentUnavailableView(
                         "No Connectors Found",
@@ -71,35 +83,42 @@ struct ConnectorsMainView: View {
                     )
                 } else {
                     ForEach(filteredConnectors, id: \.id) { connector in
-                        NavigationLink {
-                            ConnectorDetailView(connector: connector)
-                        } label: {
-                            HStack {
+                        NavigationLink(value: connector.id) {
+                            HStack(alignment: .top, spacing: 12) {
                                 Image(systemName: connector.isConnected ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(connector.isConnected ? .green : .secondary)
+                                    .foregroundStyle(connector.isConnected ? Color.green : Color.secondary)
                                     .font(.caption)
+                                    .padding(.top, 2)
+
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(connector.name).font(.subheadline.bold())
+                                    Text(connector.name)
+                                        .font(.subheadline.bold())
                                     Text(connector.isConnected ? "Connected" : "Disconnected")
                                         .font(.caption2)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(Color.secondary)
                                 }
+
+                                Spacer()
                             }
+                            .padding(.vertical, 4)
                         }
                     }
                 }
             }
 
             if !toolManager.tools.isEmpty {
-                Section("Platform Tools") {
-                    ForEach(toolManager.tools) { tool in
-                        HStack {
+                Section(header: Text("Platform Tools")) {
+                    ForEach(toolManager.tools, id: \.id) { tool in
+                        HStack(alignment: .top, spacing: 12) {
                             Label(tool.name, systemImage: tool.icon ?? "wrench")
+                                .font(.subheadline)
                             Spacer()
                             Text(tool.isEnabled ? "Active" : "Inactive")
                                 .font(.caption2)
-                                .foregroundStyle(tool.isEnabled ? .green : .secondary)
+                                .foregroundStyle(tool.isEnabled ? Color.green : Color.secondary)
+                                .padding(.top, 2)
                         }
+                        .padding(.vertical, 4)
                     }
                 }
             }
@@ -107,6 +126,10 @@ struct ConnectorsMainView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("Connectors")
         .searchable(text: $searchText, prompt: "Search Connectors")
+        .navigationDestination(for: UUID.self) { id in
+            if let connector = connectorManager.connectors.first(where: { $0.id == id }) {
+                ConnectorDetailView(connector: connector)
+            }
+        }
     }
 }
-
