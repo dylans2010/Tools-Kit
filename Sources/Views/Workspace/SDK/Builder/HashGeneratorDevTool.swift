@@ -162,9 +162,9 @@ class HashGeneratorViewModel: ObservableObject {
     private func generate() {
         guard let data = inputData() else { return }
 
-        sha256 = format(SHA256.hash(data: data))
-        sha384 = format(SHA384.hash(data: data))
-        sha512 = format(SHA512.hash(data: data))
+        sha256 = format(SHA256.hash(data: data) as SHA256.Digest)
+        sha384 = format(SHA384.hash(data: data) as SHA384.Digest)
+        sha512 = format(SHA512.hash(data: data) as SHA512.Digest)
         md5 = formatInsecure(Insecure.MD5.hash(data: data))
 
         if let keyData = hmacKey.data(using: .utf8), !hmacKey.isEmpty {

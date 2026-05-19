@@ -18,7 +18,7 @@ struct EncryptionToolView: View {
 
     var body: some View {
         Form {
-            Section("Key Configuration") {
+            Section {
                 Picker("Key Source", selection: $viewModel.keySource) {
                     Text("Password").tag(EncryptKeySource.password)
                     Text("Base64 Key").tag(EncryptKeySource.base64)
@@ -45,17 +45,21 @@ struct EncryptionToolView: View {
                     Button("Generate Key") { viewModel.generateKey() }
                         .buttonStyle(.bordered).controlSize(.small)
                 }
+            } header: {
+                Text("Key Configuration")
             }
 
-            Section("Encryption") {
+            Section {
                 Picker("Algorithm", selection: $viewModel.algorithm) {
                     Text("AES-GCM").tag(EncryptAlgorithm.aesGCM)
                     Text("ChaChaPoly").tag(EncryptAlgorithm.chaChaPoly)
                 }
                 .pickerStyle(.segmented)
+            } header: {
+                Text("Encryption")
             }
 
-            Section("Input") {
+            Section {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 100)
                     .font(.system(.caption, design: .monospaced))
@@ -67,9 +71,11 @@ struct EncryptionToolView: View {
                     Button("Clear") { viewModel.input = ""; viewModel.output = "" }
                         .buttonStyle(.bordered).controlSize(.small)
                 }
+            } header: {
+                Text("Input")
             }
 
-            Section("Actions") {
+            Section {
                 HStack(spacing: 12) {
                     Button {
                         viewModel.encrypt()
@@ -85,9 +91,11 @@ struct EncryptionToolView: View {
                     }
                     .buttonStyle(.bordered)
                 }
+            } header: {
+                Text("Actions")
             }
 
-            Section("Output") {
+            Section {
                 if !viewModel.output.isEmpty {
                     Text(viewModel.output)
                         .font(.system(.caption2, design: .monospaced))
@@ -114,9 +122,11 @@ struct EncryptionToolView: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                 }
+            } header: {
+                Text("Output")
             }
 
-            Section("Key Info") {
+            Section {
                 if !viewModel.activeKeyBase64.isEmpty {
                     LabeledContent("Active Key (Base64)") {
                         Text(viewModel.activeKeyBase64)
@@ -131,13 +141,15 @@ struct EncryptionToolView: View {
                     }
                     .buttonStyle(.bordered).controlSize(.small)
                 }
+            } header: {
+                Text("Key Info")
             }
         }
     }
 }
 
-enum EncryptKeySource { case password, base64, generated }
-enum EncryptAlgorithm { case aesGCM, chaChaPoly }
+enum EncryptKeySource: Hashable { case password, base64, generated }
+enum EncryptAlgorithm: Hashable { case aesGCM, chaChaPoly }
 
 class EncryptionToolViewModel: ObservableObject {
     @Published var keySource = EncryptKeySource.password
