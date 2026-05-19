@@ -370,7 +370,7 @@ struct SDKBuildView: View {
         return formatter.string(fromByteCount: Int64(size))
     }
 
-    private func log(_ message: String, level: SDKLogStore.LogLevel = .info) {
+    private func log(_ message: String, level: LogLevel = .info) {
         guard verboseLogging else { return }
         SDKLogStore.shared.log(message, source: "SDKBuildView", level: level)
     }
@@ -513,7 +513,7 @@ struct SDKBuildView: View {
         }
     }
 
-    private func toggleBinding(for id: String, keyPath: WritableKeyPath<SDKProject, [String]>) -> Binding<Bool> {
+    private func toggleBinding(for id: UUID, keyPath: WritableKeyPath<SDKProject, [UUID]>) -> Binding<Bool> {
         Binding(
             get: { projectManager.currentProject?[keyPath: keyPath].contains(id) ?? false },
             set: { enabled in

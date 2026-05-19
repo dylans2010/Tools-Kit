@@ -18,6 +18,7 @@ public protocol BaseConnector: AnyObject, ObservableObject, Identifiable {
 
 public extension BaseConnector {
     var requiredScopes: [String] { [] }
+    var isConnected: Bool { status == .connected }
 }
 
 public enum ConnectorType: String, CaseIterable, Codable {
