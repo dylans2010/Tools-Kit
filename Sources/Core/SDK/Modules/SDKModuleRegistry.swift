@@ -23,21 +23,19 @@ public struct SDKModuleDescriptor: Identifiable, Codable, Hashable, Equatable {
     public let displayName: String
     public let version: String
     public var loadPriority: Int
-    public var capabilities: Set<SDKModuleCapability>
+    public var capabilities: [SDKModuleCapability]
     public var dependencies: [String]
     public var minimumSDKVersion: String = "2.0"
     public var exportedServices: [String] = []
-    public var requiredScopes: [String] = []
-
     public init(identifier: String, displayName: String, version: String = "1.0",
-                loadPriority: Int = 0, capabilities: Set<SDKModuleCapability> = [],
+                loadPriority: Int = 0, capabilities: [SDKModuleCapability] = [],
                 dependencies: [String] = []) {
         self.id = UUID()
         self.identifier = identifier
         self.displayName = displayName
         self.version = version
         self.loadPriority = loadPriority
-        self.capabilities = capabilities
+        self.capabilities = SDKModuleDescriptor.deduplicated(capabilities)
         self.dependencies = dependencies
     }
 
@@ -48,8 +46,13 @@ public struct SDKModuleDescriptor: Identifiable, Codable, Hashable, Equatable {
         self.displayName = displayName
         self.version = version
         self.loadPriority = 0
-        self.capabilities = Set(capabilities)
+        self.capabilities = SDKModuleDescriptor.deduplicated(capabilities)
         self.dependencies = []
+    }
+
+    private static func deduplicated(_ capabilities: [SDKModuleCapability]) -> [SDKModuleCapability] {
+        var seen: Set<SDKModuleCapability> = []
+        return capabilities.filter { seen.insert($0).inserted }
     }
 }
 
