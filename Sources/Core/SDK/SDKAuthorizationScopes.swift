@@ -10,7 +10,7 @@ public extension SDKModuleDescriptor {
 public extension SDKModuleCapability {
     var requiredScopes: [String] {
         switch self {
-        case .storage, .networking:
+        case .storage:
             return ["workspace.files.read"]
         case .networking:
             return ["external.api.unrestricted"]

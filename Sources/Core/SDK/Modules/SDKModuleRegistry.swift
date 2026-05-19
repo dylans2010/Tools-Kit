@@ -35,7 +35,7 @@ public struct SDKModuleDescriptor: Identifiable, Codable, Hashable, Equatable {
         self.displayName = displayName
         self.version = version
         self.loadPriority = loadPriority
-        self.capabilities = capabilities
+        self.capabilities = SDKModuleDescriptor.deduplicated(capabilities)
         self.dependencies = dependencies
     }
 
@@ -46,8 +46,13 @@ public struct SDKModuleDescriptor: Identifiable, Codable, Hashable, Equatable {
         self.displayName = displayName
         self.version = version
         self.loadPriority = 0
-        self.capabilities = capabilities
+        self.capabilities = SDKModuleDescriptor.deduplicated(capabilities)
         self.dependencies = []
+    }
+
+    private static func deduplicated(_ capabilities: [SDKModuleCapability]) -> [SDKModuleCapability] {
+        var seen: Set<SDKModuleCapability> = []
+        return capabilities.filter { seen.insert($0).inserted }
     }
 }
 
