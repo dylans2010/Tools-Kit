@@ -5,6 +5,7 @@ public struct SDKProject: Identifiable, Codable {
     public enum ProjectStatus: String, Codable, CaseIterable {
         case active
         case draft
+        case archived
     }
 
     public var id: UUID

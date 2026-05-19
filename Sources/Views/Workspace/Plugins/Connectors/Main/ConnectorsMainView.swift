@@ -12,7 +12,7 @@ struct ConnectorsMainView: View {
         case disconnected = "Disconnected"
     }
 
-    private var filteredConnectors: [SDKConnector] {
+    private var filteredConnectors: [any BaseConnector] {
         var results = connectorManager.connectors
         if !searchText.isEmpty {
             results = results.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
@@ -72,7 +72,7 @@ struct ConnectorsMainView: View {
                 } else {
                     ForEach(filteredConnectors) { connector in
                         NavigationLink {
-                            ConnectorDetailView(connector: connector, manager: connectorManager)
+                            ConnectorDetailView(connector: connector)
                         } label: {
                             HStack {
                                 Image(systemName: connector.isConnected ? "checkmark.circle.fill" : "circle")
@@ -110,57 +110,3 @@ struct ConnectorsMainView: View {
     }
 }
 
-// MARK: - Connector Detail
-
-struct ConnectorDetailView: View {
-    let connector: SDKConnector
-    let manager: SDKConnectorManager
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        Form {
-            Section("Identity") {
-                LabeledContent("Name", value: connector.name)
-                LabeledContent("Status", value: connector.isConnected ? "Connected" : "Disconnected")
-                HStack {
-                    Text("Connection")
-                    Spacer()
-                    Circle()
-                        .fill(connector.isConnected ? Color.green : Color.red)
-                        .frame(width: 8, height: 8)
-                }
-            }
-
-            if !connector.capabilities.isEmpty {
-                Section("Capabilities") {
-                    ForEach(connector.capabilities, id: \.self) { cap in
-                        Label(cap, systemImage: "checkmark.seal")
-                            .font(.caption)
-                    }
-                }
-            }
-
-            Section("Actions") {
-                if connector.isConnected {
-                    Button("Disconnect") {
-                        manager.disconnect(id: connector.id)
-                        dismiss()
-                    }
-                    .foregroundStyle(.red)
-
-                    Button("Sync Now") {
-                        manager.sync(id: connector.id)
-                    }
-                } else {
-                    Button("Connect") {
-                        manager.connect(id: connector.id)
-                        dismiss()
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-            }
-        }
-        .navigationTitle(connector.name)
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}

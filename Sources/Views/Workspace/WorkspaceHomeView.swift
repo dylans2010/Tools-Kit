@@ -1,5 +1,37 @@
 import SwiftUI
 
+// MARK: - AIChatSettingsRouter
+
+private struct AIChatSettingsRouter: View {
+    @StateObject private var settingsManager = AIChatSettingsManager.shared
+
+    var body: some View {
+        AIChatSettingsView(settings: $settingsManager.settings)
+    }
+}
+
+// MARK: - GitHubTokenStore
+
+private class GitHubTokenStore {
+    static let shared = GitHubTokenStore()
+    private let key = "github_pat_token"
+    private init() {}
+
+    func getToken() -> String? {
+        UserDefaults.standard.string(forKey: key)
+    }
+
+    func saveToken(_ token: String) {
+        UserDefaults.standard.set(token, forKey: key)
+    }
+
+    func validate(_ token: String) async throws {
+        guard !token.isEmpty else {
+            throw URLError(.userAuthenticationRequired)
+        }
+    }
+}
+
 struct WorkspaceNavItem: Identifiable, Codable, Equatable {
     let id: String
     let label: String
