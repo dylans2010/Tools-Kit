@@ -6,7 +6,7 @@ struct HashGeneratorDevTool: DevTool {
     let name = "Hash Generator"
     let category = DevToolCategory.security
     let icon = "lock.rotation"
-    let description = "Generate cryptographic hashes"
+    let description = "Generate and compare cryptographic hashes"
 
     func render() -> some View {
         HashGeneratorDevToolView()
@@ -21,14 +21,65 @@ struct HashGeneratorDevToolView: View {
             Section("Input Content") {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 100)
+                HStack {
+                    Button("Paste") {
+                        if let text = UIPasteboard.general.string { viewModel.input = text }
+                    }
+                    .buttonStyle(.bordered).controlSize(.small)
+                    Button("Clear") { viewModel.input = "" }
+                        .buttonStyle(.bordered).controlSize(.small)
+                }
             }
 
-            Section("Algorithms") {
+            Section("Encoding") {
+                Picker("Input Encoding", selection: $viewModel.encoding) {
+                    Text("UTF-8").tag(HashEncoding.utf8)
+                    Text("ASCII").tag(HashEncoding.ascii)
+                    Text("Hex").tag(HashEncoding.hex)
+                }
+                .pickerStyle(.segmented)
+
+                Picker("Output Format", selection: $viewModel.outputFormat) {
+                    Text("Hex").tag(HashOutputFormat.hex)
+                    Text("Base64").tag(HashOutputFormat.base64)
+                    Text("Uppercase Hex").tag(HashOutputFormat.upperHex)
+                }
+            }
+
+            Section("Hash Results") {
                 VStack(alignment: .leading, spacing: 12) {
                     hashRow(title: "SHA-256", value: viewModel.sha256)
+                    hashRow(title: "SHA-384", value: viewModel.sha384)
                     hashRow(title: "SHA-512", value: viewModel.sha512)
                     hashRow(title: "MD5", value: viewModel.md5)
                 }
+            }
+
+            Section("HMAC") {
+                SecureField("HMAC Key", text: $viewModel.hmacKey)
+                if !viewModel.hmacKey.isEmpty {
+                    hashRow(title: "HMAC-SHA256", value: viewModel.hmacSha256)
+                }
+            }
+
+            Section("Hash Comparison") {
+                TextField("Paste hash to compare", text: $viewModel.compareHash)
+                    .font(.system(.caption, design: .monospaced))
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                if !viewModel.compareHash.isEmpty {
+                    HStack {
+                        Image(systemName: viewModel.compareResult ? "checkmark.circle.fill" : "xmark.circle.fill")
+                            .foregroundStyle(viewModel.compareResult ? .green : .red)
+                        Text(viewModel.compareResult ? "Hash matches SHA-256 output" : "No match found")
+                            .font(.caption)
+                    }
+                }
+            }
+
+            Section("Statistics") {
+                LabeledContent("Input length", value: "\(viewModel.input.count) chars")
+                LabeledContent("Byte count", value: "\(viewModel.input.data(using: .utf8)?.count ?? 0) bytes")
             }
         }
     }
@@ -53,27 +104,86 @@ struct HashGeneratorDevToolView: View {
     }
 }
 
+enum HashEncoding {
+    case utf8, ascii, hex
+}
+
+enum HashOutputFormat {
+    case hex, base64, upperHex
+}
+
 class HashGeneratorViewModel: ObservableObject {
-    @Published var input = "" {
-        didSet { generate() }
-    }
+    @Published var input = "" { didSet { generate() } }
+    @Published var encoding = HashEncoding.utf8 { didSet { generate() } }
+    @Published var outputFormat = HashOutputFormat.hex { didSet { generate() } }
+    @Published var hmacKey = "" { didSet { generate() } }
+    @Published var compareHash = "" { didSet { compare() } }
+
     @Published var sha256 = ""
+    @Published var sha384 = ""
     @Published var sha512 = ""
     @Published var md5 = ""
+    @Published var hmacSha256 = ""
+    @Published var compareResult = false
+
+    private func inputData() -> Data? {
+        switch encoding {
+        case .utf8: return input.data(using: .utf8)
+        case .ascii: return input.data(using: .ascii)
+        case .hex:
+            var data = Data()
+            var hex = input.replacingOccurrences(of: " ", with: "")
+            while hex.count >= 2 {
+                let byteStr = String(hex.prefix(2))
+                hex = String(hex.dropFirst(2))
+                guard let byte = UInt8(byteStr, radix: 16) else { return nil }
+                data.append(byte)
+            }
+            return data
+        }
+    }
+
+    private func format<H: HashFunction>(_ digest: H.Digest) -> String {
+        switch outputFormat {
+        case .hex: return digest.map { String(format: "%02x", $0) }.joined()
+        case .upperHex: return digest.map { String(format: "%02X", $0) }.joined()
+        case .base64: return Data(digest).base64EncodedString()
+        }
+    }
+
+    private func formatInsecure(_ digest: Insecure.MD5.Digest) -> String {
+        switch outputFormat {
+        case .hex: return digest.map { String(format: "%02x", $0) }.joined()
+        case .upperHex: return digest.map { String(format: "%02X", $0) }.joined()
+        case .base64: return Data(digest).base64EncodedString()
+        }
+    }
 
     private func generate() {
-        guard let data = input.data(using: .utf8) else { return }
+        guard let data = inputData() else { return }
 
-        let s256 = SHA256.hash(data: data)
-        sha256 = s256.map { String(format: "%02x", $0) }.joined()
+        sha256 = format(SHA256.hash(data: data))
+        sha384 = format(SHA384.hash(data: data))
+        sha512 = format(SHA512.hash(data: data))
+        md5 = formatInsecure(Insecure.MD5.hash(data: data))
 
-        let s512 = SHA512.hash(data: data)
-        sha512 = s512.map { String(format: "%02x", $0) }.joined()
+        if let keyData = hmacKey.data(using: .utf8), !hmacKey.isEmpty {
+            let key = SymmetricKey(data: keyData)
+            let mac = HMAC<SHA256>.authenticationCode(for: data, using: key)
+            switch outputFormat {
+            case .hex: hmacSha256 = Data(mac).map { String(format: "%02x", $0) }.joined()
+            case .upperHex: hmacSha256 = Data(mac).map { String(format: "%02X", $0) }.joined()
+            case .base64: hmacSha256 = Data(mac).base64EncodedString()
+            }
+        } else {
+            hmacSha256 = ""
+        }
+        compare()
+    }
 
-        // Simple Insecure MD5 (using Apple CryptoKit doesn't support MD5 directly for security reasons,
-        // but we can mock it or use a library. For this tool we will use Insecure.MD5)
-        let m5 = Insecure.MD5.hash(data: data)
-        md5 = m5.map { String(format: "%02x", $0) }.joined()
+    private func compare() {
+        let normalized = compareHash.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        compareResult = !normalized.isEmpty && (normalized == sha256.lowercased() || normalized == sha512.lowercased() || normalized == md5.lowercased() || normalized == sha384.lowercased())
     }
 }
 

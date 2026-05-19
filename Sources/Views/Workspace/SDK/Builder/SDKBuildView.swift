@@ -9,11 +9,11 @@ struct SDKBuildView: View {
     @StateObject private var toolManager = SDKToolManager.shared
     @StateObject private var policyEngine = SDKPolicyEngine.shared
     @StateObject private var authorizationManager = AuthorizationManager.shared
+
     @State private var isBuilding = false
     @State private var buildProgress: Double = 0.0
     @State private var exportedURL: URL?
     @State private var errorMessage: String?
-
     @State private var buildMode: BuildMode = .debug
     @State private var targetPlatform: TargetPlatform = .iOS
     @State private var includeTests = false
@@ -22,7 +22,6 @@ struct SDKBuildView: View {
     @State private var codeSigningEnabled = true
     @State private var optimizeAssets = true
     @State private var parallelBuild = true
-
     @State private var showingConsole = false
     @State private var showingSystemExplorer = false
     @State private var showingMetadataSheet = false
@@ -30,28 +29,17 @@ struct SDKBuildView: View {
     @State private var metadataDescription = ""
     @State private var metadataStatus: SDKProject.ProjectStatus = .draft
 
-    enum BuildMode: String, CaseIterable {
-        case debug = "Debug"
-        case release = "Release"
-        case profile = "Profile"
-    }
-
-    enum TargetPlatform: String, CaseIterable {
-        case iOS = "iOS"
-        case macOS = "macOS"
-        case watchOS = "watchOS"
-        case tvOS = "tvOS"
-        case multiPlatform = "Multi Platform"
-    }
+    enum BuildMode: String, CaseIterable { case debug = "Debug", release = "Release", profile = "Profile" }
+    enum TargetPlatform: String, CaseIterable { case iOS, macOS, watchOS, tvOS, multiPlatform = "Multi Platform" }
 
     var body: some View {
         List {
             if let project = projectManager.currentProject {
                 projectOverviewSection(project)
-                buildConfigurationSection
-                buildPipelineSection
-                buildOutputSection
-                buildMetricsSection
+                buildConfigSection
+                buildActionsSection
+                buildResultSection
+                metricsSection
                 developmentSection
                 sdkSystemsSection
                 sdkAssetsSection
@@ -66,42 +54,30 @@ struct SDKBuildView: View {
         .navigationTitle("Build")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Image(systemName: "shippingbox.fill")
-                    .foregroundStyle(Color.accentColor)
+                Image(systemName: "shippingbox.fill").foregroundStyle(Color.accentColor)
             }
         }
-        .sheet(isPresented: $showingConsole) {
-            NavigationStack { SDKConsoleView() }
-        }
-        .sheet(isPresented: $showingSystemExplorer) {
-            NavigationStack { SDKSystemExplorerView() }
-        }
+        .sheet(isPresented: $showingConsole) { NavigationStack { SDKConsoleView() } }
+        .sheet(isPresented: $showingSystemExplorer) { NavigationStack { SDKSystemExplorerView() } }
         .sheet(isPresented: $showingMetadataSheet) {
-            NavigationStack { metadataSheetContent }
+            NavigationStack { metadataSheet }
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }
-        .onAppear {
-            if let project = projectManager.currentProject {
-                metadataName = project.name
-                metadataDescription = project.description
-                metadataStatus = project.status
-            }
-        }
+        .onAppear { loadMetadata() }
     }
 
     // MARK: - Project Overview
 
     @ViewBuilder
     private func projectOverviewSection(_ project: SDKProject) -> some View {
-        Section {
+        Section("Project Overview") {
             LabeledContent("Project", value: project.name)
             LabeledContent("Version", value: "v\(project.version)")
             LabeledContent("Health") {
                 Text(project.healthStatus.rawValue.capitalized)
                     .foregroundStyle(healthColor(project.healthStatus))
             }
-
             HStack {
                 LabeledContent("Scopes", value: "\(project.enabledScopes.count)")
                 LabeledContent("Plugins", value: "\(project.enabledPluginIDs.count)")
@@ -113,66 +89,52 @@ struct SDKBuildView: View {
             LabeledContent("Authorization", value: authorizationManager.authState.rawValue)
 
             if isBuilding {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text("Building...")
-                            .font(.caption.bold())
-                        Spacer()
-                        Text("\(Int(buildProgress * 100))%")
-                            .font(.caption.monospaced())
-                    }
-                    ProgressView(value: buildProgress)
-                }
+                buildProgressView
             }
 
             Button {
-                metadataName = project.name
-                metadataDescription = project.description
-                metadataStatus = project.status
+                loadMetadata()
                 showingMetadataSheet = true
             } label: {
                 Label("Edit Metadata", systemImage: "slider.horizontal.3")
             }
-        } header: {
-            Text("Project Overview")
+        }
+    }
+
+    private var buildProgressView: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text("Building...").font(.caption.bold())
+                Spacer()
+                Text("\(Int(buildProgress * 100))%").font(.caption.monospaced())
+            }
+            ProgressView(value: buildProgress)
         }
     }
 
     // MARK: - Build Configuration
 
-    private var buildConfigurationSection: some View {
-        Section {
-            Label("Compilation", systemImage: "gearshape.2.fill")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
+    private var buildConfigSection: some View {
+        Section("Configuration") {
             Picker("Mode", selection: $buildMode) {
-                ForEach(BuildMode.allCases, id: \.self) { mode in
-                    Text(mode.rawValue).tag(mode)
-                }
+                ForEach(BuildMode.allCases, id: \.self) { Text($0.rawValue).tag($0) }
             }
-
             Picker("Platform", selection: $targetPlatform) {
-                ForEach(TargetPlatform.allCases, id: \.self) { platform in
-                    Text(platform.rawValue).tag(platform)
-                }
+                ForEach(TargetPlatform.allCases, id: \.self) { Text($0.rawValue).tag($0) }
             }
-
-            Toggle(isOn: $cleanBuildEnabled) { Label("Clean Build", systemImage: "trash.slash") }
-            Toggle(isOn: $includeTests) { Label("Include Tests", systemImage: "checkmark.shield") }
-            Toggle(isOn: $verboseLogging) { Label("Verbose Logging", systemImage: "text.bubble") }
-            Toggle(isOn: $codeSigningEnabled) { Label("Code Signing", systemImage: "signature") }
-            Toggle(isOn: $optimizeAssets) { Label("Optimize Assets", systemImage: "speedometer") }
-            Toggle(isOn: $parallelBuild) { Label("Parallel Build", systemImage: "square.split.2x2") }
-                } header: {
-            Text("Configuration")
+            Toggle("Clean Build", isOn: $cleanBuildEnabled)
+            Toggle("Include Tests", isOn: $includeTests)
+            Toggle("Code Signing", isOn: $codeSigningEnabled)
+            Toggle("Optimize Assets", isOn: $optimizeAssets)
+            Toggle("Parallel Build", isOn: $parallelBuild)
+            Toggle("Verbose Logging", isOn: $verboseLogging)
         }
     }
 
-    // MARK: - Build Pipeline
+    // MARK: - Build Actions
 
-    private var buildPipelineSection: some View {
-        Section {
+    private var buildActionsSection: some View {
+        Section("Build Pipeline") {
             Button(action: startBuild) {
                 HStack {
                     Label("Execute Pipeline", systemImage: "hammer.fill")
@@ -191,17 +153,15 @@ struct SDKBuildView: View {
                 Label("Clean Artifacts", systemImage: "trash.fill")
             }
             .disabled(isBuilding)
-                } header: {
-            Text("Build Pipeline")
         }
     }
 
-    // MARK: - Build Output
+    // MARK: - Build Result
 
     @ViewBuilder
-    private var buildOutputSection: some View {
+    private var buildResultSection: some View {
         if let url = exportedURL {
-            Section {
+            Section("Build Result") {
                 Label("Build successful", systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
                 HStack {
@@ -211,29 +171,23 @@ struct SDKBuildView: View {
                         Text("Size: \(fileSizeString(url))").font(.caption2).foregroundStyle(.secondary)
                     }
                     Spacer()
-                    ShareLink(item: url) {
-                        Image(systemName: "square.and.arrow.up")
-                    }
+                    ShareLink(item: url) { Image(systemName: "square.and.arrow.up") }
                 }
-            } header: {
-                Text("Build Result")
             }
         }
 
         if let error = errorMessage {
-            Section {
+            Section("Pipeline Failure") {
                 Label(error, systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(.red)
-            } header: {
-                Text("Pipeline Failure")
             }
         }
     }
 
-    // MARK: - Build Metrics
+    // MARK: - Metrics
 
-    private var buildMetricsSection: some View {
-        Section {
+    private var metricsSection: some View {
+        Section("Build Metrics") {
             let metrics = telemetry.getMetrics()
             LabeledContent("Total Executions", value: "\(metrics.totalTraces)")
             LabeledContent("Success / Failure") {
@@ -242,15 +196,13 @@ struct SDKBuildView: View {
             }
             LabeledContent("Avg Latency", value: "\(String(format: "%.1f", metrics.averageDurationMs))ms")
             LabeledContent("Log Entries", value: "\(logStore.entries.count)")
-                } header: {
-            Text("Build Metrics")
         }
     }
 
     // MARK: - Development
 
     private var developmentSection: some View {
-        Section {
+        Section("Development") {
             NavigationLink(destination: SDKWorkspaceContainerView()) { Label("IDE Workspace", systemImage: "macwindow.on.rectangle") }
             NavigationLink(destination: SDKActionConsoleView()) { Label("Action Console", systemImage: "terminal") }
             Button { showingConsole = true } label: { Label("Console Output", systemImage: "list.bullet.rectangle.portrait") }
@@ -258,15 +210,13 @@ struct SDKBuildView: View {
             NavigationLink(destination: SDKLogsView()) { Label("System Logs", systemImage: "doc.text.magnifyingglass") }
             NavigationLink(destination: SDKEventStreamView()) { Label("Event Stream", systemImage: "waveform.path.ecg.rectangle") }
             NavigationLink(destination: DevToolsMainView()) { Label("Dev Tools", systemImage: "hammer.fill") }
-                } header: {
-            Text("Development")
         }
     }
 
     // MARK: - SDK Systems
 
     private var sdkSystemsSection: some View {
-        Section {
+        Section("SDK Systems") {
             NavigationLink("SDK Download & Export", destination: SDKDownloadView())
             NavigationLink("Import Custom App", destination: CustomAppSDKView())
             NavigationLink("AI Help Assistant", destination: SDKHelpView())
@@ -275,20 +225,16 @@ struct SDKBuildView: View {
             NavigationLink("Module Registry", destination: SDKModuleRegistryView())
             NavigationLink("Plugin Lifecycle", destination: SDKPluginLifecycleView())
             NavigationLink("Connector Bindings", destination: SDKConnectorBindingView())
-        } header: {
-            Text("SDK Systems")
         }
     }
 
     // MARK: - SDK Assets
 
     private var sdkAssetsSection: some View {
-        Section {
+        Section("SDK Assets") {
             NavigationLink("Package Dependencies", destination: PackageDependenciesView())
             NavigationLink("Library Management", destination: LibraryManageView())
             NavigationLink("Framework Management", destination: FrameworkManageView())
-        } header: {
-            Text("SDK Assets")
         }
     }
 
@@ -296,7 +242,7 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func architectureSection(_ project: SDKProject) -> some View {
-        Section {
+        Section("Architecture") {
             NavigationLink("Permissions") {
                 SDKPermissionControlView(project: Binding(
                     get: { projectManager.currentProject ?? project },
@@ -313,33 +259,27 @@ struct SDKBuildView: View {
             }
             NavigationLink("Plugins", destination: SDKPluginsView())
             NavigationLink("Tools", destination: SDKToolsView())
-                } header: {
-            Text("Architecture")
         }
     }
 
     // MARK: - Stability
 
     private var stabilitySection: some View {
-        Section {
+        Section("Stability") {
             NavigationLink("Diagnostics", destination: SDKDiagnosticsView())
             NavigationLink("Security Monitor", destination: SDKSecurityMonitorView())
             NavigationLink("Control Center", destination: SDKControlCenterView())
             NavigationLink("Data Control", destination: SDKDataControlView())
-                } header: {
-            Text("Stability")
         }
     }
 
     // MARK: - Exploration
 
     private var explorationSection: some View {
-        Section {
+        Section("Exploration") {
             Button("System Explorer") { showingSystemExplorer = true }
             NavigationLink("Workspace Explorer", destination: SDKWorkspaceExplorerView())
             NavigationLink("API Browser", destination: SDKAPIBrowserView())
-                } header: {
-            Text("Exploration")
         }
     }
 
@@ -347,12 +287,10 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func deploymentSection(_ project: SDKProject) -> some View {
-        Section {
+        Section("Build & Deploy") {
             NavigationLink("Integration Tests", destination: SDKIntegrationTestView())
             NavigationLink("App Builder", destination: SDKAppBuilderView())
             NavigationLink("Deployment", destination: SDKDeploymentView(project: project))
-                } header: {
-            Text("Build & Deploy")
         }
     }
 
@@ -379,26 +317,20 @@ struct SDKBuildView: View {
 
     // MARK: - Metadata Sheet
 
-    private var metadataSheetContent: some View {
+    private var metadataSheet: some View {
         Form {
-            Section {
+            Section("Project Info") {
                 TextField("Project Name", text: $metadataName)
                 TextField("Description", text: $metadataDescription, axis: .vertical)
                     .lineLimit(3...5)
                 Picker("Status", selection: $metadataStatus) {
-                    ForEach(SDKProject.ProjectStatus.allCases, id: \.self) { status in
-                        Text(status.rawValue.capitalized).tag(status)
+                    ForEach(SDKProject.ProjectStatus.allCases, id: \.self) {
+                        Text($0.rawValue.capitalized).tag($0)
                     }
                 }
             }
-
-            Section("Access") {
-                scopeSelector
-            }
-
-            Section("Assignments") {
-                connectorAndToolAssignment
-            }
+            Section("Access Scopes") { scopeSelector }
+            Section("Assignments") { connectorAndToolAssignment }
         }
         .navigationTitle("Project Metadata")
         .navigationBarTitleDisplayMode(.inline)
@@ -407,22 +339,26 @@ struct SDKBuildView: View {
                 Button("Cancel") { showingMetadataSheet = false }
             }
             ToolbarItem(placement: .confirmationAction) {
-                Button("Save") {
-                    saveBuild()
-                    showingMetadataSheet = false
-                }
+                Button("Save") { saveBuild(); showingMetadataSheet = false }
             }
         }
     }
 
     // MARK: - Helpers
 
+    private func loadMetadata() {
+        guard let project = projectManager.currentProject else { return }
+        metadataName = project.name
+        metadataDescription = project.description
+        metadataStatus = project.status
+    }
+
     private func healthColor(_ status: HealthStatus) -> Color {
         switch status {
-        case .healthy: return .green
-        case .degraded: return .yellow
-        case .critical: return .red
-        case .unknown: return .gray
+        case .healthy: .green
+        case .degraded: .yellow
+        case .critical: .red
+        case .unknown: .gray
         }
     }
 
@@ -434,6 +370,11 @@ struct SDKBuildView: View {
         return formatter.string(fromByteCount: Int64(size))
     }
 
+    private func log(_ message: String, level: SDKLogStore.LogLevel = .info) {
+        guard verboseLogging else { return }
+        SDKLogStore.shared.log(message, source: "SDKBuildView", level: level)
+    }
+
     // MARK: - Build Functions
 
     private func startBuild() {
@@ -441,13 +382,7 @@ struct SDKBuildView: View {
         isBuilding = true
         errorMessage = nil
         exportedURL = nil
-
-        if verboseLogging {
-            SDKLogStore.shared.log(
-                "Build Started: \(buildMode.rawValue) | \(targetPlatform.rawValue)",
-                source: "SDKBuildView", level: .info
-            )
-        }
+        log("Build Started: \(buildMode.rawValue) | \(targetPlatform.rawValue)")
 
         Task {
             await MainActor.run { buildProgress = 0.1 }
@@ -456,15 +391,11 @@ struct SDKBuildView: View {
                 if cleanBuildEnabled {
                     SDKDataEngine.shared.invalidateCache()
                     await MainActor.run { buildProgress = 0.2 }
-                    if verboseLogging {
-                        SDKLogStore.shared.log(
-                            "Cache invalidated for clean build",
-                            source: "SDKBuildView", level: .info
-                        )
-                    }
+                    log("Cache invalidated for clean build")
                 }
 
                 await MainActor.run { buildProgress = 0.3 }
+
                 let config = SDKExportConfig(
                     projectName: project.name,
                     scopes: project.enabledScopes.compactMap { scopeStr in
@@ -476,42 +407,28 @@ struct SDKBuildView: View {
                     automationRules: project.automationRules,
                     exportedAt: Date()
                 )
+
                 await MainActor.run { buildProgress = 0.6 }
 
                 if includeTests {
-                    if verboseLogging {
-                        SDKLogStore.shared.log(
-                            "Running pre build validation...",
-                            source: "SDKBuildView", level: .info
-                        )
-                    }
+                    log("Running pre build validation...")
                     await MainActor.run { buildProgress = 0.7 }
                 }
 
                 let url = try await SDKExportService().export(config: config)
                 await MainActor.run {
                     buildProgress = 1.0
-                    self.exportedURL = url
-                    self.isBuilding = false
+                    exportedURL = url
+                    isBuilding = false
                     projectManager.currentProject?.lastBuiltAt = Date()
                     try? projectManager.save()
-                    if verboseLogging {
-                        SDKLogStore.shared.log(
-                            "Build Completed: \(url.lastPathComponent)",
-                            source: "SDKBuildView", level: .info
-                        )
-                    }
+                    log("Build Completed: \(url.lastPathComponent)")
                 }
             } catch {
                 await MainActor.run {
-                    self.errorMessage = error.localizedDescription
-                    self.isBuilding = false
-                    if verboseLogging {
-                        SDKLogStore.shared.log(
-                            "Build Failed: \(error.localizedDescription)",
-                            source: "SDKBuildView", level: .error
-                        )
-                    }
+                    errorMessage = error.localizedDescription
+                    isBuilding = false
+                    log("Build Failed: \(error.localizedDescription)", level: .error)
                 }
             }
         }
@@ -521,7 +438,6 @@ struct SDKBuildView: View {
         guard projectManager.currentProject != nil else { return }
         isBuilding = true
         errorMessage = nil
-
         SDKLogStore.shared.log("Quick Build Started", source: "SDKBuildView", level: .info)
 
         Task {
@@ -539,7 +455,6 @@ struct SDKBuildView: View {
 
     private func validateProject() {
         guard let project = projectManager.currentProject else { return }
-
         var issues: [String] = []
         if project.enabledScopes.isEmpty { issues.append("No Scopes Enabled") }
         if project.enabledPluginIDs.isEmpty { issues.append("No Plugins Selected") }
@@ -560,26 +475,26 @@ struct SDKBuildView: View {
         SDKLogStore.shared.log("Build cache cleaned", source: "SDKBuildView", level: .info)
     }
 
+    // MARK: - Scope & Assignment Selectors
+
     private var scopeSelector: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            ForEach(policyEngine.availableScopes(), id: \.name) { definition in
-                Toggle(isOn: Binding(
-                    get: { projectManager.currentProject?.enabledScopes.contains(definition.name) ?? false },
-                    set: { isEnabled in
-                        guard var project = projectManager.currentProject else { return }
-                        if isEnabled {
-                            if !project.enabledScopes.contains(definition.name) { project.enabledScopes.append(definition.name) }
-                        } else {
-                            project.enabledScopes.removeAll { $0 == definition.name }
-                        }
-                        projectManager.currentProject = project
+        ForEach(policyEngine.availableScopes(), id: \.name) { definition in
+            Toggle(isOn: Binding(
+                get: { projectManager.currentProject?.enabledScopes.contains(definition.name) ?? false },
+                set: { isEnabled in
+                    guard var project = projectManager.currentProject else { return }
+                    if isEnabled {
+                        if !project.enabledScopes.contains(definition.name) { project.enabledScopes.append(definition.name) }
+                    } else {
+                        project.enabledScopes.removeAll { $0 == definition.name }
                     }
-                )) {
-                    HStack {
-                        Text(definition.name).font(.caption)
-                        Spacer()
-                        Text(definition.riskLevel.rawValue.capitalized).font(.caption2).foregroundStyle(.secondary)
-                    }
+                    projectManager.currentProject = project
+                }
+            )) {
+                HStack {
+                    Text(definition.name).font(.caption)
+                    Spacer()
+                    Text(definition.riskLevel.rawValue.capitalized).font(.caption2).foregroundStyle(.secondary)
                 }
             }
         }
@@ -589,41 +504,33 @@ struct SDKBuildView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Connectors").font(.caption).foregroundStyle(.secondary)
             ForEach(connectorManager.connectors, id: \.id) { connector in
-                Toggle(connector.name, isOn: Binding(
-                    get: { projectManager.currentProject?.enabledConnectorIDs.contains(connector.id) ?? false },
-                    set: { enabled in
-                        guard var project = projectManager.currentProject else { return }
-                        if enabled {
-                            if !project.enabledConnectorIDs.contains(connector.id) { project.enabledConnectorIDs.append(connector.id) }
-                        } else {
-                            project.enabledConnectorIDs.removeAll { $0 == connector.id }
-                        }
-                        projectManager.currentProject = project
-                    }
-                ))
+                Toggle(connector.name, isOn: toggleBinding(for: connector.id, keyPath: \.enabledConnectorIDs))
             }
-
             Text("Tools").font(.caption).foregroundStyle(.secondary)
             ForEach(toolManager.tools, id: \.id) { tool in
-                Toggle(tool.name, isOn: Binding(
-                    get: { projectManager.currentProject?.enabledToolIDs.contains(tool.id) ?? false },
-                    set: { enabled in
-                        guard var project = projectManager.currentProject else { return }
-                        if enabled {
-                            if !project.enabledToolIDs.contains(tool.id) { project.enabledToolIDs.append(tool.id) }
-                        } else {
-                            project.enabledToolIDs.removeAll { $0 == tool.id }
-                        }
-                        projectManager.currentProject = project
-                    }
-                ))
+                Toggle(tool.name, isOn: toggleBinding(for: tool.id, keyPath: \.enabledToolIDs))
             }
         }
     }
 
+    private func toggleBinding(for id: String, keyPath: WritableKeyPath<SDKProject, [String]>) -> Binding<Bool> {
+        Binding(
+            get: { projectManager.currentProject?[keyPath: keyPath].contains(id) ?? false },
+            set: { enabled in
+                guard var project = projectManager.currentProject else { return }
+                if enabled {
+                    if !project[keyPath: keyPath].contains(id) { project[keyPath: keyPath].append(id) }
+                } else {
+                    project[keyPath: keyPath].removeAll { $0 == id }
+                }
+                projectManager.currentProject = project
+            }
+        )
+    }
+
     private func saveBuild() {
         guard var project = projectManager.currentProject else { return }
-        if metadataName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        guard !metadataName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             errorMessage = "Project name is required."
             return
         }

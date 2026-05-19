@@ -25,6 +25,8 @@ struct AIChatSettings: Codable {
     var responseTone: ResponseTone = .balanced
     var preferredResponseLength: ResponseLength = .medium
     var useSystemTools: Bool = true
+    var autoInjectContext: Bool = false
+    var includeConversationHistory: Bool = true
 }
 
 enum AIModelSource: String, Codable, CaseIterable {

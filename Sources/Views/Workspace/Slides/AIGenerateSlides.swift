@@ -8,9 +8,7 @@ public struct AIGenerateSlides: View {
     @StateObject private var whiteboardStore = WhiteboardStore.shared
     @StateObject private var keyboardObserver = KeyboardObserver()
     @State private var showingKeyboardSheet = false
-    @State private var selectedSuggestion: SlideSuggestion?
 
-    // All text input state is owned here but edited exclusively via the keyboard extension.
     @State private var rawText = ""
     @State private var notes = ""
     @State private var documents = ""
@@ -26,12 +24,9 @@ public struct AIGenerateSlides: View {
     @State private var selectedStyleID = AIGenSlideCatalog.defaultStyleID
     @State private var selectedImages: [PhotosPickerItem] = []
     @State private var uploadedImages: [SlidePhotoAsset] = []
-
     @State private var generatedDeck: SlideDeck?
-
-    @State private var inputExpanded = true
     @State private var showErrorAlert = false
-    @State private var imagesExpanded = false
+    @State private var hasStartedGenerating = false
 
     @FocusState private var isFieldFocused: Bool
 
@@ -49,22 +44,22 @@ public struct AIGenerateSlides: View {
                         } else if let deck = generatedDeck ?? manager.latestDeck {
                             deckPreview(deck)
                         } else {
-                            VStack(spacing: 20) {
+                            VStack(spacing: 16) {
                                 Image(systemName: "sparkles")
-                                    .font(.system(size: 40))
+                                    .font(.system(size: 36))
                                     .foregroundStyle(.secondary)
                                 Text("Enter details below to generate slides")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.top, 100)
+                            .padding(.top, 80)
                         }
                     }
                     .padding()
                 }
             } else {
-                VStack(spacing: 20) {
+                VStack(spacing: 16) {
                     Text(manager.progressMessage)
                         .font(.headline)
                         .foregroundStyle(.white)
@@ -77,10 +72,10 @@ public struct AIGenerateSlides: View {
             }
         }
         .keyboardGlow(keyboard: keyboardObserver)
-        .aiAnimationLoading(manager.isGenerating)
+        .aiAnimationLoading(hasStartedGenerating && manager.isGenerating)
         .navigationTitle("AI Slides")
         .safeAreaInset(edge: .bottom) {
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 suggestionsStrip
                 DualKeyboardInputView(
                     promptText: $rawText,
@@ -102,9 +97,7 @@ public struct AIGenerateSlides: View {
         } message: {
             Text(manager.lastError ?? "Something went wrong.")
         }
-        .onAppear {
-            isFieldFocused = true
-        }
+        .onAppear { isFieldFocused = true }
         .sheet(isPresented: $showingKeyboardSheet) {
             ZStack {
                 AuroraGlow(.dramatic)
@@ -129,82 +122,11 @@ public struct AIGenerateSlides: View {
         }
         .onChange(of: keyboardObserver.isVisible) { _, visible in
             showingKeyboardSheet = visible
-            if !visible {
-                // Re-focus to keep keyboard open
-                isFieldFocused = true
-            }
+            if !visible { isFieldFocused = true }
         }
         .sheet(item: Binding(get: { generatedDeck }, set: { generatedDeck = $0 })) { deck in
             AIGenSlidesPreview(deck: deck)
         }
-    }
-
-    // MARK: - Field Selector
-
-    private var fieldSelectorRow: some View {
-        HStack(spacing: 8) {
-            ForEach(SlideInputField.allCases, id: \.self) { field in
-                Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        activeField = field
-                    }
-                    isFieldFocused = true
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: field.icon)
-                            .font(.system(size: 11, weight: .semibold))
-                        Text(field.label)
-                            .font(.system(size: 12, weight: .medium))
-                            .lineLimit(1)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(
-                        Capsule()
-                            .fill(activeField == field
-                                  ? Color(.systemIndigo).opacity(0.22)
-                                  : Color(.systemGray5).opacity(0.8))
-                    )
-                    .overlay(
-                        Capsule()
-                            .stroke(
-                                activeField == field
-                                    ? Color(.systemIndigo).opacity(0.5)
-                                    : Color.clear,
-                                lineWidth: 1
-                            )
-                    )
-                    .foregroundStyle(activeField == field ? Color(.systemIndigo) : .primary)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    private var activeFieldPreview: some View {
-        Group {
-            switch activeField {
-            case .prompt:
-                fieldBubble(text: rawText, placeholder: "Topic or presentation goal")
-            case .notes:
-                fieldBubble(text: notes, placeholder: "Notes (one per line)")
-            case .documents:
-                fieldBubble(text: documents, placeholder: "Document snippets")
-            }
-        }
-    }
-
-    private func fieldBubble(text: String, placeholder: String) -> some View {
-        Text(text.isEmpty ? placeholder : text)
-            .font(.subheadline)
-            .foregroundStyle(text.isEmpty ? .tertiary : .primary)
-            .frame(maxWidth: .infinity, minHeight: 44, alignment: .topLeading)
-            .padding(10)
-            .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color(.systemBackground).opacity(0.5))
-            )
-            .contentShape(Rectangle())
     }
 
     // MARK: - Previews
@@ -212,31 +134,22 @@ public struct AIGenerateSlides: View {
     @ViewBuilder
     private func schemePreview(_ scheme: GenSlidesScheme) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Slide Preview (GenSlidesScheme)")
-                .font(.headline)
-            Text(scheme.meta.description)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            Text("Slide Preview (GenSlidesScheme)").font(.headline)
+            Text(scheme.meta.description).font(.caption).foregroundStyle(.secondary)
             NavigationLink("View Full Presentation") {
                 SchemeSlideCanvasView(scheme: scheme)
             }
             .buttonStyle(.borderedProminent)
             .tint(.cyan)
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 180), spacing: 12)], spacing: 12) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 10)], spacing: 10) {
                 ForEach(scheme.slides) { slide in
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(slide.title)
-                            .font(.headline)
-                            .lineLimit(2)
-                        Text(slide.type.rawValue.capitalized)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text("\(slide.elements.count) elements")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(slide.title).font(.headline).lineLimit(2)
+                        Text(slide.type.rawValue.capitalized).font(.caption).foregroundStyle(.secondary)
+                        Text("\(slide.elements.count) elements").font(.caption2).foregroundStyle(.tertiary)
                     }
-                    .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
+                    .frame(maxWidth: .infinity, minHeight: 90, alignment: .leading)
                     .padding(10)
                     .background(slideCardBackground)
                     .shadow(color: .cyan.opacity(0.15), radius: 4, x: 0, y: 2)
@@ -248,22 +161,17 @@ public struct AIGenerateSlides: View {
     @ViewBuilder
     private func deckPreview(_ deck: SlideDeck) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Slide Preview")
-                .font(.headline)
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 180), spacing: 12)], spacing: 12) {
+            Text("Slide Preview").font(.headline)
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 10)], spacing: 10) {
                 ForEach(deck.slides) { slide in
                     NavigationLink {
                         SlideCanvasView(deck: deck, startAt: slide.id)
                     } label: {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(slide.title)
-                                .font(.headline)
-                                .lineLimit(2)
-                            Text(slide.type.capitalized)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(slide.title).font(.headline).lineLimit(2)
+                            Text(slide.type.capitalized).font(.caption).foregroundStyle(.secondary)
                         }
-                        .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
+                        .frame(maxWidth: .infinity, minHeight: 90, alignment: .leading)
                         .padding(10)
                         .background(slideCardBackground)
                         .shadow(color: .purple.opacity(0.15), radius: 4, x: 0, y: 2)
@@ -290,67 +198,33 @@ public struct AIGenerateSlides: View {
             )
     }
 
-    // MARK: - Glass Card
-
-    @ViewBuilder
-    private func glassCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 8) { content() }
-            .padding(14)
-            .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(.ultraThinMaterial)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [.white.opacity(0.2), .white.opacity(0.05)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1
-                            )
-                    )
-            )
-            .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
-    }
-
     // MARK: - Helpers
 
     private var themeGrid: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 8)], spacing: 8) {
             ForEach(AIGenSlideCatalog.themes) { theme in
                 Button {
                     selectedThemeID = theme.id
                 } label: {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(theme.name)
-                            .font(.subheadline.weight(.semibold))
-                        Text(theme.font)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(theme.name).font(.subheadline.weight(.semibold))
+                        Text(theme.font).font(.caption).foregroundStyle(.secondary)
                     }
-                    .padding(10)
+                    .padding(8)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(
                         LinearGradient(
                             colors: gradientColors(for: theme),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
-                        )
-                        .opacity(0.82)
+                        ).opacity(0.82)
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(
-                                selectedThemeID == theme.id ? Color.white : Color.white.opacity(0.22),
-                                lineWidth: selectedThemeID == theme.id ? 2 : 1
-                            )
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(selectedThemeID == theme.id ? Color.white : Color.white.opacity(0.22), lineWidth: selectedThemeID == theme.id ? 2 : 1)
                     )
-                    .shadow(
-                        color: selectedThemeID == theme.id ? .purple.opacity(0.4) : .clear,
-                        radius: 6, x: 0, y: 2
-                    )
+                    .shadow(color: selectedThemeID == theme.id ? .purple.opacity(0.4) : .clear, radius: 4, x: 0, y: 2)
                 }
                 .buttonStyle(.plain)
             }
@@ -358,33 +232,24 @@ public struct AIGenerateSlides: View {
     }
 
     private var styleGrid: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 8)], spacing: 8) {
             ForEach(AIGenSlideCatalog.styles) { style in
                 Button {
                     selectedStyleID = style.id
                 } label: {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(style.name)
-                            .font(.subheadline.weight(.semibold))
-                        Text(style.visualDensity.rawValue.capitalized)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(style.name).font(.subheadline.weight(.semibold))
+                        Text(style.visualDensity.rawValue.capitalized).font(.caption).foregroundStyle(.secondary)
                     }
-                    .padding(10)
+                    .padding(8)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(
-                                selectedStyleID == style.id ? Color.cyan : Color.gray.opacity(0.35),
-                                lineWidth: selectedStyleID == style.id ? 2 : 1
-                            )
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(selectedStyleID == style.id ? Color.cyan : Color.gray.opacity(0.35), lineWidth: selectedStyleID == style.id ? 2 : 1)
                     )
-                    .shadow(
-                        color: selectedStyleID == style.id ? .cyan.opacity(0.3) : .clear,
-                        radius: 4, x: 0, y: 2
-                    )
+                    .shadow(color: selectedStyleID == style.id ? .cyan.opacity(0.3) : .clear, radius: 4, x: 0, y: 2)
                 }
                 .buttonStyle(.plain)
             }
@@ -400,14 +265,16 @@ public struct AIGenerateSlides: View {
         var value = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         if value.hasPrefix("#") { value.removeFirst() }
         guard value.count == 6, let intValue = Int(value, radix: 16) else { return nil }
-
-        let red = Double((intValue >> 16) & 0xFF) / 255.0
-        let green = Double((intValue >> 8) & 0xFF) / 255.0
-        let blue = Double(intValue & 0xFF) / 255.0
-        return Color(red: red, green: green, blue: blue)
+        return Color(
+            red: Double((intValue >> 16) & 0xFF) / 255.0,
+            green: Double((intValue >> 8) & 0xFF) / 255.0,
+            blue: Double(intValue & 0xFF) / 255.0
+        )
     }
 
     private func generate() {
+        hasStartedGenerating = true
+
         let board = whiteboardStore.boards.first(where: { $0.id == selectedBoardID })
         let input: SlideInput
 
@@ -446,16 +313,14 @@ public struct AIGenerateSlides: View {
                 generatedDeck = try await manager.generate(input: input)
             } catch {
                 generatedDeck = nil
-                await MainActor.run {
-                    showErrorAlert = true
-                }
+                await MainActor.run { showErrorAlert = true }
             }
         }
     }
 
     private var suggestionsStrip: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 ForEach(slideSuggestions) { suggestion in
                     Button {
                         selectedThemeID = suggestion.themeID
@@ -466,8 +331,8 @@ public struct AIGenerateSlides: View {
                     } label: {
                         Text(suggestion.title)
                             .font(.caption.weight(.semibold))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
                             .background(.ultraThinMaterial, in: Capsule())
                             .overlay(Capsule().stroke(.white.opacity(0.2), lineWidth: 1))
                     }
@@ -480,9 +345,7 @@ public struct AIGenerateSlides: View {
 // MARK: - Input Field Enum
 
 enum SlideInputField: String, CaseIterable {
-    case prompt
-    case notes
-    case documents
+    case prompt, notes, documents
 
     var label: String {
         switch self {
