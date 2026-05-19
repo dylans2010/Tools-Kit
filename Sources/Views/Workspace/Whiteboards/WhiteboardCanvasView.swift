@@ -69,7 +69,7 @@ struct WhiteboardCanvasView: View {
         .toolbar { toolbarContent }
         .sheet(isPresented: $showingAddElement) {
             addElementSheet
-                .presentationDetents([.medium])
+                .presentationDetents([PresentationDetent.medium])
         }
         .sheet(isPresented: $showingUnsplash) {
             UnsplashImagesView { photo in
@@ -84,8 +84,8 @@ struct WhiteboardCanvasView: View {
                 lineWidth: $drawingLineWidth,
                 opacity: $drawingOpacity
             )
-            .presentationDetents([.medium])
-            .presentationDragIndicator(.visible)
+            .presentationDetents([PresentationDetent.medium])
+            .presentationDragIndicator(Visibility.visible)
         }
         .sheet(isPresented: $showElementToolbar) {
             elementToolbarSheet
@@ -114,8 +114,8 @@ struct WhiteboardCanvasView: View {
                 onBringToFront: { bringToFront(id: canvasState.elements[idx].id) },
                 onSendToBack: { sendToBack(id: canvasState.elements[idx].id) }
             )
-            .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.visible)
+            .presentationDetents([PresentationDetent.medium, PresentationDetent.large])
+            .presentationDragIndicator(Visibility.visible)
         }
     }
 
@@ -668,6 +668,23 @@ struct WhiteboardCanvasView: View {
             Label("Idea Node", systemImage: "lightbulb")
         }
     }
+}
+
+private struct DrawingToolCustomizer: View {
+    let tool: WhiteboardViewTools.ToolEntry
+    @Binding var colorHex: String
+    @Binding var lineWidth: Double
+    @Binding var opacity: Double
+    var body: some View { EmptyView() }
+}
+
+private struct ElementToolbar: View {
+    @Binding var element: CanvasElement
+    var onDelete: () -> Void
+    var onDuplicate: () -> Void
+    var onBringToFront: () -> Void
+    var onSendToBack: () -> Void
+    var body: some View { EmptyView() }
 }
 
 // MARK: - Drawing Path View

@@ -280,6 +280,7 @@ struct PageEditorView: View {
         .background(Color.black.opacity(0.1).onTapGesture { showSlashCommand = false })
     }
 
+    @ViewBuilder
     private func slashItem(label: String, icon: String, action: @escaping () -> Void) -> some View {
         Button(action: {
             if content.hasSuffix("/") { content.removeLast() }

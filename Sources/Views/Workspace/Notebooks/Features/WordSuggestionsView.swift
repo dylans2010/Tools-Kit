@@ -81,31 +81,29 @@ struct WordSuggestionsView: View {
                     .font(.headline)
                     .foregroundColor(color)
 
-                FlowLayout(spacing: 8) {
-                    ForEach(words, id: \.self) { word in
+                FlowLayout(words, spacing: 8) { word in
+                    Button {
+                        Task { await vm.fetchSuggestions(for: word) }
+                    } label: {
+                        Text(word)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(color.opacity(0.1))
+                            .foregroundColor(color)
+                            .cornerRadius(15)
+                    }
+                    .contextMenu {
                         Button {
-                            Task { await vm.fetchSuggestions(for: word) }
+                            onInsert?(word)
+                            isPresented = false
                         } label: {
-                            Text(word)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(color.opacity(0.1))
-                                .foregroundColor(color)
-                                .cornerRadius(15)
+                            Label("Insert into Page", systemImage: "plus.circle")
                         }
-                        .contextMenu {
-                            Button {
-                                onInsert?(word)
-                                isPresented = false
-                            } label: {
-                                Label("Insert into Page", systemImage: "plus.circle")
-                            }
 
-                            Button {
-                                UIPasteboard.general.string = word
-                            } label: {
-                                Label("Copy Word", systemImage: "doc.on.doc")
-                            }
+                        Button {
+                            UIPasteboard.general.string = word
+                        } label: {
+                            Label("Copy Word", systemImage: "doc.on.doc")
                         }
                     }
                 }
