@@ -10,7 +10,7 @@ struct SDKLogsView: View {
     private var filteredEntries: [SDKLogEntry] {
         logStore.entries.filter { entry in
             (selectedLevel == nil || entry.level == selectedLevel) &&
-            (searchText.isEmpty || entry.source.localizedCaseInsensitiveContains(searchText))
+            (searchText.isEmpty || (entry.source ?? "").localizedCaseInsensitiveContains(searchText))
         }
     }
 
@@ -70,7 +70,7 @@ private struct SystemLogRow: View {
                     .background(color.opacity(0.1), in: RoundedRectangle(cornerRadius: 3))
                     .foregroundStyle(color)
 
-                Text(entry.source).font(.caption2.bold()).foregroundStyle(.secondary)
+                Text(entry.source ?? "").font(.caption2.bold()).foregroundStyle(.secondary)
                 Spacer()
                 Text(entry.timestamp.formatted(date: .omitted, time: .shortened)).font(.system(size: 8, design: .monospaced)).foregroundStyle(.tertiary)
             }

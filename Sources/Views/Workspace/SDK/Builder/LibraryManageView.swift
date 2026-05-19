@@ -8,7 +8,7 @@ struct LibraryDescriptor: Identifiable, Codable, Hashable {
     let name: String
     let path: String
     let version: String
-    let channel: VersionChannel
+    let channel: ReleaseChannel
     let type: LibraryType
     let capabilities: [String]
     let requiredScopes: [SDKScope]
@@ -29,7 +29,7 @@ struct LibraryDescriptor: Identifiable, Codable, Hashable {
 
     init(
         id: UUID = UUID(), name: String, path: String = "", version: String,
-        channel: VersionChannel = .stable, type: LibraryType = .local,
+        channel: ReleaseChannel = .stable, type: LibraryType = .local,
         capabilities: [String] = [], requiredScopes: [SDKScope] = [],
         inputSchema: [String: String] = [:], outputSchema: [String: String] = [:],
         constraints: [String] = [],
@@ -162,7 +162,7 @@ enum LibraryInvocationState: String {
     case idle, scopeCheck, capabilityMatch, inputValidation, executing, outputValidation, completed, failed
 }
 
-enum VersionChannel: String, CaseIterable, Codable, Identifiable {
+enum ReleaseChannel: String, CaseIterable, Codable, Identifiable {
     case stable, beta, experimental
     var id: String { rawValue }
 }
@@ -288,7 +288,7 @@ final class LibraryManager: ObservableObject {
 
     // MARK: - Install / Uninstall
 
-    func installLibrary(name: String, version: String, channel: VersionChannel = .stable, capabilities: [String], scopes: [SDKScope]) -> Bool {
+    func installLibrary(name: String, version: String, channel: ReleaseChannel = .stable, capabilities: [String], scopes: [SDKScope]) -> Bool {
         guard tokenEngine.requireScope(.sdkManageLibraries) else { return false }
         guard !name.isEmpty, !version.isEmpty else { return false }
 
@@ -1216,7 +1216,7 @@ struct LibraryInstallSheet: View {
 
     @State private var name = ""
     @State private var version = "1.0.0"
-    @State private var channel: VersionChannel = .stable
+    @State private var channel: ReleaseChannel = .stable
     @State private var selectedCaps: Set<LibraryCapability> = []
     @State private var selectedScopes: Set<SDKScope> = [.sdkManageLibraries]
 
@@ -1226,7 +1226,7 @@ struct LibraryInstallSheet: View {
                 TextField("Name", text: $name)
                 TextField("Version (semver)", text: $version)
                 Picker("Channel", selection: $channel) {
-                    ForEach(VersionChannel.allCases) { c in
+                    ForEach(ReleaseChannel.allCases) { c in
                         Text(c.rawValue.capitalized).tag(c)
                     }
                 }

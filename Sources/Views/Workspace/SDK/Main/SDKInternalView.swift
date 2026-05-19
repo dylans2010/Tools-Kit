@@ -77,7 +77,8 @@ struct SDKInternalView: View {
                 Button {
                     Task {
                         let data = (try? await ToolsKitSDK.shared.fetchData(scope: rawScope)) ?? []
-                        rawData = data.prefix(10).map { "\($0.title) [\($0.scope)]" }.joined(separator: "\n")
+                        let lines = data.prefix(10).map { "\($0.title) [\($0.scope)]" }
+                        rawData = lines.joined(separator: "\n")
                     }
                 } label: {
                     Label("Fetch Data", systemImage: "arrow.down.circle")
