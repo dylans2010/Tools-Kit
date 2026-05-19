@@ -23,14 +23,12 @@ public struct SDKModuleDescriptor: Identifiable, Codable, Hashable, Equatable {
     public let displayName: String
     public let version: String
     public var loadPriority: Int
-    public var capabilities: Set<SDKModuleCapability>
+    public var capabilities: [SDKModuleCapability]
     public var dependencies: [String]
     public var minimumSDKVersion: String = "2.0"
     public var exportedServices: [String] = []
-    public var requiredScopes: [String] = []
-
     public init(identifier: String, displayName: String, version: String = "1.0",
-                loadPriority: Int = 0, capabilities: Set<SDKModuleCapability> = [],
+                loadPriority: Int = 0, capabilities: [SDKModuleCapability] = [],
                 dependencies: [String] = []) {
         self.id = UUID()
         self.identifier = identifier
@@ -48,7 +46,7 @@ public struct SDKModuleDescriptor: Identifiable, Codable, Hashable, Equatable {
         self.displayName = displayName
         self.version = version
         self.loadPriority = 0
-        self.capabilities = Set(capabilities)
+        self.capabilities = capabilities
         self.dependencies = []
     }
 }

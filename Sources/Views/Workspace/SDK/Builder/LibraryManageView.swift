@@ -162,11 +162,6 @@ enum LibraryInvocationState: String {
     case idle, scopeCheck, capabilityMatch, inputValidation, executing, outputValidation, completed, failed
 }
 
-enum ReleaseChannel: String, CaseIterable, Codable, Identifiable {
-    case stable, beta, experimental
-    var id: String { rawValue }
-}
-
 struct LibraryInvocationRecord: Identifiable {
     let id = UUID()
     let libraryId: UUID
