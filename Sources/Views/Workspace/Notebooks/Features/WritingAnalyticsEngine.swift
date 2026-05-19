@@ -314,7 +314,7 @@ final class WritingAnalyticsEngine {
             "choose": ("chose", "Grammar", "Choose is present tense, chose is past."),
             "chose": ("choose", "Grammar", "Chose is past tense, choose is present."),
             "coarse": ("course", "Homophone", "Coarse means rough."),
-            "course", ("coarse", "Homophone", "Course is a path or class."),
+            "course": ("coarse", "Homophone", "Course is a path or class."),
             "complementary": ("complimentary", "Homophone", "Complementary means completing."),
             "complimentary": ("complementary", "Homophone", "Complimentary means free or praising."),
             "council": ("counsel", "Homophone", "Council is a group."),

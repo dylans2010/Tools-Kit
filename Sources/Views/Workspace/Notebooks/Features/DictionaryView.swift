@@ -174,18 +174,16 @@ struct DictionaryView: View {
     private func wordChipGroup(title: String, words: [String]) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title).font(.caption.bold()).foregroundColor(.secondary)
-            FlowLayout(spacing: 8) {
-                ForEach(words, id: \.self) { word in
-                    Button {
-                        Task { await vm.search(word: word) }
-                    } label: {
-                        Text(word)
-                            .font(.caption)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.secondary.opacity(0.1))
-                            .cornerRadius(8)
-                    }
+            FlowLayout(words, spacing: 8) { word in
+                Button {
+                    Task { await vm.search(word: word) }
+                } label: {
+                    Text(word)
+                        .font(.caption)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.secondary.opacity(0.1))
+                        .cornerRadius(8)
                 }
             }
         }
@@ -202,47 +200,3 @@ struct DictionaryView: View {
     }
 }
 
-// Minimal FlowLayout for word chips
-struct FlowLayout: View {
-    var spacing: CGFloat = 8
-    var content: [AnyView]
-
-    init<Data: Collection, V: View>(spacing: CGFloat = 8, @ViewBuilder content: () -> ForEach<Data, Data.Element, V>) {
-        self.spacing = spacing
-        self.content = content().data.map { AnyView(content().content($0)) }
-    }
-
-    var body: some View {
-        ZStack(alignment: .topLeading) {
-            var width = CGFloat.zero
-            var height = CGFloat.zero
-
-            Color.clear.frame(height: 0) // Placeholder to trigger layout
-
-            ForEach(0..<content.count, id: \.self) { index in
-                content[index]
-                    .padding([.horizontal, .vertical], spacing / 2)
-                    .alignmentGuide(.leading, computeValue: { d in
-                        if (abs(width - d.width) > 300) { // arbitrary width limit
-                            width = 0
-                            height -= d.height
-                        }
-                        let result = width
-                        if index == content.count - 1 {
-                            width = 0 // last item
-                        } else {
-                            width -= d.width
-                        }
-                        return result
-                    })
-                    .alignmentGuide(.top, computeValue: { d in
-                        let result = height
-                        if index == content.count - 1 {
-                            height = 0 // last item
-                        }
-                        return result
-                    })
-            }
-        }
-    }
-}
