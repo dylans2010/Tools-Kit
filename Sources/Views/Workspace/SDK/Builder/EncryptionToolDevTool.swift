@@ -37,9 +37,9 @@ struct EncryptionToolView: View {
                 }
 
                 HStack {
-                    Picker("Key Size", selection: $viewModel.keySize) {
-                        Text("128-bit").tag(SymmetricKeySize.bits128)
-                        Text("256-bit").tag(SymmetricKeySize.bits256)
+                    Picker("Key Size", selection: $viewModel.keySizeBits) {
+                        Text("128-bit").tag(128)
+                        Text("256-bit").tag(256)
                     }
 
                     Button("Generate Key") { viewModel.generateKey() }
@@ -143,7 +143,11 @@ class EncryptionToolViewModel: ObservableObject {
     @Published var keySource = EncryptKeySource.password
     @Published var password = "my-secret-password"
     @Published var key = ""
-    @Published var keySize = SymmetricKeySize.bits256
+    @Published var keySizeBits = 256
+
+    var keySize: SymmetricKeySize {
+        keySizeBits == 128 ? .bits128 : .bits256
+    }
     @Published var algorithm = EncryptAlgorithm.aesGCM
     @Published var input = "Sensitive data"
     @Published var output = ""
