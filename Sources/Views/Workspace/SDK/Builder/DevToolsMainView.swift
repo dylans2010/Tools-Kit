@@ -294,7 +294,7 @@ struct IPData: Codable {
 
 struct VerboseLog: Identifiable {
     let id = UUID()
-    let timestamp = Date()
+    var timestamp = Date()
     let level: String
     let message: String
 }

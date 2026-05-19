@@ -17,7 +17,7 @@ public final class SDKScopeManager: ObservableObject {
 
     public struct ScopeAuditEntry: Identifiable {
         public let id = UUID()
-        public let timestamp = Date()
+        public var timestamp = Date()
         public let scope: String
         public let operation: Operation
         public let granted: Bool

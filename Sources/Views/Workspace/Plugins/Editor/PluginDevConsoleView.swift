@@ -18,7 +18,7 @@ struct PluginDevConsoleView: View {
 
     struct PluginLog: Identifiable {
         let id = UUID()
-        let timestamp = Date()
+        var timestamp = Date()
         let type: LogType
         let message: String
 

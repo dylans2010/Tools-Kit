@@ -13,7 +13,7 @@ final class NetworkSpeedBackend: ObservableObject {
         let download: Double
         let upload: Double
         let ping: Int
-        let timestamp = Date()
+        var timestamp = Date()
     }
 
     private let testURL = URL(string: "https://apple.com")!

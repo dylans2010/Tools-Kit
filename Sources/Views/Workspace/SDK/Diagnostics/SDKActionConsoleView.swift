@@ -9,7 +9,7 @@ struct SDKActionConsoleView: View {
     @Environment(\.dismiss) private var dismiss
 
     struct ConsoleEntry: Identifiable {
-        let id = UUID(); let timestamp = Date(); let command: String; let result: String; let status: EntryStatus
+        let id = UUID(); var timestamp = Date(); let command: String; let result: String; let status: EntryStatus
         enum EntryStatus { case success, error, pending }
     }
 

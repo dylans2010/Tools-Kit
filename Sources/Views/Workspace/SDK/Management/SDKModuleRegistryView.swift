@@ -67,6 +67,7 @@ struct SDKModuleRegistryView: View {
         }
     }
 
+    @ViewBuilder
     private var modulesSection: some View {
         let modules = filteredModules
         Section {
