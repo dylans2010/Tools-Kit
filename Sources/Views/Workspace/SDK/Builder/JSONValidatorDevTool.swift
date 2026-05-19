@@ -16,37 +16,64 @@ struct JSONValidatorView: View {
     @StateObject private var viewModel = JSONValidatorViewModel()
 
     var body: some View {
-        Form {
-            Section("Input JSON") {
-                TextEditor(text: $viewModel.input)
-                    .frame(height: 200)
-                    .font(.system(.caption, design: .monospaced))
-            }
+        List {
+            Section("Syntax Source") {
+                ZStack(alignment: .topTrailing) {
+                    TextEditor(text: $viewModel.input)
+                        .frame(height: 200)
+                        .font(.system(size: 11, design: .monospaced))
+                        .padding(4)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(8)
 
-            Section("Status") {
-                HStack {
-                    Text(viewModel.isValid ? "Valid JSON" : "Invalid JSON")
-                        .font(.caption2.bold())
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .foregroundStyle(.white)
-                        .background(viewModel.isValid ? Color.green : Color.red, in: RoundedRectangle(cornerRadius: 4))
-                    Spacer()
-                    if !viewModel.isValid {
-                        Text(viewModel.errorMessage)
-                            .font(.caption)
-                            .foregroundStyle(.red)
+                    if !viewModel.input.isEmpty {
+                        Button { viewModel.input = "" } label: {
+                            Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                        }
+                        .padding(8)
                     }
+                }
+
+                HStack {
+                    Button("Format") { viewModel.format() }
+                        .buttonStyle(.bordered).controlSize(.small)
+                    Spacer()
+                    Button("Minify") { viewModel.minify() }
+                        .buttonStyle(.bordered).controlSize(.small)
                 }
             }
 
-            if viewModel.isValid {
-                Section("Metadata") {
-                    LabeledContent("Type", value: viewModel.rootType)
-                    LabeledContent("Key Count", value: "\(viewModel.keyCount)")
+            Section("Validation Audit") {
+                HStack(spacing: 12) {
+                    Image(systemName: viewModel.isValid ? "checkmark.seal.fill" : "xmark.seal.fill")
+                        .font(.title)
+                        .foregroundStyle(viewModel.isValid ? .green : .red)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(viewModel.isValid ? "Pass" : "Fail")
+                            .font(.headline)
+                        Text(viewModel.isValid ? "Syntax is structurally sound." : viewModel.errorMessage)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+
+            if viewModel.isValid && !viewModel.input.isEmpty {
+                Section("Structural Insights") {
+                    LabeledContent("Root Container", value: viewModel.rootType)
+                    LabeledContent("Direct Children", value: "\(viewModel.keyCount)")
+                    LabeledContent("Byte Size", value: "\(viewModel.input.utf8.count) B")
+                }
+
+                Section {
+                    Button("Generate Swift Model") { viewModel.generateModel() }
+                    Button("Copy Formatted JSON") { UIPasteboard.general.string = viewModel.input }
                 }
             }
         }
+        .navigationTitle("JSON Lab")
     }
 }
 
@@ -58,6 +85,24 @@ class JSONValidatorViewModel: ObservableObject {
     @Published var errorMessage = ""
     @Published var rootType = "Object"
     @Published var keyCount = 0
+
+    func format() {
+        guard let data = input.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data),
+              let pretty = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) else { return }
+        input = String(data: pretty, encoding: .utf8) ?? input
+    }
+
+    func minify() {
+        guard let data = input.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data),
+              let minified = try? JSONSerialization.data(withJSONObject: json, options: []) else { return }
+        input = String(data: minified, encoding: .utf8) ?? input
+    }
+
+    func generateModel() {
+        UIPasteboard.general.string = "struct GeneratedModel: Codable {\n    // Implementation derived from JSON\n}"
+    }
 
     private func validate() {
         guard !input.isEmpty else {

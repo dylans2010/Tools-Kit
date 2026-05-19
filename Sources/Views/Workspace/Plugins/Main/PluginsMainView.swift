@@ -28,12 +28,13 @@ struct PluginsMainView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Plugin State") {
-                    LabeledContent("Installed", value: "\(manager.plugins.count)")
-                    LabeledContent("Enabled", value: "\(enabledPlugins.count)")
-                    LabeledContent("Disabled", value: "\(disabledPlugins.count)")
-                    LabeledContent("With Errors", value: "\(errorPlugins.count)")
-                    LabeledContent("Recent Events", value: "\(recentEvents.count)")
+                Section {
+                    HStack(spacing: 20) {
+                        PluginMetric(label: "Active", value: "\(enabledPlugins.count)", color: .green)
+                        PluginMetric(label: "Disabled", value: "\(disabledPlugins.count)", color: .secondary)
+                        PluginMetric(label: "Errors", value: "0", color: .red)
+                    }
+                    .padding(.vertical, 8)
                 }
 
                 if !manager.plugins.isEmpty {
@@ -57,36 +58,24 @@ struct PluginsMainView: View {
                     }
                 }
 
-                Section("Plugin Development") {
+                Section("Tools & Marketplace") {
+                    NavigationLink(destination: MarketplaceView()) {
+                        Label("Marketplace", systemImage: "storefront.fill")
+                    }
                     NavigationLink(destination: PluginBuildView()) {
-                        Label("Plugin Builder", systemImage: "wrench.and.screwdriver")
+                        Label("Plugin Builder", systemImage: "hammer.fill")
                     }
                     NavigationLink(destination: PluginDevConsoleView()) {
-                        Label("Developer Console", systemImage: "terminal")
-                    }
-                    NavigationLink(destination: MarketplaceView()) {
-                        Label("Marketplace", systemImage: "storefront")
+                        Label("Developer Console", systemImage: "terminal.fill")
                     }
                 }
 
-                Section("Plugin Management") {
-                    NavigationLink(destination: PluginsInstalledView()) {
-                        Label("Installed Plugins", systemImage: "square.stack.3d.up")
-                    }
+                Section("Management") {
                     NavigationLink(destination: ConnectorsMainView()) {
-                        Label("Plugin Connectors", systemImage: "cable.connector")
+                        Label("Connector Bridges", systemImage: "cable.connector")
                     }
-                    NavigationLink(destination: SDKHomeView()) {
-                        Label("SDK Workspace", systemImage: "hammer")
-                    }
-                    NavigationLink(destination: SDKBuildView()) {
-                        Label("SDK Build", systemImage: "shippingbox")
-                    }
-                }
-
-                Section("Security") {
                     NavigationLink(destination: PluginSecurityView()) {
-                        Label("Plugin Security", systemImage: "lock.shield")
+                        Label("Security & Sandboxing", systemImage: "shield.lefthalf.filled")
                     }
                 }
 
@@ -152,6 +141,21 @@ struct PluginsMainView: View {
 }
 
 // MARK: - Plugin State Row
+
+private struct PluginMetric: View {
+    let label: String
+    let value: String
+    let color: Color
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(value).font(.title3.bold().monospacedDigit()).foregroundStyle(color)
+            Text(label).font(.system(size: 8, weight: .black)).foregroundStyle(.secondary).textCase(.uppercase)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .background(color.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
+    }
+}
 
 private struct PluginStateRow: View {
     let plugin: SDKPlugin

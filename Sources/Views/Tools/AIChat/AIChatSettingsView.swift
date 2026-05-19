@@ -38,122 +38,89 @@ struct AIChatSettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Group {
-                    Section {
-                        providerSectionContent
-                    } header: {
-                        Label("AI Provider", systemImage: "cpu")
-                    }
+                Section {
+                    aboutSectionContent
+                } header: {
+                    Label("Workspace AI Platform", systemImage: "info.circle.fill")
+                }
 
-                    Section {
-                        aiUsageSectionContent
-                    } header: {
-                        Label("AI Usage", systemImage: "bolt.fill")
-                    }
+                Section {
+                    providerSectionContent
+                    modelSectionContent
+                    aiUsageSectionContent
+                } header: {
+                    Label("Engine & Connectivity", systemImage: "cpu.fill")
+                }
 
-                    Section {
-                        modelSectionContent
-                    } header: {
-                        Label("Model Configuration", systemImage: "cube.fill")
-                    }
+                Section {
+                    systemPromptSectionContent
+                } header: {
+                    Label("System Instructions", systemImage: "terminal.fill")
+                }
 
-                    Section {
-                        NavigationLink(destination: SkillsView()) {
-                            Label {
-                                HStack {
-                                    Text("AI Skills")
-                                    Spacer()
-                                    Text("\(skillsManager.skills.count)")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                }
-                            } icon: {
-                                Image(systemName: "bolt.square.fill")
-                                    .foregroundColor(.orange)
+                Section {
+                    personalitySectionContent
+                    expertiseSectionContent
+                    styleSectionContent
+                } header: {
+                    Label("Personality & Voice", systemImage: "person.wave.2.fill")
+                }
+
+                Section {
+                    contextSectionContent
+                } header: {
+                    Label("Knowledge & Intelligence", systemImage: "brain.fill")
+                }
+
+                Section {
+                    NavigationLink(destination: SkillsView()) {
+                        Label {
+                            HStack {
+                                Text("Injected Capabilities")
+                                Spacer()
+                                Text("\(skillsManager.skills.count) Active")
+                                    .font(.caption2.bold())
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.orange.opacity(0.1), in: Capsule())
+                                    .foregroundStyle(.orange)
                             }
+                        } icon: {
+                            Image(systemName: "bolt.fill")
+                                .foregroundColor(.orange)
                         }
-                    } header: {
-                        Label("Capabilities", systemImage: "star.fill")
                     }
+                    memorySectionContent
+                    agentSettingsSectionContent
+                } header: {
+                    Label("Advanced Automation", systemImage: "wand.and.stars")
                 }
 
-                Group {
-                    Section {
-                        systemPromptSectionContent
-                    } header: {
-                        Label("System Prompt", systemImage: "terminal.fill")
-                    }
-
-                    Section {
-                        personalitySectionContent
-                        expertiseSectionContent
-                        styleSectionContent
-                    } header: {
-                        Label("AI Personality & Tone", systemImage: "person.fill")
-                    }
-
-                    Section {
-                        contextSectionContent
-                    } header: {
-                        Label("Knowledge & Context", systemImage: "book.fill")
-                    }
+                Section {
+                    chatInterfaceSectionContent
+                    appModeSectionContent
+                } header: {
+                    Label("Visual Experience", systemImage: "paintbrush.fill")
                 }
 
-                Group {
-                    Section {
-                        memorySectionContent
-                    } header: {
-                        Label("Memory", systemImage: "brain.head.profile")
-                    }
-
-                    Section {
-                        advancedSectionContent
-                    } header: {
-                        Label("Advanced Parameters", systemImage: "slider.horizontal.3")
-                    }
+                Section {
+                    advancedSectionContent
+                    storageSectionContent
+                } header: {
+                    Label("Runtime Config", systemImage: "slider.horizontal.3")
                 }
 
-                Group {
-                    Section {
-                        chatInterfaceSectionContent
-                    } header: {
-                        Label("Interface", systemImage: "paintbrush.fill")
-                    }
-
-                    Section {
-                        storageSectionContent
-                    } header: {
-                        Label("Data Management", systemImage: "tray.full.fill")
-                    }
+                Section {
+                    cloudDataSectionContent
+                    accountSectionContent
+                } header: {
+                    Label("User Identity", systemImage: "person.crop.circle.badge.checkmark")
                 }
 
-                Group {
-                    Section {
-                        agentSettingsSectionContent
-                    } header: {
-                        Label("Autonomous Agent", systemImage: "robot.fill")
-                    }
-
-                    Section {
-                        appModeSectionContent
-                    } header: {
-                        Label("App Experience", systemImage: "square.grid.2x2.fill")
-                    }
-                }
-
-                Group {
-                    Section {
-                        cloudDataSectionContent
-                        accountSectionContent
-                    } header: {
-                        Label("Account & Sync", systemImage: "person.crop.circle.fill")
-                    }
-
-                    Section {
-                        developerToolsSectionContent
-                    } header: {
-                        Label("Developer Settings", systemImage: "hammer.fill")
-                    }
+                Section {
+                    developerToolsSectionContent
+                } header: {
+                    Label("SDK Debugging", systemImage: "hammer.fill")
                 }
             }
             .task {
@@ -165,12 +132,6 @@ struct AIChatSettingsView: View {
             }
             .navigationTitle("AI Settings")
             .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .fontWeight(.bold)
-                }
-            }
         }
     }
 
@@ -278,15 +239,20 @@ struct AIChatSettingsView: View {
 
     private var systemPromptSectionContent: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Toggle("Use Preset", isOn: Binding(
-                get: { settings.selectedPresetID != nil },
-                set: { usePreset in
-                    if !usePreset { settings.selectedPresetID = nil }
-                    else if settings.selectedPresetID == nil {
+            Picker("Source Mode", selection: Binding(
+                get: { settings.selectedPresetID != nil ? 0 : 1 },
+                set: { mode in
+                    if mode == 0 {
                         settings.selectedPresetID = SystemPromptPreset.builtIn.first?.id
+                    } else {
+                        settings.selectedPresetID = nil
                     }
                 }
-            ))
+            )) {
+                Text("Predefined Templates").tag(0)
+                Text("Manual Instructions").tag(1)
+            }
+            .pickerStyle(.segmented)
 
             if settings.selectedPresetID != nil {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -302,10 +268,51 @@ struct AIChatSettingsView: View {
                     .padding(.vertical, 4)
                 }
             } else {
-                TextEditor(text: $settings.systemPrompt)
-                    .frame(minHeight: 100)
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
+                VStack(alignment: .leading, spacing: 8) {
+                    TextEditor(text: $settings.systemPrompt)
+                        .frame(minHeight: 140)
+                        .font(.system(size: 11, design: .monospaced))
+                        .padding(4)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(8)
+
+                    HStack {
+                        Button("Optimize Prompt") { /* AI Logic */ }
+                        Spacer()
+                        Button("Restore Default") { settings.systemPrompt = "You are a helpful assistant." }
+                    }
+                    .font(.caption2.bold())
+                }
             }
+
+            DisclosureGroup("Dynamic Injection Tokens") {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Reference workspace data using bracket notation:").font(.system(size: 10)).foregroundStyle(.secondary)
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                        TokenBadge(text: "{user_profile}")
+                        TokenBadge(text: "{active_project}")
+                        TokenBadge(text: "{recent_events}")
+                        TokenBadge(text: "{sdk_docs}")
+                        TokenBadge(text: "{current_task}")
+                        TokenBadge(text: "{local_time}")
+                    }
+                }
+                .padding(.vertical, 8)
+            }
+
+            Toggle("Append Safety Guardrails", isOn: .constant(true))
+                .font(.caption)
+        }
+    }
+
+    private struct TokenBadge: View {
+        let text: String
+        var body: some View {
+            Text(text)
+                .font(.system(size: 9, design: .monospaced))
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color.gray.opacity(0.1), in: RoundedRectangle(cornerRadius: 4))
         }
     }
 
@@ -324,19 +331,150 @@ struct AIChatSettingsView: View {
     }
 
     private var styleSectionContent: some View {
-        Group {
-            Picker("Tone", selection: $settings.responseTone) {
-                ForEach(ResponseTone.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Response Tone").font(.caption2.bold()).foregroundStyle(.secondary)
+                Picker("Tone", selection: $settings.responseTone) {
+                    ForEach(ResponseTone.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.menu)
             }
-            Picker("Length", selection: $settings.preferredResponseLength) {
-                ForEach(ResponseLength.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Interactive Voice Preview").font(.system(size: 9, weight: .black)).foregroundStyle(.blue).textCase(.uppercase)
+                Text(tonePreviewText)
+                    .font(.system(size: 11, weight: .medium, design: .serif))
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.blue.opacity(0.05))
+                    .cornerRadius(10)
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.blue.opacity(0.1), lineWidth: 1))
             }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Verbosity & Detail").font(.caption2.bold()).foregroundStyle(.secondary)
+                Picker("Length", selection: $settings.preferredResponseLength) {
+                    ForEach(ResponseLength.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.segmented)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Behavioral Controls").font(.caption2.bold()).foregroundStyle(.secondary)
+                Toggle("Use Emojis", isOn: .constant(true))
+                Toggle("Technical Depth", isOn: .constant(false))
+                Toggle("Socratic Method", isOn: .constant(false))
+            }
+            .font(.subheadline)
         }
     }
 
     private var contextSectionContent: some View {
-        TextEditor(text: $settings.knowledgeContext)
-            .frame(minHeight: 80)
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 12) {
+                Toggle("Active Intelligence Sync", isOn: .constant(true))
+                    .font(.headline)
+                Text("Allows the model to reason across your entire workspace including documents, emails, and project files.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Manual Knowledge Buffer").font(.caption2.bold()).foregroundStyle(.secondary)
+                TextEditor(text: $settings.knowledgeContext)
+                    .frame(height: 120)
+                    .font(.system(size: 11))
+                    .padding(4)
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(8)
+            }
+
+            HStack(spacing: 12) {
+                Button { settings.knowledgeContext = "" } label: {
+                    Label("Flush", systemImage: "trash")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+
+                Button { showFileImporter = true } label: {
+                    Label("Add PDF/TXT", systemImage: "doc.badge.plus")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+            }
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Connected Sources").font(.caption2.bold()).foregroundStyle(.secondary)
+                KnowledgeSourceRow(name: "SDK Documentation", icon: "book.fill", isSynced: true)
+                KnowledgeSourceRow(name: "Workspace Files", icon: "folder.fill", isSynced: true)
+                KnowledgeSourceRow(name: "External Web", icon: "globe", isSynced: false)
+            }
+        }
+    }
+
+    private struct KnowledgeSourceRow: View {
+        let name: String
+        let icon: String
+        let isSynced: Bool
+        var body: some View {
+            HStack {
+                Label(name, systemImage: icon).font(.caption)
+                Spacer()
+                Text(isSynced ? "SYNCED" : "OFFLINE")
+                    .font(.system(size: 8, weight: .black))
+                    .foregroundStyle(isSynced ? .green : .secondary)
+            }
+        }
+    }
+
+    private var aboutSectionContent: some View {
+        VStack(alignment: .center, spacing: 16) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 40))
+                .foregroundStyle(.blue.gradient)
+                .padding(.top)
+
+            VStack(spacing: 4) {
+                Text("ToolsKit AI").font(.headline)
+                Text("Version 2.4.5 (Build 2026.12)")
+                    .font(.caption.monospaced())
+                    .foregroundStyle(.secondary)
+            }
+
+            Text("A state-of-the-art AI assistant integrated directly into your Workspace, designed for high-performance productivity and seamless automation.")
+                .font(.system(size: 11))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+                .foregroundStyle(.secondary)
+
+            Divider()
+
+            HStack(spacing: 20) {
+                Link(destination: URL(string: "https://toolskit.io")!) {
+                    Label("Website", systemImage: "network")
+                }
+                Link(destination: URL(string: "https://twitter.com/toolskit")!) {
+                    Label("Twitter", systemImage: "bird")
+                }
+            }
+            .font(.caption2)
+            .padding(.bottom)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var tonePreviewText: String {
+        switch settings.responseTone {
+        case .formal: return "I would be delighted to assist you with your request in a professional manner."
+        case .casual: return "Hey! I'm totally down to help you out with that. What's up?"
+        case .concise: return "Understood. Proceeding with the requested task immediately."
+        case .creative: return "Imagine a world where your ideas take flight on the wings of artificial intelligence..."
+        default: return "Sample response text will appear here."
+        }
     }
 
     private var memorySectionContent: some View {

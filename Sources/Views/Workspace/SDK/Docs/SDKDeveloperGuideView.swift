@@ -19,11 +19,18 @@ struct SDKDeveloperGuideView: View {
         case diContainer = "DI Container"
         case routerAPI = "Router & API"
         case automationEngine = "Automation"
+        case analyticsEngine = "Analytics & Metrics"
+        case healthMonitoring = "Health & Diagnostics"
+        case workflowEngine = "Workflow Engine"
+        case projectManagement = "Project & Config"
+        case librarySystem = "Library & Versioning"
+        case localizationAccessibility = "Localize & Access"
         case swiftUIIntegration = "SwiftUI Integration"
         case packaging = "Packaging & Export"
         case deployment = "Deployment"
         case constraints = "Constraints & Rules"
         case bestPractices = "Best Practices"
+        case advancedServices = "Advanced Services"
         case definitionsReference = "Definitions Reference"
 
         var id: String { rawValue }
@@ -43,11 +50,18 @@ struct SDKDeveloperGuideView: View {
             case .diContainer: return "tray.full"
             case .routerAPI: return "arrow.up.right.and.arrow.down.left.rectangle"
             case .automationEngine: return "gearshape.2"
+            case .analyticsEngine: return "chart.bar.xaxis"
+            case .healthMonitoring: return "heart.text.square"
+            case .workflowEngine: return "point.topleft.down.curvedto.point.bottomright.up"
+            case .projectManagement: return "folder.badge.gearshape"
+            case .librarySystem: return "books.vertical"
+            case .localizationAccessibility: return "text.bubble"
             case .swiftUIIntegration: return "swift"
             case .packaging: return "shippingbox"
             case .deployment: return "cloud.arrow.up"
             case .constraints: return "exclamationmark.shield"
             case .bestPractices: return "star"
+            case .advancedServices: return "wand.and.rays"
             case .definitionsReference: return "doc.text.magnifyingglass"
             }
         }
@@ -81,11 +95,18 @@ struct SDKDeveloperGuideView: View {
             case .diContainer: DIContainerSection()
             case .routerAPI: RouterAPISection()
             case .automationEngine: AutomationSection()
+            case .analyticsEngine: AnalyticsSection()
+            case .healthMonitoring: HealthSection()
+            case .workflowEngine: WorkflowSection()
+            case .projectManagement: ProjectManagementSection()
+            case .librarySystem: LibrarySystemSection()
+            case .localizationAccessibility: LocalizationAccessibilitySection()
             case .swiftUIIntegration: SwiftUIIntegrationSection()
             case .packaging: PackagingSection()
             case .deployment: DeploymentSection()
             case .constraints: ConstraintsSection()
             case .bestPractices: BestPracticesSection()
+            case .advancedServices: AdvancedServicesSection()
             case .definitionsReference: DefinitionsReferenceSection()
             }
         }
@@ -120,6 +141,12 @@ private struct TableOfContentsSection: View {
             tocRow(.diContainer, "ServiceContainer, ServiceRegistry, protocol-based resolution")
             tocRow(.routerAPI, "Internal API routing, endpoint registration, default routes")
             tocRow(.automationEngine, "Trigger/condition/action rules, automation execution")
+            tocRow(.analyticsEngine, "Telemetry, event tracking, metrics collection")
+            tocRow(.healthMonitoring, "Service status, heartbeat, resource watching")
+            tocRow(.workflowEngine, "Stateful process orchestration and task chaining")
+            tocRow(.projectManagement, "SDKProject, configuration overrides, and state persistence")
+            tocRow(.librarySystem, "Version resolving, scope binding, and dependency bridges")
+            tocRow(.localizationAccessibility, "Multi-language support and system accessibility")
         }
         Section("UI & Integration") {
             tocRow(.swiftUIIntegration, "Observable patterns, singleton access, view architecture")
@@ -129,7 +156,8 @@ private struct TableOfContentsSection: View {
         Section("Reference") {
             tocRow(.constraints, "System constraints, prohibited interactions, security boundaries")
             tocRow(.bestPractices, "Architecture, module design, plugin dev, connector integration")
-            tocRow(.definitionsReference, "50+ structured type definitions for all SDK systems")
+            tocRow(.advancedServices, "Real-time sync, feature flags, and background execution")
+            tocRow(.definitionsReference, "70+ structured type definitions for all SDK systems")
         }
     }
 
@@ -1128,6 +1156,148 @@ private struct DefinitionsReferenceSection: View {
                 ("error", "String?", "Error message if failed"),
                 ("latency", "TimeInterval", "Request processing time"),
             ], notes: "Returned by all router handlers")
+        }
+    }
+}
+
+// MARK: - Analytics
+
+private struct AnalyticsSection: View {
+    var body: some View {
+        Section("Analytics Engine") {
+            Text("SDKAnalyticsEngine provides unified telemetry across all modules. It supports event tracking with structured metadata and session management.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "track(event:)", description: "Record a custom event with properties", icon: "point.3.filled.connected.trianglepath.dotted")
+            GuideDefRow(name: "identify(userID:)", description: "Associate events with a specific user context", icon: "person.text.rectangle")
+            GuideDefRow(name: "flush()", description: "Force immediate transmission of queued events", icon: "arrow.up.circle")
+        }
+        Section("Metrics Collection") {
+            GuideDefRow(name: "Counter", description: "Monotonically increasing integer values", icon: "plus.forwardslash.minus")
+            GuideDefRow(name: "Gauge", description: "Current value of a system variable (e.g. CPU)", icon: "gauge.medium")
+            GuideDefRow(name: "Histogram", description: "Distribution of values over time", icon: "chart.bar")
+        }
+    }
+}
+
+// MARK: - Health
+
+private struct HealthSection: View {
+    var body: some View {
+        Section("Health Monitoring") {
+            Text("SDKHealthMonitor continuously watches core services and reports system stability via the Heartbeat system.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "isHealthy", description: "Computed property aggregating all service states", icon: "checkmark.shield")
+            GuideDefRow(name: "Heartbeat", description: "1-minute periodic check of all registered health providers", icon: "waveform.path.ecg")
+        }
+        Section("Resource Watchers") {
+            GuideDefRow(name: "CPUMonitor", description: "Alerts when CPU usage exceeds 80% for > 5s", icon: "cpu")
+            GuideDefRow(name: "MemoryWatcher", description: "Monitors memory pressure and triggers cache clearing", icon: "memorychip")
+            GuideDefRow(name: "StorageWatch", description: "Monitors free space and warns on low capacity", icon: "externaldrive")
+        }
+    }
+}
+
+// MARK: - Workflow
+
+private struct WorkflowSection: View {
+    var body: some View {
+        Section("Workflow Engine") {
+            Text("SDKWorkflowEngine orchestrates complex multi-step processes across multiple SDK modules.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "Step", description: "Single executable unit with input/output validation", icon: "list.number")
+            GuideDefRow(name: "Chain", description: "Sequence of steps with error propagation handles", icon: "link")
+            GuideDefRow(name: "Branch", description: "Conditional logic determining the next step", icon: "arrow.triangle.branch")
+        }
+        Section("Implementation Example") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("""
+                let workflow = SDKWorkflow("ProcessData")
+                    .addStep(FetchStep())
+                    .addStep(ValidateStep())
+                    .onSuccess { print("Complete") }
+                    .onFailure { error in handle(error) }
+
+                await workflow.execute()
+                """)
+                .font(.system(size: 10, design: .monospaced)).padding(8).background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+            }
+        }
+    }
+}
+
+// MARK: - Advanced Services
+
+private struct AdvancedServicesSection: View {
+    var body: some View {
+        Section("Real-time Sync") {
+            Text("SDKRealtimeSync handles multi-device state synchronization and conflict resolution using a deterministic merge algorithm.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "Sync Engine", description: "WebSocket-based delta propagation with retry logic", icon: "arrow.triangle.2.circlepath")
+            GuideDefRow(name: "Conflict Resolver", description: "Last-writer-wins or custom merge strategies", icon: "arrow.triangle.merge")
+        }
+        Section("Feature Flags") {
+            Text("SDKFeatureFlagService manages dynamic feature toggles and A/B testing configurations.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "isFeatureEnabled()", description: "Sync check for local or remote feature availability", icon: "flag.fill")
+            GuideDefRow(name: "Experimentation", description: "Support for weight-based rollouts and user segments", icon: "testtube.2")
+        }
+        Section("Background Engine") {
+            Text("SDKBackgroundEngine orchestrates long-running tasks and periodic maintenance windows.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "Maintenance Task", description: "Runs only when device is charging and on WiFi", icon: "hammer.fill")
+            GuideDefRow(name: "Data Pruning", description: "Automatic cleanup of expired cache and log entries", icon: "trash.fill")
+        }
+    }
+}
+
+// MARK: - Project Management
+
+private struct ProjectManagementSection: View {
+    var body: some View {
+        Section("Project Lifecycle") {
+            Text("SDKProjectManager maintains the state of SDK projects, including enabled scopes, plugins, and build metadata.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "createProject()", description: "Initialize a new project with default configuration", icon: "plus.square")
+            GuideDefRow(name: "loadProject(id:)", description: "Restore project state from local storage", icon: "folder.badge.plus")
+            GuideDefRow(name: "updateProject()", description: "Persist changes to the current project manifest", icon: "arrow.clockwise")
+        }
+        Section("Configuration Overrides") {
+            GuideDefRow(name: "SDKConfigManager", description: "Provides dynamic overrides for SDK system settings", icon: "slider.horizontal.3")
+            GuideDefRow(name: "ConfigEntry", description: "Key-value pair with priority-based resolution", icon: "key")
+        }
+    }
+}
+
+// MARK: - Library System
+
+private struct LibrarySystemSection: View {
+    var body: some View {
+        Section("Versioning & Resolving") {
+            Text("The Library System manages external and internal dependencies with semantic versioning support.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "SDKLibraryVersionResolver", description: "Selects optimal library versions based on constraints", icon: "number.square")
+            GuideDefRow(name: "SDKLibraryScopeBinder", description: "Binds library functions to protected SDK scopes", icon: "link")
+        }
+        Section("Dependency Bridging") {
+            GuideDefRow(name: "SDKLibraryDependencyBridge", description: "Integrates legacy frameworks into the modern SDK graph", icon: "point.3.connected.trianglepath.dotted")
+            GuideDefRow(name: "ConflictResolver", description: "Automated resolution of version and capability overlaps", icon: "exclamationmark.triangle")
+        }
+    }
+}
+
+// MARK: - Localization & Accessibility
+
+private struct LocalizationAccessibilitySection: View {
+    var body: some View {
+        Section("Localization") {
+            Text("SDKLocalizationManager provides localized strings and asset resolution for all SDK UI components.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            GuideDefRow(name: "localizedString(key:)", description: "Retrieve translation for the current system locale", icon: "character.bubble")
+            GuideDefRow(name: "setLocale(identifier:)", description: "Force override the SDK locale for testing", icon: "globe")
+        }
+        Section("Accessibility") {
+            GuideDefRow(name: "SDKAccessibilityService", description: "Provides semantic labels and traits for VoiceOver", icon: "accessibility")
+            GuideDefRow(name: "highContrastMode", description: "Global state for enhanced visibility support", icon: "circle.lefthalf.filled")
         }
     }
 }

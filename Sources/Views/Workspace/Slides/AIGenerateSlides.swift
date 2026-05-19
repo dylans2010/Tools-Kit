@@ -41,48 +41,94 @@ public struct AIGenerateSlides: View {
 
     public var body: some View {
         ZStack {
-            if !manager.isGenerating {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        if let scheme = manager.latestScheme {
-                            schemePreview(scheme)
-                        } else if let deck = generatedDeck ?? manager.latestDeck {
-                            deckPreview(deck)
-                        } else {
-                            VStack(spacing: 20) {
-                                Image(systemName: "sparkles")
-                                    .font(.system(size: 40))
-                                    .foregroundStyle(.secondary)
-                                Text("Enter details below to generate slides")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.top, 100)
-                        }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    if let scheme = manager.latestScheme {
+                        schemePreview(scheme)
+                    } else if let deck = generatedDeck ?? manager.latestDeck {
+                        deckPreview(deck)
+                    } else if !manager.isGenerating {
+                        emptyState
                     }
-                    .padding()
                 }
-            } else {
-                VStack(spacing: 20) {
-                    Text(manager.progressMessage)
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                    ProgressView(value: manager.progressValue)
-                        .tint(.cyan)
-                        .padding(.horizontal, 40)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(.black.opacity(0.4))
+                .padding()
+            }
+            .opacity(manager.isGenerating ? 0.2 : 1)
+            .blur(radius: manager.isGenerating ? 5 : 0)
+
+            if manager.isGenerating {
+                loadingOverlay
             }
         }
+        .animation(.smooth, value: manager.isGenerating)
         .keyboardGlow(keyboard: keyboardObserver)
-        .aiAnimationLoading(manager.isGenerating)
+        .aiAnimationLoading(manager.isGenerating) // Extension handles timing
         .navigationTitle("AI Slides")
+        .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
-            VStack(spacing: 8) {
+            compactInputTray
+        }
+        .alert("Generation Error", isPresented: $showErrorAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(manager.lastError ?? "Something went wrong.")
+        }
+        .onAppear { isFieldFocused = true }
+        .sheet(item: Binding(get: { generatedDeck }, set: { generatedDeck = $0 })) { deck in
+            AIGenSlidesPreview(deck: deck)
+        }
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 40))
+                .foregroundStyle(.blue.gradient)
+
+            VStack(spacing: 4) {
+                Text("Design Smarter")
+                    .font(.headline)
+                Text("Transform your ideas into professional slide decks with AI.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 100)
+    }
+
+    private var loadingOverlay: some View {
+        VStack(spacing: 32) {
+            ProgressView()
+                .controlSize(.large)
+                .tint(.blue)
+
+            VStack(spacing: 12) {
+                Text(manager.progressMessage)
+                    .font(.headline.bold())
+                    .foregroundStyle(.primary)
+
+                Text("\(Int(manager.progressValue * 100))%")
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.blue.opacity(0.1), in: Capsule())
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(.ultraThinMaterial)
+        .transition(.opacity)
+    }
+
+    private var compactInputTray: some View {
+        VStack(spacing: 8) {
+            if !manager.isGenerating && rawText.isEmpty {
                 suggestionsStrip
-                DualKeyboardInputView(
+                    .padding(.horizontal, -16) // Bleed to edges
+            }
+
+            DualKeyboardInputView(
                     promptText: $rawText,
                     notesText: $notes,
                     documentsText: $documents,
@@ -95,6 +141,7 @@ public struct AIGenerateSlides: View {
                     keyboard: keyboardObserver,
                     isFocused: $isFieldFocused
                 )
+                .padding(.bottom, 4)
             }
         }
         .alert("Generation Error", isPresented: $showErrorAlert) {
@@ -455,24 +502,23 @@ public struct AIGenerateSlides: View {
 
     private var suggestionsStrip: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                ForEach(slideSuggestions) { suggestion in
+            HStack(spacing: 8) {
+                ForEach(slideSuggestions.prefix(6)) { suggestion in
                     Button {
-                        selectedThemeID = suggestion.themeID
-                        selectedStyleID = suggestion.styleID
                         rawText = suggestion.prompt
-                        notes = suggestion.notes.joined(separator: "\n")
                         generate()
                     } label: {
                         Text(suggestion.title)
-                            .font(.caption.weight(.semibold))
+                            .font(.system(size: 11, weight: .semibold))
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
-                            .background(.ultraThinMaterial, in: Capsule())
-                            .overlay(Capsule().stroke(.white.opacity(0.2), lineWidth: 1))
+                            .background(Color(.secondarySystemBackground), in: Capsule())
+                            .overlay(Capsule().stroke(Color.gray.opacity(0.1), lineWidth: 1))
                     }
+                    .buttonStyle(.plain)
                 }
-            }.padding(.horizontal, 12)
+            }
+            .padding(.horizontal, 16)
         }
     }
 }

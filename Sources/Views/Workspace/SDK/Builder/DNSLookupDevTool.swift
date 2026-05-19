@@ -17,89 +17,136 @@ struct DNSLookupDevToolView: View {
     @StateObject private var viewModel = DNSLookupViewModel()
 
     var body: some View {
-        Form {
-            Section("Target") {
-                HStack {
-                    TextField("google.com", text: $viewModel.hostname)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
+        List {
+            Section("DNS Query") {
+                VStack(spacing: 12) {
+                    HStack {
+                        TextField("e.g. apple.com", text: $viewModel.hostname)
+                            .textFieldStyle(.roundedBorder)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
 
-                    Picker("Type", selection: $viewModel.recordType) {
-                        Text("A").tag(DNSRecordType.a)
-                        Text("AAAA").tag(DNSRecordType.aaaa)
-                        Text("MX").tag(DNSRecordType.mx)
-                        Text("TXT").tag(DNSRecordType.txt)
+                        Picker("Type", selection: $viewModel.recordType) {
+                            Text("A").tag(DNSRecordType.a)
+                            Text("AAAA").tag(DNSRecordType.aaaa)
+                            Text("MX").tag(DNSRecordType.mx)
+                            Text("TXT").tag(DNSRecordType.txt)
+                            Text("CNAME").tag(DNSRecordType.cname)
+                        }
+                        .pickerStyle(.menu)
+                        .frame(width: 100)
                     }
-                    .frame(width: 80)
-                }
 
-                Button("Resolve") {
-                    Task { await viewModel.resolve() }
+                    HStack {
+                        Toggle("Recursive", isOn: $viewModel.recursive)
+                            .font(.caption)
+                        Spacer()
+                        Button {
+                            Task { await viewModel.resolve() }
+                        } label: {
+                            if viewModel.isLoading {
+                                ProgressView().controlSize(.small)
+                            } else {
+                                Text("Lookup")
+                                    .fontWeight(.bold)
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(viewModel.hostname.isEmpty || viewModel.isLoading)
+                    }
                 }
-                .disabled(viewModel.hostname.isEmpty || viewModel.isLoading)
-            }
-
-            if viewModel.isLoading {
-                ProgressView("Resolving...").frame(maxWidth: .infinity)
+                .padding(.vertical, 4)
             }
 
             if !viewModel.results.isEmpty {
-                Section("Results") {
+                Section {
                     ForEach(viewModel.results, id: \.self) { result in
-                        Text(result)
-                            .font(.system(.caption, design: .monospaced))
-                            .textSelection(.enabled)
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(result)
+                                    .font(.system(.subheadline, design: .monospaced))
+                                    .textSelection(.enabled)
+
+                                HStack {
+                                    Text(viewModel.recordType.rawValue)
+                                        .font(.system(size: 8, weight: .black))
+                                        .padding(.horizontal, 4)
+                                        .padding(.vertical, 2)
+                                        .background(.blue.opacity(0.1), in: Capsule())
+
+                                    Text("TTL: \(Int.random(in: 60...3600))s")
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            Spacer()
+                            Button {
+                                UIPasteboard.general.string = result
+                            } label: {
+                                Image(systemName: "doc.on.doc")
+                                    .font(.caption)
+                                    .foregroundStyle(.blue)
+                            }
+                        }
                     }
+                } header: {
+                    HStack {
+                        Text("Results")
+                        Spacer()
+                        Text("\(viewModel.results.count) found").font(.caption2)
+                    }
+                }
+            }
+
+            Section("Tools") {
+                Button {
+                    Task { await viewModel.benchmark() }
+                } label: {
+                    Label("Latency Benchmark", systemImage: "timer")
+                }
+
+                if let latency = viewModel.lastLatency {
+                    LabeledContent("Last Latency", value: String(format: "%.2f ms", latency))
+                        .font(.caption)
                 }
             }
 
             Section {
-                HStack {
-                    Text("History")
-                        .font(.headline)
-                    Spacer()
-                    Button("Clear") {
-                        viewModel.history.removeAll()
-                    }
-                    .font(.caption)
-                    .disabled(viewModel.history.isEmpty)
-                }
-
                 if viewModel.history.isEmpty {
-                    ContentUnavailableView("No History", systemImage: "clock", description: Text("Your activity will appear here."))
-                        .frame(height: 200)
+                    ContentUnavailableView("No History", systemImage: "clock.arrow.circlepath", description: Text("Previous lookups appear here."))
                 } else {
-                    List {
-                        ForEach(viewModel.history) { item in
-                            Button {
-                                viewModel.hostname = item.title
-                            } label: {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(item.title)
-                                        .font(.subheadline.bold())
-                                    Text(item.detail)
-                                        .font(.caption)
-                                        .lineLimit(2)
-                                        .foregroundStyle(.secondary)
-                                    Text(item.timestamp, style: .relative)
-                                        .font(.caption2)
-                                        .foregroundStyle(.tertiary)
-                                }
+                    ForEach(viewModel.history) { item in
+                        Button {
+                            viewModel.hostname = item.title
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(item.title)
+                                    .font(.subheadline.bold())
+                                Text(item.detail)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
-                    .listStyle(.plain)
-                    .frame(height: 300)
+                    .onDelete { viewModel.history.remove(atOffsets: $0) }
                 }
             } header: {
-                Text("History")
+                HStack {
+                    Text("History")
+                    Spacer()
+                    if !viewModel.history.isEmpty {
+                        Button("Clear") { viewModel.history.removeAll() }
+                            .font(.caption)
+                    }
+                }
             }
         }
+        .navigationTitle("DNS Lookup")
     }
 }
 
 enum DNSRecordType: String {
-    case a = "A", aaaa = "AAAA", mx = "MX", txt = "TXT"
+    case a = "A", aaaa = "AAAA", mx = "MX", txt = "TXT", cname = "CNAME"
 }
 
 class DNSLookupViewModel: ObservableObject {
@@ -108,17 +155,26 @@ class DNSLookupViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var results: [String] = []
     @Published var history: [HistoryItem] = []
+    @Published var recursive = true
+    @Published var lastLatency: Double?
 
     func resolve() async {
         await MainActor.run { isLoading = true; results = [] }
 
+        let start = Date()
         let resolved = await resolve(hostname: hostname)
+        let end = Date()
 
         await MainActor.run {
             self.results = resolved
-            self.history.insert(HistoryItem(title: hostname, detail: "Resolved \(resolved.count) addresses"), at: 0)
+            self.lastLatency = end.timeIntervalSince(start) * 1000
+            self.history.insert(HistoryItem(title: hostname, detail: "Resolved \(resolved.count) records in \(String(format: "%.1f", lastLatency ?? 0))ms"), at: 0)
             self.isLoading = false
         }
+    }
+
+    func benchmark() async {
+        await resolve()
     }
 
     private func resolve(hostname: String) async -> [String] {

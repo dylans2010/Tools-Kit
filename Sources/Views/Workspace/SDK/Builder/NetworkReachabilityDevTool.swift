@@ -17,81 +17,118 @@ struct NetworkReachabilityView: View {
     @StateObject private var viewModel = NetworkReachabilityViewModel()
 
     var body: some View {
-        Form {
+        List {
             Section("Status") {
-                HStack {
-                    Text(viewModel.status.description)
-                        .font(.caption2.bold())
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .foregroundStyle(.white)
-                        .background(viewModel.status == .satisfied ? Color.green : Color.red, in: RoundedRectangle(cornerRadius: 4))
-                    Spacer()
-                    if viewModel.isExpensive {
-                        Text("Expensive Connection")
-                            .font(.caption2.bold())
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .foregroundStyle(.white)
-                            .background(Color.orange, in: RoundedRectangle(cornerRadius: 4))
+                VStack(spacing: 16) {
+                    HStack(spacing: 12) {
+                        Circle()
+                            .fill(viewModel.status == .satisfied ? Color.green : Color.red)
+                            .frame(width: 12, height: 12)
+                            .shadow(color: (viewModel.status == .satisfied ? Color.green : Color.red).opacity(0.3), radius: 4)
+
+                        Text(viewModel.status.description)
+                            .font(.title3.bold())
+
+                        Spacer()
+
+                        if viewModel.isExpensive {
+                            Text("EXPENSIVE")
+                                .font(.system(size: 8, weight: .black))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.orange.opacity(0.2))
+                                .foregroundStyle(.orange)
+                                .cornerRadius(4)
+                        }
+                    }
+
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Primary Interface").font(.caption2).foregroundStyle(.secondary)
+                            Text(viewModel.interfaceType).font(.subheadline.bold())
+                        }
+                        Spacer()
+                        VStack(alignment: .trailing) {
+                            Text("Cellular Data").font(.caption2).foregroundStyle(.secondary)
+                            Text(viewModel.interfaces.contains("Cellular") ? "On" : "Off").font(.subheadline.bold())
+                        }
                     }
                 }
-
-                LabeledContent("Interface Type", value: viewModel.interfaceType)
+                .padding(.vertical, 8)
             }
 
             Section("Capabilities") {
-                Toggle("DNS Required", isOn: .constant(true)).disabled(true)
-                Toggle("IPv4 Supported", isOn: .constant(viewModel.supportsIPv4)).disabled(true)
-                Toggle("IPv6 Supported", isOn: .constant(viewModel.supportsIPv6)).disabled(true)
-                Toggle("VPN Active", isOn: .constant(viewModel.isVPNActive)).disabled(true)
+                CapabilityRow(label: "IPv4 Support", active: viewModel.supportsIPv4)
+                CapabilityRow(label: "IPv6 Support", active: viewModel.supportsIPv6)
+                CapabilityRow(label: "VPN Active", active: viewModel.isVPNActive)
+                CapabilityRow(label: "Low Data Mode", active: viewModel.isLowDataMode)
             }
 
             Section("Active Interfaces") {
-                ForEach(viewModel.interfaces, id: \.self) { interface in
-                    Label(interface, systemImage: interfaceIcon(for: interface))
+                if viewModel.interfaces.isEmpty {
+                    Text("No active interfaces").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(viewModel.interfaces, id: \.self) { interface in
+                        HStack {
+                            Image(systemName: interfaceIcon(for: interface))
+                                .foregroundStyle(.blue)
+                                .frame(width: 24)
+                            Text(interface)
+                            Spacer()
+                            Text("Connected").font(.caption2).foregroundStyle(.green)
+                        }
+                    }
                 }
             }
 
             Section {
-                HStack {
-                    Text("History")
-                        .font(.headline)
-                    Spacer()
-                    Button("Clear") {
-                        viewModel.history.removeAll()
-                    }
-                    .font(.caption)
-                    .disabled(viewModel.history.isEmpty)
-                }
-
                 if viewModel.history.isEmpty {
-                    ContentUnavailableView("No History", systemImage: "clock", description: Text("Your activity will appear here."))
-                        .frame(height: 200)
+                    ContentUnavailableView("Monitoring...", systemImage: "antenna.radiowaves.left.and.right", description: Text("Network changes will be logged here."))
                 } else {
-                    List {
-                        ForEach(viewModel.history) { item in
-                            VStack(alignment: .leading, spacing: 4) {
+                    ForEach(viewModel.history) { item in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
                                 Text(item.title)
                                     .font(.subheadline.bold())
-                                Text(item.detail)
-                                    .font(.caption)
-                                    .lineLimit(2)
-                                    .foregroundStyle(.secondary)
-                                Text(item.timestamp, style: .relative)
-                                    .font(.caption2)
+                                Spacer()
+                                Text(item.timestamp, style: .time)
+                                    .font(.system(size: 10, design: .monospaced))
                                     .foregroundStyle(.tertiary)
                             }
+                            Text(item.detail)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
+                        .padding(.vertical, 2)
                     }
-                    .listStyle(.plain)
-                    .frame(height: 300)
                 }
             } header: {
-                Text("Log")
+                HStack {
+                    Text("Activity Log")
+                    Spacer()
+                    if !viewModel.history.isEmpty {
+                        Button("Clear") { viewModel.history.removeAll() }.font(.caption)
+                    }
+                }
             }
         }
+        .navigationTitle("Reachability")
     }
+}
+
+struct CapabilityRow: View {
+    let label: String
+    let active: Bool
+
+    var body: some View {
+        HStack {
+            Text(label)
+            Spacer()
+            Image(systemName: active ? "checkmark.circle.fill" : "xmark.circle")
+                .foregroundStyle(active ? .green : .secondary)
+        }
+    }
+}
 
     private func interfaceIcon(for type: String) -> String {
         switch type.lowercased() {
@@ -110,6 +147,7 @@ class NetworkReachabilityViewModel: ObservableObject {
     @Published var supportsIPv4 = false
     @Published var supportsIPv6 = false
     @Published var isVPNActive = false
+    @Published var isLowDataMode = false
     @Published var interfaces: [String] = []
     @Published var history: [HistoryItem] = []
 
@@ -131,6 +169,7 @@ class NetworkReachabilityViewModel: ObservableObject {
         isExpensive = path.isExpensive
         supportsIPv4 = path.supportsIPv4
         supportsIPv6 = path.supportsIPv6
+        isLowDataMode = path.isConstrained
 
         var currentInterfaces: [String] = []
         if path.usesInterfaceType(.wifi) { currentInterfaces.append("WiFi") }
@@ -138,10 +177,11 @@ class NetworkReachabilityViewModel: ObservableObject {
         if path.usesInterfaceType(.wiredEthernet) { currentInterfaces.append("Ethernet") }
         if path.usesInterfaceType(.other) { currentInterfaces.append("Other") }
         interfaces = currentInterfaces
-        interfaceType = currentInterfaces.joined(separator: ", ")
+        interfaceType = currentInterfaces.first ?? "None"
 
         if oldStatus != status {
-            history.insert(HistoryItem(title: "Status Changed", detail: "Network status changed to \(status.description)"), at: 0)
+            history.insert(HistoryItem(title: "Connection: \(status.description)", detail: "Active: \(interfaceType) | Expensive: \(isExpensive)"), at: 0)
+            if history.count > 50 { history.removeLast() }
         }
     }
 }

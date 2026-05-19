@@ -14,45 +14,79 @@ struct HeaderInspectorDevTool: DevTool {
 
 struct HeaderInspectorView: View {
     @StateObject private var viewModel = HeaderInspectorViewModel()
-    @State private var rawHeaders = ""
+    @State private var rawHeaders = "Content-Type: application/json\nCache-Control: no-cache\nStrict-Transport-Security: max-age=31536000"
 
     var body: some View {
-        Form {
-            Section("Input Raw Headers") {
-                TextEditor(text: $rawHeaders)
-                    .frame(height: 150)
-                    .font(.system(.caption, design: .monospaced))
+        List {
+            Section("Source") {
+                ZStack(alignment: .topTrailing) {
+                    TextEditor(text: $rawHeaders)
+                        .frame(height: 150)
+                        .font(.system(.caption, design: .monospaced))
+                        .padding(4)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(8)
 
-                Button("Analyze Headers") {
-                    viewModel.analyze(rawHeaders)
+                    if !rawHeaders.isEmpty {
+                        Button { rawHeaders = "" } label: {
+                            Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                        }
+                        .padding(8)
+                    }
                 }
+
+                Button {
+                    viewModel.analyze(rawHeaders)
+                } label: {
+                    Label("Analyze Security & Performance", systemImage: "magnifyingglass.circle.fill")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
                 .disabled(rawHeaders.isEmpty)
             }
 
             if !viewModel.headers.isEmpty {
-                Section("Analysis") {
+                Section("Security Score: \(viewModel.securityScore)%") {
+                    ProgressView(value: Double(viewModel.securityScore) / 100)
+                        .tint(viewModel.securityScore > 70 ? .green : (viewModel.securityScore > 40 ? .orange : .red))
+
                     ForEach(viewModel.analysisResults) { result in
-                        HStack {
-                            Image(systemName: result.isPositive ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                                .foregroundStyle(result.isPositive ? .green : .orange)
-                            VStack(alignment: .leading) {
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: result.isPositive ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
+                                .foregroundStyle(result.isPositive ? .green : .red)
+                                .font(.title3)
+
+                            VStack(alignment: .leading, spacing: 2) {
                                 Text(result.title).font(.subheadline.bold())
-                                Text(result.description).font(.caption).foregroundStyle(.secondary)
+                                Text(result.description).font(.caption2).foregroundStyle(.secondary)
                             }
                         }
+                        .padding(.vertical, 4)
                     }
                 }
 
-                Section("Parsed Headers") {
+                Section("Parsed Dictionary (\(viewModel.headers.count))") {
                     ForEach(viewModel.headers.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                        VStack(alignment: .leading) {
-                            Text(key).font(.caption.bold()).foregroundStyle(Color.accentColor)
-                            Text(value).font(.caption2).textSelection(.enabled)
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(key).font(.system(size: 8, weight: .black)).foregroundStyle(.blue)
+                                Spacer()
+                                Button { UIPasteboard.general.string = value } label: {
+                                    Image(systemName: "doc.on.doc").font(.system(size: 8))
+                                }
+                            }
+                            Text(value)
+                                .font(.system(size: 11, design: .monospaced))
+                                .textSelection(.enabled)
+                                .lineLimit(3)
                         }
+                        .padding(.vertical, 2)
                     }
                 }
             }
         }
+        .navigationTitle("Header Inspector")
+        .onAppear { if viewModel.headers.isEmpty { viewModel.analyze(rawHeaders) } }
     }
 }
 
@@ -66,10 +100,12 @@ struct HeaderAnalysisResult: Identifiable {
 class HeaderInspectorViewModel: ObservableObject {
     @Published var headers: [String: String] = [:]
     @Published var analysisResults: [HeaderAnalysisResult] = []
+    @Published var securityScore = 0
 
     func analyze(_ raw: String) {
         headers = [:]
         analysisResults = []
+        var score = 0
 
         let lines = raw.components(separatedBy: .newlines)
         for line in lines {
@@ -80,21 +116,24 @@ class HeaderInspectorViewModel: ObservableObject {
         }
 
         // Basic Security Analysis
-        checkHeader("Strict-Transport-Security", positiveDesc: "HSTS is enabled.", negativeDesc: "HSTS is missing. Risk of man-in-the-middle attacks.")
-        checkHeader("Content-Security-Policy", positiveDesc: "CSP is defined.", negativeDesc: "CSP is missing. Risk of XSS attacks.")
-        checkHeader("X-Content-Type-Options", positiveDesc: "MIME sniffing is disabled.", negativeDesc: "MIME sniffing might be enabled.")
+        if checkHeader("Strict-Transport-Security", positiveDesc: "HSTS is active. Secure transport is enforced.", negativeDesc: "HSTS is missing. Vulnerable to MITM attacks.") { score += 33 }
+        if checkHeader("Content-Security-Policy", positiveDesc: "CSP is defined. XSS protection is configured.", negativeDesc: "CSP is missing. Critical XSS risk.") { score += 34 }
+        if checkHeader("X-Content-Type-Options", positiveDesc: "MIME sniffing is blocked.", negativeDesc: "MIME sniffing is allowed. Possible script injection.") { score += 33 }
 
-        // Caching Analysis
+        self.securityScore = score
+
         if let cache = headers["Cache-Control"] {
             analysisResults.append(HeaderAnalysisResult(title: "Cache Policy", description: "Found: \(cache)", isPositive: true))
         }
     }
 
-    private func checkHeader(_ key: String, positiveDesc: String, negativeDesc: String) {
-        if headers[key] != nil {
+    private func checkHeader(_ key: String, positiveDesc: String, negativeDesc: String) -> Bool {
+        if let _ = headers.keys.first(where: { $0.lowercased() == key.lowercased() }) {
             analysisResults.append(HeaderAnalysisResult(title: key, description: positiveDesc, isPositive: true))
+            return true
         } else {
             analysisResults.append(HeaderAnalysisResult(title: key, description: negativeDesc, isPositive: false))
+            return false
         }
     }
 }

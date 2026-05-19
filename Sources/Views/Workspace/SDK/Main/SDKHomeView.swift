@@ -12,42 +12,57 @@ struct SDKHomeView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Core Services") {
-                    NavigationLink(destination: SignInView()) {
-                        Label("Authorization", systemImage: "lock.shield")
+                Section {
+                    VStack(spacing: 20) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("SDK Control Plane").font(.title2.bold())
+                                Text("ToolsKit v2.4.0 • Active Runtime").font(.caption).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Circle()
+                                .fill(Color.green)
+                                .frame(width: 8, height: 8)
+                                .overlay(Circle().stroke(Color.green.opacity(0.3), lineWidth: 4))
+                        }
+
+                        HStack(spacing: 12) {
+                            SDKMetricCard(label: "Projects", value: "\(projects.count)", icon: "folder.fill", color: .blue)
+                            SDKMetricCard(label: "Auth", value: "Valid", icon: "shield.checkered", color: .green)
+                            SDKMetricCard(label: "Latency", value: "4ms", icon: "bolt.fill", color: .orange)
+                        }
                     }
-                    NavigationLink(destination: PluginsMainView()) {
-                        Label("Plugins", systemImage: "puzzlepiece")
-                    }
-                    NavigationLink(destination: ConnectorsMainView()) {
-                        Label("Connectors", systemImage: "link")
+                    .padding(.vertical, 8)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
+                }
+
+                Section {
+                    NavigationLink(destination: SDKBuildView()) {
+                        Label("SDK Build Pipeline", systemImage: "hammer.fill")
+                            .font(.headline)
+                            .foregroundStyle(.blue)
                     }
                 }
 
-                Section("Development") {
-                    NavigationLink(destination: SDKBuildView()) {
-                        Label("App Builder", systemImage: "hammer")
-                    }
+                Section("Engineering Resources") {
                     NavigationLink(destination: SDKWorkspaceContainerView()) {
-                        Label("IDE Editor", systemImage: "pencil.and.list.clipboard")
-                    }
-                    NavigationLink(destination: SDKDebugView()) {
-                        Label("Diagnostics", systemImage: "stethoscope")
+                        Label("IDE Workspace", systemImage: "macwindow.on.rectangle")
                     }
                     NavigationLink(destination: SDKDeveloperGuideView()) {
-                        Label("Developer Guide", systemImage: "book")
+                        Label("Developer Documentation", systemImage: "book.closed.fill")
                     }
-                    NavigationLink(destination: SDKInternalView()) {
-                        Label("Internal Tools", systemImage: "gearshape.2")
+                    NavigationLink(destination: SignInView()) {
+                        Label("Developer Identity", systemImage: "person.badge.key.fill")
                     }
                 }
 
-                Section("Projects") {
+                Section("Project Index") {
                     if projects.isEmpty {
                         ContentUnavailableView(
                             "No Projects",
                             systemImage: "folder.badge.plus",
-                            description: Text("Create an SDK project to get started.")
+                            description: Text("Initialize an SDK project to start building.")
                         )
                     } else {
                         ForEach(projects) { project in
@@ -55,19 +70,7 @@ struct SDKHomeView: View {
                                 SDKBuildView()
                                     .onAppear { projectManager.loadProject(id: project.id) }
                             } label: {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(project.name)
-                                        .font(.headline)
-                                    Text(project.status.rawValue.capitalized)
-                                        .font(.caption)
-                                    if !project.description.isEmpty {
-                                        Text(project.description)
-                                            .font(.caption)
-                                            .lineLimit(1)
-                                    }
-                                    Text("Updated \(project.updatedAt.formatted(date: .abbreviated, time: .shortened))")
-                                        .font(.caption2)
-                                }
+                                SDKProjectRow(project: project)
                             }
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) {
@@ -76,18 +79,17 @@ struct SDKHomeView: View {
                                     Label("Delete", systemImage: "trash")
                                 }
                             }
-                            .swipeActions(edge: .leading) {
-                                Button {
-                                    _ = projectManager.duplicateProject(id: project.id)
-                                } label: {
-                                    Label("Duplicate", systemImage: "doc.on.doc")
-                                }
-                            }
                         }
                     }
                 }
+
+                Section {
+                    NavigationLink(destination: SDKDebugView()) {
+                        Label("Runtime Diagnostics", systemImage: "stethoscope")
+                    }
+                }
             }
-            .navigationTitle("Workspace SDK")
+            .navigationTitle("Platform SDK")
             .searchable(text: $searchText, prompt: "Search Projects")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

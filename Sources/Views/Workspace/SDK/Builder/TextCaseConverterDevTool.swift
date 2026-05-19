@@ -16,28 +16,45 @@ struct TextCaseConverterView: View {
     @StateObject private var viewModel = TextCaseConverterViewModel()
 
     var body: some View {
-        Form {
+        List {
             Section("Input") {
-                TextEditor(text: $viewModel.input)
-                    .frame(height: 100)
-            }
+                ZStack(alignment: .topTrailing) {
+                    TextEditor(text: $viewModel.input)
+                        .frame(height: 120)
+                        .font(.system(.subheadline))
 
-            Section("Transformed") {
-                VStack(alignment: .leading, spacing: 12) {
-                    caseRow(title: "UPPERCASE", value: viewModel.input.uppercased())
-                    caseRow(title: "lowercase", value: viewModel.input.lowercased())
-                    caseRow(title: "Capitalized", value: viewModel.input.capitalized)
-                    caseRow(title: "snake_case", value: viewModel.toSnakeCase())
-                    caseRow(title: "CamelCase", value: viewModel.toCamelCase())
+                    if !viewModel.input.isEmpty {
+                        Button { viewModel.input = "" } label: {
+                            Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                        }
+                        .padding(8)
+                    }
                 }
             }
-        }
-    }
 
-    private func caseRow(title: String, value: String) -> some View {
+            Section("Transformations") {
+                CaseResultRow(label: "UPPERCASE", value: viewModel.input.uppercased())
+                CaseResultRow(label: "lowercase", value: viewModel.input.lowercased())
+                CaseResultRow(label: "Capitalized", value: viewModel.input.capitalized)
+                CaseResultRow(label: "snake_case", value: viewModel.toSnakeCase())
+                CaseResultRow(label: "kebab-case", value: viewModel.toKebabCase())
+                CaseResultRow(label: "camelCase", value: viewModel.toCamelCase())
+                CaseResultRow(label: "PascalCase", value: viewModel.toPascalCase())
+                CaseResultRow(label: "Title Case", value: viewModel.toTitleCase())
+            }
+        }
+        .navigationTitle("Case Converter")
+    }
+}
+
+struct CaseResultRow: View {
+    let label: String
+    let value: String
+
+    var body: some View {
         HStack {
-            VStack(alignment: .leading) {
-                Text(title).font(.caption2.bold()).foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label).font(.system(size: 8, weight: .black)).foregroundStyle(.secondary)
                 Text(value).font(.subheadline).textSelection(.enabled)
             }
             Spacer()
@@ -46,19 +63,37 @@ struct TextCaseConverterView: View {
             } label: {
                 Image(systemName: "doc.on.doc").font(.caption)
             }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
         }
+        .padding(.vertical, 2)
     }
 }
 
 class TextCaseConverterViewModel: ObservableObject {
-    @Published var input = "Hello World"
+    @Published var input = "ToolsKit SDK"
 
     func toSnakeCase() -> String {
         input.lowercased().replacingOccurrences(of: " ", with: "_")
     }
 
+    func toKebabCase() -> String {
+        input.lowercased().replacingOccurrences(of: " ", with: "-")
+    }
+
     func toCamelCase() -> String {
+        let words = input.components(separatedBy: .whitespaces)
+        guard let first = words.first?.lowercased() else { return "" }
+        let rest = words.dropFirst().map { $0.capitalized }
+        return ([first] + rest).joined()
+    }
+
+    func toPascalCase() -> String {
         input.capitalized.replacingOccurrences(of: " ", with: "")
+    }
+
+    func toTitleCase() -> String {
+        input.capitalized
     }
 }
 

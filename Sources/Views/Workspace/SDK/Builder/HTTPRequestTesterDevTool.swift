@@ -27,14 +27,14 @@ struct HTTPRequestTesterView: View {
     var body: some View {
         VStack(spacing: 0) {
             Picker("Mode", selection: $selectedTab) {
-                Text("Request").tag(0)
-                Text("Headers").tag(1)
-                Text("Auth").tag(2)
-                Text("Response").tag(3)
-                Text("History").tag(4)
+                Label("Req", systemImage: "paperplane").tag(0)
+                Label("Head", systemImage: "list.bullet").tag(1)
+                Label("Auth", systemImage: "lock").tag(2)
+                Label("Res", systemImage: "arrow.down.circle").tag(3)
+                Label("Hist", systemImage: "clock").tag(4)
             }
             .pickerStyle(.segmented)
-            .padding(.horizontal)
+            .padding()
 
             TabView(selection: $selectedTab) {
                 requestTab.tag(0)
@@ -45,6 +45,7 @@ struct HTTPRequestTesterView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
+        .navigationTitle("HTTP Tester")
     }
 
     private var requestTab: some View {
@@ -56,30 +57,50 @@ struct HTTPRequestTesterView: View {
                             Text(method).tag(method)
                         }
                     }
+                    .pickerStyle(.menu)
                     .frame(width: 100)
 
                     TextField("https://api.example.com", text: $viewModel.url)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
+                        .font(.system(.caption, design: .monospaced))
                 }
             }
 
             Section("Body") {
-                TextEditor(text: $viewModel.body)
-                    .frame(height: 150)
-                    .font(.system(.caption, design: .monospaced))
+                ZStack(alignment: .topTrailing) {
+                    TextEditor(text: $viewModel.body)
+                        .frame(minHeight: 180)
+                        .font(.system(.caption, design: .monospaced))
+
+                    if !viewModel.body.isEmpty {
+                        Button { viewModel.body = "" } label: {
+                            Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                        }
+                        .padding(8)
+                    }
+                }
             }
 
-            Button {
-                Task { await viewModel.send() }
-                selectedTab = 3
-            } label: {
-                if viewModel.isLoading {
-                    ProgressView().padding(.trailing, 8)
+            Section {
+                Button {
+                    Task { await viewModel.send() }
+                    selectedTab = 3
+                } label: {
+                    HStack {
+                        if viewModel.isLoading {
+                            ProgressView().padding(.trailing, 8)
+                        } else {
+                            Image(systemName: "paperplane.fill")
+                        }
+                        Text("Send Request")
+                            .fontWeight(.bold)
+                    }
+                    .frame(maxWidth: .infinity)
                 }
-                Text("Send Request")
+                .buttonStyle(.borderedProminent)
+                .disabled(viewModel.isLoading || viewModel.url.isEmpty)
             }
-            .disabled(viewModel.isLoading || viewModel.url.isEmpty)
         }
     }
 
@@ -126,42 +147,54 @@ struct HTTPRequestTesterView: View {
             if let response = viewModel.lastResponse {
                 List {
                     Section("Status") {
-                        HStack {
+                        HStack(spacing: 16) {
                             Text("\(response.statusCode)")
-                                .font(.caption2.bold())
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .foregroundStyle(.white)
-                                .background(response.statusCode < 400 ? Color.green : Color.red, in: RoundedRectangle(cornerRadius: 4))
-                            Text(response.statusDescription)
+                                .font(.title2.bold().monospacedDigit())
+                                .foregroundStyle(response.statusCode < 400 ? .green : .red)
+
+                            VStack(alignment: .leading) {
+                                Text(response.statusDescription).font(.subheadline.bold())
+                                Text("\(Int(response.duration * 1000))ms duration").font(.caption2).foregroundStyle(.secondary)
+                            }
+
                             Spacer()
-                            Text("\(Int(response.duration * 1000))ms")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+
+                            Button {
+                                UIPasteboard.general.string = response.body
+                            } label: {
+                                Label("Copy Body", systemImage: "doc.on.doc")
+                                    .font(.caption2)
+                            }
+                            .buttonStyle(.bordered)
                         }
+                        .padding(.vertical, 4)
                     }
 
-                    Section("Response Headers") {
+                    Section("Response Headers (\(response.headers.count))") {
                         ForEach(response.headers.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                            LabeledContent(key, value: value)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(key).font(.caption2.bold()).foregroundStyle(.secondary)
+                                Text(value).font(.system(size: 10, design: .monospaced))
+                            }
+                            .padding(.vertical, 2)
                         }
                     }
 
                     Section("Body") {
                         ScrollView {
                             Text(response.body)
-                                .font(.system(.caption2, design: .monospaced))
-                                .padding()
+                                .font(.system(size: 11, design: .monospaced))
+                                .padding(8)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .textSelection(.enabled)
                         }
-                        .background(Color(uiColor: .systemGray6))
+                        .background(Color(.secondarySystemBackground))
                         .cornerRadius(8)
-                        .frame(minHeight: 200)
+                        .frame(minHeight: 250)
                     }
                 }
             } else {
-                ContentUnavailableView("No Response", systemImage: "arrow.up.circle", description: Text("Execute a request to see the results."))
+                ContentUnavailableView("Ready", systemImage: "paperplane.circle", description: Text("Configure and send a request to view the response."))
             }
         }
     }

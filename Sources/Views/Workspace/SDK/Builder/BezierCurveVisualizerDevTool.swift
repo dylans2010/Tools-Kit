@@ -14,42 +14,64 @@ struct BezierCurveVisualizerDevTool: DevTool {
 
 struct BezierCurveVisualizerView: View {
     @StateObject private var viewModel = BezierCurveVisualizerViewModel()
+    @State private var showingCode = false
 
     var body: some View {
-        VStack {
-            BezierCanvas(points: $viewModel.points)
-                .frame(height: 300)
-                .background(Color(uiColor: .secondarySystemBackground))
-                .cornerRadius(12)
-                .padding()
+        List {
+            Section("Interactive Canvas") {
+                VStack(spacing: 16) {
+                    BezierCanvas(points: $viewModel.points)
+                        .frame(height: 300)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(16)
+                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray.opacity(0.2), lineWidth: 1))
 
-            Form {
-                Section("SwiftUI Code") {
+                    HStack {
+                        Text("Drag points to reshape the cubic curve").font(.caption2).foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Reset") { viewModel.reset() }
+                            .font(.caption2.bold())
+                    }
+                }
+                .padding(.vertical, 8)
+            }
+
+            Section("Path Metadata") {
+                LabeledContent("Point 0 (Start)", value: "\(Int(viewModel.points[0].x)), \(Int(viewModel.points[0].y))")
+                LabeledContent("Point 1 (C1)", value: "\(Int(viewModel.points[1].x)), \(Int(viewModel.points[1].y))")
+                LabeledContent("Point 2 (C2)", value: "\(Int(viewModel.points[2].x)), \(Int(viewModel.points[2].y))")
+                LabeledContent("Point 3 (End)", value: "\(Int(viewModel.points[3].x)), \(Int(viewModel.points[3].y))")
+            }
+
+            Section("Code Export") {
+                VStack(alignment: .leading, spacing: 10) {
                     Text(viewModel.codeSnippet)
-                        .font(.system(.caption2, design: .monospaced))
-                        .padding()
-                        .background(Color.secondary.opacity(0.1))
+                        .font(.system(size: 9, design: .monospaced))
+                        .padding(10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(8)
 
                     HStack {
                         Button {
                             UIPasteboard.general.string = viewModel.codeSnippet
                         } label: {
-                            Label("Copy", systemImage: "doc.on.doc")
+                            Label("Copy SwiftUI Path", systemImage: "doc.on.doc")
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
 
-                        Button {
-                            let tempDir = FileManager.default.temporaryDirectory
-                            let fileURL = tempDir.appendingPathComponent("bezier_path.swift")
-                            try? viewModel.codeSnippet.write(to: fileURL, atomically: true, encoding: .utf8)
-                        } label: {
-                            Label("Export", systemImage: "square.and.arrow.up")
-                        }
-                        .buttonStyle(.bordered)
+                        Spacer()
+
+                        Button("Share") { viewModel.shareCode() }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
                     }
                 }
+                .padding(.vertical, 4)
             }
         }
+        .navigationTitle("Bezier Lab")
     }
 }
 
@@ -92,17 +114,38 @@ struct BezierCanvas: View {
 
 class BezierCurveVisualizerViewModel: ObservableObject {
     @Published var points: [CGPoint] = [
-        CGPoint(x: 50, y: 250),
-        CGPoint(x: 100, y: 50),
-        CGPoint(x: 200, y: 50),
-        CGPoint(x: 250, y: 250)
+        CGPoint(x: 60, y: 240),
+        CGPoint(x: 80, y: 60),
+        CGPoint(x: 220, y: 60),
+        CGPoint(x: 240, y: 240)
     ]
 
+    func reset() {
+        points = [
+            CGPoint(x: 60, y: 240),
+            CGPoint(x: 80, y: 60),
+            CGPoint(x: 220, y: 60),
+            CGPoint(x: 240, y: 240)
+        ]
+    }
+
     var codeSnippet: String {
-        "path.move(to: CGPoint(x: \(Int(points[0].x)), y: \(Int(points[0].y))))\n" +
-        "path.addCurve(to: CGPoint(x: \(Int(points[3].x)), y: \(Int(points[3].y))),\n" +
-        "              control1: CGPoint(x: \(Int(points[1].x)), y: \(Int(points[1].y))),\n" +
-        "              control2: CGPoint(x: \(Int(points[2].x)), y: \(Int(points[2].y))))"
+        "Path { path in\n" +
+        "    path.move(to: CGPoint(x: \(Int(points[0].x)), y: \(Int(points[0].y))))\n" +
+        "    path.addCurve(\n" +
+        "        to: CGPoint(x: \(Int(points[3].x)), y: \(Int(points[3].y))),\n" +
+        "        control1: CGPoint(x: \(Int(points[1].x)), y: \(Int(points[1].y))),\n" +
+        "        control2: CGPoint(x: \(Int(points[2].x)), y: \(Int(points[2].y)))\n" +
+        "    )\n" +
+        "}"
+    }
+
+    func shareCode() {
+        let av = UIActivityViewController(activityItems: [codeSnippet], applicationActivities: nil)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.windows.first?.rootViewController {
+            rootVC.present(av, animated: true)
+        }
     }
 }
 

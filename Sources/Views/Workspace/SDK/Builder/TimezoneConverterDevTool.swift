@@ -16,34 +16,49 @@ struct TimezoneConverterDevToolView: View {
     @StateObject private var viewModel = TimezoneConverterViewModel()
 
     var body: some View {
-        Form {
-            Section("Base Time") {
+        List {
+            Section("Current Origin") {
                 DatePicker("Local Time", selection: $viewModel.baseDate)
+                LabeledContent("Identifier", value: TimeZone.current.identifier)
+                    .font(.caption)
             }
 
-            Section("Target Timezones") {
-                ForEach($viewModel.targetTimezones, id: \.self) { $tzName in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(tzName).font(.subheadline.bold())
-                            Text(viewModel.format(tzName)).font(.caption.monospaced())
+            Section("Global Clock (\(viewModel.targetTimezones.count))") {
+                ForEach(viewModel.targetTimezones, id: \.self) { tzName in
+                    HStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(tzName.split(separator: "/").last?.replacingOccurrences(of: "_", with: " ") ?? tzName)
+                                .font(.subheadline.bold())
+                            Text(tzName).font(.system(size: 8, design: .monospaced)).foregroundStyle(.secondary)
                         }
+
                         Spacer()
-                        Text(viewModel.offset(tzName))
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Text(viewModel.format(tzName))
+                                .font(.system(.subheadline, design: .monospaced))
+                                .foregroundStyle(.blue)
+                            Text(viewModel.offset(tzName))
+                                .font(.caption2)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.gray.opacity(0.1), in: Capsule())
+                        }
                     }
+                    .padding(.vertical, 4)
                 }
                 .onDelete { viewModel.targetTimezones.remove(atOffsets: $0) }
 
-                Button("Add Timezone") {
-                     // Selection logic would go here
-                     if let random = TimeZone.knownTimeZoneIdentifiers.randomElement() {
-                         viewModel.targetTimezones.append(random)
-                     }
+                Menu {
+                    ForEach(["Europe/Paris", "America/Los_Angeles", "Asia/Dubai", "Australia/Sydney", "Pacific/Auckland"], id: \.self) { id in
+                        Button(id) { viewModel.targetTimezones.append(id) }
+                    }
+                } label: {
+                    Label("Quick Add City", systemImage: "plus.circle")
                 }
             }
         }
+        .navigationTitle("Timezones")
     }
 }
 

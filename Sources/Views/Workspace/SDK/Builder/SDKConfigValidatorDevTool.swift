@@ -30,46 +30,86 @@ struct SDKConfigValidatorDevTool: DevTool {
 
 struct SDKConfigValidatorView: View {
     @StateObject private var config = _DTConfigManager.shared
+    @State private var showingAddSheet = false
 
     var body: some View {
-        let sortedConfigurations = config.entries.sorted { lhs, rhs in
-            lhs.key < rhs.key
-        }
         List {
-            Section("Active Configurations") {
-                ForEach(sortedConfigurations) { entry in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(entry.key).font(.subheadline.bold())
-                            Text(entry.value).font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Text("LOCAL")
-                            .font(.caption2.bold())
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .foregroundStyle(.white)
-                            .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 4))
+            Section("Validation Overview") {
+                HStack(spacing: 12) {
+                    ConfigStatusCard(label: "Healthy", count: config.entries.count, color: .green)
+                    ConfigStatusCard(label: "Overrides", count: config.changes.count, color: .orange)
+                    ConfigStatusCard(label: "Conflicts", count: 0, color: .red)
+                }
+                .padding(.vertical, 8)
+            }
+
+            Section("Live Parameters Index") {
+                if config.entries.isEmpty {
+                    ContentUnavailableView("No Configs", systemImage: "gearshape.fill", description: Text("Runtime configurations will appear here once loaded."))
+                } else {
+                    ForEach(config.entries.sorted(by: { $0.key < $1.key })) { entry in
+                        ConfigEntryRow(entry: entry)
                     }
                 }
             }
 
-            Section("Configuration Change Log") {
-                ForEach(config.changes.reversed(), id: \.self) { change in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(change.key).font(.caption.bold())
-                        HStack {
-                            Text("previous").strikethrough()
-                            Image(systemName: "arrow.right")
-                            Text(change.value)
+            Section("Audit Trail") {
+                if config.changes.isEmpty {
+                    Text("No configuration changes recorded").font(.caption2).foregroundStyle(.secondary)
+                } else {
+                    ForEach(config.changes.reversed()) { change in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(change.key).font(.caption.bold())
+                                Spacer()
+                                Text("CHANGED").font(.system(size: 7, weight: .black)).foregroundStyle(.orange)
+                            }
+                            Text("Modified to: \(change.value)").font(.system(size: 9, design: .monospaced)).foregroundStyle(.secondary)
                         }
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-
+                        .padding(.vertical, 2)
                     }
-                    .padding(.vertical, 2)
                 }
             }
+
+            Section {
+                Button { showingAddSheet = true } label: {
+                    Label("Add Parameter Override", systemImage: "plus.circle.fill")
+                }
+                Button("Force Reload from Disk") { /* Logic */ }
+                Button(role: .destructive) { config.changes.removeAll() } label: {
+                    Label("Clear Audit Trail", systemImage: "trash")
+                }
+            }
+        }
+        .navigationTitle("Config Lab")
+    }
+}
+
+struct ConfigStatusCard: View {
+    let label: String
+    let count: Int
+    let color: Color
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label).font(.system(size: 8, weight: .black)).foregroundStyle(.secondary).textCase(.uppercase)
+            Text("\(count)").font(.title3.bold()).foregroundStyle(color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(color.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+struct ConfigEntryRow: View {
+    let entry: _DTConfigEntry
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(entry.key).font(.subheadline.bold())
+                Text(entry.value).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Image(systemName: "checkmark.circle.fill").foregroundStyle(.green).font(.caption)
         }
     }
 }

@@ -14,80 +14,157 @@ struct UUIDGeneratorDevTool: DevTool {
 
 struct UUIDGeneratorDevToolView: View {
     @StateObject private var viewModel = UUIDGeneratorViewModel()
+    @State private var showingBulkSheet = false
 
     var body: some View {
-        Form {
-            Section("Generated UUID") {
-                Text(viewModel.currentUUID)
-                    .font(.system(.headline, design: .monospaced))
-                    .textSelection(.enabled)
+        List {
+            Section("Current UUID") {
+                VStack(spacing: 16) {
+                    Text(viewModel.currentUUID)
+                        .font(.system(.title3, design: .monospaced))
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+                        .textSelection(.enabled)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
 
-                Button("Generate New") { viewModel.generate() }
+                    HStack(spacing: 12) {
+                        Button {
+                            viewModel.generate()
+                        } label: {
+                            Label("Regenerate", systemImage: "arrow.clockwise")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+
+                        Button {
+                            UIPasteboard.general.string = viewModel.currentUUID
+                        } label: {
+                            Image(systemName: "doc.on.doc")
+                                .padding(10)
+                                .background(Color.blue.opacity(0.1), in: Circle())
+                        }
+                    }
+                }
+                .padding(.vertical, 8)
             }
 
-            Section("Configuration") {
+            Section("Formatting") {
                 Toggle("Uppercase", isOn: $viewModel.isUppercase)
                 Toggle("Include Hyphens", isOn: $viewModel.includeHyphens)
+                Toggle("Braces { }", isOn: $viewModel.includeBraces)
+            }
+
+            Section("Bulk Operations") {
+                Stepper("Quantity: \(viewModel.bulkCount)", value: $viewModel.bulkCount, in: 1...100)
+
+                Button {
+                    showingBulkSheet = true
+                    viewModel.generateBulk()
+                } label: {
+                    Label("Generate Bulk List", systemImage: "list.bullet.rectangle.stack")
+                }
             }
 
             Section {
-                HStack {
-                    Text("History")
-                        .font(.headline)
-                    Spacer()
-                    Button("Clear") {
-                        viewModel.history.removeAll()
-                    }
-                    .font(.caption)
-                    .disabled(viewModel.history.isEmpty)
-                }
-
                 if viewModel.history.isEmpty {
-                    ContentUnavailableView("No History", systemImage: "clock", description: Text("Your activity will appear here."))
-                        .frame(height: 200)
+                    ContentUnavailableView("No History", systemImage: "clock.arrow.circlepath", description: Text("Generated UUIDs will appear here."))
                 } else {
-                    List {
-                        ForEach(viewModel.history) { item in
+                    ForEach(viewModel.history) { item in
+                        HStack {
+                            Text(item.title)
+                                .font(.system(size: 11, design: .monospaced))
+                            Spacer()
                             Button {
-                                viewModel.currentUUID = item.title
+                                UIPasteboard.general.string = item.title
                             } label: {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(item.title)
-                                        .font(.subheadline.bold())
-                                    Text(item.detail)
-                                        .font(.caption)
-                                        .lineLimit(2)
-                                        .foregroundStyle(.secondary)
-                                    Text(item.timestamp, style: .relative)
-                                        .font(.caption2)
-                                        .foregroundStyle(.tertiary)
-                                }
+                                Image(systemName: "doc.on.doc").font(.caption)
                             }
                         }
                     }
-                    .listStyle(.plain)
-                    .frame(height: 300)
+                    .onDelete { viewModel.history.remove(atOffsets: $0) }
                 }
             } header: {
-                Text("History")
+                HStack {
+                    Text("History")
+                    Spacer()
+                    if !viewModel.history.isEmpty {
+                        Button("Clear") { viewModel.history.removeAll() }.font(.caption)
+                    }
+                }
+            }
+        }
+        .navigationTitle("UUID Generator")
+        .sheet(isPresented: $showingBulkSheet) {
+            BulkUUIDView(uuids: viewModel.bulkResults)
+        }
+    }
+}
+
+struct BulkUUIDView: View {
+    let uuids: [String]
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List(uuids, id: \.self) { uuid in
+                Text(uuid).font(.system(size: 12, design: .monospaced))
+            }
+            .navigationTitle("Bulk UUIDs")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Copy All") {
+                        UIPasteboard.general.string = uuids.joined(separator: "\n")
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                }
             }
         }
     }
 }
 
 class UUIDGeneratorViewModel: ObservableObject {
-    @Published var currentUUID = UUID().uuidString
-    @Published var isUppercase = true
-    @Published var includeHyphens = true
+    @Published var currentUUID = ""
+    @Published var isUppercase = true { didSet { updateCurrent() } }
+    @Published var includeHyphens = true { didSet { updateCurrent() } }
+    @Published var includeBraces = false { didSet { updateCurrent() } }
+    @Published var bulkCount = 10
     @Published var history: [HistoryItem] = []
+    @Published var bulkResults: [String] = []
+
+    private var baseUUID = UUID()
+
+    init() {
+        generate()
+    }
 
     func generate() {
-        var uuid = UUID().uuidString
-        if !isUppercase { uuid = uuid.lowercased() }
-        if !includeHyphens { uuid = uuid.replacingOccurrences(of: "-", with: "") }
+        baseUUID = UUID()
+        updateCurrent()
+        history.insert(HistoryItem(title: currentUUID, detail: "v4"), at: 0)
+        if history.count > 50 { history.removeLast() }
+    }
 
-        currentUUID = uuid
-        history.insert(HistoryItem(title: uuid, detail: "Generated"), at: 0)
+    func generateBulk() {
+        bulkResults = (0..<bulkCount).map { _ in
+            format(UUID())
+        }
+    }
+
+    private func updateCurrent() {
+        currentUUID = format(baseUUID)
+    }
+
+    private func format(_ uuid: UUID) -> String {
+        var s = uuid.uuidString
+        if !isUppercase { s = s.lowercased() }
+        if !includeHyphens { s = s.replacingOccurrences(of: "-", with: "") }
+        if includeBraces { s = "{\(s)}" }
+        return s
     }
 }
 

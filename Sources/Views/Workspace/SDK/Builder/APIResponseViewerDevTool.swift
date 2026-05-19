@@ -15,32 +15,86 @@ struct APIResponseViewerDevTool: DevTool {
 struct APIResponseViewerView: View {
     @StateObject private var viewModel = APIResponseViewerViewModel()
     @State private var viewMode: APIViewMode = .pretty
+    @State private var searchText = ""
 
     var body: some View {
-        Form {
-            Section("Input Raw Data") {
-                TextEditor(text: $viewModel.rawInput)
-                    .frame(height: 150)
-                    .font(.system(.caption, design: .monospaced))
+        List {
+            Section("Raw Response Body") {
+                ZStack(alignment: .topTrailing) {
+                    TextEditor(text: $viewModel.rawInput)
+                        .frame(height: 160)
+                        .font(.system(size: 11, design: .monospaced))
+                        .padding(4)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(8)
+
+                    VStack {
+                        if !viewModel.rawInput.isEmpty {
+                            Button { viewModel.rawInput = "" } label: {
+                                Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                            }
+                            .padding(8)
+                        }
+
+                        Button {
+                            if let s = UIPasteboard.general.string { viewModel.rawInput = s }
+                        } label: {
+                            Image(systemName: "doc.on.clipboard.fill").foregroundStyle(.blue)
+                        }
+                        .padding(8)
+                    }
+                }
+
+                HStack {
+                    Button("Format JSON") { viewModel.formatJSON() }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+
+                    Spacer()
+
+                    Menu {
+                        Button("Export as .json") { viewModel.export(as: "response.json") }
+                        Button("Export as .txt") { viewModel.export(as: "response.txt") }
+                    } label: {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .font(.caption2)
+                }
             }
 
-            Section("Analysis & Formatting") {
+            Section {
                 Picker("View Mode", selection: $viewMode) {
-                    Text("Pretty").tag(APIViewMode.pretty)
-                    Text("Raw").tag(APIViewMode.raw)
-                    Text("Structure").tag(APIViewMode.structure)
+                    Label("Pretty", systemImage: "text.alignleft").tag(APIViewMode.pretty)
+                    Label("Raw", systemImage: "curlybraces").tag(APIViewMode.raw)
+                    Label("Tree", systemImage: "list.bullet.indent").tag(APIViewMode.structure)
                 }
                 .pickerStyle(.segmented)
-
-                contentView
-                    .frame(minHeight: 250)
             }
 
-            Section("Metrics") {
-                LabeledContent("Data Size", value: viewModel.dataSize)
-                LabeledContent("Format Detected", value: viewModel.formatDetected)
+            Section {
+                contentView
+                    .frame(minHeight: 300)
+            } header: {
+                if viewMode == .structure {
+                    TextField("Filter keys...", text: $searchText)
+                        .textFieldStyle(.roundedBorder)
+                        .textCase(nil)
+                        .autocorrectionDisabled()
+                }
+            }
+
+            Section("Payload Analysis") {
+                HStack {
+                    MetricLabel(label: "Size", value: viewModel.dataSize)
+                    Divider()
+                    MetricLabel(label: "Type", value: viewModel.formatDetected)
+                    Divider()
+                    MetricLabel(label: "Nodes", value: "\(viewModel.nodeCount)")
+                }
+                .padding(.vertical, 4)
             }
         }
+        .navigationTitle("Response Lab")
     }
 
     @ViewBuilder
@@ -95,16 +149,31 @@ struct StructureItem: Identifiable {
 
 class APIResponseViewerViewModel: ObservableObject {
     @Published var rawInput = "" {
-        didSet {
-            process()
-        }
+        didSet { process() }
     }
     @Published var prettyOutput = ""
     @Published var dataSize = "0 bytes"
     @Published var formatDetected = "None"
     @Published var structure: [StructureItem] = []
+    @Published var nodeCount = 0
+
+    func formatJSON() {
+        guard let data = rawInput.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data, options: []),
+              let prettyData = try? JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted]),
+              let prettyString = String(data: prettyData, encoding: .utf8) else { return }
+        rawInput = prettyString
+    }
+
+    func export(as filename: String) {
+        let av = UIActivityViewController(activityItems: [rawInput], applicationActivities: nil)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            windowScene.windows.first?.rootViewController?.present(av, animated: true)
+        }
+    }
 
     private func process() {
+        nodeCount = 0
         guard let data = rawInput.data(using: .utf8) else {
             prettyOutput = ""
             dataSize = "0 bytes"
@@ -123,7 +192,7 @@ class APIResponseViewerViewModel: ObservableObject {
             structure = buildStructure(from: json)
         } else {
             prettyOutput = rawInput
-            formatDetected = "Plain Text / Unknown"
+            formatDetected = "Raw"
             structure = []
         }
     }

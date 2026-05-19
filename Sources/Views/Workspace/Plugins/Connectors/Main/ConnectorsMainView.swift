@@ -42,81 +42,72 @@ struct ConnectorsMainView: View {
 
     var body: some View {
         List {
-            Section("Overview") {
-                let conn = manager.connectors
-                LabeledContent("Active", value: "\(conn.filter { $0.status == .active }.count)")
-                LabeledContent("Errors", value: "\(conn.filter { $0.status == .error }.count)")
-                LabeledContent("Endpoints", value: "\(conn.reduce(0) { $0 + $1.endpoints.count })")
+            Section {
+                VStack(spacing: 20) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Bridge Controller").font(.title2.bold())
+                            Text("External Integration Plane • Secure Auth").font(.caption).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "cable.connector.horizontal").foregroundStyle(.orange).font(.title2)
+                    }
+
+                    HStack(spacing: 12) {
+                        ConnectorMetric(label: "Active", value: "\(manager.connectors.filter { $0.status == .active }.count)", color: .green)
+                        ConnectorMetric(label: "Faults", value: "\(manager.connectors.filter { $0.status == .error }.count)", color: .red)
+                        ConnectorMetric(label: "Nodes", value: "\(manager.connectors.reduce(0) { $0 + $1.endpoints.count })", color: .blue)
+                    }
+                }
+                .padding(.vertical, 8)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
             }
 
-            Section("Filters") {
-                Picker("Filter", selection: $selectedFilter) {
-                    ForEach(ConnectorFilter.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+            Section {
+                NavigationLink(destination: ConnectorBuilderView()) {
+                    Label("Connector Studio", systemImage: "hammer.fill")
+                        .font(.headline)
+                        .foregroundStyle(.orange)
                 }
-                .pickerStyle(.segmented)
-
-                Picker("Sort", selection: $sortOrder) {
-                    ForEach(SortOrder.allCases, id: \.self) { Text($0.rawValue).tag($0) }
-                }
-                .pickerStyle(.menu)
             }
 
-            Section("Your Connectors") {
+            Section("Active Interfaces") {
                 if manager.connectors.isEmpty {
                     ContentUnavailableView(
                         "No Connectors",
                         systemImage: "cable.connector",
-                        description: Text("Create your first connector to integrate external services.")
-                    )
-                } else if filteredConnectors.isEmpty {
-                    ContentUnavailableView(
-                        "No Results",
-                        systemImage: "magnifyingglass",
-                        description: Text("Try a different search or filter.")
+                        description: Text("Bridge external services into the SDK environment.")
                     )
                 } else {
                     ForEach(filteredConnectors) { connector in
                         NavigationLink {
                             ConnectorDefinitionDetailView(connector: connector)
                         } label: {
-                            VStack(alignment: .leading, spacing: 2) {
-                                HStack {
-                                    Text(connector.name).font(.subheadline.bold())
-                                    Spacer()
-                                    Text(connector.status.rawValue.uppercased())
-                                        .font(.system(size: 8, weight: .black))
-                                        .foregroundStyle(connectorStatusColor(connector.status))
-                                }
-                                Text(connector.identifier)
-                                    .font(.caption2.monospaced())
-                                    .foregroundStyle(.secondary)
-                            }
-                            .padding(.vertical, 2)
+                            ConnectorRow(connector: connector)
                         }
                     }
                 }
             }
 
-            Section("Platform Tools") {
-                NavigationLink(destination: ConnectorBuilderView()) {
-                    Label("Connector Builder", systemImage: "hammer")
-                }
+            Section("Advanced Infrastructure") {
                 NavigationLink(destination: SDKConnectorsView()) {
-                    Label("SDK Connectors", systemImage: "puzzlepiece.extension")
+                    Label("System Registry", systemImage: "puzzlepiece.extension.fill")
                 }
-                NavigationLink(destination: ConnectorLogsView()) {
-                    Label("Execution Logs", systemImage: "doc.text.magnifyingglass")
-                }
-                NavigationLink(destination: ConnectorSecurityView()) {
-                    Label("Security & Scopes", systemImage: "lock.shield")
+
+                DisclosureGroup("Observability") {
+                    NavigationLink(destination: ConnectorLogsView()) {
+                        Label("Traffic Monitor", systemImage: "waveform.path.ecg")
+                    }
+                    NavigationLink(destination: ConnectorSecurityView()) {
+                        Label("Auth Protocols", systemImage: "lock.shield.fill")
+                    }
                 }
             }
 
             Section {
-                Button {
-                    showingDocs = true
-                } label: {
-                    Label("View Documentation", systemImage: "book.closed")
+                Button { showingDocs = true } label: {
+                    Label("Developer Guide", systemImage: "book.closed.fill")
                 }
             }
         }
@@ -151,6 +142,21 @@ struct ConnectorsMainView: View {
 }
 
 // MARK: - Detail View
+
+private struct ConnectorMetric: View {
+    let label: String
+    let value: String
+    let color: Color
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(value).font(.title3.bold().monospacedDigit()).foregroundStyle(color)
+            Text(label).font(.system(size: 8, weight: .black)).foregroundStyle(.secondary).textCase(.uppercase)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .background(color.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
+    }
+}
 
 struct ConnectorDefinitionDetailView: View {
     @State var connector: ConnectorDefinition

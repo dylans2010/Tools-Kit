@@ -16,37 +16,54 @@ struct UnicodeInspectorView: View {
     @StateObject private var viewModel = UnicodeInspectorViewModel()
 
     var body: some View {
-        Form {
-            Section("Input Text") {
-                TextField("Enter characters...", text: $viewModel.input)
+        List {
+            Section("Character Stream") {
+                TextField("Enter characters (emojis supported)...", text: $viewModel.input)
+                    .font(.title3)
+                    .padding(.vertical, 4)
+
+                HStack {
+                    Text("\(viewModel.input.count) characters").font(.caption2).foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Clear") { viewModel.input = "" }.font(.caption2)
+                }
             }
 
-            if !viewModel.characters.isEmpty {
-                Section("Analysis") {
+            Section("Scalar Properties") {
+                if viewModel.characters.isEmpty {
+                    ContentUnavailableView("Enter Text", systemImage: "character.cursor.ibeam", description: Text("Input characters to see their Unicode properties."))
+                } else {
                     ForEach(viewModel.characters) { item in
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text(item.character)
-                                    .font(.title2)
-                                    .frame(width: 40)
-                                VStack(alignment: .leading) {
-                                    Text(item.name).font(.caption.bold())
-                                    Text("U+\(item.scalar)").font(.caption2.monospaced())
+                        HStack(spacing: 16) {
+                            Text(item.character)
+                                .font(.system(size: 32))
+                                .frame(width: 50, height: 50)
+                                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(item.name)
+                                    .font(.subheadline.bold())
+                                    .lineLimit(1)
+
+                                HStack(spacing: 8) {
+                                    Text("U+\(item.scalar)").font(.system(size: 10, design: .monospaced)).foregroundStyle(.blue)
+                                    Text(item.category).font(.system(size: 8, weight: .black)).foregroundStyle(.secondary).textCase(.uppercase)
                                 }
-                                Spacer()
-                                Text(item.category)
-                                    .font(.caption2.bold())
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .foregroundStyle(.white)
-                                    .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 4))
                             }
+
+                            Spacer()
+
+                            Button { UIPasteboard.general.string = "U+\(item.scalar)" } label: {
+                                Image(systemName: "doc.on.doc").font(.caption)
+                            }
+                            .foregroundStyle(.secondary)
                         }
                         .padding(.vertical, 4)
                     }
                 }
             }
         }
+        .navigationTitle("Unicode Lab")
     }
 }
 

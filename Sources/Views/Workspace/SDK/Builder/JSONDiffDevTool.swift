@@ -16,42 +16,65 @@ struct JSONDiffView: View {
     @StateObject private var viewModel = JSONDiffViewModel()
 
     var body: some View {
-        VStack {
-            HStack {
-                VStack {
-                    Text("Left JSON").font(.caption.bold())
-                    TextEditor(text: $viewModel.leftJSON)
-                        .frame(height: 150)
-                        .font(.system(.caption2, design: .monospaced))
-                }
-                VStack {
-                    Text("Right JSON").font(.caption.bold())
-                    TextEditor(text: $viewModel.rightJSON)
-                        .frame(height: 150)
-                        .font(.system(.caption2, design: .monospaced))
-                }
-            }
-            .padding(.horizontal)
+        List {
+            Section("Comparison Source") {
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading) {
+                            Text("Source A").font(.system(size: 8, weight: .black)).foregroundStyle(.secondary)
+                            TextEditor(text: $viewModel.leftJSON)
+                                .frame(height: 120)
+                                .font(.system(size: 9, design: .monospaced))
+                                .padding(4)
+                                .background(Color(.secondarySystemBackground))
+                                .cornerRadius(8)
+                        }
 
-            Form {
-                Section("Differences") {
-                    if viewModel.diffResults.isEmpty {
-                        Text("No differences found").foregroundStyle(.secondary)
-                    } else {
-                        ForEach(viewModel.diffResults) { result in
-                            HStack {
-                                Image(systemName: result.type.icon)
-                                    .foregroundStyle(result.type.color)
-                                VStack(alignment: .leading) {
-                                    Text(result.path).font(.caption.bold())
-                                    Text(result.description).font(.caption2).foregroundStyle(.secondary)
-                                }
+                        VStack(alignment: .leading) {
+                            Text("Source B").font(.system(size: 8, weight: .black)).foregroundStyle(.secondary)
+                            TextEditor(text: $viewModel.rightJSON)
+                                .frame(height: 120)
+                                .font(.system(size: 9, design: .monospaced))
+                                .padding(4)
+                                .background(Color(.secondarySystemBackground))
+                                .cornerRadius(8)
+                        }
+                    }
+
+                    Button { viewModel.swap() } label: {
+                        Label("Swap Sources", systemImage: "arrow.left.and.right")
+                            .font(.caption2.bold())
+                    }
+                }
+                .padding(.vertical, 8)
+            }
+
+            Section("Deltas Found (\(viewModel.diffResults.count))") {
+                if viewModel.diffResults.isEmpty {
+                    ContentUnavailableView("Identical Objects", systemImage: "equal.circle", description: Text("No structural or value differences detected between inputs."))
+                } else {
+                    ForEach(viewModel.diffResults) { result in
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: result.type.icon)
+                                .foregroundStyle(result.type.color)
+                                .font(.title3)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(result.path).font(.system(size: 11, weight: .bold, design: .monospaced))
+                                Text(result.description).font(.caption2).foregroundStyle(.secondary)
                             }
                         }
+                        .padding(.vertical, 4)
                     }
                 }
             }
+
+            Section {
+                Button("Format Both Inputs") { viewModel.formatBoth() }
+                Button("Clear All") { viewModel.leftJSON = ""; viewModel.rightJSON = "" }
+            }
         }
+        .navigationTitle("JSON Diff")
     }
 }
 
@@ -90,6 +113,24 @@ class JSONDiffViewModel: ObservableObject {
         didSet { compare() }
     }
     @Published var diffResults: [JSONDiffResult] = []
+
+    func swap() {
+        let temp = leftJSON
+        leftJSON = rightJSON
+        rightJSON = temp
+    }
+
+    func formatBoth() {
+        leftJSON = format(leftJSON)
+        rightJSON = format(rightJSON)
+    }
+
+    private func format(_ s: String) -> String {
+        guard let data = s.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data),
+              let pretty = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) else { return s }
+        return String(data: pretty, encoding: .utf8) ?? s
+    }
 
     private func compare() {
         guard let leftData = leftJSON.data(using: .utf8),

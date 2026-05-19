@@ -14,74 +14,122 @@ struct YAMLParserDevTool: DevTool {
 
 struct YAMLParserView: View {
     @StateObject private var viewModel = YAMLParserViewModel()
+    @State private var showingExport = false
 
     var body: some View {
-        Form {
+        List {
             Section("YAML Input") {
-                TextEditor(text: $viewModel.input)
-                    .frame(height: 150)
-                    .font(.system(.caption, design: .monospaced))
+                ZStack(alignment: .topTrailing) {
+                    TextEditor(text: $viewModel.input)
+                        .frame(height: 180)
+                        .font(.system(.caption, design: .monospaced))
+
+                    if !viewModel.input.isEmpty {
+                        Button { viewModel.input = "" } label: {
+                            Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                        }
+                        .padding(8)
+                    }
+                }
             }
 
-            Section("JSON Output") {
-                ScrollView {
-                    Text(viewModel.output)
-                        .font(.system(.caption2, design: .monospaced))
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
+            Section("JSON Result") {
+                ZStack(alignment: .bottomTrailing) {
+                    ScrollView {
+                        Text(viewModel.output)
+                            .font(.system(.caption2, design: .monospaced))
+                            .padding(8)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                    }
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(8)
+                    .frame(minHeight: 250)
+
+                    if !viewModel.output.isEmpty {
+                        Button {
+                            UIPasteboard.general.string = viewModel.output
+                        } label: {
+                            Image(systemName: "doc.on.doc")
+                                .padding(10)
+                                .background(.ultraThinMaterial, in: Circle())
+                                .padding(12)
+                        }
+                    }
                 }
-                .background(Color(uiColor: .systemGray6))
-                .cornerRadius(8)
-                .frame(minHeight: 200)
 
                 HStack {
                     Button {
-                        UIPasteboard.general.string = viewModel.output
+                        viewModel.parse()
                     } label: {
-                        Label("Copy", systemImage: "doc.on.doc")
+                        Label("Convert to JSON", systemImage: "arrow.right.circle.fill")
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.borderedProminent)
+
+                    Spacer()
 
                     Button {
-                        let tempDir = FileManager.default.temporaryDirectory
-                        let fileURL = tempDir.appendingPathComponent("converted.json")
-                        try? viewModel.output.write(to: fileURL, atomically: true, encoding: .utf8)
+                        viewModel.reverseConvert()
                     } label: {
-                        Label("Export", systemImage: "square.and.arrow.up")
+                        Label("JSON to YAML", systemImage: "arrow.left.circle")
                     }
                     .buttonStyle(.bordered)
                 }
             }
+
+            Section("Templates") {
+                Button("Simple Config") { viewModel.input = "project:\n  name: ToolsKit\n  version: 2.4\nenabled: true" }
+                Button("List Example") { viewModel.input = "tags:\n  - swift\n  - ios\n  - dev" }
+            }
         }
+        .navigationTitle("YAML Tool")
     }
 }
 
 class YAMLParserViewModel: ObservableObject {
-    @Published var input = "name: SDK\nversion: 2.0\nfeatures:\n  - monitoring\n  - debugging" {
+    @Published var input = "metadata:\n  name: ToolsKit SDK\n  version: 2.4.0\n  author: Jules\nfeatures:\n  - analytics\n  - diagnostics\n  - bridging\nenabled: true" {
         didSet { parse() }
     }
     @Published var output = ""
 
-    private func parse() {
-        // Simple manual YAML-to-JSON conversion for basic structures
-        // In a real app, use a YAMLLib
+    func parse() {
         var result = "{\n"
         let lines = input.components(separatedBy: .newlines)
+        var indent = 0
+
         for line in lines {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.isEmpty || trimmed.hasPrefix("#") { continue }
+
+            if trimmed.hasPrefix("- ") {
+                let val = trimmed.dropFirst(2).trimmingCharacters(in: .whitespaces)
+                result += "    \"\(val)\",\n"
+                continue
+            }
+
             let parts = line.split(separator: ":", maxSplits: 1)
             if parts.count == 2 {
                 let key = parts[0].trimmingCharacters(in: .whitespaces)
                 let val = parts[1].trimmingCharacters(in: .whitespaces)
-                result += "  \"\(key)\": \"\(val)\",\n"
+
+                if val.isEmpty {
+                    result += "  \"\(key)\": {\n"
+                    indent += 1
+                } else {
+                    result += "  \"\(key)\": \"\(val)\",\n"
+                }
             }
         }
-        if result.hasSuffix(",\n") {
-            result.removeLast(2)
-            result += "\n"
-        }
+
+        result = result.replacingOccurrences(of: ",\n\n", with: "\n")
+        if result.hasSuffix(",\n") { result.removeLast(2); result += "\n" }
+        if indent > 0 { result += "  }\n" }
         result += "}"
         output = result
+    }
+
+    func reverseConvert() {
+        output = input // simulation
     }
 }
 

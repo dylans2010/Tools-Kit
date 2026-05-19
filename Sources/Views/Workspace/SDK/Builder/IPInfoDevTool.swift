@@ -16,34 +16,40 @@ struct IPInfoDevToolView: View {
     @StateObject private var viewModel = IPInfoViewModel()
 
     var body: some View {
-        Form {
-            Section("Target IP") {
+        List {
+            Section("Network Target") {
                 HStack {
-                    TextField("8.8.8.8", text: $viewModel.ipAddress)
+                    Image(systemName: "network").foregroundStyle(.secondary)
+                    TextField("Current IP (empty) or 8.8.8.8", text: $viewModel.ipAddress)
                         .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
 
-                    Button("Lookup") {
+                    Button {
                         Task { await viewModel.lookup() }
+                    } label: {
+                        if viewModel.isLoading {
+                            ProgressView().controlSize(.small)
+                        } else {
+                            Text("Query")
+                        }
                     }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(viewModel.isLoading)
                 }
-            }
-
-            if viewModel.isLoading {
-                ProgressView().frame(maxWidth: .infinity)
             }
 
             if let info = viewModel.info {
-                Section("Geographical Data") {
-                    LabeledContent("Country", value: info.country ?? "Unknown")
-                    LabeledContent("Region", value: info.region ?? "Unknown")
-                    LabeledContent("City", value: info.city ?? "Unknown")
-                    LabeledContent("Coordinates", value: info.loc ?? "Unknown")
+                Section("Geolocation") {
+                    IPInfoRow(label: "Country", value: info.country, icon: "flag.fill")
+                    IPInfoRow(label: "Region", value: info.region, icon: "map.fill")
+                    IPInfoRow(label: "City", value: info.city, icon: "building.2.fill")
+                    IPInfoRow(label: "Location", value: info.loc, icon: "location.fill")
                 }
 
-                Section("Network Data") {
-                    LabeledContent("Organization", value: info.org ?? "Unknown")
-                    LabeledContent("Timezone", value: info.timezone ?? "Unknown")
-                    LabeledContent("Postal Code", value: info.postal ?? "Unknown")
+                Section("Provider") {
+                    IPInfoRow(label: "ASN", value: info.org, icon: "server.rack")
+                    IPInfoRow(label: "Timezone", value: info.timezone, icon: "clock.fill")
+                    IPInfoRow(label: "Postal", value: info.postal, icon: "envelope.fill")
                 }
             }
 

@@ -16,43 +16,73 @@ struct Base64DecoderView: View {
     @StateObject private var viewModel = Base64DecoderViewModel()
 
     var body: some View {
-        Form {
+        List {
             Section("Input Base64") {
-                TextEditor(text: $viewModel.inputText)
-                    .frame(height: 120)
-                    .font(.system(.body, design: .monospaced))
+                ZStack(alignment: .topTrailing) {
+                    TextEditor(text: $viewModel.inputText)
+                        .frame(height: 140)
+                        .font(.system(.subheadline, design: .monospaced))
+
+                    if !viewModel.inputText.isEmpty {
+                        Button { viewModel.inputText = "" } label: {
+                            Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                        }
+                        .padding(8)
+                    }
+                }
+
+                HStack {
+                    Button("Paste") {
+                        if let s = UIPasteboard.general.string { viewModel.inputText = s }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+
+                    Spacer()
+
+                    if viewModel.isError {
+                        Label("Invalid Base64", systemImage: "exclamationmark.triangle.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.red)
+                    }
+                }
             }
 
-            Section("Output") {
+            Section("Decoded Result") {
                 if viewModel.isError {
                     Text(viewModel.outputText)
                         .foregroundStyle(.red)
                         .font(.caption)
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.red.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
                 } else {
-                    Text(viewModel.outputText)
-                        .font(.system(.body, design: .monospaced))
-                        .textSelection(.enabled)
-                        .frame(minHeight: 60)
-                }
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(viewModel.outputText)
+                            .font(.system(.subheadline, design: .monospaced))
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, minHeight: 80, alignment: .topLeading)
+                            .padding(8)
+                            .background(Color(.secondarySystemBackground))
+                            .cornerRadius(8)
 
-                HStack {
-                    Button {
-                        UIPasteboard.general.string = viewModel.outputText
-                    } label: {
-                        Label("Copy", systemImage: "doc.on.doc")
-                    }
-                    .buttonStyle(.bordered)
+                        HStack(spacing: 12) {
+                            Button {
+                                UIPasteboard.general.string = viewModel.outputText
+                            } label: {
+                                Label("Copy", systemImage: "doc.on.doc")
+                            }
+                            .buttonStyle(.borderedProminent)
 
-                    Button {
-                        let tempDir = FileManager.default.temporaryDirectory
-                        let fileURL = tempDir.appendingPathComponent("decoded_base64.txt")
-                        try? viewModel.outputText.write(to: fileURL, atomically: true, encoding: .utf8)
-                    } label: {
-                        Label("Export", systemImage: "square.and.arrow.up")
+                            Button {
+                                viewModel.shareOutput()
+                            } label: {
+                                Label("Share", systemImage: "square.and.arrow.up")
+                            }
+                            .buttonStyle(.bordered)
+                        }
                     }
-                    .buttonStyle(.bordered)
                 }
-                .disabled(viewModel.isError)
             }
 
             Section {
@@ -102,9 +132,7 @@ struct Base64DecoderView: View {
 
 class Base64DecoderViewModel: ObservableObject {
     @Published var inputText = "" {
-        didSet {
-            decode()
-        }
+        didSet { decode() }
     }
     @Published var outputText = ""
     @Published var isError = false
@@ -121,14 +149,13 @@ class Base64DecoderViewModel: ObservableObject {
         base64 = base64.replacingOccurrences(of: "-", with: "+")
                        .replacingOccurrences(of: "_", with: "/")
 
-        // Fix padding
         let remainder = base64.count % 4
         if remainder > 0 {
             base64 = base64.padding(toLength: base64.count + (4 - remainder), withPad: "=", startingAt: 0)
         }
 
         guard let data = Data(base64Encoded: base64) else {
-            outputText = "Invalid Base64 format"
+            outputText = "Malformed Base64 string. Check for invalid characters or length."
             isError = true
             return
         }
@@ -137,12 +164,22 @@ class Base64DecoderViewModel: ObservableObject {
             outputText = decodedString
             isError = false
         } else {
-            outputText = "Data decoded but contains non-UTF8 characters (\(data.count) bytes)"
+            // Hex dump for binary
+            outputText = "Binary Data (\(data.count) bytes):\n" + data.map { String(format: "%02hhX", $0) }.joined(separator: " ")
             isError = false
         }
 
         if history.first?.title != inputText {
-            history.insert(HistoryItem(title: inputText, detail: isError ? "Failed decode" : "Decoded successfully"), at: 0)
+            history.insert(HistoryItem(title: inputText, detail: isError ? "Failed" : "Success"), at: 0)
+            if history.count > 20 { history.removeLast() }
+        }
+    }
+
+    func shareOutput() {
+        let av = UIActivityViewController(activityItems: [outputText], applicationActivities: nil)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.windows.first?.rootViewController {
+            rootVC.present(av, animated: true)
         }
     }
 }

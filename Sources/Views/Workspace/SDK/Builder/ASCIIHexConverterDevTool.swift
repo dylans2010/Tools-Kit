@@ -16,77 +16,133 @@ struct ASCIIHexConverterView: View {
     @StateObject private var viewModel = ASCIIHexConverterViewModel()
 
     var body: some View {
-        Form {
-            Section("Text (ASCII/UTF-8)") {
-                TextEditor(text: $viewModel.textInput)
-                    .frame(height: 100)
-                    .font(.system(.body, design: .monospaced))
+        List {
+            Section("Source Text") {
+                ZStack(alignment: .topTrailing) {
+                    TextEditor(text: $viewModel.textInput)
+                        .frame(height: 100)
+                        .font(.system(.subheadline, design: .monospaced))
+
+                    if !viewModel.textInput.isEmpty {
+                        Button { viewModel.textInput = "" } label: {
+                            Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                        }
+                        .padding(8)
+                    }
+                }
             }
 
-            Section("Hexadecimal") {
-                TextEditor(text: $viewModel.hexInput)
-                    .frame(height: 100)
-                    .font(.system(.body, design: .monospaced))
+            Section("Representations") {
+                ConverterRow(label: "Hexadecimal", value: $viewModel.hexInput)
+                ConverterRow(label: "Binary", value: $viewModel.binaryInput)
+                ConverterRow(label: "Octal", value: $viewModel.octalInput)
+                ConverterRow(label: "Decimal (Bytes)", value: $viewModel.decimalInput)
             }
 
             Section("Configuration") {
-                Toggle("Add Spaces", isOn: $viewModel.addSpaces)
-                Toggle("Uppercase Hex", isOn: $viewModel.isUppercase)
+                Toggle("Group Bytes (Spaces)", isOn: $viewModel.addSpaces)
+                Toggle("Uppercase Output", isOn: $viewModel.isUppercase)
+                Toggle("Include C-Style Prefix (0x, 0b)", isOn: $viewModel.addPrefix)
+            }
+
+            Section("System Specs") {
+                LabeledContent("Encoding", value: "UTF-8 / Unicode")
+                LabeledContent("Endianness", value: "Host (Little Endian)")
+                LabeledContent("Bit Width", value: "8-bit per unit")
             }
         }
+        .navigationTitle("Base Converter")
+    }
+}
+
+struct ConverterRow: View {
+    let label: String
+    @Binding var value: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label).font(.system(size: 8, weight: .black)).foregroundStyle(.blue).textCase(.uppercase)
+            HStack {
+                TextField("", text: $value)
+                    .font(.system(size: 11, design: .monospaced))
+                    .textFieldStyle(.plain)
+
+                Button {
+                    UIPasteboard.general.string = value
+                } label: {
+                    Image(systemName: "doc.on.doc").font(.caption2)
+                }
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 
 class ASCIIHexConverterViewModel: ObservableObject {
-    @Published var textInput = "" {
-        didSet {
-            if !isProcessingHex {
-                isProcessingText = true
-                convertToHex()
-                isProcessingText = false
-            }
-        }
+    @Published var textInput = "ToolsKit" {
+        didSet { if !lock { updateFromText() } }
     }
     @Published var hexInput = "" {
-        didSet {
-            if !isProcessingText {
-                isProcessingHex = true
-                convertToText()
-                isProcessingHex = false
-            }
-        }
+        didSet { if !lock { updateFromHex() } }
+    }
+    @Published var binaryInput = ""
+    @Published var octalInput = ""
+    @Published var decimalInput = ""
+
+    @Published var addSpaces = true { didSet { updateFromText() } }
+    @Published var isUppercase = true { didSet { updateFromText() } }
+    @Published var addPrefix = false { didSet { updateFromText() } }
+
+    private var lock = false
+
+    init() {
+        updateFromText()
     }
 
-    @Published var addSpaces = true
-    @Published var isUppercase = true
+    private func updateFromText() {
+        lock = true
+        defer { lock = false }
 
-    private var isProcessingText = false
-    private var isProcessingHex = false
-
-    private func convertToHex() {
         guard let data = textInput.data(using: .utf8) else { return }
-        let format = isUppercase ? "%02X" : "%02x"
-        let hex = data.map { String(format: format, $0) }.joined(separator: addSpaces ? " " : "")
-        hexInput = hex
+
+        // Hex
+        let hexFormat = (addPrefix ? "0x" : "") + (isUppercase ? "%02X" : "%02x")
+        hexInput = data.map { String(format: hexFormat, $0) }.joined(separator: addSpaces ? " " : "")
+
+        // Binary
+        binaryInput = data.map { byte in
+            let b = String(byte, radix: 2)
+            let padded = String(repeating: "0", count: 8 - b.count) + b
+            return (addPrefix ? "0b" : "") + padded
+        }.joined(separator: addSpaces ? " " : "")
+
+        // Octal
+        octalInput = data.map { (addPrefix ? "0" : "") + String($0, radix: 8) }.joined(separator: addSpaces ? " " : "")
+
+        // Decimal
+        decimalInput = data.map { String($0) }.joined(separator: addSpaces ? ", " : "")
     }
 
-    private func convertToText() {
-        let cleanedHex = hexInput.replacingOccurrences(of: " ", with: "")
-                                .replacingOccurrences(of: "0x", with: "")
+    private func updateFromHex() {
+        lock = true
+        defer { lock = false }
+
+        let cleaned = hexInput.replacingOccurrences(of: " ", with: "")
+                             .replacingOccurrences(of: "0x", with: "")
+                             .replacingOccurrences(of: "0X", with: "")
 
         var data = Data()
-        var startIndex = cleanedHex.startIndex
-        while startIndex < cleanedHex.endIndex {
-            let endIndex = cleanedHex.index(startIndex, offsetBy: 2, limitedBy: cleanedHex.endIndex) ?? cleanedHex.endIndex
-            let hexByte = String(cleanedHex[startIndex..<endIndex])
-            if let byte = UInt8(hexByte, radix: 16) {
+        var idx = cleaned.startIndex
+        while idx < cleaned.endIndex {
+            let next = cleaned.index(idx, offsetBy: 2, limitedBy: cleaned.endIndex) ?? cleaned.endIndex
+            if let byte = UInt8(cleaned[idx..<next], radix: 16) {
                 data.append(byte)
             }
-            startIndex = endIndex
+            idx = next
         }
 
-        if let decoded = String(data: data, encoding: .utf8) {
-            textInput = decoded
+        if let s = String(data: data, encoding: .utf8) {
+            textInput = s
         }
     }
 }

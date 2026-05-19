@@ -18,91 +18,103 @@ struct WebSocketMonitorView: View {
     @State private var messageToSend = ""
 
     var body: some View {
-        Form {
-            Section("Connection") {
-                HStack {
-                    TextField("wss://echo.websocket.org", text: $viewModel.url)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
+        List {
+            Section("Socket Handshake") {
+                VStack(spacing: 12) {
+                    HStack {
+                        TextField("wss://api.endpoint.com", text: $viewModel.url)
+                            .textFieldStyle(.plain)
+                            .font(.system(size: 13, design: .monospaced))
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
 
-                    Button(viewModel.isConnected ? "Disconnect" : "Connect") {
-                        if viewModel.isConnected {
-                            viewModel.disconnect()
-                        } else {
-                            viewModel.connect()
+                        Button(viewModel.isConnected ? "Close" : "Open") {
+                            viewModel.isConnected ? viewModel.disconnect() : viewModel.connect()
                         }
+                        .buttonStyle(.borderedProminent)
+                        .tint(viewModel.isConnected ? .red : .blue)
+                        .controlSize(.small)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(viewModel.isConnected ? .red : .accentColor)
-                }
+                    .padding(8)
+                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
 
-                HStack {
-                    Text(viewModel.isConnected ? "Connected" : "Disconnected")
-                        .font(.caption2.bold())
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .foregroundStyle(.white)
-                        .background(viewModel.isConnected ? Color.green : Color.secondary, in: RoundedRectangle(cornerRadius: 4))
-                    Spacer()
-                    if viewModel.isConnected {
-                        Text("Latency: \(viewModel.latency)ms")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                    HStack(spacing: 20) {
+                        SocketMetric(label: "Status", value: viewModel.isConnected ? "ACTIVE" : "IDLE", color: viewModel.isConnected ? .green : .secondary)
+                        SocketMetric(label: "Latency", value: "\(viewModel.latency)ms", color: .orange)
+                        SocketMetric(label: "Frames", value: "\(viewModel.messageHistory.count)", color: .blue)
                     }
                 }
+                .padding(.vertical, 8)
             }
 
             if viewModel.isConnected {
-                Section("Send Message") {
+                Section("Outbound Frame") {
                     HStack {
-                        TextField("Message content...", text: $messageToSend)
-                        Button("Send") {
+                        TextField("Type message...", text: $messageToSend)
+                            .font(.subheadline)
+
+                        Button {
                             viewModel.send(messageToSend)
                             messageToSend = ""
+                        } label: {
+                            Image(systemName: "paperplane.fill")
                         }
                         .disabled(messageToSend.isEmpty)
                     }
                 }
             }
 
-            Section {
-                HStack {
-                    Text("Messages")
-                        .font(.headline)
-                    Spacer()
-                    Button("Clear") {
-                        viewModel.messageHistory.removeAll()
-                    }
-                    .font(.caption)
-                    .disabled(viewModel.messageHistory.isEmpty)
-                }
-
+            Section("Frame History") {
                 if viewModel.messageHistory.isEmpty {
-                    ContentUnavailableView("No History", systemImage: "clock", description: Text("Your activity will appear here."))
-                        .frame(height: 200)
+                    ContentUnavailableView("No Frames", systemImage: "bolt.horizontal.circle", description: Text("Connection traffic will appear here."))
                 } else {
-                    List {
-                        ForEach(viewModel.messageHistory) { item in
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(item.title)
-                                    .font(.subheadline.bold())
-                                Text(item.detail)
-                                    .font(.caption)
-                                    .lineLimit(2)
-                                    .foregroundStyle(.secondary)
-                                Text(item.timestamp, style: .relative)
-                                    .font(.caption2)
-                                    .foregroundStyle(.tertiary)
-                            }
-                        }
+                    ForEach(viewModel.messageHistory) { item in
+                        FrameRow(item: item)
                     }
-                    .listStyle(.plain)
-                    .frame(height: 300)
                 }
-            } header: {
-                Text("Messages")
+            }
+
+            Section {
+                Button(role: .destructive) { viewModel.messageHistory.removeAll() } label: {
+                    Label("Clear Log", systemImage: "trash")
+                }
             }
         }
+        .navigationTitle("Socket Lab")
+    }
+}
+
+struct SocketMetric: View {
+    let label: String
+    let value: String
+    let color: Color
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label).font(.system(size: 8, weight: .black)).foregroundStyle(.secondary).textCase(.uppercase)
+            Text(value).font(.system(size: 13, weight: .bold, design: .monospaced)).foregroundStyle(color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+struct FrameRow: View {
+    let item: HistoryItem
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: item.title == "Sent" ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
+                .foregroundStyle(item.title == "Sent" ? .blue : .green)
+                .font(.caption)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.detail)
+                    .font(.system(size: 11, design: .monospaced))
+                    .lineLimit(5)
+                Text(item.timestamp, style: .time)
+                    .font(.system(size: 8))
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .padding(.vertical, 2)
     }
 }
 

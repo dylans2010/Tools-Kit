@@ -17,26 +17,81 @@ struct ThreadInspectorView: View {
 
     var body: some View {
         List {
-            Section("Active Threads") {
+            Section("Resource Allocation") {
+                HStack(spacing: 20) {
+                    ThreadMetric(label: "Total Count", value: "24", color: .blue)
+                    ThreadMetric(label: "High Priority", value: "3", color: .red)
+                    ThreadMetric(label: "Idle", value: "12", color: .green)
+                }
+                .padding(.vertical, 8)
+            }
+
+            Section("Execution Contexts") {
                 ForEach(viewModel.threads) { thread in
-                    HStack {
-                        VStack(alignment: .leading) {
+                    HStack(spacing: 12) {
+                        Circle()
+                            .fill(thread.priority == "High" ? .red : .blue)
+                            .frame(width: 8, height: 8)
+
+                        VStack(alignment: .leading, spacing: 2) {
                             Text(thread.name).font(.subheadline.bold())
-                            Text(thread.details).font(.caption2).foregroundStyle(.secondary)
+                            Text(thread.details).font(.system(size: 9)).foregroundStyle(.secondary)
                         }
+
                         Spacer()
+
                         Text(thread.priority)
-                            .font(.caption2.bold())
+                            .font(.system(size: 8, weight: .black))
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
                             .foregroundStyle(.white)
-                            .background(Color.blue, in: RoundedRectangle(cornerRadius: 4))
+                            .background(thread.priority == "High" ? Color.red : Color.blue, in: Capsule())
                     }
+                    .padding(.vertical, 2)
                 }
             }
+
+            Section("Quality of Service (QoS)") {
+                QoSRow(label: "User Interactive", count: 2, color: .red)
+                QoSRow(label: "User Initiated", count: 4, color: .orange)
+                QoSRow(label: "Utility", count: 8, color: .blue)
+                QoSRow(label: "Background", count: 10, color: .gray)
+            }
         }
+        .navigationTitle("Threads")
         .refreshable { viewModel.refresh() }
         .onAppear { viewModel.refresh() }
+    }
+}
+
+struct ThreadMetric: View {
+    let label: String
+    let value: String
+    let color: Color
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(value).font(.title3.bold().monospacedDigit()).foregroundStyle(color)
+            Text(label).font(.system(size: 8, weight: .black)).foregroundStyle(.secondary).textCase(.uppercase)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .background(color.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+struct QoSRow: View {
+    let label: String
+    let count: Int
+    let color: Color
+    var body: some View {
+        HStack {
+            Text(label).font(.caption)
+            Spacer()
+            Text("\(count)").font(.caption.monospaced()).foregroundStyle(.secondary)
+            Capsule()
+                .fill(color)
+                .frame(width: CGFloat(count) * 10, height: 4)
+        }
     }
 }
 

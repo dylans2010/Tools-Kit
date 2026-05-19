@@ -15,41 +15,103 @@ struct EncryptionToolDevTool: DevTool {
 
 struct EncryptionToolView: View {
     @StateObject private var viewModel = EncryptionToolViewModel()
+    @State private var showingKey = false
 
     var body: some View {
-        Form {
-            Section("Keys") {
-                HStack {
-                    SecureField("Password / Key", text: $viewModel.key)
-                    Button("Gen") { viewModel.generateKey() }
-                }
-            }
+        List {
+            Section("Vault Key") {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        if showingKey {
+                            TextField("Key (Base64)", text: $viewModel.key)
+                                .font(.system(.caption2, design: .monospaced))
+                        } else {
+                            SecureField("Key (Base64)", text: $viewModel.key)
+                        }
 
-            Section("Input") {
-                TextEditor(text: $viewModel.input)
-                    .frame(height: 100)
-            }
+                        Button { showingKey.toggle() } label: {
+                            Image(systemName: showingKey ? "eye.slash" : "eye")
+                        }
+                    }
 
-            Section("Actions") {
-                HStack {
-                    Button("Encrypt") { viewModel.encrypt() }
-                        .buttonStyle(.borderedProminent)
-                    Button("Decrypt") { viewModel.decrypt() }
+                    HStack {
+                        Button("Generate Key") { viewModel.generateKey() }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+
+                        Spacer()
+
+                        Button("Paste Key") {
+                            if let s = UIPasteboard.general.string { viewModel.key = s }
+                        }
                         .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+
+            Section("Data Buffer") {
+                ZStack(alignment: .topTrailing) {
+                    TextEditor(text: $viewModel.input)
+                        .frame(height: 120)
+                        .font(.system(size: 11, design: .monospaced))
+                        .padding(4)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(8)
+
+                    if !viewModel.input.isEmpty {
+                        Button { viewModel.input = "" } label: {
+                            Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                        }
+                        .padding(8)
+                    }
+                }
+
+                HStack(spacing: 16) {
+                    Button { viewModel.encrypt() } label: {
+                        Label("Encrypt", systemImage: "lock.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+
+                    Button { viewModel.decrypt() } label: {
+                        Label("Decrypt", systemImage: "lock.open.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
                 }
             }
 
-            Section("Output") {
-                Text(viewModel.output)
-                    .font(.system(.caption2, design: .monospaced))
-                    .textSelection(.enabled)
-                    .frame(minHeight: 60)
+            if !viewModel.output.isEmpty || !viewModel.error.isEmpty {
+                Section("Ciphertext / Plaintext") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        if !viewModel.error.isEmpty {
+                            Label(viewModel.error, systemImage: "exclamationmark.triangle.fill")
+                                .font(.caption2.bold())
+                                .foregroundStyle(.red)
+                        } else {
+                            Text(viewModel.output)
+                                .font(.system(size: 10, design: .monospaced))
+                                .padding(10)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color.green.opacity(0.05))
+                                .cornerRadius(8)
+                                .textSelection(.enabled)
 
-                if !viewModel.error.isEmpty {
-                    Text(viewModel.error).font(.caption).foregroundStyle(.red)
+                            HStack {
+                                Button("Copy Result") { UIPasteboard.general.string = viewModel.output }
+                                Spacer()
+                                Button("Clear") { viewModel.output = "" }
+                            }
+                            .font(.caption2)
+                            .foregroundStyle(.blue)
+                        }
+                    }
                 }
             }
         }
+        .navigationTitle("AES GCM Lab")
     }
 }
 

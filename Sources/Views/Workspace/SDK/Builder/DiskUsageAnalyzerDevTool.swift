@@ -16,30 +16,77 @@ struct DiskUsageAnalyzerView: View {
     @StateObject private var viewModel = DiskUsageAnalyzerViewModel()
 
     var body: some View {
-        VStack {
-            HStack(spacing: 4) {
-                ForEach(viewModel.items) { item in
-                    Rectangle()
-                        .fill(item.color)
-                        .frame(width: CGFloat(item.percentage) * 3, height: 20)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.secondary.opacity(0.1))
-            .cornerRadius(4)
-            .padding()
+        List {
+            Section("Storage Distribution") {
+                VStack(spacing: 20) {
+                    HStack(spacing: 2) {
+                        ForEach(viewModel.items) { item in
+                            Rectangle()
+                                .fill(item.color)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 24)
+                        }
+                    }
+                    .clipShape(Capsule())
+                    .background(Color.gray.opacity(0.1), in: Capsule())
 
-            List(viewModel.items) { item in
-                HStack {
-                    Circle().fill(item.color).frame(width: 10, height: 10)
-                    Text(item.name)
-                    Spacer()
-                    Text(item.size).font(.caption.monospaced())
-                    Text("(\(Int(item.percentage))%)").font(.caption2).foregroundStyle(.secondary)
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                        ForEach(viewModel.items) { item in
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack {
+                                    Circle().fill(item.color).frame(width: 8, height: 8)
+                                    Text(item.name).font(.system(size: 10, weight: .bold)).foregroundStyle(.secondary)
+                                }
+                                Text(item.size).font(.headline.monospacedDigit())
+                                Text("\(Int(item.percentage))% of total").font(.system(size: 8)).foregroundStyle(.tertiary)
+                            }
+                        }
+                    }
+                }
+                .padding(.vertical, 12)
+            }
+
+            Section("Directory Breakdown (Simulated)") {
+                DirectoryRow(name: "Documents", size: "1.2 GB", icon: "doc.fill", color: .blue)
+                DirectoryRow(name: "Library", size: "840 MB", icon: "books.vertical.fill", color: .orange)
+                DirectoryRow(name: "Caches", size: "412 MB", icon: "archivebox.fill", color: .purple)
+                DirectoryRow(name: "Temp", size: "48 MB", icon: "trash.fill", color: .secondary)
+            }
+
+            Section {
+                Button {
+                    viewModel.load()
+                } label: {
+                    Label("Recalculate Usage", systemImage: "arrow.clockwise")
+                }
+
+                Button(role: .destructive) {
+                    // Simulation
+                } label: {
+                    Label("Purge System Caches", systemImage: "flame.fill")
                 }
             }
         }
+        .navigationTitle("Disk Analyzer")
         .onAppear { viewModel.load() }
+    }
+}
+
+struct DirectoryRow: View {
+    let name: String
+    let size: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundStyle(color)
+                .frame(width: 24)
+            Text(name).font(.subheadline)
+            Spacer()
+            Text(size).font(.caption.monospaced()).foregroundStyle(.secondary)
+        }
     }
 }
 

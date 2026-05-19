@@ -4,6 +4,9 @@ struct WorkspaceHomeView: View {
     @StateObject private var mailStore = MailStore.shared
     @StateObject private var authorizationManager = AuthorizationManager.shared
     @State private var showingSignIn = false
+    @Environment(\.editMode) private var editMode
+
+    @State private var sections: [HomeSection] = WorkspaceHomeView.defaultSections
 
     private var hasMailAccounts: Bool {
         !mailStore.accounts.isEmpty
@@ -19,119 +22,23 @@ struct WorkspaceHomeView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Workspace") {
-                    NavigationLink { NotesView() } label: {
-                        Label("Notes", systemImage: "note.text")
-                    }
-                    NavigationLink { TasksHomeView() } label: {
-                        Label("Tasks", systemImage: "checklist")
-                    }
-                    NavigationLink { FileManagementView() } label: {
-                        Label("Files", systemImage: "folder")
-                    }
-                    NavigationLink { CalendarHomeView() } label: {
-                        Label("Calendar", systemImage: "calendar")
-                    }
-                    NavigationLink { SpreadsheetsHomeView() } label: {
-                        Label("Spreadsheets", systemImage: "tablecells")
-                    }
-                    NavigationLink { WorkspaceHabitTrackerView() } label: {
-                        Label("Habits", systemImage: "flame")
-                    }
-                }
+                ForEach($sections) { $section in
+                    Section(section.title) {
+                        let filteredIndices = Array(section.items.enumerated()).filter { $0.element.isVisible || editMode?.wrappedValue.isEditing == true }.map { $0.offset }
 
-                Section("Creation") {
-                    NavigationLink { NotebooksHomeView() } label: {
-                        Label("Notebooks", systemImage: "book.closed")
-                    }
-                    NavigationLink { ArticlesHomeView() } label: {
-                        Label("Articles", systemImage: "newspaper")
-                    }
-                    NavigationLink { EditingHomeView() } label: {
-                        Label("Media Editing", systemImage: "photo.stack")
-                    }
-                    NavigationLink { SlidesHomeView() } label: {
-                        Label("Slides", systemImage: "rectangle.on.rectangle")
-                    }
-                    NavigationLink { WhiteboardsHomeView() } label: {
-                        Label("Whiteboards", systemImage: "scribble.variable")
-                    }
-                }
-
-                Section("Collaboration") {
-                    NavigationLink { AgenticUIHomeView() } label: {
-                        Label("Agentic System", systemImage: "sparkles")
-                    }
-                    NavigationLink { PersonaHomeView() } label: {
-                        Label("Persona", systemImage: "brain.head.profile")
-                    }
-                    NavigationLink { CollaborationHomeView() } label: {
-                        Label("Collaboration", systemImage: "person.2")
-                    }
-                    NavigationLink { JoinMeetingView() } label: {
-                        Label("Meetings", systemImage: "video")
-                    }
-                    NavigationLink { AutomationHomeView() } label: {
-                        Label("Automations", systemImage: "bolt")
-                    }
-                    NavigationLink { IntegrationsHomeView() } label: {
-                        Label("Integrations", systemImage: "square.grid.3x3")
-                    }
-                    NavigationLink { TimeTravelHomeView() } label: {
-                        Label("Time Travel", systemImage: "clock.arrow.circlepath")
-                    }
-                }
-
-                Section("System") {
-                    Group {
-                        if authorizationManager.authState == .authenticated {
-                            NavigationLink { SDKHomeView() } label: {
-                                Label("SDK", systemImage: "hammer")
-                            }
-                            NavigationLink { PluginsMainView() } label: {
-                                Label("Plugins", systemImage: "puzzlepiece.extension")
-                            }
-                            NavigationLink { ConnectorsMainView() } label: {
-                                Label("Connectors", systemImage: "cable.connector")
-                            }
-                        } else {
-                            Button {
-                                handleSDKAccess()
-                            } label: {
-                                Label("SDK (Sign In Required)", systemImage: "hammer")
-                                    .foregroundStyle(.secondary)
-                            }
-                            Button {
-                                handleSDKAccess()
-                            } label: {
-                                Label("Plugins (Sign In Required)", systemImage: "puzzlepiece.extension")
-                                    .foregroundStyle(.secondary)
-                            }
-                            Button {
-                                handleSDKAccess()
-                            } label: {
-                                Label("Connectors (Sign In Required)", systemImage: "cable.connector")
-                                    .foregroundStyle(.secondary)
-                            }
+                        ForEach(filteredIndices, id: \.self) { index in
+                            HomeRow(item: $section.items[index], authManager: authorizationManager, onAuthRequired: handleSDKAccess)
+                        }
+                        .onMove { indices, newOffset in
+                            section.items.move(fromOffsets: indices, toOffset: newOffset)
+                            saveLayout()
                         }
                     }
-
-                    NavigationLink { SecurityHomeView() } label: {
-                        Label("Security", systemImage: "lock.shield")
-                    }
-                    NavigationLink { SecurityOnboardingView(authService: AuthService.shared) } label: {
-                        Label("Security Setup", systemImage: "shield.checkered")
-                    }
-                    NavigationLink { GitHubRouterView() } label: {
-                        Label("GitHub", systemImage: "terminal")
-                    }
                 }
 
-                Section("Settings") {
+                Section("Mail & Settings") {
                     if hasMailAccounts {
-                        NavigationLink {
-                            UniversalInboxView()
-                        } label: {
+                        NavigationLink { UniversalInboxView() } label: {
                             Label("Mail", systemImage: "envelope")
                         }
                     } else {
@@ -139,7 +46,7 @@ struct WorkspaceHomeView: View {
                             Label("Mail", systemImage: "envelope")
                         }
                     }
-                                    }
+                }
             }
             .navigationTitle("Workspace")
             .sheet(isPresented: $showingSignIn) {
@@ -150,7 +57,12 @@ struct WorkspaceHomeView: View {
             .onAppear {
                 // Remove auto sign-in on appear, let handleSDKAccess manage it
             }
+            .onAppear(perform: loadLayout)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    EditButton()
+                }
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink {
                         AIChatSettingsRouter()
@@ -161,6 +73,158 @@ struct WorkspaceHomeView: View {
             }
         }
         .withPluginOverlay()
+    }
+}
+
+// MARK: - Models
+
+struct HomeSection: Identifiable, Codable {
+    let id: String
+    var title: String
+    var items: [HomeItem]
+}
+
+struct HomeItem: Identifiable, Codable {
+    let id: String
+    var title: String
+    var icon: String
+    var destination: AnyView?
+    var requiresAuth: Bool = false
+    var isVisible: Bool = true
+
+    enum CodingKeys: String, CodingKey {
+        case id, title, icon, requiresAuth, isVisible
+    }
+
+    init(id: String, title: String, icon: String, destination: AnyView? = nil, requiresAuth: Bool = false, isVisible: Bool = true) {
+        self.id = id; self.title = title; self.icon = icon; self.destination = destination; self.requiresAuth = requiresAuth; self.isVisible = isVisible
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        icon = try container.decode(String.self, forKey: .icon)
+        requiresAuth = try container.decode(Bool.self, forKey: .requiresAuth)
+        isVisible = try container.decode(Bool.self, forKey: .isVisible)
+        destination = nil
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(title, forKey: .title)
+        try container.encode(icon, forKey: .icon)
+        try container.encode(requiresAuth, forKey: .requiresAuth)
+        try container.encode(isVisible, forKey: .isVisible)
+    }
+}
+
+// MARK: - Helper Views
+
+struct HomeRow: View {
+    @Binding var item: HomeItem
+    let authManager: AuthorizationManager
+    let onAuthRequired: () -> Void
+    @Environment(\.editMode) private var editMode
+
+    var body: some View {
+        if editMode?.wrappedValue.isEditing == true {
+            Button {
+                item.isVisible.toggle()
+            } label: {
+                HStack {
+                    Label(item.title, systemImage: item.icon)
+                        .foregroundStyle(item.isVisible ? .primary : .secondary)
+                    Spacer()
+                    Image(systemName: item.isVisible ? "eye" : "eye.slash")
+                        .foregroundStyle(item.isVisible ? .blue : .secondary)
+                }
+            }
+            .buttonStyle(.plain)
+        } else {
+            if item.requiresAuth && authManager.authState != .authenticated {
+                Button(action: onAuthRequired) {
+                    Label("\(item.title) (Sign In Required)", systemImage: item.icon)
+                        .foregroundStyle(.secondary)
+                }
+            } else if let dest = item.destination {
+                NavigationLink {
+                    dest
+                } label: {
+                    Label(item.title, systemImage: item.icon)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Persistence
+
+extension WorkspaceHomeView {
+    static let defaultSections: [HomeSection] = [
+        HomeSection(id: "workspace", title: "Workspace", items: [
+            HomeItem(id: "notes", title: "Notes", icon: "note.text", destination: AnyView(NotesView())),
+            HomeItem(id: "tasks", title: "Tasks", icon: "checklist", destination: AnyView(TasksHomeView())),
+            HomeItem(id: "files", title: "Files", icon: "folder", destination: AnyView(FileManagementView())),
+            HomeItem(id: "calendar", title: "Calendar", icon: "calendar", destination: AnyView(CalendarHomeView())),
+            HomeItem(id: "spreadsheets", title: "Spreadsheets", icon: "tablecells", destination: AnyView(SpreadsheetsHomeView())),
+            HomeItem(id: "habits", title: "Habits", icon: "flame", destination: AnyView(WorkspaceHabitTrackerView()))
+        ]),
+        HomeSection(id: "creation", title: "Creation", items: [
+            HomeItem(id: "notebooks", title: "Notebooks", icon: "book.closed", destination: AnyView(NotebooksHomeView())),
+            HomeItem(id: "articles", title: "Articles", icon: "newspaper", destination: AnyView(ArticlesHomeView())),
+            HomeItem(id: "media", title: "Media Editing", icon: "photo.stack", destination: AnyView(EditingHomeView())),
+            HomeItem(id: "slides", title: "Slides", icon: "rectangle.on.rectangle", destination: AnyView(SlidesHomeView())),
+            HomeItem(id: "whiteboards", title: "Whiteboards", icon: "scribble.variable", destination: AnyView(WhiteboardsHomeView()))
+        ]),
+        HomeSection(id: "collaboration", title: "Collaboration", items: [
+            HomeItem(id: "agentic", title: "Agentic System", icon: "sparkles", destination: AnyView(AgenticUIHomeView())),
+            HomeItem(id: "persona", title: "Persona", icon: "brain.head.profile", destination: AnyView(PersonaHomeView())),
+            HomeItem(id: "collaboration_main", title: "Collaboration", icon: "person.2", destination: AnyView(CollaborationHomeView())),
+            HomeItem(id: "meetings", title: "Meetings", icon: "video", destination: AnyView(JoinMeetingView())),
+            HomeItem(id: "automations", title: "Automations", icon: "bolt", destination: AnyView(AutomationHomeView())),
+            HomeItem(id: "integrations", title: "Integrations", icon: "square.grid.3x3", destination: AnyView(IntegrationsHomeView())),
+            HomeItem(id: "timetravel", title: "Time Travel", icon: "clock.arrow.circlepath", destination: AnyView(TimeTravelHomeView()))
+        ]),
+        HomeSection(id: "system", title: "System", items: [
+            HomeItem(id: "sdk", title: "SDK", icon: "hammer", destination: AnyView(SDKHomeView()), requiresAuth: true),
+            HomeItem(id: "plugins", title: "Plugins", icon: "puzzlepiece.extension", destination: AnyView(PluginsMainView()), requiresAuth: true),
+            HomeItem(id: "connectors", title: "Connectors", icon: "cable.connector", destination: AnyView(ConnectorsMainView()), requiresAuth: true),
+            HomeItem(id: "security", title: "Security", icon: "lock.shield", destination: AnyView(SecurityHomeView())),
+            HomeItem(id: "github", title: "GitHub", icon: "terminal", destination: AnyView(GitHubRouterView()))
+        ])
+    ]
+
+    private func saveLayout() {
+        if let encoded = try? JSONEncoder().encode(sections) {
+            UserDefaults.standard.set(encoded, forKey: "workspace_home_layout_v3")
+        }
+    }
+
+    private func loadLayout() {
+        guard let data = UserDefaults.standard.data(forKey: "workspace_home_layout_v3"),
+              var decoded = try? JSONDecoder().decode([HomeSection].self, from: data) else { return }
+
+        // Restore destinations which aren't Codable
+        for sIdx in decoded.indices {
+            for iIdx in decoded[sIdx].items.indices {
+                let itemId = decoded[sIdx].items[iIdx].id
+                if let originalItem = findOriginalItem(id: itemId) {
+                    decoded[sIdx].items[iIdx].destination = originalItem.destination
+                }
+            }
+        }
+        self.sections = decoded
+    }
+
+    private func findOriginalItem(id: String) -> HomeItem? {
+        for section in WorkspaceHomeView.defaultSections {
+            if let item = section.items.first(where: { $0.id == id }) {
+                return item
+            }
+        }
+        return nil
     }
 }
 

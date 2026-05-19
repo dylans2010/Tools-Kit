@@ -14,32 +14,80 @@ struct ScriptRunnerDevTool: DevTool {
 
 struct ScriptRunnerView: View {
     @StateObject private var viewModel = ScriptRunnerViewModel()
-    @State private var script = "console.log('Starting SDK task...');\nToolsKit.sync();"
+    @State private var script = "// SDK Automation Hook\nconsole.log('Initializing workflow...');\nToolsKit.sync();\nconsole.log('Sync complete.');"
 
     var body: some View {
-        Form {
-            Section("Script Editor") {
-                TextEditor(text: $script)
-                    .frame(height: 200)
-                    .font(.system(.caption, design: .monospaced))
+        List {
+            Section("Logic Console") {
+                VStack(spacing: 12) {
+                    ZStack(alignment: .topTrailing) {
+                        TextEditor(text: $script)
+                            .frame(height: 200)
+                            .font(.system(size: 11, design: .monospaced))
+                            .padding(4)
+                            .background(Color(.secondarySystemBackground))
+                            .cornerRadius(8)
 
-                Button("Run Script") {
-                    Task { await viewModel.run(script) }
+                        Button {
+                            UIPasteboard.general.string = script
+                        } label: {
+                            Image(systemName: "doc.on.doc").foregroundStyle(.secondary)
+                        }
+                        .padding(8)
+                    }
+
+                    HStack {
+                        Menu {
+                            Button("Health Check Loop") { script = "while(true) { check(); wait(1000); }" }
+                            Button("Batch Processing") { script = "items.forEach(i => process(i));" }
+                        } label: {
+                            Label("Templates", systemImage: "text.badge.plus")
+                        }
+                        .font(.caption2)
+
+                        Spacer()
+
+                        Button {
+                            Task { await viewModel.run(script) }
+                        } label: {
+                            if viewModel.isRunning {
+                                ProgressView().controlSize(.small)
+                            } else {
+                                Label("Execute Script", systemImage: "play.fill")
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(viewModel.isRunning)
+                    }
                 }
-                .disabled(viewModel.isRunning)
+                .padding(.vertical, 4)
             }
 
-            Section("Output / Console") {
-                ScrollView {
-                    Text(viewModel.output)
-                        .font(.system(.caption2, design: .monospaced))
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
+            Section("Output Trace") {
+                VStack(alignment: .leading, spacing: 8) {
+                    ScrollView {
+                        Text(viewModel.output)
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundStyle(.white)
+                            .padding(10)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .frame(height: 150)
+                    .background(Color.black)
+                    .cornerRadius(8)
+
+                    HStack {
+                        Text("Exit Code: \(viewModel.isRunning ? "--" : "0")")
+                        Spacer()
+                        Button("Clear Terminal") { viewModel.output = "" }
+                    }
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(.secondary)
                 }
-                .background(Color.black.opacity(0.05))
-                .frame(height: 150)
+                .padding(.vertical, 4)
             }
         }
+        .navigationTitle("Automation")
     }
 }
 

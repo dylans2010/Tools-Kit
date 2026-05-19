@@ -14,33 +14,92 @@ struct KeychainViewerDevTool: DevTool {
 
 struct KeychainViewerView: View {
     @StateObject private var viewModel = KeychainViewerViewModel()
+    @State private var showingAddSheet = false
 
     var body: some View {
         List {
-            Section("Keychain Items") {
+            Section("App Keychain Index") {
                 if viewModel.items.isEmpty {
-                    Text("No items found").foregroundStyle(.secondary)
+                    ContentUnavailableView("Empty Vault", systemImage: "key.viewfinder", description: Text("No generic password entries found for this application bundle."))
                 } else {
-                    ForEach($viewModel.items) { $item in
-                        VStack(alignment: .leading) {
-                            Text(item.account).font(.headline)
-                            Text(item.service).font(.caption).foregroundStyle(.secondary)
-                        }
+                    ForEach(viewModel.items) { item in
+                        KeychainEntryRow(item: item)
                     }
                     .onDelete(perform: viewModel.delete)
                 }
             }
 
-            Section("Add Entry") {
-                TextField("Service", text: $viewModel.newService)
-                TextField("Account", text: $viewModel.newAccount)
-                SecureField("Value", text: $viewModel.newValue)
-                Button("Save Entry") { viewModel.save() }
-                    .disabled(viewModel.newService.isEmpty || viewModel.newAccount.isEmpty)
+            Section {
+                Button { showingAddSheet = true } label: {
+                    Label("Manually Add Entry", systemImage: "plus.key.fill")
+                }
+
+                Button("Export Secure Backup") { /* Implementation */ }
             }
         }
+        .navigationTitle("Keychain")
         .refreshable { viewModel.load() }
         .onAppear { viewModel.load() }
+        .sheet(isPresented: $showingAddSheet) {
+            AddKeychainEntryView(viewModel: viewModel)
+        }
+    }
+}
+
+struct KeychainEntryRow: View {
+    let item: KeychainItem
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "lock.shield.fill")
+                .foregroundStyle(.blue)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.account).font(.subheadline.bold())
+                Text(item.service).font(.system(size: 9)).foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Menu {
+                Button("Copy Password") { /* SecItemCopyMatching */ }
+                Button("Copy Metadata") { UIPasteboard.general.string = "\(item.service):\(item.account)" }
+            } label: {
+                Image(systemName: "ellipsis.circle").foregroundStyle(.tertiary)
+            }
+        }
+        .padding(.vertical, 2)
+    }
+}
+
+struct AddKeychainEntryView: View {
+    @ObservedObject var viewModel: KeychainViewerViewModel
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Identity") {
+                    TextField("Service (e.g. com.app.api)", text: $viewModel.newService)
+                    TextField("Account (e.g. username)", text: $viewModel.newAccount)
+                }
+                Section("Secret") {
+                    SecureField("Password / Token", text: $viewModel.newValue)
+                }
+            }
+            .navigationTitle("New Secure Item")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        viewModel.save()
+                        dismiss()
+                    }
+                    .disabled(viewModel.newService.isEmpty || viewModel.newAccount.isEmpty || viewModel.newValue.isEmpty)
+                }
+            }
+        }
+        .presentationDetents([.medium])
     }
 }
 
