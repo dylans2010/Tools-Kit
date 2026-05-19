@@ -195,10 +195,10 @@ final class LibraryRegistry: ObservableObject {
 
     private func seedMarketplace() {
         marketplaceLibraries = [
-            LibraryDescriptor(name: "NeuralProcessor", version: "2.1.0", channel: .stable, capabilities: [LibraryCapability.mlInference.rawValue, LibraryCapability.textProcessing.rawValue], requiredScopes: [.persona]),
-            LibraryDescriptor(name: "CloudVault", version: "1.0.5", channel: .stable, capabilities: [LibraryCapability.storageIO.rawValue, LibraryCapability.cryptoOps.rawValue], requiredScopes: [.files]),
-            LibraryDescriptor(name: "StreamBridge", version: "0.9.8", channel: .beta, capabilities: [LibraryCapability.networkRelay.rawValue, LibraryCapability.audioProcessing.rawValue], requiredScopes: [.meet]),
-            LibraryDescriptor(name: "DataAnalyzer", version: "3.2.1", channel: .experimental, capabilities: [LibraryCapability.dataTransform.rawValue, LibraryCapability.imageAnalysis.rawValue], requiredScopes: [.workspaceRead])
+            LibraryDescriptor(name: "NeuralProcessor", version: "2.1.0", channel: ReleaseChannel.stable, capabilities: [LibraryCapability.mlInference.rawValue, LibraryCapability.textProcessing.rawValue], requiredScopes: [SDKScope.persona]),
+            LibraryDescriptor(name: "CloudVault", version: "1.0.5", channel: ReleaseChannel.stable, capabilities: [LibraryCapability.storageIO.rawValue, LibraryCapability.cryptoOps.rawValue], requiredScopes: [SDKScope.files]),
+            LibraryDescriptor(name: "StreamBridge", version: "0.9.8", channel: ReleaseChannel.beta, capabilities: [LibraryCapability.networkRelay.rawValue, LibraryCapability.audioProcessing.rawValue], requiredScopes: [SDKScope.meet]),
+            LibraryDescriptor(name: "DataAnalyzer", version: "3.2.1", channel: ReleaseChannel.experimental, capabilities: [LibraryCapability.dataTransform.rawValue, LibraryCapability.imageAnalysis.rawValue], requiredScopes: [SDKScope.workspaceRead])
         ]
     }
 

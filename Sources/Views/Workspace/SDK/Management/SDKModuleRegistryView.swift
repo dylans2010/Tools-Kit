@@ -68,46 +68,53 @@ struct SDKModuleRegistryView: View {
     }
 
     private var modulesSection: some View {
+        let modules = filteredModules
         Section {
-            ForEach(filteredModules) { mod in
-                Button { selectedModule = mod } label: {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text(mod.displayName).font(.subheadline.bold())
-                                Text("v\(mod.version)")
-                                    .font(.caption.monospaced()).foregroundStyle(.secondary)
-                            }
-                            Text(mod.identifier)
-                                .font(.system(size: 9, design: .monospaced)).foregroundStyle(.tertiary)
-                            HStack(spacing: 6) {
-                                ForEach(mod.capabilities.prefix(3), id: \.self) { cap in
-                                    Text(cap.rawValue)
-                                        .font(.system(size: 8, weight: .medium))
-                                        .padding(.horizontal, 6).padding(.vertical, 2)
-                                        .background(Color.accentColor.opacity(0.1), in: Capsule())
-                                        .foregroundStyle(Color.accentColor)
-                                }
-                                if mod.capabilities.count > 3 {
-                                    Text("+\(mod.capabilities.count - 3)")
-                                        .font(.system(size: 8)).foregroundStyle(.tertiary)
-                                }
-                            }
-                        }
-                        Spacer()
-                        Circle()
-                            .fill(registry.activeModuleIDs.contains(mod.id) ? Color.green : Color.secondary.opacity(0.3))
-                            .frame(width: 8, height: 8)
-                    }
-                }
+            ForEach(modules) { mod in
+                Button { selectedModule = mod } label: { moduleRow(mod) }
                 .buttonStyle(.plain)
             }
             .onDelete { offsets in
-                let toRemove = offsets.map { filteredModules[$0].identifier }
+                let toRemove = offsets.map { modules[$0].identifier }
                 toRemove.forEach { registry.unregister(identifier: $0) }
             }
         } header: {
-            Text("Modules (\(filteredModules.count))")
+            Text("Modules (\(modules.count))")
+        }
+    }
+
+    private func moduleRow(_ mod: SDKModuleDescriptor) -> some View {
+        let previewCapabilities = Array(mod.capabilities.prefix(3))
+        let extraCount = max(0, mod.capabilities.count - 3)
+        let isActive = registry.activeModuleIDs.contains(mod.id)
+
+        return HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(mod.displayName).font(.subheadline.bold())
+                    Text("v\(mod.version)")
+                        .font(.caption.monospaced()).foregroundStyle(.secondary)
+                }
+                Text(mod.identifier)
+                    .font(.system(size: 9, design: .monospaced)).foregroundStyle(.tertiary)
+                HStack(spacing: 6) {
+                    ForEach(previewCapabilities, id: \.self) { cap in
+                        Text(cap.rawValue)
+                            .font(.system(size: 8, weight: .medium))
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(Color.accentColor.opacity(0.1), in: Capsule())
+                            .foregroundStyle(Color.accentColor)
+                    }
+                    if extraCount > 0 {
+                        Text("+\(extraCount)")
+                            .font(.system(size: 8)).foregroundStyle(.tertiary)
+                    }
+                }
+            }
+            Spacer()
+            Circle()
+                .fill(isActive ? Color.green : Color.secondary.opacity(0.3))
+                .frame(width: 8, height: 8)
         }
     }
 
@@ -200,7 +207,7 @@ struct SDKModuleRegistryView: View {
                 LabeledContent("Status", value: registry.activeModuleIDs.contains(mod.id) ? "Active" : "Inactive")
             }
             Section("Capabilities") {
-                ForEach(mod.capabilities, id: \.self) { cap in
+                ForEach(Array(mod.capabilities).sorted(by: { $0.rawValue < $1.rawValue }), id: \.self) { cap in
                     Button { filterCapability = cap; selectedModule = nil } label: {
                         Label(cap.rawValue, systemImage: "cpu")
                     }
