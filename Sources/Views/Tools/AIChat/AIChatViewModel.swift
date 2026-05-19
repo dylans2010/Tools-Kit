@@ -134,42 +134,6 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
 
     // MARK: - Messaging
 
-    private func buildSystemPrompt() -> String? {
-        let s = settingsManager.settings
-        var parts: [String] = []
-
-        if !s.systemPrompt.isEmpty {
-            parts.append(s.systemPrompt)
-        }
-
-        if s.useCustomPersonality && !s.personalityName.isEmpty {
-            parts.append("Your name is \(s.personalityName).")
-        }
-
-        if s.useCustomPersonality && !s.personalityTraits.isEmpty {
-            parts.append("Personality traits: \(s.personalityTraits.joined(separator: ", ")).")
-        }
-
-        if !s.expertiseAreas.isEmpty {
-            parts.append("Areas of expertise: \(s.expertiseAreas.joined(separator: ", ")).")
-        }
-
-        if !s.knowledgeContext.isEmpty {
-            parts.append(s.knowledgeContext)
-        }
-        if s.memoryEnabled {
-            let memory = memoryStore.contextSnippet()
-            if !memory.isEmpty { parts.append(memory) }
-        }
-
-        let skillsPrompt = AIService.SkillsManager.shared.activeSkillsPrompt()
-        if !skillsPrompt.isEmpty {
-            parts.append(skillsPrompt)
-        }
-
-        return parts.isEmpty ? nil : parts.joined(separator: "\n\n")
-    }
-
     func sendMessage() {
         guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         guard let provider = currentProvider else {
@@ -191,17 +155,17 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
         error = nil
 
         let model = settingsManager.settings.modelID
-
         var allMessages = messages
-        if let systemPrompt = buildSystemPrompt() {
-            let systemMessage = ChatMessage(role: "system", content: systemPrompt)
-            allMessages.insert(systemMessage, at: 0)
-        }
 
         Task {
             do {
                 let authorization = try await featureCheck.authorizeRequest(providerID: providerID)
                 let key = authorization.apiKey
+
+                // Use AIService to build the comprehensive system prompt
+                let systemPrompt = await AIService.shared.buildComprehensiveSystemPrompt()
+                let systemMessage = ChatMessage(role: "system", content: systemPrompt)
+                allMessages.insert(systemMessage, at: 0)
 
                 let response: String
                 if !attachmentsToSend.isEmpty {

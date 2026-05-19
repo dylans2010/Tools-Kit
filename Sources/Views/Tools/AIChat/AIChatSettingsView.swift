@@ -355,31 +355,31 @@ struct AIChatSettingsView: View {
     private var contextToolsSectionContent: some View {
         Group {
             NavigationLink {
-                FileContextManagerView()
+                FileContextManagerView(settings: $settings)
             } label: {
                 Label("File Context Sources", systemImage: "doc.badge.plus")
             }
 
             NavigationLink {
-                WebContextManagerView()
+                WebContextManagerView(settings: $settings)
             } label: {
                 Label("Web Context Sources", systemImage: "globe")
             }
 
             NavigationLink {
-                RAGSettingsView()
+                RAGSettingsView(settings: $settings)
             } label: {
                 Label("RAG Settings", systemImage: "magnifyingglass.circle")
             }
 
             NavigationLink {
-                EmbeddingConfigView()
+                EmbeddingConfigView(settings: $settings)
             } label: {
                 Label("Embedding Configuration", systemImage: "point.3.connected.trianglepath.dotted")
             }
 
             NavigationLink {
-                ContextWindowView()
+                ContextWindowView(settings: $settings)
             } label: {
                 Label("Context Window Manager", systemImage: "rectangle.split.3x1")
             }
@@ -395,13 +395,13 @@ struct AIChatSettingsView: View {
             }
 
             NavigationLink {
-                PromptVariablesView()
+                PromptVariablesView(settings: $settings)
             } label: {
                 Label("Dynamic Variables", systemImage: "curlybraces")
             }
 
             NavigationLink {
-                PromptChainEditorView()
+                PromptChainEditorView(settings: $settings)
             } label: {
                 Label("Prompt Chain Editor", systemImage: "link.badge.plus")
             }
@@ -417,19 +417,19 @@ struct AIChatSettingsView: View {
     private var personalityToolsSectionContent: some View {
         Group {
             NavigationLink {
-                ResponseFormatterView()
+                ResponseFormatterView(settings: $settings)
             } label: {
                 Label("Response Formatting Rules", systemImage: "textformat.abc")
             }
 
             NavigationLink {
-                LanguageSettingsView()
+                LanguageSettingsView(settings: $settings)
             } label: {
                 Label("Language & Locale", systemImage: "globe.americas")
             }
 
             NavigationLink {
-                OutputConstraintsView()
+                OutputConstraintsView(settings: $settings)
             } label: {
                 Label("Output Constraints", systemImage: "ruler")
             }
@@ -1043,19 +1043,31 @@ struct ColorPickerRow: View {
 // MARK: - Context Tool Views
 
 struct FileContextManagerView: View {
-    @State private var fileSources: [String] = []
+    @Binding var settings: AIChatSettings
     @State private var newSource = ""
 
     var body: some View {
         Form {
             Section("Active File Sources") {
-                if fileSources.isEmpty {
+                if settings.fileSources.isEmpty {
                     Text("No file sources configured").font(.caption).foregroundStyle(.secondary)
                 } else {
-                    ForEach(fileSources, id: \.self) { source in
-                        Label(source, systemImage: "doc.fill")
+                    ForEach(settings.fileSources) { source in
+                        HStack {
+                            Label(source.path, systemImage: "doc.fill")
+                            Spacer()
+                            Toggle("", isOn: Binding(
+                                get: { source.isActive },
+                                set: { val in
+                                    if let idx = settings.fileSources.firstIndex(where: { $0.id == source.id }) {
+                                        settings.fileSources[idx].isActive = val
+                                    }
+                                }
+                            ))
+                            .labelsHidden()
+                        }
                     }
-                    .onDelete { fileSources.remove(atOffsets: $0) }
+                    .onDelete { settings.fileSources.remove(atOffsets: $0) }
                 }
             }
             Section("Add Source") {
@@ -1063,20 +1075,10 @@ struct FileContextManagerView: View {
                     TextField("File path or bundle resource", text: $newSource)
                     Button("Add") {
                         guard !newSource.isEmpty else { return }
-                        fileSources.append(newSource)
+                        settings.fileSources.append(FileSource(path: newSource))
                         newSource = ""
                     }
                     .disabled(newSource.isEmpty)
-                }
-            }
-            Section("Options") {
-                Toggle("Auto-refresh on file change", isOn: .constant(true))
-                Toggle("Include subdirectories", isOn: .constant(false))
-                Picker("File type filter", selection: .constant("All")) {
-                    Text("All").tag("All")
-                    Text("Text").tag("Text")
-                    Text("JSON").tag("JSON")
-                    Text("Markdown").tag("Markdown")
                 }
             }
         }
@@ -1085,19 +1087,31 @@ struct FileContextManagerView: View {
 }
 
 struct WebContextManagerView: View {
-    @State private var urls: [String] = []
+    @Binding var settings: AIChatSettings
     @State private var newURL = ""
 
     var body: some View {
         Form {
             Section("Web Sources") {
-                if urls.isEmpty {
+                if settings.webSources.isEmpty {
                     Text("No web sources configured").font(.caption).foregroundStyle(.secondary)
                 } else {
-                    ForEach(urls, id: \.self) { url in
-                        Label(url, systemImage: "globe")
+                    ForEach(settings.webSources) { source in
+                        HStack {
+                            Label(source.url, systemImage: "globe")
+                            Spacer()
+                            Toggle("", isOn: Binding(
+                                get: { source.isActive },
+                                set: { val in
+                                    if let idx = settings.webSources.firstIndex(where: { $0.id == source.id }) {
+                                        settings.webSources[idx].isActive = val
+                                    }
+                                }
+                            ))
+                            .labelsHidden()
+                        }
                     }
-                    .onDelete { urls.remove(atOffsets: $0) }
+                    .onDelete { settings.webSources.remove(atOffsets: $0) }
                 }
             }
             Section("Add URL") {
@@ -1107,17 +1121,11 @@ struct WebContextManagerView: View {
                         .autocorrectionDisabled()
                     Button("Add") {
                         guard !newURL.isEmpty else { return }
-                        urls.append(newURL)
+                        settings.webSources.append(WebSource(url: newURL))
                         newURL = ""
                     }
                     .disabled(newURL.isEmpty)
                 }
-            }
-            Section("Crawl Settings") {
-                Toggle("Auto-crawl linked pages", isOn: .constant(false))
-                Stepper("Max depth: 2", value: .constant(2), in: 1...5)
-                Toggle("Strip HTML tags", isOn: .constant(true))
-                Toggle("Cache pages locally", isOn: .constant(true))
             }
         }
         .navigationTitle("Web Context")
@@ -1125,35 +1133,29 @@ struct WebContextManagerView: View {
 }
 
 struct RAGSettingsView: View {
+    @Binding var settings: AIChatSettings
     var body: some View {
         Form {
             Section("Retrieval Settings") {
-                Stepper("Top K results: 5", value: .constant(5), in: 1...20)
+                Stepper("Top K results: \(settings.ragTopK)", value: $settings.ragTopK, in: 1...20)
                 VStack(alignment: .leading) {
-                    Text("Similarity threshold: 0.75")
-                    Slider(value: .constant(0.75), in: 0.1...1.0)
+                    Text("Similarity threshold: \(settings.ragSimilarityThreshold, specifier: "%.2f")")
+                    Slider(value: $settings.ragSimilarityThreshold, in: 0.1...1.0)
                 }
-                Picker("Search strategy", selection: .constant("Hybrid")) {
+                Picker("Search strategy", selection: $settings.ragSearchStrategy) {
                     Text("Semantic").tag("Semantic")
                     Text("Keyword").tag("Keyword")
                     Text("Hybrid").tag("Hybrid")
                 }
             }
             Section("Chunking") {
-                Stepper("Chunk size: 512 tokens", value: .constant(512), in: 128...2048, step: 128)
-                Stepper("Chunk overlap: 64 tokens", value: .constant(64), in: 0...256, step: 32)
-                Picker("Chunking strategy", selection: .constant("Sentence")) {
+                Stepper("Chunk size: \(settings.ragChunkSize) tokens", value: $settings.ragChunkSize, in: 128...2048, step: 128)
+                Stepper("Chunk overlap: \(settings.ragChunkOverlap) tokens", value: $settings.ragChunkOverlap, in: 0...256, step: 32)
+                Picker("Chunking strategy", selection: $settings.ragChunkingStrategy) {
                     Text("Fixed").tag("Fixed")
                     Text("Sentence").tag("Sentence")
                     Text("Paragraph").tag("Paragraph")
                 }
-            }
-            Section("Index") {
-                Button("Rebuild Index") {}
-                    .foregroundStyle(.blue)
-                Button("Clear Index", role: .destructive) {}
-                LabeledContent("Documents indexed", value: "0")
-                LabeledContent("Total chunks", value: "0")
             }
         }
         .navigationTitle("RAG Settings")
@@ -1161,22 +1163,20 @@ struct RAGSettingsView: View {
 }
 
 struct EmbeddingConfigView: View {
+    @Binding var settings: AIChatSettings
     var body: some View {
         Form {
             Section("Embedding Model") {
-                Picker("Model", selection: .constant("default")) {
+                Picker("Model", selection: $settings.embeddingModel) {
                     Text("Built-in (Local)").tag("default")
                     Text("OpenAI text-embedding-3-small").tag("openai-small")
                     Text("OpenAI text-embedding-3-large").tag("openai-large")
                 }
-                LabeledContent("Dimensions", value: "1536")
-                Toggle("Normalize vectors", isOn: .constant(true))
+                LabeledContent("Dimensions", value: "\(settings.embeddingDimensions)")
+                Toggle("Normalize vectors", isOn: $settings.normalizeVectors)
             }
             Section("Storage") {
-                LabeledContent("Vector store size", value: "0 KB")
-                Toggle("Compress embeddings", isOn: .constant(false))
-                Button("Export Vectors") {}
-                Button("Import Vectors") {}
+                Toggle("Compress embeddings", isOn: $settings.compressEmbeddings)
             }
         }
         .navigationTitle("Embedding Config")
@@ -1184,30 +1184,30 @@ struct EmbeddingConfigView: View {
 }
 
 struct ContextWindowView: View {
+    @Binding var settings: AIChatSettings
     var body: some View {
         Form {
-            Section("Token Budget") {
-                LabeledContent("Max context window", value: "128K")
+            Section("Token Budget Allocation") {
                 VStack(alignment: .leading) {
-                    Text("System prompt allocation: 20%")
-                    Slider(value: .constant(0.2), in: 0.05...0.5)
+                    Text("System prompt: \(Int(settings.contextAllocationSystemPrompt * 100))%")
+                    Slider(value: $settings.contextAllocationSystemPrompt, in: 0.05...0.5)
                 }
                 VStack(alignment: .leading) {
-                    Text("History allocation: 40%")
-                    Slider(value: .constant(0.4), in: 0.1...0.8)
+                    Text("History: \(Int(settings.contextAllocationHistory * 100))%")
+                    Slider(value: $settings.contextAllocationHistory, in: 0.1...0.8)
                 }
                 VStack(alignment: .leading) {
-                    Text("RAG context allocation: 30%")
-                    Slider(value: .constant(0.3), in: 0.05...0.5)
+                    Text("RAG context: \(Int(settings.contextAllocationRAG * 100))%")
+                    Slider(value: $settings.contextAllocationRAG, in: 0.05...0.5)
                 }
             }
             Section("Overflow Strategy") {
-                Picker("When context exceeds limit", selection: .constant("Truncate oldest")) {
+                Picker("When context exceeds limit", selection: $settings.contextOverflowStrategy) {
                     Text("Truncate oldest messages").tag("Truncate oldest")
                     Text("Summarize history").tag("Summarize")
                     Text("Drop RAG context first").tag("Drop RAG")
                 }
-                Toggle("Show warning on overflow", isOn: .constant(true))
+                Toggle("Show warning on overflow", isOn: $settings.showContextOverflowWarning)
             }
         }
         .navigationTitle("Context Window")
@@ -1243,6 +1243,10 @@ struct PromptTemplateLibraryView: View {
 }
 
 struct PromptVariablesView: View {
+    @Binding var settings: AIChatSettings
+    @State private var newName = ""
+    @State private var newValue = ""
+
     var body: some View {
         Form {
             Section("Built-in Variables") {
@@ -1251,12 +1255,28 @@ struct PromptVariablesView: View {
                 LabeledContent("{{user_name}}", value: "User's name")
                 LabeledContent("{{app_version}}", value: "App version")
                 LabeledContent("{{device_model}}", value: "Device model")
-                LabeledContent("{{os_version}}", value: "OS version")
-                LabeledContent("{{language}}", value: "System language")
             }
             Section("Custom Variables") {
-                Text("No custom variables defined").font(.caption).foregroundStyle(.secondary)
-                Button("Add Variable") {}
+                ForEach(settings.promptVariables) { variable in
+                    HStack {
+                        Text(variable.name).bold()
+                        Spacer()
+                        Text(variable.value).foregroundColor(.secondary)
+                    }
+                }
+                .onDelete { settings.promptVariables.remove(atOffsets: $0) }
+
+                VStack {
+                    TextField("Name (e.g. company_name)", text: $newName)
+                    TextField("Value", text: $newValue)
+                    Button("Add Variable") {
+                        guard !newName.isEmpty else { return }
+                        settings.promptVariables.append(PromptVariable(name: newName, value: newValue))
+                        newName = ""
+                        newValue = ""
+                    }
+                    .disabled(newName.isEmpty)
+                }
             }
         }
         .navigationTitle("Dynamic Variables")
@@ -1264,18 +1284,21 @@ struct PromptVariablesView: View {
 }
 
 struct PromptChainEditorView: View {
+    @Binding var settings: AIChatSettings
     var body: some View {
         Form {
             Section("Prompt Chains") {
-                Text("Chain multiple prompts together for complex workflows. Each step's output feeds into the next.")
-                    .font(.caption).foregroundStyle(.secondary)
-                Button("Create New Chain") {}
-                    .buttonStyle(.borderedProminent)
-            }
-            Section("Examples") {
-                Label("Research → Summarize → Format", systemImage: "arrow.right.circle")
-                Label("Translate → Review → Polish", systemImage: "arrow.right.circle")
-                Label("Analyze → Recommend → Draft", systemImage: "arrow.right.circle")
+                if settings.promptChains.isEmpty {
+                    Text("No chains defined").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(settings.promptChains) { chain in
+                        Text(chain.name)
+                    }
+                    .onDelete { settings.promptChains.remove(atOffsets: $0) }
+                }
+                Button("Create New Chain") {
+                    settings.promptChains.append(PromptChain(name: "New Chain", steps: []))
+                }
             }
         }
         .navigationTitle("Prompt Chains")
@@ -1294,24 +1317,25 @@ struct PromptVersionHistoryView: View {
 // MARK: - Personality Tool Views
 
 struct ResponseFormatterView: View {
+    @Binding var settings: AIChatSettings
     var body: some View {
         Form {
             Section("Formatting Rules") {
-                Toggle("Use Markdown formatting", isOn: .constant(true))
-                Toggle("Include code blocks with syntax highlighting", isOn: .constant(true))
-                Toggle("Use bullet points for lists", isOn: .constant(true))
-                Toggle("Add section headers", isOn: .constant(false))
-                Toggle("Include table of contents for long responses", isOn: .constant(false))
+                Toggle("Use Markdown formatting", isOn: $settings.useMarkdown)
+                Toggle("Include code blocks", isOn: $settings.includeCodeBlocks)
+                Toggle("Use bullet points for lists", isOn: $settings.useBulletPoints)
+                Toggle("Add section headers", isOn: $settings.addSectionHeaders)
+                Toggle("Include table of contents", isOn: $settings.includeTOC)
             }
             Section("Code Style") {
-                Picker("Default language", selection: .constant("Swift")) {
+                Picker("Default language", selection: $settings.defaultCodeLanguage) {
                     Text("Swift").tag("Swift")
                     Text("Python").tag("Python")
                     Text("JavaScript").tag("JavaScript")
                     Text("TypeScript").tag("TypeScript")
                     Text("Auto-detect").tag("Auto")
                 }
-                Toggle("Show line numbers", isOn: .constant(false))
+                Toggle("Show line numbers", isOn: $settings.showLineNumbers)
             }
         }
         .navigationTitle("Response Formatting")
@@ -1319,31 +1343,26 @@ struct ResponseFormatterView: View {
 }
 
 struct LanguageSettingsView: View {
+    @Binding var settings: AIChatSettings
     var body: some View {
         Form {
             Section("Response Language") {
-                Picker("Primary language", selection: .constant("English")) {
+                Picker("Primary language", selection: $settings.primaryLanguage) {
                     Text("English").tag("English")
                     Text("Spanish").tag("Spanish")
                     Text("French").tag("French")
                     Text("German").tag("German")
-                    Text("Japanese").tag("Japanese")
-                    Text("Chinese").tag("Chinese")
-                    Text("Korean").tag("Korean")
-                    Text("Portuguese").tag("Portuguese")
-                    Text("Arabic").tag("Arabic")
                 }
-                Toggle("Auto-detect input language", isOn: .constant(true))
-                Toggle("Match response language to input", isOn: .constant(true))
+                Toggle("Auto-detect input language", isOn: $settings.autoDetectLanguage)
+                Toggle("Match response language", isOn: $settings.matchResponseLanguage)
             }
             Section("Locale") {
-                Picker("Date format", selection: .constant("System")) {
+                Picker("Date format", selection: $settings.dateFormat) {
                     Text("System Default").tag("System")
                     Text("MM/DD/YYYY").tag("US")
                     Text("DD/MM/YYYY").tag("EU")
-                    Text("YYYY-MM-DD").tag("ISO")
                 }
-                Picker("Number format", selection: .constant("System")) {
+                Picker("Number format", selection: $settings.numberFormat) {
                     Text("System Default").tag("System")
                     Text("1,000.00").tag("US")
                     Text("1.000,00").tag("EU")
@@ -1355,18 +1374,19 @@ struct LanguageSettingsView: View {
 }
 
 struct OutputConstraintsView: View {
+    @Binding var settings: AIChatSettings
     var body: some View {
         Form {
             Section("Length Constraints") {
-                Stepper("Max paragraphs: 10", value: .constant(10), in: 1...50)
-                Stepper("Max sentences per paragraph: 5", value: .constant(5), in: 1...20)
-                Toggle("Enforce word count limits", isOn: .constant(false))
+                Stepper("Max paragraphs: \(settings.maxParagraphs)", value: $settings.maxParagraphs, in: 1...50)
+                Stepper("Max sentences per paragraph: \(settings.maxSentencesPerParagraph)", value: $settings.maxSentencesPerParagraph, in: 1...20)
+                Toggle("Enforce word count limits", isOn: $settings.enforceWordCountLimits)
             }
             Section("Content Filters") {
-                Toggle("Avoid technical jargon", isOn: .constant(false))
-                Toggle("Family-friendly content only", isOn: .constant(true))
-                Toggle("Cite sources when possible", isOn: .constant(false))
-                Toggle("Avoid opinions", isOn: .constant(false))
+                Toggle("Avoid technical jargon", isOn: $settings.avoidJargon)
+                Toggle("Family-friendly content only", isOn: $settings.familyFriendlyOnly)
+                Toggle("Cite sources when possible", isOn: $settings.citeSources)
+                Toggle("Avoid opinions", isOn: $settings.avoidOpinions)
             }
         }
         .navigationTitle("Output Constraints")

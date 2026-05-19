@@ -1,5 +1,29 @@
 import Foundation
 
+struct PromptVariable: Codable, Identifiable {
+    var id = UUID()
+    var name: String
+    var value: String
+}
+
+struct FileSource: Codable, Identifiable {
+    var id = UUID()
+    var path: String
+    var isActive: Bool = true
+}
+
+struct WebSource: Codable, Identifiable {
+    var id = UUID()
+    var url: String
+    var isActive: Bool = true
+}
+
+struct PromptChain: Codable, Identifiable {
+    var id = UUID()
+    var name: String
+    var steps: [String]
+}
+
 struct AIChatSettings: Codable {
     var selectedProviderID: String = "openrouter"
     var aiModelSource: AIModelSource = .appModel
@@ -27,6 +51,52 @@ struct AIChatSettings: Codable {
     var useSystemTools: Bool = true
     var autoInjectContext: Bool = false
     var includeConversationHistory: Bool = true
+
+    // Prompt Tools
+    var promptVariables: [PromptVariable] = []
+    var promptChains: [PromptChain] = []
+
+    // Knowledge & Context
+    var fileSources: [FileSource] = []
+    var webSources: [WebSource] = []
+    var ragTopK: Int = 5
+    var ragSimilarityThreshold: Double = 0.75
+    var ragChunkSize: Int = 512
+    var ragChunkOverlap: Int = 64
+    var ragSearchStrategy: String = "Hybrid"
+    var ragChunkingStrategy: String = "Sentence"
+    var embeddingModel: String = "default"
+    var embeddingDimensions: Int = 1536
+    var normalizeVectors: Bool = true
+    var compressEmbeddings: Bool = false
+    var contextAllocationSystemPrompt: Double = 0.2
+    var contextAllocationHistory: Double = 0.4
+    var contextAllocationRAG: Double = 0.3
+    var contextOverflowStrategy: String = "Truncate oldest"
+    var showContextOverflowWarning: Bool = true
+
+    // Personality & Tone (Response Formatting)
+    var useMarkdown: Bool = true
+    var includeCodeBlocks: Bool = true
+    var useBulletPoints: Bool = true
+    var addSectionHeaders: Bool = false
+    var includeTOC: Bool = false
+    var defaultCodeLanguage: String = "Swift"
+    var showLineNumbers: Bool = false
+    var primaryLanguage: String = "English"
+    var autoDetectLanguage: Bool = true
+    var matchResponseLanguage: Bool = true
+    var dateFormat: String = "System"
+    var numberFormat: String = "System"
+
+    // Output Constraints
+    var maxParagraphs: Int = 10
+    var maxSentencesPerParagraph: Int = 5
+    var enforceWordCountLimits: Bool = false
+    var avoidJargon: Bool = false
+    var familyFriendlyOnly: Bool = true
+    var citeSources: Bool = false
+    var avoidOpinions: Bool = false
 }
 
 enum AIModelSource: String, Codable, CaseIterable {

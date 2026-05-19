@@ -92,6 +92,117 @@ class AIService {
         }
     }
 
+    // MARK: - Prompt Builder Logic
+
+    @MainActor
+    func buildComprehensiveSystemPrompt(taskSpecific: String = "") async -> String {
+        let s = settingsManager.settings
+        var sections: [String] = []
+
+        // 1. Core Identity & System Prompt
+        let corePrompt = s.systemPrompt.isEmpty ? "You are a helpful assistant." : s.systemPrompt
+        sections.append(corePrompt)
+
+        // 2. Personality
+        if s.useCustomPersonality {
+            var personality = ""
+            if !s.personalityName.isEmpty {
+                personality += "Your name is \(s.personalityName). "
+            }
+            if !s.personalityTraits.isEmpty {
+                personality += "Traits: \(s.personalityTraits.joined(separator: ", ")). "
+            }
+            if !personality.isEmpty {
+                sections.append("### Personality\n\(personality)")
+            }
+        }
+
+        // 3. Expertise
+        if !s.expertiseAreas.isEmpty {
+            sections.append("### Expertise\nAreas: \(s.expertiseAreas.joined(separator: ", "))")
+        }
+
+        // 4. Style & Tone
+        var style = "Tone: \(s.responseTone.rawValue). Length: \(s.preferredResponseLength.rawValue)."
+        if s.useMarkdown { style += " Use Markdown." }
+        if s.includeCodeBlocks { style += " Use code blocks for code snippets." }
+        if s.useBulletPoints { style += " Prefer bullet points for lists." }
+        sections.append("### Style & Tone\n\(style)")
+
+        // 5. Knowledge & Context (RAG)
+        var knowledgeParts: [String] = []
+        if !s.knowledgeContext.isEmpty {
+            knowledgeParts.append(s.knowledgeContext)
+        }
+
+        if s.autoInjectContext {
+            let insights = await AIContextEngine.shared.generateInsights()
+            knowledgeParts.append(contentsOf: insights)
+        }
+
+        if !knowledgeParts.isEmpty {
+            sections.append("### Knowledge Context\n\(knowledgeParts.joined(separator: "\n"))")
+        }
+
+        // 6. Memory
+        if s.memoryEnabled {
+            let memorySnippet = AIChatMemoryStore.shared.contextSnippet()
+            if !memorySnippet.isEmpty {
+                sections.append("### Long-term Memory\n\(memorySnippet)")
+            }
+        }
+
+        // 7. Active Skills
+        let skills = SkillsManager.shared.activeSkillsPrompt()
+        if !skills.isEmpty {
+            sections.append("### Active Skills\n\(skills)")
+        }
+
+        // 8. Output Constraints
+        var constraints: [String] = []
+        constraints.append("- Max paragraphs: \(s.maxParagraphs)")
+        constraints.append("- Max sentences per paragraph: \(s.maxSentencesPerParagraph)")
+        if s.avoidJargon { constraints.append("- Avoid technical jargon.") }
+        if s.familyFriendlyOnly { constraints.append("- Family-friendly content only.") }
+        if s.citeSources { constraints.append("- Cite sources when possible.") }
+        if s.avoidOpinions { constraints.append("- Avoid stating personal opinions.") }
+        sections.append("### Constraints\n\(constraints.joined(separator: "\n"))")
+
+        // 9. Task Specific
+        if !taskSpecific.isEmpty {
+            sections.append("### Task-Specific Instructions\n\(taskSpecific)")
+        }
+
+        let finalPrompt = sections.joined(separator: "\n\n")
+        return substituteVariables(in: finalPrompt)
+    }
+
+    private func substituteVariables(in text: String) -> String {
+        var result = text
+        let s = settingsManager.settings
+
+        // Built-in Variables
+        let now = Date()
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        result = result.replacingOccurrences(of: "{{date}}", with: formatter.string(from: now))
+
+        formatter.dateStyle = .none
+        formatter.timeStyle = .short
+        result = result.replacingOccurrences(of: "{{time}}", with: formatter.string(from: now))
+
+        result = result.replacingOccurrences(of: "{{user_name}}", with: NSFullUserName())
+        result = result.replacingOccurrences(of: "{{app_version}}", with: "1.0.0")
+        result = result.replacingOccurrences(of: "{{device_model}}", with: "iPhone")
+
+        // Custom Variables
+        for variable in s.promptVariables {
+            result = result.replacingOccurrences(of: "{{\(variable.name)}}", with: variable.value)
+        }
+
+        return result
+    }
+
     // MARK: - Public API
 
     @MainActor
@@ -117,20 +228,7 @@ class AIService {
             }
         }
 
-        // Combine System Prompt, App Default System Prompt, and Active Skills
-        let appSystemPrompt = settingsManager.settings.systemPrompt
-        let activeSkills = SkillsManager.shared.activeSkillsPrompt()
-
-        var finalSystemPrompt = "You are a helpful assistant."
-        if !appSystemPrompt.isEmpty {
-            finalSystemPrompt = appSystemPrompt
-        }
-        if !systemPrompt.isEmpty {
-            finalSystemPrompt += "\n\nTask-specific instructions: \(systemPrompt)"
-        }
-        if !activeSkills.isEmpty {
-            finalSystemPrompt += activeSkills
-        }
+        let finalSystemPrompt = await buildComprehensiveSystemPrompt(taskSpecific: systemPrompt)
 
         let messages = [
             ChatMessage(role: "system", content: finalSystemPrompt),
