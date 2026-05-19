@@ -28,84 +28,101 @@ struct ConnectorsMainView: View {
     private var connectedCount: Int { connectorManager.connectors.filter(\.isConnected).count }
     private var totalCount: Int { connectorManager.connectors.count }
 
+    @ViewBuilder
+    private var overviewSection: some View {
+        Section(header: Text("Overview")) {
+            HStack(spacing: 16) {
+                VStack(spacing: 2) {
+                    Text("\(totalCount)")
+                        .font(.title3.bold())
+                        .foregroundStyle(Color.blue)
+                    Text("Total")
+                        .font(.caption2)
+                        .foregroundStyle(Color.secondary)
+                }
+                .frame(maxWidth: .infinity)
+
+                VStack(spacing: 2) {
+                    Text("\(connectedCount)")
+                        .font(.title3.bold())
+                        .foregroundStyle(Color.green)
+                    Text("Connected")
+                        .font(.caption2)
+                        .foregroundStyle(Color.secondary)
+                }
+                .frame(maxWidth: .infinity)
+
+                VStack(spacing: 2) {
+                    Text("\(toolManager.tools.count)")
+                        .font(.title3.bold())
+                        .foregroundStyle(Color.orange)
+                    Text("Tools")
+                        .font(.caption2)
+                        .foregroundStyle(Color.secondary)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .padding(.vertical, 4)
+        }
+    }
+
+    @ViewBuilder
+    private var filterSection: some View {
+        Section(header: Text("Filter")) {
+            Picker("Filter", selection: $filterCategory) {
+                ForEach(ConnectorCategory.allCases, id: \.self) { category in
+                    Text(category.rawValue).tag(category)
+                }
+            }
+            .pickerStyle(.segmented)
+        }
+    }
+
+    @ViewBuilder
+    private var connectorsSection: some View {
+        Section(header: Text("Connectors")) {
+            if filteredConnectors.isEmpty {
+                ContentUnavailableView(
+                    "No Connectors Found",
+                    systemImage: "cable.connector.slash",
+                    description: Text(searchText.isEmpty ? "No connectors registered." : "No matches for \"\(searchText)\".")
+                )
+            } else {
+                ForEach(filteredConnectors, id: \.id) { connector in
+                    NavigationLink(value: connector.id) {
+                        ConnectorRow(connector: connector)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var platformToolsSection: some View {
+        if !toolManager.tools.isEmpty {
+            Section(header: Text("Platform Tools")) {
+                ForEach(toolManager.tools, id: \.id) { tool in
+                    HStack(alignment: .top, spacing: 12) {
+                        Label(tool.name, systemImage: tool.icon ?? "wrench")
+                            .font(.subheadline)
+                        Spacer()
+                        Text(tool.isEnabled ? "Active" : "Inactive")
+                            .font(.caption2)
+                            .foregroundStyle(tool.isEnabled ? Color.green : Color.secondary)
+                            .padding(.top, 2)
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+        }
+    }
+
     var body: some View {
         List {
-            Section(header: Text("Overview")) {
-                HStack(spacing: 16) {
-                    VStack(spacing: 2) {
-                        Text("\(totalCount)")
-                            .font(.title3.bold())
-                            .foregroundStyle(Color.blue)
-                        Text("Total")
-                            .font(.caption2)
-                            .foregroundStyle(Color.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-
-                    VStack(spacing: 2) {
-                        Text("\(connectedCount)")
-                            .font(.title3.bold())
-                            .foregroundStyle(Color.green)
-                        Text("Connected")
-                            .font(.caption2)
-                            .foregroundStyle(Color.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-
-                    VStack(spacing: 2) {
-                        Text("\(toolManager.tools.count)")
-                            .font(.title3.bold())
-                            .foregroundStyle(Color.orange)
-                        Text("Tools")
-                            .font(.caption2)
-                            .foregroundStyle(Color.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-                .padding(.vertical, 4)
-            }
-
-            Section(header: Text("Filter")) {
-                Picker("Filter", selection: $filterCategory) {
-                    ForEach(ConnectorCategory.allCases, id: \.self) { category in
-                        Text(category.rawValue).tag(category)
-                    }
-                }
-                .pickerStyle(.segmented)
-            }
-
-            Section(header: Text("Connectors")) {
-                if filteredConnectors.isEmpty {
-                    ContentUnavailableView(
-                        "No Connectors Found",
-                        systemImage: "cable.connector.slash",
-                        description: Text(searchText.isEmpty ? "No connectors registered." : "No matches for \"\(searchText)\".")
-                    )
-                } else {
-                    ForEach(filteredConnectors, id: \.id) { connector in
-                        NavigationLink(value: connector.id) {
-                            ConnectorRow(connector: connector)
-                        }
-                    }
-                }
-            }
-
-            if !toolManager.tools.isEmpty {
-                Section(header: Text("Platform Tools")) {
-                    ForEach(toolManager.tools, id: \.id) { tool in
-                        HStack(alignment: .top, spacing: 12) {
-                            Label(tool.name, systemImage: tool.icon ?? "wrench")
-                                .font(.subheadline)
-                            Spacer()
-                            Text(tool.isEnabled ? "Active" : "Inactive")
-                                .font(.caption2)
-                                .foregroundStyle(tool.isEnabled ? Color.green : Color.secondary)
-                                .padding(.top, 2)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-            }
+            overviewSection
+            filterSection
+            connectorsSection
+            platformToolsSection
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Connectors")
