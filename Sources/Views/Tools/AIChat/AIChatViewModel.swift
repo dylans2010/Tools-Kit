@@ -159,34 +159,16 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
 
         Task {
             do {
-                let authorization = try await featureCheck.authorizeRequest(providerID: providerID)
-                let key = authorization.apiKey
-
                 // Use AIService to build the comprehensive system prompt
                 let systemPrompt = await AIService.shared.buildComprehensiveSystemPrompt()
                 let systemMessage = ChatMessage(role: "system", content: systemPrompt)
                 allMessages.insert(systemMessage, at: 0)
 
-                let response: String
-                if !attachmentsToSend.isEmpty {
-                    guard provider.supportsVision(model: model) else {
-                        await MainActor.run {
-                            self.error = "The selected model does not support vision/file attachments. Please choose a vision-capable model in settings."
-                            self.isLoading = false
-                            self.inputText = currentInput
-                            self.pendingAttachments = attachmentsToSend
-                        }
-                        return
-                    }
-                    response = try await provider.sendWithAttachments(
-                        messages: allMessages,
-                        attachments: attachmentsToSend,
-                        model: model,
-                        apiKey: key
-                    )
-                } else {
-                    response = try await provider.send(messages: allMessages, model: model, apiKey: key)
-                }
+                let response = try await AIService.shared.processMessages(
+                    messages: allMessages,
+                    attachments: attachmentsToSend,
+                    model: model
+                )
 
                 await MainActor.run {
                     self.messages.append(ChatMessage(role: "assistant", content: response))

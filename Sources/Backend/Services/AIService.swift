@@ -207,11 +207,27 @@ class AIService {
 
     @MainActor
     func processText(prompt: String, systemPrompt: String = "", model: String? = nil) async throws -> String {
+        let finalSystemPrompt = await buildComprehensiveSystemPrompt(taskSpecific: systemPrompt)
+        let messages = [
+            ChatMessage(role: "system", content: finalSystemPrompt),
+            ChatMessage(role: "user", content: prompt)
+        ]
+        return try await processMessages(messages: messages, model: model)
+    }
+
+    @MainActor
+    func processMessages(messages: [ChatMessage], attachments: [ChatAttachment] = [], model: String? = nil) async throws -> String {
         guard let provider = currentProvider else {
             throw AIError.unknownProvider(currentProviderID)
         }
         let authorization = try await featureCheck.authorizeRequest(providerID: currentProviderID)
         let apiKey = authorization.apiKey
+
+        // Check if Dynamic Routing is enabled for OpenRouter
+        if currentProviderID == "openrouter" && settingsManager.settings.dynamicRoutingEnabled {
+            let router = DynamicAIModelRouting(provider: provider, apiKey: apiKey)
+            return try await router.execute(messages: messages, attachments: attachments)
+        }
 
         var modelToUse = model ?? settingsManager.settings.modelID
         if modelToUse.isEmpty {
@@ -228,14 +244,11 @@ class AIService {
             }
         }
 
-        let finalSystemPrompt = await buildComprehensiveSystemPrompt(taskSpecific: systemPrompt)
-
-        let messages = [
-            ChatMessage(role: "system", content: finalSystemPrompt),
-            ChatMessage(role: "user", content: prompt)
-        ]
-
-        return try await provider.send(messages: messages, model: modelToUse, apiKey: apiKey)
+        if attachments.isEmpty {
+            return try await provider.send(messages: messages, model: modelToUse, apiKey: apiKey)
+        } else {
+            return try await provider.sendWithAttachments(messages: messages, attachments: attachments, model: modelToUse, apiKey: apiKey)
+        }
     }
 
     func summarize(text: String) async throws -> String {
@@ -409,5 +422,74 @@ class AIService {
             return cleaned
         }
         return trimmed
+    }
+}
+
+// MARK: - Dynamic AI Model Routing
+
+/// A production-grade routing system for OpenRouter "free" tier models.
+/// Implements resilient, fault-tolerant orchestration with automatic fallback and retry logic.
+struct DynamicAIModelRouting {
+    private let provider: any AIProvider
+    private let apiKey: String
+    private let modelCatalog = AIModelCatalog.shared
+
+    init(provider: any AIProvider, apiKey: String) {
+        self.provider = provider
+        self.apiKey = apiKey
+    }
+
+    /// Executes the AI request across available free models until success or exhaustion.
+    func execute(messages: [ChatMessage], attachments: [ChatAttachment] = []) async throws -> String {
+        // 1. Ensure models are loaded for OpenRouter
+        if await MainActor.run({ modelCatalog.models(for: "openrouter").isEmpty }) {
+            await modelCatalog.loadModels(for: "openrouter")
+        }
+
+        // 2. Fetch and prioritize "free" models
+        let freeModels = await MainActor.run {
+            modelCatalog.models(for: "openrouter")
+                .filter { $0.id.lowercased().contains("free") }
+                .sorted { m1, m2 in
+                    // Prioritize newer/larger models if known, otherwise alphabetic
+                    if m1.id.contains("gemini-2.0") && !m2.id.contains("gemini-2.0") { return true }
+                    if !m1.id.contains("gemini-2.0") && m2.id.contains("gemini-2.0") { return false }
+                    return m1.id < m2.id
+                }
+        }
+
+        guard !freeModels.isEmpty else {
+            throw AIError.networkError("No free OpenRouter models available for dynamic routing.")
+        }
+
+        var lastError: Error?
+
+        // 3. Iterate through eligible models with retry logic
+        for model in freeModels {
+            // Support for Task cancellation
+            try Task.checkCancellation()
+
+            // Skip if vision is required but not supported by this specific model
+            if !attachments.isEmpty && !provider.supportsVision(model: model.id) {
+                continue
+            }
+
+            do {
+                // Attempt request
+                if attachments.isEmpty {
+                    return try await provider.send(messages: messages, model: model.id, apiKey: apiKey)
+                } else {
+                    return try await provider.sendWithAttachments(messages: messages, attachments: attachments, model: model.id, apiKey: apiKey)
+                }
+            } catch {
+                // Store error and continue to the next model in the fallback chain
+                lastError = error
+                // In production, we might log this internally for telemetry
+                continue
+            }
+        }
+
+        // 4. Exhausted all options
+        throw AIError.networkError("All available free models exhausted. Last error: \(lastError?.localizedDescription ?? "Unknown")")
     }
 }

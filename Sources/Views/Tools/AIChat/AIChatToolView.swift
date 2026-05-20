@@ -8,6 +8,7 @@ struct AIChatToolView: View {
     @State private var showFileImporter = false
     @State private var showPhotoPicker = false
     @State private var showVisionAlert = false
+    @State private var showErrorAlert = false
     @State private var showHistorySheet = false
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
 
@@ -49,6 +50,16 @@ struct AIChatToolView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text("The current model doesn't support image/file attachments. Switch to a vision-capable model (e.g. GPT-4o, Gemini, Claude) in Settings.")
+        }
+        .alert("AI Error", isPresented: $showErrorAlert, presenting: viewModel.error) { _ in
+            Button("OK", role: .cancel) { viewModel.error = nil }
+        } message: { error in
+            Text(error)
+        }
+        .onChange(of: viewModel.error) { _, newValue in
+            if newValue != nil {
+                showErrorAlert = true
+            }
         }
     }
 

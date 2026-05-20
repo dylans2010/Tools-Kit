@@ -299,12 +299,27 @@ struct AIChatSettingsView: View {
             .padding(.top, 4)
 
             if settings.selectedProviderID == "openrouter" {
-                NavigationLink(destination: OpenRouterFreeModelsView(selectedModelID: $settings.modelID)) {
-                    Label {
-                        Text("Browse Free Models")
-                    } icon: {
-                        Image(systemName: "gift.fill")
-                            .foregroundColor(.orange)
+                VStack(alignment: .leading, spacing: 12) {
+                    Divider()
+
+                    Toggle(isOn: $settings.dynamicRoutingEnabled) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Dynamic AI Routing")
+                                .font(.headline)
+                            Text("Automatically switches between free models to prevent interruptions from rate limits or failures.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
+
+                    NavigationLink(destination: OpenRouterFreeModelsView(selectedModelID: $settings.modelID)) {
+                        Label {
+                            Text("Browse Free Models")
+                        } icon: {
+                            Image(systemName: "gift.fill")
+                                .foregroundColor(.orange)
+                        }
                     }
                 }
                 .padding(.top, 8)
