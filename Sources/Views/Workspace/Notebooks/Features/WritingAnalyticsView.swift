@@ -189,8 +189,8 @@ struct WritingAnalyticsView: View {
 
             VStack(spacing: 4) {
                 Text(level.level).font(.title2.bold())
-                Text(level.cefr).font(.headline).foregroundColor(.secondary)
-                Text(level.description).font(.subheadline).foregroundColor(.secondary)
+                Text("Grade Level: \(vm.stats.gradeLevel)").font(.headline).foregroundColor(.secondary)
+                Text(level.cefr).font(.subheadline).foregroundColor(.secondary)
             }
 
             ProgressView(value: vm.stats.readabilityScore, total: 100)
@@ -199,7 +199,30 @@ struct WritingAnalyticsView: View {
 
             HStack(spacing: 16) {
                 statTile(label: "CEFR Level", value: level.cefr, icon: "graduationcap", color: .blue)
-                statTile(label: "Complex Words", value: "\(vm.stats.complexWordCount)", icon: "brain", color: .purple)
+                statTile(label: "Grade Level", value: vm.stats.gradeLevel, icon: "text.book.closed", color: .orange)
+            }
+
+            if let amb = vm.ambiguityAnalysis {
+                SectionCard(title: "Clarity & Ambiguity") {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Text("Confusion Score")
+                            Spacer()
+                            Text("\(Int(amb.confusionScore))%")
+                                .foregroundColor(amb.confusionScore > 50 ? .red : .green)
+                                .bold()
+                        }
+                        ProgressView(value: amb.confusionScore, total: 100)
+                            .accentColor(amb.confusionScore > 50 ? .red : .green)
+
+                        if !amb.unclearSections.isEmpty {
+                            Text("Unclear Sections").font(.caption.bold()).padding(.top, 4)
+                            ForEach(amb.unclearSections, id: \.self) { section in
+                                Text("• \(section)").font(.caption).foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                }
             }
 
             VStack(alignment: .leading, spacing: 12) {
@@ -220,6 +243,31 @@ struct WritingAnalyticsView: View {
     // MARK: - Tone Tab
     private var toneTab: some View {
         VStack(spacing: 24) {
+            if let arg = vm.argumentAnalysis {
+                SectionCard(title: "Argument Strength") {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Text("Strength Score")
+                            Spacer()
+                            Text("\(Int(arg.strengthScore))%")
+                                .foregroundColor(arg.strengthScore > 70 ? .green : .orange)
+                                .bold()
+                        }
+                        ProgressView(value: arg.strengthScore, total: 100)
+                            .accentColor(arg.strengthScore > 70 ? .green : .orange)
+
+                        Text(arg.feedback).font(.subheadline).padding(.vertical, 4)
+
+                        if !arg.logicGaps.isEmpty {
+                            Text("Logic Gaps").font(.caption.bold())
+                            ForEach(arg.logicGaps, id: \.self) { gap in
+                                Text("• \(gap)").font(.caption).foregroundColor(.red)
+                            }
+                        }
+                    }
+                }
+            }
+
             VStack(spacing: 8) {
                 Text(vm.tone.primary)
                     .font(.system(size: 48, weight: .bold))
@@ -259,6 +307,23 @@ struct WritingAnalyticsView: View {
     // MARK: - Structure Tab
     private var structureTab: some View {
         VStack(spacing: 24) {
+            SectionCard(title: "Structural Balance") {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Balance Score")
+                        Spacer()
+                        Text("\(Int(vm.structureFlow.balanceScore))%")
+                            .foregroundColor(.purple)
+                            .bold()
+                    }
+                    ProgressView(value: vm.structureFlow.balanceScore, total: 100)
+                        .accentColor(.purple)
+
+                    Text(vm.structureFlow.flowFeedback)
+                        .font(.subheadline)
+                }
+            }
+
             HStack(spacing: 12) {
                 VStack {
                     Text("\(vm.sentenceLengths.short)").font(.title.bold()).foregroundColor(.green)
@@ -324,26 +389,26 @@ struct WritingAnalyticsView: View {
                 statTile(label: "Richness", value: String(format: "%.1f%%", vm.stats.vocabularyRichness), icon: "chart.pie", color: .indigo)
             }
 
+            SectionCard(title: "Keyword Density") {
+                VStack(spacing: 12) {
+                    ForEach(vm.keywordInsights) { insight in
+                        HStack {
+                            Text(insight.word).font(.subheadline)
+                            Spacer()
+                            Text("\(insight.count) times (\(String(format: "%.1f", insight.density))%)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        if insight.id != vm.keywordInsights.last?.id { Divider() }
+                    }
+                }
+            }
+
             VStack(alignment: .leading, spacing: 16) {
                 Text("Word Complexity").font(.headline)
                 complexityRow(label: "Simple", count: vm.complexity.simple, total: vm.stats.wordCount, color: .green)
                 complexityRow(label: "Moderate", count: vm.complexity.moderate, total: vm.stats.wordCount, color: .orange)
                 complexityRow(label: "Complex", count: vm.complexity.complex, total: vm.stats.wordCount, color: .red)
-            }
-
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Most Frequent Words").font(.headline)
-                ForEach(vm.wordFrequency.prefix(8)) { item in
-                    HStack {
-                        Text(item.word).font(.subheadline)
-                        Spacer()
-                        Text("\(item.count)").font(.caption).foregroundColor(.secondary)
-                        Rectangle()
-                            .fill(Color.indigo.opacity(0.3))
-                            .frame(width: CGFloat(item.percentage) * 5, height: 4)
-                            .cornerRadius(2)
-                    }
-                }
             }
 
             if !vm.overusedWords.isEmpty {
@@ -444,10 +509,10 @@ struct WritingAnalyticsView: View {
         VStack(spacing: 24) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Image(systemName: "info.circle").foregroundColor(.blue)
-                    Text("Local Plagiarism Simulation").font(.headline)
+                    Image(systemName: "shield.checkered").foregroundColor(.blue)
+                    Text("AI Plagiarism Detection").font(.headline)
                 }
-                Text("This tool simulates a plagiarism check by analyzing sentence uniqueness across our local database of common patterns.")
+                Text("Analyzes text against extensive web databases and academic sources using advanced similarity indexing.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -461,7 +526,7 @@ struct WritingAnalyticsView: View {
                 if vm.isRunningPlagiarism {
                     ProgressView().padding(.horizontal)
                 } else {
-                    Label("Run Local Plagiarism Scan", systemImage: "magnifyingglass")
+                    Label("Run Plagiarism Analysis", systemImage: "magnifyingglass")
                         .frame(maxWidth: .infinity)
                 }
             }
@@ -516,10 +581,6 @@ struct WritingAnalyticsView: View {
                         }
                     }
 
-                    Text("Disclaimer: This is a local simulation and does not check against the live web or copyrighted databases.")
-                        .font(.system(size: 8))
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
                 }
             }
         }

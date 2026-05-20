@@ -8,9 +8,29 @@ struct WritingStats {
     var avgWordsPerSentence: Double = 0.0
     var avgWordsPerParagraph: Double = 0.0
     var readabilityScore: Double = 0.0
+    var gradeLevel: String = "N/A"
     var complexWordCount: Int = 0
     var uniqueWordCount: Int = 0
     var vocabularyRichness: Double = 0.0
+}
+
+struct ArgumentAnalysis: Codable {
+    var strengthScore: Double
+    var feedback: String
+    var logicGaps: [String]
+    var persuasiveElements: [String]
+}
+
+struct AmbiguityAnalysis: Codable {
+    var confusionScore: Double
+    var unclearSections: [String]
+    var suggestions: [String]
+}
+
+struct StructureFlow: Codable {
+    var balanceScore: Double
+    var flowFeedback: String
+    var paragraphStats: [Double] // words per paragraph distribution
 }
 
 struct ToneAnalysis {
@@ -77,6 +97,13 @@ struct AnalyticsChatMessage: Identifiable {
     var role: String
     var content: String
     var timestamp: Date = Date()
+}
+
+struct KeywordInsight: Identifiable {
+    let id = UUID()
+    var word: String
+    var count: Int
+    var density: Double
 }
 
 struct SearchMatch: Identifiable {

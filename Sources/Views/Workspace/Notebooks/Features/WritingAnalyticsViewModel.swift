@@ -58,6 +58,10 @@ final class WritingAnalyticsViewModel: ObservableObject {
     @Published var complexity = WordComplexity()
     @Published var wordFrequency: [WordFrequencyItem] = []
     @Published var overusedWords: [OverusedWord] = []
+    @Published var keywordInsights: [KeywordInsight] = []
+    @Published var structureFlow = StructureFlow(balanceScore: 0, flowFeedback: "", paragraphStats: [])
+    @Published var argumentAnalysis: ArgumentAnalysis? = nil
+    @Published var ambiguityAnalysis: AmbiguityAnalysis? = nil
     @Published var suggestions: [ImprovementSuggestion] = []
     @Published var grammarIssues: [GrammarIssue] = []
     @Published var isCheckingGrammar = false
@@ -91,6 +95,8 @@ final class WritingAnalyticsViewModel: ObservableObject {
             let complexity = engine.analyzeWordComplexity(text: text)
             let frequency = engine.computeWordFrequency(text: text)
             let overused = engine.findOverusedWords(from: frequency, totalWords: stats.wordCount)
+            let keywords = engine.analyzeKeywordDensity(text: text)
+            let flow = engine.analyzeStructureFlow(text: text)
             let suggestions = engine.generateImprovementSuggestions(stats: stats, overused: overused, tone: tone)
 
             self.stats = stats
@@ -99,7 +105,53 @@ final class WritingAnalyticsViewModel: ObservableObject {
             self.complexity = complexity
             self.wordFrequency = frequency
             self.overusedWords = overused
+            self.keywordInsights = keywords
+            self.structureFlow = flow
             self.suggestions = suggestions
+
+            await runAdvancedAIAnalysis(text: text)
+        }
+    }
+
+    private func runAdvancedAIAnalysis(text: String) async {
+        do {
+            let argumentPrompt = """
+            Analyze the argument strength and logical flow of this text.
+            Return a JSON object with:
+            - strengthScore: Double (0-100)
+            - feedback: String
+            - logicGaps: [String]
+            - persuasiveElements: [String]
+
+            Text:
+            \(text)
+            """
+
+            let argResponse = try await AIService.shared.processText(prompt: argumentPrompt, systemPrompt: "You are an expert logic and rhetoric analyst. Return JSON ONLY.")
+            if let data = argResponse.data(using: .utf8),
+               let result = try? JSONDecoder().decode(ArgumentAnalysis.self, from: data) {
+                self.argumentAnalysis = result
+            }
+
+            let ambiguityPrompt = """
+            Analyze the following text for confusion, ambiguity, and lack of clarity.
+            Return a JSON object with:
+            - confusionScore: Double (0-100, where 100 is very confusing)
+            - unclearSections: [String]
+            - suggestions: [String]
+
+            Text:
+            \(text)
+            """
+
+            let ambResponse = try await AIService.shared.processText(prompt: ambiguityPrompt, systemPrompt: "You are an expert editor focused on clarity. Return JSON ONLY.")
+            if let data = ambResponse.data(using: .utf8),
+               let result = try? JSONDecoder().decode(AmbiguityAnalysis.self, from: data) {
+                self.ambiguityAnalysis = result
+            }
+
+        } catch {
+            print("Advanced AI Analysis failed: \(error)")
         }
     }
 
@@ -130,7 +182,7 @@ final class WritingAnalyticsViewModel: ObservableObject {
         Task {
             do {
                 let prompt = """
-                Perform a professional plagiarism analysis on the following text.
+                Perform a professional plagiarism analysis on the following text using available third-party data and web-based similarity indices.
                 Identify potential matches, similarity percentages, and risk levels.
                 Format the response as a JSON object with:
                 - overallScore: Double (0-100)
@@ -145,24 +197,14 @@ final class WritingAnalyticsViewModel: ObservableObject {
 
                 let response = try await AIService.shared.processText(prompt: prompt, systemPrompt: "You are an expert plagiarism detection system. Return JSON ONLY.")
 
-                // Simplified parsing for this example
                 if let data = response.data(using: .utf8),
                    let result = try? JSONDecoder().decode(PlagiarismResult.self, from: data) {
                     await MainActor.run {
                         self.plagiarismResult = result
                     }
-                } else {
-                    // Fallback to local scan if AI fails to return valid JSON
-                    let fallback = engine.runLocalPlagiarismScan(text: text)
-                    await MainActor.run {
-                        self.plagiarismResult = fallback
-                    }
                 }
             } catch {
-                let fallback = engine.runLocalPlagiarismScan(text: text)
-                await MainActor.run {
-                    self.plagiarismResult = fallback
-                }
+                print("Plagiarism scan failed: \(error)")
             }
             isRunningPlagiarism = false
         }

@@ -1208,6 +1208,7 @@
 		WA0200000000000000000001 /* WritingAnalyticsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA0100000000000000000001 /* WritingAnalyticsModels.swift */; };
 		WA0200000000000000000002 /* WritingAnalyticsEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA0100000000000000000002 /* WritingAnalyticsEngine.swift */; };
 		WA0200000000000000000003 /* WritingAnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA0100000000000000000003 /* WritingAnalyticsViewModel.swift */; };
+		ED0200000000000000000001 /* EssayDraftingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0100000000000000000001 /* EssayDraftingView.swift */; };
 		WA0200000000000000000004 /* WritingAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA0100000000000000000004 /* WritingAnalyticsView.swift */; };
 		DV0200000000000000000001 /* DictionaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000001 /* DictionaryViewModel.swift */; };
 		DV0200000000000000000002 /* DictionaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000002 /* DictionaryView.swift */; };
@@ -2765,6 +2766,7 @@
 		WA0100000000000000000001 /* WritingAnalyticsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsModels.swift; sourceTree = "<group>"; };
 		WA0100000000000000000002 /* WritingAnalyticsEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsEngine.swift; sourceTree = "<group>"; };
 		WA0100000000000000000003 /* WritingAnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsViewModel.swift; sourceTree = "<group>"; };
+		ED0100000000000000000001 /* EssayDraftingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EssayDraftingView.swift; sourceTree = "<group>"; };
 		WA0100000000000000000004 /* WritingAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsView.swift; sourceTree = "<group>"; };
 		DV0100000000000000000001 /* DictionaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryViewModel.swift; sourceTree = "<group>"; };
 		DV0100000000000000000002 /* DictionaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryView.swift; sourceTree = "<group>"; };
@@ -5148,6 +5150,7 @@
 				WA0100000000000000000001 /* WritingAnalyticsModels.swift */,
 				WA0100000000000000000002 /* WritingAnalyticsEngine.swift */,
 				WA0100000000000000000003 /* WritingAnalyticsViewModel.swift */,
+				ED0100000000000000000001 /* EssayDraftingView.swift */,
 				WA0100000000000000000004 /* WritingAnalyticsView.swift */,
 				DV0100000000000000000001 /* DictionaryViewModel.swift */,
 				DV0100000000000000000002 /* DictionaryView.swift */,
@@ -10479,6 +10482,7 @@
 				WA0200000000000000000001 /* WritingAnalyticsModels.swift in Sources */,
 				WA0200000000000000000002 /* WritingAnalyticsEngine.swift in Sources */,
 				WA0200000000000000000003 /* WritingAnalyticsViewModel.swift in Sources */,
+				ED0200000000000000000001 /* EssayDraftingView.swift in Sources */,
 				WA0200000000000000000004 /* WritingAnalyticsView.swift in Sources */,
 				DV0200000000000000000001 /* DictionaryViewModel.swift in Sources */,
 				DV0200000000000000000002 /* DictionaryView.swift in Sources */,

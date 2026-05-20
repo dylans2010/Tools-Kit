@@ -35,6 +35,9 @@ final class WritingAnalyticsEngine {
         let readabilityScore = 206.835 - (1.015 * avgWordsPerSentence) - (84.6 * avgSyllablesPerWord)
         let clampedScore = max(0, min(100, readabilityScore))
 
+        let gradeLevelValue = (0.39 * avgWordsPerSentence) + (11.8 * avgSyllablesPerWord) - 15.59
+        let gradeLevel = String(format: "%.1f", max(0, gradeLevelValue))
+
         let uniqueWords = Set(words.map { $0.lowercased().trimmingCharacters(in: .punctuationCharacters) }).filter { !$0.isEmpty }
         let vocabularyRichness = wordCount > 0 ? (Double(uniqueWords.count) / Double(wordCount)) * 100 : 0
 
@@ -46,6 +49,7 @@ final class WritingAnalyticsEngine {
             avgWordsPerSentence: avgWordsPerSentence,
             avgWordsPerParagraph: avgWordsPerParagraph,
             readabilityScore: clampedScore,
+            gradeLevel: gradeLevel,
             complexWordCount: complexWordCount,
             uniqueWordCount: uniqueWords.count,
             vocabularyRichness: vocabularyRichness
@@ -160,6 +164,48 @@ final class WritingAnalyticsEngine {
 
         let avg = sentences.isEmpty ? 0 : Double(totalWords) / Double(sentences.count)
         return SentenceLengthAnalysis(short: short, medium: medium, long: long, average: avg)
+    }
+
+    func analyzeKeywordDensity(text: String) -> [KeywordInsight] {
+        let cleanText = stripHTML(text).lowercased()
+        let words = cleanText.components(separatedBy: .whitespacesAndNewlines)
+            .map { $0.trimmingCharacters(in: .punctuationCharacters) }
+            .filter { $0.count > 3 }
+
+        let totalWords = words.count
+        guard totalWords > 0 else { return [] }
+
+        var freq = [String: Int]()
+        for w in words {
+            freq[w, default: 0] += 1
+        }
+
+        return freq.map { word, count in
+            KeywordInsight(word: word, count: count, density: (Double(count) / Double(totalWords)) * 100)
+        }
+        .sorted { $0.count > $1.count }
+        .prefix(10)
+        .map { $0 }
+    }
+
+    func analyzeStructureFlow(text: String) -> StructureFlow {
+        let paragraphs = stripHTML(text).components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+        let counts = paragraphs.map { Double($0.components(separatedBy: .whitespaces).filter { !$0.isEmpty }.count) }
+
+        let avg = counts.isEmpty ? 0 : counts.reduce(0, +) / Double(counts.count)
+        let variance = counts.isEmpty ? 0 : counts.map { pow($0 - avg, 2) }.reduce(0, +) / Double(counts.count)
+        let stdDev = sqrt(variance)
+
+        // A simple balance score: 100 - (coeff of variation * 100), clamped
+        let cv = avg > 0 ? stdDev / avg : 0
+        let balanceScore = max(0, min(100, 100 - (cv * 50))) // 50 is arbitrary scaling
+
+        var feedback = "Paragraph lengths are consistent."
+        if cv > 0.5 {
+            feedback = "Paragraph lengths vary significantly. Consider balancing them for better flow."
+        }
+
+        return StructureFlow(balanceScore: balanceScore, flowFeedback: feedback, paragraphStats: counts)
     }
 
     func analyzeWordComplexity(text: String) -> WordComplexity {
