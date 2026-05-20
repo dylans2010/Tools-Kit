@@ -71,7 +71,7 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func projectOverviewSection(_ project: SDKProject) -> some View {
-        Section("Project Overview") {
+        Section("Overview") {
             LabeledContent("Project", value: project.name)
             LabeledContent("Version", value: "v\(project.version)")
             LabeledContent("Health") {
@@ -162,7 +162,7 @@ struct SDKBuildView: View {
     private var buildResultSection: some View {
         if let url = exportedURL {
             Section("Build Result") {
-                Label("Build successful", systemImage: "checkmark.circle.fill")
+                Label("Build Successful", systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
                 HStack {
                     Image(systemName: "doc.zipper")

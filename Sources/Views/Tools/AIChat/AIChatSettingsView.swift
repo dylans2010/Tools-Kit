@@ -177,7 +177,7 @@ struct AIChatSettingsView: View {
             .onChange(of: settings.selectedProviderID) { _, _ in
                 Task { await loadProviderModels(force: false) }
             }
-            .navigationTitle("AI Settings")
+            .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
         }
     }
@@ -285,14 +285,14 @@ struct AIChatSettingsView: View {
             Divider()
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Model ID / Endpoint")
+                Text("Models")
                     .font(.caption.bold())
-                TextField("e.g. gemini-2.0-flash, gpt-4o, or a full URL", text: $settings.modelID)
+                TextField("Model ID or Endpoint", text: $settings.modelID)
                     .textFieldStyle(.roundedBorder)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
 
-                Text("This model will be used by all AI-powered features including CraftRead, inline suggestions, and any other AI tools.")
+                Text("This model will be used by all AI powered features inside ToolsKit.")
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
@@ -306,7 +306,7 @@ struct AIChatSettingsView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Dynamic AI Routing")
                                 .font(.headline)
-                            Text("Automatically switches between free models to prevent interruptions from rate limits or failures.")
+                            Text("Automatically switches between free models to prevent interruptions from rate limits or failures. Note this can take longer to respond.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -317,7 +317,7 @@ struct AIChatSettingsView: View {
                         Label {
                             Text("Browse Free Models")
                         } icon: {
-                            Image(systemName: "gift.fill")
+                            Image(systemName: "tray.full.fill")
                                 .foregroundColor(.orange)
                         }
                     }
@@ -390,7 +390,7 @@ struct AIChatSettingsView: View {
             TextEditor(text: $settings.knowledgeContext)
                 .frame(minHeight: 80)
 
-            Toggle("Auto-Inject App Context", isOn: $settings.autoInjectContext)
+            Toggle("Auto-= Inject App Context", isOn: $settings.autoInjectContext)
             Toggle("Include Conversation History", isOn: $settings.includeConversationHistory)
         }
     }
@@ -736,10 +736,10 @@ extension AIChatSettingsView {
         }
         var description: String {
             switch self {
-            case .dashboard: return "Standard tools & dashboard"
-            case .music: return "Music player experience"
-            case .workouts: return "AI fitness tracking"
-            case .workspace: return "Production workspace"
+            case .dashboard: return "Standard Tools & Dashboard"
+            case .music: return "Music Player Experience"
+            case .workouts: return "AI Fitness Tracking"
+            case .workspace: return "Production Workspace"
             }
         }
     }
@@ -1180,9 +1180,9 @@ struct RAGSettingsView: View {
     var body: some View {
         Form {
             Section("Retrieval Settings") {
-                Stepper("Top K results: \(settings.ragTopK)", value: $settings.ragTopK, in: 1...20)
+                Stepper("Top K Results: \(settings.ragTopK)", value: $settings.ragTopK, in: 1...20)
                 VStack(alignment: .leading) {
-                    Text("Similarity threshold: \(settings.ragSimilarityThreshold, specifier: "%.2f")")
+                    Text("Similarity Threshold: \(settings.ragSimilarityThreshold, specifier: "%.2f")")
                     Slider(value: $settings.ragSimilarityThreshold, in: 0.1...1.0)
                 }
                 Picker("Search strategy", selection: $settings.ragSearchStrategy) {
@@ -1192,9 +1192,9 @@ struct RAGSettingsView: View {
                 }
             }
             Section("Chunking") {
-                Stepper("Chunk size: \(settings.ragChunkSize) tokens", value: $settings.ragChunkSize, in: 128...2048, step: 128)
-                Stepper("Chunk overlap: \(settings.ragChunkOverlap) tokens", value: $settings.ragChunkOverlap, in: 0...256, step: 32)
-                Picker("Chunking strategy", selection: $settings.ragChunkingStrategy) {
+                Stepper("Chunk Size: \(settings.ragChunkSize) Tokens", value: $settings.ragChunkSize, in: 128...2048, step: 128)
+                Stepper("Chunk Overlap: \(settings.ragChunkOverlap) Tokens", value: $settings.ragChunkOverlap, in: 0...256, step: 32)
+                Picker("Chunking Strategy", selection: $settings.ragChunkingStrategy) {
                     Text("Fixed").tag("Fixed")
                     Text("Sentence").tag("Sentence")
                     Text("Paragraph").tag("Paragraph")
@@ -1211,15 +1211,15 @@ struct EmbeddingConfigView: View {
         Form {
             Section("Embedding Model") {
                 Picker("Model", selection: $settings.embeddingModel) {
-                    Text("Built-in (Local)").tag("default")
+                    Text("Built In (Local)").tag("default")
                     Text("OpenAI text-embedding-3-small").tag("openai-small")
                     Text("OpenAI text-embedding-3-large").tag("openai-large")
                 }
                 LabeledContent("Dimensions", value: "\(settings.embeddingDimensions)")
-                Toggle("Normalize vectors", isOn: $settings.normalizeVectors)
+                Toggle("Normalize Vectors", isOn: $settings.normalizeVectors)
             }
             Section("Storage") {
-                Toggle("Compress embeddings", isOn: $settings.compressEmbeddings)
+                Toggle("Compress Embeddings", isOn: $settings.compressEmbeddings)
             }
         }
         .navigationTitle("Embedding Config")
@@ -1232,7 +1232,7 @@ struct ContextWindowView: View {
         Form {
             Section("Token Budget Allocation") {
                 VStack(alignment: .leading) {
-                    Text("System prompt: \(Int(settings.contextAllocationSystemPrompt * 100))%")
+                    Text("System Prompt: \(Int(settings.contextAllocationSystemPrompt * 100))%")
                     Slider(value: $settings.contextAllocationSystemPrompt, in: 0.05...0.5)
                 }
                 VStack(alignment: .leading) {
@@ -1240,7 +1240,7 @@ struct ContextWindowView: View {
                     Slider(value: $settings.contextAllocationHistory, in: 0.1...0.8)
                 }
                 VStack(alignment: .leading) {
-                    Text("RAG context: \(Int(settings.contextAllocationRAG * 100))%")
+                    Text("RAG Context: \(Int(settings.contextAllocationRAG * 100))%")
                     Slider(value: $settings.contextAllocationRAG, in: 0.05...0.5)
                 }
             }
@@ -1293,11 +1293,11 @@ struct PromptVariablesView: View {
     var body: some View {
         Form {
             Section("Built-in Variables") {
-                LabeledContent("{{date}}", value: "Current date")
-                LabeledContent("{{time}}", value: "Current time")
-                LabeledContent("{{user_name}}", value: "User's name")
-                LabeledContent("{{app_version}}", value: "App version")
-                LabeledContent("{{device_model}}", value: "Device model")
+                LabeledContent("{{date}}", value: "Current Date")
+                LabeledContent("{{time}}", value: "Current Time")
+                LabeledContent("{{user_name}}", value: "User's Name")
+                LabeledContent("{{app_version}}", value: "App Version")
+                LabeledContent("{{device_model}}", value: "Device Model")
             }
             Section("Custom Variables") {
                 ForEach(settings.promptVariables) { variable in
@@ -1310,7 +1310,7 @@ struct PromptVariablesView: View {
                 .onDelete { settings.promptVariables.remove(atOffsets: $0) }
 
                 VStack {
-                    TextField("Name (e.g. company_name)", text: $newName)
+                    TextField("Name", text: $newName)
                     TextField("Value", text: $newValue)
                     Button("Add Variable") {
                         guard !newName.isEmpty else { return }
@@ -1332,7 +1332,7 @@ struct PromptChainEditorView: View {
         Form {
             Section("Prompt Chains") {
                 if settings.promptChains.isEmpty {
-                    Text("No chains defined").font(.caption).foregroundStyle(.secondary)
+                    Text("No Chains Defined").font(.caption).foregroundStyle(.secondary)
                 } else {
                     ForEach(settings.promptChains) { chain in
                         Text(chain.name)

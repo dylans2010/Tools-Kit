@@ -22,7 +22,7 @@ struct SDKHomeView: View {
                     Label("Connectors", systemImage: "link")
                 }
             } header: {
-                SDKSectionHeader("Core Services", subtitle: "Authentication, plugins, and connectors", alignment: .leading)
+                SDKSectionHeader("Core Services", subtitle: "Authentication, plugins, and connectors.", alignment: .leading)
             }
 
             Section {
@@ -30,13 +30,13 @@ struct SDKHomeView: View {
                     Label("App Builder", systemImage: "hammer")
                 }
                 NavigationLink(destination: SDKWorkspaceContainerView()) {
-                    Label("IDE Editor", systemImage: "pencil.and.list.clipboard")
+                    Label("Editor", systemImage: "pencil.and.list.clipboard")
                 }
                 NavigationLink(destination: SDKDebugView()) {
                     Label("Diagnostics", systemImage: "stethoscope")
                 }
                 NavigationLink(destination: SDKDeveloperGuideView()) {
-                    Label("Developer Guide", systemImage: "book")
+                    Label("Documentation", systemImage: "book")
                 }
                 NavigationLink(destination: SDKInternalView()) {
                     Label("Internal Tools", systemImage: "gearshape.2")
@@ -98,7 +98,7 @@ struct SDKHomeView: View {
                     }
                 }
             } header: {
-                SDKSectionHeader("Projects", subtitle: "\(projects.count) project\(projects.count == 1 ? "" : "s")", alignment: .leading)
+                SDKSectionHeader("Projects", subtitle: "\(projects.count) Project\(projects.count == 1 ? "" : "s")", alignment: .leading)
             }
         }
         .listStyle(.insetGrouped)

@@ -94,7 +94,7 @@ struct FolderDetailView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
-                .searchable(text: $searchText, prompt: "Search pages...")
+                .searchable(text: $searchText, prompt: "Search Pages")
             }
         }
         .navigationTitle(liveFolder.name)

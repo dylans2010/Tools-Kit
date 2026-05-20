@@ -46,7 +46,7 @@ struct EmailComposingView: View {
 
     @AppStorage("mail.settings.defaultSenderAccountId") private var defaultSenderAccountId = ""
     @AppStorage("mail.settings.undoSendEnabled") private var undoSendEnabled = true
-    @AppStorage("mail.settings.undoSendDelay") private var undoSendDelay = 10
+    @AppStorage("mail.settings.undoSendDelay") private var undoSendDelay = 5
 
     @FocusState private var focusedField: ComposeField?
 
@@ -213,7 +213,7 @@ struct EmailComposingView: View {
                 }
                 Button("Cancel", role: .cancel) { }
             } message: {
-                Text("You have unsent content. Would you like to save it as a draft?")
+                Text("You have unsent content. Would you like to save it as a draft or discard it?")
             }
         }
     }
@@ -260,7 +260,7 @@ struct EmailComposingView: View {
                     }
                 }
 
-                TextField("Add recipient", text: $newRecipient)
+                TextField("Add Recipient", text: $newRecipient)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.emailAddress)
                     .focused($focusedField, equals: .to)
@@ -379,7 +379,7 @@ struct EmailComposingView: View {
                 .padding(.horizontal, 12)
 
             if messageBody.isEmpty {
-                Text("Compose your message…")
+                Text("Compose")
                     .font(.body)
                     .foregroundStyle(.tertiary)
                     .padding(.top, 8)
@@ -593,7 +593,7 @@ struct EmailComposingView: View {
 
     private var undoSendBannerView: some View {
         HStack {
-            Text("Sending in \(undoCountdown)s…")
+            Text("Sending In \(undoCountdown)s…")
                 .font(.subheadline.bold())
             Spacer()
             Button("Undo") { cancelPendingUndoSend() }
@@ -865,7 +865,7 @@ struct EmailComposingView: View {
             showingDocumentScanner = false
         }
         #else
-        Text("Document Scanning is not supported on this platform.")
+        Text("Document Scanning is not supported on this platform, switch to iOS to proceed.")
         #endif
     }
 
@@ -1029,7 +1029,7 @@ struct EmailComposeDraftsView: View {
         NavigationStack {
             Group {
                 if drafts.isEmpty {
-                    ContentUnavailableView("No Drafts", systemImage: "tray", description: Text("Saved drafts will appear here."))
+                    ContentUnavailableView("No Drafts", systemImage: "tray", description: Text("All ypur saved drafts will appear here."))
                 } else {
                     List {
                         ForEach(drafts) { draft in

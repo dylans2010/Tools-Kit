@@ -11,7 +11,7 @@ struct PluginSettingsView: View {
     var body: some View {
         Form {
             Section("General") {
-                Toggle("Auto-update Plugins", isOn: $autoUpdateEnabled)
+                Toggle("Auto Update Plugins", isOn: $autoUpdateEnabled)
                 Toggle("Sandbox Mode", isOn: $sandboxMode)
                 Stepper("Max Concurrent: \(maxConcurrent)", value: $maxConcurrent, in: 1...20)
             }
@@ -43,7 +43,7 @@ struct PluginSettingsView: View {
 
             Section("About") {
                 LabeledContent("Plugin Engine Version", value: "2.0.0")
-                LabeledContent("Sandbox Version", value: "1.5.0")
+                LabeledContent("Sandbox Version", value: "1.1.0.2")
             }
         }
         .navigationTitle("Plugin Settings")

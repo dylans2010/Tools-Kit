@@ -89,7 +89,7 @@ struct MarketplaceView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .searchable(text: $searchText, prompt: "Search modules...")
+        .searchable(text: $searchText, prompt: "Search Modules")
         .navigationTitle("Marketplace")
     }
 }
@@ -133,7 +133,7 @@ struct MarketplacePluginRow: View {
     let plugin: SDKPlugin
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "puzzlepiece.extension") // TODO: icon unavailable on SDKPlugin
+            Image(systemName: "puzzlepiece.extension")
                 .font(.title3)
                 .foregroundStyle(Color.accentColor)
                 .frame(width: 44, height: 44)

@@ -1,5 +1,4 @@
 
-
 import SwiftUI
 
 struct PluginLimitedView: View {

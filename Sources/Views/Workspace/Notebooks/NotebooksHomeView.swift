@@ -265,7 +265,7 @@ private struct NotebookRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(notebook.name)
                         .font(.headline)
-                    Text("\(notebook.folders.count) folders · \(notebook.folders.flatMap(\.pages).count) pages")
+                    Text("\(notebook.folders.count) Folders · \(notebook.folders.flatMap(\.pages).count) Pages")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

@@ -252,7 +252,7 @@ struct PageEditorView: View {
         VStack {
             Spacer()
             VStack(alignment: .leading, spacing: 0) {
-                Text("INSERT").font(.caption2.bold()).foregroundColor(.secondary).padding(.horizontal).padding(.vertical, 12)
+                Text("Insert").font(.caption2.bold()).foregroundColor(.secondary).padding(.horizontal).padding(.vertical, 12)
                 Divider()
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {

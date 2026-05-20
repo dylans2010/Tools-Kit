@@ -67,7 +67,7 @@ struct PluginsMainView: View {
 
             Section("Development") {
                 NavigationLink(destination: PluginBuildView()) {
-                    Label("Plugin Builder", systemImage: "wrench.and.screwdriver")
+                    Label("Builder", systemImage: "wrench.and.screwdriver")
                 }
                 NavigationLink(destination: PluginDevConsoleView()) {
                     Label("Developer Console", systemImage: "terminal")

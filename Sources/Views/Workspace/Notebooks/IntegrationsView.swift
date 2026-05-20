@@ -36,7 +36,7 @@ struct IntegrationsView: View {
             toolsSection
         }
         .navigationTitle("Integrations")
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search tools")
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search Tools")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Menu {
@@ -124,7 +124,7 @@ struct IntegrationsView: View {
                 .labelsHidden()
             }
 
-            Text(tool.description.isEmpty ? "No description" : tool.description)
+            Text(tool.description.isEmpty ? "No Description" : tool.description)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)

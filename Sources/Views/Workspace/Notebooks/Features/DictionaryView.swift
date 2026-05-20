@@ -41,7 +41,7 @@ struct DictionaryView: View {
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass").foregroundColor(.secondary)
-            TextField("Search a word...", text: $vm.searchText)
+            TextField("Search Words", text: $vm.searchText)
                 .textFieldStyle(.plain)
                 .onSubmit {
                     Task { await vm.search(word: vm.searchText) }

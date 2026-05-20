@@ -153,7 +153,7 @@ export async function onEvent(event, ctx) {
         .alert("Identifier Locked", isPresented: $showingIdentifierLockAlert) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text("The identifier 'com.toolskit.\(identifier)' cannot be changed after creation.")
+            Text("The identifier 'com.toolskit.\(identifier)' cannot be changed after creation. This helps us identify your plugin on the app.")
         }
     }
 
@@ -203,7 +203,7 @@ export async function onEvent(event, ctx) {
             name: name,
             version: version,
             permissions: Array(selectedCapabilities).map { cap -> PluginPermission in
-                // Simple mapping for demo purposes, would need real mapping logic
+                                                          
                 switch cap {
                 case .notes, .files: return .readData
                 case .mail: return .notifications
@@ -310,7 +310,7 @@ private struct BuildCapabilitiesSection: View {
             }
         }
 
-        Section("Actions (Event Subscriptions)") {
+        Section("Scopes") {
             if selectedCapabilities.isEmpty {
                 Text("Select Capabilities First").font(.caption).foregroundStyle(.secondary)
             } else {
@@ -353,7 +353,7 @@ private struct BuildSecuritySection: View {
                     }
                 }
             } else {
-                Text("No high-risk scopes selected.").font(.caption).foregroundStyle(.secondary)
+                Text("No high risk scopes selected.").font(.caption).foregroundStyle(.secondary)
             }
         }
     }
@@ -367,7 +367,7 @@ private struct BuildEndpointsSection: View {
     var body: some View {
         Section("External Endpoints") {
             if endpoints.isEmpty {
-                ContentUnavailableView("No Endpoints", systemImage: "network", description: Text("Connect to external APIs by adding endpoints."))
+                ContentUnavailableView("No Endpoints", systemImage: "network", description: Text("Connect to external APIs by adding their endpoints."))
             } else {
                 ForEach(endpoints) { endpoint in
                     Button { onEdit(endpoint) } label: {
@@ -450,7 +450,7 @@ private struct BuildRulesSection: View {
     var body: some View {
         Section("Execution Rules") {
             if executionRules.isEmpty {
-                Text("No rules defined.").font(.caption).foregroundStyle(.secondary)
+                Text("No Rules Defined").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach($executionRules) { $rule in
                     VStack(alignment: .leading, spacing: 8) {
@@ -520,7 +520,7 @@ private struct BuildToolkitSection: View {
     var body: some View {
         Section("Plugin Toolkit") {
             if toolkitTools.isEmpty {
-                Text("No toolkit tools selected.").font(.caption).foregroundStyle(.secondary)
+                Text("No Tools Selected").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach($toolkitTools) { $tool in
                     VStack(spacing: 8) {
@@ -536,7 +536,7 @@ private struct BuildToolkitSection: View {
                 }
                 .onDelete { toolkitTools.remove(atOffsets: $0) }
             }
-            Button("Add Toolkit Tool", systemImage: "hammer.fill") {
+            Button("Add ToolKit Tool", systemImage: "hammer.fill") {
                 toolkitTools.append(PluginToolkitTool(name: "AI Text Summarizer", category: .ai, config: [:]))
             }
         }
@@ -602,9 +602,9 @@ private struct BuildReleaseSection: View {
 
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    VStack(alignment: .leading) { Text("CURRENT").font(.caption2.bold()); Text("v1.0.0").font(.caption.monospaced()) }
+                    VStack(alignment: .leading) { Text("Current").font(.caption2.bold()); Text("v1.0.0").font(.caption.monospaced()) }
                     Spacer(); Image(systemName: "arrow.right").foregroundStyle(.tertiary); Spacer()
-                    VStack(alignment: .trailing) { Text("NEW").font(.caption2.bold()); Text("v\(version)").font(.caption.monospaced()).foregroundStyle(.sdkSuccess) }
+                    VStack(alignment: .trailing) { Text("New").font(.caption2.bold()); Text("v\(version)").font(.caption.monospaced()).foregroundStyle(.sdkSuccess) }
                 }
                 VStack(alignment: .leading, spacing: 4) {
                     Label("+ Added \(endpointsCount) Endpoints", systemImage: "plus.circle").foregroundStyle(.sdkSuccess)

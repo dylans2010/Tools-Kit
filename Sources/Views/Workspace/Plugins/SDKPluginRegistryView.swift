@@ -31,7 +31,7 @@ struct SDKPluginRegistryView: View {
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Plugin Registry")
-        .searchable(text: $searchText, prompt: "Search plugins")
+        .searchable(text: $searchText, prompt: "Search Plugins")
         .sheet(item: $selectedPlugin) { plugin in
             NavigationStack {
                 pluginDetailSheet(plugin)

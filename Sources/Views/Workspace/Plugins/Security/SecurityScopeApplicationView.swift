@@ -1,5 +1,4 @@
 
-
 import SwiftUI
 
 struct SecurityScopeApplicationView: View {
@@ -10,7 +9,7 @@ struct SecurityScopeApplicationView: View {
     var body: some View {
         Form {
             Section {
-                Text("High-risk permissions and sensitive workspace access require additional security information and justification.")
+                Text("High risk permissions and sensitive workspace access require additional security information and justification.")
                     .font(.subheadline).foregroundStyle(.secondary)
             } header: {
                 Label("Security Scope Gate", systemImage: "lock.trianglebadge.exclamationmark")
@@ -52,7 +51,7 @@ struct SecurityScopeApplicationView: View {
                     TextField("How long is data stored?", text: Binding(get: { plugin.retentionPolicy ?? "" }, set: { plugin.retentionPolicy = $0.isEmpty ? nil : $0 }))
                 }
             } header: {
-                Label("Data Governance", systemImage: "hand.raised.fill")
+                Label("Privacy Notes", systemImage: "hand.raised.fill")
             }
 
             Section {
@@ -77,12 +76,12 @@ struct SecurityScopeApplicationView: View {
                 }
 
                 if plugin.capabilities.isEmpty {
-                    Text("No scopes requested.").font(.caption).foregroundStyle(.secondary)
+                    Text("No Scopes Requested").font(.caption).foregroundStyle(.secondary)
                 }
             } header: {
                 Label("Scope Authorization Status", systemImage: "shield.checkered")
             } footer: {
-                Text("Changes are applied to the plugin definition. High-risk plugins without an API Key or Privacy Note will be blocked during installation or execution.")
+                Text("Changes are applied to the plugin definition. High risk plugins without an API Key or Privacy Note will be blocked during installation or execution.")
             }
         }
         .navigationTitle("Security Scopes")

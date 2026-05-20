@@ -73,7 +73,7 @@ struct NotebookDetailView: View {
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle(liveNotebook.name)
         .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, prompt: "Search folders/pages")
+        .searchable(text: $searchText, prompt: "Search Folders or Pages")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Menu {
@@ -163,7 +163,7 @@ struct NotebookDetailView: View {
 
                 HStack(spacing: 8) {
                     if supportsImagePlayground {
-                        Button("Image Playground", systemImage: "sparkles") {
+                        Button("Generate", systemImage: "apple.intelligence") {
                             showingImagePlayground = true
                         }
                         .buttonStyle(.borderedProminent)
@@ -238,7 +238,7 @@ struct NotebookDetailView: View {
                                     Text(folder.name)
                                         .font(.headline)
                                         .foregroundStyle(.primary)
-                                    Text("\(folder.pages.count) pages")
+                                    Text("\(folder.pages.count) Pages")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }
@@ -379,7 +379,7 @@ struct NotebookDetailView: View {
         Task {
             do {
                 let context = liveNotebook.folders.map {
-                    "\($0.name) | pages: \($0.pages.count)"
+                    "\($0.name) | Pages: \($0.pages.count)"
                 }.joined(separator: "\n")
                 let insights = try await manager.generateNoteInsights(noteContent: trimmed, notebookContext: context)
                 await MainActor.run {

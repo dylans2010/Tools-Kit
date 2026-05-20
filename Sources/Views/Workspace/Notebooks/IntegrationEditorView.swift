@@ -86,7 +86,7 @@ struct IntegrationEditorView: View {
                             if isBuildingAI {
                                 ProgressView().padding(.trailing, 8)
                             }
-                            Label("Generate Tool Details", systemImage: "sparkles")
+                            Label("Build", systemImage: "sparkles")
                         }
                         .frame(maxWidth: .infinity)
                     }

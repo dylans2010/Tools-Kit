@@ -193,7 +193,7 @@ class EssayDraftingViewModel: ObservableObject {
     @Published var struggle: String = "Starting"
     @Published var hookEnabled: Bool = true
     @Published var sourceRequirement: String = "None"
-    @Published var outputMode: String = "Full essay"
+    @Published var outputMode: String = "Full Essay"
     @Published var styleReference: String = ""
     @Published var keywords: String = ""
 
@@ -212,9 +212,9 @@ class EssayDraftingViewModel: ObservableObject {
     @Published var detectionError: String? = nil
 
     let goals = ["Inform", "Argue", "Analyze", "Reflect"]
-    let struggles = ["Starting", "Organizing", "Making arguments", "Grammar"]
+    let struggles = ["Starting", "Organizing", "Making Arguments", "Grammar"]
     let sourceRequirements = ["None", "Light", "Strict"]
-    let outputModes = ["Full essay", "Outline only", "Paragraph-by-paragraph"]
+    let outputModes = ["Full Essay", "Outline Only", "Paragraph by Paragraph"]
 
     func parseEssay(_ raw: String) -> (title: String, body: String) {
         let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -232,7 +232,7 @@ class EssayDraftingViewModel: ObservableObject {
         Task {
             do {
                 let prompt = "Suggest a clear, compelling thesis statement for a \(goal) essay about: \(topic)"
-                let result = try await AIService.shared.processText(prompt: prompt, systemPrompt: "You are an expert academic advisor. Provide only the thesis statement.")
+                let result = try await AIService.shared.processText(prompt: prompt, systemPrompt: "You are an expert academic advisor. Provide only the thesis statement WITHOUT any additional explanation or formatting. Don't include quotes or 'Thesis:' prefix, ONLY the thesis statement.")
                 await MainActor.run {
                     self.thesis = result.trimmingCharacters(in: .whitespacesAndNewlines)
                     self.suggestedThesisLoading = false
@@ -379,7 +379,7 @@ class EssayDraftingViewModel: ObservableObject {
                 9. Never output markdown formatting — output plain prose only.
                 10. Never make the essay longer than 115% of the original word count.
 
-                OUTPUT: Return only the rewritten essay text. No preamble, no explanation, no labels.
+                OUTPUT: Return only the rewritten essay text. No preamble, no explanation, no labels, ONLY the rewritten essay.
                 """
 
                 let result = try await AIService.shared.processText(prompt: generatedContent, systemPrompt: systemPrompt)
@@ -466,7 +466,7 @@ class EssayDraftingViewModel: ObservableObject {
 
         } catch {
             await MainActor.run {
-                self.detectionError = "Detection failed. Check your connection and try again."
+                self.detectionError = "Coming Soon!"
                 self.isDetecting = false
             }
         }
@@ -554,8 +554,8 @@ struct EssayDraftingView: View {
     }
 
     private var loadingLabel: String {
-        if viewModel.isGenerating { return "Drafting your essay..." }
-        if viewModel.isHumanizing { return "Humanizing content..." }
+        if viewModel.isGenerating { return "Drafting Your Essay..." }
+        if viewModel.isHumanizing { return "Humanizing Content..." }
         return "Loading..."
     }
 
@@ -580,7 +580,7 @@ struct EssayDraftingView: View {
                     Text("What are you writing about?").font(.title2.bold())
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Label("Topic or Prompt", systemImage: "pencil.line")
+                        Label("Topic", systemImage: "pencil.line")
                             .font(.subheadline).fontWeight(.semibold)
                         TextEditor(text: $viewModel.topic)
                             .frame(height: 120)
@@ -606,7 +606,7 @@ struct EssayDraftingView: View {
 
             case 2:
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Define your core thesis").font(.title2.bold())
+                    Text("Define Core Thesis").font(.title2.bold())
 
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
@@ -635,7 +635,7 @@ struct EssayDraftingView: View {
                             .font(.subheadline).fontWeight(.semibold)
                         ForEach(0..<viewModel.keyPoints.count, id: \.self) { index in
                             HStack {
-                                TextField("Key point \(index + 1)", text: $viewModel.keyPoints[index])
+                                TextField("Key Point \(index + 1)", text: $viewModel.keyPoints[index])
                                     .textFieldStyle(.roundedBorder)
                                 if viewModel.keyPoints.count > 1 {
                                     Button(action: {
@@ -674,7 +674,7 @@ struct EssayDraftingView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Audience", systemImage: "person.text.rectangle")
                             .font(.subheadline).fontWeight(.semibold)
-                        TextField("e.g. Students, Researchers", text: $viewModel.audience)
+                        TextField("Sudents, Research, etc", text: $viewModel.audience)
                             .textFieldStyle(.roundedBorder)
                     }
                 }
@@ -695,7 +695,7 @@ struct EssayDraftingView: View {
                     ChipSelectorView(title: "Point Of View", icon: "person.text.rectangle", selection: $viewModel.selectedPOV, iconFor: { $0.icon })
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Label("What do you struggle with most?", systemImage: "brain")
+                        Label("What is your struggle?", systemImage: "questionmark.text.page.fill")
                             .font(.subheadline).fontWeight(.semibold)
                         Picker("Struggle", selection: $viewModel.struggle) {
                             ForEach(viewModel.struggles, id: \.self) { Text($0) }
@@ -1158,7 +1158,7 @@ struct AIDetectorSectionView: View {
                                     }
 
                                     if result.sentenceScores.count > 8 {
-                                        Text("+ \(result.sentenceScores.count - 8) more sentences")
+                                        Text("+ \(result.sentenceScores.count - 8) More Sentences")
                                             .font(.caption2)
                                             .foregroundColor(.secondary)
                                     }

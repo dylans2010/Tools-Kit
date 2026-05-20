@@ -16,7 +16,7 @@ struct PluginDependenciesView: View {
             Section("Required Dependencies") {
                 let required = dependencies.filter { $0.isRequired }
                 if required.isEmpty && !isLoading {
-                    Text("No required dependencies")
+                    Text("No Required Dependencies")
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(required) { dep in
@@ -28,7 +28,7 @@ struct PluginDependenciesView: View {
             Section("Optional Dependencies") {
                 let optional = dependencies.filter { !$0.isRequired }
                 if optional.isEmpty && !isLoading {
-                    Text("No optional dependencies")
+                    Text("No Optional Dependencies")
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(optional) { dep in

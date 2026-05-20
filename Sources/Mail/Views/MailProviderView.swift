@@ -27,7 +27,7 @@ struct MailProviderView: View {
                         Text("Connect iCloud Mail")
                             .font(.system(size: 28, weight: .bold, design: .rounded))
 
-                        Text("Sign in with your Apple ID and app-specific password.")
+                        Text("Sign in with your Apple ID and a app specific password.")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -44,7 +44,7 @@ struct MailProviderView: View {
                             .foregroundColor(.secondary)
                             .padding(.leading, 4)
 
-                        TextField("email@icloud.com", text: $email)
+                        TextField("iCloud Email", text: $email)
                             .textInputAutocapitalization(.never)
                             .keyboardType(.emailAddress)
                             .autocorrectionDisabled(true)
@@ -54,7 +54,7 @@ struct MailProviderView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("App-Specific Password")
+                        Text("App Specific Password")
                             .font(.caption.bold())
                             .foregroundColor(.secondary)
                             .padding(.leading, 4)
@@ -70,7 +70,7 @@ struct MailProviderView: View {
                     Link(destination: URL(string: "https://appleid.apple.com")!) {
                         HStack {
                             Image(systemName: "questionmark.circle.fill")
-                            Text("How to create an app-specific password")
+                            Text("How to create an app-specific password?")
                         }
                         .font(.footnote.weight(.medium))
                     }
@@ -124,7 +124,6 @@ struct MailProviderView: View {
         isSaving = true
         errorMsg = nil
 
-        // Simulate networking delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             let success = MailKeychainManager.shared.saveCredentials(email: email, password: password)
             if success {

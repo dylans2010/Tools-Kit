@@ -14,7 +14,7 @@ struct PluginUpdateView: View {
                     VStack(alignment: .leading) {
                         Text("Plugin Updates")
                             .font(.headline)
-                        Text("\(availableUpdates.count) updates available")
+                        Text("\(availableUpdates.count) Updates Available")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

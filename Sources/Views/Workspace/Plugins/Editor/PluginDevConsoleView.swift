@@ -127,7 +127,7 @@ struct PluginDevConsoleView: View {
             payload: ["id": UUID().uuidString, "title": "Debug Note"],
             timestamp: Date()
         )
-        appendLog(.system, "Injecting test event...")
+        appendLog(.system, "Injecting Test Event...")
         PluginEventBus.shared.emit(event)
     }
 }

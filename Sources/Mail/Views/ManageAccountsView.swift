@@ -259,7 +259,6 @@ struct ManageAccountsView: View {
             case .proton:
                 session = try await ProtonMailProvider().authenticate(credentials: credentials)
             case .icloud:
-                // This case is now handled above
                 return
             case .imap:
                 session = try await IMAPProvider().authenticate(credentials: credentials)

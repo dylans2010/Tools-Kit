@@ -1,5 +1,4 @@
 
-
 import SwiftUI
 
 struct PluginSecurityView: View {
