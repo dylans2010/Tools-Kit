@@ -297,6 +297,18 @@ struct AIChatSettingsView: View {
                     .foregroundColor(.secondary)
             }
             .padding(.top, 4)
+
+            if settings.selectedProviderID == "openrouter" {
+                NavigationLink(destination: OpenRouterFreeModelsView(selectedModelID: $settings.modelID)) {
+                    Label {
+                        Text("Browse Free Models")
+                    } icon: {
+                        Image(systemName: "gift.fill")
+                            .foregroundColor(.orange)
+                    }
+                }
+                .padding(.top, 8)
+            }
         }
     }
 
@@ -1438,15 +1450,59 @@ struct PersonalityPresetsView: View {
     }
 }
 
+struct OpenRouterFreeModels: Identifiable {
+    let id: String
+    let name: String
+}
+
+struct OpenRouterFreeModelsView: View {
+    @StateObject private var modelCatalog = AIModelCatalog.shared
+    @Binding var selectedModelID: String
+
+    var freeModels: [AIModel] {
+        modelCatalog.models(for: "openrouter").filter { $0.id.lowercased().contains("free") }
+    }
+
+    var body: some View {
+        List {
+            if freeModels.isEmpty {
+                Text("No free models found or still loading...")
+                    .foregroundColor(.secondary)
+            } else {
+                ForEach(freeModels) { model in
+                    Button {
+                        selectedModelID = model.id
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(model.name).font(.headline)
+                                Text(model.id).font(.caption).foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            if selectedModelID == model.id {
+                                Image(systemName: "checkmark.circle.fill").foregroundColor(.blue)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Browse Free Models")
+    }
+}
+
 struct ToneSamplerView: View {
     @State private var sampleText = "Explain what an API is."
     @State private var selectedTone = "Neutral"
+    @State private var response: String = ""
+    @State private var isGenerating = false
 
     var body: some View {
         Form {
             Section("Sample Prompt") {
                 TextEditor(text: $sampleText)
-                    .frame(height: 60)
+                    .frame(height: 80)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.1)))
             }
             Section("Tone") {
                 Picker("Select tone", selection: $selectedTone) {
@@ -1454,17 +1510,53 @@ struct ToneSamplerView: View {
                         Text($0).tag($0)
                     }
                 }
-                .pickerStyle(.segmented)
+                .pickerStyle(.menu)
             }
-            Section("Preview") {
-                Text("Send the sample prompt above to preview how the AI would respond in the selected tone.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Button("Generate Preview") {}
-                    .buttonStyle(.borderedProminent)
+            Section {
+                Button {
+                    generatePreview()
+                } label: {
+                    HStack {
+                        if isGenerating { ProgressView().padding(.trailing, 8) }
+                        Text(isGenerating ? "Generating..." : "Generate Preview")
+                            .fontWeight(.bold)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(isGenerating || sampleText.isEmpty)
+            }
+
+            if !response.isEmpty {
+                Section("AI Response") {
+                    Text(response)
+                        .font(.subheadline)
+                        .padding(.vertical, 4)
+                        .textSelection(.enabled)
+                }
             }
         }
         .navigationTitle("Tone Sampler")
+    }
+
+    private func generatePreview() {
+        isGenerating = true
+        response = ""
+        Task {
+            do {
+                let prompt = "Prompt: \(sampleText)\n\nPlease respond to the prompt above using a \(selectedTone) tone."
+                let result = try await AIService.shared.processText(prompt: prompt)
+                await MainActor.run {
+                    self.response = result
+                    self.isGenerating = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.response = "Error: \(error.localizedDescription)"
+                    self.isGenerating = false
+                }
+            }
+        }
     }
 }
 

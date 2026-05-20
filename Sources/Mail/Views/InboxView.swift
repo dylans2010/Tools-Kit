@@ -249,56 +249,90 @@ struct InboxView: View {
     }
 
     private func inboxRow(thread: MailThread, message: MailMessage) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .firstTextBaseline) {
+        HStack(alignment: .top, spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(thread.isRead ? Color.secondary.opacity(0.1) : providerColor((activeAccount ?? account).providerType).opacity(0.2))
+                    .frame(width: 44, height: 44)
+
+                Text(senderInitials(from: message.from))
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundColor(thread.isRead ? .secondary : providerColor((activeAccount ?? account).providerType))
+
+                if !thread.isRead {
+                    Circle()
+                        .fill(providerColor((activeAccount ?? account).providerType))
+                        .frame(width: 10, height: 10)
+                        .overlay(Circle().stroke(Color.workspaceBackground ?? .black, lineWidth: 2))
+                        .offset(x: 16, y: -16)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text(senderName(from: message.from))
+                        .font(.system(size: 15, weight: thread.isRead ? .semibold : .bold))
+                        .foregroundColor(thread.isRead ? .primary.opacity(0.8) : .white)
+                        .lineLimit(1)
+
+                    Spacer()
+
+                    Text(relativeTimestamp(message.date))
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+
                 HStack(spacing: 8) {
-                    if (thread.priorityScore ?? 0) > 0.8 {
-                        Image(systemName: "exclamationmark.circle.fill")
-                            .foregroundStyle(.red)
-                            .font(.caption)
-                    } else {
-                        Circle()
-                            .fill(thread.isRead ? Color.clear : providerColor((activeAccount ?? account).providerType))
-                            .frame(width: 8, height: 8)
+                    Text(message.subject)
+                        .font(.system(size: 14, weight: thread.isRead ? .regular : .semibold))
+                        .foregroundColor(thread.isRead ? .secondary : .white)
+                        .lineLimit(1)
+
+                    if let intent = thread.intent {
+                        Text(intent.replacingOccurrences(of: "_", with: " ").capitalized)
+                            .font(.system(size: 8, weight: .black))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(providerColor((activeAccount ?? account).providerType).opacity(0.2))
+                            .foregroundColor(providerColor((activeAccount ?? account).providerType))
+                            .cornerRadius(4)
                     }
 
-                    Text(senderName(from: message.from))
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
+                    if (thread.priorityScore ?? 0) > 0.8 {
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .font(.caption2)
+                            .foregroundColor(.red)
+                    }
                 }
 
-                Spacer()
-
-                Text(relativeTimestamp(message.date))
-                    .font(.caption2)
-                    .foregroundStyle(Color(hex: "#8888AA"))
+                Text(previewText(for: message))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+                    .padding(.top, 1)
             }
-
-            HStack {
-                Text(message.subject)
-                    .font(.subheadline)
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-
-                if let intent = thread.intent {
-                    Text(intent.replacingOccurrences(of: "_", with: " ").capitalized)
-                        .font(.system(size: 10, weight: .bold))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.blue.opacity(0.2), in: Capsule())
-                        .foregroundStyle(.blue)
-                }
-            }
-
-            Text(previewText(for: message))
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .lineLimit(2)
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 4)
-        .background(thread.isRead ? Color.clear : Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 12))
+        .padding(.vertical, 12)
+        .padding(.horizontal, 14)
+        .background(thread.isRead ? Color.clear : Color.white.opacity(0.04))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(thread.isRead ? Color.clear : Color.white.opacity(0.05), lineWidth: 1)
+        )
+    }
+
+    private func senderInitials(from value: String) -> String {
+        let name = senderName(from: value)
+        let components = name.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+        if components.count >= 2 {
+            let first = components[0].prefix(1).uppercased()
+            let last = components[1].prefix(1).uppercased()
+            return first + last
+        } else if let first = components.first?.prefix(1).uppercased() {
+            return first
+        }
+        return "?"
     }
 
     private var skeletonList: some View {

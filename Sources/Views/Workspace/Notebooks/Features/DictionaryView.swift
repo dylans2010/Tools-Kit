@@ -80,13 +80,16 @@ struct DictionaryView: View {
     }
 
     private func resultView(_ result: DictionaryResult) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                HStack(alignment: .firstTextBaseline) {
+        List {
+            Section {
+                HStack(alignment: .center) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(result.word).font(.system(size: 40, weight: .bold))
+                        Text(result.word)
+                            .font(.system(size: 34, weight: .bold, design: .rounded))
                         if let phonetic = result.phonetic {
-                            Text(phonetic).font(.title3).foregroundColor(.secondary)
+                            Text(phonetic)
+                                .font(.title3)
+                                .foregroundColor(.secondary)
                         }
                     }
                     Spacer()
@@ -94,63 +97,57 @@ struct DictionaryView: View {
                         vm.playAudio()
                     } label: {
                         Image(systemName: "speaker.wave.2.fill")
-                            .font(.title)
-                            .padding()
-                            .background(Color.blue.opacity(0.1))
-                            .clipShape(Circle())
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .frame(width: 50, height: 50)
+                            .background(Circle().fill(Color.blue))
+                            .shadow(color: .blue.opacity(0.3), radius: 5, x: 0, y: 3)
                     }
+                    .buttonStyle(.plain)
                 }
+                .padding(.vertical, 8)
+            }
+            .listRowBackground(Color.clear)
 
-                ForEach(result.meanings) { meaning in
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(meaning.partOfSpeech.capitalized)
-                            .font(.caption.bold())
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .background(partOfSpeechColor(meaning.partOfSpeech).opacity(0.1))
-                            .foregroundColor(partOfSpeechColor(meaning.partOfSpeech))
-                            .cornerRadius(8)
+            ForEach(result.meanings) { meaning in
+                Section(header: Text(meaning.partOfSpeech.uppercased()).font(.caption.bold()).foregroundColor(partOfSpeechColor(meaning.partOfSpeech))) {
+                    ForEach(Array(meaning.definitions.enumerated()), id: \.offset) { index, def in
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack(alignment: .top, spacing: 12) {
+                                Text("\(index + 1)")
+                                    .font(.subheadline.bold())
+                                    .foregroundColor(.white)
+                                    .frame(width: 24, height: 24)
+                                    .background(Circle().fill(partOfSpeechColor(meaning.partOfSpeech)))
 
-                        ForEach(Array(meaning.definitions.enumerated()), id: \.offset) { index, def in
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("\(index + 1). \(def.definition)")
+                                Text(def.definition)
                                     .font(.body)
-
-                                if let example = def.example {
-                                    Text("\"\(example)\"")
-                                        .font(.subheadline.italic())
-                                        .foregroundColor(.secondary)
-                                }
-
-                                if !def.synonyms.isEmpty {
-                                    wordChipGroup(title: "Synonyms", words: def.synonyms)
-                                }
-
-                                if !def.antonyms.isEmpty {
-                                    wordChipGroup(title: "Antonyms", words: def.antonyms)
-                                }
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
-                            .padding(.bottom, 8)
-                        }
-                    }
-                    .padding()
-                    .background(Color.secondary.opacity(0.05))
-                    .cornerRadius(12)
-                }
 
-                if !result.sourceUrls.isEmpty {
-                    DisclosureGroup("Sources") {
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(result.sourceUrls, id: \.self) { url in
-                                Link(url, destination: URL(string: url)!)
-                                    .font(.caption)
-                                    .foregroundColor(.blue)
+                            if let example = def.example {
+                                Text("\"\(example)\"")
+                                    .font(.subheadline.italic())
+                                    .foregroundColor(.secondary)
+                                    .padding(.leading, 36)
+                            }
+
+                            if !def.synonyms.isEmpty {
+                                wordChipGroup(title: "Synonyms", words: def.synonyms, color: .blue)
+                                    .padding(.leading, 36)
+                            }
+
+                            if !def.antonyms.isEmpty {
+                                wordChipGroup(title: "Antonyms", words: def.antonyms, color: .orange)
+                                    .padding(.leading, 36)
                             }
                         }
-                        .padding(.top, 8)
+                        .padding(.vertical, 4)
                     }
                 }
+            }
 
+            Section("Actions") {
                 Button {
                     if let firstDef = result.meanings.first?.definitions.first?.definition,
                        let pos = result.meanings.first?.partOfSpeech {
@@ -158,33 +155,54 @@ struct DictionaryView: View {
                         isPresented = false
                     }
                 } label: {
-                    Text("Insert to Page")
+                    Label("Insert to Page", systemImage: "plus.circle.fill")
+                        .font(.headline)
+                        .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
+                        .background(RoundedRectangle(cornerRadius: 12).fill(Color.blue))
                 }
-                .padding(.top, 20)
+                .buttonStyle(.plain)
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
             }
-            .padding()
+
+            if !result.sourceUrls.isEmpty {
+                Section("Sources") {
+                    ForEach(result.sourceUrls, id: \.self) { url in
+                        Link(destination: URL(string: url)!) {
+                            HStack {
+                                Text(url)
+                                    .font(.caption)
+                                    .lineLimit(1)
+                                Spacer()
+                                Image(systemName: "arrow.up.right.square")
+                                    .font(.caption)
+                            }
+                        }
+                    }
+                }
+            }
         }
+        .listStyle(.insetGrouped)
     }
 
-    private func wordChipGroup(title: String, words: [String]) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+    private func wordChipGroup(title: String, words: [String], color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
             Text(title).font(.caption.bold()).foregroundColor(.secondary)
             FlowLayout(words, spacing: 8) { word in
                 Button {
                     Task { await vm.search(word: word) }
                 } label: {
                     Text(word)
-                        .font(.caption)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.secondary.opacity(0.1))
+                        .font(.system(size: 11, weight: .medium))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(color.opacity(0.1))
+                        .foregroundColor(color)
                         .cornerRadius(8)
                 }
+                .buttonStyle(.plain)
             }
         }
     }

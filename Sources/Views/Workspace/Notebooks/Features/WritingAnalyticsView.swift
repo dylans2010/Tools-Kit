@@ -39,26 +39,31 @@ struct WritingAnalyticsView: View {
 
     private var tabPicker: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
                 ForEach(WritingAnalyticsViewModel.AnalyticsTab.allCases) { tab in
                     Button {
-                        vm.activeTab = tab
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: tab.systemImage)
-                            Text(tab.label)
+                        withAnimation(.spring()) {
+                            vm.activeTab = tab
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(vm.activeTab == tab ? tab.accentColor : Color.secondary.opacity(0.1))
+                    } label: {
+                        VStack(spacing: 6) {
+                            Image(systemName: tab.systemImage)
+                                .font(.system(size: 20))
+                            Text(tab.label)
+                                .font(.system(size: 10, weight: .bold))
+                        }
+                        .frame(width: 80, height: 60)
+                        .background(vm.activeTab == tab ? tab.accentColor : Color(uiColor: .secondarySystemGroupedBackground))
                         .foregroundColor(vm.activeTab == tab ? .white : .primary)
-                        .cornerRadius(20)
+                        .cornerRadius(12)
+                        .shadow(color: vm.activeTab == tab ? tab.accentColor.opacity(0.3) : .clear, radius: 8, y: 4)
                     }
                 }
             }
             .padding(.horizontal)
-            .padding(.vertical, 10)
+            .padding(.vertical, 12)
         }
+        .background(Color(uiColor: .systemGroupedBackground))
     }
 
     @ViewBuilder
@@ -78,7 +83,7 @@ struct WritingAnalyticsView: View {
 
     // MARK: - Overview Tab
     private var overviewTab: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 24) {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                 statTile(label: "Words", value: "\(vm.stats.wordCount)", icon: "text.wordspacing", color: .blue)
                 statTile(label: "Characters", value: "\(vm.stats.charCount)", icon: "character", color: .green)
@@ -86,48 +91,85 @@ struct WritingAnalyticsView: View {
                 statTile(label: "Paragraphs", value: "\(vm.stats.paragraphCount)", icon: "paragraph", color: .purple)
             }
 
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Document Details").font(.headline)
-                VStack(spacing: 8) {
+            SectionCard(title: "Document Details") {
+                VStack(spacing: 12) {
                     detailRow(label: "Avg. Words / Sentence", value: String(format: "%.1f", vm.stats.avgWordsPerSentence))
+                    Divider()
                     detailRow(label: "Avg. Words / Paragraph", value: String(format: "%.1f", vm.stats.avgWordsPerParagraph))
+                    Divider()
                     detailRow(label: "Estimated Read Time", value: "\(Int(ceil(Double(vm.stats.wordCount) / 200.0))) min")
                 }
-                .padding()
-                .background(Color.secondary.opacity(0.05))
-                .cornerRadius(12)
             }
 
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Improvement Suggestions").font(.headline)
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Improvement Suggestions")
+                    .font(.headline)
+                    .padding(.horizontal, 4)
+
                 if vm.suggestions.isEmpty {
                     Text("Great job! No major improvements needed.")
                         .foregroundColor(.secondary)
-                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 32)
+                        .background(Color(uiColor: .secondarySystemGroupedBackground))
+                        .cornerRadius(16)
                 } else {
                     ForEach(vm.suggestions) { suggestion in
-                        HStack(alignment: .top, spacing: 12) {
-                            Text(suggestion.icon).font(.title2)
+                        HStack(alignment: .top, spacing: 16) {
+                            ZStack {
+                                Circle()
+                                    .fill(suggestion.impact == "High" ? Color.red.opacity(0.1) : Color.orange.opacity(0.1))
+                                    .frame(width: 44, height: 44)
+                                Text(suggestion.icon).font(.title3)
+                            }
+
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
                                     Text(suggestion.category).font(.subheadline.bold())
+                                    Spacer()
                                     Text(suggestion.impact)
-                                        .font(.caption2.bold())
-                                        .padding(.horizontal, 6)
+                                        .font(.system(size: 10, weight: .bold))
+                                        .padding(.horizontal, 8)
                                         .padding(.vertical, 2)
-                                        .background(suggestion.impact == "High" ? Color.red.opacity(0.1) : Color.orange.opacity(0.1))
-                                        .foregroundColor(suggestion.impact == "High" ? .red : .orange)
-                                        .cornerRadius(4)
+                                        .background(suggestion.impact == "High" ? Color.red : Color.orange)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(6)
                                 }
-                                Text(suggestion.suggestion).font(.caption).foregroundColor(.secondary)
+                                Text(suggestion.suggestion)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
                         }
                         .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.secondary.opacity(0.05))
-                        .cornerRadius(12)
+                        .background(Color(uiColor: .secondarySystemGroupedBackground))
+                        .cornerRadius(16)
+                        .shadow(color: .black.opacity(0.03), radius: 5, x: 0, y: 2)
                     }
                 }
+            }
+        }
+    }
+
+    struct SectionCard<Content: View>: View {
+        let title: String
+        let content: Content
+
+        init(title: String, @ViewBuilder content: () -> Content) {
+            self.title = title
+            self.content = content()
+        }
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(title).font(.headline).padding(.horizontal, 4)
+                VStack(spacing: 0) {
+                    content
+                }
+                .padding()
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .cornerRadius(16)
+                .shadow(color: .black.opacity(0.03), radius: 5, x: 0, y: 2)
             }
         }
     }
@@ -621,20 +663,29 @@ struct WritingAnalyticsView: View {
 
     // MARK: - Helpers
     private func statTile(label: String, value: String, icon: String, color: Color) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundColor(color)
-            Text(value)
-                .font(.title2.bold())
-            Text(label)
-                .font(.caption)
-                .foregroundColor(.secondary)
+        VStack(spacing: 10) {
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.1))
+                    .frame(width: 40, height: 40)
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(color)
+            }
+            VStack(spacing: 2) {
+                Text(value)
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                Text(label)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.secondary)
+            }
         }
         .frame(maxWidth: .infinity)
-        .padding()
-        .background(color.opacity(0.05))
-        .cornerRadius(12)
+        .padding(.vertical, 16)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .cornerRadius(16)
+        .shadow(color: .black.opacity(0.03), radius: 5, x: 0, y: 2)
     }
 
     private func detailRow(label: String, value: String) -> some View {

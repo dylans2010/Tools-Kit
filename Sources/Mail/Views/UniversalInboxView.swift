@@ -63,20 +63,62 @@ struct UniversalInboxView: View {
     private var accountSections: some View {
         ForEach(accountManager.accounts) { account in
             NavigationLink(destination: InboxView(account: account, folder: .inbox)) {
-                HStack(spacing: 12) {
-                    Circle()
-                        .fill(Color.blue.opacity(0.1))
-                        .frame(width: 40, height: 40)
-                        .overlay(Image(systemName: "envelope.fill").foregroundStyle(.blue))
-
-                    VStack(alignment: .leading) {
-                        Text(account.emailAddress).font(.subheadline.bold())
-                        Text(account.providerType.displayName).font(.caption).foregroundStyle(.secondary)
+                HStack(spacing: 16) {
+                    ZStack {
+                        Circle()
+                            .fill(providerColor(account.providerType).opacity(0.15))
+                            .frame(width: 48, height: 48)
+                        Image(systemName: providerIcon(for: account.providerType))
+                            .foregroundStyle(providerColor(account.providerType))
+                            .font(.system(size: 20, weight: .bold))
                     }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(account.emailAddress)
+                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                            .foregroundColor(.primary)
+                        Text(account.providerType.displayName)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(Color.secondary.opacity(0.5))
                 }
-                .padding(.vertical, 4)
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .cornerRadius(16)
+                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
             }
-            .listRowBackground(Color.workspaceSurface)
+            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+            .listRowBackground(Color.clear)
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func providerIcon(for provider: MailAccount.ProviderType) -> String {
+        switch provider {
+        case .gmail: return "g.circle.fill"
+        case .outlook: return "envelope.fill"
+        case .yahoo: return "y.circle.fill"
+        case .icloud: return "icloud.fill"
+        default: return "envelope.badge.shield.half.filled"
+        }
+    }
+
+    private func providerColor(_ provider: MailAccount.ProviderType) -> Color {
+        switch provider {
+        case .gmail: return .red
+        case .outlook: return .blue
+        case .yahoo: return .purple
+        case .proton: return .green
+        case .icloud: return .cyan
+        case .imap: return .gray
         }
     }
 
