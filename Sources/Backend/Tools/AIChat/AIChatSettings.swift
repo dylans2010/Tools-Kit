@@ -51,6 +51,7 @@ struct AIChatSettings: Codable {
     var useSystemTools: Bool = true
     var autoInjectContext: Bool = false
     var includeConversationHistory: Bool = true
+    var dynamicRoutingEnabled: Bool = false
 
     // Prompt Tools
     var promptVariables: [PromptVariable] = []
