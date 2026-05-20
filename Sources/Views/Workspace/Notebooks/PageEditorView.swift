@@ -33,6 +33,7 @@ struct PageEditorView: View {
     @State private var showingDictionary = false
     @State private var showingWordSuggestions = false
     @State private var showingAnalytics = false
+    @State private var showingEssayDrafting = false
 
     // Existing Sheets
     @State private var showingSearch = false
@@ -116,6 +117,9 @@ struct PageEditorView: View {
         .sheet(isPresented: $showingAnalytics) {
             WritingAnalyticsView(documentText: content, documentTitle: title, isPresented: $showingAnalytics)
         }
+        .sheet(isPresented: $showingEssayDrafting) {
+            EssayDraftingView()
+        }
         .sheet(isPresented: $showingPageInfo) {
             PageInfoView(page: page, content: content, title: $title, isPresented: $showingPageInfo)
         }
@@ -198,6 +202,8 @@ struct PageEditorView: View {
 
                     toolbarButton(icon: "chart.bar.doc.horizontal", label: "Analytics") { showingAnalytics = true }
 
+                    toolbarButton(icon: "doc.text.badge.plus", label: "Draft") { showingEssayDrafting = true }
+
                     toolbarButton(icon: "book.closed", label: "Dictionary") { showingDictionary = true }
 
                     toolbarButton(icon: "wand.and.stars", label: "Suggestions") { showingWordSuggestions = true }
@@ -221,28 +227,7 @@ struct PageEditorView: View {
     }
 
     private var formattingPopover: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Formatting").font(.headline).padding(.bottom, 4)
-            Group {
-                formatItem(label: "Bold", icon: "bold") { wrap("**") }
-                formatItem(label: "Italic", icon: "italic") { wrap("_") }
-                formatItem(label: "Underline", icon: "underline") { wrap("__") }
-                formatItem(label: "Strikethrough", icon: "strikethrough") { wrap("~~") }
-            }
-            Divider()
-            Group {
-                formatItem(label: "Heading 1", icon: "h1.circle") { insert("\n# ") }
-                formatItem(label: "Heading 2", icon: "h2.circle") { insert("\n## ") }
-                formatItem(label: "Heading 3", icon: "h3.circle") { insert("\n### ") }
-            }
-            Divider()
-            Group {
-                formatItem(label: "Inline Code", icon: "code") { wrap("`") }
-                formatItem(label: "Blockquote", icon: "quote.opening") { insert("\n> ") }
-            }
-        }
-        .padding()
-        .frame(width: 200)
+        NotebookFormattingView(content: $content, isPresented: $showFormattingPopover)
     }
 
     private func formatItem(label: String, icon: String, action: @escaping () -> Void) -> some View {
@@ -400,6 +385,144 @@ struct PageEditorView: View {
 }
 
 // MARK: - PageInfoView
+struct NotebookFormattingView: View {
+    @Binding var content: String
+    @Binding var isPresented: Bool
+
+    @State private var selectedFont = "System"
+    @State private var fontSize: CGFloat = 16
+    @State private var lineSpacing: CGFloat = 4
+    @State private var alignment: TextAlignment = .leading
+
+    let fonts = ["System", "Serif", "Monospace", "Rounded"]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            HStack {
+                Text("Formatting").font(.headline)
+                Spacer()
+                Button("Done") { isPresented = false }
+            }
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Typography").font(.subheadline.bold()).foregroundColor(.secondary)
+                        HStack {
+                            ForEach(fonts, id: \.self) { font in
+                                Button(action: { selectedFont = font }) {
+                                    Text(font)
+                                        .font(.caption)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(selectedFont == font ? Color.accentColor : Color.secondary.opacity(0.1))
+                                        .foregroundColor(selectedFont == font ? .white : .primary)
+                                        .cornerRadius(8)
+                                }
+                            }
+                        }
+
+                        HStack {
+                            Image(systemName: "textformat.size.smaller")
+                            Slider(value: $fontSize, in: 12...32)
+                            Image(systemName: "textformat.size.larger")
+                        }
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Rich Text Styles").font(.subheadline.bold()).foregroundColor(.secondary)
+                        HStack(spacing: 16) {
+                            formatButton(icon: "bold", action: { wrap("**") })
+                            formatButton(icon: "italic", action: { wrap("_") })
+                            formatButton(icon: "underline", action: { wrap("__") })
+                            formatButton(icon: "strikethrough", action: { wrap("~~") })
+                            formatButton(icon: "link", action: { insert("[link](url)") })
+                        }
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Spacing & Alignment").font(.subheadline.bold()).foregroundColor(.secondary)
+                        HStack(spacing: 20) {
+                            alignmentButton(icon: "text.alignleft", align: .leading)
+                            alignmentButton(icon: "text.aligncenter", align: .center)
+                            alignmentButton(icon: "text.alignright", align: .trailing)
+                        }
+
+                        HStack {
+                            Image(systemName: "line.horizontal.3")
+                            Slider(value: $lineSpacing, in: 0...20)
+                            Text("\(Int(lineSpacing))").font(.caption.monospaced()).frame(width: 20)
+                        }
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Structure").font(.subheadline.bold()).foregroundColor(.secondary)
+                        FlowLayout(spacing: 8) {
+                            structureButton(label: "H1", action: { insert("\n# ") })
+                            structureButton(label: "H2", action: { insert("\n## ") })
+                            structureButton(label: "H3", action: { insert("\n### ") })
+                            structureButton(label: "List", icon: "list.bullet", action: { insert("\n- ") })
+                            structureButton(label: "Number", icon: "list.number", action: { insert("\n1. ") })
+                            structureButton(label: "Quote", icon: "quote.opening", action: { insert("\n> ") })
+                            structureButton(label: "Code", icon: "curlybraces", action: { insert("\n```\n\n```") })
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .frame(width: 300, height: 500)
+    }
+
+    private func formatButton(icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .frame(width: 40, height: 40)
+                .background(Color.secondary.opacity(0.1))
+                .cornerRadius(8)
+        }
+    }
+
+    private func alignmentButton(icon: String, align: TextAlignment) -> some View {
+        Button(action: { alignment = align }) {
+            Image(systemName: icon)
+                .foregroundColor(alignment == align ? .accentColor : .primary)
+                .frame(width: 40, height: 40)
+                .background(alignment == align ? Color.accentColor.opacity(0.1) : Color.secondary.opacity(0.1))
+                .cornerRadius(8)
+        }
+    }
+
+    private func structureButton(label: String, icon: String? = nil, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                if let icon = icon { Image(systemName: icon) }
+                Text(label)
+            }
+            .font(.caption.bold())
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.secondary.opacity(0.1))
+            .cornerRadius(8)
+        }
+        .foregroundColor(.primary)
+    }
+
+    private func insert(_ text: String) {
+        content += text
+    }
+
+    private func wrap(_ marker: String) {
+        content += marker + "text" + marker
+    }
+}
+
 struct PageInfoView: View {
     let page: NotebookPage
     let content: String
@@ -442,10 +565,24 @@ struct PageInfoView: View {
                 }
 
                 Section("Export") {
-                    Button("Export as PDF") {}
-                    Button("Export as Markdown") {}
-                    Button("Export as Plain Text") {}
-                    Button("Copy Page Link") {}
+                    ShareLink(item: content, preview: SharePreview(title, image: Image(systemName: "doc.text"))) {
+                        Label("Export as Plain Text", systemImage: "text.alignleft")
+                    }
+
+                    ShareLink(item: content, subject: Text(title), message: Text("Markdown Export")) {
+                        Label("Export as Markdown", systemImage: "arrow.down.doc")
+                    }
+
+                    if let richText = try? NSAttributedString(markdown: content),
+                       let rtfData = try? richText.data(from: NSRange(location: 0, length: richText.length), documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf]) {
+                        ShareLink(item: rtfData, preview: SharePreview(title, image: Image(systemName: "textformat"))) {
+                            Label("Export as Rich Text", systemImage: "textformat")
+                        }
+                    }
+
+                    Button(action: { UIPasteboard.general.string = content }) {
+                        Label("Copy Page Link", systemImage: "link")
+                    }
                 }
             }
             .navigationTitle("Page Info")
