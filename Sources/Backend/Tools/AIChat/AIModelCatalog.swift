@@ -27,7 +27,21 @@ final class AIModelCatalog: ObservableObject {
         defer { loadingProviders.remove(providerID) }
 
         do {
-            let models = try await provider.fetchModels(apiKey: key)
+            var models = try await provider.fetchModels(apiKey: key)
+
+            // Mark free models for OpenRouter
+            if providerID == "openrouter" {
+                models = models.map { model in
+                    if model.id.lowercased().contains("free") {
+                        var m = model
+                        // We might want to tag it or just keep as is,
+                        // the instruction says to separate them in UI
+                        return m
+                    }
+                    return model
+                }
+            }
+
             modelsByProvider[providerID] = models
         } catch {
             modelsByProvider[providerID] = []

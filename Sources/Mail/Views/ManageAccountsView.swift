@@ -4,6 +4,7 @@ struct ManageAccountsView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var mailStore = MailStore.shared
     @State private var loadingProvider: MailAccount.ProviderType?
+    @State private var showingICloudSetup = false
     @State private var statusMessage: String?
     @State private var isSuccess = false
     @State private var showError = false
@@ -38,6 +39,9 @@ struct ManageAccountsView: View {
                                 ForEach(MailAccount.ProviderType.allCases, id: \.self) { provider in
                                     modernProviderCard(for: provider)
                                 }
+                            }
+                            .navigationDestination(isPresented: $showingICloudSetup) {
+                                MailProviderView()
                             }
                             .padding(.horizontal)
                         }
@@ -235,6 +239,11 @@ struct ManageAccountsView: View {
     }
 
     private func handleProviderTap(_ provider: MailAccount.ProviderType) async {
+        if provider == .icloud {
+            showingICloudSetup = true
+            return
+        }
+
         loadingProvider = provider
 
         do {
@@ -250,14 +259,8 @@ struct ManageAccountsView: View {
             case .proton:
                 session = try await ProtonMailProvider().authenticate(credentials: credentials)
             case .icloud:
-                session = try await IMAPProvider().authenticate(credentials: MailCredentials(
-                    email: "",
-                    password: nil,
-                    host: "imap.mail.me.com",
-                    port: 993,
-                    smtpHost: "smtp.mail.me.com",
-                    smtpPort: 587
-                ))
+                // This case is now handled above
+                return
             case .imap:
                 session = try await IMAPProvider().authenticate(credentials: credentials)
             }

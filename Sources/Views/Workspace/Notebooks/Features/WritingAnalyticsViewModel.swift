@@ -128,8 +128,42 @@ final class WritingAnalyticsViewModel: ObservableObject {
     func runPlagiarismScan(text: String) {
         isRunningPlagiarism = true
         Task {
-            try? await Task.sleep(nanoseconds: 1_000_000_000) // fake delay
-            plagiarismResult = engine.runLocalPlagiarismScan(text: text)
+            do {
+                let prompt = """
+                Perform a professional plagiarism analysis on the following text.
+                Identify potential matches, similarity percentages, and risk levels.
+                Format the response as a JSON object with:
+                - overallScore: Double (0-100)
+                - riskLevel: String ("low", "medium", "high")
+                - checkedSentences: Int
+                - totalSentences: Int
+                - matches: Array of objects (text: String, similarity: Double, source: String, matchType: String)
+
+                Text to analyze:
+                \(text)
+                """
+
+                let response = try await AIService.shared.processText(prompt: prompt, systemPrompt: "You are an expert plagiarism detection system. Return JSON ONLY.")
+
+                // Simplified parsing for this example
+                if let data = response.data(using: .utf8),
+                   let result = try? JSONDecoder().decode(PlagiarismResult.self, from: data) {
+                    await MainActor.run {
+                        self.plagiarismResult = result
+                    }
+                } else {
+                    // Fallback to local scan if AI fails to return valid JSON
+                    let fallback = engine.runLocalPlagiarismScan(text: text)
+                    await MainActor.run {
+                        self.plagiarismResult = fallback
+                    }
+                }
+            } catch {
+                let fallback = engine.runLocalPlagiarismScan(text: text)
+                await MainActor.run {
+                    self.plagiarismResult = fallback
+                }
+            }
             isRunningPlagiarism = false
         }
     }

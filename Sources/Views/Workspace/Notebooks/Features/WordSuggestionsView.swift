@@ -76,22 +76,37 @@ struct WordSuggestionsView: View {
     @ViewBuilder
     private func suggestionSection(title: String, icon: String, words: [String], color: Color) -> some View {
         if !words.isEmpty {
-            VStack(alignment: .leading, spacing: 12) {
-                Label(title, systemImage: icon)
-                    .font(.headline)
-                    .foregroundColor(color)
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    ZStack {
+                        Circle()
+                            .fill(color.opacity(0.1))
+                            .frame(width: 32, height: 32)
+                        Image(systemName: icon)
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(color)
+                    }
+                    Text(title)
+                        .font(.headline)
+                }
 
-                FlowLayout(words, spacing: 8) { word in
+                FlowLayout(words, spacing: 10) { word in
                     Button {
                         Task { await vm.fetchSuggestions(for: word) }
                     } label: {
                         Text(word)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
+                            .font(.system(size: 13, weight: .medium))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
                             .background(color.opacity(0.1))
                             .foregroundColor(color)
-                            .cornerRadius(15)
+                            .cornerRadius(10)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(color.opacity(0.2), lineWidth: 1)
+                            )
                     }
+                    .buttonStyle(.plain)
                     .contextMenu {
                         Button {
                             onInsert?(word)
@@ -110,8 +125,9 @@ struct WordSuggestionsView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
-            .background(Color.secondary.opacity(0.05))
-            .cornerRadius(12)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .cornerRadius(16)
+            .shadow(color: .black.opacity(0.03), radius: 5, x: 0, y: 2)
         }
     }
 }

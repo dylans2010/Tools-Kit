@@ -171,36 +171,40 @@ struct PageEditorView: View {
     private var bottomToolbar: some View {
         VStack(spacing: 0) {
             Divider()
-            HStack(spacing: 20) {
-                toolbarButton(icon: "textformat", label: "Format") { showFormattingPopover = true }
-                    .popover(isPresented: $showFormattingPopover) { formattingPopover }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 24) {
+                    toolbarButton(icon: "textformat", label: "Format") { showFormattingPopover = true }
+                        .popover(isPresented: $showFormattingPopover) { formattingPopover }
 
-                toolbarButton(icon: "slash.circle", label: "Insert") { showSlashCommand.toggle() }
+                    toolbarButton(icon: "slash.circle", label: "Insert") { showSlashCommand.toggle() }
 
-                toolbarButton(icon: "paperclip", label: "Attach") { showingFilePicker = true }
+                    toolbarButton(icon: "paperclip", label: "Attach") { showingFilePicker = true }
 
-                PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                    VStack(spacing: 4) {
-                        Image(systemName: "photo")
-                        Text("Photo").font(.system(size: 10))
+                    PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                        VStack(spacing: 4) {
+                            Image(systemName: "photo")
+                                .font(.system(size: 18))
+                            Text("Photo").font(.system(size: 10, weight: .medium))
+                        }
                     }
+                    .foregroundColor(.primary)
+
+                    toolbarButton(icon: "sparkles", label: "AI") { showingAI = true }
+                        .confirmationDialog("AI Assistant", isPresented: $showingAI) {
+                            Button("Summarize") { runAI("Summarize", "Summarize these notes: \(content)") }
+                            Button("Action Items") { runAI("Action Items", "Extract action items: \(content)") }
+                            Button("Cancel", role: .cancel) {}
+                        }
+
+                    toolbarButton(icon: "chart.bar.doc.horizontal", label: "Analytics") { showingAnalytics = true }
+
+                    toolbarButton(icon: "book.closed", label: "Dictionary") { showingDictionary = true }
+
+                    toolbarButton(icon: "wand.and.stars", label: "Suggestions") { showingWordSuggestions = true }
                 }
-
-                toolbarButton(icon: "sparkles", label: "AI") { showingAI = true }
-                    .confirmationDialog("AI Assistant", isPresented: $showingAI) {
-                        Button("Summarize") { runAI("Summarize", "Summarize these notes: \(content)") }
-                        Button("Action Items") { runAI("Action Items", "Extract action items: \(content)") }
-                        Button("Cancel", role: .cancel) {}
-                    }
-
-                toolbarButton(icon: "chart.bar.doc.horizontal", label: "Analytics") { showingAnalytics = true }
-
-                toolbarButton(icon: "book.closed", label: "Dictionary") { showingDictionary = true }
-
-                toolbarButton(icon: "wand.and.stars", label: "Suggestions") { showingWordSuggestions = true }
+                .padding(.vertical, 12)
+                .padding(.horizontal, 20)
             }
-            .padding(.vertical, 8)
-            .padding(.horizontal)
             .background(.ultraThinMaterial)
         }
     }
@@ -209,7 +213,8 @@ struct PageEditorView: View {
         Button(action: action) {
             VStack(spacing: 4) {
                 Image(systemName: icon)
-                Text(label).font(.system(size: 10))
+                    .font(.system(size: 18))
+                Text(label).font(.system(size: 10, weight: .medium))
             }
         }
         .foregroundColor(.primary)
@@ -253,7 +258,7 @@ struct PageEditorView: View {
         VStack {
             Spacer()
             VStack(alignment: .leading, spacing: 0) {
-                Text("INSERT").font(.caption2.bold()).foregroundColor(.secondary).padding(.horizontal).padding(.vertical, 8)
+                Text("INSERT").font(.caption2.bold()).foregroundColor(.secondary).padding(.horizontal).padding(.vertical, 12)
                 Divider()
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
@@ -270,14 +275,15 @@ struct PageEditorView: View {
                         slashItem(label: "File", icon: "paperclip") { showingFilePicker = true }
                     }
                 }
-                .frame(maxHeight: 300)
+                .frame(maxHeight: 350)
             }
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .cornerRadius(16)
-            .shadow(radius: 10)
+            .background(.ultraThinMaterial)
+            .cornerRadius(20)
+            .shadow(color: .black.opacity(0.15), radius: 20, x: 0, y: 10)
             .padding()
+            .padding(.bottom, 60)
         }
-        .background(Color.black.opacity(0.1).onTapGesture { showSlashCommand = false })
+        .background(Color.black.opacity(0.2).onTapGesture { showSlashCommand = false })
     }
 
     @ViewBuilder

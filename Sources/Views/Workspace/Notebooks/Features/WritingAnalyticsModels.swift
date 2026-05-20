@@ -86,7 +86,7 @@ struct SearchMatch: Identifiable {
     var contextSnippet: String
 }
 
-struct PlagiarismResult {
+struct PlagiarismResult: Codable {
     var overallScore: Double
     var riskLevel: String
     var matches: [PlagiarismMatch]
@@ -94,10 +94,14 @@ struct PlagiarismResult {
     var totalSentences: Int
 }
 
-struct PlagiarismMatch: Identifiable {
+struct PlagiarismMatch: Identifiable, Codable {
     let id = UUID()
     var text: String
     var similarity: Double
     var source: String
     var matchType: String
+
+    enum CodingKeys: String, CodingKey {
+        case text, similarity, source, matchType
+    }
 }
