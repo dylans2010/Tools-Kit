@@ -463,14 +463,17 @@ struct NotebookFormattingView: View {
 
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Structure").font(.subheadline.bold()).foregroundColor(.secondary)
-                        FlowLayout(spacing: 8) {
-                            structureButton(label: "H1", action: { insert("\n# ") })
-                            structureButton(label: "H2", action: { insert("\n## ") })
-                            structureButton(label: "H3", action: { insert("\n### ") })
-                            structureButton(label: "List", icon: "list.bullet", action: { insert("\n- ") })
-                            structureButton(label: "Number", icon: "list.number", action: { insert("\n1. ") })
-                            structureButton(label: "Quote", icon: "quote.opening", action: { insert("\n> ") })
-                            structureButton(label: "Code", icon: "curlybraces", action: { insert("\n```\n\n```") })
+                        FlowLayout(["h1", "h2", "h3", "list", "number", "quote", "code"], spacing: 8) { type in
+                            switch type {
+                            case "h1": structureButton(label: "H1", action: { insert("\n# ") })
+                            case "h2": structureButton(label: "H2", action: { insert("\n## ") })
+                            case "h3": structureButton(label: "H3", action: { insert("\n### ") })
+                            case "list": structureButton(label: "List", icon: "list.bullet", action: { insert("\n- ") })
+                            case "number": structureButton(label: "Number", icon: "list.number", action: { insert("\n1. ") })
+                            case "quote": structureButton(label: "Quote", icon: "quote.opening", action: { insert("\n> ") })
+                            case "code": structureButton(label: "Code", icon: "curlybraces", action: { insert("\n```\n\n```") })
+                            default: EmptyView()
+                            }
                         }
                     }
                 }

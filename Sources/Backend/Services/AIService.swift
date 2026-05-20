@@ -442,7 +442,7 @@ struct DynamicAIModelRouting {
     /// Executes the AI request across available free models until success or exhaustion.
     func execute(messages: [ChatMessage], attachments: [ChatAttachment] = []) async throws -> String {
         // 1. Ensure models are loaded for OpenRouter
-        if await MainActor.run({ modelCatalog.models(for: "openrouter").isEmpty }) {
+        if await MainActor.run { modelCatalog.models(for: "openrouter").isEmpty } {
             await modelCatalog.loadModels(for: "openrouter")
         }
 
