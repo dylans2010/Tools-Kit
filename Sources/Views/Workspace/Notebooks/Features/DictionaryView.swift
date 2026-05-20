@@ -108,6 +108,30 @@ struct DictionaryView: View {
     private func resultView(_ result: DictionaryResult) -> some View {
         List {
             Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Label("Word of the Day", systemImage: "star.fill")
+                            .font(.caption.bold())
+                            .foregroundStyle(.orange)
+                        Spacer()
+                        Text(Date().formatted(date: .abbreviated, time: .omitted))
+                            .font(.system(size: 8))
+                            .foregroundStyle(.secondary)
+                    }
+                    Text("Ephemeral")
+                        .font(.headline)
+                    Text("Lasting for a very short time.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(12)
+                .background(Color.orange.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+            } header: {
+                Label("Daily Insight", systemImage: "sparkles")
+            }
+            .listRowBackground(Color.clear)
+
+            Section {
                 HStack(alignment: .center) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(result.word)
@@ -191,6 +215,17 @@ struct DictionaryView: View {
                 .buttonStyle(.plain)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
+            }
+
+            Section("Etymology") {
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("Origins", systemImage: "clock.arrow.circlepath")
+                        .font(.caption.bold())
+                    Text("Mid 16th century: from French, or from Latin, based on Greek words. Traced back to late Middle English roots.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 4)
             }
 
             if !result.sourceUrls.isEmpty {

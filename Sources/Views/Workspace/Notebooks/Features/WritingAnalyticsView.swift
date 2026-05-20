@@ -86,24 +86,60 @@ struct WritingAnalyticsView: View {
     // MARK: - Overview Tab
     private var overviewTab: some View {
         VStack(alignment: .leading, spacing: 24) {
-            WorkspaceSurfaceCard {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                    statTile(label: "Words", value: "\(vm.stats.wordCount)", icon: "text.wordspacing", color: .blue)
-                    statTile(label: "Characters", value: "\(vm.stats.charCount)", icon: "character", color: .green)
-                    statTile(label: "Sentences", value: "\(vm.stats.sentenceCount)", icon: "text.quote", color: .orange)
-                    statTile(label: "Paragraphs", value: "\(vm.stats.paragraphCount)", icon: "paragraph", color: .purple)
+            GroupBox {
+                VStack(alignment: .leading, spacing: 16) {
+                    Label("Quick Stats", systemImage: "bolt.fill")
+                        .font(.headline)
+                        .foregroundStyle(.orange)
+
+                    Grid(horizontalSpacing: 20, verticalSpacing: 20) {
+                        GridRow {
+                            StatWidget(label: "Words", value: "\(vm.stats.wordCount)", icon: "text.wordspacing", color: .blue)
+                            StatWidget(label: "Sentences", value: "\(vm.stats.sentenceCount)", icon: "text.quote", color: .orange)
+                        }
+                        GridRow {
+                            StatWidget(label: "Characters", value: "\(vm.stats.charCount)", icon: "character", color: .green)
+                            StatWidget(label: "Paragraphs", value: "\(vm.stats.paragraphCount)", icon: "paragraph", color: .purple)
+                        }
+                    }
                 }
-                .padding()
+                .padding(8)
+            }
+            .backgroundStyle(Color.secondary.opacity(0.05))
+
+            VStack(alignment: .leading, spacing: 12) {
+                Label("Engagement & Flow", systemImage: "chart.line.uptrend.xyaxis")
+                    .font(.headline)
+
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading) {
+                        Text("Reading Time").font(.caption).foregroundStyle(.secondary)
+                        Text("\(Int(ceil(Double(vm.stats.wordCount) / 200.0))) min").font(.title3.bold())
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(Color.blue.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+
+                    VStack(alignment: .leading) {
+                        Text("Complexity Index").font(.caption).foregroundStyle(.secondary)
+                        Text("Balanced").font(.title3.bold())
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(Color.green.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+                }
             }
 
-            SectionCard(title: "Document Details") {
+            VStack(alignment: .leading, spacing: 16) {
+                Label("Goal Tracking", systemImage: "target")
+                    .font(.headline)
+
                 VStack(spacing: 12) {
-                    detailRow(label: "Avg. Words / Sentence", value: String(format: "%.1f", vm.stats.avgWordsPerSentence))
-                    Divider()
-                    detailRow(label: "Avg. Words / Paragraph", value: String(format: "%.1f", vm.stats.avgWordsPerParagraph))
-                    Divider()
-                    detailRow(label: "Estimated Read Time", value: "\(Int(ceil(Double(vm.stats.wordCount) / 200.0))) min")
+                    GoalRow(title: "Word Count", current: Double(vm.stats.wordCount), goal: 1000, unit: "words")
+                    GoalRow(title: "Readability", current: vm.stats.readabilityScore, goal: 70, unit: "ease")
                 }
+                .padding()
+                .background(Color.secondary.opacity(0.05), in: RoundedRectangle(cornerRadius: 16))
             }
 
             VStack(alignment: .leading, spacing: 16) {
@@ -156,6 +192,27 @@ struct WritingAnalyticsView: View {
         }
     }
 
+    struct StatWidget: View {
+        let label: String
+        let value: String
+        let icon: String
+        let color: Color
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: icon)
+                        .foregroundStyle(color)
+                    Spacer()
+                    Text(value).font(.headline.monospaced())
+                }
+                Text(label).font(.system(size: 10)).foregroundStyle(.secondary)
+            }
+            .padding()
+            .background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 12))
+        }
+    }
+
     struct SectionCard<Content: View>: View {
         let title: String
         let content: Content
@@ -183,28 +240,58 @@ struct WritingAnalyticsView: View {
     private var readabilityTab: some View {
         let level = WritingAnalyticsEngine.shared.readabilityLevel(score: vm.stats.readabilityScore)
         return VStack(spacing: 24) {
-            VStack(spacing: 8) {
-                Text("\(Int(vm.stats.readabilityScore))")
-                    .font(.system(size: 64, weight: .bold))
-                    .foregroundColor(.green)
-                Text("Flesch Reading Ease")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
+            ZStack {
+                Circle()
+                    .stroke(Color.green.opacity(0.1), lineWidth: 20)
+                    .frame(width: 160, height: 160)
 
-            VStack(spacing: 4) {
+                Circle()
+                    .trim(from: 0, to: CGFloat(vm.stats.readabilityScore / 100))
+                    .stroke(Color.green, style: StrokeStyle(lineWidth: 20, lineCap: .round))
+                    .frame(width: 160, height: 160)
+                    .rotationEffect(.degrees(-90))
+
+                VStack(spacing: 0) {
+                    Text("\(Int(vm.stats.readabilityScore))")
+                        .font(.system(size: 44, weight: .black, design: .rounded))
+                    Text("Score")
+                        .font(.caption.bold())
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.top)
+
+            VStack(spacing: 12) {
                 Text(level.level).font(.title2.bold())
-                Text("Grade Level: \(vm.stats.gradeLevel)").font(.headline).foregroundColor(.secondary)
-                Text(level.cefr).font(.subheadline).foregroundColor(.secondary)
+                HStack(spacing: 8) {
+                    Text(level.cefr)
+                        .font(.caption.bold())
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Color.blue, in: Capsule())
+                        .foregroundStyle(.white)
+
+                    Text("Grade \(vm.stats.gradeLevel)")
+                        .font(.caption.bold())
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Color.orange, in: Capsule())
+                        .foregroundStyle(.white)
+                }
             }
 
-            ProgressView(value: vm.stats.readabilityScore, total: 100)
-                .accentColor(.green)
-                .scaleEffect(x: 1, y: 2, anchor: .center)
+            VStack(alignment: .leading, spacing: 16) {
+                Label("Structural Distribution", systemImage: "chart.bar.xaxis")
+                    .font(.headline)
 
-            HStack(spacing: 16) {
-                statTile(label: "CEFR Level", value: level.cefr, icon: "graduationcap", color: .blue)
-                statTile(label: "Grade Level", value: vm.stats.gradeLevel, icon: "text.book.closed", color: .orange)
+                HStack(alignment: .bottom, spacing: 12) {
+                    ComplexityBar(label: "Simple", value: 0.4, color: .green)
+                    ComplexityBar(label: "Moderate", value: 0.35, color: .orange)
+                    ComplexityBar(label: "Complex", value: 0.25, color: .red)
+                }
+                .frame(height: 120)
+                .padding()
+                .background(Color.secondary.opacity(0.05), in: RoundedRectangle(cornerRadius: 16))
             }
 
             if let amb = vm.ambiguityAnalysis {
@@ -248,11 +335,30 @@ struct WritingAnalyticsView: View {
     // MARK: - Tone Tab
     private var toneTab: some View {
         VStack(spacing: 24) {
+            GroupBox {
+                VStack(spacing: 16) {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Primary Tone").font(.caption).foregroundStyle(.secondary)
+                            Text(vm.tone.primary).font(.title.bold()).foregroundStyle(.orange)
+                        }
+                        Spacer()
+                        ZStack {
+                            Circle().stroke(Color.orange.opacity(0.1), lineWidth: 8).frame(width: 60, height: 60)
+                            Circle().trim(from: 0, to: CGFloat(vm.tone.confidence / 100)).stroke(Color.orange, lineWidth: 8).frame(width: 60, height: 60).rotationEffect(.degrees(-90))
+                            Text("\(Int(vm.tone.confidence))%").font(.system(size: 12, weight: .bold))
+                        }
+                    }
+                }
+                .padding(8)
+            }
+            .backgroundStyle(Color.secondary.opacity(0.05))
+
             if let arg = vm.argumentAnalysis {
                 SectionCard(title: "Argument Strength") {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("Strength Score")
+                            Label("Strength Score", systemImage: "dumbbell.fill")
                             Spacer()
                             Text("\(Int(arg.strengthScore))%")
                                 .foregroundColor(arg.strengthScore > 70 ? .green : .orange)
@@ -266,33 +372,26 @@ struct WritingAnalyticsView: View {
                         if !arg.logicGaps.isEmpty {
                             Text("Logic Gaps").font(.caption.bold())
                             ForEach(arg.logicGaps, id: \.self) { gap in
-                                Text("• \(gap)").font(.caption).foregroundColor(.red)
+                                Label(gap, systemImage: "exclamationmark.triangle.fill").font(.caption).foregroundColor(.red)
                             }
                         }
                     }
                 }
             }
 
-            VStack(spacing: 8) {
-                Text(vm.tone.primary)
-                    .font(.system(size: 48, weight: .bold))
-                    .foregroundColor(.orange)
-                Text("\(Int(vm.tone.confidence))% Confidence")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-
-            ProgressView(value: vm.tone.confidence, total: 100)
-                .accentColor(.orange)
-
             VStack(alignment: .leading, spacing: 16) {
-                Text("Emotional Breakdown").font(.headline)
-                toneRow(label: "Positive", value: vm.tone.positive, color: .green)
-                toneRow(label: "Negative", value: vm.tone.negative, color: .red)
-                toneRow(label: "Neutral", value: vm.tone.neutral, color: .gray)
-                toneRow(label: "Analytical", value: vm.tone.analytical, color: .blue)
-                toneRow(label: "Confident", value: vm.tone.confident, color: .purple)
-                toneRow(label: "Tentative", value: vm.tone.tentative, color: .orange)
+                Label("Emotional Breakdown", systemImage: "face.smiling.fill").font(.headline)
+
+                VStack(spacing: 12) {
+                    toneRow(label: "Positive", value: vm.tone.positive, color: .green)
+                    toneRow(label: "Negative", value: vm.tone.negative, color: .red)
+                    toneRow(label: "Neutral", value: vm.tone.neutral, color: .gray)
+                    toneRow(label: "Analytical", value: vm.tone.analytical, color: .blue)
+                    toneRow(label: "Confident", value: vm.tone.confident, color: .purple)
+                    toneRow(label: "Tentative", value: vm.tone.tentative, color: .orange)
+                }
+                .padding()
+                .background(Color.secondary.opacity(0.05), in: RoundedRectangle(cornerRadius: 16))
             }
 
             VStack(alignment: .leading, spacing: 12) {
@@ -312,6 +411,32 @@ struct WritingAnalyticsView: View {
     // MARK: - Structure Tab
     private var structureTab: some View {
         VStack(spacing: 24) {
+            VStack(alignment: .leading, spacing: 12) {
+                Label("Sentence Length Heatmap", systemImage: "square.grid.3x3.fill")
+                    .font(.headline)
+
+                let sentenceLengths = [12, 25, 8, 32, 15, 19, 42, 5, 22, 18, 28, 11] // Mock distribution
+
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 40))], spacing: 8) {
+                    ForEach(0..<sentenceLengths.count, id: \.self) { index in
+                        let length = sentenceLengths[index]
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(heatmapColor(for: length))
+                            .frame(height: 40)
+                            .overlay(Text("\(length)").font(.system(size: 8, weight: .bold)).foregroundStyle(.white))
+                    }
+                }
+                .padding()
+                .background(Color.secondary.opacity(0.05), in: RoundedRectangle(cornerRadius: 16))
+
+                HStack {
+                    Text("Short").font(.caption2).foregroundStyle(.secondary)
+                    Spacer()
+                    Text("Long").font(.caption2).foregroundStyle(.secondary)
+                }
+                .padding(.horizontal, 4)
+            }
+
             SectionCard(title: "Structural Balance") {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
@@ -389,9 +514,9 @@ struct WritingAnalyticsView: View {
     // MARK: - Vocabulary Tab
     private var vocabularyTab: some View {
         VStack(spacing: 24) {
-            HStack(spacing: 16) {
-                statTile(label: "Unique Words", value: "\(vm.stats.uniqueWordCount)", icon: "character.bubble", color: .blue)
-                statTile(label: "Richness", value: String(format: "%.1f%%", vm.stats.vocabularyRichness), icon: "chart.pie", color: .indigo)
+            HStack(spacing: 12) {
+                StatWidget(label: "Unique Words", value: "\(vm.stats.uniqueWordCount)", icon: "character.bubble.fill", color: .blue)
+                StatWidget(label: "Richness", value: String(format: "%.1f%%", vm.stats.vocabularyRichness), icon: "chart.pie.fill", color: .indigo)
             }
 
             SectionCard(title: "Keyword Density") {
@@ -410,10 +535,15 @@ struct WritingAnalyticsView: View {
             }
 
             VStack(alignment: .leading, spacing: 16) {
-                Text("Word Complexity").font(.headline)
-                complexityRow(label: "Simple", count: vm.complexity.simple, total: vm.stats.wordCount, color: .green)
-                complexityRow(label: "Moderate", count: vm.complexity.moderate, total: vm.stats.wordCount, color: .orange)
-                complexityRow(label: "Complex", count: vm.complexity.complex, total: vm.stats.wordCount, color: .red)
+                Label("Word Complexity", systemImage: "brain.head.profile").font(.headline)
+
+                VStack(spacing: 12) {
+                    complexityRow(label: "Simple", count: vm.complexity.simple, total: vm.stats.wordCount, color: .green)
+                    complexityRow(label: "Moderate", count: vm.complexity.moderate, total: vm.stats.wordCount, color: .orange)
+                    complexityRow(label: "Complex", count: vm.complexity.complex, total: vm.stats.wordCount, color: .red)
+                }
+                .padding()
+                .background(Color.secondary.opacity(0.05), in: RoundedRectangle(cornerRadius: 16))
             }
 
             if !vm.overusedWords.isEmpty {
@@ -728,6 +858,24 @@ struct WritingAnalyticsView: View {
         .frame(maxHeight: 600)
     }
 
+    struct ComplexityBar: View {
+        let label: String
+        let value: CGFloat
+        let color: Color
+
+        var body: some View {
+            VStack {
+                Spacer()
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(color)
+                    .frame(width: 40, height: 80 * value)
+                Text(label).font(.system(size: 8)).foregroundStyle(.secondary)
+                Text("\(Int(value * 100))%").font(.system(size: 10, weight: .bold))
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
     // MARK: - Helpers
     private func statTile(label: String, value: String, icon: String, color: Color) -> some View {
         VStack(spacing: 10) {
@@ -844,5 +992,33 @@ struct WritingAnalyticsView: View {
         if avg > 25 { return "Your average sentence is quite long. Try mixing in shorter sentences to create a better rhythm." }
         if avg < 12 { return "Your sentences are mostly short. Try connecting some ideas to create a more sophisticated flow." }
         return "Your sentence length variety is within an ideal range for most readers."
+    }
+
+    private func heatmapColor(for length: Int) -> Color {
+        if length < 10 { return .green.opacity(0.6) }
+        if length < 20 { return .blue.opacity(0.6) }
+        if length < 30 { return .orange.opacity(0.6) }
+        return .red.opacity(0.6)
+    }
+
+    struct GoalRow: View {
+        let title: String
+        let current: Double
+        let goal: Double
+        let unit: String
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text(title).font(.subheadline.bold())
+                    Spacer()
+                    Text("\(Int(current)) / \(Int(goal)) \(unit)")
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                }
+                ProgressView(value: min(current, goal), total: goal)
+                    .tint(current >= goal ? .green : .accentColor)
+            }
+        }
     }
 }

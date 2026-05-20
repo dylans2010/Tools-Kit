@@ -561,7 +561,7 @@ struct EssayDraftingView: View {
 
     private var stepIndicator: some View {
         HStack(spacing: 8) {
-            ForEach(1...5, id: \.self) { step in
+            ForEach(1...6, id: \.self) { step in
                 Capsule()
                     .fill(viewModel.currentStep == step ? Color.accentColor : (viewModel.currentStep > step ? Color.accentColor.opacity(0.4) : Color(.tertiarySystemBackground)))
                     .frame(height: 6)
@@ -575,6 +575,38 @@ struct EssayDraftingView: View {
     private var stepContent: some View {
         VStack(alignment: .leading, spacing: 20) {
             switch viewModel.currentStep {
+            case 6:
+                VStack(alignment: .leading, spacing: 24) {
+                    Text("Outline & References").font(.title2.bold())
+
+                    GroupBox {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Label("Structured Outline", systemImage: "list.number")
+                                .font(.headline)
+                            Text("1. Introduction & Hook\n2. Thesis Statement\n3. Evidence Point A\n4. Evidence Point B\n5. Counter-argument\n6. Conclusion")
+                                .font(.caption.monospaced())
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(8)
+                    }
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("Reference Manager", systemImage: "books.vertical.fill")
+                            .font(.subheadline.bold())
+
+                        Button {} label: {
+                            Label("Add Source URL/DOI", systemImage: "plus.circle")
+                        }
+                        .buttonStyle(.bordered)
+
+                        Text("No references added yet.").font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .id(6)
             case 1:
                 VStack(alignment: .leading, spacing: 20) {
                     Text("What are you writing about?").font(.title2.bold())
@@ -814,7 +846,7 @@ struct EssayDraftingView: View {
                 .disabled(isAnyLoading)
             }
 
-            if viewModel.currentStep < 5 {
+            if viewModel.currentStep < 6 {
                 Button {
                     transitionToStep(viewModel.currentStep + 1)
                 } label: {

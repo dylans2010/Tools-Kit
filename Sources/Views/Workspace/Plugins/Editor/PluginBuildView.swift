@@ -25,6 +25,12 @@ struct PluginBuildView: View {
     @State private var dataUsageExplanation: String?
     @State private var retentionPolicy: String?
 
+    // Environment Variables
+    @State private var envVars: [String: String] = [:]
+
+    // Dependencies
+    @State private var dependencies: [String] = []
+
     // Logic
     @State private var sourceCode = """
 export async function onEvent(event, ctx) {
@@ -42,6 +48,11 @@ export async function onEvent(event, ctx) {
 
     // Execution Rules
     @State private var executionRules: [ExecutionRule] = []
+
+    // Resource Limits
+    @State private var memoryLimitMB: Int = 128
+    @State private var cpuLimitPercent: Int = 20
+    @State private var executionTimeout: Int = 30
 
     // UI Extensions
     @State private var uiExtensions: [UIExtension] = []
@@ -68,10 +79,13 @@ export async function onEvent(event, ctx) {
         case identity = "Identity"
         case capabilities = "Capabilities"
         case security = "Security"
+        case environment = "Environment"
+        case dependencies = "Dependencies"
         case endpoints = "Endpoints"
         case logic = "Logic"
         case mapping = "Mapping"
         case rules = "Rules"
+        case resources = "Resources"
         case ui = "UI"
         case toolkit = "Toolkit"
         case testing = "Testing"
@@ -103,6 +117,10 @@ export async function onEvent(event, ctx) {
                     self.dataUsageExplanation = updated.dataUsageExplanation
                     self.retentionPolicy = updated.retentionPolicy
                 }
+            case .environment:
+                BuildEnvironmentSection(envVars: $envVars)
+            case .dependencies:
+                BuildDependenciesSection(dependencies: $dependencies)
             case .endpoints:
                 BuildEndpointsSection(endpoints: $endpoints) { showingAddEndpoint = true } onEdit: { selectedEndpointForEdit = $0 }
             case .logic:
@@ -111,6 +129,8 @@ export async function onEvent(event, ctx) {
                 BuildMappingSection(dataMappings: $dataMappings)
             case .rules:
                 BuildRulesSection(executionRules: $executionRules)
+            case .resources:
+                BuildResourcesSection(memoryLimit: $memoryLimitMB, cpuLimit: $cpuLimitPercent, timeout: $executionTimeout)
             case .ui:
                 BuildUIInjectionSection(uiExtensions: $uiExtensions, toolkitTools: $toolkitTools)
             case .toolkit:
@@ -263,14 +283,15 @@ private struct BuildIdentitySection: View {
     let onLockedTap: () -> Void
 
     var body: some View {
-        Section("Plugin Identity") {
+        Section {
             TextField("Name", text: $name)
-            TextField("Description", text: $description)
+            TextField("Description", text: $description, axis: .vertical)
+                .lineLimit(3...6)
             TextField("Author", text: $author)
             TextField("Version", text: $version)
 
             HStack {
-                Text("Identifier")
+                Label("Identifier", systemImage: "at")
                 Spacer()
                 if isLocked {
                     Text("com.toolskit.\(identifier)").foregroundStyle(.secondary)
@@ -284,6 +305,8 @@ private struct BuildIdentitySection: View {
             }
             .contentShape(Rectangle())
             .onTapGesture { if isLocked { onLockedTap() } }
+        } header: {
+            Label("Plugin Identity", systemImage: "person.text.rectangle.fill")
         }
     }
 }
@@ -293,7 +316,7 @@ private struct BuildCapabilitiesSection: View {
     @Binding var selectedActions: Set<PluginAction>
 
     var body: some View {
-        Section("Capabilities (System Access)") {
+        Section {
             ForEach(PluginCapability.allCases) { cap in
                 Toggle(isOn: Binding(
                     get: { selectedCapabilities.contains(cap) },
@@ -305,25 +328,38 @@ private struct BuildCapabilitiesSection: View {
                         }
                     }
                 )) {
-                    Label(cap.displayName, systemImage: cap.icon)
+                    VStack(alignment: .leading) {
+                        Label(cap.displayName, systemImage: cap.icon)
+                        Text(cap.technicalKey).font(.system(size: 8, design: .monospaced)).foregroundStyle(.secondary)
+                    }
                 }
             }
+        } header: {
+            Label("Capabilities (System Access)", systemImage: "lock.shield.fill")
         }
 
-        Section("Scopes") {
+        Section {
             if selectedCapabilities.isEmpty {
-                Text("Select Capabilities First").font(.caption).foregroundStyle(.secondary)
+                ContentUnavailableView("No Capabilities", systemImage: "shield.slash", description: Text("Select capabilities above to enable specific action scopes."))
+                    .scaleEffect(0.8)
             } else {
                 ForEach(PluginAction.allCases.filter { selectedCapabilities.contains($0.parentCapability) }) { action in
-                    Toggle(action.rawValue, isOn: Binding(
+                    Toggle(isOn: Binding(
                         get: { selectedActions.contains(action) },
                         set: { isSelected in
                             if isSelected { selectedActions.insert(action) }
                             else { selectedActions.remove(action) }
                         }
-                    ))
+                    )) {
+                        VStack(alignment: .leading) {
+                            Text(action.rawValue).font(.subheadline.bold())
+                            Text(action.description).font(.caption2).foregroundStyle(.secondary)
+                        }
+                    }
                 }
             }
+        } header: {
+            Label("Action Scopes", systemImage: "target")
         }
     }
 }
@@ -336,14 +372,21 @@ private struct BuildSecuritySection: View {
     let onUpdate: (PluginDefinition) -> Void
 
     var body: some View {
-        Section("Security & Scopes") {
+        Section {
             let highRiskSelected = selectedCapabilities.contains { $0.riskLevel == .high }
             if highRiskSelected {
                 NavigationLink {
                     SecurityScopeApplicationView(plugin: Binding(get: { plugin }, set: { onUpdate($0) }))
                 } label: {
                     HStack {
-                        Label("High Risk Security Gate", systemImage: "shield.fill").foregroundStyle(.red)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Label("High Risk Security Gate", systemImage: "shield.fill")
+                                .foregroundStyle(.red)
+                                .font(.headline)
+                            Text("Advanced security configuration required for selected scopes.")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
                         Spacer()
                         if apiKey != nil && privacyNote != nil {
                             Image(systemName: "checkmark.circle.fill").foregroundStyle(.sdkSuccess)
@@ -353,8 +396,116 @@ private struct BuildSecuritySection: View {
                     }
                 }
             } else {
-                Text("No high risk scopes selected.").font(.caption).foregroundStyle(.secondary)
+                ContentUnavailableView("Standard Security", systemImage: "shield.checkered", description: Text("No high-risk capabilities selected. Standard security policies apply."))
+                    .scaleEffect(0.8)
             }
+        } header: {
+            Label("Security & Scopes", systemImage: "lock.fill")
+        }
+    }
+}
+
+private struct BuildEnvironmentSection: View {
+    @Binding var envVars: [String: String]
+    @State private var newKey = ""
+    @State private var newValue = ""
+
+    var body: some View {
+        Section {
+            if envVars.isEmpty {
+                Text("No environment variables defined.").font(.caption).foregroundStyle(.secondary)
+            } else {
+                ForEach(Array(envVars.keys.sorted()), id: \.self) { key in
+                    HStack {
+                        Text(key).font(.caption.monospaced()).bold()
+                        Spacer()
+                        Text(envVars[key] ?? "").font(.caption.monospaced()).foregroundStyle(.secondary)
+                        Button { envVars.removeValue(forKey: key) } label: {
+                            Image(systemName: "minus.circle.fill").foregroundStyle(.red)
+                        }
+                    }
+                }
+            }
+
+            HStack {
+                TextField("Key", text: $newKey).font(.caption.monospaced())
+                TextField("Value", text: $newValue).font(.caption.monospaced())
+                Button("Add") {
+                    envVars[newKey] = newValue
+                    newKey = ""; newValue = ""
+                }.disabled(newKey.isEmpty)
+            }
+        } header: {
+            Label("Environment Variables", systemImage: "curlybraces.square.fill")
+        }
+    }
+}
+
+private struct BuildDependenciesSection: View {
+    @Binding var dependencies: [String]
+    @State private var newDep = ""
+
+    var body: some View {
+        Section {
+            if dependencies.isEmpty {
+                Text("No dependencies defined.").font(.caption).foregroundStyle(.secondary)
+            } else {
+                ForEach(dependencies, id: \.self) { dep in
+                    HStack {
+                        Label(dep, systemImage: "package.fill").font(.subheadline)
+                        Spacer()
+                        Button { dependencies.removeAll { $0 == dep } } label: {
+                            Image(systemName: "trash").foregroundStyle(.red)
+                        }
+                    }
+                }
+            }
+
+            HStack {
+                TextField("Module Name (e.g. lodash)", text: $newDep)
+                Button("Add") {
+                    dependencies.append(newDep)
+                    newDep = ""
+                }.disabled(newDep.isEmpty)
+            }
+        } header: {
+            Label("External Dependencies", systemImage: "shippingbox.fill")
+        }
+    }
+}
+
+private struct BuildResourcesSection: View {
+    @Binding var memoryLimit: Int
+    @Binding var cpuLimit: Int
+    @Binding var timeout: Int
+
+    var body: some View {
+        Section {
+            VStack(alignment: .leading) {
+                HStack {
+                    Label("Memory Limit", systemImage: "memorychip")
+                    Spacer()
+                    Text("\(memoryLimit) MB").bold()
+                }
+                Slider(value: Binding(get: { Double(memoryLimit) }, set: { memoryLimit = Int($0) }), in: 16...512, step: 16)
+            }
+
+            VStack(alignment: .leading) {
+                HStack {
+                    Label("CPU Limit", systemImage: "cpu")
+                    Spacer()
+                    Text("\(cpuLimit)%").bold()
+                }
+                Slider(value: Binding(get: { Double(cpuLimit) }, set: { cpuLimit = Int($0) }), in: 5...100, step: 5)
+            }
+
+            Stepper(value: $timeout, in: 1...300) {
+                Label("Execution Timeout", systemImage: "timer")
+                Spacer()
+                Text("\(timeout)s").bold()
+            }
+        } header: {
+            Label("Resource Limits", systemImage: "gauge.with.dots.needle.bottom.100percent")
         }
     }
 }

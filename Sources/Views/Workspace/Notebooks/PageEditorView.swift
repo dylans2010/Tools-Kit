@@ -419,93 +419,167 @@ struct NotebookFormattingView: View {
     @State private var selectedFont = "System"
     @State private var fontSize: CGFloat = 16
     @State private var lineSpacing: CGFloat = 4
+    @State private var characterSpacing: CGFloat = 0
+    @State private var paragraphSpacing: CGFloat = 10
+    @State private var indentation: CGFloat = 0
+
     @State private var alignment: TextAlignment = .leading
     @State private var textColor: Color = .primary
-    @State private var highlightColor: Color = .clear
+    @State private var highlightColor: Color = .yellow
 
-    let fonts = ["System", "Serif", "Monospace", "Rounded"]
+    let fonts = ["System", "Serif", "Monospace", "Rounded", "Georgia", "Helvetica", "Courier"]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Text("Formatting").font(.headline)
+                Label("Text Formatting", systemImage: "textformat")
+                    .font(.headline)
                 Spacer()
                 Button("Done") { isPresented = false }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
             }
+            .padding()
+
+            Divider()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Colors").font(.subheadline.bold()).foregroundColor(.secondary)
-                        HStack(spacing: 20) {
-                            ColorPicker("Text", selection: $textColor)
-                                .font(.caption)
-                            ColorPicker("Highlight", selection: $highlightColor)
-                                .font(.caption)
+                VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("Appearance", systemImage: "paintbrush.fill")
+                            .font(.subheadline.bold()).foregroundColor(.secondary)
+
+                        HStack(spacing: 16) {
+                            VStack(alignment: .leading) {
+                                Text("Text Color").font(.caption2).foregroundStyle(.secondary)
+                                ColorPicker("Text", selection: $textColor)
+                                    .labelsHidden()
+                            }
+
+                            VStack(alignment: .leading) {
+                                Text("Highlight").font(.caption2).foregroundStyle(.secondary)
+                                ColorPicker("Highlight", selection: $highlightColor)
+                                    .labelsHidden()
+                            }
+
+                            Spacer()
+
+                            Button {
+                                applyColor()
+                            } label: {
+                                Label("Apply Color", systemImage: "paintpalette")
+                                    .font(.caption.bold())
+                            }
+                            .buttonStyle(.borderedProminent)
+
+                            Button {
+                                applyHighlight()
+                            } label: {
+                                Label("Highlight", systemImage: "highlighter")
+                                    .font(.caption.bold())
+                            }
+                            .buttonStyle(.bordered)
                         }
+                        .padding(12)
+                        .background(Color.secondary.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
                     }
 
-                    Divider()
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("Typography", systemImage: "text.cursor")
+                            .font(.subheadline.bold()).foregroundColor(.secondary)
 
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Typography").font(.subheadline.bold()).foregroundColor(.secondary)
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack {
                                 ForEach(fonts, id: \.self) { font in
                                     Button(action: { selectedFont = font }) {
                                         Text(font)
                                             .font(.caption)
-                                            .padding(.horizontal, 10)
-                                            .padding(.vertical, 6)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
                                             .background(selectedFont == font ? Color.accentColor : Color.secondary.opacity(0.1))
                                             .foregroundColor(selectedFont == font ? .white : .primary)
-                                            .cornerRadius(6)
+                                            .cornerRadius(8)
                                     }
                                 }
                             }
                         }
 
-                        HStack {
-                            Image(systemName: "textformat.size.smaller").font(.caption)
-                            Slider(value: $fontSize, in: 12...32)
-                            Image(systemName: "textformat.size.larger").font(.caption)
+                        VStack(spacing: 16) {
+                            SliderRow(label: "Size", value: $fontSize, range: 10...40, icon: "textformat.size")
+                            SliderRow(label: "Line Height", value: $lineSpacing, range: 0...20, icon: "line.3.horizontal")
+                            SliderRow(label: "Character Spacing", value: $characterSpacing, range: -2...10, icon: "arrow.left.and.right")
+                            SliderRow(label: "Paragraph Spacing", value: $paragraphSpacing, range: 0...40, icon: "paragraphsign")
+                            SliderRow(label: "Indentation", value: $indentation, range: 0...50, icon: "arrow.right.to.line")
                         }
+                        .padding(12)
+                        .background(Color.secondary.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
                     }
 
-                    Divider()
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("Emphasis", systemImage: "bold.italic.underline")
+                            .font(.subheadline.bold()).foregroundColor(.secondary)
 
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Styles").font(.subheadline.bold()).foregroundColor(.secondary)
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                        HStack(spacing: 10) {
                             formatButton(icon: "bold", action: { wrap("**") })
                             formatButton(icon: "italic", action: { wrap("_") })
-                            formatButton(icon: "underline", action: { wrap("__") })
+                            formatButton(icon: "underline", action: { wrap("<u>", "</u>") })
                             formatButton(icon: "strikethrough", action: { wrap("~~") })
                             formatButton(icon: "link", action: { insert("[link](url)") })
                         }
                     }
 
-                    Divider()
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("Structure", systemImage: "list.bullet.indent")
+                            .font(.subheadline.bold()).foregroundColor(.secondary)
 
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Structure").font(.subheadline.bold()).foregroundColor(.secondary)
-                        FlowLayout(["h1", "h2", "h3", "list", "number", "quote", "code"], spacing: 6) { type in
+                        FlowLayout(["h1", "h2", "h3", "h4", "list", "number", "quote", "code", "table"], spacing: 8) { type in
                             switch type {
                             case "h1": structureButton(label: "H1", action: { insert("\n# ") })
                             case "h2": structureButton(label: "H2", action: { insert("\n## ") })
                             case "h3": structureButton(label: "H3", action: { insert("\n### ") })
-                            case "list": structureButton(label: "List", icon: "list.bullet", action: { insert("\n- ") })
+                            case "h4": structureButton(label: "H4", action: { insert("\n#### ") })
+                            case "list": structureButton(label: "Bullet", icon: "list.bullet", action: { insert("\n- ") })
                             case "number": structureButton(label: "Number", icon: "list.number", action: { insert("\n1. ") })
                             case "quote": structureButton(label: "Quote", icon: "quote.opening", action: { insert("\n> ") })
                             case "code": structureButton(label: "Code", icon: "curlybraces", action: { insert("\n```\n\n```") })
+                            case "table": structureButton(label: "Table", icon: "tablecells", action: { insert("\n|  |  |\n|--|--|\n|  |  |\n") })
                             default: EmptyView()
                             }
                         }
                     }
                 }
+                .padding()
             }
         }
-        .padding()
+    }
+
+    struct SliderRow: View {
+        let label: String
+        @Binding var value: CGFloat
+        let range: ClosedRange<CGFloat>
+        let icon: String
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Image(systemName: icon).font(.caption).foregroundStyle(.secondary)
+                    Text(label).font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    Text("\(Int(value))").font(.caption.monospaced()).bold()
+                }
+                Slider(value: $value, in: range)
+            }
+        }
+    }
+
+    private func applyColor() {
+        let hex = textColor.toHex() ?? "#000000"
+        wrap("<color value=\"\(hex)\">", "</color>")
+    }
+
+    private func applyHighlight() {
+        let hex = highlightColor.toHex() ?? "#FFFF00"
+        wrap("<highlight value=\"\(hex)\">", "</highlight>")
     }
 
     private func formatButton(icon: String, action: @escaping () -> Void) -> some View {
@@ -548,6 +622,10 @@ struct NotebookFormattingView: View {
 
     private func wrap(_ marker: String) {
         content += marker + "text" + marker
+    }
+
+    private func wrap(_ start: String, _ end: String) {
+        content += start + "selected text" + end
     }
 }
 

@@ -51,10 +51,16 @@ struct SDKBuildView: View {
                 emptyProjectSection
             }
         }
-        .navigationTitle("Build")
+        .navigationTitle("SDK Builder")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Image(systemName: "shippingbox.fill").foregroundStyle(Color.accentColor)
+                HStack(spacing: 12) {
+                    Button { showingMetadataSheet = true } label: {
+                        Image(systemName: "slider.horizontal.3")
+                    }
+                    Image(systemName: "shippingbox.fill")
+                        .foregroundStyle(Color.accentColor)
+                }
             }
         }
         .sheet(isPresented: $showingConsole) { NavigationStack { SDKConsoleView() } }
@@ -71,33 +77,92 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func projectOverviewSection(_ project: SDKProject) -> some View {
-        Section("Overview") {
-            LabeledContent("Project", value: project.name)
-            LabeledContent("Version", value: "v\(project.version)")
-            LabeledContent("Health") {
-                Text(project.healthStatus.rawValue.capitalized)
-                    .foregroundStyle(healthColor(project.healthStatus))
-            }
-            HStack {
-                LabeledContent("Scopes", value: "\(project.enabledScopes.count)")
-                LabeledContent("Plugins", value: "\(project.enabledPluginIDs.count)")
-            }
-            HStack {
-                LabeledContent("Tools", value: "\(project.enabledToolIDs.count)")
-                LabeledContent("Links", value: "\(project.enabledConnectorIDs.count)")
-            }
-            LabeledContent("Authorization", value: authorizationManager.authState.rawValue)
+        Section {
+            VStack(spacing: 16) {
+                HStack(spacing: 20) {
+                    ZStack {
+                        Circle()
+                            .fill(healthColor(project.healthStatus).opacity(0.1))
+                            .frame(width: 60, height: 60)
+                        Image(systemName: "cube.transparent.fill")
+                            .font(.title)
+                            .foregroundStyle(healthColor(project.healthStatus))
+                    }
 
-            if isBuilding {
-                buildProgressView
-            }
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(project.name)
+                            .font(.headline)
+                        Text("Version v\(project.version)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
 
-            Button {
-                loadMetadata()
-                showingMetadataSheet = true
-            } label: {
-                Label("Edit Metadata", systemImage: "slider.horizontal.3")
+                        HStack {
+                            Circle()
+                                .fill(healthColor(project.healthStatus))
+                                .frame(width: 8, height: 8)
+                            Text(project.healthStatus.rawValue.capitalized)
+                                .font(.caption.bold())
+                                .foregroundStyle(healthColor(project.healthStatus))
+                        }
+                    }
+                    Spacer()
+
+                    VStack(alignment: .trailing) {
+                        Text(authorizationManager.authState.rawValue)
+                            .font(.caption2.bold())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.accentColor.opacity(0.1), in: Capsule())
+
+                        Text("Auth State")
+                            .font(.system(size: 8))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Divider()
+
+                Grid(verticalSpacing: 12) {
+                    GridRow {
+                        MetricItem(title: "Scopes", value: "\(project.enabledScopes.count)", icon: "shield.fill", color: .blue)
+                        MetricItem(title: "Plugins", value: "\(project.enabledPluginIDs.count)", icon: "puzzlepiece.fill", color: .orange)
+                    }
+                    GridRow {
+                        MetricItem(title: "Tools", value: "\(project.enabledToolIDs.count)", icon: "hammer.fill", color: .purple)
+                        MetricItem(title: "Links", value: "\(project.enabledConnectorIDs.count)", icon: "link", color: .green)
+                    }
+                }
+
+                if isBuilding {
+                    buildProgressView
+                        .padding(.top, 8)
+                }
             }
+            .padding(.vertical, 8)
+        } header: {
+            Label("Project Overview", systemImage: "info.circle.fill")
+        }
+    }
+
+    struct MetricItem: View {
+        let title: String
+        let value: String
+        let icon: String
+        let color: Color
+
+        var body: some View {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundStyle(color)
+                    .frame(width: 24)
+                VStack(alignment: .leading) {
+                    Text(value).font(.subheadline.bold())
+                    Text(title).font(.system(size: 10)).foregroundStyle(.secondary)
+                }
+                Spacer()
+            }
+            .padding(8)
+            .background(color.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
         }
     }
 
@@ -115,44 +180,77 @@ struct SDKBuildView: View {
     // MARK: - Build Configuration
 
     private var buildConfigSection: some View {
-        Section("Configuration") {
-            Picker("Mode", selection: $buildMode) {
-                ForEach(BuildMode.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+        Section {
+            Picker(selection: $buildMode) {
+                ForEach(BuildMode.allCases, id: \.self) { Label($0.rawValue, systemImage: "gearshape.2").tag($0) }
+            } label: {
+                Label("Build Mode", systemImage: "hammer.circle.fill")
             }
-            Picker("Platform", selection: $targetPlatform) {
-                ForEach(TargetPlatform.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+
+            Picker(selection: $targetPlatform) {
+                ForEach(TargetPlatform.allCases, id: \.self) { Label($0.rawValue, systemImage: "iphone").tag($0) }
+            } label: {
+                Label("Target Platform", systemImage: "cpu.fill")
             }
-            Toggle("Clean Build", isOn: $cleanBuildEnabled)
-            Toggle("Include Tests", isOn: $includeTests)
-            Toggle("Code Signing", isOn: $codeSigningEnabled)
-            Toggle("Optimize Assets", isOn: $optimizeAssets)
-            Toggle("Parallel Build", isOn: $parallelBuild)
-            Toggle("Verbose Logging", isOn: $verboseLogging)
+
+            DisclosureGroup {
+                VStack(spacing: 12) {
+                    Toggle(isOn: $cleanBuildEnabled) {
+                        Label("Clean Build", systemImage: "leaf.fill")
+                    }
+                    Toggle(isOn: $includeTests) {
+                        Label("Include Tests", systemImage: "checkmark.seal.fill")
+                    }
+                    Toggle(isOn: $codeSigningEnabled) {
+                        Label("Code Signing", systemImage: "key.fill")
+                    }
+                    Toggle(isOn: $optimizeAssets) {
+                        Label("Optimize Assets", systemImage: "wand.and.stars")
+                    }
+                    Toggle(isOn: $parallelBuild) {
+                        Label("Parallel Build", systemImage: "bolt.fill")
+                    }
+                    Toggle(isOn: $verboseLogging) {
+                        Label("Verbose Logging", systemImage: "text.alignleft")
+                    }
+                }
+                .padding(.top, 8)
+            } label: {
+                Label("Advanced Options", systemImage: "slider.horizontal.3")
+                    .font(.subheadline.bold())
+            }
+        } header: {
+            Label("Configuration", systemImage: "wrench.and.screwdriver.fill")
         }
     }
 
     // MARK: - Build Actions
 
     private var buildActionsSection: some View {
-        Section("Build Pipeline") {
+        Section {
             Button(action: startBuild) {
                 HStack {
-                    Label("Execute Pipeline", systemImage: "hammer.fill")
+                    Label("Execute Pipeline", systemImage: "play.fill")
+                        .bold()
                     Spacer()
                     if isBuilding { ProgressView().controlSize(.small) }
                 }
             }
             .disabled(isBuilding)
+            .listRowBackground(Color.accentColor.opacity(0.1))
 
             Button(action: validateProject) {
-                Label("Run Validation", systemImage: "checkmark.seal.fill")
+                Label("Run Validation", systemImage: "checkmark.shield.fill")
             }
             .disabled(isBuilding)
 
             Button(action: cleanBuildCache) {
-                Label("Clean Artifacts", systemImage: "trash.fill")
+                Label("Purge Build Cache", systemImage: "trash.slash.fill")
             }
             .disabled(isBuilding)
+            .foregroundStyle(.red)
+        } header: {
+            Label("Pipeline Control", systemImage: "terminal.fill")
         }
     }
 
@@ -187,54 +285,89 @@ struct SDKBuildView: View {
     // MARK: - Metrics
 
     private var metricsSection: some View {
-        Section("Build Metrics") {
+        Section {
             let metrics = telemetry.getMetrics()
-            LabeledContent("Total Executions", value: "\(metrics.totalTraces)")
-            LabeledContent("Success / Failure") {
-                Text("\(metrics.successCount) / \(metrics.failureCount)")
-                    .foregroundStyle(metrics.failureCount > 0 ? Color.orange : Color.green)
+            Grid(verticalSpacing: 16) {
+                GridRow {
+                    MetricStatCard(title: "Executions", value: "\(metrics.totalTraces)", icon: "waveform.path.ecg", color: .blue)
+                    MetricStatCard(title: "Success Rate", value: "\(metrics.totalTraces > 0 ? Int(Double(metrics.successCount) / Double(metrics.totalTraces) * 100) : 0)%", icon: "checkmark.circle.fill", color: .green)
+                }
+                GridRow {
+                    MetricStatCard(title: "Avg Latency", value: "\(Int(metrics.averageDurationMs))ms", icon: "timer", color: .orange)
+                    MetricStatCard(title: "Logs", value: "\(logStore.entries.count)", icon: "doc.text.fill", color: .purple)
+                }
             }
-            LabeledContent("Avg Latency", value: "\(String(format: "%.1f", metrics.averageDurationMs))ms")
-            LabeledContent("Log Entries", value: "\(logStore.entries.count)")
+            .padding(.vertical, 8)
+        } header: {
+            Label("Build Telemetry", systemImage: "chart.bar.fill")
+        }
+    }
+
+    struct MetricStatCard: View {
+        let title: String
+        let value: String
+        let icon: String
+        let color: Color
+
+        var body: some View {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundStyle(color)
+                Text(value)
+                    .font(.headline)
+                Text(title)
+                    .font(.system(size: 10))
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Color.secondary.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
         }
     }
 
     // MARK: - Development
 
     private var developmentSection: some View {
-        Section("Development") {
+        Section {
             NavigationLink(destination: SDKWorkspaceContainerView()) { Label("IDE Workspace", systemImage: "macwindow.on.rectangle") }
-            NavigationLink(destination: SDKActionConsoleView()) { Label("Action Console", systemImage: "terminal") }
-            Button { showingConsole = true } label: { Label("Console Output", systemImage: "list.bullet.rectangle.portrait") }
+            NavigationLink(destination: SDKActionConsoleView()) { Label("Action Console", systemImage: "terminal.fill") }
+            Button { showingConsole = true } label: { Label("Live Console Output", systemImage: "list.bullet.rectangle.portrait.fill") }
             NavigationLink(destination: SDKDebugView()) { Label("Debug Inspector", systemImage: "ladybug.fill") }
-            NavigationLink(destination: SDKLogsView()) { Label("System Logs", systemImage: "doc.text.magnifyingglass") }
-            NavigationLink(destination: SDKEventStreamView()) { Label("Event Stream", systemImage: "waveform.path.ecg.rectangle") }
-            NavigationLink(destination: DevToolsMainView()) { Label("Dev Tools", systemImage: "hammer.fill") }
+            NavigationLink(destination: SDKLogsView()) { Label("System Logs", systemImage: "doc.text.magnifyingglass.fill") }
+            NavigationLink(destination: SDKEventStreamView()) { Label("Real-time Event Stream", systemImage: "waveform.path.ecg.rectangle.fill") }
+            NavigationLink(destination: DevToolsMainView()) { Label("Advanced Dev Tools", systemImage: "hammer.circle.fill") }
+        } header: {
+            Label("Development & Debugging", systemImage: "chevron.left.forwardslash.chevron.right")
         }
     }
 
     // MARK: - SDK Systems
 
     private var sdkSystemsSection: some View {
-        Section("SDK Systems") {
-            NavigationLink("SDK Download & Export", destination: SDKDownloadView())
-            NavigationLink("Import Custom App", destination: CustomAppSDKView())
-            NavigationLink("AI Help Assistant", destination: SDKHelpView())
-            NavigationLink("AI App Builder", destination: SDKSupportView())
-            NavigationLink("Developer Guide", destination: SDKDeveloperGuideView())
-            NavigationLink("Module Registry", destination: SDKModuleRegistryView())
-            NavigationLink("Plugin Lifecycle", destination: SDKPluginLifecycleView())
-            NavigationLink("Connector Bindings", destination: SDKConnectorBindingView())
+        Section {
+            NavigationLink(destination: SDKDownloadView()) { Label("SDK Export & Artifacts", systemImage: "arrow.down.doc.fill") }
+            NavigationLink(destination: CustomAppSDKView()) { Label("Import App Shell", systemImage: "square.and.arrow.down.fill") }
+            NavigationLink(destination: SDKHelpView()) { Label("AI Architecture Copilot", systemImage: "sparkles") }
+            NavigationLink(destination: SDKSupportView()) { Label("Automated App Generator", systemImage: "magicmouse.fill") }
+            NavigationLink(destination: SDKDeveloperGuideView()) { Label("SDK Technical Reference", systemImage: "book.fill") }
+            NavigationLink(destination: SDKModuleRegistryView()) { Label("Global Module Registry", systemImage: "archivebox.fill") }
+            NavigationLink(destination: SDKPluginLifecycleView()) { Label("Plugin Lifecycle Monitor", systemImage: "arrow.3.trianglepath") }
+            NavigationLink(destination: SDKConnectorBindingView()) { Label("Bridge Connector Bindings", systemImage: "point.3.connected.trianglepath.dotted") }
+        } header: {
+            Label("Core SDK Infrastructure", systemImage: "square.stack.3d.up.fill")
         }
     }
 
     // MARK: - SDK Assets
 
     private var sdkAssetsSection: some View {
-        Section("SDK Assets") {
-            NavigationLink("Package Dependencies", destination: PackageDependenciesView())
-            NavigationLink("Library Management", destination: LibraryManageView())
-            NavigationLink("Framework Management", destination: FrameworkManageView())
+        Section {
+            NavigationLink(destination: PackageDependenciesView()) { Label("SPM Dependencies", systemImage: "shippingbox.fill") }
+            NavigationLink(destination: LibraryManageView()) { Label("Static & Dynamic Libraries", systemImage: "building.columns.fill") }
+            NavigationLink(destination: FrameworkManageView()) { Label("Binary Frameworks (xcframework)", systemImage: "square.grid.3x3.fill") }
+        } header: {
+            Label("Asset Management", systemImage: "folder.fill")
         }
     }
 
@@ -242,44 +375,52 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func architectureSection(_ project: SDKProject) -> some View {
-        Section("Architecture") {
-            NavigationLink("Permissions") {
+        Section {
+            NavigationLink {
                 SDKPermissionControlView(project: Binding(
                     get: { projectManager.currentProject ?? project },
                     set: { projectManager.currentProject = $0 }
                 ))
-            }
-            NavigationLink("Authorization", destination: SignInView())
-            NavigationLink("Automation", destination: SDKAutomationView())
-            NavigationLink("Flow Builder") {
+            } label: { Label("Permission Scopes", systemImage: "lock.shield.fill") }
+
+            NavigationLink(destination: SignInView()) { Label("Auth & ID Management", systemImage: "person.badge.key.fill") }
+            NavigationLink(destination: SDKAutomationView()) { Label("Workflow Automation", systemImage: "bolt.horizontal.circle.fill") }
+            NavigationLink {
                 SDKFlowBuilderView(project: Binding(
                     get: { projectManager.currentProject ?? project },
                     set: { projectManager.currentProject = $0 }
                 ))
-            }
-            NavigationLink("Plugins", destination: SDKPluginsView())
-            NavigationLink("Tools", destination: SDKToolsView())
+            } label: { Label("Logic Flow Designer", systemImage: "arrow.triangle.pull") }
+
+            NavigationLink(destination: SDKPluginsView()) { Label("Installed Plugins", systemImage: "puzzlepiece.extension.fill") }
+            NavigationLink(destination: SDKToolsView()) { Label("Developer Toolset", systemImage: "briefcase.fill") }
+        } header: {
+            Label("Architectural Components", systemImage: "point.3.filled.connected.trianglepath.dotted")
         }
     }
 
     // MARK: - Stability
 
     private var stabilitySection: some View {
-        Section("Stability") {
-            NavigationLink("Diagnostics", destination: SDKDiagnosticsView())
-            NavigationLink("Security Monitor", destination: SDKSecurityMonitorView())
-            NavigationLink("Control Center", destination: SDKControlCenterView())
-            NavigationLink("Data Control", destination: SDKDataControlView())
+        Section {
+            NavigationLink(destination: SDKDiagnosticsView()) { Label("Health Diagnostics", systemImage: "stethoscope") }
+            NavigationLink(destination: SDKSecurityMonitorView()) { Label("Security Perimeter", systemImage: "shield.lefthalf.filled.badge.vicinity") }
+            NavigationLink(destination: SDKControlCenterView()) { Label("Global Control Center", systemImage: "command.circle.fill") }
+            NavigationLink(destination: SDKDataControlView()) { Label("Data Sovereignty Control", systemImage: "externaldrive.fill.badge.checkmark") }
+        } header: {
+            Label("Stability & Security", systemImage: "heart.text.square.fill")
         }
     }
 
     // MARK: - Exploration
 
     private var explorationSection: some View {
-        Section("Exploration") {
-            Button("System Explorer") { showingSystemExplorer = true }
-            NavigationLink("Workspace Explorer", destination: SDKWorkspaceExplorerView())
-            NavigationLink("API Browser", destination: SDKAPIBrowserView())
+        Section {
+            Button { showingSystemExplorer = true } label: { Label("Native System Explorer", systemImage: "macwindow.badge.plus") }
+            NavigationLink(destination: SDKWorkspaceExplorerView()) { Label("Workspace File Browser", systemImage: "folder.badge.gearshape") }
+            NavigationLink(destination: SDKAPIBrowserView()) { Label("Internal API Surface", systemImage: "network.badge.shield.half.filled") }
+        } header: {
+            Label("Exploration", systemImage: "flashlight.on.fill")
         }
     }
 
@@ -287,10 +428,12 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func deploymentSection(_ project: SDKProject) -> some View {
-        Section("Build & Deploy") {
-            NavigationLink("Integration Tests", destination: SDKIntegrationTestView())
-            NavigationLink("App Builder", destination: SDKAppBuilderView())
-            NavigationLink("Deployment", destination: SDKDeploymentView(project: project))
+        Section {
+            NavigationLink(destination: SDKIntegrationTestView()) { Label("End-to-End Tests", systemImage: "testtube.2") }
+            NavigationLink(destination: SDKAppBuilderView()) { Label("No-Code App Builder", systemImage: "paintpalette.fill") }
+            NavigationLink(destination: SDKDeploymentView(project: project)) { Label("Production Deployment", systemImage: "rocket.fill") }
+        } header: {
+            Label("Validation & Delivery", systemImage: "paperplane.circle.fill")
         }
     }
 
