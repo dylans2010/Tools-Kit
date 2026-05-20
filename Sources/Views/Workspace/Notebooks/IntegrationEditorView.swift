@@ -31,6 +31,13 @@ struct IntegrationEditorView: View {
     @State private var isBuildingAI = false
     @State private var isEnabled: Bool
 
+    // Preview
+    @State private var showPreview = false
+    @State private var previewContent = "The quick brown fox jumps over the lazy dog."
+    @State private var previewTitle = "Sample Note"
+    @State private var previewOutput = ""
+    @State private var isRunningPreview = false
+
     init(tool: IntegrationTool?) {
         self.tool = tool
         _name = State(initialValue: tool?.name ?? "")
@@ -195,7 +202,32 @@ struct IntegrationEditorView: View {
                     Toggle("Run in Background Mode", isOn: $runInBackground)
                     Toggle("Enabled", isOn: $isEnabled)
                 } header: {
-                    Text("Runtime Options")
+                    Label("Runtime Options", systemImage: "play.circle.fill")
+                }
+
+                Section {
+                    Button {
+                        runPreview()
+                    } label: {
+                        HStack {
+                            if isRunningPreview { ProgressView().padding(.trailing, 8) }
+                            Label("Run Live Preview", systemImage: "play.rectangle.fill")
+                        }
+                    }
+                    .disabled(isRunningPreview)
+
+                    if !previewOutput.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Preview Output").font(.caption.bold()).foregroundStyle(.secondary)
+                            Text(previewOutput)
+                                .font(.system(.caption, design: .monospaced))
+                                .padding(8)
+                                .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
+                        }
+                        .padding(.vertical, 4)
+                    }
+                } header: {
+                    Label("Test & Preview", systemImage: "testtube.2")
                 }
             }
             .navigationTitle(tool == nil ? "New Integration" : "Edit Integration")
@@ -237,6 +269,38 @@ struct IntegrationEditorView: View {
             .split(separator: ",")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
+    }
+
+    private func runPreview() {
+        isRunningPreview = true
+        previewOutput = ""
+
+        let now = Date().formatted()
+        var finalPrompt = promptTemplate
+            .replacingOccurrences(of: "{{content}}", with: previewContent)
+            .replacingOccurrences(of: "{{title}}", with: previewTitle)
+            .replacingOccurrences(of: "{{timestamp}}", with: now)
+            .replacingOccurrences(of: "{{word_count}}", with: "\(previewContent.split(separator: " ").count)")
+            .replacingOccurrences(of: "{{attachments}}", with: "none")
+
+        Task {
+            do {
+                let result = try await AIService.shared.processText(
+                    prompt: finalPrompt,
+                    systemPrompt: systemPrompt,
+                    model: aiModel
+                )
+                await MainActor.run {
+                    previewOutput = result
+                    isRunningPreview = false
+                }
+            } catch {
+                await MainActor.run {
+                    previewOutput = "Error: \(error.localizedDescription)"
+                    isRunningPreview = false
+                }
+            }
+        }
     }
 
     private func buildWithAI() {

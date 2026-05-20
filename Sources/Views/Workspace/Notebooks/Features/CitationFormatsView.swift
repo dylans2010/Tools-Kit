@@ -2,10 +2,25 @@ import SwiftUI
 
 struct CitationFormatsView: View {
     @Environment(\.dismiss) private var dismiss
+    @State private var searchText = ""
 
     var body: some View {
         NavigationStack {
             List {
+                Section("Search & Reference") {
+                    HStack {
+                        Image(systemName: "magnifyingglass").foregroundColor(.secondary)
+                        TextField("Search Citation Styles...", text: $searchText)
+                            .textFieldStyle(.plain)
+                        if !searchText.isEmpty {
+                            Button { searchText = "" } label: { Image(systemName: "xmark.circle.fill").foregroundColor(.secondary) }
+                        }
+                    }
+                    .padding(8)
+                    .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
+                }
+                .listRowBackground(Color.clear)
+
                 Section("Academic Styles") {
                     CitationRow(name: "APA 7th Edition",
                                 description: "Commonly used in psychology, education, and sciences.",

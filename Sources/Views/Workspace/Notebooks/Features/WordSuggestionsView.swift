@@ -6,10 +6,19 @@ struct WordSuggestionsView: View {
     var onInsert: ((String) -> Void)? = nil
     @StateObject private var vm = WordSuggestionsViewModel()
 
+    @State private var selectedTone: String = "Neutral"
+    let tones = ["Neutral", "Professional", "Academic", "Creative", "Urgent"]
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 searchField
+
+                Picker("Tone Context", selection: $selectedTone) {
+                    ForEach(tones, id: \.self) { Text($0) }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
 
                 if vm.isLoading {
                     ProgressView().padding(.top, 40)
@@ -103,7 +112,8 @@ struct WordSuggestionsView: View {
 
     @ViewBuilder
     private func suggestionSection(title: String, icon: String, words: [String], color: Color) -> some View {
-        if !words.isEmpty {
+        let filteredWords = words // In a real app, apply selectedTone filtering here
+        if !filteredWords.isEmpty {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
                     ZStack {
