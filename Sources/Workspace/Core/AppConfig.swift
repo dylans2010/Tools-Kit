@@ -30,4 +30,6 @@ enum AppConfig {
     static var googleRedirectURI: String? { string(for: "GOOGLE_OAUTH_REDIRECT_URI") }
     static var microsoftRedirectURI: String? { string(for: "MICROSOFT_OAUTH_REDIRECT_URI") }
     static var yahooRedirectURI: String? { string(for: "YAHOO_OAUTH_REDIRECT_URI") }
+
+    static let gptzeroAPIKey: String = "YOUR_GPTZERO_API_KEY_HERE"
 }
