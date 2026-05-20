@@ -314,12 +314,6 @@ struct InboxView: View {
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 14)
-        .background(thread.isRead ? Color.clear : Color.white.opacity(0.04))
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(thread.isRead ? Color.clear : Color.white.opacity(0.05), lineWidth: 1)
-        )
     }
 
     private func senderInitials(from value: String) -> String {

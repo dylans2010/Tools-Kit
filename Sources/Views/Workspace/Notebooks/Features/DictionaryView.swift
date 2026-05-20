@@ -22,8 +22,10 @@ struct DictionaryView: View {
                     Spacer()
                 } else if let result = vm.result {
                     resultView(result)
-                } else {
+                } else if !vm.recentSearches.isEmpty {
                     recentSearchesView
+                } else {
+                    emptyStateView
                 }
             }
             .navigationTitle("Dictionary")
@@ -56,27 +58,51 @@ struct DictionaryView: View {
 
     private var recentSearchesView: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if !vm.recentSearches.isEmpty {
-                Text("Recent Searches").font(.headline).padding(.horizontal)
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(vm.recentSearches, id: \.self) { word in
-                            Button {
-                                Task { await vm.search(word: word) }
-                            } label: {
-                                Text(word)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(Color.blue.opacity(0.1))
-                                    .cornerRadius(15)
-                            }
+            Text("Recent Searches").font(.headline).padding(.horizontal)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(vm.recentSearches, id: \.self) { word in
+                        Button {
+                            Task { await vm.search(word: word) }
+                        } label: {
+                            Text(word)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(15)
                         }
                     }
-                    .padding(.horizontal)
                 }
+                .padding(.horizontal)
             }
             Spacer()
         }
+    }
+
+    private var emptyStateView: some View {
+        ContentUnavailableView {
+            Label("Dictionary", systemImage: "book.closed")
+        } description: {
+            Text("Search for any word to see definitions, synonyms, and audio pronunciations.")
+        } actions: {
+            VStack(spacing: 12) {
+                Text("Try searching for:").font(.caption).foregroundStyle(.secondary)
+                HStack {
+                    suggestionChip("Luminous")
+                    suggestionChip("Eloquent")
+                    suggestionChip("Resilient")
+                }
+            }
+        }
+    }
+
+    private func suggestionChip(_ word: String) -> some View {
+        Button(word) {
+            vm.searchText = word
+            Task { await vm.search(word: word) }
+        }
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.capsule)
     }
 
     private func resultView(_ result: DictionaryResult) -> some View {

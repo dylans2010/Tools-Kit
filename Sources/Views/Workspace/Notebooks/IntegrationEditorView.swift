@@ -27,6 +27,8 @@ struct IntegrationEditorView: View {
     @State private var requiredVariablesText: String
     @State private var exampleInputsText: String
     @State private var postProcessingText: String
+    @State private var aiBuildPrompt: String
+    @State private var isBuildingAI = false
     @State private var isEnabled: Bool
 
     init(tool: IntegrationTool?) {
@@ -53,12 +55,45 @@ struct IntegrationEditorView: View {
         _requiredVariablesText = State(initialValue: (tool?.requiredVariables ?? []).joined(separator: "\n"))
         _exampleInputsText = State(initialValue: (tool?.exampleInputs ?? []).joined(separator: "\n"))
         _postProcessingText = State(initialValue: (tool?.postProcessingRules ?? []).joined(separator: "\n"))
+        _aiBuildPrompt = State(initialValue: tool?.aiBuildPrompt ?? "")
         _isEnabled = State(initialValue: tool?.isEnabled ?? true)
     }
 
     var body: some View {
         NavigationStack {
             Form {
+                Section("AI Builder") {
+                    TextEditor(text: $aiBuildPrompt)
+                        .frame(minHeight: 80)
+                        .font(.body)
+                        .overlay(
+                            Group {
+                                if aiBuildPrompt.isEmpty {
+                                    Text("Describe the tool you want AI to build for you...")
+                                        .foregroundColor(.secondary)
+                                        .padding(.leading, 4)
+                                        .padding(.top, 8)
+                                        .allowsHitTesting(false)
+                                }
+                            },
+                            alignment: .topLeading
+                        )
+
+                    Button {
+                        buildWithAI()
+                    } label: {
+                        HStack {
+                            if isBuildingAI {
+                                ProgressView().padding(.trailing, 8)
+                            }
+                            Label("Generate Tool Details", systemImage: "sparkles")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(isBuildingAI || aiBuildPrompt.isEmpty)
+                }
+
                 Section {
                     TextField("Name (e.g. Meeting Action Extractor)", text: $name)
                     TextField("Category (e.g. Product, Study, Meetings)", text: $category)
@@ -204,6 +239,46 @@ struct IntegrationEditorView: View {
             .filter { !$0.isEmpty }
     }
 
+    private func buildWithAI() {
+        isBuildingAI = true
+        Task {
+            do {
+                let schema = """
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "description": { "type": "string" },
+                    "category": { "type": "string" },
+                    "systemPrompt": { "type": "string" },
+                    "promptTemplate": { "type": "string" },
+                    "aiModel": { "type": "string" }
+                  }
+                }
+                """
+                let result = try await AIService.shared.generateStructuredJSON(
+                    prompt: "Build an integration tool based on this description: \(aiBuildPrompt)",
+                    jsonSchema: schema
+                )
+
+                if let data = result.data(using: .utf8),
+                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    await MainActor.run {
+                        name = json["name"] as? String ?? name
+                        description = json["description"] as? String ?? description
+                        category = json["category"] as? String ?? category
+                        systemPrompt = json["systemPrompt"] as? String ?? systemPrompt
+                        promptTemplate = json["promptTemplate"] as? String ?? promptTemplate
+                        aiModel = json["aiModel"] as? String ?? aiModel
+                    }
+                }
+            } catch {
+                print("AI Build failed: \(error)")
+            }
+            await MainActor.run { isBuildingAI = false }
+        }
+    }
+
     private func save() {
         var updated = tool ?? IntegrationTool()
         updated.name = name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled" : name
@@ -229,6 +304,7 @@ struct IntegrationEditorView: View {
         updated.requiredVariables = splitLines(requiredVariablesText)
         updated.exampleInputs = splitLines(exampleInputsText)
         updated.postProcessingRules = splitLines(postProcessingText)
+        updated.aiBuildPrompt = aiBuildPrompt
         updated.isEnabled = isEnabled
         manager.saveIntegration(updated)
         dismiss()

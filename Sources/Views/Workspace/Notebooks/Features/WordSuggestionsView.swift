@@ -14,6 +14,8 @@ struct WordSuggestionsView: View {
                 if vm.isLoading {
                     ProgressView().padding(.top, 40)
                     Spacer()
+                } else if vm.synonyms.isEmpty && vm.simplerWords.isEmpty && vm.complexerWords.isEmpty {
+                    emptyStateView
                 } else {
                     ScrollView {
                         VStack(spacing: 24) {
@@ -53,6 +55,32 @@ struct WordSuggestionsView: View {
                 }
             }
         }
+    }
+
+    private var emptyStateView: some View {
+        ContentUnavailableView {
+            Label("Word Suggestions", systemImage: "wand.and.stars")
+        } description: {
+            Text("Enter a word to discover synonyms, simpler alternatives, sophisticated variants, and more.")
+        } actions: {
+            VStack(spacing: 12) {
+                Text("Popular lookups:").font(.caption).foregroundStyle(.secondary)
+                HStack {
+                    suggestionChip("Innovative")
+                    suggestionChip("Effective")
+                    suggestionChip("Challenge")
+                }
+            }
+        }
+    }
+
+    private func suggestionChip(_ word: String) -> some View {
+        Button(word) {
+            vm.inputWord = word
+            Task { await vm.fetchSuggestions(for: word) }
+        }
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.capsule)
     }
 
     private var searchField: some View {

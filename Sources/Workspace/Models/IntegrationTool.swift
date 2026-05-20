@@ -49,6 +49,7 @@ struct IntegrationTool: Codable, Identifiable, Equatable {
     var requiredVariables: [String] = []
     var exampleInputs: [String] = []
     var postProcessingRules: [String] = []
+    var aiBuildPrompt: String?
     var isEnabled: Bool = true
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
@@ -58,7 +59,7 @@ struct IntegrationTool: Codable, Identifiable, Equatable {
         case temperature, topP, frequencyPenalty, presencePenalty, maxResponseTokens
         case aiModel, triggerMode, inputScope, outputStyle, includeAttachmentsContext
         case runInBackground, allowWebResults, timeoutSeconds, requiredVariables
-        case exampleInputs, postProcessingRules, isEnabled, createdAt, updatedAt
+        case exampleInputs, postProcessingRules, aiBuildPrompt, isEnabled, createdAt, updatedAt
     }
 
     init() {}
@@ -88,6 +89,7 @@ struct IntegrationTool: Codable, Identifiable, Equatable {
         requiredVariables = try c.decodeIfPresent([String].self, forKey: .requiredVariables) ?? []
         exampleInputs = try c.decodeIfPresent([String].self, forKey: .exampleInputs) ?? []
         postProcessingRules = try c.decodeIfPresent([String].self, forKey: .postProcessingRules) ?? []
+        aiBuildPrompt = try c.decodeIfPresent(String.self, forKey: .aiBuildPrompt)
         isEnabled = try c.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? true
         createdAt = try c.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date()
         updatedAt = try c.decodeIfPresent(Date.self, forKey: .updatedAt) ?? createdAt
@@ -118,6 +120,7 @@ struct IntegrationTool: Codable, Identifiable, Equatable {
         try c.encode(requiredVariables, forKey: .requiredVariables)
         try c.encode(exampleInputs, forKey: .exampleInputs)
         try c.encode(postProcessingRules, forKey: .postProcessingRules)
+        try c.encode(aiBuildPrompt, forKey: .aiBuildPrompt)
         try c.encode(isEnabled, forKey: .isEnabled)
         try c.encode(createdAt, forKey: .createdAt)
         try c.encode(updatedAt, forKey: .updatedAt)
