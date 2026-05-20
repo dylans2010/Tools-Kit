@@ -9,6 +9,8 @@ struct NotebookPage: Codable, Identifiable, Equatable {
     var history: [NotebookVersion] = []
     var backlinks: [NotebookBacklink] = []
     var tags: [String] = []
+    var isMarked: Bool = false
+    var pageNumber: Int? = nil
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
 
@@ -21,6 +23,8 @@ struct NotebookPage: Codable, Identifiable, Equatable {
         history: [NotebookVersion] = [],
         backlinks: [NotebookBacklink] = [],
         tags: [String] = [],
+        isMarked: Bool = false,
+        pageNumber: Int? = nil,
         createdAt: Date = Date(),
         updatedAt: Date = Date()
     ) {
@@ -32,6 +36,8 @@ struct NotebookPage: Codable, Identifiable, Equatable {
         self.history = history
         self.backlinks = backlinks
         self.tags = tags
+        self.isMarked = isMarked
+        self.pageNumber = pageNumber
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }

@@ -62,9 +62,21 @@ struct CitationFormatsView: View {
                     CitationRow(name: "CSE Name-Year",
                                 description: "Council of Science Editors style.",
                                 format: "Smith J, Doe B. 2024. The Future of AI. Sci Tech J. 12:45-67.")
+
+                    CitationRow(name: "NLM",
+                                description: "National Library of Medicine style for medical journals.",
+                                format: "Smith J, Doe B. The future of AI. Sci Tech J. 2024 Jan;12(3):45-67.")
                 }
 
                 Section("Legal & Government") {
+                    CitationRow(name: "Bluebook Brief",
+                                description: "Citation style for legal briefs.",
+                                format: "Brief for Petitioner at 12, Smith v. Jones, 123 U.S. 456 (2024).")
+
+                    CitationRow(name: "Legal Case (US)",
+                                description: "Standard US legal case citation.",
+                                format: "Smith v. Jones, 123 F.3d 456 (9th Cir. 2024).")
+
                     CitationRow(name: "Bluebook (Law Review)",
                                 description: "Uniform system of citation for legal documents.",
                                 format: "John Smith, *The Future of AI*, 12 Tech. J. 45 (2024).")
@@ -174,6 +186,32 @@ struct CitationFormatsView: View {
                     CitationRow(name: "APA Song",
                                 description: "Citing individual songs.",
                                 format: "The AI Band. (2024). *The Future of AI* [Song]. On *Digital Dreams*. Synth Label.")
+
+                    CitationRow(name: "Movie Script",
+                                description: "Format for citing screenplays.",
+                                format: "Smith, John. *The Future of AI*. Screenplay, 2024.")
+                }
+
+                Section("Miscellaneous") {
+                    CitationRow(name: "Personal Interview",
+                                description: "Citing a private interview.",
+                                format: "Smith, John. Personal interview. 20 May 2024.")
+
+                    CitationRow(name: "Lecture",
+                                description: "Citing a live presentation or lecture.",
+                                format: "Smith, John. \"The Future of AI.\" Guest Lecture, University of Tech, 20 May 2024.")
+
+                    CitationRow(name: "Software",
+                                description: "Citing computer software or apps.",
+                                format: "Smith, J. (2024). *Tools-Kit* (Version 1.0) [Mobile app]. App Store.")
+
+                    CitationRow(name: "Standard",
+                                description: "Citing technical standards (ISO, ANSI).",
+                                format: "International Organization for Standardization. (2024). *Information technology* (ISO Standard No. 12345).")
+
+                    CitationRow(name: "Patent",
+                                description: "Citing an official patent.",
+                                format: "Smith, John. (2024). U.S. Patent No. 1,234,567. Washington, DC: U.S. Patent and Trademark Office.")
                 }
             }
             .navigationTitle("Citations")

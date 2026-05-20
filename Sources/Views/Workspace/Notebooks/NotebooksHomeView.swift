@@ -256,11 +256,11 @@ private struct NotebookRow: View {
     var body: some View {
         WorkspaceSurfaceCard {
             HStack(spacing: 12) {
-                Image(systemName: "book.closed.fill")
-                    .foregroundStyle(.indigo)
+                Image(systemName: notebook.iconName)
+                    .foregroundStyle(Color(hex: notebook.colorHex))
                     .font(.title3)
                     .frame(width: 40, height: 40)
-                    .background(Color.indigo.opacity(0.15))
+                    .background(Color(hex: notebook.colorHex).opacity(0.15))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                 VStack(alignment: .leading, spacing: 4) {
                     Text(notebook.name)

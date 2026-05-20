@@ -116,28 +116,6 @@ struct EmailComposingView: View {
 
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
-                        showingDraftsSheet = true
-                    } label: {
-                        Image(systemName: "tray.full")
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Button {
-                        saveDraft()
-                    } label: {
-                        Image(systemName: "square.and.arrow.down")
-                            .foregroundStyle(.orange)
-                    }
-                    .disabled(!hasUnsavedContent)
-
-                    Button {
-                        showingAIPanel = true
-                    } label: {
-                        Image(systemName: "sparkles")
-                            .foregroundStyle(LinearGradient(colors: [.aiGradientStart, .aiGradientEnd], startPoint: .topLeading, endPoint: .bottomTrailing))
-                    }
-
-                    Button {
                         if scheduleDate != nil {
                             Task { await handleScheduledOrImmediateSend() }
                         } else {
@@ -151,7 +129,6 @@ struct EmailComposingView: View {
                                 .font(.body.bold())
                         }
                     }
-                    .disabled(cannotSend)
                 }
             }
             .onAppear(perform: prefillReply)
@@ -443,6 +420,37 @@ struct EmailComposingView: View {
     private var formattingBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 4) {
+                Button {
+                    showingDraftsSheet = true
+                } label: {
+                    Image(systemName: "tray.full")
+                        .font(.system(size: 15, weight: .medium))
+                        .frame(width: 36, height: 36)
+                        .foregroundStyle(.secondary)
+                }
+
+                Button {
+                    saveDraft()
+                } label: {
+                    Image(systemName: "square.and.arrow.down")
+                        .font(.system(size: 15, weight: .medium))
+                        .frame(width: 36, height: 36)
+                        .foregroundStyle(.orange)
+                }
+
+                Button {
+                    showingAIPanel = true
+                } label: {
+                    Image(systemName: "sparkles.rectangle.stack")
+                        .font(.system(size: 15, weight: .medium))
+                        .frame(width: 36, height: 36)
+                        .foregroundStyle(LinearGradient(colors: [.aiGradientStart, .aiGradientEnd], startPoint: .topLeading, endPoint: .bottomTrailing))
+                }
+
+                Divider()
+                    .frame(height: 24)
+                    .padding(.horizontal, 4)
+
                 formatButton("bold", "**bold**")
                 formatButton("italic", "_italic_")
                 formatButton("textformat.size", "## ")
@@ -492,9 +500,9 @@ struct EmailComposingView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     toolbarButton("paperclip", .blue) { showingAttachmentPicker = true }
-                    toolbarButton("doc.viewfinder", .orange) { showingDocumentScanner = true }
-                    toolbarButton("pencil.and.outline", .pink) { showingDrawingSheet = true }
-                    toolbarButton("sparkles", .purple) { showingAIWrite = true }
+                    toolbarButton("scanner", .orange) { showingDocumentScanner = true }
+                    toolbarButton("pencil.tip.crop.circle", .pink) { showingDrawingSheet = true }
+                    toolbarButton("sparkles.rectangle.stack", .purple) { showingAIWrite = true }
                     toolbarButton("globe", .cyan) { showingTranslateSheet = true }
                     toolbarButton("calendar.badge.clock", .green) { showingScheduleSheet = true }
                     toolbarButton("textformat", .indigo) {

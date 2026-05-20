@@ -179,26 +179,52 @@ final class WritingAnalyticsViewModel: ObservableObject {
 
     func runPlagiarismScan(text: String) {
         isRunningPlagiarism = true
+        self.plagiarismResult = nil
+
         Task {
             do {
-                let prompt = """
-                Perform a professional plagiarism analysis on the following text using available third-party data and web-based similarity indices.
-                Identify potential matches, similarity percentages, and risk levels.
-                Format the response as a JSON object with:
-                - overallScore: Double (0-100)
-                - riskLevel: String ("low", "medium", "high")
-                - checkedSentences: Int
-                - totalSentences: Int
-                - matches: Array of objects (text: String, similarity: Double, source: String, matchType: String)
+                let schema = """
+                {
+                  "type": "object",
+                  "required": ["overallScore", "riskLevel", "checkedSentences", "totalSentences", "matches"],
+                  "properties": {
+                    "overallScore": { "type": "number" },
+                    "riskLevel": { "type": "string" },
+                    "checkedSentences": { "type": "integer" },
+                    "totalSentences": { "type": "integer" },
+                    "matches": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "text": { "type": "string" },
+                          "similarity": { "type": "number" },
+                          "source": { "type": "string" },
+                          "matchType": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+                """
 
-                Text to analyze:
+                let prompt = """
+                Perform a detailed plagiarism check on this text. Cross-reference with web databases and academic journals.
+                Identify any overlapping content, provide a similarity score, and identify the risk level (low, medium, high).
+
+                Text:
                 \(text)
                 """
 
-                let response = try await AIService.shared.processText(prompt: prompt, systemPrompt: "You are an expert plagiarism detection system. Return JSON ONLY.")
+                let response = try await AIService.shared.generateStructuredJSON(
+                    prompt: prompt,
+                    jsonSchema: schema,
+                    systemPrompt: "You are an AI plagiarism detector. You must return valid JSON matching the schema provided."
+                )
 
-                if let data = response.data(using: .utf8),
-                   let result = try? JSONDecoder().decode(PlagiarismResult.self, from: data) {
+                if let data = response.data(using: .utf8) {
+                    let decoder = JSONDecoder()
+                    let result = try decoder.decode(PlagiarismResult.self, from: data)
                     await MainActor.run {
                         self.plagiarismResult = result
                     }
@@ -206,7 +232,9 @@ final class WritingAnalyticsViewModel: ObservableObject {
             } catch {
                 print("Plagiarism scan failed: \(error)")
             }
-            isRunningPlagiarism = false
+            await MainActor.run {
+                isRunningPlagiarism = false
+            }
         }
     }
 

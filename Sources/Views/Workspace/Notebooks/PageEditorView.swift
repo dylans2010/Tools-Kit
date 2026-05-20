@@ -37,6 +37,7 @@ struct PageEditorView: View {
 
     // Existing Sheets
     @State private var showingSearch = false
+    @State private var showingIntegrationsPicker = false
     @State private var showingCompare = false
     @State private var showingComments = false
     @State private var showingLogs = false
@@ -117,6 +118,11 @@ struct PageEditorView: View {
         .sheet(isPresented: $showingAnalytics) {
             WritingAnalyticsView(documentText: content, documentTitle: title, isPresented: $showingAnalytics)
         }
+        .sheet(isPresented: $showingIntegrationsPicker) {
+            IntegrationsPickerView(isPresented: $showingIntegrationsPicker) { tool in
+                runIntegration(tool)
+            }
+        }
         .sheet(isPresented: $showingEssayDrafting) {
             EssayDraftingView()
         }
@@ -178,7 +184,7 @@ struct PageEditorView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 24) {
                     toolbarButton(icon: "textformat", label: "Format") { showFormattingPopover = true }
-                        .popover(isPresented: $showFormattingPopover) { formattingPopover }
+                        .sheet(isPresented: $showFormattingPopover) { formattingPopover }
 
                     toolbarButton(icon: "slash.circle", label: "Insert") { showSlashCommand.toggle() }
 
@@ -207,6 +213,8 @@ struct PageEditorView: View {
                     toolbarButton(icon: "book.closed", label: "Dictionary") { showingDictionary = true }
 
                     toolbarButton(icon: "wand.and.stars", label: "Suggestions") { showingWordSuggestions = true }
+
+                    toolbarButton(icon: "puzzlepiece.extension", label: "Integrations") { showingIntegrationsPicker = true }
                 }
                 .padding(.vertical, 12)
                 .padding(.horizontal, 20)
@@ -228,6 +236,7 @@ struct PageEditorView: View {
 
     private var formattingPopover: some View {
         NotebookFormattingView(content: $content, isPresented: $showFormattingPopover)
+            .presentationDetents([.height(350), .medium])
     }
 
     private func formatItem(label: String, icon: String, action: @escaping () -> Void) -> some View {
@@ -315,6 +324,24 @@ struct PageEditorView: View {
         }
     }
 
+    private func runIntegration(_ tool: IntegrationTool) {
+        aiTask = tool.name
+        aiLoading = true
+        showingAIResult = true
+        Task {
+            do {
+                let result = try await AIService.shared.processText(
+                    prompt: tool.promptTemplate.replacingOccurrences(of: "{{content}}", with: content),
+                    systemPrompt: tool.systemPrompt,
+                    model: tool.aiModel
+                )
+                await MainActor.run { aiResult = result; aiLoading = false }
+            } catch {
+                await MainActor.run { aiResult = "Error: \(error.localizedDescription)"; aiLoading = false }
+            }
+        }
+    }
+
     // MARK: - Helpers
     private func insert(_ text: String) {
         content += text
@@ -393,11 +420,13 @@ struct NotebookFormattingView: View {
     @State private var fontSize: CGFloat = 16
     @State private var lineSpacing: CGFloat = 4
     @State private var alignment: TextAlignment = .leading
+    @State private var textColor: Color = .primary
+    @State private var highlightColor: Color = .clear
 
     let fonts = ["System", "Serif", "Monospace", "Rounded"]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Formatting").font(.headline)
                 Spacer()
@@ -405,35 +434,49 @@ struct NotebookFormattingView: View {
             }
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Typography").font(.subheadline.bold()).foregroundColor(.secondary)
-                        HStack {
-                            ForEach(fonts, id: \.self) { font in
-                                Button(action: { selectedFont = font }) {
-                                    Text(font)
-                                        .font(.caption)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 8)
-                                        .background(selectedFont == font ? Color.accentColor : Color.secondary.opacity(0.1))
-                                        .foregroundColor(selectedFont == font ? .white : .primary)
-                                        .cornerRadius(8)
-                                }
-                            }
-                        }
-
-                        HStack {
-                            Image(systemName: "textformat.size.smaller")
-                            Slider(value: $fontSize, in: 12...32)
-                            Image(systemName: "textformat.size.larger")
+                VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Colors").font(.subheadline.bold()).foregroundColor(.secondary)
+                        HStack(spacing: 20) {
+                            ColorPicker("Text", selection: $textColor)
+                                .font(.caption)
+                            ColorPicker("Highlight", selection: $highlightColor)
+                                .font(.caption)
                         }
                     }
 
                     Divider()
 
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Rich Text Styles").font(.subheadline.bold()).foregroundColor(.secondary)
-                        HStack(spacing: 16) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Typography").font(.subheadline.bold()).foregroundColor(.secondary)
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                ForEach(fonts, id: \.self) { font in
+                                    Button(action: { selectedFont = font }) {
+                                        Text(font)
+                                            .font(.caption)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .background(selectedFont == font ? Color.accentColor : Color.secondary.opacity(0.1))
+                                            .foregroundColor(selectedFont == font ? .white : .primary)
+                                            .cornerRadius(6)
+                                    }
+                                }
+                            }
+                        }
+
+                        HStack {
+                            Image(systemName: "textformat.size.smaller").font(.caption)
+                            Slider(value: $fontSize, in: 12...32)
+                            Image(systemName: "textformat.size.larger").font(.caption)
+                        }
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Styles").font(.subheadline.bold()).foregroundColor(.secondary)
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                             formatButton(icon: "bold", action: { wrap("**") })
                             formatButton(icon: "italic", action: { wrap("_") })
                             formatButton(icon: "underline", action: { wrap("__") })
@@ -444,26 +487,9 @@ struct NotebookFormattingView: View {
 
                     Divider()
 
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Spacing & Alignment").font(.subheadline.bold()).foregroundColor(.secondary)
-                        HStack(spacing: 20) {
-                            alignmentButton(icon: "text.alignleft", align: .leading)
-                            alignmentButton(icon: "text.aligncenter", align: .center)
-                            alignmentButton(icon: "text.alignright", align: .trailing)
-                        }
-
-                        HStack {
-                            Image(systemName: "line.horizontal.3")
-                            Slider(value: $lineSpacing, in: 0...20)
-                            Text("\(Int(lineSpacing))").font(.caption.monospaced()).frame(width: 20)
-                        }
-                    }
-
-                    Divider()
-
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 10) {
                         Text("Structure").font(.subheadline.bold()).foregroundColor(.secondary)
-                        FlowLayout(["h1", "h2", "h3", "list", "number", "quote", "code"], spacing: 8) { type in
+                        FlowLayout(["h1", "h2", "h3", "list", "number", "quote", "code"], spacing: 6) { type in
                             switch type {
                             case "h1": structureButton(label: "H1", action: { insert("\n# ") })
                             case "h2": structureButton(label: "H2", action: { insert("\n## ") })
@@ -480,7 +506,6 @@ struct NotebookFormattingView: View {
             }
         }
         .padding()
-        .frame(width: 300, height: 500)
     }
 
     private func formatButton(icon: String, action: @escaping () -> Void) -> some View {
@@ -595,5 +620,40 @@ struct PageInfoView: View {
                 }
             }
         }
+    }
+}
+
+struct IntegrationsPickerView: View {
+    @Binding var isPresented: Bool
+    let onSelect: (IntegrationTool) -> Void
+    @StateObject private var manager = NotebooksManager.shared
+
+    var body: some View {
+        NavigationStack {
+            List {
+                if manager.integrations.isEmpty {
+                    ContentUnavailableView("No Integrations", systemImage: "puzzlepiece", description: Text("Create custom AI tools in the Integrations menu."))
+                } else {
+                    ForEach(manager.integrations) { tool in
+                        Button {
+                            onSelect(tool)
+                            isPresented = false
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(tool.name).font(.headline)
+                                Text(tool.description).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Select Integration")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { isPresented = false }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
     }
 }

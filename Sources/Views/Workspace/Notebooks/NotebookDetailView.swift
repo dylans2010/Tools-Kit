@@ -189,29 +189,21 @@ struct NotebookDetailView: View {
     }
 
     private var quickToolsSection: some View {
-        WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Notebook Tools")
-                    .font(.headline)
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Notebook Tools")
+                .font(.headline)
+                .padding(.horizontal, 4)
 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        quickTool("Create Folder", icon: "folder.badge.plus") { showingCreateFolder = true }
-                        quickTool("Starter Folder", icon: "folder.fill.badge.plus") { addStarterFolder() }
-                        quickTool("Duplicate First", icon: "doc.on.doc") { duplicateFirstFolder() }
-                        quickTool("Sort A–Z", icon: "textformat") { selectedSort = .alphabetical }
-                        quickTool("Sort by Pages", icon: "number") { selectedSort = .pages }
-                        quickTool("Newest First", icon: "clock.arrow.circlepath") { selectedSort = .recent }
-                        quickTool("Toggle Non-Empty", icon: "line.3.horizontal.decrease.circle") { showOnlyNonEmptyFolders.toggle() }
-                        quickTool("Clean Empty", icon: "trash.slash") { removeEmptyFolders() }
-                        quickTool("AI Insights", icon: "brain.head.profile") { showingAISheet = true }
-                        quickTool("Integrations", icon: "puzzlepiece.extension") { showingIntegrations = true }
-                        if supportsImagePlayground {
-                            quickTool("AI Artwork", icon: "sparkles") { showingImagePlayground = true }
-                        }
-                    }
-                    .padding(.vertical, 2)
-                }
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
+                quickTool("Add Folder", icon: "folder.badge.plus") { showingCreateFolder = true }
+                quickTool("Starter", icon: "folder.fill.badge.plus") { addStarterFolder() }
+                quickTool("Duplicate", icon: "doc.on.doc") { duplicateFirstFolder() }
+                quickTool("Sort A–Z", icon: "textformat") { selectedSort = .alphabetical }
+                quickTool("Sort Pages", icon: "number") { selectedSort = .pages }
+                quickTool("Recent", icon: "clock.arrow.circlepath") { selectedSort = .recent }
+                quickTool("Clean", icon: "trash.slash") { removeEmptyFolders() }
+                quickTool("AI Tools", icon: "brain.head.profile") { showingAISheet = true }
+                quickTool("Integrations", icon: "puzzlepiece.extension") { showingIntegrations = true }
             }
         }
     }
@@ -344,11 +336,15 @@ struct NotebookDetailView: View {
 
     private func quickTool(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Label(title, systemImage: icon)
-                .font(.caption.weight(.semibold))
-                .padding(.horizontal, 10)
-                .padding(.vertical, 8)
-                .background(Color.accentColor.opacity(0.14), in: Capsule())
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title3)
+                Text(title)
+                    .font(.caption2.weight(.medium))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
     }

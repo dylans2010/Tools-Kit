@@ -24,6 +24,16 @@ struct CreateFolderView: View {
         case dream = "Dream Journal"
         case client = "Client Wiki"
         case brand = "Brand Guidelines"
+        case lecture = "Lecture Notes"
+        case wiki = "Personal Wiki"
+        case budget = "Budget Tracker"
+        case trip = "Trip Planner"
+        case habit = "Habit Tracker"
+        case workout = "Workout Log"
+        case contacts = "Contact List"
+        case inventory2 = "Home Inventory"
+        case ideas = "Idea Bank"
+        case tasks = "Task Master"
 
         var id: String { rawValue }
 
@@ -45,6 +55,16 @@ struct CreateFolderView: View {
             case .dream: return "moon.stars.fill"
             case .client: return "person.2.fill"
             case .brand: return "paintpalette.fill"
+            case .lecture: return "doc.text.fill"
+            case .wiki: return "network"
+            case .budget: return "creditcard.fill"
+            case .trip: return "map.fill"
+            case .habit: return "checkmark.circle.fill"
+            case .workout: return "dumbbell.fill"
+            case .contacts: return "person.crop.circle.fill"
+            case .inventory2: return "house.fill"
+            case .ideas: return "lightbulb.circle.fill"
+            case .tasks: return "checklist"
             }
         }
     }
@@ -154,6 +174,26 @@ struct CreateFolderView: View {
         case .brand:
             manager.addPage(to: folderID, in: notebookID, title: "Visual Style", content: "# Brand Identity\n\nColors:\nTypography:\nLogo Usage:")
             manager.addPage(to: folderID, in: notebookID, title: "Voice & Tone", content: "# Communication Guide\n\n- Friendly but professional\n- Direct and concise")
+        case .lecture:
+            manager.addPage(to: folderID, in: notebookID, title: "Lecture 1", content: "# Lecture Notes\n\nDate: \nTopic: \nKey Points:")
+        case .wiki:
+            manager.addPage(to: folderID, in: notebookID, title: "Home", content: "# Wiki Home\n\nWelcome to your personal wiki.")
+        case .budget:
+            manager.addPage(to: folderID, in: notebookID, title: "Monthly Overview", content: "# Budget\n\nIncome:\nExpenses:")
+        case .trip:
+            manager.addPage(to: folderID, in: notebookID, title: "Itinerary", content: "# Trip Itinerary")
+        case .habit:
+            manager.addPage(to: folderID, in: notebookID, title: "Habits", content: "# Habit Tracking")
+        case .workout:
+            manager.addPage(to: folderID, in: notebookID, title: "Workout", content: "# Daily Workout")
+        case .contacts:
+            manager.addPage(to: folderID, in: notebookID, title: "Contacts", content: "# Contact Directory")
+        case .inventory2:
+            manager.addPage(to: folderID, in: notebookID, title: "Home Assets", content: "# Inventory")
+        case .ideas:
+            manager.addPage(to: folderID, in: notebookID, title: "Idea List", content: "# Bank of Ideas")
+        case .tasks:
+            manager.addPage(to: folderID, in: notebookID, title: "Tasks", content: "# Task List\n\n- [ ] Task 1")
         }
     }
 }

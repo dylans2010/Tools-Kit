@@ -68,27 +68,32 @@ struct WritingAnalyticsView: View {
 
     @ViewBuilder
     private var contentArea: some View {
-        switch vm.activeTab {
-        case .overview: overviewTab
-        case .readability: readabilityTab
-        case .tone: toneTab
-        case .structure: structureTab
-        case .vocabulary: vocabularyTab
-        case .grammar: grammarTab
-        case .plagiarism: plagiarismTab
-        case .search: searchTab
-        case .craftread: craftReadTab
+        VStack(spacing: 20) {
+            switch vm.activeTab {
+            case .overview: overviewTab
+            case .readability: readabilityTab
+            case .tone: toneTab
+            case .structure: structureTab
+            case .vocabulary: vocabularyTab
+            case .grammar: grammarTab
+            case .plagiarism: plagiarismTab
+            case .search: searchTab
+            case .craftread: craftReadTab
+            }
         }
     }
 
     // MARK: - Overview Tab
     private var overviewTab: some View {
         VStack(alignment: .leading, spacing: 24) {
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                statTile(label: "Words", value: "\(vm.stats.wordCount)", icon: "text.wordspacing", color: .blue)
-                statTile(label: "Characters", value: "\(vm.stats.charCount)", icon: "character", color: .green)
-                statTile(label: "Sentences", value: "\(vm.stats.sentenceCount)", icon: "text.quote", color: .orange)
-                statTile(label: "Paragraphs", value: "\(vm.stats.paragraphCount)", icon: "paragraph", color: .purple)
+            WorkspaceSurfaceCard {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                    statTile(label: "Words", value: "\(vm.stats.wordCount)", icon: "text.wordspacing", color: .blue)
+                    statTile(label: "Characters", value: "\(vm.stats.charCount)", icon: "character", color: .green)
+                    statTile(label: "Sentences", value: "\(vm.stats.sentenceCount)", icon: "text.quote", color: .orange)
+                    statTile(label: "Paragraphs", value: "\(vm.stats.paragraphCount)", icon: "paragraph", color: .purple)
+                }
+                .padding()
             }
 
             SectionCard(title: "Document Details") {
@@ -507,31 +512,32 @@ struct WritingAnalyticsView: View {
     // MARK: - Plagiarism Tab
     private var plagiarismTab: some View {
         VStack(spacing: 24) {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Image(systemName: "shield.checkered").foregroundColor(.blue)
-                    Text("AI Plagiarism Detection").font(.headline)
-                }
-                Text("Analyzes text against extensive web databases and academic sources using advanced similarity indexing.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .padding()
-            .background(Color.blue.opacity(0.05))
-            .cornerRadius(12)
+            WorkspaceSurfaceCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Image(systemName: "shield.dotted").foregroundColor(.blue)
+                        Text("AI Plagiarism Detection").font(.headline)
+                    }
+                    Text("Analyzes text against extensive web databases and academic sources using advanced similarity indexing.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
 
-            Button {
-                vm.runPlagiarismScan(text: documentText)
-            } label: {
-                if vm.isRunningPlagiarism {
-                    ProgressView().padding(.horizontal)
-                } else {
-                    Label("Run Plagiarism Analysis", systemImage: "magnifyingglass")
-                        .frame(maxWidth: .infinity)
+                    Button {
+                        vm.runPlagiarismScan(text: documentText)
+                    } label: {
+                        if vm.isRunningPlagiarism {
+                            ProgressView().padding(.horizontal)
+                        } else {
+                            Label("Run Plagiarism Analysis", systemImage: "magnifyingglass")
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(vm.isRunningPlagiarism)
+                    .padding(.top, 8)
                 }
+                .padding()
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(vm.isRunningPlagiarism)
 
             if let result = vm.plagiarismResult {
                 VStack(spacing: 20) {
