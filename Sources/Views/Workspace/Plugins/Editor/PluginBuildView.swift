@@ -343,7 +343,7 @@ private struct BuildCapabilitiesSection: View {
                 ContentUnavailableView("No Capabilities", systemImage: "shield.slash", description: Text("Select capabilities above to enable specific action scopes."))
                     .scaleEffect(0.8)
             } else {
-                ForEach(PluginAction.allCases.filter { selectedCapabilities.contains($0.parentCapability) }) { action in
+                ForEach(PluginAction.allCases.filter { selectedCapabilities.contains($0.parentCapability) }, id: \.self) { action in
                     Toggle(isOn: Binding(
                         get: { selectedActions.contains(action) },
                         set: { isSelected in
