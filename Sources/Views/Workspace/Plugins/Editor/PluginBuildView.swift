@@ -325,12 +325,12 @@ private struct BuildCapabilitiesSection: View {
         Section {
             ForEach(PluginCapability.allCases) { cap in
                 Toggle(isOn: Binding(
-                    get: { selectedCapabilities.contains(cap) },
+                    get: { selectedCapabilities.wrappedValue.contains(cap) },
                     set: { isSelected in
-                        if isSelected { selectedCapabilities.insert(cap) }
+                        if isSelected { selectedCapabilities.wrappedValue.insert(cap) }
                         else {
-                            selectedCapabilities.remove(cap)
-                            selectedActions = selectedActions.filter { $0.parentCapability != cap }
+                            selectedCapabilities.wrappedValue.remove(cap)
+                            selectedActions.wrappedValue = selectedActions.wrappedValue.filter { $0.parentCapability != cap }
                         }
                     }
                 )) {
@@ -344,7 +344,7 @@ private struct BuildCapabilitiesSection: View {
             Label("Capabilities (System Access)", systemImage: "lock.shield.fill")
         }
 
-        if selectedCapabilities.isEmpty {
+        if selectedCapabilities.wrappedValue.isEmpty {
             Section {
                 ContentUnavailableView("No Capabilities", systemImage: "shield.slash", description: Text("Select capabilities above to enable specific action scopes."))
                     .scaleEffect(0.8)
@@ -353,14 +353,16 @@ private struct BuildCapabilitiesSection: View {
             }
         } else {
             Section {
-                ForEach(PluginAction.allCases.filter { selectedCapabilities.contains($0.parentCapability) }, id: \.self) { action in
-                    Toggle(isOn: Binding(
-                        get: { selectedActions.contains(action) },
-                        set: { isSelected in
-                            if isSelected { selectedActions.insert(action) }
-                            else { selectedActions.remove(action) }
-                        }
-                    )) {
+                ForEach(PluginAction.allCases.filter { selectedCapabilities.wrappedValue.contains($0.parentCapability) }, id: \.self) { action in
+                    Toggle(
+                        isOn: Binding(
+                            get: { selectedActions.wrappedValue.contains(action) },
+                            set: { isSelected in
+                                if isSelected { selectedActions.wrappedValue.insert(action) }
+                                else { selectedActions.wrappedValue.remove(action) }
+                            }
+                        )
+                    ) {
                         VStack(alignment: .leading) {
                             Text(action.rawValue).font(.subheadline.bold())
                             Text(action.description).font(.caption2).foregroundStyle(.secondary)
@@ -588,9 +590,12 @@ private struct BuildMappingSection: View {
                     VStack(alignment: .leading, spacing: 8) {
                         TextField("Source (e.g. event.note.content)", text: $mapping.sourceField).font(.caption.monospaced())
                         TextField("Target (e.g. payload.body.text)", text: $mapping.targetField).font(.caption.monospaced())
-                        if let _ = mapping.transformer {
-                            TextField("Transformer Logic", text: Binding(get: { mapping.transformer ?? "" }, set: { mapping.transformer = $0.isEmpty ? nil : $0 }))
-                                .font(.system(size: 10, design: .monospaced)).foregroundStyle(Color.accentColor)
+                        if mapping.wrappedValue.transformer != nil {
+                            TextField("Transformer Logic", text: Binding(
+                                get: { mapping.wrappedValue.transformer ?? "" },
+                                set: { mapping.wrappedValue.transformer = $0.isEmpty ? nil : $0 }
+                            ))
+                            .font(.system(size: 10, design: .monospaced)).foregroundStyle(Color.accentColor)
                         }
                     }
                     .padding(.vertical, 4)
@@ -641,9 +646,9 @@ private struct BuildUIInjectionSection: View {
     var body: some View {
         Section("UI Injection") {
             VStack(alignment: .leading, spacing: 12) {
-                Toggle("Command Palette Integration", isOn: Binding(get: { toolkitTools.contains { $0.name == "Command Palette Integration" } }, set: { toggleTool("Command Palette Integration", .workspace, $0) }))
-                Toggle("Context Menu Extensions", isOn: Binding(get: { toolkitTools.contains { $0.name == "Context Menu Extensions" } }, set: { toggleTool("Context Menu Extensions", .workspace, $0) }))
-                Toggle("Custom UI Injection", isOn: Binding(get: { toolkitTools.contains { $0.name == "UI Injection Config" } }, set: { toggleTool("UI Injection Config", .workspace, $0) }))
+                Toggle("Command Palette Integration", isOn: Binding(get: { toolkitTools.wrappedValue.contains { $0.name == "Command Palette Integration" } }, set: { toggleTool("Command Palette Integration", .workspace, $0) }))
+                Toggle("Context Menu Extensions", isOn: Binding(get: { toolkitTools.wrappedValue.contains { $0.name == "Context Menu Extensions" } }, set: { toggleTool("Context Menu Extensions", .workspace, $0) }))
+                Toggle("Custom UI Injection", isOn: Binding(get: { toolkitTools.wrappedValue.contains { $0.name == "UI Injection Config" } }, set: { toggleTool("UI Injection Config", .workspace, $0) }))
             }
 
             ForEach($uiExtensions) { $ext in
@@ -667,11 +672,11 @@ private struct BuildUIInjectionSection: View {
 
     private func toggleTool(_ name: String, _ category: PluginToolCategory, _ enabled: Bool) {
         if enabled {
-            if !toolkitTools.contains(where: { $0.name == name }) {
-                toolkitTools.append(PluginToolkitTool(name: name, category: category, config: [:]))
+            if !toolkitTools.wrappedValue.contains(where: { $0.name == name }) {
+                toolkitTools.wrappedValue.append(PluginToolkitTool(name: name, category: category, config: [:]))
             }
         } else {
-            toolkitTools.removeAll { $0.name == name }
+            toolkitTools.wrappedValue.removeAll { $0.name == name }
         }
     }
 }
@@ -689,7 +694,7 @@ private struct BuildToolkitSection: View {
                             ForEach(PluginToolCategory.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
                         }
                         Picker("Tool", selection: $tool.name) {
-                            ForEach(availableToolkitTools(for: tool.category), id: \.self) { Text($0).tag($0) }
+                            ForEach(availableToolkitTools(for: tool.category.wrappedValue), id: \.self) { Text($0).tag($0) }
                         }
                     }
                     .pickerStyle(.menu).controlSize(.small)
