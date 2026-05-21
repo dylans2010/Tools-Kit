@@ -93,61 +93,26 @@ export async function onEvent(event, ctx) {
     }
 
     var body: some View {
-        Form {
-            Section {
-                Picker("Navigation", selection: $selectedSection) {
-                    ForEach(BuildSection.allCases, id: \.self) { section in
-                        Text(section.rawValue).tag(section)
+        NavigationStack {
+            Form {
+                Section {
+                    Picker("Navigation", selection: $selectedSection) {
+                        ForEach(BuildSection.allCases, id: \.self) { section in
+                            Text(section.rawValue).tag(section)
+                        }
                     }
+                    .pickerStyle(.menu)
                 }
-                .pickerStyle(.menu)
-            }
 
-            switch selectedSection {
-            case .identity:
-                BuildIdentitySection(name: $name, description: $description, author: $author, version: $version, identifier: $identifier, isLocked: isIdentifierLocked) {
-                    if isIdentifierLocked { showingIdentifierLockAlert = true }
-                }
-            case .capabilities:
-                BuildCapabilitiesSection(selectedCapabilities: $selectedCapabilities, selectedActions: $selectedActions)
-            case .security:
-                BuildSecuritySection(selectedCapabilities: selectedCapabilities, apiKey: apiKey, privacyNote: privacyNote, plugin: currentPluginSnapshot) { updated in
-                    self.apiKey = updated.apiKey
-                    self.privacyNote = updated.privacyNote
-                    self.dataUsageExplanation = updated.dataUsageExplanation
-                    self.retentionPolicy = updated.retentionPolicy
-                }
-            case .environment:
-                BuildEnvironmentSection(envVars: $envVars)
-            case .dependencies:
-                BuildDependenciesSection(dependencies: $dependencies)
-            case .endpoints:
-                BuildEndpointsSection(endpoints: $endpoints) { showingAddEndpoint = true } onEdit: { selectedEndpointForEdit = $0 }
-            case .logic:
-                BuildLogicSection(sourceCode: $sourceCode)
-            case .mapping:
-                BuildMappingSection(dataMappings: $dataMappings)
-            case .rules:
-                BuildRulesSection(executionRules: $executionRules)
-            case .resources:
-                BuildResourcesSection(memoryLimit: $memoryLimitMB, cpuLimit: $cpuLimitPercent, timeout: $executionTimeout)
-            case .ui:
-                BuildUIInjectionSection(uiExtensions: $uiExtensions, toolkitTools: $toolkitTools)
-            case .toolkit:
-                BuildToolkitSection(toolkitTools: $toolkitTools)
-            case .testing:
-                BuildTestingSection(testEventPayload: $testEventPayload, simulatedBuildOutput: simulatedBuildOutput) { runLocalValidation() }
-            case .release:
-                BuildReleaseSection(version: $version, releaseNotes: $releaseNotes, endpointsCount: endpoints.count, uiExtensionsCount: uiExtensions.count, plugin: currentPluginSnapshot)
+                sectionContent
+                BuildSubmitSection(errors: performStrictValidation(), errorMessage: errorMessage) { buildAndInstall() }
             }
-
-            BuildSubmitSection(errors: performStrictValidation(), errorMessage: errorMessage) { buildAndInstall() }
-        }
-        .navigationTitle("Plugin Builder")
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) { Button("Cancel") { dismiss() } }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button { showingDocs = true } label: { Label("Documentation", systemImage: "book.closed") }
+            .navigationTitle("Plugin Builder")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { showingDocs = true } label: { Label("Documentation", systemImage: "book.closed") }
+                }
             }
         }
         .sheet(isPresented: $showingDocs) {
@@ -174,6 +139,47 @@ export async function onEvent(event, ctx) {
             Button("OK", role: .cancel) { }
         } message: {
             Text("The identifier 'com.toolskit.\(identifier)' cannot be changed after creation. This helps us identify your plugin on the app.")
+        }
+    }
+
+    @ViewBuilder
+    private var sectionContent: some View {
+        switch selectedSection {
+        case .identity:
+            BuildIdentitySection(name: $name, description: $description, author: $author, version: $version, identifier: $identifier, isLocked: isIdentifierLocked) {
+                if isIdentifierLocked { showingIdentifierLockAlert = true }
+            }
+        case .capabilities:
+            BuildCapabilitiesSection(selectedCapabilities: $selectedCapabilities, selectedActions: $selectedActions)
+        case .security:
+            BuildSecuritySection(selectedCapabilities: selectedCapabilities, apiKey: apiKey, privacyNote: privacyNote, plugin: currentPluginSnapshot) { updated in
+                self.apiKey = updated.apiKey
+                self.privacyNote = updated.privacyNote
+                self.dataUsageExplanation = updated.dataUsageExplanation
+                self.retentionPolicy = updated.retentionPolicy
+            }
+        case .environment:
+            BuildEnvironmentSection(envVars: $envVars)
+        case .dependencies:
+            BuildDependenciesSection(dependencies: $dependencies)
+        case .endpoints:
+            BuildEndpointsSection(endpoints: $endpoints) { showingAddEndpoint = true } onEdit: { selectedEndpointForEdit = $0 }
+        case .logic:
+            BuildLogicSection(sourceCode: $sourceCode)
+        case .mapping:
+            BuildMappingSection(dataMappings: $dataMappings)
+        case .rules:
+            BuildRulesSection(executionRules: $executionRules)
+        case .resources:
+            BuildResourcesSection(memoryLimit: $memoryLimitMB, cpuLimit: $cpuLimitPercent, timeout: $executionTimeout)
+        case .ui:
+            BuildUIInjectionSection(uiExtensions: $uiExtensions, toolkitTools: $toolkitTools)
+        case .toolkit:
+            BuildToolkitSection(toolkitTools: $toolkitTools)
+        case .testing:
+            BuildTestingSection(testEventPayload: $testEventPayload, simulatedBuildOutput: simulatedBuildOutput) { runLocalValidation() }
+        case .release:
+            BuildReleaseSection(version: $version, releaseNotes: $releaseNotes, endpointsCount: endpoints.count, uiExtensionsCount: uiExtensions.count, plugin: currentPluginSnapshot)
         }
     }
 
@@ -338,11 +344,15 @@ private struct BuildCapabilitiesSection: View {
             Label("Capabilities (System Access)", systemImage: "lock.shield.fill")
         }
 
-        Section {
-            if selectedCapabilities.isEmpty {
+        if selectedCapabilities.isEmpty {
+            Section {
                 ContentUnavailableView("No Capabilities", systemImage: "shield.slash", description: Text("Select capabilities above to enable specific action scopes."))
                     .scaleEffect(0.8)
-            } else {
+            } header: {
+                Label("Action Scopes", systemImage: "target")
+            }
+        } else {
+            Section {
                 ForEach(PluginAction.allCases.filter { selectedCapabilities.contains($0.parentCapability) }, id: \.self) { action in
                     Toggle(isOn: Binding(
                         get: { selectedActions.contains(action) },
@@ -357,9 +367,9 @@ private struct BuildCapabilitiesSection: View {
                         }
                     }
                 }
+            } header: {
+                Label("Action Scopes", systemImage: "target")
             }
-        } header: {
-            Label("Action Scopes", systemImage: "target")
         }
     }
 }
