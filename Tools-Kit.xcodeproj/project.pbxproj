@@ -1210,8 +1210,8 @@
 		WA0200000000000000000003 /* WritingAnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA0100000000000000000003 /* WritingAnalyticsViewModel.swift */; };
 		ED0200000000000000000001 /* EssayDraftingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0100000000000000000001 /* EssayDraftingView.swift */; };
 		WA0200000000000000000004 /* WritingAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA0100000000000000000004 /* WritingAnalyticsView.swift */; };
-		DV0200000000000000000001 /* DictionaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000001 /* DictionaryViewModel.swift */; };
-		DV0200000000000000000002 /* DictionaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000002 /* DictionaryView.swift */; };
+		DV02000000000000000000A1 /* DictionaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV01000000000000000000A1 /* DictionaryViewModel.swift */; };
+		DV02000000000000000000A2 /* DictionaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV01000000000000000000A2 /* DictionaryView.swift */; };
 		SG0200000000000000000001 /* WordSuggestionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = SG0100000000000000000001 /* WordSuggestionsViewModel.swift */; };
 		SG0200000000000000000002 /* WordSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SG0100000000000000000002 /* WordSuggestionsView.swift */; };
 		ML02B9C001F45A2E4FCA868D /* NotebookVersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */; };
@@ -2766,12 +2766,10 @@
 		WA0100000000000000000001 /* WritingAnalyticsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsModels.swift; sourceTree = "<group>"; };
 		WA0100000000000000000002 /* WritingAnalyticsEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsEngine.swift; sourceTree = "<group>"; };
 		WA0100000000000000000003 /* WritingAnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsViewModel.swift; sourceTree = "<group>"; };
+		DV01000000000000000000A1 /* DictionaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryViewModel.swift; sourceTree = "<group>"; };
+		DV01000000000000000000A2 /* DictionaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryView.swift; sourceTree = "<group>"; };
 		ED0100000000000000000001 /* EssayDraftingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EssayDraftingView.swift; sourceTree = "<group>"; };
 		WA0100000000000000000004 /* WritingAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsView.swift; sourceTree = "<group>"; };
-		DV0100000000000000000001 /* DictionaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryViewModel.swift; sourceTree = "<group>"; };
-		DV0100000000000000000002 /* DictionaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryView.swift; sourceTree = "<group>"; };
-		SG0100000000000000000001 /* WordSuggestionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSuggestionsViewModel.swift; sourceTree = "<group>"; };
-		SG0100000000000000000002 /* WordSuggestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSuggestionsView.swift; sourceTree = "<group>"; };
 		ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookVersionHistoryView.swift; sourceTree = "<group>"; };
 		ML010000000000000000000011 /* NotebookSearchPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookSearchPageView.swift; sourceTree = "<group>"; };
 		ML010000000000000000000012 /* NotebookComparePagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookComparePagesView.swift; sourceTree = "<group>"; };
@@ -5148,16 +5146,14 @@
 				ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */,
 				ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */,
 				WA0100000000000000000001 /* WritingAnalyticsModels.swift */,
+				DV01000000000000000000A1 /* DictionaryViewModel.swift */,
+				DV01000000000000000000A2 /* DictionaryView.swift */,
 				WA0100000000000000000002 /* WritingAnalyticsEngine.swift */,
 				WA0100000000000000000003 /* WritingAnalyticsViewModel.swift */,
 				ED0100000000000000000001 /* EssayDraftingView.swift */,
 				WA0100000000000000000004 /* WritingAnalyticsView.swift */,
-				DV0100000000000000000001 /* DictionaryViewModel.swift */,
-				DV0100000000000000000002 /* DictionaryView.swift */,
 				SG0100000000000000000001 /* WordSuggestionsViewModel.swift */,
 				SG0100000000000000000002 /* WordSuggestionsView.swift */,
-			);
-			path = Features;
 			sourceTree = "<group>";
 		};
 		6405EFCF04B342CB95C74ADD /* Tools */ = {
@@ -10482,14 +10478,10 @@
 				WA0200000000000000000001 /* WritingAnalyticsModels.swift in Sources */,
 				WA0200000000000000000002 /* WritingAnalyticsEngine.swift in Sources */,
 				WA0200000000000000000003 /* WritingAnalyticsViewModel.swift in Sources */,
+				DV02000000000000000000A1 /* DictionaryViewModel.swift in Sources */,
+				DV02000000000000000000A2 /* DictionaryView.swift in Sources */,
 				ED0200000000000000000001 /* EssayDraftingView.swift in Sources */,
 				WA0200000000000000000004 /* WritingAnalyticsView.swift in Sources */,
-				DV0200000000000000000001 /* DictionaryViewModel.swift in Sources */,
-				DV0200000000000000000002 /* DictionaryView.swift in Sources */,
-				SG0200000000000000000001 /* WordSuggestionsViewModel.swift in Sources */,
-				SG0200000000000000000002 /* WordSuggestionsView.swift in Sources */,
-				ML02B9C001F45A2E4FCA868D /* NotebookVersionHistoryView.swift in Sources */,
-				ML020000000000000000000011 /* NotebookSearchPageView.swift in Sources */,
 				ML020000000000000000000012 /* NotebookComparePagesView.swift in Sources */,
 				ML020000000000000000000013 /* NotebookAddCommentsView.swift in Sources */,
 				ML020000000000000000000014 /* NotebookAuditLogsView.swift in Sources */,
