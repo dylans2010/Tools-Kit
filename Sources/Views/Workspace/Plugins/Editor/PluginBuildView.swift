@@ -325,12 +325,13 @@ private struct BuildCapabilitiesSection: View {
         Section {
             ForEach(PluginCapability.allCases) { cap in
                 Toggle(isOn: Binding(
-                    get: { selectedCapabilities.wrappedValue.contains(cap) },
+                    get: { selectedCapabilities.contains(cap) },
                     set: { isSelected in
-                        if isSelected { selectedCapabilities.wrappedValue.insert(cap) }
-                        else {
-                            selectedCapabilities.wrappedValue.remove(cap)
-                            selectedActions.wrappedValue = selectedActions.wrappedValue.filter { $0.parentCapability != cap }
+                        if isSelected {
+                            selectedCapabilities.insert(cap)
+                        } else {
+                            selectedCapabilities.remove(cap)
+                            selectedActions = selectedActions.filter { $0.parentCapability != cap }
                         }
                     }
                 )) {
@@ -344,7 +345,7 @@ private struct BuildCapabilitiesSection: View {
             Label("Capabilities (System Access)", systemImage: "lock.shield.fill")
         }
 
-        if selectedCapabilities.wrappedValue.isEmpty {
+        if selectedCapabilities.isEmpty {
             Section {
                 ContentUnavailableView("No Capabilities", systemImage: "shield.slash", description: Text("Select capabilities above to enable specific action scopes."))
                     .scaleEffect(0.8)
@@ -353,13 +354,16 @@ private struct BuildCapabilitiesSection: View {
             }
         } else {
             Section {
-                ForEach(PluginAction.allCases.filter { selectedCapabilities.wrappedValue.contains($0.parentCapability) }, id: \.self) { action in
+                ForEach(PluginAction.allCases.filter { selectedCapabilities.contains($0.parentCapability) }, id: \.self) { action in
                     Toggle(
                         isOn: Binding(
-                            get: { selectedActions.wrappedValue.contains(action) },
+                            get: { selectedActions.contains(action) },
                             set: { isSelected in
-                                if isSelected { selectedActions.wrappedValue.insert(action) }
-                                else { selectedActions.wrappedValue.remove(action) }
+                                if isSelected {
+                                    selectedActions.insert(action)
+                                } else {
+                                    selectedActions.remove(action)
+                                }
                             }
                         )
                     ) {
@@ -587,18 +591,7 @@ private struct BuildMappingSection: View {
                 Text("No data mappings defined.").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach($dataMappings) { $mapping in
-                    VStack(alignment: .leading, spacing: 8) {
-                        TextField("Source (e.g. event.note.content)", text: $mapping.sourceField).font(.caption.monospaced())
-                        TextField("Target (e.g. payload.body.text)", text: $mapping.targetField).font(.caption.monospaced())
-                        if mapping.wrappedValue.transformer != nil {
-                            TextField("Transformer Logic", text: Binding(
-                                get: { mapping.wrappedValue.transformer ?? "" },
-                                set: { mapping.wrappedValue.transformer = $0.isEmpty ? nil : $0 }
-                            ))
-                            .font(.system(size: 10, design: .monospaced)).foregroundStyle(Color.accentColor)
-                        }
-                    }
-                    .padding(.vertical, 4)
+                    MappingRow(mapping: $mapping)
                 }
                 .onDelete { dataMappings.remove(atOffsets: $0) }
             }
@@ -611,6 +604,25 @@ private struct BuildMappingSection: View {
     }
 }
 
+private struct MappingRow: View {
+    @Binding var mapping: DataMapping
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            TextField("Source (e.g. event.note.content)", text: $mapping.sourceField).font(.caption.monospaced())
+            TextField("Target (e.g. payload.body.text)", text: $mapping.targetField).font(.caption.monospaced())
+            if mapping.transformer != nil {
+                TextField("Transformer Logic", text: Binding(
+                    get: { mapping.transformer ?? "" },
+                    set: { mapping.transformer = $0.isEmpty ? nil : $0 }
+                ))
+                .font(.system(size: 10, design: .monospaced)).foregroundStyle(Color.accentColor)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+
 private struct BuildRulesSection: View {
     @Binding var executionRules: [ExecutionRule]
     var body: some View {
@@ -619,16 +631,7 @@ private struct BuildRulesSection: View {
                 Text("No Rules Defined").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach($executionRules) { $rule in
-                    VStack(alignment: .leading, spacing: 8) {
-                        Picker("Type", selection: $rule.type) {
-                            ForEach(RuleType.allCases, id: \.self) { Text($0.rawValue).tag($0) }
-                        }
-                        .pickerStyle(.menu).labelsHidden().controlSize(.mini)
-
-                        TextField("Condition (JS)", text: $rule.condition)
-                            .font(.system(.caption, design: .monospaced)).padding(4).background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 4))
-                    }
-                    .padding(.vertical, 4)
+                    ExecutionRuleRow(rule: $rule)
                 }
                 .onDelete { executionRules.remove(atOffsets: $0) }
             }
@@ -639,6 +642,23 @@ private struct BuildRulesSection: View {
     }
 }
 
+private struct ExecutionRuleRow: View {
+    @Binding var rule: ExecutionRule
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Picker("Type", selection: $rule.type) {
+                ForEach(RuleType.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+            }
+            .pickerStyle(.menu).labelsHidden().controlSize(.mini)
+
+            TextField("Condition (JS)", text: $rule.condition)
+                .font(.system(.caption, design: .monospaced)).padding(4).background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 4))
+        }
+        .padding(.vertical, 4)
+    }
+}
+
 private struct BuildUIInjectionSection: View {
     @Binding var uiExtensions: [UIExtension]
     @Binding var toolkitTools: [PluginToolkitTool]
@@ -646,21 +666,13 @@ private struct BuildUIInjectionSection: View {
     var body: some View {
         Section("UI Injection") {
             VStack(alignment: .leading, spacing: 12) {
-                Toggle("Command Palette Integration", isOn: Binding(get: { toolkitTools.wrappedValue.contains { $0.name == "Command Palette Integration" } }, set: { toggleTool("Command Palette Integration", .workspace, $0) }))
-                Toggle("Context Menu Extensions", isOn: Binding(get: { toolkitTools.wrappedValue.contains { $0.name == "Context Menu Extensions" } }, set: { toggleTool("Context Menu Extensions", .workspace, $0) }))
-                Toggle("Custom UI Injection", isOn: Binding(get: { toolkitTools.wrappedValue.contains { $0.name == "UI Injection Config" } }, set: { toggleTool("UI Injection Config", .workspace, $0) }))
+                Toggle("Command Palette Integration", isOn: Binding(get: { toolkitTools.contains { $0.name == "Command Palette Integration" } }, set: { toggleTool("Command Palette Integration", .workspace, $0) }))
+                Toggle("Context Menu Extensions", isOn: Binding(get: { toolkitTools.contains { $0.name == "Context Menu Extensions" } }, set: { toggleTool("Context Menu Extensions", .workspace, $0) }))
+                Toggle("Custom UI Injection", isOn: Binding(get: { toolkitTools.contains { $0.name == "UI Injection Config" } }, set: { toggleTool("UI Injection Config", .workspace, $0) }))
             }
 
             ForEach($uiExtensions) { $ext in
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Picker("Type", selection: $ext.type) { ForEach(UIExtensionType.allCases, id: \.self) { Text($0.rawValue).tag($0) } }.pickerStyle(.menu)
-                        Picker("Component", selection: $ext.component) { ForEach(UIComponentType.allCases, id: \.self) { Text($0.rawValue).tag($0) } }.pickerStyle(.menu)
-                    }.controlSize(.mini)
-                    TextField("Target View", text: $ext.targetView).font(.caption)
-                    TextField("Action Binding", text: $ext.actionBinding).font(.caption.monospaced())
-                }
-                .padding(.vertical, 4)
+                UIExtensionRow(ext: $ext)
             }
             .onDelete { uiExtensions.remove(atOffsets: $0) }
 
@@ -672,12 +684,28 @@ private struct BuildUIInjectionSection: View {
 
     private func toggleTool(_ name: String, _ category: PluginToolCategory, _ enabled: Bool) {
         if enabled {
-            if !toolkitTools.wrappedValue.contains(where: { $0.name == name }) {
-                toolkitTools.wrappedValue.append(PluginToolkitTool(name: name, category: category, config: [:]))
+            if !toolkitTools.contains(where: { $0.name == name }) {
+                toolkitTools.append(PluginToolkitTool(name: name, category: category, config: [:]))
             }
         } else {
-            toolkitTools.wrappedValue.removeAll { $0.name == name }
+            toolkitTools.removeAll { $0.name == name }
         }
+    }
+}
+
+private struct UIExtensionRow: View {
+    @Binding var ext: UIExtension
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Picker("Type", selection: $ext.type) { ForEach(UIExtensionType.allCases, id: \.self) { Text($0.rawValue).tag($0) } }.pickerStyle(.menu)
+                Picker("Component", selection: $ext.component) { ForEach(UIComponentType.allCases, id: \.self) { Text($0.rawValue).tag($0) } }.pickerStyle(.menu)
+            }.controlSize(.mini)
+            TextField("Target View", text: $ext.targetView).font(.caption)
+            TextField("Action Binding", text: $ext.actionBinding).font(.caption.monospaced())
+        }
+        .padding(.vertical, 4)
     }
 }
 
@@ -689,16 +717,7 @@ private struct BuildToolkitSection: View {
                 Text("No Tools Selected").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach($toolkitTools) { $tool in
-                    VStack(spacing: 8) {
-                        Picker("Category", selection: $tool.category) {
-                            ForEach(PluginToolCategory.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
-                        }
-                        Picker("Tool", selection: $tool.name) {
-                            ForEach(availableToolkitTools(for: tool.category.wrappedValue), id: \.self) { Text($0).tag($0) }
-                        }
-                    }
-                    .pickerStyle(.menu).controlSize(.small)
-                    .padding(.vertical, 4)
+                    ToolkitToolRow(tool: $tool)
                 }
                 .onDelete { toolkitTools.remove(atOffsets: $0) }
             }
@@ -706,6 +725,23 @@ private struct BuildToolkitSection: View {
                 toolkitTools.append(PluginToolkitTool(name: "AI Text Summarizer", category: .ai, config: [:]))
             }
         }
+    }
+}
+
+private struct ToolkitToolRow: View {
+    @Binding var tool: PluginToolkitTool
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Picker("Category", selection: $tool.category) {
+                ForEach(PluginToolCategory.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
+            }
+            Picker("Tool", selection: $tool.name) {
+                ForEach(availableToolkitTools(for: tool.category), id: \.self) { Text($0).tag($0) }
+            }
+        }
+        .pickerStyle(.menu).controlSize(.small)
+        .padding(.vertical, 4)
     }
 
     private func availableToolkitTools(for category: PluginToolCategory) -> [String] {
