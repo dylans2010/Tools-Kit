@@ -14,6 +14,12 @@ struct PluginBuildView: View {
     @State private var icon = "puzzlepiece"
     @State private var identifier = ""
     @State private var isIdentifierLocked = false
+    @State private var homepage = ""
+    @State private var license = "MIT"
+    @State private var category: PluginMarketCategory = .utility
+    @State private var tags: [String] = []
+    @State private var minPlatformVersion = "1.0"
+    @State private var supportEmail = ""
 
     // Capabilities & Actions
     @State private var selectedCapabilities: Set<PluginCapability> = []
@@ -24,6 +30,11 @@ struct PluginBuildView: View {
     @State private var privacyNote: String?
     @State private var dataUsageExplanation: String?
     @State private var retentionPolicy: String?
+    @State private var sandboxMode: SandboxExecutionMode = .strict
+    @State private var ipAllowlist: [String] = []
+    @State private var rateLimitPerMinute: Int = 60
+    @State private var signatureVerification = true
+    @State private var contentSecurityPolicy = "default-src 'self'"
 
     // Environment Variables
     @State private var envVars: [String: String] = [:]
@@ -42,6 +53,10 @@ export async function onEvent(event, ctx) {
     @State private var endpoints: [ExternalAPIEndpoint] = []
     @State private var showingAddEndpoint = false
     @State private var selectedEndpointForEdit: ExternalAPIEndpoint?
+    @State private var endpointHealthChecks = true
+    @State private var endpointTimeoutMs: Int = 5000
+    @State private var endpointCircuitBreakerThreshold: Int = 5
+    @State private var endpointCacheTTL: Int = 0
 
     // Data Mapping
     @State private var dataMappings: [DataMapping] = []
@@ -62,8 +77,21 @@ export async function onEvent(event, ctx) {
 
     // Release Info
     @State private var releaseNotes = ""
+    @State private var releaseChannel: ReleaseChannel = .stable
+    @State private var rolloutPercentage: Double = 100
+    @State private var deprecationNotice = ""
+    @State private var migrationGuide = ""
+    @State private var signRelease = true
+    @State private var previousVersions: [String] = []
 
     // Testing
+    @State private var testSuites: [PluginTestSuite] = []
+    @State private var coverageTarget: Double = 80
+    @State private var enableLoadTesting = false
+    @State private var loadTestConcurrency: Int = 10
+    @State private var loadTestDuration: Int = 30
+    @State private var mockResponses: [String: String] = [:]
+
     @State private var testEventPayload = """
 {"type":"","payload":{}}
 """
@@ -146,13 +174,13 @@ export async function onEvent(event, ctx) {
     private var sectionContent: some View {
         switch selectedSection {
         case .identity:
-            BuildIdentitySection(name: $name, description: $description, author: $author, version: $version, identifier: $identifier, isLocked: isIdentifierLocked) {
+            BuildIdentitySection(name: $name, description: $description, author: $author, version: $version, identifier: $identifier, isLocked: isIdentifierLocked, homepage: $homepage, license: $license, category: $category, tags: $tags, minPlatformVersion: $minPlatformVersion, supportEmail: $supportEmail) {
                 if isIdentifierLocked { showingIdentifierLockAlert = true }
             }
         case .capabilities:
             BuildCapabilitiesSection(selectedCapabilities: $selectedCapabilities, selectedActions: $selectedActions)
         case .security:
-            BuildSecuritySection(selectedCapabilities: selectedCapabilities, apiKey: apiKey, privacyNote: privacyNote, plugin: currentPluginSnapshot) { updated in
+            BuildSecuritySection(selectedCapabilities: selectedCapabilities, apiKey: apiKey, privacyNote: privacyNote, plugin: currentPluginSnapshot, sandboxMode: $sandboxMode, ipAllowlist: $ipAllowlist, rateLimitPerMinute: $rateLimitPerMinute, signatureVerification: $signatureVerification, contentSecurityPolicy: $contentSecurityPolicy) { updated in
                 self.apiKey = updated.apiKey
                 self.privacyNote = updated.privacyNote
                 self.dataUsageExplanation = updated.dataUsageExplanation
@@ -163,7 +191,7 @@ export async function onEvent(event, ctx) {
         case .dependencies:
             BuildDependenciesSection(dependencies: $dependencies)
         case .endpoints:
-            BuildEndpointsSection(endpoints: $endpoints) { showingAddEndpoint = true } onEdit: { selectedEndpointForEdit = $0 }
+            BuildEndpointsSection(endpoints: $endpoints, healthChecks: $endpointHealthChecks, timeoutMs: $endpointTimeoutMs, circuitBreakerThreshold: $endpointCircuitBreakerThreshold, cacheTTL: $endpointCacheTTL) { showingAddEndpoint = true } onEdit: { selectedEndpointForEdit = $0 }
         case .logic:
             BuildLogicSection(sourceCode: $sourceCode)
         case .mapping:
@@ -177,9 +205,9 @@ export async function onEvent(event, ctx) {
         case .toolkit:
             BuildToolkitSection(toolkitTools: $toolkitTools)
         case .testing:
-            BuildTestingSection(testEventPayload: $testEventPayload, simulatedBuildOutput: simulatedBuildOutput) { runLocalValidation() }
+            BuildTestingSection(testEventPayload: $testEventPayload, simulatedBuildOutput: simulatedBuildOutput, testSuites: $testSuites, coverageTarget: $coverageTarget, enableLoadTesting: $enableLoadTesting, loadTestConcurrency: $loadTestConcurrency, loadTestDuration: $loadTestDuration, mockResponses: $mockResponses) { runLocalValidation() }
         case .release:
-            BuildReleaseSection(version: $version, releaseNotes: $releaseNotes, endpointsCount: endpoints.count, uiExtensionsCount: uiExtensions.count, plugin: currentPluginSnapshot)
+            BuildReleaseSection(version: $version, releaseNotes: $releaseNotes, endpointsCount: endpoints.count, uiExtensionsCount: uiExtensions.count, plugin: currentPluginSnapshot, releaseChannel: $releaseChannel, rolloutPercentage: $rolloutPercentage, deprecationNotice: $deprecationNotice, migrationGuide: $migrationGuide, signRelease: $signRelease, previousVersions: $previousVersions)
         }
     }
 
@@ -286,7 +314,17 @@ private struct BuildIdentitySection: View {
     @Binding var version: String
     @Binding var identifier: String
     let isLocked: Bool
+    @Binding var homepage: String
+    @Binding var license: String
+    @Binding var category: PluginMarketCategory
+    @Binding var tags: [String]
+    @Binding var minPlatformVersion: String
+    @Binding var supportEmail: String
     let onLockedTap: () -> Void
+
+    @State private var newTag = ""
+
+    private let licenseOptions = ["MIT", "Apache-2.0", "GPL-3.0", "BSD-2-Clause", "ISC", "Proprietary", "Custom"]
 
     var body: some View {
         Section {
@@ -294,7 +332,7 @@ private struct BuildIdentitySection: View {
             TextField("Description", text: $description, axis: .vertical)
                 .lineLimit(3...6)
             TextField("Author", text: $author)
-            TextField("Version", text: $version)
+            TextField("Version (semver)", text: $version)
 
             HStack {
                 Label("Identifier", systemImage: "at")
@@ -313,6 +351,72 @@ private struct BuildIdentitySection: View {
             .onTapGesture { if isLocked { onLockedTap() } }
         } header: {
             Label("Plugin Identity", systemImage: "person.text.rectangle.fill")
+        }
+
+        Section {
+            Picker("Category", selection: $category) {
+                ForEach(PluginMarketCategory.allCases) { cat in
+                    Text(cat.rawValue).tag(cat)
+                }
+            }
+            .pickerStyle(.menu)
+
+            Picker("License", selection: $license) {
+                ForEach(licenseOptions, id: \.self) { Text($0).tag($0) }
+            }
+            .pickerStyle(.menu)
+
+            TextField("Homepage URL", text: $homepage)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .keyboardType(.URL)
+
+            TextField("Support Email", text: $supportEmail)
+                .textInputAutocapitalization(.never)
+                .keyboardType(.emailAddress)
+
+            TextField("Min Platform Version", text: $minPlatformVersion)
+                .keyboardType(.decimalPad)
+        } header: {
+            Label("Metadata & Distribution", systemImage: "tag.fill")
+        }
+
+        Section {
+            if tags.isEmpty {
+                Text("No tags added.").font(.caption).foregroundStyle(.secondary)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(tags, id: \.self) { tag in
+                            HStack(spacing: 4) {
+                                Text(tag).font(.caption2.bold())
+                                Button {
+                                    tags.removeAll { $0 == tag }
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill").font(.caption2)
+                                }
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.accentColor.opacity(0.12), in: Capsule())
+                        }
+                    }
+                }
+            }
+            HStack {
+                TextField("Add tag...", text: $newTag)
+                    .textInputAutocapitalization(.never)
+                Button("Add") {
+                    let trimmed = newTag.trimmingCharacters(in: .whitespaces)
+                    guard !trimmed.isEmpty, !tags.contains(trimmed) else { return }
+                    tags.append(trimmed)
+                    newTag = ""
+                }.disabled(newTag.trimmingCharacters(in: .whitespaces).isEmpty)
+            }
+        } header: {
+            Label("Tags", systemImage: "number")
+        } footer: {
+            Text("Tags help users discover your plugin in the marketplace.")
         }
     }
 }
@@ -385,7 +489,14 @@ private struct BuildSecuritySection: View {
     let apiKey: String?
     let privacyNote: String?
     let plugin: PluginDefinition
+    @Binding var sandboxMode: SandboxExecutionMode
+    @Binding var ipAllowlist: [String]
+    @Binding var rateLimitPerMinute: Int
+    @Binding var signatureVerification: Bool
+    @Binding var contentSecurityPolicy: String
     let onUpdate: (PluginDefinition) -> Void
+
+    @State private var newIP = ""
 
     var body: some View {
         Section {
@@ -417,6 +528,74 @@ private struct BuildSecuritySection: View {
             }
         } header: {
             Label("Security & Scopes", systemImage: "lock.fill")
+        }
+
+        Section {
+            Picker("Sandbox Mode", selection: $sandboxMode) {
+                ForEach(SandboxExecutionMode.allCases) { mode in
+                    VStack(alignment: .leading) {
+                        Text(mode.rawValue).tag(mode)
+                    }
+                }
+            }
+            .pickerStyle(.menu)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(sandboxMode.description)
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+
+            Toggle(isOn: $signatureVerification) {
+                Label("Request Signature Verification", systemImage: "signature")
+            }
+
+            VStack(alignment: .leading) {
+                HStack {
+                    Label("Rate Limit", systemImage: "speedometer")
+                    Spacer()
+                    Text("\(rateLimitPerMinute) req/min").bold().font(.caption)
+                }
+                Slider(value: Binding(get: { Double(rateLimitPerMinute) }, set: { rateLimitPerMinute = Int($0) }), in: 1...1000, step: 10)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Label("Content Security Policy", systemImage: "shield.lefthalf.filled").font(.caption.bold()).foregroundStyle(.secondary)
+                TextField("CSP directive", text: $contentSecurityPolicy)
+                    .font(.system(.caption, design: .monospaced))
+                    .textFieldStyle(.roundedBorder)
+            }
+        } header: {
+            Label("Execution Sandbox", systemImage: "lock.rectangle.stack.fill")
+        } footer: {
+            Text("Sandbox mode controls the level of isolation for plugin execution.")
+        }
+
+        Section {
+            if ipAllowlist.isEmpty {
+                Text("No IP restrictions (all IPs allowed).").font(.caption).foregroundStyle(.secondary)
+            } else {
+                ForEach(ipAllowlist, id: \.self) { ip in
+                    HStack {
+                        Text(ip).font(.caption.monospaced())
+                        Spacer()
+                        Button { ipAllowlist.removeAll { $0 == ip } } label: {
+                            Image(systemName: "minus.circle.fill").foregroundStyle(.red)
+                        }
+                    }
+                }
+            }
+            HStack {
+                TextField("IP or CIDR (e.g. 10.0.0.0/8)", text: $newIP)
+                    .font(.caption.monospaced())
+                    .textInputAutocapitalization(.never)
+                Button("Add") {
+                    guard !newIP.isEmpty else { return }
+                    ipAllowlist.append(newIP)
+                    newIP = ""
+                }.disabled(newIP.isEmpty)
+            }
+        } header: {
+            Label("Network Allowlist", systemImage: "network.badge.shield.half.filled")
         }
     }
 }
@@ -528,6 +707,10 @@ private struct BuildResourcesSection: View {
 
 private struct BuildEndpointsSection: View {
     @Binding var endpoints: [ExternalAPIEndpoint]
+    @Binding var healthChecks: Bool
+    @Binding var timeoutMs: Int
+    @Binding var circuitBreakerThreshold: Int
+    @Binding var cacheTTL: Int
     let onAdd: () -> Void
     let onEdit: (ExternalAPIEndpoint) -> Void
 
@@ -556,6 +739,42 @@ private struct BuildEndpointsSection: View {
             Button(action: onAdd) {
                 Label("Add Endpoint", systemImage: "plus.circle.fill").font(.subheadline.bold())
             }
+        }
+
+        Section {
+            Toggle(isOn: $healthChecks) {
+                Label("Health Check Monitoring", systemImage: "heart.text.square")
+            }
+
+            VStack(alignment: .leading) {
+                HStack {
+                    Label("Request Timeout", systemImage: "timer")
+                    Spacer()
+                    Text("\(timeoutMs) ms").bold().font(.caption)
+                }
+                Slider(value: Binding(get: { Double(timeoutMs) }, set: { timeoutMs = Int($0) }), in: 500...30000, step: 500)
+            }
+
+            Stepper(value: $circuitBreakerThreshold, in: 1...50) {
+                HStack {
+                    Label("Circuit Breaker", systemImage: "bolt.trianglebadge.exclamationmark")
+                    Spacer()
+                    Text("\(circuitBreakerThreshold) failures").bold().font(.caption)
+                }
+            }
+
+            VStack(alignment: .leading) {
+                HStack {
+                    Label("Response Cache TTL", systemImage: "clock.arrow.circlepath")
+                    Spacer()
+                    Text(cacheTTL == 0 ? "Disabled" : "\(cacheTTL)s").bold().font(.caption)
+                }
+                Slider(value: Binding(get: { Double(cacheTTL) }, set: { cacheTTL = Int($0) }), in: 0...3600, step: 30)
+            }
+        } header: {
+            Label("Endpoint Resilience", systemImage: "arrow.triangle.2.circlepath")
+        } footer: {
+            Text("Circuit breaker opens after consecutive failures, preventing cascading errors.")
         }
     }
 }
@@ -761,7 +980,16 @@ private struct ToolkitToolRow: View {
 private struct BuildTestingSection: View {
     @Binding var testEventPayload: String
     let simulatedBuildOutput: [String]
+    @Binding var testSuites: [PluginTestSuite]
+    @Binding var coverageTarget: Double
+    @Binding var enableLoadTesting: Bool
+    @Binding var loadTestConcurrency: Int
+    @Binding var loadTestDuration: Int
+    @Binding var mockResponses: [String: String]
     let onSimulate: () -> Void
+
+    @State private var newMockKey = ""
+    @State private var newMockValue = ""
 
     var body: some View {
         Section("Test Plugin (Sandbox)") {
@@ -786,6 +1014,100 @@ private struct BuildTestingSection: View {
                 }
             }
         }
+
+        Section {
+            VStack(alignment: .leading) {
+                HStack {
+                    Label("Coverage Target", systemImage: "percent")
+                    Spacer()
+                    Text("\(Int(coverageTarget))%").bold().font(.caption)
+                        .foregroundStyle(coverageTarget >= 80 ? .green : (coverageTarget >= 50 ? .orange : .red))
+                }
+                Slider(value: $coverageTarget, in: 0...100, step: 5)
+            }
+
+            if testSuites.isEmpty {
+                Text("No test suites defined.").font(.caption).foregroundStyle(.secondary)
+            } else {
+                ForEach($testSuites) { $suite in
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text(suite.name).font(.subheadline.bold())
+                            Spacer()
+                            if let rate = suite.passRate {
+                                Text("\(Int(rate))% pass")
+                                    .font(.caption2.bold())
+                                    .padding(.horizontal, 6).padding(.vertical, 2)
+                                    .background(rate >= 80 ? Color.green.opacity(0.12) : Color.red.opacity(0.12), in: Capsule())
+                                    .foregroundStyle(rate >= 80 ? .green : .red)
+                            }
+                        }
+                        Text("\(suite.testCases.count) test case(s)")
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+                .onDelete { testSuites.remove(atOffsets: $0) }
+            }
+
+            Button("Add Test Suite", systemImage: "testtube.2") {
+                testSuites.append(PluginTestSuite(name: "Suite \(testSuites.count + 1)", testCases: [
+                    PluginTestCase(name: "Default Test", input: "{}", expectedOutput: "{\"ok\":true}")
+                ]))
+            }
+        } header: {
+            Label("Test Suites & Coverage", systemImage: "checkmark.circle.trianglebadge.exclamationmark")
+        }
+
+        Section {
+            Toggle(isOn: $enableLoadTesting) {
+                Label("Enable Load Testing", systemImage: "bolt.horizontal.fill")
+            }
+
+            if enableLoadTesting {
+                Stepper(value: $loadTestConcurrency, in: 1...100) {
+                    HStack {
+                        Label("Concurrency", systemImage: "person.3.sequence")
+                        Spacer()
+                        Text("\(loadTestConcurrency) threads").bold().font(.caption)
+                    }
+                }
+
+                Stepper(value: $loadTestDuration, in: 5...300, step: 5) {
+                    HStack {
+                        Label("Duration", systemImage: "timer")
+                        Spacer()
+                        Text("\(loadTestDuration)s").bold().font(.caption)
+                    }
+                }
+            }
+        } header: {
+            Label("Performance Testing", systemImage: "gauge.with.needle.fill")
+        }
+
+        Section {
+            if mockResponses.isEmpty {
+                Text("No mock responses configured.").font(.caption).foregroundStyle(.secondary)
+            } else {
+                ForEach(Array(mockResponses.keys.sorted()), id: \.self) { key in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(key).font(.caption.monospaced().bold())
+                        Text(mockResponses[key] ?? "").font(.system(size: 9, design: .monospaced)).foregroundStyle(.secondary).lineLimit(2)
+                    }
+                }
+            }
+            HStack {
+                TextField("Endpoint path", text: $newMockKey).font(.caption.monospaced())
+                TextField("JSON response", text: $newMockValue).font(.caption.monospaced())
+                Button("Add") {
+                    mockResponses[newMockKey] = newMockValue
+                    newMockKey = ""; newMockValue = ""
+                }.disabled(newMockKey.isEmpty)
+            }
+        } header: {
+            Label("Mock Responses", systemImage: "doc.badge.gearshape")
+        } footer: {
+            Text("Define mock API responses for testing without live endpoints.")
+        }
     }
 }
 
@@ -795,6 +1117,12 @@ private struct BuildReleaseSection: View {
     let endpointsCount: Int
     let uiExtensionsCount: Int
     let plugin: PluginDefinition
+    @Binding var releaseChannel: ReleaseChannel
+    @Binding var rolloutPercentage: Double
+    @Binding var deprecationNotice: String
+    @Binding var migrationGuide: String
+    @Binding var signRelease: Bool
+    @Binding var previousVersions: [String]
 
     var body: some View {
         Section("Release & Versioning") {
@@ -821,6 +1149,65 @@ private struct BuildReleaseSection: View {
                     LabeledContent { Text(entry.notes).font(.caption2) } label: { Text("v\(entry.version)").bold() }
                 }
             }
+        }
+
+        Section {
+            Picker("Release Channel", selection: $releaseChannel) {
+                ForEach(ReleaseChannel.allCases) { channel in
+                    Label(channel.rawValue, systemImage: channel.icon).tag(channel)
+                }
+            }
+            .pickerStyle(.menu)
+
+            HStack {
+                Image(systemName: releaseChannel.icon)
+                    .foregroundStyle(releaseChannel.color)
+                Text(releaseChannel.rawValue)
+                    .font(.caption.bold())
+                    .foregroundStyle(releaseChannel.color)
+                Spacer()
+            }
+            .padding(8)
+            .background(releaseChannel.color.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+
+            VStack(alignment: .leading) {
+                HStack {
+                    Label("Rollout Percentage", systemImage: "chart.bar.fill")
+                    Spacer()
+                    Text("\(Int(rolloutPercentage))%").bold().font(.caption)
+                }
+                Slider(value: $rolloutPercentage, in: 1...100, step: 1)
+            }
+
+            Toggle(isOn: $signRelease) {
+                Label("Code Sign Release", systemImage: "signature")
+            }
+        } header: {
+            Label("Distribution Strategy", systemImage: "shippingbox.and.arrow.backward")
+        } footer: {
+            Text("Canary and nightly channels auto-expire after 72 hours.")
+        }
+
+        Section {
+            VStack(alignment: .leading, spacing: 4) {
+                Label("Deprecation Notice", systemImage: "exclamationmark.triangle").font(.caption.bold()).foregroundStyle(.secondary)
+                TextField("Explain what's deprecated and why...", text: $deprecationNotice, axis: .vertical)
+                    .lineLimit(2...4)
+                    .textFieldStyle(.roundedBorder)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Label("Migration Guide", systemImage: "arrow.right.arrow.left").font(.caption.bold()).foregroundStyle(.secondary)
+                TextEditor(text: $migrationGuide)
+                    .font(.system(.caption, design: .monospaced))
+                    .frame(minHeight: 60)
+                    .padding(4)
+                    .background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 8))
+            }
+        } header: {
+            Label("Lifecycle Management", systemImage: "arrow.triangle.branch")
+        } footer: {
+            Text("Provide migration instructions for breaking changes to ease user transitions.")
         }
     }
 }
@@ -1002,6 +1389,120 @@ private struct DocSection: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title).font(.headline)
             Text(text).foregroundStyle(.secondary)
+        }
+    }
+}
+
+// MARK: - Strict Plugin Key Generator
+
+enum PluginKeyPattern {
+    /// Generates a strict-pattern key: `tk-{region}-{timestamp_hex}-{entropy_block}-{checksum}`
+    /// Pattern: `tk-{2 char region}-{8 hex timestamp}-{16 hex entropy}-{4 hex crc}`
+    static func generate(region: String = "us") -> String {
+        let regionCode = String(region.lowercased().prefix(2)).padding(toLength: 2, withPad: "x", startingAt: 0)
+        let timestamp = String(format: "%08x", UInt32(Date().timeIntervalSince1970))
+        let entropy = (0..<16).map { _ in String(format: "%x", Int.random(in: 0...15)) }.joined()
+        let raw = "\(regionCode)\(timestamp)\(entropy)"
+        let checksum = String(format: "%04x", raw.utf8.reduce(0) { ($0 &+ UInt32($1)) & 0xFFFF })
+        return "tk-\(regionCode)-\(timestamp)-\(entropy)-\(checksum)"
+    }
+
+    static func validate(_ key: String) -> Bool {
+        let pattern = #"^tk-[a-z]{2}-[0-9a-f]{8}-[0-9a-f]{16}-[0-9a-f]{4}$"#
+        return key.range(of: pattern, options: .regularExpression) != nil
+    }
+
+    static func decode(_ key: String) -> (region: String, timestamp: Date, entropy: String, checksum: String)? {
+        guard validate(key) else { return nil }
+        let parts = key.split(separator: "-")
+        guard parts.count == 5 else { return nil }
+        let region = String(parts[1])
+        let ts = UInt32(parts[2], radix: 16) ?? 0
+        let date = Date(timeIntervalSince1970: TimeInterval(ts))
+        return (region, date, String(parts[3]), String(parts[4]))
+    }
+}
+
+// MARK: - Supporting Types
+
+enum SandboxExecutionMode: String, CaseIterable, Identifiable {
+    case strict = "Strict"
+    case standard = "Standard"
+    case permissive = "Permissive"
+    var id: String { rawValue }
+    var description: String {
+        switch self {
+        case .strict: return "No network, no filesystem, isolated memory"
+        case .standard: return "Allowlisted network, read-only filesystem"
+        case .permissive: return "Full network, scoped filesystem access"
+        }
+    }
+}
+
+enum ReleaseChannel: String, CaseIterable, Identifiable {
+    case stable = "Stable"
+    case beta = "Beta"
+    case canary = "Canary"
+    case nightly = "Nightly"
+    var id: String { rawValue }
+    var icon: String {
+        switch self {
+        case .stable: return "checkmark.seal.fill"
+        case .beta: return "testtube.2"
+        case .canary: return "bird"
+        case .nightly: return "moon.stars"
+        }
+    }
+    var color: Color {
+        switch self {
+        case .stable: return .green
+        case .beta: return .orange
+        case .canary: return .yellow
+        case .nightly: return .purple
+        }
+    }
+}
+
+enum PluginMarketCategory: String, CaseIterable, Identifiable {
+    case utility = "Utility"
+    case productivity = "Productivity"
+    case integration = "Integration"
+    case analytics = "Analytics"
+    case security = "Security"
+    case ai = "AI / ML"
+    case developer = "Developer Tools"
+    case communication = "Communication"
+    var id: String { rawValue }
+}
+
+struct PluginTestSuite: Identifiable {
+    let id = UUID()
+    var name: String
+    var testCases: [PluginTestCase]
+    var lastRun: Date?
+    var passRate: Double?
+}
+
+struct PluginTestCase: Identifiable {
+    let id = UUID()
+    var name: String
+    var input: String
+    var expectedOutput: String
+    var status: TestCaseStatus = .pending
+
+    enum TestCaseStatus: String {
+        case pending = "Pending"
+        case passed = "Passed"
+        case failed = "Failed"
+        case skipped = "Skipped"
+
+        var color: Color {
+            switch self {
+            case .pending: return .secondary
+            case .passed: return .green
+            case .failed: return .red
+            case .skipped: return .orange
+            }
         }
     }
 }

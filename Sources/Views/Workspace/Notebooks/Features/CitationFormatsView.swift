@@ -101,11 +101,34 @@ class CitationFormatsViewModel: ObservableObject {
     @Published var isGenerating = false
     @Published var savedCitations: [GeneratedCitation] = []
     @Published var recentFormats: [String] = []
+    @Published var annotationNotes: [String: String] = [:]
+    @Published var citationGroups: [CitationGroup] = []
+    @Published var exportFormat: ExportFormat = .plainText
+    @Published var showBatchExport = false
+    @Published var sortOrder: SortOrder = .dateAdded
+    @Published var duplicateWarnings: [String] = []
 
     enum CitationTab: String, CaseIterable {
         case templates = "Templates"
         case generator = "Generator"
         case saved = "Saved"
+        case bibliography = "Bibliography"
+    }
+
+    enum ExportFormat: String, CaseIterable {
+        case plainText = "Plain Text"
+        case richText = "Rich Text"
+        case bibtex = "BibTeX"
+        case ris = "RIS"
+        case endnote = "EndNote XML"
+    }
+
+    enum SortOrder: String, CaseIterable {
+        case dateAdded = "Date Added"
+        case authorAZ = "Author A-Z"
+        case yearDesc = "Year (Newest)"
+        case yearAsc = "Year (Oldest)"
+        case styleGroup = "Style"
     }
 
     var fieldsForSourceType: [CitationField] {
@@ -335,6 +358,62 @@ class CitationFormatsViewModel: ObservableObject {
         chapterTitle = ""
         generatedCitations = []
     }
+
+    func exportAllSaved() -> String {
+        switch exportFormat {
+        case .plainText:
+            return savedCitations.map { "[\($0.style)] \($0.formatted)" }.joined(separator: "\n\n")
+        case .richText:
+            return savedCitations.map { "**\($0.style)**\n\($0.formatted)\nIn-text: \($0.inText)" }.joined(separator: "\n\n---\n\n")
+        case .bibtex:
+            return savedCitations.enumerated().map { i, c in
+                "@misc{ref\(i + 1),\n  title = {\(c.formatted)},\n  note = {\(c.style)}\n}"
+            }.joined(separator: "\n\n")
+        case .ris:
+            return savedCitations.map { c in
+                "TY  - GEN\nTI  - \(c.formatted)\nN1  - \(c.style)\nER  -"
+            }.joined(separator: "\n\n")
+        case .endnote:
+            let entries = savedCitations.map { "<record><titles><title>\($0.formatted)</title></titles><notes>\($0.style)</notes></record>" }.joined()
+            return "<?xml version=\"1.0\"?>\n<xml><records>\(entries)</records></xml>"
+        }
+    }
+
+    func checkDuplicates() {
+        var seen: Set<String> = []
+        duplicateWarnings = []
+        for citation in savedCitations {
+            let normalized = citation.formatted.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+            if seen.contains(normalized) {
+                duplicateWarnings.append(citation.formatted)
+            } else {
+                seen.insert(normalized)
+            }
+        }
+    }
+
+    func addToGroup(_ citation: GeneratedCitation, groupName: String) {
+        if let idx = citationGroups.firstIndex(where: { $0.name == groupName }) {
+            citationGroups[idx].citations.append(citation)
+        } else {
+            citationGroups.append(CitationGroup(name: groupName, citations: [citation]))
+        }
+    }
+
+    var sortedSavedCitations: [GeneratedCitation] {
+        switch sortOrder {
+        case .dateAdded: return savedCitations
+        case .authorAZ: return savedCitations.sorted { $0.formatted < $1.formatted }
+        case .yearDesc, .yearAsc: return savedCitations
+        case .styleGroup: return savedCitations.sorted { $0.style < $1.style }
+        }
+    }
+}
+
+struct CitationGroup: Identifiable {
+    let id = UUID()
+    var name: String
+    var citations: [GeneratedCitation]
 }
 
 // MARK: - Main View
@@ -356,6 +435,8 @@ struct CitationFormatsView: View {
                     generatorTab
                 case .saved:
                     savedTab
+                case .bibliography:
+                    bibliographyTab
                 }
             }
             .background(Color(.systemGroupedBackground))
@@ -407,6 +488,7 @@ struct CitationFormatsView: View {
         case .templates: return "doc.text.magnifyingglass"
         case .generator: return "wand.and.stars"
         case .saved: return "bookmark.fill"
+        case .bibliography: return "books.vertical.fill"
         }
     }
 
@@ -841,7 +923,58 @@ struct CitationFormatsView: View {
                 .padding()
             } else {
                 List {
-                    ForEach(viewModel.savedCitations) { citation in
+                    Section {
+                        HStack {
+                            Label("Sort", systemImage: "arrow.up.arrow.down")
+                                .font(.caption.bold()).foregroundStyle(.secondary)
+                            Picker("Sort", selection: $viewModel.sortOrder) {
+                                ForEach(CitationFormatsViewModel.SortOrder.allCases, id: \.rawValue) {
+                                    Text($0.rawValue).tag($0)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .labelsHidden()
+
+                            Spacer()
+
+                            Text("\(viewModel.savedCitations.count) citation(s)")
+                                .font(.caption2).foregroundStyle(.secondary)
+                        }
+
+                        if !viewModel.duplicateWarnings.isEmpty {
+                            HStack(spacing: 6) {
+                                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange).font(.caption)
+                                Text("\(viewModel.duplicateWarnings.count) duplicate(s) detected")
+                                    .font(.caption2.bold()).foregroundStyle(.orange)
+                            }
+                        }
+
+                        HStack(spacing: 8) {
+                            Button {
+                                viewModel.checkDuplicates()
+                            } label: {
+                                Label("Check Duplicates", systemImage: "doc.on.doc.fill")
+                                    .font(.caption2.bold())
+                            }
+                            .buttonStyle(.bordered).controlSize(.small)
+
+                            Picker("Export", selection: $viewModel.exportFormat) {
+                                ForEach(CitationFormatsViewModel.ExportFormat.allCases, id: \.rawValue) {
+                                    Text($0.rawValue).tag($0)
+                                }
+                            }
+                            .pickerStyle(.menu).controlSize(.small)
+
+                            ShareLink(item: viewModel.exportAllSaved()) {
+                                Label("Export", systemImage: "square.and.arrow.up")
+                                    .font(.caption2.bold())
+                            }
+                            .buttonStyle(.bordered).controlSize(.small)
+                        }
+                    }
+                    .listRowBackground(Color.clear)
+
+                    ForEach(viewModel.sortedSavedCitations) { citation in
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 Text(citation.style)
@@ -871,6 +1004,145 @@ struct CitationFormatsView: View {
                     }
                 }
             }
+        }
+    }
+
+    // MARK: - Bibliography Tab
+
+    @State private var newGroupName = ""
+
+    private var bibliographyTab: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Bibliography Builder", systemImage: "books.vertical.fill")
+                        .font(.headline)
+                    Text("Organize citations into groups to build structured bibliographies for your papers.")
+                        .font(.caption).foregroundColor(.secondary)
+
+                    HStack {
+                        TextField("New group name...", text: $newGroupName)
+                            .textFieldStyle(.roundedBorder)
+                        Button("Create") {
+                            guard !newGroupName.isEmpty else { return }
+                            viewModel.citationGroups.append(CitationGroup(name: newGroupName, citations: []))
+                            newGroupName = ""
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(newGroupName.isEmpty)
+                    }
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+
+                if viewModel.citationGroups.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "folder.badge.plus")
+                            .font(.system(size: 48))
+                            .foregroundColor(.secondary)
+                        Text("No Bibliography Groups")
+                            .font(.headline)
+                        Text("Create groups to organize your saved citations into bibliographies.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.vertical, 40)
+                } else {
+                    ForEach($viewModel.citationGroups) { $group in
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                Image(systemName: "folder.fill").foregroundColor(.accentColor)
+                                Text(group.name).font(.subheadline.bold())
+                                Spacer()
+                                Text("\(group.citations.count) item(s)")
+                                    .font(.caption2).foregroundColor(.secondary)
+                            }
+
+                            if group.citations.isEmpty {
+                                Text("Drag citations here or add from Saved tab.")
+                                    .font(.caption2).foregroundColor(.secondary).italic()
+                                    .padding(.vertical, 8)
+                            } else {
+                                ForEach(group.citations) { citation in
+                                    HStack(spacing: 8) {
+                                        Text(citation.style)
+                                            .font(.system(size: 8, weight: .bold))
+                                            .padding(.horizontal, 6).padding(.vertical, 2)
+                                            .background(Color.accentColor.opacity(0.15), in: Capsule())
+                                        Text(citation.formatted)
+                                            .font(.caption2).lineLimit(1)
+                                        Spacer()
+                                    }
+                                    .padding(6)
+                                    .background(Color(.tertiarySystemBackground), in: RoundedRectangle(cornerRadius: 6))
+                                }
+                            }
+
+                            HStack(spacing: 8) {
+                                ShareLink(item: group.citations.map(\.formatted).joined(separator: "\n\n")) {
+                                    Label("Export Group", systemImage: "square.and.arrow.up")
+                                        .font(.caption2.bold())
+                                }
+                                .buttonStyle(.bordered).controlSize(.small)
+
+                                Button {
+                                    UIPasteboard.general.string = group.citations.map(\.formatted).joined(separator: "\n\n")
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                } label: {
+                                    Label("Copy All", systemImage: "doc.on.doc")
+                                        .font(.caption2.bold())
+                                }
+                                .buttonStyle(.bordered).controlSize(.small)
+                            }
+                        }
+                        .padding()
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Label("Quick Add from Saved", systemImage: "plus.circle.fill")
+                        .font(.subheadline.bold())
+
+                    if viewModel.savedCitations.isEmpty {
+                        Text("No saved citations to add. Generate and save citations first.")
+                            .font(.caption).foregroundColor(.secondary)
+                    } else if viewModel.citationGroups.isEmpty {
+                        Text("Create a group above first.")
+                            .font(.caption).foregroundColor(.secondary)
+                    } else {
+                        ForEach(viewModel.savedCitations) { citation in
+                            HStack {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(citation.style).font(.caption2.bold()).foregroundColor(.accentColor)
+                                    Text(citation.formatted).font(.caption2).lineLimit(1)
+                                }
+                                Spacer()
+                                Menu {
+                                    ForEach(viewModel.citationGroups) { group in
+                                        Button(group.name) {
+                                            viewModel.addToGroup(citation, groupName: group.name)
+                                        }
+                                    }
+                                } label: {
+                                    Label("Add to...", systemImage: "folder.badge.plus")
+                                        .font(.caption2.bold())
+                                }
+                                .controlSize(.small)
+                            }
+                            .padding(8)
+                            .background(Color(.tertiarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .padding()
         }
     }
 

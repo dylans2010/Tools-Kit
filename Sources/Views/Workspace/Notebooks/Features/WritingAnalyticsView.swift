@@ -6,6 +6,44 @@ struct WritingAnalyticsView: View {
     @Binding var isPresented: Bool
     @StateObject private var vm = WritingAnalyticsViewModel()
 
+    @State private var showExportSheet = false
+    @State private var selectedExportFormat: AnalyticsExportFormat = .summary
+    @State private var comparisonBaseline: WritingBaseline = .academic
+    @State private var showWritingScore = true
+
+    enum AnalyticsExportFormat: String, CaseIterable {
+        case summary = "Summary Report"
+        case detailed = "Detailed Metrics"
+        case csv = "CSV Data"
+    }
+
+    enum WritingBaseline: String, CaseIterable {
+        case academic = "Academic"
+        case journalism = "Journalism"
+        case creative = "Creative Writing"
+        case technical = "Technical"
+        case business = "Business"
+
+        var targetReadability: Double {
+            switch self {
+            case .academic: return 35
+            case .journalism: return 65
+            case .creative: return 70
+            case .technical: return 40
+            case .business: return 55
+            }
+        }
+        var targetSentenceLength: Double {
+            switch self {
+            case .academic: return 22
+            case .journalism: return 16
+            case .creative: return 18
+            case .technical: return 20
+            case .business: return 15
+            }
+        }
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -30,10 +68,104 @@ struct WritingAnalyticsView: View {
                         Text(documentTitle).font(.caption).foregroundColor(.secondary)
                     }
                 }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Section("Export") {
+                            ForEach(AnalyticsExportFormat.allCases, id: \.rawValue) { fmt in
+                                Button {
+                                    selectedExportFormat = fmt
+                                    showExportSheet = true
+                                } label: {
+                                    Label(fmt.rawValue, systemImage: "square.and.arrow.up")
+                                }
+                            }
+                        }
+                        Section("Baseline") {
+                            ForEach(WritingBaseline.allCases, id: \.rawValue) { baseline in
+                                Button {
+                                    comparisonBaseline = baseline
+                                } label: {
+                                    HStack {
+                                        Text(baseline.rawValue)
+                                        if comparisonBaseline == baseline {
+                                            Image(systemName: "checkmark")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
             }
             .onAppear {
                 vm.runAnalysis(text: documentText)
             }
+            .sheet(isPresented: $showExportSheet) {
+                analyticsExportView
+            }
+        }
+    }
+
+    private var analyticsExportView: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text(analyticsReportText)
+                        .font(.system(.caption, design: .monospaced))
+                        .textSelection(.enabled)
+                        .padding()
+                }
+            }
+            .navigationTitle("Export")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ShareLink(item: analyticsReportText) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Done") { showExportSheet = false }
+                }
+            }
+        }
+    }
+
+    private var analyticsReportText: String {
+        switch selectedExportFormat {
+        case .summary:
+            return """
+            Writing Analytics Report — \(documentTitle)
+            ===========================================
+            Words: \(vm.stats.wordCount)
+            Sentences: \(vm.stats.sentenceCount)
+            Paragraphs: \(vm.stats.paragraphCount)
+            Characters: \(vm.stats.charCount)
+            Readability: \(String(format: "%.1f", vm.stats.readabilityScore))
+            Avg Sentence Length: \(String(format: "%.1f", vm.stats.averageSentenceLength)) words
+            Baseline: \(comparisonBaseline.rawValue)
+            """
+        case .detailed:
+            return """
+            DETAILED WRITING ANALYTICS — \(documentTitle)
+            =============================================
+            Word Count: \(vm.stats.wordCount)
+            Sentence Count: \(vm.stats.sentenceCount)
+            Paragraph Count: \(vm.stats.paragraphCount)
+            Character Count: \(vm.stats.charCount)
+            Readability Score: \(String(format: "%.1f", vm.stats.readabilityScore))
+            Average Sentence Length: \(String(format: "%.1f", vm.stats.averageSentenceLength))
+            Unique Words: \(vm.stats.uniqueWordCount)
+            Lexical Density: \(String(format: "%.1f%%", vm.stats.lexicalDensity))
+            Dominant Tone: \(vm.stats.dominantTone)
+            Comparison Baseline: \(comparisonBaseline.rawValue)
+            Target Readability: \(String(format: "%.0f", comparisonBaseline.targetReadability))
+            Target Sentence Length: \(String(format: "%.0f", comparisonBaseline.targetSentenceLength))
+            """
+        case .csv:
+            return "metric,value\nwords,\(vm.stats.wordCount)\nsentences,\(vm.stats.sentenceCount)\nparagraphs,\(vm.stats.paragraphCount)\ncharacters,\(vm.stats.charCount)\nreadability,\(vm.stats.readabilityScore)\navg_sentence_length,\(vm.stats.averageSentenceLength)\nunique_words,\(vm.stats.uniqueWordCount)\nlexical_density,\(vm.stats.lexicalDensity)"
         }
     }
 
@@ -86,6 +218,10 @@ struct WritingAnalyticsView: View {
     // MARK: - Overview Tab
     private var overviewTab: some View {
         VStack(alignment: .leading, spacing: 24) {
+            if showWritingScore {
+                writingScoreCard
+            }
+
             GroupBox {
                 VStack(alignment: .leading, spacing: 16) {
                     Label("Quick Stats", systemImage: "bolt.fill")
@@ -128,6 +264,8 @@ struct WritingAnalyticsView: View {
                     .padding()
                     .background(Color.green.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
                 }
+
+                baselineComparisonCard
             }
 
             VStack(alignment: .leading, spacing: 16) {
@@ -1019,6 +1157,138 @@ struct WritingAnalyticsView: View {
                 ProgressView(value: min(current, goal), total: goal)
                     .tint(current >= goal ? .green : .accentColor)
             }
+        }
+    }
+
+    // MARK: - Writing Score Card
+
+    private var computedWritingScore: Int {
+        var score = 50
+        let readability = vm.stats.readabilityScore
+        if readability >= 60 && readability <= 80 { score += 15 }
+        else if readability >= 40 { score += 8 }
+        let avgSentence = vm.stats.averageSentenceLength
+        if avgSentence >= 12 && avgSentence <= 22 { score += 15 }
+        else if avgSentence >= 8 { score += 5 }
+        let density = vm.stats.lexicalDensity
+        if density >= 40 && density <= 65 { score += 10 }
+        if vm.stats.paragraphCount >= 3 { score += 5 }
+        if vm.stats.wordCount >= 200 { score += 5 }
+        return min(100, score)
+    }
+
+    private var scoreGrade: (letter: String, color: Color) {
+        let s = computedWritingScore
+        if s >= 90 { return ("A+", .green) }
+        if s >= 80 { return ("A", .green) }
+        if s >= 70 { return ("B", .blue) }
+        if s >= 60 { return ("C", .orange) }
+        if s >= 50 { return ("D", .red) }
+        return ("F", .red)
+    }
+
+    private var writingScoreCard: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Label("Writing Score", systemImage: "star.fill")
+                    .font(.headline)
+                    .foregroundStyle(.indigo)
+                Spacer()
+                Text(scoreGrade.letter)
+                    .font(.system(size: 28, weight: .black, design: .rounded))
+                    .foregroundStyle(scoreGrade.color)
+            }
+
+            HStack(spacing: 16) {
+                ZStack {
+                    Circle()
+                        .stroke(Color.secondary.opacity(0.15), lineWidth: 8)
+                        .frame(width: 72, height: 72)
+                    Circle()
+                        .trim(from: 0, to: CGFloat(computedWritingScore) / 100)
+                        .stroke(scoreGrade.color, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                        .frame(width: 72, height: 72)
+                        .rotationEffect(.degrees(-90))
+                    Text("\(computedWritingScore)")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    scoreMetricRow("Readability", value: vm.stats.readabilityScore, target: comparisonBaseline.targetReadability)
+                    scoreMetricRow("Sentence Flow", value: vm.stats.averageSentenceLength, target: comparisonBaseline.targetSentenceLength)
+                    scoreMetricRow("Vocabulary", value: vm.stats.lexicalDensity, target: 55)
+                }
+            }
+        }
+        .padding()
+        .background(Color.indigo.opacity(0.04), in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func scoreMetricRow(_ label: String, value: Double, target: Double) -> some View {
+        HStack(spacing: 6) {
+            let delta = value - target
+            Image(systemName: abs(delta) < 10 ? "checkmark.circle.fill" : (delta > 0 ? "arrow.up.circle" : "arrow.down.circle"))
+                .font(.caption2)
+                .foregroundStyle(abs(delta) < 10 ? .green : .orange)
+            Text(label).font(.caption2).foregroundStyle(.secondary)
+            Spacer()
+            Text(String(format: "%.0f", value)).font(.caption2.bold())
+            Text("/ \(String(format: "%.0f", target))").font(.system(size: 8)).foregroundStyle(.secondary)
+        }
+    }
+
+    // MARK: - Baseline Comparison Card
+
+    private var baselineComparisonCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("Baseline: \(comparisonBaseline.rawValue)", systemImage: "ruler")
+                    .font(.caption.bold())
+                Spacer()
+                Menu {
+                    ForEach(WritingBaseline.allCases, id: \.rawValue) { b in
+                        Button(b.rawValue) { comparisonBaseline = b }
+                    }
+                } label: {
+                    Text("Change").font(.caption2.bold()).foregroundStyle(.accentColor)
+                }
+            }
+
+            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 6) {
+                GridRow {
+                    Text("Metric").font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary)
+                    Text("Yours").font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary)
+                    Text("Target").font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary)
+                    Text("Status").font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary)
+                }
+                Divider()
+                GridRow {
+                    Text("Readability").font(.caption2)
+                    Text(String(format: "%.0f", vm.stats.readabilityScore)).font(.caption2.bold())
+                    Text(String(format: "%.0f", comparisonBaseline.targetReadability)).font(.caption2)
+                    baselineStatusIcon(value: vm.stats.readabilityScore, target: comparisonBaseline.targetReadability)
+                }
+                GridRow {
+                    Text("Avg Sentence").font(.caption2)
+                    Text(String(format: "%.1f", vm.stats.averageSentenceLength)).font(.caption2.bold())
+                    Text(String(format: "%.0f", comparisonBaseline.targetSentenceLength)).font(.caption2)
+                    baselineStatusIcon(value: vm.stats.averageSentenceLength, target: comparisonBaseline.targetSentenceLength)
+                }
+            }
+        }
+        .padding()
+        .background(Color.secondary.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func baselineStatusIcon(value: Double, target: Double) -> some View {
+        let delta = abs(value - target)
+        let pct = target > 0 ? delta / target : 0
+        if pct < 0.15 {
+            return Image(systemName: "checkmark.circle.fill").font(.caption2).foregroundStyle(.green)
+        } else if pct < 0.35 {
+            return Image(systemName: "arrow.triangle.2.circlepath").font(.caption2).foregroundStyle(.orange)
+        } else {
+            return Image(systemName: "exclamationmark.triangle.fill").font(.caption2).foregroundStyle(.red)
         }
     }
 }
