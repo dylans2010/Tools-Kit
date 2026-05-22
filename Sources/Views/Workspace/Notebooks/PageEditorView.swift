@@ -25,6 +25,8 @@ struct PageEditorView: View {
     @State private var aiResult = ""
     @State private var aiLoading = false
     @State private var aiTask = ""
+    @State private var customAIPrompt = ""
+    @State private var showingCustomAIInput = false
 
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var showingFilePicker = false
@@ -165,7 +167,7 @@ struct PageEditorView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 if isPreview {
-                    MarkdownRenderedView(markdown: content)
+                    previewContent
                         .padding()
                 } else {
                     TextEditor(text: $content)
@@ -176,6 +178,128 @@ struct PageEditorView: View {
             }
             .padding(.top)
         }
+    }
+
+    private var previewContent: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            let lines = content.components(separatedBy: "\n")
+            ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
+                let trimmed = line.trimmingCharacters(in: .whitespaces)
+                if isImageLine(trimmed) {
+                    renderImageLine(trimmed)
+                } else if isAttachmentLine(trimmed) {
+                    renderAttachmentLine(trimmed)
+                } else {
+                    MarkdownRenderedView(markdown: line)
+                }
+            }
+        }
+    }
+
+    private func isImageLine(_ line: String) -> Bool {
+        line.hasPrefix("![") && line.contains("](") && line.hasSuffix(")")
+    }
+
+    private func isAttachmentLine(_ line: String) -> Bool {
+        line.hasPrefix("[") && line.contains("](attachment://") && line.hasSuffix(")")
+    }
+
+    private func renderImageLine(_ line: String) -> some View {
+        let urlString = extractURL(from: line)
+        let altText = extractAltText(from: line)
+        return VStack(alignment: .leading, spacing: 4) {
+            if let url = URL(string: urlString), urlString.hasPrefix("http") {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    case .failure:
+                        imageErrorPlaceholder(altText)
+                    case .empty:
+                        ProgressView()
+                            .frame(maxWidth: .infinity, minHeight: 120)
+                    @unknown default:
+                        imageErrorPlaceholder(altText)
+                    }
+                }
+            } else {
+                imageErrorPlaceholder(altText)
+            }
+            if !altText.isEmpty {
+                Text(altText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .italic()
+            }
+        }
+    }
+
+    private func renderAttachmentLine(_ line: String) -> some View {
+        let fileName = extractLinkText(from: line)
+        let ext = (fileName as NSString).pathExtension.lowercased()
+        let isImage = ["jpg", "jpeg", "png", "gif", "webp", "heic", "bmp", "tiff", "svg"].contains(ext)
+        let isPDF = ext == "pdf"
+        let isVideo = ["mp4", "mov", "avi", "mkv", "m4v"].contains(ext)
+        let isAudio = ["mp3", "wav", "m4a", "aac", "flac"].contains(ext)
+
+        return HStack(spacing: 12) {
+            Image(systemName: isImage ? "photo" : isPDF ? "doc.richtext" : isVideo ? "film" : isAudio ? "waveform" : "paperclip")
+                .font(.title3)
+                .foregroundStyle(isImage ? .blue : isPDF ? .red : isVideo ? .purple : isAudio ? .orange : .secondary)
+                .frame(width: 40, height: 40)
+                .background(Color(.tertiarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(fileName)
+                    .font(.subheadline.weight(.medium))
+                Text(ext.uppercased() + " file")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Image(systemName: "arrow.down.circle")
+                .foregroundStyle(.secondary)
+        }
+        .padding(10)
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    private func imageErrorPlaceholder(_ alt: String) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: "photo.badge.exclamationmark")
+                .font(.title2)
+                .foregroundStyle(.secondary)
+            Text(alt.isEmpty ? "Image" : alt)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, minHeight: 100)
+        .background(Color(.tertiarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    private func extractURL(from line: String) -> String {
+        guard let openParen = line.range(of: "]("),
+              let closeParen = line.range(of: ")", range: openParen.upperBound..<line.endIndex) else { return "" }
+        return String(line[openParen.upperBound..<closeParen.lowerBound])
+    }
+
+    private func extractAltText(from line: String) -> String {
+        guard let start = line.firstIndex(of: "["),
+              let end = line.range(of: "](") else { return "" }
+        let afterBracket = line.index(after: start)
+        guard afterBracket < end.lowerBound else { return "" }
+        return String(line[afterBracket..<end.lowerBound])
+    }
+
+    private func extractLinkText(from line: String) -> String {
+        guard let start = line.firstIndex(of: "["),
+              let end = line.range(of: "](") else { return "" }
+        let afterBracket = line.index(after: start)
+        guard afterBracket < end.lowerBound else { return "" }
+        return String(line[afterBracket..<end.lowerBound])
     }
 
     private var bottomToolbar: some View {
@@ -201,9 +325,25 @@ struct PageEditorView: View {
 
                     toolbarButton(icon: "sparkles", label: "AI") { showingAI = true }
                         .confirmationDialog("AI Assistant", isPresented: $showingAI) {
-                            Button("Summarize") { runAI("Summarize", "Summarize these notes: \(content)") }
-                            Button("Action Items") { runAI("Action Items", "Extract action items: \(content)") }
+                            Button("Summarize") { runAI("Summarize", "Summarize these notes concisely: \(content)") }
+                            Button("Action Items") { runAI("Action Items", "Extract action items from: \(content)") }
+                            Button("Expand Ideas") { runAI("Expand", "Expand on the key ideas in: \(content)") }
+                            Button("Fix Grammar") { runAI("Grammar", "Fix grammar and spelling in: \(content)") }
+                            Button("Simplify Language") { runAI("Simplify", "Simplify the language in: \(content)") }
+                            Button("Make Professional") { runAI("Professional", "Rewrite in a professional tone: \(content)") }
+                            Button("Translate to Spanish") { runAI("Translate", "Translate to Spanish: \(content)") }
+                            Button("Generate Outline") { runAI("Outline", "Create a structured outline from: \(content)") }
+                            Button("Key Takeaways") { runAI("Takeaways", "Extract key takeaways from: \(content)") }
+                            Button("Create Quiz") { runAI("Quiz", "Create a quiz with questions and answers from: \(content)") }
+                            Button("Generate Title") { runAI("Title", "Suggest 5 titles for: \(content)") }
+                            Button("Add Citations") { runAI("Citations", "Add suggested citations and references for: \(content)") }
+                            Button("Explain Like I'm 5") { runAI("ELI5", "Explain this content simply for a beginner: \(content)") }
+                            Button("Find Contradictions") { runAI("Contradictions", "Find any contradictions or inconsistencies in: \(content)") }
+                            Button("Custom Prompt...") { showingCustomAIInput = true }
                             Button("Cancel", role: .cancel) {}
+                        }
+                        .sheet(isPresented: $showingCustomAIInput) {
+                            customAIInputSheet
                         }
 
                     toolbarButton(icon: "chart.bar.doc.horizontal", label: "Analytics") { showingAnalytics = true }
@@ -305,23 +445,102 @@ struct PageEditorView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     if aiLoading {
-                        ProgressView().frame(maxWidth: .infinity).padding(.top, 40)
+                        VStack(spacing: 16) {
+                            Spacer().frame(height: 40)
+                            Text("Processing with AI...")
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
+                            Text(aiTask)
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
+                        .frame(maxWidth: .infinity)
                     } else {
-                        Text((try? AttributedString(markdown: aiResult)) ?? AttributedString(aiResult))
+                        MarkdownRenderedView(markdown: aiResult)
                             .padding()
                     }
                 }
             }
-            .navigationTitle("AI Result")
+            .aiAnimationLoading(aiLoading)
+            .navigationTitle(aiTask.isEmpty ? "AI Result" : aiTask)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { showingAIResult = false }
                 }
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Copy") { UIPasteboard.general.string = aiResult }
+                    Button {
+                        UIPasteboard.general.string = aiResult
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.clipboard")
+                    }
+                }
+                ToolbarItem(placement: .bottomBar) {
+                    Button {
+                        content += "\n\n" + aiResult
+                        showingAIResult = false
+                    } label: {
+                        Label("Insert into Page", systemImage: "plus.square.on.square")
+                    }
+                    .disabled(aiResult.isEmpty || aiLoading)
                 }
             }
         }
+    }
+
+    private var customAIInputSheet: some View {
+        NavigationStack {
+            VStack(spacing: 16) {
+                Text("Enter your custom prompt")
+                    .font(.headline)
+                    .padding(.top, 16)
+
+                Text("The AI will process your page content based on your instructions.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+
+                TextEditor(text: $customAIPrompt)
+                    .font(.body)
+                    .frame(minHeight: 120)
+                    .padding(10)
+                    .background(Color(.tertiarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
+                    .overlay(alignment: .topLeading) {
+                        if customAIPrompt.isEmpty {
+                            Text("e.g. Rewrite this as bullet points, Convert to a table...")
+                                .foregroundStyle(.tertiary)
+                                .padding(.top, 18)
+                                .padding(.leading, 14)
+                                .allowsHitTesting(false)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+
+                Spacer()
+            }
+            .navigationTitle("Custom AI Prompt")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        showingCustomAIInput = false
+                        customAIPrompt = ""
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Run") {
+                        let prompt = customAIPrompt
+                        showingCustomAIInput = false
+                        customAIPrompt = ""
+                        runAI("Custom", "\(prompt)\n\nContent:\n\(content)")
+                    }
+                    .bold()
+                    .disabled(customAIPrompt.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+            }
+        }
+        .presentationDetents([.medium])
     }
 
     private func runIntegration(_ tool: IntegrationTool) {

@@ -21,6 +21,8 @@ struct NotebookDetailView: View {
     @State private var aiInsights: NotebooksManager.AINotebookInsights?
     @State private var notebookArtwork: UIImage?
     @State private var photoPickerItem: PhotosPickerItem?
+    @AppStorage("notebookCoverData") private var savedCoverData: Data = Data()
+    @State private var showingToolsDropdown = false
 
     private enum FolderSort: String, CaseIterable, Identifiable {
         case recent = "Recent"
@@ -112,9 +114,15 @@ struct NotebookDetailView: View {
             Task {
                 if let data = try? await newItem.loadTransferable(type: Data.self),
                    let image = UIImage(data: data) {
-                    await MainActor.run { notebookArtwork = image }
+                    await MainActor.run {
+                        notebookArtwork = image
+                        saveCoverToAppStorage(image)
+                    }
                 }
             }
+        }
+        .onAppear {
+            loadCoverFromAppStorage()
         }
     }
 
@@ -235,18 +243,51 @@ struct NotebookDetailView: View {
             }
             .padding(.horizontal, 4)
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 95))], spacing: 10) {
-                modernQuickTool("Add Folder", icon: "folder.badge.plus", color: .blue) { showingCreateFolder = true }
-                modernQuickTool("Starter", icon: "folder.fill.badge.plus", color: .indigo) { addStarterFolder() }
-                modernQuickTool("Duplicate", icon: "doc.on.doc", color: .purple) { duplicateFirstFolder() }
-                modernQuickTool("Sort A–Z", icon: "textformat", color: .orange) { selectedSort = .alphabetical }
-                modernQuickTool("Sort Pages", icon: "number", color: .teal) { selectedSort = .pages }
-                modernQuickTool("Recent", icon: "clock.arrow.circlepath", color: .cyan) { selectedSort = .recent }
-                modernQuickTool("Clean", icon: "trash.slash", color: .red) { removeEmptyFolders() }
-                modernQuickTool("AI Tools", icon: "brain.head.profile", color: .green) { showingAISheet = true }
-                modernQuickTool("Integrations", icon: "puzzlepiece.extension", color: .mint) { showingIntegrations = true }
+            DisclosureGroup(isExpanded: $showingToolsDropdown) {
+                VStack(spacing: 2) {
+                    toolDropdownItem("Add Folder", icon: "folder.badge.plus", color: .blue) { showingCreateFolder = true }
+                    toolDropdownItem("Add Starter Folder", icon: "folder.fill.badge.plus", color: .indigo) { addStarterFolder() }
+                    toolDropdownItem("Duplicate First Folder", icon: "doc.on.doc", color: .purple) { duplicateFirstFolder() }
+                    Divider().padding(.vertical, 4)
+                    toolDropdownItem("Sort Alphabetically", icon: "textformat.abc", color: .orange) { selectedSort = .alphabetical }
+                    toolDropdownItem("Sort by Page Count", icon: "number", color: .teal) { selectedSort = .pages }
+                    toolDropdownItem("Sort by Recent", icon: "clock.arrow.circlepath", color: .cyan) { selectedSort = .recent }
+                    Divider().padding(.vertical, 4)
+                    toolDropdownItem("Remove Empty Folders", icon: "trash.slash", color: .red) { removeEmptyFolders() }
+                    toolDropdownItem("AI Notebook Tools", icon: "brain.head.profile", color: .green) { showingAISheet = true }
+                    toolDropdownItem("Integrations", icon: "puzzlepiece.extension", color: .mint) { showingIntegrations = true }
+                }
+                .padding(.top, 8)
+            } label: {
+                Label("Quick Actions", systemImage: "bolt.circle.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
             }
+            .padding(14)
+            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .tint(.accentColor)
         }
+    }
+
+    private func toolDropdownItem(_ title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 15))
+                    .foregroundStyle(color)
+                    .frame(width: 30, height: 30)
+                    .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+                Text(title)
+                    .font(.subheadline)
+                    .foregroundStyle(.primary)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.vertical, 6)
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder
@@ -557,6 +598,22 @@ struct NotebookDetailView: View {
 
     private func handleImagePlaygroundResult(_ url: URL) {
         if let data = try? Data(contentsOf: url),
+           let image = UIImage(data: data) {
+            notebookArtwork = image
+            saveCoverToAppStorage(image)
+        }
+    }
+
+    private func saveCoverToAppStorage(_ image: UIImage) {
+        let key = "notebookCover_\(notebook.id.uuidString)"
+        if let data = image.jpegData(compressionQuality: 0.7) {
+            UserDefaults.standard.set(data, forKey: key)
+        }
+    }
+
+    private func loadCoverFromAppStorage() {
+        let key = "notebookCover_\(notebook.id.uuidString)"
+        if let data = UserDefaults.standard.data(forKey: key),
            let image = UIImage(data: data) {
             notebookArtwork = image
         }

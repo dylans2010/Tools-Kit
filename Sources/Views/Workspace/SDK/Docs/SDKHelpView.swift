@@ -7,6 +7,7 @@ struct SDKHelpView: View {
     @State private var selectedTopic: QuickTopic?
     @State private var showingTopicPicker = false
     @State private var activeTask: Task<Void, Never>?
+    @State private var selectedCategory: TopicCategory = .all
 
     struct HelpMessage: Identifiable {
         let id = UUID()
@@ -15,6 +16,15 @@ struct SDKHelpView: View {
         let timestamp: Date
 
         enum Role: String { case user, assistant }
+    }
+
+    enum TopicCategory: String, CaseIterable, Identifiable {
+        case all = "All"
+        case core = "Core"
+        case integration = "Integration"
+        case advanced = "Advanced"
+
+        var id: String { rawValue }
     }
 
     enum QuickTopic: String, CaseIterable, Identifiable {
@@ -28,6 +38,14 @@ struct SDKHelpView: View {
         case troubleshoot = "Troubleshooting"
 
         var id: String { rawValue }
+
+        var category: TopicCategory {
+            switch self {
+            case .modules, .plugins, .data: return .core
+            case .connectors, .dependencies: return .integration
+            case .security, .events, .troubleshoot: return .advanced
+            }
+        }
 
         var prompt: String {
             switch self {
@@ -54,6 +72,24 @@ struct SDKHelpView: View {
             case .troubleshoot: return "wrench.and.screwdriver"
             }
         }
+
+        var gradient: [Color] {
+            switch self {
+            case .modules: return [.blue, .cyan]
+            case .plugins: return [.purple, .indigo]
+            case .connectors: return [.green, .mint]
+            case .dependencies: return [.orange, .yellow]
+            case .security: return [.red, .pink]
+            case .events: return [.teal, .blue]
+            case .data: return [.indigo, .purple]
+            case .troubleshoot: return [.orange, .red]
+            }
+        }
+    }
+
+    private var filteredTopics: [QuickTopic] {
+        if selectedCategory == .all { return QuickTopic.allCases }
+        return QuickTopic.allCases.filter { $0.category == selectedCategory }
     }
 
     var body: some View {
@@ -65,13 +101,14 @@ struct SDKHelpView: View {
             }
             inputBar
         }
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("SDK Help")
         .toolbarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
                     Button(role: .destructive) {
-                        conversation.removeAll()
+                        withAnimation { conversation.removeAll() }
                     } label: {
                         Label("Clear Chat", systemImage: "trash")
                     }
@@ -82,6 +119,7 @@ struct SDKHelpView: View {
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle.fill")
+                        .symbolRenderingMode(.hierarchical)
                 }
             }
         }
@@ -113,13 +151,30 @@ struct SDKHelpView: View {
 
     private var emptyState: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                VStack(spacing: 8) {
-                    Image(systemName: "questionmark.bubble.fill")
-                        .font(.system(size: 48))
-                        .foregroundStyle(Color.accentColor.opacity(0.6))
+            VStack(spacing: 28) {
+                VStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [.blue.opacity(0.2), .purple.opacity(0.15)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 80, height: 80)
+                        Image(systemName: "questionmark.bubble.fill")
+                            .font(.system(size: 36))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [.blue, .purple],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    }
                     Text("SDK Help Assistant")
-                        .font(.title3.bold())
+                        .font(.title2.bold())
                     Text("Ask about modules, plugins, connectors, dependencies, or any SDK feature.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -127,57 +182,118 @@ struct SDKHelpView: View {
                         .padding(.horizontal, 32)
                 }
 
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(TopicCategory.allCases) { cat in
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.2)) { selectedCategory = cat }
+                            } label: {
+                                Text(cat.rawValue)
+                                    .font(.caption.weight(.semibold))
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 7)
+                                    .background(
+                                        selectedCategory == cat
+                                            ? Color.accentColor
+                                            : Color(.tertiarySystemBackground),
+                                        in: Capsule()
+                                    )
+                                    .foregroundStyle(selectedCategory == cat ? .white : .primary)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                }
+
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                    ForEach(QuickTopic.allCases) { topic in
+                    ForEach(filteredTopics) { topic in
                         Button {
                             submitQuery(topic.prompt)
                         } label: {
-                            VStack(spacing: 6) {
-                                Image(systemName: topic.icon)
-                                    .font(.title3)
+                            VStack(spacing: 10) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: topic.gradient.map { $0.opacity(0.15) },
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                        .frame(width: 44, height: 44)
+                                    Image(systemName: topic.icon)
+                                        .font(.system(size: 20))
+                                        .foregroundStyle(
+                                            LinearGradient(
+                                                colors: topic.gradient,
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                }
                                 Text(topic.rawValue)
                                     .font(.caption.bold())
+                                    .foregroundStyle(.primary)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 12))
+                            .padding(.vertical, 16)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .fill(Color(.secondarySystemGroupedBackground))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .stroke(Color(.separator).opacity(0.2), lineWidth: 1)
+                            )
                         }
                         .buttonStyle(.plain)
                     }
                 }
                 .padding(.horizontal, 16)
+                .animation(.easeInOut(duration: 0.25), value: selectedCategory)
             }
-            .padding(.top, 40)
+            .padding(.top, 32)
+            .padding(.bottom, 16)
         }
     }
 
     private var conversationList: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 12) {
+                LazyVStack(alignment: .leading, spacing: 16) {
                     ForEach(conversation) { message in
-                        HStack(alignment: .top, spacing: 8) {
+                        HStack(alignment: .top, spacing: 10) {
                             if message.role == .assistant {
-                                Image(systemName: "cpu")
-                                    .font(.caption)
-                                    .foregroundStyle(Color.accentColor)
-                                    .padding(.top, 4)
+                                ZStack {
+                                    Circle()
+                                        .fill(Color.accentColor.opacity(0.12))
+                                        .frame(width: 28, height: 28)
+                                    Image(systemName: "cpu")
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(Color.accentColor)
+                                }
+                                .padding(.top, 2)
                             }
-                            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
+                            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 6) {
                                 if message.role == .assistant {
                                     SDKMarkdownView(text: message.content)
-                                        .padding(10)
+                                        .padding(12)
                                         .background(
-                                            Color.primary.opacity(0.04),
-                                            in: RoundedRectangle(cornerRadius: 12)
+                                            Color(.secondarySystemGroupedBackground),
+                                            in: RoundedRectangle(cornerRadius: 14, style: .continuous)
                                         )
                                 } else {
                                     Text(message.content)
                                         .font(.subheadline)
-                                        .padding(10)
+                                        .padding(12)
                                         .background(
-                                            Color.accentColor.opacity(0.1),
-                                            in: RoundedRectangle(cornerRadius: 12)
+                                            LinearGradient(
+                                                colors: [.accentColor.opacity(0.15), .accentColor.opacity(0.08)],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            in: RoundedRectangle(cornerRadius: 14, style: .continuous)
                                         )
                                 }
                                 Text(message.timestamp.formatted(date: .omitted, time: .shortened))
@@ -189,11 +305,17 @@ struct SDKHelpView: View {
                     }
 
                     if isLoading {
-                        HStack {
-                            ProgressView().controlSize(.small)
-                            Text("Thinking...").font(.caption).foregroundStyle(.secondary)
+                        HStack(spacing: 8) {
+                            ProgressView()
+                                .controlSize(.small)
+                                .tint(.accentColor)
+                            Text("Thinking...")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-                        .padding(.leading, 8)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color(.tertiarySystemBackground), in: Capsule())
                     }
                 }
                 .padding(16)
@@ -210,21 +332,31 @@ struct SDKHelpView: View {
     }
 
     private var inputBar: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             TextField("Ask about the SDK...", text: $query, axis: .vertical)
                 .lineLimit(1...4)
-                .textFieldStyle(.roundedBorder)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(Color(.secondarySystemGroupedBackground))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(Color(.separator).opacity(0.3), lineWidth: 1)
+                )
 
             Button(action: { submitQuery(query) }) {
                 Image(systemName: "arrow.up.circle.fill")
-                    .font(.title2)
+                    .font(.system(size: 32))
+                    .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(query.trimmingCharacters(in: .whitespaces).isEmpty ? Color.secondary : Color.accentColor)
             }
             .disabled(query.trimmingCharacters(in: .whitespaces).isEmpty || isLoading)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(.bar)
+        .padding(.vertical, 10)
+        .background(.ultraThinMaterial)
     }
 
     private func submitQuery(_ text: String) {

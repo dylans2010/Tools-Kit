@@ -5,6 +5,7 @@ struct ConnectorsMainView: View {
     @StateObject private var toolManager = SDKToolManager.shared
     @State private var searchText = ""
     @State private var filterCategory: ConnectorCategory = .all
+    @State private var showingConnectorBuilder = false
 
     enum ConnectorCategory: String, CaseIterable {
         case all = "All"
@@ -127,6 +128,20 @@ struct ConnectorsMainView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("Connectors")
         .searchable(text: $searchText, prompt: "Search Connectors")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showingConnectorBuilder = true
+                } label: {
+                    Label("Create New", systemImage: "plus.circle.fill")
+                }
+            }
+        }
+        .sheet(isPresented: $showingConnectorBuilder) {
+            NavigationStack {
+                ConnectorBuilderView()
+            }
+        }
         .navigationDestination(for: UUID.self) { id in
             if let connector = connectorManager.connectors.first(where: { $0.id == id }) {
                 Self.openDetailView(connector)
