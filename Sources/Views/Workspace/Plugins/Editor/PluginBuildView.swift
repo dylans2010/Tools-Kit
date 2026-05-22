@@ -97,6 +97,73 @@ export async function onEvent(event, ctx) {
 """
     @State private var simulatedBuildOutput: [String] = []
 
+    // Webhooks
+    @State private var webhooks: [PluginWebhookConfig] = []
+    @State private var webhookRetryCount: Int = 3
+    @State private var webhookDeliveryTimeout: Int = 10
+
+    // Localization
+    @State private var supportedLocales: [PluginLocaleEntry] = []
+    @State private var defaultLocale = "en"
+    @State private var autoDetectLocale = true
+
+    // Analytics
+    @State private var analyticsEnabled = true
+    @State private var trackUsageEvents = true
+    @State private var trackPerformanceMetrics = true
+    @State private var analyticsRetentionDays: Int = 90
+    @State private var customAnalyticsEvents: [String] = []
+
+    // Collaboration
+    @State private var collaborationEnabled = false
+    @State private var maxCollaborators: Int = 5
+    @State private var collaboratorEmails: [String] = []
+    @State private var sharePermission: PluginSharePermission = .readOnly
+
+    // Scheduling
+    @State private var scheduledTasks: [PluginScheduledTask] = []
+    @State private var enableBackgroundExecution = false
+    @State private var maxConcurrentScheduledTasks: Int = 3
+
+    // Notifications
+    @State private var notificationRules: [PluginNotificationRule] = []
+    @State private var enablePushNotifications = false
+    @State private var enableEmailNotifications = false
+    @State private var notificationThrottleSeconds: Int = 60
+
+    // Feature Flags
+    @State private var featureFlags: [PluginFeatureFlag] = []
+    @State private var enableRemoteConfig = false
+
+    // Accessibility
+    @State private var accessibilityLabelsEnabled = true
+    @State private var dynamicTypeSupport = true
+    @State private var reduceMotionSupport = true
+    @State private var voiceOverOptimized = true
+    @State private var highContrastMode = false
+    @State private var minimumTouchTarget: Int = 44
+
+    // Backup & Restore
+    @State private var autoBackupEnabled = false
+    @State private var backupFrequencyHours: Int = 24
+    @State private var maxBackupCount: Int = 5
+    @State private var backupEncryption = true
+    @State private var lastBackupDate: Date?
+
+    // Logging
+    @State private var logLevel: PluginLogLevel = .info
+    @State private var enableRemoteLogging = false
+    @State private var logRetentionDays: Int = 30
+    @State private var sensitiveDataMasking = true
+    @State private var structuredLogging = true
+
+    // Build Pipeline
+    @State private var buildPipelineStages: [PluginBuildStage] = []
+    @State private var enableContinuousIntegration = false
+    @State private var autoRunTestsOnBuild = true
+    @State private var enableLinting = true
+    @State private var enableMinification = false
+
     @State private var showingIdentifierLockAlert = false
     @State private var errorMessage: String?
     @State private var showingDocs = false
@@ -117,6 +184,17 @@ export async function onEvent(event, ctx) {
         case ui = "UI"
         case toolkit = "Toolkit"
         case testing = "Testing"
+        case webhooks = "Webhooks"
+        case localization = "Localization"
+        case analytics = "Analytics"
+        case collaboration = "Collaboration"
+        case scheduling = "Scheduling"
+        case notifications = "Notifications"
+        case featureFlags = "Feature Flags"
+        case accessibility = "Accessibility"
+        case backup = "Backup"
+        case logging = "Logging"
+        case pipeline = "Pipeline"
         case release = "Release"
     }
 
@@ -206,6 +284,28 @@ export async function onEvent(event, ctx) {
             BuildToolkitSection(toolkitTools: $toolkitTools)
         case .testing:
             BuildTestingSection(testEventPayload: $testEventPayload, simulatedBuildOutput: simulatedBuildOutput, testSuites: $testSuites, coverageTarget: $coverageTarget, enableLoadTesting: $enableLoadTesting, loadTestConcurrency: $loadTestConcurrency, loadTestDuration: $loadTestDuration, mockResponses: $mockResponses) { runLocalValidation() }
+        case .webhooks:
+            BuildWebhooksSection(webhooks: $webhooks, retryCount: $webhookRetryCount, deliveryTimeout: $webhookDeliveryTimeout)
+        case .localization:
+            BuildLocalizationSection(supportedLocales: $supportedLocales, defaultLocale: $defaultLocale, autoDetectLocale: $autoDetectLocale)
+        case .analytics:
+            BuildAnalyticsSection(analyticsEnabled: $analyticsEnabled, trackUsageEvents: $trackUsageEvents, trackPerformanceMetrics: $trackPerformanceMetrics, retentionDays: $analyticsRetentionDays, customEvents: $customAnalyticsEvents)
+        case .collaboration:
+            BuildCollaborationSection(enabled: $collaborationEnabled, maxCollaborators: $maxCollaborators, collaboratorEmails: $collaboratorEmails, sharePermission: $sharePermission)
+        case .scheduling:
+            BuildSchedulingSection(scheduledTasks: $scheduledTasks, enableBackgroundExecution: $enableBackgroundExecution, maxConcurrent: $maxConcurrentScheduledTasks)
+        case .notifications:
+            BuildNotificationsSection(rules: $notificationRules, enablePush: $enablePushNotifications, enableEmail: $enableEmailNotifications, throttleSeconds: $notificationThrottleSeconds)
+        case .featureFlags:
+            BuildFeatureFlagsSection(featureFlags: $featureFlags, enableRemoteConfig: $enableRemoteConfig)
+        case .accessibility:
+            BuildAccessibilitySection(labelsEnabled: $accessibilityLabelsEnabled, dynamicType: $dynamicTypeSupport, reduceMotion: $reduceMotionSupport, voiceOver: $voiceOverOptimized, highContrast: $highContrastMode, minTouchTarget: $minimumTouchTarget)
+        case .backup:
+            BuildBackupSection(autoBackup: $autoBackupEnabled, frequencyHours: $backupFrequencyHours, maxCount: $maxBackupCount, encryption: $backupEncryption, lastBackup: lastBackupDate)
+        case .logging:
+            BuildLoggingSection(logLevel: $logLevel, remoteLogging: $enableRemoteLogging, retentionDays: $logRetentionDays, dataMasking: $sensitiveDataMasking, structured: $structuredLogging)
+        case .pipeline:
+            BuildPipelineSection(stages: $buildPipelineStages, ciEnabled: $enableContinuousIntegration, autoTests: $autoRunTestsOnBuild, linting: $enableLinting, minification: $enableMinification)
         case .release:
             BuildReleaseSection(version: $version, releaseNotes: $releaseNotes, endpointsCount: endpoints.count, uiExtensionsCount: uiExtensions.count, plugin: currentPluginSnapshot, releaseChannel: $releaseChannel, rolloutPercentage: $rolloutPercentage, deprecationNotice: $deprecationNotice, migrationGuide: $migrationGuide, signRelease: $signRelease, previousVersions: $previousVersions)
         }
@@ -1389,6 +1489,1089 @@ private struct DocSection: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title).font(.headline)
             Text(text).foregroundStyle(.secondary)
+        }
+    }
+}
+
+// MARK: - Webhooks Section
+
+private struct BuildWebhooksSection: View {
+    @Binding var webhooks: [PluginWebhookConfig]
+    @Binding var retryCount: Int
+    @Binding var deliveryTimeout: Int
+
+    @State private var newWebhookURL = ""
+    @State private var newWebhookSecret = ""
+    @State private var newWebhookEvents: Set<String> = []
+
+    private let eventTypes = ["plugin.installed", "plugin.enabled", "plugin.disabled", "plugin.error", "plugin.executed", "data.created", "data.updated", "data.deleted", "user.action", "system.alert"]
+
+    var body: some View {
+        Section {
+            if webhooks.isEmpty {
+                ContentUnavailableView("No Webhooks", systemImage: "antenna.radiowaves.left.and.right", description: Text("Add webhook endpoints to receive real-time event notifications."))
+                    .scaleEffect(0.8)
+            } else {
+                ForEach(webhooks) { webhook in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Image(systemName: webhook.isActive ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash")
+                                .foregroundStyle(webhook.isActive ? .green : .secondary)
+                            Text(webhook.url).font(.caption.monospaced()).lineLimit(1)
+                        }
+                        Text("\(webhook.events.count) event(s) subscribed").font(.caption2).foregroundStyle(.secondary)
+                        if webhook.hasSecret {
+                            HStack(spacing: 4) {
+                                Image(systemName: "lock.fill").font(.system(size: 8))
+                                Text("HMAC Signed").font(.system(size: 8, weight: .bold))
+                            }.foregroundStyle(.green)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+                .onDelete { webhooks.remove(atOffsets: $0) }
+            }
+        } header: {
+            Label("Webhook Endpoints", systemImage: "arrow.up.right.and.arrow.down.left.rectangle.fill")
+        }
+
+        Section {
+            TextField("Webhook URL", text: $newWebhookURL)
+                .textInputAutocapitalization(.never)
+                .keyboardType(.URL)
+                .font(.caption.monospaced())
+
+            TextField("Signing Secret (optional)", text: $newWebhookSecret)
+                .textInputAutocapitalization(.never)
+                .font(.caption.monospaced())
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Subscribe to Events").font(.caption.bold()).foregroundStyle(.secondary)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))], spacing: 6) {
+                    ForEach(eventTypes, id: \.self) { event in
+                        Button {
+                            if newWebhookEvents.contains(event) { newWebhookEvents.remove(event) }
+                            else { newWebhookEvents.insert(event) }
+                        } label: {
+                            Text(event)
+                                .font(.system(size: 9, weight: .bold, design: .monospaced))
+                                .padding(.horizontal, 8).padding(.vertical, 4)
+                                .frame(maxWidth: .infinity)
+                                .background(newWebhookEvents.contains(event) ? Color.blue : Color(.tertiarySystemBackground), in: RoundedRectangle(cornerRadius: 6))
+                                .foregroundStyle(newWebhookEvents.contains(event) ? .white : .primary)
+                        }
+                    }
+                }
+            }
+
+            Button("Add Webhook", systemImage: "plus.circle.fill") {
+                guard !newWebhookURL.isEmpty else { return }
+                webhooks.append(PluginWebhookConfig(url: newWebhookURL, secret: newWebhookSecret.isEmpty ? nil : newWebhookSecret, events: Array(newWebhookEvents), isActive: true))
+                newWebhookURL = ""; newWebhookSecret = ""; newWebhookEvents = []
+            }
+            .disabled(newWebhookURL.isEmpty || newWebhookEvents.isEmpty)
+        } header: {
+            Label("Add Webhook", systemImage: "plus.app")
+        }
+
+        Section {
+            Stepper(value: $retryCount, in: 0...10) {
+                HStack {
+                    Label("Retry Attempts", systemImage: "arrow.counterclockwise")
+                    Spacer()
+                    Text("\(retryCount)").bold().font(.caption)
+                }
+            }
+            Stepper(value: $deliveryTimeout, in: 1...60) {
+                HStack {
+                    Label("Delivery Timeout", systemImage: "timer")
+                    Spacer()
+                    Text("\(deliveryTimeout)s").bold().font(.caption)
+                }
+            }
+        } header: {
+            Label("Webhook Delivery Settings", systemImage: "gear")
+        } footer: {
+            Text("Failed deliveries will be retried with exponential backoff.")
+        }
+    }
+}
+
+// MARK: - Localization Section
+
+private struct BuildLocalizationSection: View {
+    @Binding var supportedLocales: [PluginLocaleEntry]
+    @Binding var defaultLocale: String
+    @Binding var autoDetectLocale: Bool
+
+    @State private var newLocaleCode = ""
+    @State private var newLocaleLabel = ""
+
+    private let commonLocales = ["en", "es", "fr", "de", "ja", "ko", "zh", "pt", "it", "ru", "ar", "hi"]
+
+    var body: some View {
+        Section {
+            Picker("Default Locale", selection: $defaultLocale) {
+                ForEach(commonLocales, id: \.self) { code in
+                    Text(code.uppercased()).tag(code)
+                }
+            }
+            .pickerStyle(.menu)
+
+            Toggle(isOn: $autoDetectLocale) {
+                Label("Auto-Detect User Locale", systemImage: "globe")
+            }
+        } header: {
+            Label("Locale Settings", systemImage: "character.bubble.fill")
+        }
+
+        Section {
+            if supportedLocales.isEmpty {
+                Text("No locales configured. The default locale will be used.").font(.caption).foregroundStyle(.secondary)
+            } else {
+                ForEach(supportedLocales) { locale in
+                    HStack {
+                        Text(locale.code.uppercased())
+                            .font(.caption.bold().monospaced())
+                            .padding(.horizontal, 8).padding(.vertical, 4)
+                            .background(Color.accentColor.opacity(0.12), in: RoundedRectangle(cornerRadius: 4))
+                        Text(locale.displayLabel).font(.caption)
+                        Spacer()
+                        if locale.code == defaultLocale {
+                            Text("Default").font(.system(size: 8, weight: .black)).foregroundStyle(.blue)
+                        }
+                        Text("\(locale.translatedKeys) keys").font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+                .onDelete { supportedLocales.remove(atOffsets: $0) }
+            }
+
+            HStack {
+                TextField("Code (e.g. es)", text: $newLocaleCode)
+                    .textInputAutocapitalization(.never)
+                    .font(.caption.monospaced())
+                TextField("Label (e.g. Spanish)", text: $newLocaleLabel)
+                    .font(.caption)
+                Button("Add") {
+                    guard !newLocaleCode.isEmpty else { return }
+                    supportedLocales.append(PluginLocaleEntry(code: newLocaleCode.lowercased(), displayLabel: newLocaleLabel.isEmpty ? newLocaleCode.uppercased() : newLocaleLabel))
+                    newLocaleCode = ""; newLocaleLabel = ""
+                }.disabled(newLocaleCode.isEmpty)
+            }
+        } header: {
+            Label("Supported Locales", systemImage: "textformat")
+        }
+
+        Section {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Quick Add Common Locales").font(.caption.bold()).foregroundStyle(.secondary)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(commonLocales, id: \.self) { locale in
+                            let exists = supportedLocales.contains { $0.code == locale }
+                            Button {
+                                if !exists {
+                                    supportedLocales.append(PluginLocaleEntry(code: locale, displayLabel: locale.uppercased()))
+                                }
+                            } label: {
+                                Text(locale.uppercased())
+                                    .font(.caption2.bold())
+                                    .padding(.horizontal, 10).padding(.vertical, 4)
+                                    .background(exists ? Color.green.opacity(0.2) : Color(.tertiarySystemBackground), in: Capsule())
+                                    .foregroundStyle(exists ? .green : .primary)
+                            }
+                            .disabled(exists)
+                        }
+                    }
+                }
+            }
+        } header: {
+            Label("Quick Add", systemImage: "bolt.fill")
+        }
+    }
+}
+
+// MARK: - Analytics Section
+
+private struct BuildAnalyticsSection: View {
+    @Binding var analyticsEnabled: Bool
+    @Binding var trackUsageEvents: Bool
+    @Binding var trackPerformanceMetrics: Bool
+    @Binding var retentionDays: Int
+    @Binding var customEvents: [String]
+
+    @State private var newEvent = ""
+
+    var body: some View {
+        Section {
+            Toggle(isOn: $analyticsEnabled) {
+                Label("Enable Analytics", systemImage: "chart.xyaxis.line")
+            }
+
+            if analyticsEnabled {
+                Toggle(isOn: $trackUsageEvents) {
+                    Label("Track Usage Events", systemImage: "hand.tap.fill")
+                }
+                Toggle(isOn: $trackPerformanceMetrics) {
+                    Label("Track Performance Metrics", systemImage: "gauge.with.needle.fill")
+                }
+
+                Stepper(value: $retentionDays, in: 7...365, step: 7) {
+                    HStack {
+                        Label("Data Retention", systemImage: "calendar")
+                        Spacer()
+                        Text("\(retentionDays) days").bold().font(.caption)
+                    }
+                }
+            }
+        } header: {
+            Label("Analytics Configuration", systemImage: "chart.bar.fill")
+        } footer: {
+            Text("Analytics data is collected in compliance with your privacy policy and retention settings.")
+        }
+
+        if analyticsEnabled {
+            Section {
+                if customEvents.isEmpty {
+                    Text("No custom analytics events defined.").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(customEvents, id: \.self) { event in
+                        HStack {
+                            Image(systemName: "chart.line.uptrend.xyaxis").foregroundStyle(.blue).font(.caption)
+                            Text(event).font(.caption.monospaced())
+                            Spacer()
+                            Button { customEvents.removeAll { $0 == event } } label: {
+                                Image(systemName: "minus.circle.fill").foregroundStyle(.red)
+                            }
+                        }
+                    }
+                }
+                HStack {
+                    TextField("Custom event name", text: $newEvent)
+                        .textInputAutocapitalization(.never).font(.caption.monospaced())
+                    Button("Add") {
+                        guard !newEvent.isEmpty else { return }
+                        customEvents.append(newEvent); newEvent = ""
+                    }.disabled(newEvent.isEmpty)
+                }
+            } header: {
+                Label("Custom Events", systemImage: "list.bullet.rectangle")
+            }
+
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Built-in Tracked Metrics").font(.caption.bold()).foregroundStyle(.secondary)
+                    HStack(spacing: 12) {
+                        AnalyticsMetricChip(name: "Installs", icon: "arrow.down.circle")
+                        AnalyticsMetricChip(name: "Executions", icon: "play.circle")
+                        AnalyticsMetricChip(name: "Errors", icon: "exclamationmark.circle")
+                    }
+                    HStack(spacing: 12) {
+                        AnalyticsMetricChip(name: "Latency", icon: "clock")
+                        AnalyticsMetricChip(name: "Memory", icon: "memorychip")
+                        AnalyticsMetricChip(name: "CPU", icon: "cpu")
+                    }
+                }
+            } header: {
+                Label("Built-in Metrics", systemImage: "speedometer")
+            }
+        }
+    }
+}
+
+private struct AnalyticsMetricChip: View {
+    let name: String
+    let icon: String
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon).font(.system(size: 9))
+            Text(name).font(.system(size: 9, weight: .bold))
+        }
+        .padding(.horizontal, 8).padding(.vertical, 4)
+        .background(Color.blue.opacity(0.1), in: Capsule())
+        .foregroundStyle(.blue)
+    }
+}
+
+// MARK: - Collaboration Section
+
+private struct BuildCollaborationSection: View {
+    @Binding var enabled: Bool
+    @Binding var maxCollaborators: Int
+    @Binding var collaboratorEmails: [String]
+    @Binding var sharePermission: PluginSharePermission
+
+    @State private var newEmail = ""
+
+    var body: some View {
+        Section {
+            Toggle(isOn: $enabled) {
+                Label("Enable Collaboration", systemImage: "person.2.fill")
+            }
+
+            if enabled {
+                Picker("Default Permission", selection: $sharePermission) {
+                    ForEach(PluginSharePermission.allCases, id: \.self) { perm in
+                        Text(perm.rawValue).tag(perm)
+                    }
+                }
+                .pickerStyle(.menu)
+
+                Stepper(value: $maxCollaborators, in: 1...50) {
+                    HStack {
+                        Label("Max Collaborators", systemImage: "person.3.fill")
+                        Spacer()
+                        Text("\(maxCollaborators)").bold().font(.caption)
+                    }
+                }
+            }
+        } header: {
+            Label("Collaboration Settings", systemImage: "person.2.badge.gearshape.fill")
+        }
+
+        if enabled {
+            Section {
+                if collaboratorEmails.isEmpty {
+                    Text("No collaborators added.").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(collaboratorEmails, id: \.self) { email in
+                        HStack {
+                            Image(systemName: "person.crop.circle").foregroundStyle(.blue).font(.caption)
+                            Text(email).font(.caption)
+                            Spacer()
+                            Button { collaboratorEmails.removeAll { $0 == email } } label: {
+                                Image(systemName: "minus.circle.fill").foregroundStyle(.red)
+                            }
+                        }
+                    }
+                }
+                HStack {
+                    TextField("Collaborator email", text: $newEmail)
+                        .textInputAutocapitalization(.never).keyboardType(.emailAddress).font(.caption)
+                    Button("Invite") {
+                        guard !newEmail.isEmpty else { return }
+                        collaboratorEmails.append(newEmail); newEmail = ""
+                    }.disabled(newEmail.isEmpty)
+                }
+            } header: {
+                Label("Collaborators", systemImage: "person.badge.plus")
+            } footer: {
+                Text("Collaborators will receive an invitation to co-develop this plugin.")
+            }
+        }
+    }
+}
+
+// MARK: - Scheduling Section
+
+private struct BuildSchedulingSection: View {
+    @Binding var scheduledTasks: [PluginScheduledTask]
+    @Binding var enableBackgroundExecution: Bool
+    @Binding var maxConcurrent: Int
+
+    @State private var newTaskName = ""
+    @State private var newCronExpression = ""
+    @State private var newTaskAction = ""
+
+    var body: some View {
+        Section {
+            Toggle(isOn: $enableBackgroundExecution) {
+                Label("Background Execution", systemImage: "clock.arrow.2.circlepath")
+            }
+
+            if enableBackgroundExecution {
+                Stepper(value: $maxConcurrent, in: 1...20) {
+                    HStack {
+                        Label("Max Concurrent Tasks", systemImage: "rectangle.3.group")
+                        Spacer()
+                        Text("\(maxConcurrent)").bold().font(.caption)
+                    }
+                }
+            }
+        } header: {
+            Label("Scheduling Settings", systemImage: "calendar.badge.clock")
+        }
+
+        Section {
+            if scheduledTasks.isEmpty {
+                ContentUnavailableView("No Scheduled Tasks", systemImage: "clock.badge.questionmark", description: Text("Add scheduled tasks to run plugin logic on a recurring basis."))
+                    .scaleEffect(0.8)
+            } else {
+                ForEach(scheduledTasks) { task in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Image(systemName: task.isEnabled ? "clock.fill" : "clock")
+                                .foregroundStyle(task.isEnabled ? .blue : .secondary)
+                            Text(task.name).font(.subheadline.bold())
+                            Spacer()
+                            Text(task.isEnabled ? "Active" : "Paused")
+                                .font(.system(size: 8, weight: .black))
+                                .padding(.horizontal, 6).padding(.vertical, 2)
+                                .background(task.isEnabled ? Color.green.opacity(0.12) : Color.secondary.opacity(0.12), in: Capsule())
+                                .foregroundStyle(task.isEnabled ? .green : .secondary)
+                        }
+                        Text(task.cronExpression).font(.caption2.monospaced()).foregroundStyle(.secondary)
+                        Text(task.action).font(.caption2).foregroundStyle(.tertiary)
+                    }
+                    .padding(.vertical, 2)
+                }
+                .onDelete { scheduledTasks.remove(atOffsets: $0) }
+            }
+        } header: {
+            Label("Scheduled Tasks", systemImage: "list.bullet.below.rectangle")
+        }
+
+        Section {
+            TextField("Task Name", text: $newTaskName).font(.caption)
+            TextField("Cron Expression (e.g. */5 * * * *)", text: $newCronExpression).font(.caption.monospaced())
+            TextField("Action (function name)", text: $newTaskAction).font(.caption.monospaced())
+            Button("Add Scheduled Task", systemImage: "plus.circle.fill") {
+                guard !newTaskName.isEmpty, !newCronExpression.isEmpty else { return }
+                scheduledTasks.append(PluginScheduledTask(name: newTaskName, cronExpression: newCronExpression, action: newTaskAction.isEmpty ? "onSchedule" : newTaskAction))
+                newTaskName = ""; newCronExpression = ""; newTaskAction = ""
+            }
+            .disabled(newTaskName.isEmpty || newCronExpression.isEmpty)
+        } header: {
+            Label("Add Task", systemImage: "plus.app")
+        } footer: {
+            Text("Cron expressions follow the standard 5-field format: minute hour day month weekday.")
+        }
+    }
+}
+
+// MARK: - Notifications Section
+
+private struct BuildNotificationsSection: View {
+    @Binding var rules: [PluginNotificationRule]
+    @Binding var enablePush: Bool
+    @Binding var enableEmail: Bool
+    @Binding var throttleSeconds: Int
+
+    @State private var newRuleName = ""
+    @State private var newRuleCondition = ""
+    @State private var newRuleChannel: NotificationChannel = .inApp
+
+    var body: some View {
+        Section {
+            Toggle(isOn: $enablePush) {
+                Label("Push Notifications", systemImage: "bell.badge.fill")
+            }
+            Toggle(isOn: $enableEmail) {
+                Label("Email Notifications", systemImage: "envelope.badge.fill")
+            }
+
+            Stepper(value: $throttleSeconds, in: 0...3600, step: 15) {
+                HStack {
+                    Label("Throttle Interval", systemImage: "timer")
+                    Spacer()
+                    Text(throttleSeconds == 0 ? "None" : "\(throttleSeconds)s").bold().font(.caption)
+                }
+            }
+        } header: {
+            Label("Notification Channels", systemImage: "bell.and.waves.left.and.right")
+        }
+
+        Section {
+            if rules.isEmpty {
+                Text("No notification rules defined.").font(.caption).foregroundStyle(.secondary)
+            } else {
+                ForEach(rules) { rule in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Image(systemName: rule.channel.icon).foregroundStyle(.blue).font(.caption)
+                            Text(rule.name).font(.subheadline.bold())
+                            Spacer()
+                            Text(rule.channel.rawValue)
+                                .font(.system(size: 8, weight: .bold))
+                                .padding(.horizontal, 6).padding(.vertical, 2)
+                                .background(Color.accentColor.opacity(0.12), in: Capsule())
+                        }
+                        Text(rule.condition).font(.caption2.monospaced()).foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 2)
+                }
+                .onDelete { rules.remove(atOffsets: $0) }
+            }
+
+            VStack(spacing: 8) {
+                TextField("Rule Name", text: $newRuleName).font(.caption)
+                TextField("Condition (e.g. event.type == 'error')", text: $newRuleCondition).font(.caption.monospaced())
+                Picker("Channel", selection: $newRuleChannel) {
+                    ForEach(NotificationChannel.allCases, id: \.self) { ch in
+                        Text(ch.rawValue).tag(ch)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }
+
+            Button("Add Rule", systemImage: "plus.circle.fill") {
+                guard !newRuleName.isEmpty, !newRuleCondition.isEmpty else { return }
+                rules.append(PluginNotificationRule(name: newRuleName, condition: newRuleCondition, channel: newRuleChannel))
+                newRuleName = ""; newRuleCondition = ""
+            }
+            .disabled(newRuleName.isEmpty || newRuleCondition.isEmpty)
+        } header: {
+            Label("Notification Rules", systemImage: "bell.badge.waveform.fill")
+        } footer: {
+            Text("Rules determine when and how notifications are sent based on plugin events.")
+        }
+    }
+}
+
+// MARK: - Feature Flags Section
+
+private struct BuildFeatureFlagsSection: View {
+    @Binding var featureFlags: [PluginFeatureFlag]
+    @Binding var enableRemoteConfig: Bool
+
+    @State private var newFlagKey = ""
+    @State private var newFlagDescription = ""
+
+    var body: some View {
+        Section {
+            Toggle(isOn: $enableRemoteConfig) {
+                Label("Remote Config", systemImage: "icloud.and.arrow.down")
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Remote config allows toggling feature flags without redeploying the plugin.")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+        } header: {
+            Label("Feature Flag Settings", systemImage: "flag.2.crossed.fill")
+        }
+
+        Section {
+            if featureFlags.isEmpty {
+                ContentUnavailableView("No Feature Flags", systemImage: "flag.slash", description: Text("Add feature flags to gradually roll out new functionality."))
+                    .scaleEffect(0.8)
+            } else {
+                ForEach($featureFlags) { $flag in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Toggle(isOn: $flag.isEnabled) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(flag.key).font(.caption.bold().monospaced())
+                                    if !flag.flagDescription.isEmpty {
+                                        Text(flag.flagDescription).font(.caption2).foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                        }
+                        HStack(spacing: 8) {
+                            Text("Rollout: \(Int(flag.rolloutPercentage))%")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundStyle(flag.rolloutPercentage >= 100 ? .green : .orange)
+                            if flag.expiresAt != nil {
+                                Text("Has Expiry").font(.system(size: 8, weight: .bold))
+                                    .padding(.horizontal, 4).padding(.vertical, 2)
+                                    .background(Color.orange.opacity(0.12), in: Capsule())
+                                    .foregroundStyle(.orange)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+                .onDelete { featureFlags.remove(atOffsets: $0) }
+            }
+
+            VStack(spacing: 8) {
+                TextField("Flag key (e.g. enable_new_ui)", text: $newFlagKey)
+                    .textInputAutocapitalization(.never).font(.caption.monospaced())
+                TextField("Description (optional)", text: $newFlagDescription).font(.caption)
+            }
+
+            Button("Add Feature Flag", systemImage: "flag.fill") {
+                guard !newFlagKey.isEmpty else { return }
+                featureFlags.append(PluginFeatureFlag(key: newFlagKey, flagDescription: newFlagDescription))
+                newFlagKey = ""; newFlagDescription = ""
+            }
+            .disabled(newFlagKey.isEmpty)
+        } header: {
+            Label("Flags", systemImage: "flag.badge.ellipsis")
+        } footer: {
+            Text("Feature flags can be toggled at runtime to enable or disable functionality.")
+        }
+    }
+}
+
+// MARK: - Accessibility Section
+
+private struct BuildAccessibilitySection: View {
+    @Binding var labelsEnabled: Bool
+    @Binding var dynamicType: Bool
+    @Binding var reduceMotion: Bool
+    @Binding var voiceOver: Bool
+    @Binding var highContrast: Bool
+    @Binding var minTouchTarget: Int
+
+    var body: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Accessibility ensures your plugin is usable by everyone, including those with disabilities.")
+                    .font(.caption).foregroundStyle(.secondary)
+
+                HStack(spacing: 12) {
+                    AccessibilityScoreCircle(
+                        score: accessibilityScore,
+                        label: "Score"
+                    )
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(accessibilityGrade).font(.title3.bold()).foregroundStyle(accessibilityColor)
+                        Text("\(enabledFeaturesCount)/6 features enabled").font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+            }
+        } header: {
+            Label("Accessibility Overview", systemImage: "accessibility")
+        }
+
+        Section {
+            Toggle(isOn: $labelsEnabled) {
+                Label("Accessibility Labels", systemImage: "text.badge.checkmark")
+            }
+            Toggle(isOn: $dynamicType) {
+                Label("Dynamic Type Support", systemImage: "textformat.size")
+            }
+            Toggle(isOn: $reduceMotion) {
+                Label("Reduce Motion Support", systemImage: "figure.walk.motion")
+            }
+            Toggle(isOn: $voiceOver) {
+                Label("VoiceOver Optimization", systemImage: "speaker.wave.3.fill")
+            }
+            Toggle(isOn: $highContrast) {
+                Label("High Contrast Mode", systemImage: "circle.lefthalf.filled")
+            }
+
+            Stepper(value: $minTouchTarget, in: 24...64, step: 4) {
+                HStack {
+                    Label("Min Touch Target", systemImage: "hand.point.up.left.fill")
+                    Spacer()
+                    Text("\(minTouchTarget)pt").bold().font(.caption)
+                        .foregroundStyle(minTouchTarget >= 44 ? .green : .orange)
+                }
+            }
+        } header: {
+            Label("Accessibility Features", systemImage: "accessibility.fill")
+        } footer: {
+            Text("Apple recommends a minimum touch target of 44pt for optimal accessibility.")
+        }
+    }
+
+    private var enabledFeaturesCount: Int {
+        [labelsEnabled, dynamicType, reduceMotion, voiceOver, highContrast, minTouchTarget >= 44].filter { $0 }.count
+    }
+
+    private var accessibilityScore: Double {
+        Double(enabledFeaturesCount) / 6.0 * 100
+    }
+
+    private var accessibilityGrade: String {
+        switch enabledFeaturesCount {
+        case 6: return "Excellent"
+        case 5: return "Very Good"
+        case 4: return "Good"
+        case 3: return "Fair"
+        default: return "Needs Improvement"
+        }
+    }
+
+    private var accessibilityColor: Color {
+        switch enabledFeaturesCount {
+        case 5...6: return .green
+        case 3...4: return .orange
+        default: return .red
+        }
+    }
+}
+
+private struct AccessibilityScoreCircle: View {
+    let score: Double
+    let label: String
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(Color.secondary.opacity(0.2), lineWidth: 4)
+                .frame(width: 52, height: 52)
+            Circle()
+                .trim(from: 0, to: score / 100)
+                .stroke(score >= 80 ? Color.green : (score >= 50 ? Color.orange : Color.red), style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                .frame(width: 52, height: 52)
+                .rotationEffect(.degrees(-90))
+            Text("\(Int(score))")
+                .font(.system(size: 14, weight: .black, design: .rounded))
+        }
+    }
+}
+
+// MARK: - Backup Section
+
+private struct BuildBackupSection: View {
+    @Binding var autoBackup: Bool
+    @Binding var frequencyHours: Int
+    @Binding var maxCount: Int
+    @Binding var encryption: Bool
+    let lastBackup: Date?
+
+    var body: some View {
+        Section {
+            if let lastBackup {
+                HStack {
+                    Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Last Backup").font(.caption.bold())
+                        Text(lastBackup.formatted(date: .abbreviated, time: .shortened)).font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+            } else {
+                HStack {
+                    Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                    Text("No backups found").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+
+            Toggle(isOn: $autoBackup) {
+                Label("Auto-Backup", systemImage: "arrow.clockwise.icloud")
+            }
+
+            if autoBackup {
+                Stepper(value: $frequencyHours, in: 1...168, step: 1) {
+                    HStack {
+                        Label("Frequency", systemImage: "clock.arrow.circlepath")
+                        Spacer()
+                        Text(frequencyHours == 1 ? "Every hour" : "Every \(frequencyHours)h").bold().font(.caption)
+                    }
+                }
+
+                Stepper(value: $maxCount, in: 1...50) {
+                    HStack {
+                        Label("Max Backups", systemImage: "square.stack.3d.up")
+                        Spacer()
+                        Text("\(maxCount)").bold().font(.caption)
+                    }
+                }
+
+                Toggle(isOn: $encryption) {
+                    Label("Encrypt Backups", systemImage: "lock.shield.fill")
+                }
+            }
+        } header: {
+            Label("Backup & Restore", systemImage: "externaldrive.fill.badge.timemachine")
+        } footer: {
+            Text("Backups include plugin configuration, source code, and all settings. Encrypted backups use AES-256.")
+        }
+
+        Section {
+            Button {
+                // Simulated manual backup trigger
+            } label: {
+                Label("Create Backup Now", systemImage: "arrow.down.doc.fill").frame(maxWidth: .infinity).bold()
+            }
+            .buttonStyle(.bordered)
+
+            Button {
+                // Simulated restore
+            } label: {
+                Label("Restore from Backup", systemImage: "arrow.uturn.backward.circle.fill").frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+
+            Button(role: .destructive) {
+                // Simulated cleanup
+            } label: {
+                Label("Delete All Backups", systemImage: "trash.fill").frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+        } header: {
+            Label("Backup Actions", systemImage: "gearshape.2.fill")
+        }
+    }
+}
+
+// MARK: - Logging Section
+
+private struct BuildLoggingSection: View {
+    @Binding var logLevel: PluginLogLevel
+    @Binding var remoteLogging: Bool
+    @Binding var retentionDays: Int
+    @Binding var dataMasking: Bool
+    @Binding var structured: Bool
+
+    var body: some View {
+        Section {
+            Picker("Log Level", selection: $logLevel) {
+                ForEach(PluginLogLevel.allCases, id: \.self) { level in
+                    HStack {
+                        Circle().fill(level.color).frame(width: 8, height: 8)
+                        Text(level.rawValue.capitalized)
+                    }.tag(level)
+                }
+            }
+            .pickerStyle(.menu)
+
+            HStack(spacing: 6) {
+                ForEach(PluginLogLevel.allCases, id: \.self) { level in
+                    VStack(spacing: 2) {
+                        Circle()
+                            .fill(logLevel.severity >= level.severity ? level.color : Color.secondary.opacity(0.2))
+                            .frame(width: 12, height: 12)
+                        Text(level.rawValue.prefix(3).uppercased())
+                            .font(.system(size: 7, weight: .bold))
+                            .foregroundStyle(logLevel.severity >= level.severity ? level.color : .secondary)
+                    }
+                    if level != PluginLogLevel.allCases.last {
+                        Rectangle().fill(Color.secondary.opacity(0.2)).frame(height: 1).frame(maxWidth: 20)
+                    }
+                }
+            }
+            .padding(.vertical, 4)
+        } header: {
+            Label("Log Level", systemImage: "doc.text.fill")
+        } footer: {
+            Text("Messages below the selected level will be suppressed.")
+        }
+
+        Section {
+            Toggle(isOn: $remoteLogging) {
+                Label("Remote Logging", systemImage: "icloud.fill")
+            }
+            Toggle(isOn: $dataMasking) {
+                Label("Sensitive Data Masking", systemImage: "eye.slash.fill")
+            }
+            Toggle(isOn: $structured) {
+                Label("Structured Logging (JSON)", systemImage: "curlybraces")
+            }
+
+            Stepper(value: $retentionDays, in: 1...365) {
+                HStack {
+                    Label("Log Retention", systemImage: "calendar")
+                    Spacer()
+                    Text("\(retentionDays) days").bold().font(.caption)
+                }
+            }
+        } header: {
+            Label("Logging Options", systemImage: "text.alignleft")
+        }
+
+        Section {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Log Output Preview").font(.caption.bold()).foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    if structured {
+                        Text("{\"level\":\"\(logLevel.rawValue)\",\"msg\":\"Plugin started\",\"ts\":\"\(Date().ISO8601Format())\"}")
+                            .font(.system(size: 9, design: .monospaced)).foregroundStyle(.green)
+                    } else {
+                        Text("[\(logLevel.rawValue.uppercased())] \(Date().formatted()) - Plugin started")
+                            .font(.system(size: 9, design: .monospaced)).foregroundStyle(.green)
+                    }
+                }
+                .padding(8).frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.black, in: RoundedRectangle(cornerRadius: 8))
+            }
+        } header: {
+            Label("Preview", systemImage: "eye")
+        }
+    }
+}
+
+// MARK: - Build Pipeline Section
+
+private struct BuildPipelineSection: View {
+    @Binding var stages: [PluginBuildStage]
+    @Binding var ciEnabled: Bool
+    @Binding var autoTests: Bool
+    @Binding var linting: Bool
+    @Binding var minification: Bool
+
+    var body: some View {
+        Section {
+            Toggle(isOn: $ciEnabled) {
+                Label("Continuous Integration", systemImage: "arrow.triangle.2.circlepath.circle.fill")
+            }
+            Toggle(isOn: $autoTests) {
+                Label("Auto-Run Tests on Build", systemImage: "testtube.2")
+            }
+            Toggle(isOn: $linting) {
+                Label("Code Linting", systemImage: "checkmark.diamond.fill")
+            }
+            Toggle(isOn: $minification) {
+                Label("Code Minification", systemImage: "rectangle.compress.vertical")
+            }
+        } header: {
+            Label("Build Configuration", systemImage: "hammer.fill")
+        }
+
+        Section {
+            if stages.isEmpty {
+                ContentUnavailableView("No Pipeline Stages", systemImage: "arrow.right.arrow.left", description: Text("Add build pipeline stages to automate your build process."))
+                    .scaleEffect(0.8)
+            } else {
+                ForEach(Array(stages.enumerated()), id: \.element.id) { index, stage in
+                    HStack {
+                        Text("\(index + 1)")
+                            .font(.caption.bold())
+                            .frame(width: 24, height: 24)
+                            .background(stage.status.color.opacity(0.12), in: Circle())
+                            .foregroundStyle(stage.status.color)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(stage.name).font(.subheadline.bold())
+                            Text(stage.command).font(.caption2.monospaced()).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: stage.status.icon)
+                            .foregroundStyle(stage.status.color)
+                            .font(.caption)
+                    }
+                    .padding(.vertical, 2)
+                }
+                .onDelete { stages.remove(atOffsets: $0) }
+                .onMove { stages.move(fromOffsets: $0, toOffset: $1) }
+            }
+
+            Button("Add Stage", systemImage: "plus.circle.fill") {
+                stages.append(PluginBuildStage(name: "Stage \(stages.count + 1)", command: "echo 'Running stage...'"))
+            }
+        } header: {
+            Label("Pipeline Stages", systemImage: "arrow.right.square.fill")
+        } footer: {
+            Text("Stages execute sequentially. Drag to reorder. A failing stage halts the pipeline.")
+        }
+
+        Section {
+            Button {
+                for i in stages.indices {
+                    stages[i].status = .success
+                }
+            } label: {
+                Label("Simulate Pipeline Run", systemImage: "play.fill").frame(maxWidth: .infinity).bold()
+            }
+            .buttonStyle(.bordered)
+        } header: {
+            Label("Pipeline Actions", systemImage: "bolt.fill")
+        }
+    }
+}
+
+// MARK: - New Supporting Types
+
+struct PluginWebhookConfig: Identifiable {
+    let id = UUID()
+    var url: String
+    var secret: String?
+    var events: [String]
+    var isActive: Bool
+    var hasSecret: Bool { secret != nil }
+}
+
+struct PluginLocaleEntry: Identifiable {
+    let id = UUID()
+    var code: String
+    var displayLabel: String
+    var translatedKeys: Int = 0
+}
+
+enum PluginSharePermission: String, CaseIterable {
+    case readOnly = "Read Only"
+    case readWrite = "Read & Write"
+    case admin = "Admin"
+}
+
+struct PluginScheduledTask: Identifiable {
+    let id = UUID()
+    var name: String
+    var cronExpression: String
+    var action: String
+    var isEnabled: Bool = true
+    var lastRunAt: Date?
+}
+
+struct PluginNotificationRule: Identifiable {
+    let id = UUID()
+    var name: String
+    var condition: String
+    var channel: NotificationChannel
+}
+
+enum NotificationChannel: String, CaseIterable {
+    case inApp = "In-App"
+    case push = "Push"
+    case email = "Email"
+    case webhook = "Webhook"
+
+    var icon: String {
+        switch self {
+        case .inApp: return "bell.fill"
+        case .push: return "iphone.radiowaves.left.and.right"
+        case .email: return "envelope.fill"
+        case .webhook: return "arrow.up.right.square"
+        }
+    }
+}
+
+struct PluginFeatureFlag: Identifiable {
+    let id = UUID()
+    var key: String
+    var flagDescription: String
+    var isEnabled: Bool = false
+    var rolloutPercentage: Double = 100
+    var expiresAt: Date?
+}
+
+enum PluginLogLevel: String, CaseIterable {
+    case verbose, debug, info, warning, error, critical
+
+    var severity: Int {
+        switch self {
+        case .verbose: return 0
+        case .debug: return 1
+        case .info: return 2
+        case .warning: return 3
+        case .error: return 4
+        case .critical: return 5
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .verbose: return .secondary
+        case .debug: return .blue
+        case .info: return .green
+        case .warning: return .orange
+        case .error: return .red
+        case .critical: return .purple
+        }
+    }
+}
+
+struct PluginBuildStage: Identifiable {
+    let id = UUID()
+    var name: String
+    var command: String
+    var status: BuildStageStatus = .pending
+    var duration: TimeInterval?
+}
+
+enum BuildStageStatus: String, CaseIterable {
+    case pending, running, success, failed, skipped
+
+    var icon: String {
+        switch self {
+        case .pending: return "circle"
+        case .running: return "arrow.triangle.2.circlepath"
+        case .success: return "checkmark.circle.fill"
+        case .failed: return "xmark.circle.fill"
+        case .skipped: return "minus.circle"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .pending: return .secondary
+        case .running: return .blue
+        case .success: return .green
+        case .failed: return .red
+        case .skipped: return .orange
         }
     }
 }
