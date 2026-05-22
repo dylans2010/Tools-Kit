@@ -551,7 +551,7 @@ struct SDKDebugView: View {
                 .foregroundStyle(entry.isInput ? .blue : .green)
             Text(entry.text)
                 .font(.caption.monospaced())
-                .foregroundStyle(entry.isInput ? .primary : .green)
+                .foregroundStyle(entry.isInput ? Color.primary : Color.green)
         }
     }
 
