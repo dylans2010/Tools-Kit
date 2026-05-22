@@ -357,6 +357,32 @@ enum PluginAction: String, Codable, CaseIterable, Identifiable {
         case .workspaceEvent: return .intelligence
         }
     }
+
+    var description: String {
+        switch self {
+        case .noteCreated: return "Triggered when a new note is created."
+        case .noteUpdated: return "Triggered when an existing note is modified."
+        case .noteDeleted: return "Triggered when a note is removed."
+        case .taskCreated: return "Triggered when a new task is added."
+        case .taskCompleted: return "Triggered when a task status changes to completed."
+        case .taskDeleted: return "Triggered when a task is removed."
+        case .mailReceived: return "Triggered when a new email arrives in the inbox."
+        case .mailSent: return "Triggered when an email is successfully sent."
+        case .repoCommitPushed: return "Triggered when a new commit is pushed to a repository."
+        case .repoPROpened: return "Triggered when a new pull request is created."
+        case .repoPRMerged: return "Triggered when a pull request is merged."
+        case .meetStarted: return "Triggered when a meeting session begins."
+        case .meetEnded: return "Triggered when a meeting session concludes."
+        case .meetTranscriptGenerated: return "Triggered when a meeting transcript becomes available."
+        case .mediaImported: return "Triggered when new media assets are added."
+        case .mediaExported: return "Triggered when media is exported from the workspace."
+        case .calendarEventCreated: return "Triggered when a new event is added to the calendar."
+        case .calendarEventUpdated: return "Triggered when a calendar event is modified."
+        case .fileUploaded: return "Triggered when a file is uploaded to the workspace."
+        case .fileDeleted: return "Triggered when a file is removed from storage."
+        case .workspaceEvent: return "Triggered by general workspace-wide events."
+        }
+    }
 }
 
 // MARK: - Event Models

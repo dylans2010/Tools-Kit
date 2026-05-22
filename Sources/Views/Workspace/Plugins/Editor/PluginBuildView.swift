@@ -354,7 +354,7 @@ private struct BuildCapabilitiesSection: View {
             }
         } else {
             Section {
-                ForEach(PluginAction.allCases.filter { selectedCapabilities.contains($0.parentCapability) }, id: \.self) { action in
+                ForEach(Array(PluginAction.allCases.filter { selectedCapabilities.contains($0.parentCapability) }), id: \.self) { action in
                     Toggle(
                         isOn: Binding(
                             get: { selectedActions.contains(action) },
