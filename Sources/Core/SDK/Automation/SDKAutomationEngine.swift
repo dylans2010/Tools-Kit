@@ -96,6 +96,12 @@ public final class SDKAutomationEngine: ObservableObject {
         }
     }
 
+    public func trigger(_ rule: SDKAutomationRule) {
+        Task {
+            try? await run(rule: rule, context: [:])
+        }
+    }
+
     public func add(_ rule: SDKAutomationRule) {
         rules.append(rule)
         SDKProjectManager.shared.currentProject?.automationRules = rules

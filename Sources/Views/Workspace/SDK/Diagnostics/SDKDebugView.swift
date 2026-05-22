@@ -525,38 +525,49 @@ struct SDKDebugView: View {
 
     private var interactiveConsoleSheet: some View {
         VStack(spacing: 0) {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 4) {
-                    ForEach(consoleOutput) { entry in
-                        HStack(alignment: .top) {
-                            Text(entry.isInput ? ">" : "<")
-                                .font(.caption.monospaced())
-                                .foregroundStyle(entry.isInput ? .blue : .green)
-                            Text(entry.text)
-                                .font(.caption.monospaced())
-                                .foregroundStyle(entry.isInput ? .primary : .green)
-                        }
-                    }
-                }
-                .padding()
-            }
-            .background(Color.black.opacity(0.05))
-
-            HStack {
-                TextField("Command...", text: $consoleInput)
-                    .font(.body.monospaced())
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                Button("Run") {
-                    executeConsoleCommand()
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(consoleInput.isEmpty)
-            }
-            .padding()
+            consoleOutputScrollView
+            consoleInputBar
         }
         .navigationTitle("Console")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var consoleOutputScrollView: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 4) {
+                ForEach(consoleOutput) { entry in
+                    consoleEntryRow(entry)
+                }
+            }
+            .padding()
+        }
+        .background(Color.black.opacity(0.05))
+    }
+
+    private func consoleEntryRow(_ entry: ConsoleEntry) -> some View {
+        HStack(alignment: .top) {
+            Text(entry.isInput ? ">" : "<")
+                .font(.caption.monospaced())
+                .foregroundStyle(entry.isInput ? .blue : .green)
+            Text(entry.text)
+                .font(.caption.monospaced())
+                .foregroundStyle(entry.isInput ? .primary : .green)
+        }
+    }
+
+    private var consoleInputBar: some View {
+        HStack {
+            TextField("Command...", text: $consoleInput)
+                .font(.body.monospaced())
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+            Button("Run") {
+                executeConsoleCommand()
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(consoleInput.isEmpty)
+        }
+        .padding()
     }
 
     // MARK: - Helpers
