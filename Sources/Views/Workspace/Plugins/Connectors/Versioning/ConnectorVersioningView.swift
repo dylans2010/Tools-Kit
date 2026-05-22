@@ -23,6 +23,21 @@ struct ConnectorVersioningView: View {
         [VersionEntry(version: connector.version, date: connector.updatedAt, notes: "Current saved connector configuration", status: deploymentStatus, changes: connector.endpoints.count + connector.flow.steps.count + connector.schema.mappings.count)]
     }
 
+    @State private var showingBranchManager = false
+    @State private var branches: [VersionBranch] = [
+        VersionBranch(name: "main", isDefault: true, lastActivity: Date()),
+        VersionBranch(name: "staging", isDefault: false, lastActivity: Date().addingTimeInterval(-86400)),
+        VersionBranch(name: "development", isDefault: false, lastActivity: Date().addingTimeInterval(-172800))
+    ]
+    @State private var selectedBranch = "main"
+    @State private var showingMergeSheet = false
+    @State private var enableAutoVersioning = false
+    @State private var versioningStrategy: VersioningStrategy = .semantic
+    @State private var showingTagManager = false
+    @State private var tags: [VersionTag] = []
+    @State private var newTagName = ""
+    @State private var showingChangelogGenerator = false
+
     var body: some View {
         List {
             Section {
@@ -30,12 +45,15 @@ struct ConnectorVersioningView: View {
                     DetailMetricPill(label: "Version", value: "v\(connector.version)", color: .blue)
                     DetailMetricPill(label: "History", value: "\(versionHistory.count)", color: .purple)
                     DetailMetricPill(label: "Status", value: deploymentStatus.rawValue, color: deploymentStatus == .deployed ? .sdkSuccess : .orange)
+                    DetailMetricPill(label: "Branch", value: selectedBranch, color: .teal)
                 }
                 .padding(.vertical, 8)
             }
             .listRowBackground(Color.clear).listRowInsets(EdgeInsets())
 
             CurrentReleaseSection(connector: connector, status: $deploymentStatus)
+
+            branchSection
 
             Section("Version History") {
                 if versionHistory.count == 1 { Text("Only the current saved version is available.").font(.caption).foregroundStyle(.secondary) }
@@ -44,23 +62,187 @@ struct ConnectorVersioningView: View {
                 }
             }
 
+            tagsSection
+
             Section("Configuration Diff") {
                 VStack(alignment: .leading, spacing: 8) {
                     DiffItem(label: "Endpoints", value: "\(connector.endpoints.count)")
                     DiffItem(label: "Flow Steps", value: "\(connector.flow.steps.count)")
                     DiffItem(label: "Auth Type", value: connector.authConfig.type.rawValue.capitalized)
+                    DiffItem(label: "Schema Mappings", value: "\(connector.schema.mappings.count)")
                 }.padding(.vertical, 4)
             }
+
+            versioningSettingsSection
 
             Section {
                 Button(action: { newVersion = incrementVersion(connector.version); showingReleaseSheet = true }) { Label("Create New Release", systemImage: "arrow.up.circle.fill").font(.subheadline.bold()) }
                 Button(action: { showingCompare = true }) { Label("Compare Changes", systemImage: "arrow.left.arrow.right") }
+                Button { showingChangelogGenerator = true } label: { Label("Generate Changelog", systemImage: "doc.text") }
             }
         }
         .listStyle(.insetGrouped).navigationTitle("Versioning").navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button { showingBranchManager = true } label: { Label("Branch Manager", systemImage: "arrow.triangle.branch") }
+                    Button { showingTagManager = true } label: { Label("Tag Manager", systemImage: "tag") }
+                    Button { showingChangelogGenerator = true } label: { Label("Changelog", systemImage: "doc.text") }
+                } label: { Image(systemName: "ellipsis.circle") }
+            }
+        }
         .sheet(isPresented: $showingReleaseSheet) { ReleaseManagementSheet(connector: connector, newVersion: $newVersion, notes: $releaseNotes, onPublish: { connector.version = newVersion; deploymentStatus = .deployed; manager.updateConnector(connector); showingReleaseSheet = false }).presentationDetents([.large]) }
         .sheet(isPresented: $showingCompare) { CompareVersionsSheet(history: versionHistory).presentationDetents([.large]) }
+        .sheet(isPresented: $showingBranchManager) {
+            NavigationStack { branchManagerSheet }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showingTagManager) {
+            NavigationStack { tagManagerSheet }
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showingChangelogGenerator) {
+            NavigationStack { changelogSheet }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
         .alert("Rollback to v\(rollbackTarget)?", isPresented: $showingRollbackAlert) { Button("Cancel", role: .cancel) {}; Button("Rollback", role: .destructive) { connector.version = rollbackTarget; deploymentStatus = .rollback; manager.updateConnector(connector) } } message: { Text("This will revert the active configuration.") }
+    }
+
+    // MARK: - Branch Section
+
+    private var branchSection: some View {
+        Section("Branches") {
+            Picker("Active Branch", selection: $selectedBranch) {
+                ForEach(branches, id: \.name) { branch in
+                    Text(branch.name).tag(branch.name)
+                }
+            }
+            ForEach(branches, id: \.name) { branch in
+                HStack {
+                    Image(systemName: "arrow.triangle.branch")
+                        .foregroundStyle(branch.isDefault ? .green : .secondary)
+                    Text(branch.name).font(.subheadline)
+                    if branch.isDefault {
+                        Text("default").font(.caption2)
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(Color.green.opacity(0.15), in: Capsule())
+                            .foregroundStyle(.green)
+                    }
+                    Spacer()
+                    Text(branch.lastActivity.formatted(date: .abbreviated, time: .omitted))
+                        .font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    // MARK: - Tags Section
+
+    private var tagsSection: some View {
+        Section("Tags") {
+            if tags.isEmpty {
+                Text("No tags created").font(.caption).foregroundStyle(.secondary)
+            } else {
+                ForEach(tags) { tag in
+                    HStack {
+                        Image(systemName: "tag.fill").foregroundStyle(.orange)
+                        Text(tag.name).font(.subheadline)
+                        Spacer()
+                        Text("v\(tag.version)").font(.caption2.monospaced()).foregroundStyle(.secondary)
+                    }
+                }
+                .onDelete { tags.remove(atOffsets: $0) }
+            }
+            HStack {
+                TextField("Tag name", text: $newTagName).font(.caption)
+                Button {
+                    tags.append(VersionTag(name: newTagName, version: connector.version, date: Date()))
+                    newTagName = ""
+                } label: { Image(systemName: "plus.circle.fill") }
+                .disabled(newTagName.isEmpty)
+            }
+        }
+    }
+
+    // MARK: - Versioning Settings
+
+    private var versioningSettingsSection: some View {
+        Section("Versioning Settings") {
+            Toggle("Auto-Versioning", isOn: $enableAutoVersioning)
+            Picker("Strategy", selection: $versioningStrategy) {
+                ForEach(VersioningStrategy.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+            }
+        }
+    }
+
+    // MARK: - Sheets
+
+    private var branchManagerSheet: some View {
+        List {
+            ForEach(branches, id: \.name) { branch in
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(branch.name).font(.subheadline.bold())
+                        if branch.isDefault { Text("default").font(.caption2).foregroundStyle(.green) }
+                    }
+                    Text("Last activity: \(branch.lastActivity.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+        }
+        .navigationTitle("Branch Manager")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var tagManagerSheet: some View {
+        List {
+            ForEach(tags) { tag in
+                LabeledContent(tag.name) {
+                    VStack(alignment: .trailing) {
+                        Text("v\(tag.version)").font(.caption.monospaced())
+                        Text(tag.date.formatted(date: .abbreviated, time: .omitted)).font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .onDelete { tags.remove(atOffsets: $0) }
+        }
+        .navigationTitle("Tag Manager")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var changelogSheet: some View {
+        Form {
+            Section("Generated Changelog") {
+                Text("## v\(connector.version)")
+                    .font(.headline)
+                Text("Released: \(connector.updatedAt.formatted(date: .abbreviated, time: .omitted))")
+                    .font(.caption).foregroundStyle(.secondary)
+                Text("### Changes")
+                    .font(.subheadline.bold())
+                Text("- \(connector.endpoints.count) endpoints configured")
+                    .font(.caption)
+                Text("- \(connector.flow.steps.count) flow steps defined")
+                    .font(.caption)
+                Text("- Auth: \(connector.authConfig.type.rawValue.capitalized)")
+                    .font(.caption)
+                Text("- Schema: \(connector.schema.mappings.count) mappings")
+                    .font(.caption)
+            }
+            Section {
+                Button("Copy Changelog") {
+                    let changelog = "## v\(connector.version)\nReleased: \(connector.updatedAt.formatted(date: .abbreviated, time: .omitted))\n\n### Changes\n- \(connector.endpoints.count) endpoints\n- \(connector.flow.steps.count) flow steps\n- Auth: \(connector.authConfig.type.rawValue)\n- \(connector.schema.mappings.count) schema mappings"
+                    UIPasteboard.general.string = changelog
+                }
+                .frame(maxWidth: .infinity).bold()
+                .buttonStyle(.borderedProminent)
+            }
+            .listRowBackground(Color.clear)
+        }
+        .navigationTitle("Changelog")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private func incrementVersion(_ v: String) -> String { let p = v.split(separator: ".").compactMap { Int($0) }; return p.count == 3 ? "\(p[0]).\(p[1]).\(p[2] + 1)" : v }
@@ -139,4 +321,25 @@ private struct DiffItem: View {
 private struct DetailMetricPill: View {
     let label: String; let value: String; let color: Color
     var body: some View { VStack(spacing: 4) { Text(value).font(.headline).foregroundStyle(color); Text(label).font(.caption2.bold()).foregroundStyle(.secondary) }.frame(maxWidth: .infinity) }
+}
+
+// MARK: - Version Models
+
+private struct VersionBranch {
+    let name: String
+    let isDefault: Bool
+    let lastActivity: Date
+}
+
+private struct VersionTag: Identifiable {
+    let id = UUID()
+    let name: String
+    let version: String
+    let date: Date
+}
+
+private enum VersioningStrategy: String, CaseIterable {
+    case semantic = "Semantic"
+    case calver = "CalVer"
+    case incremental = "Incremental"
 }
