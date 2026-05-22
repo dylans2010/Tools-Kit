@@ -1563,6 +1563,7 @@
 		3ACD485C621F41389BE35DB5 /* TypographyScaleDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7702CF69F348E4BC0B7488 /* TypographyScaleDevTool.swift */; };
 		DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E813EF936284C389651EA24 /* ColorMixerDevTool.swift */; };
 		21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5619C319AF314C56B15BA1E5 /* DevToolsMainView.swift */; };
+		NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3106,6 +3107,7 @@
 		2D7702CF69F348E4BC0B7488 /* TypographyScaleDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/TypographyScaleDevTool.swift; sourceTree = "<group>"; };
 		8E813EF936284C389651EA24 /* ColorMixerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ColorMixerDevTool.swift; sourceTree = "<group>"; };
 		5619C319AF314C56B15BA1E5 /* DevToolsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DevToolsMainView.swift; sourceTree = "<group>"; };
+		NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/NewDevTools.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -7868,6 +7870,7 @@
 				2D7702CF69F348E4BC0B7488 /* TypographyScaleDevTool.swift */,
 				8E813EF936284C389651EA24 /* ColorMixerDevTool.swift */,
 				5619C319AF314C56B15BA1E5 /* DevToolsMainView.swift */,
+				NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */,
 );
 			path = SDK;
 			sourceTree = "<group>";
@@ -11733,6 +11736,7 @@
 				3ACD485C621F41389BE35DB5 /* TypographyScaleDevTool.swift in Sources */,
 				DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */,
 				21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */,
+				NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11847,6 +11851,7 @@
 				3ACD485C621F41389BE35DB5 /* TypographyScaleDevTool.swift in Sources */,
 				DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */,
 				21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */,
+				NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11973,6 +11978,7 @@
 				3ACD485C621F41389BE35DB5 /* TypographyScaleDevTool.swift in Sources */,
 				DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */,
 				21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */,
+				NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
