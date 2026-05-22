@@ -25,6 +25,9 @@ public struct SDKConnectorMetricsSummary: Identifiable, Sendable {
     public let maxLatency: TimeInterval
     public let lastRequestAt: Date?
     public let uptime: TimeInterval
+    public let recentLatencies: [Double]
+
+    public var connectorID: UUID { id }
 
     public var successRate: Double {
         guard totalRequests > 0 else { return 0 }
@@ -42,7 +45,8 @@ public struct SDKConnectorMetricsSummary: Identifiable, Sendable {
         minLatency: TimeInterval,
         maxLatency: TimeInterval,
         lastRequestAt: Date?,
-        uptime: TimeInterval
+        uptime: TimeInterval,
+        recentLatencies: [Double] = []
     ) {
         self.id = id
         self.connectorName = connectorName
@@ -55,6 +59,7 @@ public struct SDKConnectorMetricsSummary: Identifiable, Sendable {
         self.maxLatency = maxLatency
         self.lastRequestAt = lastRequestAt
         self.uptime = uptime
+        self.recentLatencies = recentLatencies
     }
 }
 
@@ -141,7 +146,8 @@ public final class SDKConnectorMetricsTracker: SDKConnectorMetricsProtocol, Obse
                 minLatency: minVal,
                 maxLatency: maxVal,
                 lastRequestAt: data.lastRequestAt,
-                uptime: uptime
+                uptime: uptime,
+                recentLatencies: Array(data.latencies.suffix(50))
             )
         }
         .sorted { $0.connectorName < $1.connectorName }
