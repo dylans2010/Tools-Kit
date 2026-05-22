@@ -6,6 +6,13 @@ struct SDKDiagnosticsView: View {
     @StateObject private var connectorManager = SDKConnectorManager.shared
     @StateObject private var pluginManager = SDKPluginManager.shared
     @StateObject private var telemetry = SDKTelemetryEngine.shared
+    @StateObject private var logStore = SDKLogStore.shared
+    @State private var showingExportReport = false
+    @State private var showingDependencyGraph = false
+    @State private var showingResourceMonitor = false
+    @State private var autoRefreshDiag = false
+    @State private var refreshTimer: Timer?
+    @State private var diagnosticAlerts: [DiagnosticAlert] = []
     private let successRateHealthyThreshold: Double = 90
 
     var body: some View {
@@ -31,6 +38,13 @@ struct SDKDiagnosticsView: View {
 
                 MetricsSummaryView(items: snapshot.summaryItems)
 
+                ResourceMonitorPanel(
+                    memoryGB: ProcessInfo.processInfo.physicalMemory / 1024 / 1024 / 1024,
+                    processors: ProcessInfo.processInfo.activeProcessorCount,
+                    uptime: ProcessInfo.processInfo.systemUptime,
+                    thermalState: ProcessInfo.processInfo.thermalState
+                )
+
                 DiagnosticsStatusPanel(
                     title: "Data Sync State",
                     rows: snapshot.syncRows,
@@ -48,12 +62,220 @@ struct SDKDiagnosticsView: View {
                     rows: snapshot.connectorRows,
                     emptyMessage: "No connectors registered"
                 )
+
+                DiagnosticAlertsPanel(alerts: diagnosticAlerts)
+
+                DependencyHealthPanel(
+                    connectorCount: connectorManager.connectors.count,
+                    connectedCount: connectorManager.connectors.filter { $0.status == .connected }.count,
+                    pluginCount: pluginManager.plugins.count,
+                    enabledPluginCount: pluginManager.plugins.filter(\.isEnabled).count
+                )
+
+                DiagnosticActionsPanel(
+                    autoRefresh: $autoRefreshDiag,
+                    onExport: { showingExportReport = true },
+                    onClearAlerts: { diagnosticAlerts.removeAll() }
+                )
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
         }
         .navigationTitle("Diagnostics")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button { showingExportReport = true } label: { Label("Export Report", systemImage: "square.and.arrow.up") }
+                    Button { showingDependencyGraph = true } label: { Label("Dependency Graph", systemImage: "point.3.connected.trianglepath.dotted") }
+                    Button { showingResourceMonitor = true } label: { Label("Resource Monitor", systemImage: "gauge.with.dots.needle.33percent") }
+                    Divider()
+                    Button { runFullDiagnostic() } label: { Label("Run Full Diagnostic", systemImage: "stethoscope") }
+                } label: { Image(systemName: "ellipsis.circle") }
+            }
+        }
+        .onAppear { checkForAlerts() }
+        .onDisappear { refreshTimer?.invalidate() }
+        .onChange(of: autoRefreshDiag) { _, enabled in
+            if enabled {
+                refreshTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { _ in
+                    checkForAlerts()
+                }
+            } else {
+                refreshTimer?.invalidate()
+                refreshTimer = nil
+            }
+        }
+        .sheet(isPresented: $showingExportReport) {
+            NavigationStack { diagnosticExportSheet(snapshot) }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showingDependencyGraph) {
+            NavigationStack { dependencyGraphSheet }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showingResourceMonitor) {
+            NavigationStack { resourceMonitorSheet }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
+    }
+
+    private func diagnosticExportSheet(_ snapshot: DiagnosticsSnapshot) -> some View {
+        Form {
+            Section("Report Summary") {
+                LabeledContent("Health Status", value: "\(snapshot.healthRows.filter { $0.indicator.tint == .green }.count)/\(snapshot.healthRows.count) healthy")
+                LabeledContent("Success Rate", value: snapshot.successRateText)
+                LabeledContent("Connectors", value: "\(snapshot.connectorRows.count)")
+                LabeledContent("Plugins", value: "\(snapshot.pluginRows.count)")
+                LabeledContent("Alerts", value: "\(diagnosticAlerts.count)")
+            }
+            Section("Telemetry") {
+                LabeledContent("Total Traces", value: "\(snapshot.telemetryMetrics.totalTraces)")
+                LabeledContent("Avg Latency", value: "\(Int(snapshot.telemetryMetrics.averageDurationMs))ms")
+                LabeledContent("Successes", value: "\(snapshot.telemetryMetrics.successCount)")
+                LabeledContent("Failures", value: "\(snapshot.telemetryMetrics.failureCount)")
+            }
+            Section {
+                Button("Copy Report to Clipboard") {
+                    let report = buildDiagnosticReport(snapshot)
+                    UIPasteboard.general.string = report
+                }
+                .frame(maxWidth: .infinity).bold()
+                .buttonStyle(.borderedProminent)
+            }
+            .listRowBackground(Color.clear)
+        }
+        .navigationTitle("Diagnostic Report")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var dependencyGraphSheet: some View {
+        List {
+            Section("Connector Dependencies") {
+                ForEach(connectorManager.connectors, id: \.id) { connector in
+                    HStack {
+                        Image(systemName: "link").foregroundStyle(connector.isConnected ? .green : .secondary)
+                        VStack(alignment: .leading) {
+                            Text(connector.name).font(.subheadline)
+                            Text(connector.status.rawValue.capitalized).font(.caption2).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
+            Section("Plugin Dependencies") {
+                ForEach(pluginManager.plugins, id: \.id) { plugin in
+                    HStack {
+                        Image(systemName: "puzzlepiece").foregroundStyle(plugin.isEnabled ? .blue : .secondary)
+                        VStack(alignment: .leading) {
+                            Text(plugin.name).font(.subheadline)
+                            Text("v\(plugin.version)").font(.caption2).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Dependencies")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var resourceMonitorSheet: some View {
+        List {
+            Section("System Resources") {
+                LabeledContent("Physical Memory", value: "\(ProcessInfo.processInfo.physicalMemory / 1024 / 1024 / 1024) GB")
+                LabeledContent("Active Processors", value: "\(ProcessInfo.processInfo.activeProcessorCount)")
+                LabeledContent("System Uptime") {
+                    let uptime = ProcessInfo.processInfo.systemUptime
+                    Text("\(Int(uptime / 3600))h \(Int(uptime.truncatingRemainder(dividingBy: 3600) / 60))m")
+                }
+                LabeledContent("Thermal State") {
+                    let state = ProcessInfo.processInfo.thermalState
+                    Text(thermalLabel(state)).foregroundStyle(thermalColor(state))
+                }
+            }
+            Section("Log Statistics") {
+                LabeledContent("Total Entries", value: "\(logStore.entries.count)")
+                LabeledContent("Errors", value: "\(logStore.entries.filter { $0.level == .error }.count)")
+                LabeledContent("Warnings", value: "\(logStore.entries.filter { $0.level == .warning }.count)")
+            }
+        }
+        .navigationTitle("Resource Monitor")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func checkForAlerts() {
+        var alerts: [DiagnosticAlert] = []
+        let health = bgEngine.systemHealth
+        if !health.connectorReachability {
+            alerts.append(DiagnosticAlert(severity: .critical, message: "Connector reachability is degraded", source: "System Health"))
+        }
+        if !health.pluginSandboxStatus {
+            alerts.append(DiagnosticAlert(severity: .warning, message: "Plugin sandbox status warning", source: "System Health"))
+        }
+        if !health.coreDataHealth {
+            alerts.append(DiagnosticAlert(severity: .critical, message: "Core data store is unavailable", source: "System Health"))
+        }
+        let metrics = telemetry.getMetrics()
+        if metrics.totalTraces > 0 {
+            let successRate = Double(metrics.successCount) / Double(metrics.totalTraces) * 100
+            if successRate < successRateHealthyThreshold {
+                alerts.append(DiagnosticAlert(severity: .warning, message: "Success rate below \(Int(successRateHealthyThreshold))%: \(Int(successRate))%", source: "Telemetry"))
+            }
+        }
+        diagnosticAlerts = alerts
+    }
+
+    private func runFullDiagnostic() {
+        bgEngine.startHealthCheckLoop()
+        checkForAlerts()
+    }
+
+    private func buildDiagnosticReport(_ snapshot: DiagnosticsSnapshot) -> String {
+        var lines: [String] = []
+        lines.append("=== SDK Diagnostics Report ===")
+        lines.append("Generated: \(Date().formatted())")
+        lines.append("")
+        lines.append("[System Health]")
+        for row in snapshot.healthRows {
+            lines.append("  \(row.title): \(row.value) — \(row.indicator.text)")
+        }
+        lines.append("")
+        lines.append("[Telemetry]")
+        lines.append("  Total: \(snapshot.telemetryMetrics.totalTraces), Success: \(snapshot.telemetryMetrics.successCount), Fail: \(snapshot.telemetryMetrics.failureCount)")
+        lines.append("  Avg Latency: \(Int(snapshot.telemetryMetrics.averageDurationMs))ms, Success Rate: \(snapshot.successRateText)")
+        lines.append("")
+        lines.append("[Connectors]")
+        for row in snapshot.connectorRows { lines.append("  \(row.title): \(row.indicator.text)") }
+        lines.append("[Plugins]")
+        for row in snapshot.pluginRows { lines.append("  \(row.title): \(row.indicator.text)") }
+        if !diagnosticAlerts.isEmpty {
+            lines.append("")
+            lines.append("[Alerts]")
+            for alert in diagnosticAlerts { lines.append("  [\(alert.severity.rawValue.uppercased())] \(alert.message)") }
+        }
+        return lines.joined(separator: "\n")
+    }
+
+    private func thermalLabel(_ state: ProcessInfo.ThermalState) -> String {
+        switch state {
+        case .nominal: return "Nominal"
+        case .fair: return "Fair"
+        case .serious: return "Serious"
+        case .critical: return "Critical"
+        @unknown default: return "Unknown"
+        }
+    }
+
+    private func thermalColor(_ state: ProcessInfo.ThermalState) -> Color {
+        switch state {
+        case .nominal: return .green
+        case .fair: return .yellow
+        case .serious: return .orange
+        case .critical: return .red
+        @unknown default: return .secondary
+        }
     }
 
     private func makeSnapshot() -> DiagnosticsSnapshot {
@@ -407,5 +629,184 @@ private struct HealthIndicatorBadge: View {
             .padding(.vertical, 4)
             .foregroundStyle(indicator.tint)
             .background(indicator.tint.opacity(0.15), in: Capsule())
+    }
+}
+
+// MARK: - New Diagnostic Panels
+
+private struct ResourceMonitorPanel: View {
+    let memoryGB: UInt64
+    let processors: Int
+    let uptime: TimeInterval
+    let thermalState: ProcessInfo.ThermalState
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Resource Monitor")
+                .font(.headline)
+            HStack(spacing: 16) {
+                VStack(spacing: 2) {
+                    Image(systemName: "memorychip").foregroundStyle(.blue)
+                    Text("\(memoryGB) GB").font(.caption.bold())
+                    Text("Memory").font(.caption2).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                VStack(spacing: 2) {
+                    Image(systemName: "cpu").foregroundStyle(.purple)
+                    Text("\(processors)").font(.caption.bold())
+                    Text("CPUs").font(.caption2).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                VStack(spacing: 2) {
+                    Image(systemName: "clock").foregroundStyle(.green)
+                    Text("\(Int(uptime / 3600))h").font(.caption.bold())
+                    Text("Uptime").font(.caption2).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                VStack(spacing: 2) {
+                    Image(systemName: "thermometer").foregroundStyle(thermalColor)
+                    Text(thermalText).font(.caption.bold())
+                    Text("Thermal").font(.caption2).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private var thermalText: String {
+        switch thermalState {
+        case .nominal: return "OK"
+        case .fair: return "Fair"
+        case .serious: return "Warn"
+        case .critical: return "Hot"
+        @unknown default: return "?"
+        }
+    }
+
+    private var thermalColor: Color {
+        switch thermalState {
+        case .nominal: return .green
+        case .fair: return .yellow
+        case .serious: return .orange
+        case .critical: return .red
+        @unknown default: return .secondary
+        }
+    }
+}
+
+private struct DiagnosticAlertsPanel: View {
+    let alerts: [DiagnosticAlert]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Alerts").font(.headline)
+                Spacer()
+                if !alerts.isEmpty {
+                    Text("\(alerts.count)")
+                        .font(.caption2.bold())
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(Color.red.opacity(0.15), in: Capsule())
+                        .foregroundStyle(.red)
+                }
+            }
+            if alerts.isEmpty {
+                HStack {
+                    Image(systemName: "checkmark.shield.fill").foregroundStyle(.green)
+                    Text("No active alerts").font(.caption).foregroundStyle(.secondary)
+                }
+            } else {
+                ForEach(alerts) { alert in
+                    HStack(spacing: 8) {
+                        Image(systemName: alert.severity == .critical ? "exclamationmark.octagon.fill" : "exclamationmark.triangle.fill")
+                            .foregroundStyle(alert.severity == .critical ? .red : .orange)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(alert.message).font(.caption)
+                            Text(alert.source).font(.caption2).foregroundStyle(.tertiary)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+private struct DependencyHealthPanel: View {
+    let connectorCount: Int
+    let connectedCount: Int
+    let pluginCount: Int
+    let enabledPluginCount: Int
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Dependency Health")
+                .font(.headline)
+            HStack(spacing: 16) {
+                VStack(spacing: 2) {
+                    Text("\(connectedCount)/\(connectorCount)").font(.caption.bold()).foregroundStyle(.blue)
+                    Text("Connectors").font(.caption2).foregroundStyle(.secondary)
+                    ProgressView(value: connectorCount > 0 ? Double(connectedCount) / Double(connectorCount) : 1.0)
+                        .tint(.blue)
+                }
+                .frame(maxWidth: .infinity)
+                VStack(spacing: 2) {
+                    Text("\(enabledPluginCount)/\(pluginCount)").font(.caption.bold()).foregroundStyle(.purple)
+                    Text("Plugins").font(.caption2).foregroundStyle(.secondary)
+                    ProgressView(value: pluginCount > 0 ? Double(enabledPluginCount) / Double(pluginCount) : 1.0)
+                        .tint(.purple)
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+private struct DiagnosticActionsPanel: View {
+    @Binding var autoRefresh: Bool
+    let onExport: () -> Void
+    let onClearAlerts: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Actions")
+                .font(.headline)
+            Toggle("Auto-Refresh (10s)", isOn: $autoRefresh)
+                .font(.subheadline)
+            HStack(spacing: 12) {
+                Button(action: onExport) {
+                    Label("Export", systemImage: "square.and.arrow.up")
+                        .font(.caption)
+                }
+                .buttonStyle(.bordered)
+                Button(action: onClearAlerts) {
+                    Label("Clear Alerts", systemImage: "xmark.circle")
+                        .font(.caption)
+                }
+                .buttonStyle(.bordered)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+private struct DiagnosticAlert: Identifiable {
+    let id = UUID()
+    let severity: AlertSeverity
+    let message: String
+    let source: String
+
+    enum AlertSeverity: String {
+        case warning, critical
     }
 }

@@ -2,8 +2,13 @@ import SwiftUI
 
 struct SDKHomeView: View {
     @StateObject private var projectManager = SDKProjectManager.shared
+    @StateObject private var connectorManager = SDKConnectorManager.shared
+    @StateObject private var pluginManager = SDKPluginManager.shared
+    @StateObject private var telemetry = SDKTelemetryEngine.shared
     @State private var searchText = ""
     @State private var statusFilter: SDKProject.ProjectStatus?
+    @State private var showingSystemStatus = false
+    @State private var showingQuickActions = false
 
     private var projects: [SDKProject] {
         projectManager.filteredProjects(search: searchText, status: statusFilter)
@@ -11,6 +16,8 @@ struct SDKHomeView: View {
 
     var body: some View {
         List {
+            systemOverviewSection
+
             Section {
                 NavigationLink(destination: SignInView()) {
                     Label("Authorization", systemImage: "lock.shield")
@@ -44,6 +51,8 @@ struct SDKHomeView: View {
             } header: {
                 SDKSectionHeader("Development", subtitle: "Build, debug, and explore the SDK", alignment: .leading)
             }
+
+            quickActionsSection
 
             Section {
                 if projects.isEmpty {
@@ -122,6 +131,65 @@ struct SDKHomeView: View {
                     Image(systemName: "ellipsis.circle")
                 }
             }
+        }
+    }
+
+    // MARK: - System Overview Section
+
+    private var systemOverviewSection: some View {
+        Section {
+            HStack(spacing: 16) {
+                VStack(spacing: 2) {
+                    Text("\(projects.count)").font(.title3.bold()).foregroundStyle(.blue)
+                    Text("Projects").font(.caption2).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                VStack(spacing: 2) {
+                    Text("\(connectorManager.connectors.filter { $0.isConnected }.count)").font(.title3.bold()).foregroundStyle(.green)
+                    Text("Connected").font(.caption2).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                VStack(spacing: 2) {
+                    Text("\(pluginManager.plugins.filter(\.isEnabled).count)").font(.title3.bold()).foregroundStyle(.purple)
+                    Text("Plugins").font(.caption2).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                VStack(spacing: 2) {
+                    let metrics = telemetry.getMetrics()
+                    let rate = metrics.totalTraces > 0 ? Int(Double(metrics.successCount) / Double(metrics.totalTraces) * 100) : 100
+                    Text("\(rate)%").font(.title3.bold()).foregroundStyle(rate >= 95 ? .green : rate >= 80 ? .orange : .red)
+                    Text("Health").font(.caption2).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+            }
+        } header: {
+            SDKSectionHeader("System Status", subtitle: "Real-time workspace overview", alignment: .leading)
+        }
+    }
+
+    // MARK: - Quick Actions Section
+
+    private var quickActionsSection: some View {
+        Section {
+            Button {
+                _ = projectManager.createProject(name: "New SDK Project", status: .draft)
+            } label: {
+                Label("Create New Project", systemImage: "plus.rectangle")
+            }
+            NavigationLink(destination: SDKDiagnosticsView()) {
+                Label("Run Diagnostics", systemImage: "stethoscope")
+            }
+            NavigationLink(destination: SDKAPIExplorerView()) {
+                Label("API Explorer", systemImage: "point.3.connected.trianglepath.dotted")
+            }
+            NavigationLink(destination: SDKDataInspectorView()) {
+                Label("Data Inspector", systemImage: "magnifyingglass")
+            }
+            NavigationLink(destination: SDKAutomationView()) {
+                Label("Automation", systemImage: "bolt")
+            }
+        } header: {
+            SDKSectionHeader("Quick Actions", subtitle: "Frequently used tools", alignment: .leading)
         }
     }
 
