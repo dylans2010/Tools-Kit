@@ -36,6 +36,7 @@ struct PageEditorView: View {
     @State private var showingWordSuggestions = false
     @State private var showingAnalytics = false
     @State private var showingEssayDrafting = false
+    @State private var showingScanNotebooks = false
 
     // Existing Sheets
     @State private var showingSearch = false
@@ -127,6 +128,9 @@ struct PageEditorView: View {
         }
         .sheet(isPresented: $showingEssayDrafting) {
             EssayDraftingView()
+        }
+        .sheet(isPresented: $showingScanNotebooks) {
+            ScanNotebooksView()
         }
         .sheet(isPresented: $showingPageInfo) {
             PageInfoView(page: page, content: content, title: $title, isPresented: $showingPageInfo)
@@ -349,6 +353,8 @@ struct PageEditorView: View {
                     toolbarButton(icon: "chart.bar.doc.horizontal", label: "Analytics") { showingAnalytics = true }
 
                     toolbarButton(icon: "doc.text.badge.plus", label: "Draft") { showingEssayDrafting = true }
+
+                    toolbarButton(icon: "doc.text.viewfinder", label: "Scan") { showingScanNotebooks = true }
 
                     toolbarButton(icon: "book.closed", label: "Dictionary") { showingDictionary = true }
 
