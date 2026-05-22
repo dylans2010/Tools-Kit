@@ -19,7 +19,7 @@ struct PluginReviewsView: View {
                                 .foregroundStyle(.yellow)
                         }
                     }
-                    Text("\(reviews.count) reviews")
+                    Text("\(reviews.count) Reviews")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

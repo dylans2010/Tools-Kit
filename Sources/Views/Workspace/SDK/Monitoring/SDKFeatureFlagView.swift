@@ -31,7 +31,7 @@ struct SDKFeatureFlagView: View {
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Feature Flags")
-        .searchable(text: $searchText, prompt: "Search flags")
+        .searchable(text: $searchText, prompt: "Search Flags")
     }
 
     private var summarySection: some View {

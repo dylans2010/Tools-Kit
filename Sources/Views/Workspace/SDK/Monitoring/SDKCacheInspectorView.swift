@@ -23,7 +23,7 @@ struct SDKCacheInspectorView: View {
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Cache Inspector")
-        .searchable(text: $searchText, prompt: "Search cache keys")
+        .searchable(text: $searchText, prompt: "Search Cache Keys")
         .confirmationDialog("Clear Cache", isPresented: $showingClearConfirmation) {
             Button("Clear All", role: .destructive) { cacheManager.removeAll() }
             Button("Clear Expired Only") { cacheManager.removeExpired() }
@@ -96,7 +96,7 @@ struct SDKCacheInspectorView: View {
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
                             } else {
-                                Label("No expiry", systemImage: "infinity")
+                                Label("No Expiry", systemImage: "infinity")
                                     .font(.caption2)
                                     .foregroundStyle(.tertiary)
                             }

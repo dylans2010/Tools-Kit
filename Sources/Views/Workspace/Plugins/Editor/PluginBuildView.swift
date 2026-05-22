@@ -1,5 +1,3 @@
-
-
 import SwiftUI
 
 struct PluginBuildView: View {
@@ -182,7 +180,7 @@ export async function onEvent(event, ctx) {
         case rules = "Rules"
         case resources = "Resources"
         case ui = "UI"
-        case toolkit = "Toolkit"
+        case toolkit = "ToolKit"
         case testing = "Testing"
         case webhooks = "Webhooks"
         case localization = "Localization"
@@ -383,12 +381,12 @@ export async function onEvent(event, ctx) {
         output.append("• [\(Date().formatted())] Initializing Simulation...")
         let errors = performStrictValidation()
         for error in errors { output.append("ERROR: \(error)") }
-        output.append("• Validating logic syntax...")
+        output.append("• Validating Logic Syntax...")
         if sourceCode.contains("await") && !sourceCode.contains("async") {
             output.append("  ERROR: 'await' used outside of 'async' function")
         }
         if errors.isEmpty && output.count == 2 {
-            output.append("✓ Validation successful.")
+            output.append("✓ Validation Successful.")
         }
         simulatedBuildOutput = output
     }
@@ -483,7 +481,7 @@ private struct BuildIdentitySection: View {
 
         Section {
             if tags.isEmpty {
-                Text("No tags added.").font(.caption).foregroundStyle(.secondary)
+                Text("No Tags Added").font(.caption).foregroundStyle(.secondary)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
@@ -504,7 +502,7 @@ private struct BuildIdentitySection: View {
                 }
             }
             HStack {
-                TextField("Add tag...", text: $newTag)
+                TextField("Add Tag", text: $newTag)
                     .textInputAutocapitalization(.never)
                 Button("Add") {
                     let trimmed = newTag.trimmingCharacters(in: .whitespaces)
@@ -516,7 +514,7 @@ private struct BuildIdentitySection: View {
         } header: {
             Label("Tags", systemImage: "number")
         } footer: {
-            Text("Tags help users discover your plugin in the marketplace.")
+            Text("Tags help users discover your plugin in the Marketplace.")
         }
     }
 }
@@ -623,7 +621,7 @@ private struct BuildSecuritySection: View {
                     }
                 }
             } else {
-                ContentUnavailableView("Standard Security", systemImage: "shield.checkered", description: Text("No high-risk capabilities selected. Standard security policies apply."))
+                ContentUnavailableView("Standard Security", systemImage: "shield.checkered", description: Text("No high risk capabilities selected. Standard security policies apply."))
                     .scaleEffect(0.8)
             }
         } header: {
@@ -660,7 +658,7 @@ private struct BuildSecuritySection: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Label("Content Security Policy", systemImage: "shield.lefthalf.filled").font(.caption.bold()).foregroundStyle(.secondary)
-                TextField("CSP directive", text: $contentSecurityPolicy)
+                TextField("CSP Directive", text: $contentSecurityPolicy)
                     .font(.system(.caption, design: .monospaced))
                     .textFieldStyle(.roundedBorder)
             }
@@ -672,7 +670,7 @@ private struct BuildSecuritySection: View {
 
         Section {
             if ipAllowlist.isEmpty {
-                Text("No IP restrictions (all IPs allowed).").font(.caption).foregroundStyle(.secondary)
+                Text("No IP Restrictions (All IPs Allowed).").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(ipAllowlist, id: \.self) { ip in
                     HStack {
@@ -743,7 +741,7 @@ private struct BuildDependenciesSection: View {
     var body: some View {
         Section {
             if dependencies.isEmpty {
-                Text("No dependencies defined.").font(.caption).foregroundStyle(.secondary)
+                Text("No Dependencies Defined").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(dependencies, id: \.self) { dep in
                     HStack {
@@ -859,7 +857,7 @@ private struct BuildEndpointsSection: View {
                 HStack {
                     Label("Circuit Breaker", systemImage: "bolt.trianglebadge.exclamationmark")
                     Spacer()
-                    Text("\(circuitBreakerThreshold) failures").bold().font(.caption)
+                    Text("\(circuitBreakerThreshold) Failures").bold().font(.caption)
                 }
             }
 
@@ -1135,14 +1133,14 @@ private struct BuildTestingSection: View {
                             Text(suite.name).font(.subheadline.bold())
                             Spacer()
                             if let rate = suite.passRate {
-                                Text("\(Int(rate))% pass")
+                                Text("\(Int(rate))% Pass")
                                     .font(.caption2.bold())
                                     .padding(.horizontal, 6).padding(.vertical, 2)
                                     .background(rate >= 80 ? Color.green.opacity(0.12) : Color.red.opacity(0.12), in: Capsule())
                                     .foregroundStyle(rate >= 80 ? .green : .red)
                             }
                         }
-                        Text("\(suite.testCases.count) test case(s)")
+                        Text("\(suite.testCases.count) Test Case(s)")
                             .font(.caption2).foregroundStyle(.secondary)
                     }
                 }
@@ -1168,7 +1166,7 @@ private struct BuildTestingSection: View {
                     HStack {
                         Label("Concurrency", systemImage: "person.3.sequence")
                         Spacer()
-                        Text("\(loadTestConcurrency) threads").bold().font(.caption)
+                        Text("\(loadTestConcurrency) Threads").bold().font(.caption)
                     }
                 }
 
@@ -1196,8 +1194,8 @@ private struct BuildTestingSection: View {
                 }
             }
             HStack {
-                TextField("Endpoint path", text: $newMockKey).font(.caption.monospaced())
-                TextField("JSON response", text: $newMockValue).font(.caption.monospaced())
+                TextField("Endpoint Path", text: $newMockKey).font(.caption.monospaced())
+                TextField("JSON Response", text: $newMockValue).font(.caption.monospaced())
                 Button("Add") {
                     mockResponses[newMockKey] = newMockValue
                     newMockKey = ""; newMockValue = ""
@@ -1541,7 +1539,7 @@ private struct BuildWebhooksSection: View {
                 .keyboardType(.URL)
                 .font(.caption.monospaced())
 
-            TextField("Signing Secret (optional)", text: $newWebhookSecret)
+            TextField("Signing Secret (Optional)", text: $newWebhookSecret)
                 .textInputAutocapitalization(.never)
                 .font(.caption.monospaced())
 
@@ -1760,7 +1758,7 @@ private struct BuildAnalyticsSection: View {
 
             Section {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Built-in Tracked Metrics").font(.caption.bold()).foregroundStyle(.secondary)
+                    Text("Built in Tracked Metrics").font(.caption.bold()).foregroundStyle(.secondary)
                     HStack(spacing: 12) {
                         AnalyticsMetricChip(name: "Installs", icon: "arrow.down.circle")
                         AnalyticsMetricChip(name: "Executions", icon: "play.circle")
@@ -1806,7 +1804,7 @@ private struct BuildCollaborationSection: View {
     var body: some View {
         Section {
             Toggle(isOn: $enabled) {
-                Label("Enable Collaboration", systemImage: "person.2.fill")
+                Label("Enable Collaboration (Preview)", systemImage: "person.2.fill")
             }
 
             if enabled {
@@ -1832,7 +1830,7 @@ private struct BuildCollaborationSection: View {
         if enabled {
             Section {
                 if collaboratorEmails.isEmpty {
-                    Text("No collaborators added.").font(.caption).foregroundStyle(.secondary)
+                    Text("No Collaborators Added").font(.caption).foregroundStyle(.secondary)
                 } else {
                     ForEach(collaboratorEmails, id: \.self) { email in
                         HStack {
@@ -1846,7 +1844,7 @@ private struct BuildCollaborationSection: View {
                     }
                 }
                 HStack {
-                    TextField("Collaborator email", text: $newEmail)
+                    TextField("Collaborator Email", text: $newEmail)
                         .textInputAutocapitalization(.never).keyboardType(.emailAddress).font(.caption)
                     Button("Invite") {
                         guard !newEmail.isEmpty else { return }
@@ -2076,9 +2074,9 @@ private struct BuildFeatureFlagsSection: View {
             }
 
             VStack(spacing: 8) {
-                TextField("Flag key (e.g. enable_new_ui)", text: $newFlagKey)
+                TextField("Flag Key (e.g. enable_new_ui)", text: $newFlagKey)
                     .textInputAutocapitalization(.never).font(.caption.monospaced())
-                TextField("Description (optional)", text: $newFlagDescription).font(.caption)
+                TextField("Description (Optional)", text: $newFlagDescription).font(.caption)
             }
 
             Button("Add Feature Flag", systemImage: "flag.fill") {
@@ -2347,7 +2345,7 @@ private struct BuildLoggingSection: View {
                 HStack {
                     Label("Log Retention", systemImage: "calendar")
                     Spacer()
-                    Text("\(retentionDays) days").bold().font(.caption)
+                    Text("\(retentionDays) Days").bold().font(.caption)
                 }
             }
         } header: {
@@ -2390,7 +2388,7 @@ private struct BuildPipelineSection: View {
                 Label("Continuous Integration", systemImage: "arrow.triangle.2.circlepath.circle.fill")
             }
             Toggle(isOn: $autoTests) {
-                Label("Auto-Run Tests on Build", systemImage: "testtube.2")
+                Label("Auto Run Tests on Build", systemImage: "testtube.2")
             }
             Toggle(isOn: $linting) {
                 Label("Code Linting", systemImage: "checkmark.diamond.fill")

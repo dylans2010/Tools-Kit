@@ -29,7 +29,7 @@ struct SDKHealthDashboardView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(healthMonitor.overallStatus.rawValue.capitalized)
                         .font(.headline)
-                    Text("Checks performed: \(healthMonitor.checkCount)")
+                    Text("Checks Performed: \(healthMonitor.checkCount)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

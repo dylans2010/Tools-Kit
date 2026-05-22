@@ -189,7 +189,7 @@ struct SDKHomeView: View {
                 Label("Automation", systemImage: "bolt")
             }
         } header: {
-            SDKSectionHeader("Quick Actions", subtitle: "Frequently used tools", alignment: .leading)
+            SDKSectionHeader("Quick Actions", subtitle: "Frequently Used Tools", alignment: .leading)
         }
     }
 

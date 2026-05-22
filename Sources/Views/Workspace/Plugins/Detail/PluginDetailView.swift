@@ -80,11 +80,11 @@ private struct PluginProfileHeader: View {
                 Image(systemName: "puzzlepiece.extension").font(.largeTitle).foregroundStyle(Color.accentColor).frame(width: 64, height: 64).background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 14)) // TODO: icon unavailable on SDKPlugin
                 VStack(alignment: .leading, spacing: 4) {
                     Text(plugin.name).font(.title3.bold())
-                    Text("by Unknown Author").font(.subheadline).foregroundStyle(.secondary) // TODO: author unavailable on SDKPlugin
+                    Text("By Unknown Author").font(.subheadline).foregroundStyle(.secondary) // TODO: author unavailable on SDKPlugin
                     Text("Version \(plugin.version)").font(.caption2.bold()).foregroundStyle(.tertiary)
                 }
             }
-            Text("No description available").font(.body).foregroundStyle(.secondary) // TODO: description unavailable on SDKPlugin
+            Text("No Description Available").font(.body).foregroundStyle(.secondary) // TODO: description unavailable on SDKPlugin
         }.padding(.vertical, 8)
     }
 }

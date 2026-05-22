@@ -41,7 +41,7 @@ struct SDKTemplateGalleryView: View {
             }
         }
         .navigationTitle("Template Gallery")
-        .searchable(text: $searchText, prompt: "Search templates")
+        .searchable(text: $searchText, prompt: "Search Templates")
     }
 
     private func templateRow(_ template: SlideTemplate) -> some View {
@@ -68,7 +68,7 @@ struct SDKTemplateGalleryView: View {
                 }
             }
             HStack {
-                Text("\(template.slideLayouts.count) slides")
+                Text("\(template.slideLayouts.count) Slides")
                 if !template.tags.isEmpty {
                     ForEach(template.tags.prefix(3), id: \.self) { tag in
                         Text(tag)

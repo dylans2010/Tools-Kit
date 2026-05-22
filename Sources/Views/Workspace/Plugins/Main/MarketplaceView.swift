@@ -637,7 +637,7 @@ struct MarketplacePluginRow: View {
                             .foregroundStyle(.green)
                     }
                 }
-                Text("No description available").font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+                Text("No Description Available").font(.caption2).foregroundStyle(.secondary).lineLimit(1)
                 HStack(spacing: 4) {
                     Text("v\(plugin.version)").monospaced()
                     Text("·")
@@ -888,7 +888,7 @@ private struct MarketplacePluginPreviewSheet: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Permissions").font(.headline.bold())
                     if plugin.permissions.isEmpty {
-                        Text("No permissions required.").font(.caption).foregroundStyle(.secondary)
+                        Text("No Permissions Required").font(.caption).foregroundStyle(.secondary)
                     } else {
                         ForEach(plugin.permissions, id: \.self) { perm in
                             HStack {

@@ -1,5 +1,3 @@
-
-
 import SwiftUI
 
 struct SDKDeploymentView: View {
@@ -36,7 +34,7 @@ struct SDKDeploymentView: View {
                 Button(action: deploy) {
                     HStack {
                         if isDeploying { ProgressView().controlSize(.small) }
-                        Label("Deploy to Workspace", systemImage: "arrow.up.doc.fill")
+                        Label("Deploy To Workspace", systemImage: "arrow.up.doc.fill")
                             .bold()
                     }
                     .frame(maxWidth: .infinity)
@@ -47,7 +45,7 @@ struct SDKDeploymentView: View {
 
             if let plugin = deployedPlugin {
                 Section {
-                    Label("Successfully deployed", systemImage: "checkmark.circle.fill")
+                    Label("Successfully Deployed!", systemImage: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                     LabeledContent("Identifier") {
                         Text(plugin.identifier).font(.caption.monospaced())

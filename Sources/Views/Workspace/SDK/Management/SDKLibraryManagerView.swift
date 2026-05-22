@@ -1,5 +1,3 @@
-
-
 import SwiftUI
 
 struct SDKLibraryManagerView: View {
@@ -86,7 +84,7 @@ private struct LibraryItemRow: View {
             }
             HStack(spacing: 12) {
                 Label("\(library.usageCount) calls", systemImage: "phone").font(.caption2)
-                Label("\(library.linkedScopes.count) scopes", systemImage: "lock.shield").font(.caption2)
+                Label("\(library.linkedScopes.count) Scopes", systemImage: "lock.shield").font(.caption2)
             }.foregroundStyle(.secondary)
             if !library.pipelineStages.isEmpty {
                 Text(library.pipelineStages.joined(separator: " → "))

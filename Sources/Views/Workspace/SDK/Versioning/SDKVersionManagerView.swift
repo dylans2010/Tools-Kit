@@ -75,7 +75,7 @@ struct SDKVersionManagerView: View {
                             Text(notice.message)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            Text("Use \(notice.alternative) instead")
+                            Text("Use \(notice.alternative) Instead")
                                 .font(.caption)
                                 .foregroundStyle(.blue)
                         }

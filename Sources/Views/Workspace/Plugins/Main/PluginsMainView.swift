@@ -946,12 +946,12 @@ private struct PluginBulkActionsSheet: View {
                         manager.disable(id: plugin.id)
                     }
                 } label: {
-                    Label("Disable High-Permission Plugins", systemImage: "shield.slash")
+                    Label("Disable High Permission Plugins", systemImage: "shield.slash")
                 }
             }
 
             Section {
-                Text("Total: \(manager.plugins.count) plugins · \(manager.plugins.filter(\.isEnabled).count) enabled")
+                Text("Total: \(manager.plugins.count) Plugins · \(manager.plugins.filter(\.isEnabled).count) Enabled")
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
@@ -1067,7 +1067,7 @@ private struct PluginDependencyGraphSheet: View {
                         HStack {
                             Text(perm.rawValue.capitalized).font(.caption.bold())
                             Spacer()
-                            Text("\(count) plugin(s)").font(.caption2).foregroundStyle(.secondary)
+                            Text("\(count) Plugin(s)").font(.caption2).foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -1080,7 +1080,7 @@ private struct PluginDependencyGraphSheet: View {
                     HStack {
                         Text(hook).font(.caption.monospaced())
                         Spacer()
-                        Text("\(count) plugin(s)").font(.caption2).foregroundStyle(.secondary)
+                        Text("\(count) Plugin(s)").font(.caption2).foregroundStyle(.secondary)
                     }
                 }
             }

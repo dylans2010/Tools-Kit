@@ -79,7 +79,7 @@ struct SDKMarketplaceView: View {
             }
         }
         .navigationTitle("Marketplace")
-        .searchable(text: $searchText, prompt: "Search extensions")
+        .searchable(text: $searchText, prompt: "Search Extensions")
         .task { loadExtensions() }
     }
 

@@ -38,7 +38,7 @@ struct SDKPermissionControlView: View {
                     }
                 )) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("No-Sandbox Access")
+                        Text("No Sandbox Access")
                         Text("Bypass kernel boundary restrictions")
                             .font(.caption2)
                             .foregroundStyle(.secondary)

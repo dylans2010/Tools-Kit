@@ -92,7 +92,7 @@ struct SDKBuildView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(project.name)
                             .font(.headline)
-                        Text("Version v\(project.version)")
+                        Text("Version \(project.version)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
 
@@ -348,7 +348,7 @@ struct SDKBuildView: View {
         Section {
             NavigationLink(destination: SDKDownloadView()) { Label("SDK Export & Artifacts", systemImage: "arrow.down.doc.fill") }
             NavigationLink(destination: CustomAppSDKView()) { Label("Import App Shell", systemImage: "square.and.arrow.down.fill") }
-            NavigationLink(destination: SDKHelpView()) { Label("AI Architecture Copilot", systemImage: "sparkles") }
+            NavigationLink(destination: SDKHelpView()) { Label("SDK Assist", systemImage: "sparkle") }
             NavigationLink(destination: SDKSupportView()) { Label("Automated App Generator", systemImage: "magicmouse.fill") }
             NavigationLink(destination: SDKDeveloperGuideView()) { Label("SDK Technical Reference", systemImage: "book.fill") }
             NavigationLink(destination: SDKModuleRegistryView()) { Label("Global Module Registry", systemImage: "archivebox.fill") }
@@ -607,7 +607,7 @@ struct SDKBuildView: View {
             SDKLogStore.shared.log("Project Validation Passed", source: "SDKBuildView", level: .info)
             errorMessage = nil
         } else {
-            let msg = "Validation warnings: " + issues.joined(separator: ", ")
+            let msg = "Validation Warnings: " + issues.joined(separator: ", ")
             SDKLogStore.shared.log(msg, source: "SDKBuildView", level: .warning)
             errorMessage = msg
         }

@@ -38,7 +38,7 @@ struct SDKTestRunnerView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(suite.name)
                                 .font(.headline)
-                            Text("\(suite.cases.count) test cases")
+                            Text("\(suite.cases.count) Test Cases")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             ForEach(suite.cases) { tc in
@@ -95,12 +95,12 @@ struct SDKTestRunnerView: View {
             }
 
             if !harness.runHistory.isEmpty {
-                Section("History (\(harness.runHistory.count) runs)") {
+                Section("History (\(harness.runHistory.count) Runs)") {
                     ForEach(harness.runHistory) { run in
                         HStack {
                             Image(systemName: run.allPassed ? "checkmark.circle" : "xmark.circle")
                                 .foregroundStyle(run.allPassed ? .green : .red)
-                            Text("\(run.passedCount)/\(run.totalCount) passed")
+                            Text("\(run.passedCount)/\(run.totalCount) Passed")
                                 .font(.caption)
                             Spacer()
                             Text(run.startedAt.formatted(date: .abbreviated, time: .shortened))

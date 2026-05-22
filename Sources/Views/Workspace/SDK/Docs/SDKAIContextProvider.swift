@@ -1,12 +1,6 @@
 import Foundation
 
-/// Single-source-of-truth context provider for all AI-driven SDK features.
-/// Loads SDK_AI_System.md and constructs constrained system prompts from it.
-/// No external knowledge, hardcoded prompts, or fallback sources are permitted.
 enum SDKAIContextProvider {
-
-    /// Load the SDK_AI_System.md document from the app bundle.
-    /// Returns the full document content or an error notice if unavailable.
     static func loadContext() -> String {
         if let url = Bundle.main.url(forResource: "SDK_AI_System", withExtension: "md"),
            let content = try? String(contentsOf: url, encoding: .utf8) {
@@ -14,8 +8,7 @@ enum SDKAIContextProvider {
         }
         return "[SDK_AI_System.md could not be loaded from the app bundle. AI context is unavailable.]"
     }
-
-    /// Construct the system prompt for SDKHelpView.
+    
     /// The AI acts as a constrained interpretive assistant reading only SDK_AI_System.md.
     static func helpSystemPrompt(context: String) -> String {
         return """

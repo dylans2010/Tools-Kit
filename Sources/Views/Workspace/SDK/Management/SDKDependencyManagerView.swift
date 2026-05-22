@@ -34,7 +34,7 @@ struct SDKDependencyManagerView: View {
             Section("Conflict Resolution") {
                 let conflicts = conflictResolver.conflicts(in: state.dependencies)
                 if conflicts.isEmpty {
-                    Label("System integrity verified", systemImage: "checkmark.circle.fill").font(.caption).foregroundStyle(.green)
+                    Label("System Integrity Verified", systemImage: "checkmark.circle.fill").font(.caption).foregroundStyle(.green)
                 } else {
                     ForEach(conflicts, id: \.self) { conflict in
                         Label {
@@ -81,7 +81,7 @@ private struct DependencyTreeNodeRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 TextField("Pre-run Hook", text: Binding(get: { node.preRunHook ?? "" }, set: { node.preRunHook = $0.isEmpty ? nil : $0 })).font(.system(size: 9, design: .monospaced))
                 if node.linkedTo.count > 0 {
-                    Label("\(node.linkedTo.count) links", systemImage: "link").font(.system(size: 8)).foregroundStyle(.tertiary)
+                    Label("\(node.linkedTo.count) Links", systemImage: "link").font(.system(size: 8)).foregroundStyle(.tertiary)
                 }
             }
         }
