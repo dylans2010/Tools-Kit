@@ -1,6 +1,81 @@
 import SwiftUI
 import Aurora
 
+// MARK: - SuggestEssayDraft Animation
+
+struct SuggestEssayDraft: ViewModifier {
+    let isAnimating: Bool
+    @State private var sweepDirection = false
+    @State private var glowPhase: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                ZStack {
+                    if isAnimating {
+                        RoundedRectangle(cornerRadius: 12)
+                            .strokeBorder(
+                                AngularGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.accentColor.opacity(0.0),
+                                        Color.accentColor.opacity(0.6),
+                                        Color.purple.opacity(0.5),
+                                        Color.accentColor.opacity(0.8),
+                                        Color.blue.opacity(0.4),
+                                        Color.accentColor.opacity(0.0)
+                                    ]),
+                                    center: .center,
+                                    startAngle: .degrees(glowPhase),
+                                    endAngle: .degrees(glowPhase + 360)
+                                ),
+                                lineWidth: 2.5
+                            )
+                            .onAppear {
+                                withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: false)) {
+                                    glowPhase = 360
+                                }
+                            }
+                            .transition(.opacity)
+
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.accentColor.opacity(0.2), lineWidth: 1)
+                            .blur(radius: 4)
+
+                        AuroraGlow(.semiDramatic)
+                            .washSweepDuration(1.5)
+                            .washPulseWidth(0.6)
+                            .washPeak(0.4)
+                            .direction(sweepDirection ? .leadingToTrailing : .trailingToLeading)
+                            .introStyle(.borderFill)
+                            .introDuration(0.3)
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(lineWidth: 6)
+                            )
+                            .allowsHitTesting(false)
+                            .onAppear {
+                                withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: true)) {
+                                    sweepDirection.toggle()
+                                }
+                            }
+                    }
+                }
+                .animation(.easeInOut(duration: 0.4), value: isAnimating)
+            )
+            .shadow(
+                color: isAnimating ? Color.accentColor.opacity(0.25) : .clear,
+                radius: isAnimating ? 10 : 0
+            )
+            .animation(.easeInOut(duration: 0.4), value: isAnimating)
+    }
+}
+
+extension View {
+    func suggestEssayDraftAnimation(_ isAnimating: Bool) -> some View {
+        self.modifier(SuggestEssayDraft(isAnimating: isAnimating))
+    }
+}
+
 // MARK: - Enums
 
 enum EssayTone: String, CaseIterable, Identifiable {
@@ -135,6 +210,22 @@ enum LanguageComplexity: String, CaseIterable, Identifiable {
     }
 }
 
+enum EssayVocabularyLevel: String, CaseIterable, Identifiable {
+    case basic = "Basic"
+    case intermediate = "Intermediate"
+    case advanced = "Advanced"
+    case scholarly = "Scholarly"
+    var id: String { rawValue }
+}
+
+enum EssayParagraphStyle: String, CaseIterable, Identifiable {
+    case standard = "Standard"
+    case concise = "Concise"
+    case detailed = "Detailed"
+    case mixed = "Mixed"
+    var id: String { rawValue }
+}
+
 // MARK: - Models
 
 struct AIDetectionResult {
@@ -196,6 +287,11 @@ class EssayDraftingViewModel: ObservableObject {
     @Published var outputMode: String = "Full Essay"
     @Published var styleReference: String = ""
     @Published var keywords: String = ""
+    @Published var vocabularyLevel: EssayVocabularyLevel = .intermediate
+    @Published var paragraphStyle: EssayParagraphStyle = .standard
+    @Published var includeCounterArguments: Bool = false
+    @Published var includeTransitions: Bool = true
+    @Published var targetWordCount: Int = 800
 
     // UI State
     @Published var currentStep: Int = 1
@@ -743,29 +839,7 @@ struct EssayDraftingView: View {
                             .padding(8)
                             .background(Color(.secondarySystemBackground))
                             .cornerRadius(12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(
-                                        thesisSuggestAnimating
-                                            ? Color.accentColor
-                                            : Color.clear,
-                                        lineWidth: 2
-                                    )
-                                    .scaleEffect(thesisSuggestAnimating ? 1.03 : 1.0)
-                                    .opacity(thesisSuggestAnimating ? 1 : 0)
-                                    .animation(
-                                        thesisSuggestAnimating
-                                            ? .easeInOut(duration: 0.6).repeatForever(autoreverses: true)
-                                            : .easeOut(duration: 0.3),
-                                        value: thesisSuggestAnimating
-                                    )
-                            )
-                            .shadow(
-                                color: thesisSuggestAnimating ? Color.accentColor.opacity(0.3) : .clear,
-                                radius: thesisSuggestAnimating ? 8 : 0,
-                                x: 0,
-                                y: 0
-                            )
+                            .suggestEssayDraftAnimation(thesisSuggestAnimating)
                             .onChange(of: viewModel.suggestedThesisLoading) { _, isLoading in
                                 if !isLoading && thesisSuggestAnimating {
                                     withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
@@ -819,8 +893,30 @@ struct EssayDraftingView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Audience", systemImage: "person.text.rectangle")
                             .font(.subheadline).fontWeight(.semibold)
-                        TextField("Sudents, Research, etc", text: $viewModel.audience)
+                        TextField("Students, Researchers, etc", text: $viewModel.audience)
                             .textFieldStyle(.roundedBorder)
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Vocabulary Level", systemImage: "textformat.abc")
+                            .font(.subheadline).fontWeight(.semibold)
+                        Picker("Vocabulary", selection: $viewModel.vocabularyLevel) {
+                            ForEach(EssayVocabularyLevel.allCases) { level in
+                                Text(level.rawValue).tag(level)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Paragraph Style", systemImage: "text.alignleft")
+                            .font(.subheadline).fontWeight(.semibold)
+                        Picker("Paragraph Style", selection: $viewModel.paragraphStyle) {
+                            ForEach(EssayParagraphStyle.allCases) { style in
+                                Text(style.rawValue).tag(style)
+                            }
+                        }
+                        .pickerStyle(.segmented)
                     }
                 }
                 .padding()
@@ -853,6 +949,16 @@ struct EssayDraftingView: View {
                             .font(.subheadline).fontWeight(.semibold)
                     }
 
+                    Toggle(isOn: $viewModel.includeCounterArguments) {
+                        Label("Include Counter-Arguments", systemImage: "arrow.left.arrow.right")
+                            .font(.subheadline).fontWeight(.semibold)
+                    }
+
+                    Toggle(isOn: $viewModel.includeTransitions) {
+                        Label("Strong Paragraph Transitions", systemImage: "arrow.right.arrow.left")
+                            .font(.subheadline).fontWeight(.semibold)
+                    }
+
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Source Citation Requirements", systemImage: "quote.bubble")
                             .font(.subheadline).fontWeight(.semibold)
@@ -860,6 +966,16 @@ struct EssayDraftingView: View {
                             ForEach(viewModel.sourceRequirements, id: \.self) { Text($0) }
                         }
                         .pickerStyle(.segmented)
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Label("Target Word Count", systemImage: "number.circle")
+                                .font(.subheadline).fontWeight(.semibold)
+                            Spacer()
+                            Text("\(viewModel.targetWordCount) words").font(.caption.bold()).foregroundStyle(.accentColor)
+                        }
+                        Slider(value: Binding(get: { Double(viewModel.targetWordCount) }, set: { viewModel.targetWordCount = Int($0) }), in: 200...5000, step: 100)
                     }
                 }
                 .padding()
