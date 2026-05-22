@@ -132,6 +132,8 @@ struct ConnectorBuilderView: View {
 
             EndpointsConfigSection(endpoints: $pendingEndpoints, quickMethod: $quickEndpointMethod, quickPath: $quickEndpointPath, onAdd: addEndpoint)
 
+            connectorToolsSection
+
             managementToolsSection
 
             Section("Reliability") {
@@ -226,6 +228,59 @@ struct ConnectorBuilderView: View {
         .sheet(isPresented: $showingLogsViewer) { logsViewerSheet.presentationDetents([.large]) }
         .sheet(isPresented: $showingImportExport) { importExportSheet.presentationDetents([.medium]) }
         .alert("Validation", isPresented: $showingValidationAlert) { Button("OK") {} } message: { Text(validationMessage) }
+    }
+
+    // MARK: - Connector Tools Section
+
+    private var connectorToolsSection: some View {
+        Section("Connector Tools") {
+            connectorToolRow("OAuth Token Inspector", icon: "lock.open.rotation", desc: "Decode and inspect OAuth access & refresh tokens")
+            connectorToolRow("API Key Validator", icon: "key.fill", desc: "Validate API keys against the target service")
+            connectorToolRow("Request Signature Generator", icon: "signature", desc: "Generate HMAC-SHA256 request signatures")
+            connectorToolRow("Webhook Debugger", icon: "antenna.radiowaves.left.and.right", desc: "Inspect incoming webhook payloads in real-time")
+            connectorToolRow("Rate Limit Monitor", icon: "gauge.with.dots.needle.bottom.50percent", desc: "Track API rate limit headers and usage")
+            connectorToolRow("Response Cache Manager", icon: "archivebox", desc: "Cache and manage API response data locally")
+            connectorToolRow("Header Builder", icon: "list.bullet.clipboard", desc: "Build and template complex request headers")
+            connectorToolRow("Payload Transformer", icon: "arrow.triangle.swap", desc: "Transform JSON payloads between different schemas")
+            connectorToolRow("GraphQL Explorer", icon: "point.3.connected.trianglepath.dotted", desc: "Build and test GraphQL queries and mutations")
+            connectorToolRow("SOAP Envelope Builder", icon: "envelope.fill", desc: "Construct SOAP XML envelopes for legacy APIs")
+            connectorToolRow("Certificate Pinning", icon: "lock.shield.fill", desc: "Configure SSL certificate pinning for endpoints")
+            connectorToolRow("API Diff Checker", icon: "doc.text.magnifyingglass", desc: "Compare API responses across versions")
+            connectorToolRow("Batch Request Runner", icon: "square.stack.3d.up", desc: "Execute multiple API requests in sequence or parallel")
+            connectorToolRow("Mock Server", icon: "server.rack", desc: "Create mock API responses for offline testing")
+            connectorToolRow("Error Code Reference", icon: "exclamationmark.triangle", desc: "HTTP status code reference and custom error mapping")
+            connectorToolRow("Retry Policy Editor", icon: "arrow.clockwise.circle", desc: "Configure exponential backoff and retry strategies")
+            connectorToolRow("Data Pagination Helper", icon: "arrow.right.arrow.left", desc: "Handle cursor-based and offset pagination")
+            connectorToolRow("OAuth2 PKCE Generator", icon: "lock.rotation", desc: "Generate PKCE code verifiers and challenges")
+            connectorToolRow("API Blueprint Generator", icon: "doc.badge.gearshape", desc: "Auto-generate API documentation from endpoints")
+            connectorToolRow("Multipart Form Builder", icon: "doc.richtext", desc: "Build multipart/form-data requests with file uploads")
+            connectorToolRow("WebSocket Tester", icon: "bolt.horizontal", desc: "Test WebSocket connections and message streaming")
+            connectorToolRow("gRPC Client", icon: "arrow.left.arrow.right.circle", desc: "Build and test gRPC service calls")
+            connectorToolRow("SSE Stream Listener", icon: "waveform", desc: "Listen to Server-Sent Events streams")
+            connectorToolRow("API Health Monitor", icon: "heart.text.square", desc: "Continuous health checks with uptime tracking")
+            connectorToolRow("JWT Token Generator", icon: "person.badge.key.fill", desc: "Create and sign JWT tokens for API auth")
+            connectorToolRow("CORS Policy Checker", icon: "globe.badge.chevron.backward", desc: "Verify CORS headers and policy compliance")
+            connectorToolRow("API Version Manager", icon: "clock.badge.checkmark", desc: "Manage and switch between API versions")
+        }
+    }
+
+    private func connectorToolRow(_ title: String, icon: String, desc: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 16))
+                .foregroundStyle(.tint)
+                .frame(width: 28, height: 28)
+                .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 6))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.subheadline.weight(.medium))
+                Text(desc).font(.caption2).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.vertical, 4)
     }
 
     // MARK: - Management Tools

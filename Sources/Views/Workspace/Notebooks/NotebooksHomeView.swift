@@ -9,6 +9,10 @@ struct NotebooksHomeView: View {
     @State private var aiLoading = false
     @State private var aiError: String?
     @State private var aiInsights: NotebooksManager.AINotebookInsights?
+    @State private var editingNotebook: Notebook?
+    @State private var showingEditSheet = false
+    @State private var showingDeleteConfirmation = false
+    @State private var notebookToDelete: Notebook?
 
     var body: some View {
         ScrollView {
@@ -23,6 +27,22 @@ struct NotebooksHomeView: View {
         .sheet(isPresented: $showingCreate) { CreateNotebookView() }
         .sheet(isPresented: $showingIntegrations) { NavigationStack { IntegrationsView() } }
         .sheet(isPresented: $showingAISheet) { aiSheet }
+        .sheet(isPresented: $showingEditSheet) {
+            if let notebook = editingNotebook {
+                EditNotebookSheet(notebook: notebook, manager: manager, isPresented: $showingEditSheet)
+            }
+        }
+        .alert("Delete Notebook", isPresented: $showingDeleteConfirmation) {
+            Button("Cancel", role: .cancel) { notebookToDelete = nil }
+            Button("Delete", role: .destructive) {
+                if let notebook = notebookToDelete {
+                    manager.deleteNotebook(notebook)
+                    notebookToDelete = nil
+                }
+            }
+        } message: {
+            Text("Are you sure you want to delete \"\(notebookToDelete?.name ?? "")\"? This action cannot be undone.")
+        }
     }
 
     private var compactHeader: some View {
@@ -130,6 +150,23 @@ struct NotebooksHomeView: View {
                         NotebookRow(notebook: notebook)
                     }
                     .buttonStyle(.plain)
+                    .contextMenu {
+                        Button {
+                            editingNotebook = notebook
+                            showingEditSheet = true
+                        } label: {
+                            Label("Edit Notebook", systemImage: "pencil")
+                        }
+
+                        Divider()
+
+                        Button(role: .destructive) {
+                            notebookToDelete = notebook
+                            showingDeleteConfirmation = true
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
                 }
             }
         }
@@ -272,6 +309,123 @@ private struct NotebookRow: View {
                 Spacer()
                 Image(systemName: "chevron.right")
                     .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
+private struct EditNotebookSheet: View {
+    let notebook: Notebook
+    let manager: NotebooksManager
+    @Binding var isPresented: Bool
+    @State private var name: String
+    @State private var iconName: String
+    @State private var colorHex: String
+
+    private let iconOptions = [
+        "book.closed", "book.fill", "text.book.closed", "magazine",
+        "bookmark.fill", "star.fill", "heart.fill", "folder.fill",
+        "doc.text.fill", "pencil.circle.fill", "lightbulb.fill", "brain.head.profile"
+    ]
+
+    private let colorOptions = [
+        "#4F46E5", "#2563EB", "#7C3AED", "#DB2777",
+        "#DC2626", "#EA580C", "#D97706", "#16A34A",
+        "#0D9488", "#0891B2", "#4B5563", "#78716C"
+    ]
+
+    init(notebook: Notebook, manager: NotebooksManager, isPresented: Binding<Bool>) {
+        self.notebook = notebook
+        self.manager = manager
+        self._isPresented = isPresented
+        self._name = State(initialValue: notebook.name)
+        self._iconName = State(initialValue: notebook.iconName)
+        self._colorHex = State(initialValue: notebook.colorHex)
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Name") {
+                    TextField("Notebook Name", text: $name)
+                        .font(.headline)
+                }
+
+                Section("Icon") {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))], spacing: 12) {
+                        ForEach(iconOptions, id: \.self) { icon in
+                            Button {
+                                iconName = icon
+                            } label: {
+                                Image(systemName: icon)
+                                    .font(.title3)
+                                    .frame(width: 44, height: 44)
+                                    .background(
+                                        iconName == icon
+                                            ? Color.accentColor.opacity(0.15)
+                                            : Color(.tertiarySystemBackground),
+                                        in: RoundedRectangle(cornerRadius: 10)
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(iconName == icon ? Color.accentColor : .clear, lineWidth: 2)
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+
+                Section("Color") {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 40))], spacing: 12) {
+                        ForEach(colorOptions, id: \.self) { hex in
+                            Button {
+                                colorHex = hex
+                            } label: {
+                                Circle()
+                                    .fill(Color(hex: hex))
+                                    .frame(width: 36, height: 36)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.primary, lineWidth: colorHex == hex ? 3 : 0)
+                                    )
+                                    .overlay {
+                                        if colorHex == hex {
+                                            Image(systemName: "checkmark")
+                                                .font(.caption.bold())
+                                                .foregroundStyle(.white)
+                                        }
+                                    }
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+
+                Section("Info") {
+                    LabeledContent("Folders", value: "\(notebook.folders.count)")
+                    LabeledContent("Pages", value: "\(notebook.folders.flatMap(\.pages).count)")
+                    LabeledContent("Created", value: notebook.createdAt.formatted(date: .abbreviated, time: .shortened))
+                }
+            }
+            .navigationTitle("Edit Notebook")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { isPresented = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        var updated = notebook
+                        updated.name = name.isEmpty ? "Untitled Notebook" : name
+                        updated.iconName = iconName
+                        updated.colorHex = colorHex
+                        manager.updateNotebook(updated)
+                        isPresented = false
+                    }
+                    .bold()
+                    .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
             }
         }
     }
