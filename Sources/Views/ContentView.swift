@@ -4,6 +4,7 @@ struct ContentView: View {
     @StateObject private var modeManager = MusicModeManager.shared
     @StateObject private var workoutsMode = WorkoutsModeManager.shared
     @StateObject private var workspaceMode = WorkspaceModeManager.shared
+    @StateObject private var diagnosticsMode = DiagnosticsModeManager.shared
     @State private var isAuthenticated = false
     @State private var isCheckingSession = true
     @State private var hasRestoredSession = false
@@ -39,6 +40,8 @@ struct ContentView: View {
             WorkoutsHomeView()
         } else if workspaceMode.isWorkspaceModeEnabled {
             WorkspaceHomeView()
+        } else if diagnosticsMode.isDiagnosticsModeEnabled {
+            DiagnosticsHomeView()
         } else {
             DashboardView {
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {

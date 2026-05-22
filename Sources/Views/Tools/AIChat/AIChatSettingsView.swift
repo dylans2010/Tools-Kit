@@ -11,6 +11,7 @@ struct AIChatSettingsView: View {
     @StateObject private var musicMode = MusicModeManager.shared
     @StateObject private var workoutsMode = WorkoutsModeManager.shared
     @StateObject private var workspaceMode = WorkspaceModeManager.shared
+    @StateObject private var diagnosticsMode = DiagnosticsModeManager.shared
     @StateObject private var skillsManager = AIService.SkillsManager.shared
 
     @State private var isUploadingToCloud = false
@@ -708,7 +709,7 @@ struct AppModePickerView: View {
 
 extension AIChatSettingsView {
     enum AppMode: String, CaseIterable, Identifiable {
-        case dashboard, music, workouts, workspace
+        case dashboard, music, workouts, workspace, diagnostics
         var id: String { rawValue }
         var title: String {
             switch self {
@@ -716,6 +717,7 @@ extension AIChatSettingsView {
             case .music: return "Music"
             case .workouts: return "Workouts"
             case .workspace: return "Workspace"
+            case .diagnostics: return "Diagnostics"
             }
         }
         var icon: String {
@@ -724,6 +726,7 @@ extension AIChatSettingsView {
             case .music: return "music.note.list"
             case .workouts: return "figure.strengthtraining.traditional"
             case .workspace: return "rectangle.3.group"
+            case .diagnostics: return "stethoscope"
             }
         }
         var tint: Color {
@@ -732,6 +735,7 @@ extension AIChatSettingsView {
             case .music: return .pink
             case .workouts: return .mint
             case .workspace: return .indigo
+            case .diagnostics: return .teal
             }
         }
         var description: String {
@@ -740,6 +744,7 @@ extension AIChatSettingsView {
             case .music: return "Music Player Experience"
             case .workouts: return "AI Fitness Tracking"
             case .workspace: return "Production Workspace"
+            case .diagnostics: return "iOS Device Diagnostics Suite"
             }
         }
     }
@@ -748,6 +753,7 @@ extension AIChatSettingsView {
         if musicMode.isMusicModeEnabled { return .music }
         if workoutsMode.isWorkoutsModeEnabled { return .workouts }
         if workspaceMode.isWorkspaceModeEnabled { return .workspace }
+        if diagnosticsMode.isDiagnosticsModeEnabled { return .diagnostics }
         return .dashboard
     }
 
@@ -758,6 +764,7 @@ extension AIChatSettingsView {
                 musicMode.isMusicModeEnabled = (newMode == .music)
                 workoutsMode.isWorkoutsModeEnabled = (newMode == .workouts)
                 workspaceMode.isWorkspaceModeEnabled = (newMode == .workspace)
+                diagnosticsMode.isDiagnosticsModeEnabled = (newMode == .diagnostics)
             }
         )
     }
