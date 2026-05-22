@@ -22,46 +22,87 @@ enum ScanExtractionMode: String, CaseIterable, Identifiable, Codable {
         }
     }
 
-    var prompt: String {
-        switch self {
-        case .fullText:
-            return "Return the full OCR text exactly as extracted, cleaned up for readability."
-        case .summary:
-            return "Summarize the following scanned text concisely while preserving all key information. Return a structured summary with a title and body."
-        case .keyPoints:
-            return "Extract the most important key points from this scanned text. Return as a JSON array of strings, each a key point."
-        case .actionItems:
-            return "Extract all action items, tasks, and to-dos from this scanned text. Return as a JSON array of objects with 'title' and optional 'dueDate' (ISO8601) fields."
-        case .flashcards:
-            return "Create study flashcards from this scanned text. Return as a JSON array of objects with 'question' and 'answer' fields."
-        }
-    }
-
     var systemPrompt: String {
         switch self {
         case .fullText:
-            return "You clean up OCR text. Fix obvious OCR errors while preserving structure. Return only the cleaned text."
+            return ""
         case .summary:
-            return "You are an expert summarizer. Return JSON with 'title' (string) and 'body' (string) fields."
+            return "You are an expert summarizer. Given the raw OCR text from a scanned document, produce a concise summary preserving all key information. Return only the summary, no preamble."
         case .keyPoints:
-            return "You extract key points. Return a JSON array of strings. No extra commentary."
+            return "You extract key points. Given the raw OCR text, return a JSON array of strings, each a key point. Return ONLY valid JSON."
         case .actionItems:
-            return "You extract actionable tasks. Return a JSON array of objects with 'title' (string) and optional 'dueDate' (ISO8601 string) fields."
+            return "You extract action items. Given the raw OCR text, return a JSON array of objects with keys \"task\" (string) and \"done\" (bool, default false). Return ONLY valid JSON."
         case .flashcards:
-            return "You create study flashcards. Return a JSON array of objects with 'question' and 'answer' fields."
+            return "You create flashcards. Given the raw OCR text, return a JSON array of objects with keys \"question\" and \"answer\". Return ONLY valid JSON."
+        }
+    }
+
+    var userPrompt: String {
+        switch self {
+        case .fullText:    return ""
+        case .summary:     return "Summarize the following scanned text:"
+        case .keyPoints:   return "Extract key points from the following scanned text as a JSON array of strings:"
+        case .actionItems: return "Extract action items from the following scanned text as a JSON array of {\"task\": string, \"done\": bool}:"
+        case .flashcards:  return "Create flashcards from the following scanned text as a JSON array of {\"question\": string, \"answer\": string}:"
         }
     }
 }
 
-// MARK: - Structured Extraction Results
+// MARK: - Structured Extraction Result
 
-struct ScanSummaryResult: Codable, Equatable {
-    var title: String
-    var body: String
+enum ScanExtractionResult: Codable, Equatable {
+    case fullText(String)
+    case summary(String)
+    case keyPoints([String])
+    case actionItems([ScanActionItem])
+    case flashcards([ScanFlashcard])
+
+    var displayTitle: String {
+        switch self {
+        case .fullText:    return "Full Text"
+        case .summary:     return "Summary"
+        case .keyPoints:   return "Key Points"
+        case .actionItems: return "Action Items"
+        case .flashcards:  return "Flashcards"
+        }
+    }
+
+    var plainText: String {
+        switch self {
+        case .fullText(let t):    return t
+        case .summary(let t):     return t
+        case .keyPoints(let pts): return pts.enumerated().map { "• \($0.element)" }.joined(separator: "\n")
+        case .actionItems(let items):
+            return items.map { ($0.done ? "☑" : "☐") + " \($0.task)" }.joined(separator: "\n")
+        case .flashcards(let cards):
+            return cards.map { "Q: \($0.question)\nA: \($0.answer)" }.joined(separator: "\n\n")
+        }
+    }
+}
+
+struct ScanActionItem: Codable, Identifiable, Equatable {
+    var id = UUID()
+    var task: String
+    var done: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case task, done
+    }
+
+    init(task: String, done: Bool = false) {
+        self.task = task
+        self.done = done
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.task = try c.decode(String.self, forKey: .task)
+        self.done = try c.decodeIfPresent(Bool.self, forKey: .done) ?? false
+    }
 }
 
 struct ScanFlashcard: Codable, Identifiable, Equatable {
-    var id: UUID = UUID()
+    var id = UUID()
     var question: String
     var answer: String
 
@@ -70,233 +111,269 @@ struct ScanFlashcard: Codable, Identifiable, Equatable {
     }
 
     init(question: String, answer: String) {
-        self.id = UUID()
         self.question = question
         self.answer = answer
     }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = UUID()
         self.question = try c.decode(String.self, forKey: .question)
         self.answer = try c.decode(String.self, forKey: .answer)
     }
 }
 
-struct ScanActionItem: Codable, Identifiable, Equatable {
-    var id: UUID = UUID()
-    var title: String
-    var dueDate: String?
-    var isCompleted: Bool = false
+// MARK: - Detected Structured Data
 
-    enum CodingKeys: String, CodingKey {
-        case title, dueDate
+struct ScanDetectedData: Codable, Identifiable, Equatable {
+    var id = UUID()
+    var kind: DetectedKind
+    var rawText: String
+    var confidence: Double
+
+    enum DetectedKind: String, Codable, CaseIterable {
+        case table
+        case checklist
+        case date
+        case email
+        case url
+        case phoneNumber
+
+        var icon: String {
+            switch self {
+            case .table:       return "tablecells"
+            case .checklist:   return "checklist"
+            case .date:        return "calendar"
+            case .email:       return "envelope"
+            case .url:         return "link"
+            case .phoneNumber: return "phone"
+            }
+        }
+
+        var label: String {
+            switch self {
+            case .table:       return "Table"
+            case .checklist:   return "Checklist"
+            case .date:        return "Date"
+            case .email:       return "Email"
+            case .url:         return "URL"
+            case .phoneNumber: return "Phone"
+            }
+        }
     }
 
-    init(title: String, dueDate: String? = nil) {
-        self.id = UUID()
-        self.title = title
-        self.dueDate = dueDate
+    enum CodingKeys: String, CodingKey {
+        case kind, rawText, confidence
+    }
+
+    init(kind: DetectedKind, rawText: String, confidence: Double = 1.0) {
+        self.kind = kind
+        self.rawText = rawText
+        self.confidence = confidence
     }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = UUID()
-        self.title = try c.decode(String.self, forKey: .title)
-        self.dueDate = try c.decodeIfPresent(String.self, forKey: .dueDate)
+        self.kind = try c.decode(DetectedKind.self, forKey: .kind)
+        self.rawText = try c.decode(String.self, forKey: .rawText)
+        self.confidence = try c.decodeIfPresent(Double.self, forKey: .confidence) ?? 1.0
     }
 }
 
-// MARK: - Structured Data Detection
+// MARK: - Unreadable Region
 
-enum DetectedStructure: String, Codable, Identifiable, Equatable {
-    case table      = "Table"
-    case checklist  = "Checklist"
-    case date       = "Date"
-    case equation   = "Equation"
-    case list       = "List"
-
-    var id: String { rawValue }
-
-    var icon: String {
-        switch self {
-        case .table:     return "tablecells"
-        case .checklist: return "checklist"
-        case .date:      return "calendar"
-        case .equation:  return "function"
-        case .list:      return "list.bullet"
-        }
-    }
+struct ScanUnreadableRegion: Identifiable, Equatable {
+    let id = UUID()
+    let boundingBox: CGRect
+    let reason: String
 }
 
-struct DetectedStructureItem: Identifiable, Equatable, Codable {
-    var id: UUID = UUID()
-    var kind: DetectedStructure
-    var rawText: String
-    var lineRange: ClosedRange<Int>
+// MARK: - Quality Feedback
 
-    static func == (lhs: DetectedStructureItem, rhs: DetectedStructureItem) -> Bool {
-        lhs.id == rhs.id
+struct ScanQualityFeedback: Equatable {
+    var isBlurry: Bool = false
+    var isLowLight: Bool = false
+    var isSkewed: Bool = false
+    var overallScore: Double = 1.0
+
+    var issues: [String] {
+        var result: [String] = []
+        if isBlurry   { result.append("Image appears blurry") }
+        if isLowLight { result.append("Low lighting detected") }
+        if isSkewed   { result.append("Document may be skewed") }
+        return result
     }
+
+    var hasIssues: Bool { !issues.isEmpty }
 }
 
-// MARK: - Scan Result (persistent)
+// MARK: - Chat Message
 
-struct ScanResult: Identifiable, Codable, Equatable {
-    var id: UUID = UUID()
-    var rawText: String
-    var extractionMode: ScanExtractionMode
-    var summaryResult: ScanSummaryResult?
-    var keyPoints: [String]?
-    var actionItems: [ScanActionItem]?
-    var flashcards: [ScanFlashcard]?
-    var detectedStructures: [DetectedStructureItem]
-    var imageData: Data?
-    var tags: [String]
-    var createdAt: Date = Date()
-
-    var displayTitle: String {
-        if let summary = summaryResult {
-            return summary.title
-        }
-        let preview = rawText.prefix(60)
-        return preview.isEmpty ? "Scan \(createdAt.formatted(.dateTime.month().day().hour().minute()))" : String(preview) + "…"
-    }
-
-    static func == (lhs: ScanResult, rhs: ScanResult) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
-// MARK: - Chat System
-
-struct ScanChatMessage: Identifiable, Codable, Equatable {
-    var id: UUID = UUID()
-    var role: MessageRole
+struct ScanChatMessage: Codable, Identifiable, Equatable {
+    var id = UUID()
+    var role: Role
     var content: String
-    var createdAt: Date = Date()
+    var timestamp: Date
 
-    enum MessageRole: String, Codable {
-        case user
-        case assistant
-        case system
+    enum Role: String, Codable {
+        case user, assistant
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case role, content, timestamp
+    }
+
+    init(role: Role, content: String, timestamp: Date = Date()) {
+        self.role = role
+        self.content = content
+        self.timestamp = timestamp
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.role = try c.decode(Role.self, forKey: .role)
+        self.content = try c.decode(String.self, forKey: .content)
+        self.timestamp = try c.decode(Date.self, forKey: .timestamp)
     }
 }
 
-struct ScanChatSession: Identifiable, Codable, Equatable {
-    var id: UUID = UUID()
-    var scanID: UUID
-    var messages: [ScanChatMessage] = []
-    var createdAt: Date = Date()
+// MARK: - Transform Format
 
-    static func == (lhs: ScanChatSession, rhs: ScanChatSession) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
-// MARK: - Transform Pipeline
-
-enum ScanTransformTarget: String, CaseIterable, Identifiable, Codable {
-    case note          = "Note"
-    case tasks         = "Tasks"
-    case presentation  = "Presentation"
-    case report        = "Report"
-    case spreadsheet   = "Spreadsheet"
-    case calendarEvent = "Calendar Event"
+enum ScanTransformFormat: String, CaseIterable, Identifiable {
+    case tasks          = "Tasks"
+    case note           = "Note"
+    case presentation   = "Presentation"
+    case report         = "Report"
+    case spreadsheet    = "Spreadsheet"
+    case calendarEvents = "Calendar Events"
 
     var id: String { rawValue }
 
     var icon: String {
         switch self {
-        case .note:          return "note.text"
-        case .tasks:         return "checklist"
-        case .presentation:  return "rectangle.on.rectangle.angled"
-        case .report:        return "doc.richtext"
-        case .spreadsheet:   return "tablecells"
-        case .calendarEvent: return "calendar.badge.plus"
-        }
-    }
-
-    var prompt: String {
-        switch self {
-        case .note:
-            return "Convert the following scanned text into a well-structured note with a title and organized content using markdown."
-        case .tasks:
-            return "Convert the following scanned text into a list of actionable tasks. Return JSON array of objects with 'title', 'description', and 'priority' (Low/Medium/High/Critical) fields."
-        case .presentation:
-            return "Convert the following scanned text into presentation slides. Return JSON array of objects with 'title' and 'bulletPoints' (array of strings) fields."
-        case .report:
-            return "Convert the following scanned text into a professional report with title, executive summary, sections, and conclusion. Return as markdown."
-        case .spreadsheet:
-            return "Extract any tabular data from the following scanned text. Return JSON with 'headers' (array of strings) and 'rows' (array of arrays of strings)."
-        case .calendarEvent:
-            return "Extract event/date information from the following scanned text. Return JSON with 'title', 'description', 'date' (ISO8601), and 'location' fields."
+        case .tasks:          return "checklist"
+        case .note:           return "note.text"
+        case .presentation:   return "play.rectangle"
+        case .report:         return "doc.richtext"
+        case .spreadsheet:    return "tablecells"
+        case .calendarEvents: return "calendar.badge.plus"
         }
     }
 
     var systemPrompt: String {
         switch self {
-        case .note:
-            return "You convert raw text into clean, structured markdown notes."
         case .tasks:
-            return "You extract tasks from text. Return valid JSON array."
+            return "Convert the scanned content into a structured task list. Return a JSON array of {\"task\": string, \"priority\": \"high\"|\"medium\"|\"low\"}. Return ONLY valid JSON."
+        case .note:
+            return "Reformat the scanned content into a clean, well-structured note with headings, bullet points, and paragraphs. Return clean markdown."
         case .presentation:
-            return "You create slide outlines. Return valid JSON array."
+            return "Convert the scanned content into presentation slides. Return a JSON array of {\"title\": string, \"bullets\": [string]}. Return ONLY valid JSON."
         case .report:
-            return "You write professional reports in markdown format."
+            return "Transform the scanned content into a professional report with an executive summary, findings, and recommendations. Return clean markdown."
         case .spreadsheet:
-            return "You extract tabular data. Return valid JSON with 'headers' and 'rows'."
-        case .calendarEvent:
-            return "You extract event info. Return valid JSON."
+            return "Extract any tabular or list data from the scanned content. Return a JSON object with \"headers\": [string] and \"rows\": [[string]]. Return ONLY valid JSON."
+        case .calendarEvents:
+            return "Extract any dates, deadlines, or scheduled items from the scanned content. Return a JSON array of {\"title\": string, \"date\": string, \"notes\": string}. Return ONLY valid JSON."
         }
     }
 }
 
-struct ScanTransformResult: Identifiable, Equatable {
-    var id: UUID = UUID()
-    var target: ScanTransformTarget
-    var content: String
-    var createdAt: Date = Date()
-}
+// MARK: - Scan Record (persistent context)
 
-// MARK: - Image Quality
+struct ScanRecord: Codable, Identifiable, Equatable {
+    var id: UUID
+    var rawText: String
+    var extractionMode: ScanExtractionMode
+    var result: ScanExtractionResult
+    var detectedData: [ScanDetectedData]
+    var chatMessages: [ScanChatMessage]
+    var tags: [String]
+    var timestamp: Date
+    var linkedScanIDs: [UUID]
 
-enum ScanQualityIssue: String, Identifiable {
-    case blur        = "Image appears blurry"
-    case lowLight    = "Low lighting detected"
-    case skewed      = "Document appears skewed"
-    case partial     = "Text may be partially cut off"
+    enum CodingKeys: String, CodingKey {
+        case id, rawText, extractionMode, result, detectedData, chatMessages, tags, timestamp, linkedScanIDs
+    }
 
-    var id: String { rawValue }
-
-    var icon: String {
-        switch self {
-        case .blur:     return "camera.metering.unknown"
-        case .lowLight: return "sun.min"
-        case .skewed:   return "skew"
-        case .partial:  return "crop"
-        }
+    init(
+        rawText: String,
+        extractionMode: ScanExtractionMode,
+        result: ScanExtractionResult,
+        detectedData: [ScanDetectedData] = [],
+        chatMessages: [ScanChatMessage] = [],
+        tags: [String] = [],
+        linkedScanIDs: [UUID] = []
+    ) {
+        self.id = UUID()
+        self.rawText = rawText
+        self.extractionMode = extractionMode
+        self.result = result
+        self.detectedData = detectedData
+        self.chatMessages = chatMessages
+        self.tags = tags
+        self.timestamp = Date()
+        self.linkedScanIDs = linkedScanIDs
     }
 }
 
-// MARK: - Scan History Filter
+// MARK: - Scan Context Store
 
-enum ScanHistoryFilter: String, CaseIterable, Identifiable {
-    case all       = "All"
-    case today     = "Today"
-    case thisWeek  = "This Week"
-    case thisMonth = "This Month"
+@MainActor
+final class ScanContextStore: ObservableObject {
+    static let shared = ScanContextStore()
 
-    var id: String { rawValue }
-}
+    @Published private(set) var records: [ScanRecord] = []
 
-// MARK: - Scan Step (expanded)
+    private let storageURL: URL
 
-enum ScanStep: Int, CaseIterable {
-    case capture   = 1
-    case review    = 2
-    case aiTools   = 3
-    case chat      = 4
-    case transform = 5
-    case history   = 6
+    init() {
+        let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let dir = support.appendingPathComponent("ScanNotebooks", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        self.storageURL = dir.appendingPathComponent("scan_records.json")
+        loadRecords()
+    }
+
+    func loadRecords() {
+        guard let data = try? Data(contentsOf: storageURL),
+              let decoded = try? JSONDecoder().decode([ScanRecord].self, from: data) else { return }
+        records = decoded.sorted { $0.timestamp > $1.timestamp }
+    }
+
+    func addRecord(_ record: ScanRecord) {
+        records.insert(record, at: 0)
+        persist()
+    }
+
+    func updateRecord(_ record: ScanRecord) {
+        guard let idx = records.firstIndex(where: { $0.id == record.id }) else { return }
+        records[idx] = record
+        persist()
+    }
+
+    func deleteRecord(id: UUID) {
+        records.removeAll { $0.id == id }
+        persist()
+    }
+
+    func record(for id: UUID) -> ScanRecord? {
+        records.first { $0.id == id }
+    }
+
+    func search(query: String) -> [ScanRecord] {
+        let q = query.lowercased()
+        return records.filter {
+            $0.rawText.lowercased().contains(q) ||
+            $0.result.plainText.lowercased().contains(q) ||
+            $0.tags.contains(where: { $0.lowercased().contains(q) })
+        }
+    }
+
+    func linkedRecords(for record: ScanRecord) -> [ScanRecord] {
+        record.linkedScanIDs.compactMap { lid in records.first { $0.id == lid } }
+    }
+
+    private func persist() {
+        guard let data = try? JSONEncoder().encode(records) else { return }
+        try? data.write(to: storageURL, options: .atomic)
+    }
 }
