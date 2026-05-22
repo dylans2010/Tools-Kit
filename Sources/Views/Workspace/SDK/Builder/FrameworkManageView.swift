@@ -14,8 +14,26 @@ enum FrameworkLifecycleState: String, CaseIterable, Codable, Identifiable {
 }
 
 enum ReleaseChannel: String, CaseIterable, Codable, Identifiable {
-    case stable, beta, experimental
+    case stable, beta, experimental, canary, nightly
     var id: String { rawValue }
+    var icon: String {
+        switch self {
+        case .stable: return "checkmark.seal.fill"
+        case .beta: return "testtube.2"
+        case .experimental: return "flask"
+        case .canary: return "bird"
+        case .nightly: return "moon.stars"
+        }
+    }
+    var color: Color {
+        switch self {
+        case .stable: return .green
+        case .beta: return .orange
+        case .experimental: return .red
+        case .canary: return .yellow
+        case .nightly: return .purple
+        }
+    }
 }
 
 struct FrameworkDescriptor: Identifiable, Codable, Hashable {

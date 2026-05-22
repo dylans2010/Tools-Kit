@@ -1154,7 +1154,7 @@ private struct BuildReleaseSection: View {
         Section {
             Picker("Release Channel", selection: $releaseChannel) {
                 ForEach(ReleaseChannel.allCases) { channel in
-                    Label(channel.rawValue, systemImage: channel.icon).tag(channel)
+                    Label(channel.rawValue.capitalized, systemImage: channel.icon).tag(channel)
                 }
             }
             .pickerStyle(.menu)
@@ -1162,7 +1162,7 @@ private struct BuildReleaseSection: View {
             HStack {
                 Image(systemName: releaseChannel.icon)
                     .foregroundStyle(releaseChannel.color)
-                Text(releaseChannel.rawValue)
+                Text(releaseChannel.rawValue.capitalized)
                     .font(.caption.bold())
                     .foregroundStyle(releaseChannel.color)
                 Spacer()
@@ -1439,29 +1439,7 @@ enum SandboxExecutionMode: String, CaseIterable, Identifiable {
     }
 }
 
-enum ReleaseChannel: String, CaseIterable, Identifiable {
-    case stable = "Stable"
-    case beta = "Beta"
-    case canary = "Canary"
-    case nightly = "Nightly"
-    var id: String { rawValue }
-    var icon: String {
-        switch self {
-        case .stable: return "checkmark.seal.fill"
-        case .beta: return "testtube.2"
-        case .canary: return "bird"
-        case .nightly: return "moon.stars"
-        }
-    }
-    var color: Color {
-        switch self {
-        case .stable: return .green
-        case .beta: return .orange
-        case .canary: return .yellow
-        case .nightly: return .purple
-        }
-    }
-}
+
 
 enum PluginMarketCategory: String, CaseIterable, Identifiable {
     case utility = "Utility"

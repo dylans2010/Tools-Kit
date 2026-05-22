@@ -1250,7 +1250,7 @@ struct WritingAnalyticsView: View {
                         Button(b.rawValue) { comparisonBaseline = b }
                     }
                 } label: {
-                    Text("Change").font(.caption2.bold()).foregroundStyle(.accentColor)
+                    Text("Change").font(.caption2.bold()).foregroundStyle(Color.accentColor)
                 }
             }
 

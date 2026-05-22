@@ -41,11 +41,11 @@ struct SuggestEssayDraft: ViewModifier {
                             .stroke(Color.accentColor.opacity(0.2), lineWidth: 1)
                             .blur(radius: 4)
 
-                        AuroraGlow(.semiDramatic)
+                        AuroraGlow(.dramatic)
                             .washSweepDuration(1.5)
                             .washPulseWidth(0.6)
                             .washPeak(0.4)
-                            .direction(sweepDirection ? .leadingToTrailing : .trailingToLeading)
+                            .direction(sweepDirection ? .leftToRight : .rightToLeft)
                             .introStyle(.borderFill)
                             .introDuration(0.3)
                             .clipShape(
@@ -973,7 +973,7 @@ struct EssayDraftingView: View {
                             Label("Target Word Count", systemImage: "number.circle")
                                 .font(.subheadline).fontWeight(.semibold)
                             Spacer()
-                            Text("\(viewModel.targetWordCount) words").font(.caption.bold()).foregroundStyle(.accentColor)
+                            Text("\(viewModel.targetWordCount) words").font(.caption.bold()).foregroundStyle(Color.accentColor)
                         }
                         Slider(value: Binding(get: { Double(viewModel.targetWordCount) }, set: { viewModel.targetWordCount = Int($0) }), in: 200...5000, step: 100)
                     }
