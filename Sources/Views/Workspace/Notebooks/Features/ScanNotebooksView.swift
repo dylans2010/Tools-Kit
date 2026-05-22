@@ -94,14 +94,6 @@ enum ScanAITool: String, CaseIterable, Identifiable {
     }
 }
 
-// MARK: - Scan Step
-
-enum ScanStep: Int, CaseIterable {
-    case capture = 1
-    case review  = 2
-    case aiTools = 3
-}
-
 // MARK: - View Model
 
 @MainActor
@@ -113,6 +105,23 @@ final class ScanNotebooksViewModel: ObservableObject {
     @Published var aiResult = ""
     @Published var isProcessingAI = false
     @Published var didCopy = false
+
+    // Mode selection
+    @Published var selectedExtractionMode: ScanExtractionMode = .fullText
+
+    // Chat
+    @Published var chatInput = ""
+
+    // Transform
+    @Published var selectedTransformTarget: ScanTransformTarget?
+    @Published var showTransformSheet = false
+
+    // History
+    @Published var historyFilter: ScanHistoryFilter = .all
+    @Published var historySearchQuery = ""
+
+    // Active scan for chat/transform
+    @Published var activeScanID: UUID?
 
     func processWithTool(_ tool: ScanAITool, text: String) {
         selectedTool = tool
@@ -180,9 +189,12 @@ struct ScanNotebooksView: View {
     @StateObject private var engine = ScanNotebooksEngine()
     @StateObject private var viewModel = ScanNotebooksViewModel()
     @State private var didCopyExtracted = false
+    @State private var showHistorySheet = false
 
     private var isAnyLoading: Bool {
-        engine.isCapturing || engine.isExtracting || viewModel.isProcessingAI || viewModel.isTransitioning
+        engine.isCapturing || engine.isExtracting || viewModel.isProcessingAI
+        || viewModel.isTransitioning || engine.isProcessingStructured
+        || engine.isChatProcessing || engine.isTransforming
     }
 
     var body: some View {
@@ -191,11 +203,11 @@ struct ScanNotebooksView: View {
                 Color(.systemGroupedBackground).ignoresSafeArea()
 
                 VStack(spacing: 0) {
-                    stepIndicator
+                    topTabBar
 
                     ScrollView {
                         VStack(spacing: 24) {
-                            stepContent
+                            mainContent
                                 .transition(.asymmetric(
                                     insertion: .move(edge: .trailing).combined(with: .opacity),
                                     removal: .move(edge: .leading).combined(with: .opacity)
@@ -204,7 +216,7 @@ struct ScanNotebooksView: View {
                         .padding()
                     }
 
-                    if viewModel.currentStep != .aiTools || viewModel.aiResult.isEmpty {
+                    if shouldShowNavButtons {
                         navigationButtons
                     }
                 }
@@ -222,15 +234,28 @@ struct ScanNotebooksView: View {
                     }
                     .disabled(isAnyLoading)
                 }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showHistorySheet = true
+                    } label: {
+                        Label("History", systemImage: "clock.arrow.circlepath")
+                    }
+                }
             }
             .onAppear { engine.requestCameraAccess() }
             .onDisappear { engine.stopSession() }
-            .modifier(AIAnimationCoreModifier(isLoading: viewModel.isProcessingAI))
+            .modifier(AIAnimationCoreModifier(isLoading: viewModel.isProcessingAI || engine.isProcessingStructured || engine.isChatProcessing || engine.isTransforming))
             .overlay {
-                if viewModel.isProcessingAI {
+                if viewModel.isProcessingAI || engine.isProcessingStructured || engine.isTransforming {
                     loadingOverlay
                         .transition(.opacity)
                 }
+            }
+            .sheet(isPresented: $showHistorySheet) {
+                scanHistorySheet
+            }
+            .sheet(isPresented: $viewModel.showTransformSheet) {
+                transformSheet
             }
         }
     }
@@ -249,60 +274,78 @@ struct ScanNotebooksView: View {
         .zIndex(200)
     }
 
-    // MARK: - Step Indicator
+    // MARK: - Top Tab Bar
 
-    private var stepIndicator: some View {
-        HStack(spacing: 8) {
-            ForEach(ScanStep.allCases, id: \.rawValue) { step in
-                VStack(spacing: 4) {
-                    Capsule()
-                        .fill(
-                            viewModel.currentStep == step
-                                ? Color.accentColor
-                                : (viewModel.currentStep.rawValue > step.rawValue
-                                   ? Color.accentColor.opacity(0.4)
-                                   : Color(.tertiarySystemBackground))
-                        )
-                        .frame(height: 6)
-
-                    Text(stepLabel(for: step))
-                        .font(.system(size: 9, weight: .medium))
-                        .foregroundColor(
-                            viewModel.currentStep == step ? .accentColor : .secondary
-                        )
-                }
-                .animation(.spring(), value: viewModel.currentStep)
+    private var topTabBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 4) {
+                tabBarButton("Capture", icon: "camera.fill", step: .capture)
+                tabBarButton("Review", icon: "doc.text.magnifyingglass", step: .review)
+                tabBarButton("AI Tools", icon: "wand.and.stars", step: .aiTools)
+                tabBarButton("Chat", icon: "bubble.left.and.bubble.right.fill", step: .chat)
+                tabBarButton("Transform", icon: "arrow.triangle.branch", step: .transform)
             }
+            .padding(.horizontal)
         }
-        .padding()
+        .padding(.vertical, 8)
+        .background(Color(.secondarySystemBackground).opacity(0.5))
     }
 
-    private func stepLabel(for step: ScanStep) -> String {
-        switch step {
-        case .capture:  return "Capture"
-        case .review:   return "Review"
-        case .aiTools:  return "AI Tools"
+    private func tabBarButton(_ title: String, icon: String, step: ScanStep) -> some View {
+        Button {
+            transitionToStep(step)
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.caption2)
+                Text(title)
+                    .font(.caption.weight(.semibold))
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(
+                viewModel.currentStep == step
+                    ? Color.accentColor
+                    : Color(.tertiarySystemBackground)
+            )
+            .foregroundColor(viewModel.currentStep == step ? .white : .primary)
+            .clipShape(Capsule())
+        }
+        .animation(.spring(), value: viewModel.currentStep)
+    }
+
+    private var shouldShowNavButtons: Bool {
+        switch viewModel.currentStep {
+        case .capture, .review:
+            return true
+        case .aiTools:
+            return viewModel.aiResult.isEmpty
+        case .chat, .transform, .history:
+            return false
         }
     }
 
-    // MARK: - Step Content
+    // MARK: - Main Content Router
 
     @ViewBuilder
-    private var stepContent: some View {
+    private var mainContent: some View {
         switch viewModel.currentStep {
         case .capture:
-            captureStepView
-                .id(ScanStep.capture)
+            captureStepView.id(ScanStep.capture)
         case .review:
-            reviewStepView
-                .id(ScanStep.review)
+            reviewStepView.id(ScanStep.review)
         case .aiTools:
-            aiToolsStepView
-                .id(ScanStep.aiTools)
+            aiToolsStepView.id(ScanStep.aiTools)
+        case .chat:
+            chatStepView.id(ScanStep.chat)
+        case .transform:
+            transformStepView.id(ScanStep.transform)
+        case .history:
+            historyStepView.id(ScanStep.history)
         }
     }
 
-    // MARK: Step 1 — Capture
+    // MARK: - Step 1: Capture
 
     private var captureStepView: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -312,6 +355,14 @@ struct ScanNotebooksView: View {
             Text("Point your camera at handwritten or printed notes to extract text.")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
+
+            // Mode selection
+            modeSelectionBar
+
+            // Quality feedback
+            if !engine.qualityIssues.isEmpty {
+                qualityFeedbackBar
+            }
 
             if engine.cameraPermissionDenied {
                 cameraPermissionDeniedView
@@ -324,6 +375,69 @@ struct ScanNotebooksView: View {
         .padding()
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var modeSelectionBar: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Extraction Mode", systemImage: "slider.horizontal.3")
+                .font(.subheadline.bold())
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(ScanExtractionMode.allCases) { mode in
+                        Button {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            engine.selectedExtractionMode = mode
+                            viewModel.selectedExtractionMode = mode
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: mode.icon)
+                                    .font(.caption2)
+                                Text(mode.rawValue)
+                                    .font(.caption.weight(.medium))
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(
+                                viewModel.selectedExtractionMode == mode
+                                    ? Color.accentColor
+                                    : Color(.tertiarySystemBackground)
+                            )
+                            .foregroundColor(viewModel.selectedExtractionMode == mode ? .white : .primary)
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(
+                                        viewModel.selectedExtractionMode == mode
+                                            ? Color.accentColor
+                                            : Color(.separator).opacity(0.3),
+                                        lineWidth: 1
+                                    )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var qualityFeedbackBar: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ForEach(engine.qualityIssues) { issue in
+                HStack(spacing: 8) {
+                    Image(systemName: issue.icon)
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                    Text(issue.rawValue)
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                }
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.orange.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private var cameraPermissionDeniedView: some View {
@@ -350,15 +464,50 @@ struct ScanNotebooksView: View {
 
     private func capturedImagePreview(_ image: UIImage) -> some View {
         VStack(spacing: 12) {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFit()
-                .frame(maxHeight: 300)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(.separator).opacity(0.3), lineWidth: 1)
-                )
+            ZStack {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxHeight: 300)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(.separator).opacity(0.3), lineWidth: 1)
+                    )
+
+                // Unreadable region highlights
+                GeometryReader { geo in
+                    ForEach(Array(engine.unreadableRegions.enumerated()), id: \.offset) { _, rect in
+                        Rectangle()
+                            .fill(Color.red.opacity(0.2))
+                            .border(Color.red.opacity(0.5), width: 1)
+                            .frame(
+                                width: rect.width * geo.size.width,
+                                height: rect.height * geo.size.height
+                            )
+                            .position(
+                                x: rect.midX * geo.size.width,
+                                y: (1 - rect.midY) * geo.size.height
+                            )
+                    }
+                }
+            }
+
+            // OCR confidence bar
+            if engine.ocrConfidence < 1.0 {
+                HStack(spacing: 8) {
+                    Image(systemName: engine.ocrConfidence > 0.7 ? "checkmark.circle" : "exclamationmark.triangle")
+                        .font(.caption)
+                        .foregroundColor(engine.ocrConfidence > 0.7 ? .green : .orange)
+                    Text("OCR Confidence: \(Int(engine.ocrConfidence * 100))%")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    ProgressView(value: engine.ocrConfidence)
+                        .frame(width: 80)
+                        .tint(engine.ocrConfidence > 0.7 ? .green : .orange)
+                }
+            }
 
             if engine.isExtracting {
                 HStack(spacing: 8) {
@@ -437,7 +586,7 @@ struct ScanNotebooksView: View {
         }
     }
 
-    // MARK: Step 2 — Review
+    // MARK: - Step 2: Review
 
     private var reviewStepView: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -457,19 +606,17 @@ struct ScanNotebooksView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 32)
             } else {
-                ScrollView {
-                    Text(engine.extractedText)
-                        .font(.body)
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                // Structured result display
+                if let result = engine.structuredResult {
+                    structuredResultView(result)
+                } else {
+                    rawTextView
                 }
-                .frame(maxHeight: 350)
-                .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(.separator).opacity(0.3), lineWidth: 1)
-                )
+
+                // Detected structures
+                if !engine.detectedStructures.isEmpty {
+                    detectedStructuresSection
+                }
 
                 let wordCount = engine.extractedText.split { $0.isWhitespace }.count
                 let charCount = engine.extractedText.count
@@ -478,6 +625,16 @@ struct ScanNotebooksView: View {
                     HStack(spacing: 10) {
                         statChip(icon: "textformat.123", label: "\(wordCount) words")
                         statChip(icon: "character.cursor.ibeam", label: "\(charCount) chars")
+                        if engine.ocrConfidence < 1.0 {
+                            statChip(
+                                icon: "gauge",
+                                label: "\(Int(engine.ocrConfidence * 100))% confidence"
+                            )
+                        }
+                        statChip(
+                            icon: "doc.text.below.ecg",
+                            label: "\(engine.detectedStructures.count) structures"
+                        )
                     }
                 }
 
@@ -505,6 +662,19 @@ struct ScanNotebooksView: View {
                     }
                     .buttonStyle(.bordered)
                     .buttonBorderShape(.capsule)
+
+                    if engine.structuredResult == nil && viewModel.selectedExtractionMode != .fullText {
+                        Button {
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            engine.performStructuredExtraction(mode: viewModel.selectedExtractionMode)
+                        } label: {
+                            Label("Extract \(viewModel.selectedExtractionMode.rawValue)", systemImage: "sparkles")
+                                .font(.caption.bold())
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .buttonBorderShape(.capsule)
+                        .disabled(engine.isProcessingStructured)
+                    }
                 }
             }
         }
@@ -513,7 +683,146 @@ struct ScanNotebooksView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    // MARK: Step 3 — AI Tools
+    private var rawTextView: some View {
+        ScrollView {
+            Text(engine.extractedText)
+                .font(.body)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxHeight: 350)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color(.separator).opacity(0.3), lineWidth: 1)
+        )
+    }
+
+    @ViewBuilder
+    private func structuredResultView(_ result: ScanResult) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label(result.extractionMode.rawValue, systemImage: result.extractionMode.icon)
+                    .font(.subheadline.bold())
+                    .foregroundColor(.accentColor)
+                Spacer()
+                Text(result.createdAt, style: .relative)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+
+            if let summary = result.summaryResult {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(summary.title)
+                        .font(.headline)
+                    Text(summary.body)
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                }
+                .padding()
+                .background(Color(.tertiarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            if let points = result.keyPoints {
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(Array(points.enumerated()), id: \.offset) { idx, point in
+                        HStack(alignment: .top, spacing: 8) {
+                            Text("\(idx + 1).")
+                                .font(.caption.bold())
+                                .foregroundColor(.accentColor)
+                                .frame(width: 20, alignment: .trailing)
+                            Text(point)
+                                .font(.subheadline)
+                        }
+                    }
+                }
+                .padding()
+                .background(Color(.tertiarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            if let items = result.actionItems {
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(items) { item in
+                        HStack(spacing: 8) {
+                            Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+                                .font(.caption)
+                                .foregroundColor(item.isCompleted ? .green : .secondary)
+                            Text(item.title)
+                                .font(.subheadline)
+                                .strikethrough(item.isCompleted)
+                            if let due = item.dueDate {
+                                Spacer()
+                                Text(due)
+                                    .font(.caption2)
+                                    .foregroundColor(.orange)
+                            }
+                        }
+                    }
+                }
+                .padding()
+                .background(Color(.tertiarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            if let cards = result.flashcards {
+                VStack(spacing: 10) {
+                    ForEach(cards) { card in
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "questionmark.circle.fill")
+                                    .font(.caption)
+                                    .foregroundColor(.accentColor)
+                                Text(card.question)
+                                    .font(.subheadline.bold())
+                            }
+                            HStack(spacing: 6) {
+                                Image(systemName: "lightbulb.fill")
+                                    .font(.caption)
+                                    .foregroundColor(.yellow)
+                                Text(card.answer)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .padding()
+                        .background(Color(.tertiarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                }
+            }
+        }
+    }
+
+    private var detectedStructuresSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Detected Structures", systemImage: "doc.text.below.ecg")
+                .font(.subheadline.bold())
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(engine.detectedStructures) { item in
+                        HStack(spacing: 6) {
+                            Image(systemName: item.kind.icon)
+                                .font(.caption2)
+                                .foregroundColor(.accentColor)
+                            Text(item.kind.rawValue)
+                                .font(.caption2.weight(.medium))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color(.tertiarySystemBackground))
+                        .clipShape(Capsule())
+                        .overlay(Capsule().stroke(Color(.separator).opacity(0.3), lineWidth: 1))
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Step 3: AI Tools
 
     private var aiToolsStepView: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -537,7 +846,6 @@ struct ScanNotebooksView: View {
                 .font(.subheadline)
                 .foregroundColor(.secondary)
 
-            // Custom prompt
             VStack(alignment: .leading, spacing: 8) {
                 Label("Custom Instruction", systemImage: "text.cursor")
                     .font(.subheadline.bold())
@@ -672,6 +980,444 @@ struct ScanNotebooksView: View {
         }
     }
 
+    // MARK: - Step 4: Chat ("Ask Anything About This")
+
+    private var chatStepView: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Ask Anything About This")
+                    .font(.title2.bold())
+                Spacer()
+                if let scanID = viewModel.activeScanID ?? engine.structuredResult?.id {
+                    let related = engine.linkedScans(for: scanID)
+                    if !related.isEmpty {
+                        Label("\(related.count) linked", systemImage: "link")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+
+            Text("Chat with AI about your scanned content. Context is preserved across messages.")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+
+            // Chat messages
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 12) {
+                        if engine.activeChatMessages.isEmpty {
+                            VStack(spacing: 12) {
+                                Image(systemName: "bubble.left.and.bubble.right")
+                                    .font(.system(size: 36))
+                                    .foregroundColor(.secondary.opacity(0.5))
+                                Text("Start a conversation about your scan")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 40)
+                        } else {
+                            ForEach(engine.activeChatMessages) { message in
+                                chatBubble(message)
+                                    .id(message.id)
+                            }
+                        }
+
+                        if engine.isChatProcessing {
+                            HStack(spacing: 8) {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                Text("Thinking...")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.horizontal)
+                            .id("typing")
+                        }
+                    }
+                    .padding(.vertical, 8)
+                }
+                .frame(maxHeight: 400)
+                .background(Color(.tertiarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color(.separator).opacity(0.3), lineWidth: 1)
+                )
+                .onChange(of: engine.activeChatMessages.count) { _ in
+                    if let last = engine.activeChatMessages.last {
+                        withAnimation {
+                            proxy.scrollTo(last.id, anchor: .bottom)
+                        }
+                    }
+                }
+            }
+
+            // Chat input
+            HStack(spacing: 8) {
+                TextField("Ask about this scan...", text: $viewModel.chatInput)
+                    .textFieldStyle(.roundedBorder)
+
+                Button {
+                    let scanID = viewModel.activeScanID ?? engine.structuredResult?.id ?? UUID()
+                    if viewModel.activeScanID == nil {
+                        viewModel.activeScanID = scanID
+                        engine.startChatSession(for: scanID)
+                    }
+                    let text = viewModel.chatInput
+                    viewModel.chatInput = ""
+                    engine.sendChatMessage(text, scanID: scanID)
+                } label: {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.accentColor)
+                }
+                .disabled(viewModel.chatInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || engine.isChatProcessing)
+            }
+
+            // Quick question suggestions
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    quickChatButton("Summarize key findings")
+                    quickChatButton("What are the main topics?")
+                    quickChatButton("Find action items")
+                    quickChatButton("Explain the key terms")
+                }
+            }
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .onAppear {
+            let scanID = viewModel.activeScanID ?? engine.structuredResult?.id
+            if let sid = scanID {
+                engine.startChatSession(for: sid)
+            }
+        }
+    }
+
+    private func chatBubble(_ message: ScanChatMessage) -> some View {
+        HStack {
+            if message.role == .user { Spacer() }
+
+            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
+                Text(message.content)
+                    .font(.subheadline)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(
+                        message.role == .user
+                            ? Color.accentColor
+                            : Color(.tertiarySystemBackground)
+                    )
+                    .foregroundColor(message.role == .user ? .white : .primary)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+
+                Text(message.createdAt, style: .time)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: 280, alignment: message.role == .user ? .trailing : .leading)
+
+            if message.role != .user { Spacer() }
+        }
+        .padding(.horizontal, 8)
+    }
+
+    private func quickChatButton(_ text: String) -> some View {
+        Button {
+            viewModel.chatInput = text
+        } label: {
+            Text(text)
+                .font(.caption)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color(.tertiarySystemBackground))
+                .clipShape(Capsule())
+                .overlay(Capsule().stroke(Color(.separator).opacity(0.3), lineWidth: 1))
+        }
+        .foregroundColor(.primary)
+    }
+
+    // MARK: - Step 5: Transform
+
+    private var transformStepView: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text("Transform")
+                .font(.title2.bold())
+
+            Text("Convert your scanned content into other formats and integrate with your workspace.")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: 12),
+                GridItem(.flexible(), spacing: 12)
+            ], spacing: 12) {
+                ForEach(ScanTransformTarget.allCases) { target in
+                    Button {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        viewModel.selectedTransformTarget = target
+                        let scanID = viewModel.activeScanID ?? engine.structuredResult?.id ?? UUID()
+                        engine.transformScan(scanID: scanID, target: target)
+                    } label: {
+                        VStack(spacing: 10) {
+                            Image(systemName: target.icon)
+                                .font(.title2)
+                                .foregroundColor(.accentColor)
+                            Text(target.rawValue)
+                                .font(.caption.weight(.semibold))
+                                .lineLimit(1)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                        .background(Color(.tertiarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .stroke(Color(.separator).opacity(0.3), lineWidth: 1)
+                        )
+                    }
+                    .foregroundColor(.primary)
+                    .disabled(engine.isTransforming || engine.extractedText.isEmpty)
+                }
+            }
+
+            if let result = engine.transformResult {
+                transformResultView(result)
+            }
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func transformResultView(_ result: ScanTransformResult) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label(result.target.rawValue, systemImage: result.target.icon)
+                    .font(.headline)
+                    .foregroundColor(.accentColor)
+                Spacer()
+                Text(result.createdAt, style: .relative)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+
+            ScrollView {
+                Text(result.content)
+                    .font(.body)
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .frame(maxHeight: 300)
+            .background(Color(.tertiarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(.separator).opacity(0.3), lineWidth: 1)
+            )
+
+            HStack(spacing: 10) {
+                Button {
+                    UIPasteboard.general.string = result.content
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                } label: {
+                    Label("Copy", systemImage: "doc.on.doc")
+                        .font(.caption.bold())
+                }
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.capsule)
+
+                Button {
+                    let scanID = viewModel.activeScanID ?? engine.structuredResult?.id ?? UUID()
+                    engine.applyTransformToWorkspace(result: result, scanID: scanID)
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                } label: {
+                    Label("Add to Workspace", systemImage: "plus.circle.fill")
+                        .font(.caption.bold())
+                }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
+            }
+        }
+    }
+
+    // MARK: - Step 6: History
+
+    private var historyStepView: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Scan History")
+                .font(.title2.bold())
+
+            // Search
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.secondary)
+                TextField("Search scans...", text: $viewModel.historySearchQuery)
+                    .textFieldStyle(.roundedBorder)
+            }
+
+            // Filter
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(ScanHistoryFilter.allCases) { filter in
+                        Button {
+                            viewModel.historyFilter = filter
+                        } label: {
+                            Text(filter.rawValue)
+                                .font(.caption.weight(.medium))
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(
+                                    viewModel.historyFilter == filter
+                                        ? Color.accentColor
+                                        : Color(.tertiarySystemBackground)
+                                )
+                                .foregroundColor(viewModel.historyFilter == filter ? .white : .primary)
+                                .clipShape(Capsule())
+                        }
+                    }
+                }
+            }
+
+            let results = viewModel.historySearchQuery.isEmpty
+                ? engine.filteredHistory(filter: viewModel.historyFilter)
+                : engine.searchHistory(query: viewModel.historySearchQuery)
+
+            if results.isEmpty {
+                VStack(spacing: 12) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.system(size: 36))
+                        .foregroundColor(.secondary.opacity(0.5))
+                    Text("No scans found")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 32)
+            } else {
+                LazyVStack(spacing: 10) {
+                    ForEach(results) { scan in
+                        scanHistoryRow(scan)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func scanHistoryRow(_ scan: ScanResult) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: scan.extractionMode.icon)
+                    .font(.caption)
+                    .foregroundColor(.accentColor)
+                Text(scan.displayTitle)
+                    .font(.subheadline.weight(.medium))
+                    .lineLimit(1)
+                Spacer()
+                Text(scan.createdAt, style: .relative)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+
+            Text(scan.rawText.prefix(120) + (scan.rawText.count > 120 ? "…" : ""))
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .lineLimit(2)
+
+            if !scan.tags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 4) {
+                        ForEach(scan.tags, id: \.self) { tag in
+                            Text(tag)
+                                .font(.system(size: 9, weight: .medium))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.accentColor.opacity(0.1))
+                                .clipShape(Capsule())
+                        }
+                    }
+                }
+            }
+
+            HStack(spacing: 10) {
+                Button {
+                    viewModel.activeScanID = scan.id
+                    engine.startChatSession(for: scan.id)
+                    transitionToStep(.chat)
+                } label: {
+                    Label("Chat", systemImage: "bubble.left")
+                        .font(.caption2.bold())
+                }
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.capsule)
+
+                Button {
+                    viewModel.activeScanID = scan.id
+                    transitionToStep(.transform)
+                } label: {
+                    Label("Transform", systemImage: "arrow.triangle.branch")
+                        .font(.caption2.bold())
+                }
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.capsule)
+
+                Spacer()
+
+                Button(role: .destructive) {
+                    engine.deleteScan(scan)
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.caption2)
+                }
+            }
+        }
+        .padding()
+        .background(Color(.tertiarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color(.separator).opacity(0.3), lineWidth: 1)
+        )
+    }
+
+    // MARK: - History Sheet
+
+    private var scanHistorySheet: some View {
+        NavigationStack {
+            historyStepView
+                .padding()
+                .navigationTitle("Scan History")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Done") { showHistorySheet = false }
+                    }
+                }
+        }
+    }
+
+    // MARK: - Transform Sheet
+
+    private var transformSheet: some View {
+        NavigationStack {
+            transformStepView
+                .padding()
+                .navigationTitle("Transform Scan")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Done") { viewModel.showTransformSheet = false }
+                    }
+                }
+        }
+    }
+
     // MARK: - Navigation Buttons
 
     private var navigationButtons: some View {
@@ -691,9 +1437,9 @@ struct ScanNotebooksView: View {
                 .disabled(isAnyLoading)
             }
 
-            if viewModel.currentStep.rawValue < ScanStep.allCases.count {
+            if viewModel.currentStep == .capture || viewModel.currentStep == .review {
                 Button {
-                    let next = ScanStep(rawValue: viewModel.currentStep.rawValue + 1) ?? .aiTools
+                    let next = ScanStep(rawValue: viewModel.currentStep.rawValue + 1) ?? .review
                     transitionToStep(next)
                 } label: {
                     Label(nextButtonLabel, systemImage: "chevron.right")
@@ -713,7 +1459,7 @@ struct ScanNotebooksView: View {
         switch viewModel.currentStep {
         case .capture: return "Review Text"
         case .review:  return "Use AI Tools"
-        case .aiTools: return "Next"
+        default:       return "Next"
         }
     }
 
@@ -723,7 +1469,7 @@ struct ScanNotebooksView: View {
             return !engine.extractedText.isEmpty
         case .review:
             return !engine.extractedText.isEmpty
-        case .aiTools:
+        default:
             return false
         }
     }
