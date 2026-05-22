@@ -55,13 +55,13 @@ struct SDKPluginRegistryView: View {
         Section("Category") {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    CategoryChip(label: "All", isSelected: selectedCategory == nil) {
+                    PluginCategoryChip(label: "All", isSelected: selectedCategory == nil) {
                         selectedCategory = nil
                     }
                     ForEach(SDKPluginCategory.allCases, id: \.self) { category in
                         let count = registry.plugins(inCategory: category).count
                         if count > 0 {
-                            CategoryChip(
+                            PluginCategoryChip(
                                 label: "\(category.rawValue.capitalized) (\(count))",
                                 isSelected: selectedCategory == category
                             ) {
@@ -247,7 +247,7 @@ private struct PluginRegistryRow: View {
     }
 }
 
-private struct CategoryChip: View {
+private struct PluginCategoryChip: View {
     let label: String
     let isSelected: Bool
     let action: () -> Void

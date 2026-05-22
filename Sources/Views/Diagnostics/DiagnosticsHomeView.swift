@@ -48,7 +48,7 @@ struct DiagnosticsHomeView: View {
     private var categoryScrollBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                CategoryChip(
+                DiagnosticsCategoryChip(
                     title: "All",
                     icon: "square.grid.2x2.fill",
                     isSelected: viewModel.selectedCategory == nil,
@@ -60,7 +60,7 @@ struct DiagnosticsHomeView: View {
                 }
 
                 ForEach(DiagnosticCategory.allCases) { category in
-                    CategoryChip(
+                    DiagnosticsCategoryChip(
                         title: category.rawValue,
                         icon: category.icon,
                         isSelected: viewModel.selectedCategory == category,
@@ -164,7 +164,7 @@ struct DiagnosticsHomeView: View {
     }
 }
 
-struct CategoryChip: View {
+struct DiagnosticsCategoryChip: View {
     let title: String
     let icon: String
     let isSelected: Bool
