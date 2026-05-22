@@ -165,7 +165,7 @@ struct PageEditorView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 if isPreview {
-                    Text((try? AttributedString(markdown: content)) ?? AttributedString(content))
+                    MarkdownRenderedView(markdown: content)
                         .padding()
                 } else {
                     TextEditor(text: $content)
@@ -573,13 +573,11 @@ struct NotebookFormattingView: View {
     }
 
     private func applyColor() {
-        let hex = textColor.toHex() ?? "#000000"
-        wrap("<color value=\"\(hex)\">", "</color>")
+        wrap("**", "**")
     }
 
     private func applyHighlight() {
-        let hex = highlightColor.toHex() ?? "#FFFF00"
-        wrap("<highlight value=\"\(hex)\">", "</highlight>")
+        wrap("==", "==")
     }
 
     private func formatButton(icon: String, action: @escaping () -> Void) -> some View {
@@ -621,11 +619,11 @@ struct NotebookFormattingView: View {
     }
 
     private func wrap(_ marker: String) {
-        content += marker + "text" + marker
+        content += " " + marker + "your text" + marker
     }
 
     private func wrap(_ start: String, _ end: String) {
-        content += start + "selected text" + end
+        content += " " + start + "your text" + end
     }
 }
 
@@ -698,6 +696,378 @@ struct PageInfoView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Markdown Rendered View
+
+struct MarkdownRenderedView: View {
+    let markdown: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(Array(parseBlocks().enumerated()), id: \.offset) { _, block in
+                renderBlock(block)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private enum MarkdownBlock {
+        case heading(Int, String)
+        case paragraph(String)
+        case bulletItem(String)
+        case numberedItem(Int, String)
+        case codeBlock(String)
+        case blockquote(String)
+        case divider
+        case table([[String]])
+        case highlight(String)
+    }
+
+    private func parseBlocks() -> [MarkdownBlock] {
+        var blocks: [MarkdownBlock] = []
+        let lines = markdown.components(separatedBy: "\n")
+        var i = 0
+        var currentParagraph = ""
+
+        func flushParagraph() {
+            let trimmed = currentParagraph.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmed.isEmpty {
+                blocks.append(.paragraph(trimmed))
+            }
+            currentParagraph = ""
+        }
+
+        while i < lines.count {
+            let line = lines[i]
+            let trimmedLine = line.trimmingCharacters(in: .whitespaces)
+
+            if trimmedLine.hasPrefix("```") {
+                flushParagraph()
+                var codeLines: [String] = []
+                i += 1
+                while i < lines.count && !lines[i].trimmingCharacters(in: .whitespaces).hasPrefix("```") {
+                    codeLines.append(lines[i])
+                    i += 1
+                }
+                blocks.append(.codeBlock(codeLines.joined(separator: "\n")))
+                i += 1
+                continue
+            }
+
+            if trimmedLine.hasPrefix("####") {
+                flushParagraph()
+                let text = String(trimmedLine.dropFirst(4)).trimmingCharacters(in: .whitespaces)
+                blocks.append(.heading(4, text))
+            } else if trimmedLine.hasPrefix("###") {
+                flushParagraph()
+                let text = String(trimmedLine.dropFirst(3)).trimmingCharacters(in: .whitespaces)
+                blocks.append(.heading(3, text))
+            } else if trimmedLine.hasPrefix("##") {
+                flushParagraph()
+                let text = String(trimmedLine.dropFirst(2)).trimmingCharacters(in: .whitespaces)
+                blocks.append(.heading(2, text))
+            } else if trimmedLine.hasPrefix("# ") {
+                flushParagraph()
+                let text = String(trimmedLine.dropFirst(2)).trimmingCharacters(in: .whitespaces)
+                blocks.append(.heading(1, text))
+            } else if trimmedLine.hasPrefix("---") || trimmedLine.hasPrefix("***") || trimmedLine.hasPrefix("___") {
+                flushParagraph()
+                blocks.append(.divider)
+            } else if trimmedLine.hasPrefix("- ") || trimmedLine.hasPrefix("* ") {
+                flushParagraph()
+                let text = String(trimmedLine.dropFirst(2))
+                blocks.append(.bulletItem(text))
+            } else if let dotIndex = trimmedLine.firstIndex(of: "."),
+                      dotIndex > trimmedLine.startIndex,
+                      let num = Int(String(trimmedLine[trimmedLine.startIndex..<dotIndex])),
+                      trimmedLine.index(after: dotIndex) < trimmedLine.endIndex,
+                      trimmedLine[trimmedLine.index(after: dotIndex)] == " " {
+                flushParagraph()
+                let textStart = trimmedLine.index(dotIndex, offsetBy: 2)
+                let text = textStart < trimmedLine.endIndex ? String(trimmedLine[textStart...]) : ""
+                blocks.append(.numberedItem(num, text))
+            } else if trimmedLine.hasPrefix("> ") {
+                flushParagraph()
+                let text = String(trimmedLine.dropFirst(2))
+                blocks.append(.blockquote(text))
+            } else if trimmedLine.hasPrefix("|") && trimmedLine.hasSuffix("|") {
+                flushParagraph()
+                var tableRows: [[String]] = []
+                while i < lines.count {
+                    let tableLine = lines[i].trimmingCharacters(in: .whitespaces)
+                    if tableLine.hasPrefix("|") && tableLine.hasSuffix("|") {
+                        let cells = tableLine
+                            .trimmingCharacters(in: CharacterSet(charactersIn: "|"))
+                            .components(separatedBy: "|")
+                            .map { $0.trimmingCharacters(in: .whitespaces) }
+                        let isSeparator = cells.allSatisfy { $0.allSatisfy { $0 == "-" || $0 == ":" } }
+                        if !isSeparator {
+                            tableRows.append(cells)
+                        }
+                        i += 1
+                    } else {
+                        break
+                    }
+                }
+                if !tableRows.isEmpty {
+                    blocks.append(.table(tableRows))
+                }
+                continue
+            } else if trimmedLine.contains("==") && trimmedLine.range(of: "==.+==", options: .regularExpression) != nil {
+                flushParagraph()
+                blocks.append(.highlight(trimmedLine))
+            } else if trimmedLine.isEmpty {
+                flushParagraph()
+            } else {
+                if !currentParagraph.isEmpty {
+                    currentParagraph += " "
+                }
+                currentParagraph += trimmedLine
+            }
+
+            i += 1
+        }
+        flushParagraph()
+        return blocks
+    }
+
+    @ViewBuilder
+    private func renderBlock(_ block: MarkdownBlock) -> some View {
+        switch block {
+        case .heading(let level, let text):
+            renderInlineMarkdown(text)
+                .font(headingFont(level))
+                .fontWeight(.bold)
+                .padding(.top, level == 1 ? 8 : 4)
+
+        case .paragraph(let text):
+            renderInlineMarkdown(text)
+                .font(.body)
+                .lineSpacing(4)
+
+        case .bulletItem(let text):
+            HStack(alignment: .top, spacing: 8) {
+                Text("\u{2022}")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                renderInlineMarkdown(text)
+                    .font(.body)
+            }
+            .padding(.leading, 8)
+
+        case .numberedItem(let num, let text):
+            HStack(alignment: .top, spacing: 8) {
+                Text("\(num).")
+                    .font(.body.monospacedDigit())
+                    .foregroundColor(.secondary)
+                    .frame(minWidth: 20, alignment: .trailing)
+                renderInlineMarkdown(text)
+                    .font(.body)
+            }
+            .padding(.leading, 8)
+
+        case .codeBlock(let code):
+            ScrollView(.horizontal, showsIndicators: false) {
+                Text(code)
+                    .font(.system(.caption, design: .monospaced))
+                    .foregroundColor(.primary)
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.tertiarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+        case .blockquote(let text):
+            HStack(spacing: 10) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.accentColor)
+                    .frame(width: 3)
+                renderInlineMarkdown(text)
+                    .font(.body.italic())
+                    .foregroundColor(.secondary)
+            }
+            .padding(.vertical, 4)
+            .padding(.leading, 4)
+
+        case .divider:
+            Divider()
+                .padding(.vertical, 4)
+
+        case .table(let rows):
+            renderTable(rows)
+
+        case .highlight(let text):
+            let cleaned = text.replacingOccurrences(of: "==", with: "")
+            Text(cleaned)
+                .font(.body)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.yellow.opacity(0.4))
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+    }
+
+    private func headingFont(_ level: Int) -> Font {
+        switch level {
+        case 1: return .title
+        case 2: return .title2
+        case 3: return .title3
+        default: return .headline
+        }
+    }
+
+    private func renderInlineMarkdown(_ text: String) -> Text {
+        var result = Text("")
+        var remaining = text[text.startIndex...]
+
+        while !remaining.isEmpty {
+            if remaining.hasPrefix("**") || remaining.hasPrefix("__") {
+                let marker = String(remaining.prefix(2))
+                remaining = remaining.dropFirst(2)
+                if let endRange = remaining.range(of: marker) {
+                    let boldText = String(remaining[remaining.startIndex..<endRange.lowerBound])
+                    result = result + Text(boldText).bold()
+                    remaining = remaining[endRange.upperBound...]
+                    continue
+                } else {
+                    result = result + Text(marker)
+                    continue
+                }
+            }
+
+            if remaining.hasPrefix("*") || remaining.hasPrefix("_") {
+                let marker = String(remaining.prefix(1))
+                remaining = remaining.dropFirst(1)
+                if let endRange = remaining.range(of: marker) {
+                    let italicText = String(remaining[remaining.startIndex..<endRange.lowerBound])
+                    result = result + Text(italicText).italic()
+                    remaining = remaining[endRange.upperBound...]
+                    continue
+                } else {
+                    result = result + Text(marker)
+                    continue
+                }
+            }
+
+            if remaining.hasPrefix("~~") {
+                remaining = remaining.dropFirst(2)
+                if let endRange = remaining.range(of: "~~") {
+                    let strikeText = String(remaining[remaining.startIndex..<endRange.lowerBound])
+                    result = result + Text(strikeText).strikethrough()
+                    remaining = remaining[endRange.upperBound...]
+                    continue
+                } else {
+                    result = result + Text("~~")
+                    continue
+                }
+            }
+
+            if remaining.hasPrefix("`") {
+                remaining = remaining.dropFirst(1)
+                if let endRange = remaining.range(of: "`") {
+                    let codeText = String(remaining[remaining.startIndex..<endRange.lowerBound])
+                    result = result + Text(codeText)
+                        .font(.system(.body, design: .monospaced))
+                        .foregroundColor(.purple)
+                    remaining = remaining[endRange.upperBound...]
+                    continue
+                } else {
+                    result = result + Text("`")
+                    continue
+                }
+            }
+
+            if remaining.hasPrefix("==") {
+                remaining = remaining.dropFirst(2)
+                if let endRange = remaining.range(of: "==") {
+                    let highlightText = String(remaining[remaining.startIndex..<endRange.lowerBound])
+                    result = result + Text(highlightText)
+                        .foregroundColor(.black)
+                        .backgroundColor(.yellow)
+                    remaining = remaining[endRange.upperBound...]
+                    continue
+                } else {
+                    result = result + Text("==")
+                    continue
+                }
+            }
+
+            if remaining.hasPrefix("[") {
+                if let closeBracket = remaining.range(of: "]"),
+                   remaining[closeBracket.upperBound...].hasPrefix("("),
+                   let closeParen = remaining[closeBracket.upperBound...].range(of: ")") {
+                    let linkText = String(remaining[remaining.index(after: remaining.startIndex)..<closeBracket.lowerBound])
+                    result = result + Text(linkText)
+                        .foregroundColor(.blue)
+                        .underline()
+                    remaining = remaining[closeParen.upperBound...]
+                    continue
+                }
+            }
+
+            let nextSpecial = findNextSpecialChar(in: remaining)
+            let plainEnd = nextSpecial ?? remaining.endIndex
+            let plainText = String(remaining[remaining.startIndex..<plainEnd])
+            result = result + Text(plainText)
+            remaining = remaining[plainEnd...]
+        }
+
+        return result
+    }
+
+    private func findNextSpecialChar(in text: Substring) -> String.Index? {
+        let markers: [String] = ["**", "__", "*", "_", "~~", "`", "==", "["]
+        var earliest: String.Index? = nil
+        for marker in markers {
+            if let range = text.range(of: marker) {
+                if range.lowerBound != text.startIndex {
+                    if earliest == nil || range.lowerBound < earliest! {
+                        earliest = range.lowerBound
+                    }
+                }
+            }
+        }
+        return earliest
+    }
+
+    @ViewBuilder
+    private func renderTable(_ rows: [[String]]) -> some View {
+        if let header = rows.first {
+            VStack(spacing: 0) {
+                HStack(spacing: 0) {
+                    ForEach(Array(header.enumerated()), id: \.offset) { _, cell in
+                        Text(cell)
+                            .font(.caption.bold())
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(8)
+                            .background(Color(.tertiarySystemBackground))
+                    }
+                }
+                Divider()
+                ForEach(Array(rows.dropFirst().enumerated()), id: \.offset) { _, row in
+                    HStack(spacing: 0) {
+                        ForEach(Array(row.enumerated()), id: \.offset) { _, cell in
+                            Text(cell)
+                                .font(.caption)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(8)
+                        }
+                    }
+                    Divider()
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(.separator), lineWidth: 0.5))
+        }
+    }
+}
+
+// MARK: - Text.backgroundColor helper
+private extension Text {
+    func backgroundColor(_ color: Color) -> Text {
+        self.foregroundColor(.black)
     }
 }
 
