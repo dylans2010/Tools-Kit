@@ -1,21 +1,55 @@
 import SwiftUI
 import AVFoundation
 import Vision
+import CoreImage
 
 // MARK: - Scan Engine
 
 @MainActor
 final class ScanNotebooksEngine: NSObject, ObservableObject {
 
-    // MARK: Published state — Camera & OCR
+    // MARK: Published state — camera
 
     @Published var isCameraReady = false
     @Published var isCapturing = false
     @Published var capturedImage: UIImage?
+    @Published var cameraPermissionDenied = false
+
+    // MARK: Published state — extraction
+
     @Published var extractedText = ""
     @Published var extractionError: String?
     @Published var isExtracting = false
-    @Published var cameraPermissionDenied = false
+    @Published var selectedMode: ScanExtractionMode = .fullText
+    @Published var extractionResult: ScanExtractionResult?
+    @Published var isProcessingMode = false
+
+    // MARK: Published state — quality & regions
+
+    @Published var qualityFeedback = ScanQualityFeedback()
+    @Published var unreadableRegions: [ScanUnreadableRegion] = []
+
+    // MARK: Published state — structured data detection
+
+    @Published var detectedData: [ScanDetectedData] = []
+
+    // MARK: Published state — chat
+
+    @Published var chatMessages: [ScanChatMessage] = []
+    @Published var isChatLoading = false
+
+    // MARK: Published state — transform
+
+    @Published var transformResult: String?
+    @Published var isTransforming = false
+
+    // MARK: Published state — persistent context
+
+    @Published var currentRecord: ScanRecord?
+
+    // MARK: Dependencies
+
+    let contextStore = ScanContextStore.shared
 
     // MARK: Published state — Structured extraction
 
@@ -54,6 +88,9 @@ final class ScanNotebooksEngine: NSObject, ObservableObject {
     let captureSession = AVCaptureSession()
     private let photoOutput = AVCapturePhotoOutput()
     private var currentDevice: AVCaptureDevice?
+    private let videoOutput = AVCaptureVideoDataOutput()
+    private let videoQueue = DispatchQueue(label: "com.toolskit.scan.video", qos: .userInitiated)
+    private var lastQualityCheck: Date = .distantPast
 
     // MARK: Persistence
 
@@ -118,6 +155,12 @@ final class ScanNotebooksEngine: NSObject, ObservableObject {
             captureSession.addOutput(photoOutput)
         }
 
+        videoOutput.setSampleBufferDelegate(self, queue: videoQueue)
+        videoOutput.alwaysDiscardsLateVideoFrames = true
+        if captureSession.canAddOutput(videoOutput) {
+            captureSession.addOutput(videoOutput)
+        }
+
         captureSession.commitConfiguration()
         currentDevice = device
 
@@ -143,11 +186,14 @@ final class ScanNotebooksEngine: NSObject, ObservableObject {
         extractedText = ""
         extractionError = nil
         isExtracting = false
-        qualityIssues = []
+        extractionResult = nil
+        isProcessingMode = false
+        qualityFeedback = ScanQualityFeedback()
         unreadableRegions = []
-        ocrConfidence = 1.0
-        structuredResult = nil
-        detectedStructures = []
+        detectedData = []
+        chatMessages = []
+        transformResult = nil
+        currentRecord = nil
 
         if !captureSession.isRunning {
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -156,7 +202,7 @@ final class ScanNotebooksEngine: NSObject, ObservableObject {
         }
     }
 
-    // MARK: - Text Extraction (Vision) with Quality Analysis
+    // MARK: - Text extraction (Vision) with structured modes
 
     func extractText(from image: UIImage) {
         guard let cgImage = image.cgImage else {
@@ -192,30 +238,13 @@ final class ScanNotebooksEngine: NSObject, ObservableObject {
                     return
                 }
 
-                self.extractedText = lines.joined(separator: "\n")
+                let fullText = lines.joined(separator: "\n")
+                self.extractedText = fullText
 
-                var totalConfidence: Float = 0
-                var count: Float = 0
-                var lowConfRegions: [CGRect] = []
+                self.findUnreadableRegions(observations: observations, imageSize: image.size)
+                self.detectStructuredData(in: fullText)
 
-                for obs in observations {
-                    if let candidate = obs.topCandidates(1).first {
-                        totalConfidence += candidate.confidence
-                        count += 1
-                        if candidate.confidence < 0.5 {
-                            lowConfRegions.append(obs.boundingBox)
-                        }
-                    }
-                }
-
-                self.ocrConfidence = count > 0 ? Double(totalConfidence / count) : 0
-                self.unreadableRegions = lowConfRegions
-
-                if self.ocrConfidence < 0.6 {
-                    self.qualityIssues.append(.blur)
-                }
-
-                self.detectStructures(in: self.extractedText)
+                await self.processExtractionMode(rawText: fullText)
             }
         }
 
@@ -228,434 +257,358 @@ final class ScanNotebooksEngine: NSObject, ObservableObject {
         }
     }
 
-    // MARK: - Image Quality Analysis
+    // MARK: - Extraction mode processing
 
-    private func analyzeImageQuality(_ cgImage: CGImage) {
-        let width = cgImage.width
-        let height = cgImage.height
+    func processExtractionMode(rawText: String) async {
+        let mode = selectedMode
 
-        if width < 640 || height < 480 {
-            qualityIssues.append(.partial)
+        if mode == .fullText {
+            extractionResult = .fullText(rawText)
+            saveScanRecord()
+            return
         }
 
-        DispatchQueue.global(qos: .utility).async { [weak self] in
-            let laplacianVariance = self?.computeLaplacianVariance(cgImage) ?? 100
-            Task { @MainActor in
-                if laplacianVariance < 50 {
-                    self?.qualityIssues.append(.blur)
-                }
-            }
+        isProcessingMode = true
+        do {
+            let prompt = "\(mode.userPrompt)\n\n\(rawText)"
+            let response = try await AIService.shared.processText(
+                prompt: prompt,
+                systemPrompt: mode.systemPrompt
+            )
+            let result = parseExtractionResult(mode: mode, response: response, rawText: rawText)
+            extractionResult = result
+            saveScanRecord()
+        } catch {
+            extractionResult = .fullText(rawText)
         }
-
-        let brightnessRequest = VNGenerateImageFeaturePrintRequest()
-        DispatchQueue.global(qos: .utility).async { [weak self] in
-            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-            try? handler.perform([brightnessRequest])
-            let avgBrightness = self?.estimateBrightness(cgImage) ?? 128
-            Task { @MainActor in
-                if avgBrightness < 60 {
-                    self?.qualityIssues.append(.lowLight)
-                }
-            }
-        }
+        isProcessingMode = false
     }
 
-    private func computeLaplacianVariance(_ cgImage: CGImage) -> Double {
-        guard let data = cgImage.dataProvider?.data,
-              let ptr = CFDataGetBytePtr(data) else { return 100 }
-
-        let width = cgImage.width
-        let height = cgImage.height
-        let bytesPerPixel = cgImage.bitsPerPixel / 8
-        let bytesPerRow = cgImage.bytesPerRow
-
-        guard width > 2, height > 2 else { return 100 }
-
-        var sum: Double = 0
-        var sumSq: Double = 0
-        var count: Double = 0
-
-        let step = max(1, min(width, height) / 100)
-
-        for y in stride(from: 1, to: height - 1, by: step) {
-            for x in stride(from: 1, to: width - 1, by: step) {
-                let idx = y * bytesPerRow + x * bytesPerPixel
-                let center = Double(ptr[idx])
-                let top = Double(ptr[(y - 1) * bytesPerRow + x * bytesPerPixel])
-                let bottom = Double(ptr[(y + 1) * bytesPerRow + x * bytesPerPixel])
-                let left = Double(ptr[y * bytesPerRow + (x - 1) * bytesPerPixel])
-                let right = Double(ptr[y * bytesPerRow + (x + 1) * bytesPerPixel])
-                let laplacian = top + bottom + left + right - 4 * center
-                sum += laplacian
-                sumSq += laplacian * laplacian
-                count += 1
-            }
-        }
-
-        guard count > 0 else { return 100 }
-        let mean = sum / count
-        return (sumSq / count) - (mean * mean)
-    }
-
-    private func estimateBrightness(_ cgImage: CGImage) -> Double {
-        guard let data = cgImage.dataProvider?.data,
-              let ptr = CFDataGetBytePtr(data) else { return 128 }
-
-        let width = cgImage.width
-        let height = cgImage.height
-        let bytesPerPixel = cgImage.bitsPerPixel / 8
-        let bytesPerRow = cgImage.bytesPerRow
-
-        var total: Double = 0
-        var count: Double = 0
-        let step = max(1, min(width, height) / 50)
-
-        for y in stride(from: 0, to: height, by: step) {
-            for x in stride(from: 0, to: width, by: step) {
-                let idx = y * bytesPerRow + x * bytesPerPixel
-                let r = Double(ptr[idx])
-                let g = bytesPerPixel > 1 ? Double(ptr[idx + 1]) : r
-                let b = bytesPerPixel > 2 ? Double(ptr[idx + 2]) : r
-                total += 0.299 * r + 0.587 * g + 0.114 * b
-                count += 1
-            }
-        }
-
-        return count > 0 ? total / count : 128
-    }
-
-    // MARK: - Structure Detection
-
-    private func detectStructures(in text: String) {
-        let lines = text.components(separatedBy: "\n")
-        var structures: [DetectedStructureItem] = []
-
-        for (index, line) in lines.enumerated() {
-            let trimmed = line.trimmingCharacters(in: .whitespaces)
-
-            if trimmed.contains("\t") || trimmed.contains(" | ") || trimmed.filter({ $0 == "|" }).count >= 2 {
-                structures.append(DetectedStructureItem(kind: .table, rawText: trimmed, lineRange: index...index))
-            }
-
-            if trimmed.hasPrefix("☐") || trimmed.hasPrefix("☑") || trimmed.hasPrefix("☒")
-                || trimmed.hasPrefix("[ ]") || trimmed.hasPrefix("[x]") || trimmed.hasPrefix("[X]")
-                || trimmed.hasPrefix("□") || trimmed.hasPrefix("✓") || trimmed.hasPrefix("✗") {
-                structures.append(DetectedStructureItem(kind: .checklist, rawText: trimmed, lineRange: index...index))
-            }
-
-            let datePattern = #"\b\d{1,2}[/\-\.]\d{1,2}[/\-\.]\d{2,4}\b"#
-            let isoPattern = #"\b\d{4}-\d{2}-\d{2}\b"#
-            let wordDatePattern = #"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2},? \d{4}\b"#
-            if trimmed.range(of: datePattern, options: .regularExpression) != nil
-                || trimmed.range(of: isoPattern, options: .regularExpression) != nil
-                || trimmed.range(of: wordDatePattern, options: .regularExpression) != nil {
-                structures.append(DetectedStructureItem(kind: .date, rawText: trimmed, lineRange: index...index))
-            }
-
-            if trimmed.hasPrefix("- ") || trimmed.hasPrefix("• ") || trimmed.hasPrefix("* ") {
-                structures.append(DetectedStructureItem(kind: .list, rawText: trimmed, lineRange: index...index))
-            }
-
-            let eqPattern = #"[=+\-*/^]"#
-            if (trimmed.contains("=") && trimmed.range(of: #"\d+\s*[+\-*/^]\s*\d+"#, options: .regularExpression) != nil)
-                || trimmed.range(of: eqPattern, options: .regularExpression) != nil && trimmed.filter({ $0.isNumber }).count > trimmed.count / 2 {
-                structures.append(DetectedStructureItem(kind: .equation, rawText: trimmed, lineRange: index...index))
-            }
-        }
-
-        detectedStructures = structures
-    }
-
-    // MARK: - Structured Extraction (AI)
-
-    func performStructuredExtraction(mode: ScanExtractionMode) {
+    func reprocessWithMode(_ mode: ScanExtractionMode) {
         guard !extractedText.isEmpty else { return }
-        isProcessingStructured = true
-
+        selectedMode = mode
         Task {
-            do {
-                let prompt = "\(mode.prompt)\n\nScanned text:\n\(extractedText)"
-                let result = try await aiService.processText(
-                    prompt: prompt,
-                    systemPrompt: mode.systemPrompt
+            await processExtractionMode(rawText: extractedText)
+        }
+    }
+
+    private func parseExtractionResult(mode: ScanExtractionMode, response: String, rawText: String) -> ScanExtractionResult {
+        let trimmed = response.trimmingCharacters(in: .whitespacesAndNewlines)
+        switch mode {
+        case .fullText:
+            return .fullText(rawText)
+        case .summary:
+            return .summary(trimmed)
+        case .keyPoints:
+            if let data = trimmed.data(using: .utf8),
+               let points = try? JSONDecoder().decode([String].self, from: data) {
+                return .keyPoints(points)
+            }
+            let lines = trimmed.components(separatedBy: .newlines)
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+                .map { $0.hasPrefix("•") || $0.hasPrefix("-") ? String($0.dropFirst()).trimmingCharacters(in: .whitespaces) : $0 }
+            return .keyPoints(lines)
+        case .actionItems:
+            if let data = trimmed.data(using: .utf8),
+               let items = try? JSONDecoder().decode([ScanActionItem].self, from: data) {
+                return .actionItems(items)
+            }
+            let lines = trimmed.components(separatedBy: .newlines)
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+            return .actionItems(lines.map { ScanActionItem(task: $0) })
+        case .flashcards:
+            if let data = trimmed.data(using: .utf8),
+               let cards = try? JSONDecoder().decode([ScanFlashcard].self, from: data) {
+                return .flashcards(cards)
+            }
+            return .flashcards([ScanFlashcard(question: "Review", answer: trimmed)])
+        }
+    }
+
+    // MARK: - Unreadable region detection
+
+    private func findUnreadableRegions(observations: [VNRecognizedTextObservation], imageSize: CGSize) {
+        var regions: [ScanUnreadableRegion] = []
+        for obs in observations {
+            guard let candidate = obs.topCandidates(1).first else {
+                let box = obs.boundingBox
+                let rect = CGRect(
+                    x: box.origin.x * imageSize.width,
+                    y: (1 - box.origin.y - box.height) * imageSize.height,
+                    width: box.width * imageSize.width,
+                    height: box.height * imageSize.height
                 )
-
-                var scan = ScanResult(
-                    rawText: extractedText,
-                    extractionMode: mode,
-                    detectedStructures: detectedStructures,
-                    imageData: capturedImage?.jpegData(compressionQuality: 0.6),
-                    tags: detectedStructures.map { $0.kind.rawValue }
+                regions.append(ScanUnreadableRegion(boundingBox: rect, reason: "No text recognized"))
+                continue
+            }
+            if candidate.confidence < 0.5 {
+                let box = obs.boundingBox
+                let rect = CGRect(
+                    x: box.origin.x * imageSize.width,
+                    y: (1 - box.origin.y - box.height) * imageSize.height,
+                    width: box.width * imageSize.width,
+                    height: box.height * imageSize.height
                 )
-
-                switch mode {
-                case .fullText:
-                    scan.summaryResult = ScanSummaryResult(title: "Full Text", body: result)
-                case .summary:
-                    if let data = result.data(using: .utf8),
-                       let decoded = try? JSONDecoder().decode(ScanSummaryResult.self, from: data) {
-                        scan.summaryResult = decoded
-                    } else {
-                        scan.summaryResult = ScanSummaryResult(title: "Summary", body: result)
-                    }
-                case .keyPoints:
-                    if let data = result.data(using: .utf8),
-                       let decoded = try? JSONDecoder().decode([String].self, from: data) {
-                        scan.keyPoints = decoded
-                    } else {
-                        scan.keyPoints = result.components(separatedBy: "\n").filter { !$0.isEmpty }
-                    }
-                case .actionItems:
-                    if let data = result.data(using: .utf8),
-                       let decoded = try? JSONDecoder().decode([ScanActionItem].self, from: data) {
-                        scan.actionItems = decoded
-                    } else {
-                        scan.actionItems = result.components(separatedBy: "\n")
-                            .filter { !$0.isEmpty }
-                            .map { ScanActionItem(title: $0) }
-                    }
-                case .flashcards:
-                    if let data = result.data(using: .utf8),
-                       let decoded = try? JSONDecoder().decode([ScanFlashcard].self, from: data) {
-                        scan.flashcards = decoded
-                    } else {
-                        scan.flashcards = [ScanFlashcard(question: "Review", answer: result)]
-                    }
-                }
-
-                structuredResult = scan
-                addToHistory(scan)
-                isProcessingStructured = false
-            } catch {
-                extractionError = "Structured extraction failed: \(error.localizedDescription)"
-                isProcessingStructured = false
+                regions.append(ScanUnreadableRegion(boundingBox: rect, reason: "Low confidence (\(Int(candidate.confidence * 100))%)"))
             }
         }
+        unreadableRegions = regions
     }
 
-    // MARK: - Persistent Context Layer
+    // MARK: - Structured data detection
 
-    private func addToHistory(_ scan: ScanResult) {
-        scanHistory.insert(scan, at: 0)
-        scanIndex[scan.id] = scan
-        saveHistory()
+    private func detectStructuredData(in text: String) {
+        var detected: [ScanDetectedData] = []
+
+        let dateDetector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.date.rawValue)
+        let linkDetector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        let phoneDetector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.phoneNumber.rawValue)
+
+        let range = NSRange(text.startIndex..., in: text)
+
+        dateDetector?.enumerateMatches(in: text, range: range) { match, _, _ in
+            if let match, let r = Range(match.range, in: text) {
+                detected.append(ScanDetectedData(kind: .date, rawText: String(text[r])))
+            }
+        }
+
+        linkDetector?.enumerateMatches(in: text, range: range) { match, _, _ in
+            if let match, let r = Range(match.range, in: text) {
+                let raw = String(text[r])
+                if raw.contains("@") {
+                    detected.append(ScanDetectedData(kind: .email, rawText: raw))
+                } else {
+                    detected.append(ScanDetectedData(kind: .url, rawText: raw))
+                }
+            }
+        }
+
+        phoneDetector?.enumerateMatches(in: text, range: range) { match, _, _ in
+            if let match, let r = Range(match.range, in: text) {
+                detected.append(ScanDetectedData(kind: .phoneNumber, rawText: String(text[r])))
+            }
+        }
+
+        let lines = text.components(separatedBy: .newlines)
+        let checklistPattern = lines.filter {
+            $0.trimmingCharacters(in: .whitespaces).hasPrefix("☐") ||
+            $0.trimmingCharacters(in: .whitespaces).hasPrefix("☑") ||
+            $0.trimmingCharacters(in: .whitespaces).hasPrefix("[ ]") ||
+            $0.trimmingCharacters(in: .whitespaces).hasPrefix("[x]") ||
+            $0.trimmingCharacters(in: .whitespaces).hasPrefix("[X]") ||
+            $0.trimmingCharacters(in: .whitespaces).hasPrefix("- [ ]") ||
+            $0.trimmingCharacters(in: .whitespaces).hasPrefix("- [x]")
+        }
+        if !checklistPattern.isEmpty {
+            detected.append(ScanDetectedData(kind: .checklist, rawText: checklistPattern.joined(separator: "\n")))
+        }
+
+        let tableLines = lines.filter { $0.contains("|") || $0.contains("\t") }
+        if tableLines.count >= 2 {
+            detected.append(ScanDetectedData(kind: .table, rawText: tableLines.joined(separator: "\n")))
+        }
+
+        detectedData = detected
     }
 
-    func deleteScan(_ scan: ScanResult) {
-        scanHistory.removeAll { $0.id == scan.id }
-        scanIndex.removeValue(forKey: scan.id)
-        chatSessions.removeValue(forKey: scan.id)
-        saveHistory()
-        saveChatSessions()
-    }
+    // MARK: - Real-time quality analysis
 
-    func searchHistory(query: String) -> [ScanResult] {
-        guard !query.isEmpty else { return scanHistory }
-        let lowered = query.lowercased()
-        return scanHistory.filter { scan in
-            scan.rawText.lowercased().contains(lowered)
-            || scan.displayTitle.lowercased().contains(lowered)
-            || scan.tags.contains(where: { $0.lowercased().contains(lowered) })
+    nonisolated func analyzeFrameQuality(_ sampleBuffer: CMSampleBuffer) {
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+
+        var isBlurry = false
+        var isLowLight = false
+
+        let extent = ciImage.extent
+        let inputImage = ciImage.clampedToExtent()
+        let avgFilter = CIFilter(name: "CIAreaAverage", parameters: [
+            kCIInputImageKey: inputImage,
+            kCIInputExtentKey: CIVector(cgRect: extent)
+        ])
+
+        if let outputImage = avgFilter?.outputImage {
+            var bitmap = [UInt8](repeating: 0, count: 4)
+            let context = CIContext(options: [.workingColorSpace: NSNull()])
+            context.render(outputImage,
+                          toBitmap: &bitmap,
+                          rowBytes: 4,
+                          bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
+                          format: .RGBA8,
+                          colorSpace: nil)
+            let luminance = (0.299 * Double(bitmap[0]) + 0.587 * Double(bitmap[1]) + 0.114 * Double(bitmap[2])) / 255.0
+            isLowLight = luminance < 0.15
+        }
+
+        let laplacian = CIFilter(name: "CIConvolution3X3", parameters: [
+            kCIInputImageKey: ciImage,
+            "inputWeights": CIVector(values: [0, 1, 0, 1, -4, 1, 0, 1, 0], count: 9),
+            "inputBias": 0
+        ])
+        if let lapOutput = laplacian?.outputImage {
+            let statsFilter = CIFilter(name: "CIAreaAverage", parameters: [
+                kCIInputImageKey: lapOutput.clampedToExtent(),
+                kCIInputExtentKey: CIVector(cgRect: extent)
+            ])
+            if let statsOutput = statsFilter?.outputImage {
+                var bitmap = [UInt8](repeating: 0, count: 4)
+                let context = CIContext(options: [.workingColorSpace: NSNull()])
+                context.render(statsOutput,
+                              toBitmap: &bitmap,
+                              rowBytes: 4,
+                              bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
+                              format: .RGBA8,
+                              colorSpace: nil)
+                let variance = Double(bitmap[0])
+                isBlurry = variance < 15
+            }
+        }
+
+        let score = max(0, min(1, 1.0 - (isBlurry ? 0.4 : 0) - (isLowLight ? 0.4 : 0)))
+
+        Task { @MainActor [isBlurry, isLowLight, score] in
+            self.qualityFeedback = ScanQualityFeedback(
+                isBlurry: isBlurry,
+                isLowLight: isLowLight,
+                overallScore: score
+            )
         }
     }
 
-    func filteredHistory(filter: ScanHistoryFilter) -> [ScanResult] {
-        let calendar = Calendar.current
-        let now = Date()
-        switch filter {
-        case .all:
-            return scanHistory
-        case .today:
-            return scanHistory.filter { calendar.isDateInToday($0.createdAt) }
-        case .thisWeek:
-            let weekAgo = calendar.date(byAdding: .day, value: -7, to: now) ?? now
-            return scanHistory.filter { $0.createdAt >= weekAgo }
-        case .thisMonth:
-            let monthAgo = calendar.date(byAdding: .month, value: -1, to: now) ?? now
-            return scanHistory.filter { $0.createdAt >= monthAgo }
-        }
-    }
+    // MARK: - Chat system ("Ask Anything About This")
 
-    func linkedScans(for scanID: UUID) -> [ScanResult] {
-        guard let scan = scanIndex[scanID] else { return [] }
-        return scanHistory.filter { other in
-            guard other.id != scanID else { return false }
-            let sharedTags = Set(scan.tags).intersection(Set(other.tags))
-            return !sharedTags.isEmpty
-        }
-    }
+    func sendChatMessage(_ userMessage: String) {
+        guard !userMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        let userMsg = ScanChatMessage(role: .user, content: userMessage)
+        chatMessages.append(userMsg)
+        isChatLoading = true
 
-    // MARK: - Chat System (per-scan, multi-turn)
-
-    func startChatSession(for scanID: UUID) {
-        if chatSessions[scanID] == nil {
-            chatSessions[scanID] = ScanChatSession(scanID: scanID)
-        }
-        activeChatMessages = chatSessions[scanID]?.messages ?? []
-    }
-
-    func sendChatMessage(_ text: String, scanID: UUID) {
-        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-
-        let userMessage = ScanChatMessage(role: .user, content: text)
-        chatSessions[scanID]?.messages.append(userMessage)
-        activeChatMessages = chatSessions[scanID]?.messages ?? []
-        isChatProcessing = true
+        let contextSummary = buildChatContext()
 
         Task {
             do {
-                let scanContext = scanIndex[scanID]?.rawText ?? extractedText
-                let linked = linkedScans(for: scanID)
-                var contextBlock = "Scanned text:\n\(scanContext)"
-                if !linked.isEmpty {
-                    contextBlock += "\n\nRelated scans:\n"
-                    for related in linked.prefix(3) {
-                        contextBlock += "---\n\(related.rawText.prefix(500))\n"
-                    }
-                }
-
-                let history = (chatSessions[scanID]?.messages ?? [])
-                    .filter { $0.role != .system }
-                    .map { "\($0.role.rawValue): \($0.content)" }
-                    .joined(separator: "\n")
-
                 let prompt = """
-                Context:
-                \(contextBlock)
+                The user is asking about scanned content. Here is the context:
 
-                Conversation history:
-                \(history)
+                --- SCANNED TEXT ---
+                \(extractedText)
 
-                User question: \(text)
+                --- PREVIOUS CONVERSATION ---
+                \(contextSummary)
+
+                --- USER QUESTION ---
+                \(userMessage)
                 """
 
-                let systemPrompt = "You are a knowledgeable assistant helping analyze scanned document content. Answer questions based on the provided scanned text and any related scans. Be precise and helpful. If asked about something not in the documents, say so."
-
-                let response = try await aiService.processText(
+                let response = try await AIService.shared.processText(
                     prompt: prompt,
-                    systemPrompt: systemPrompt
+                    systemPrompt: "You are a helpful assistant that answers questions about scanned documents. Use the scanned text and conversation history to provide accurate, contextual answers. Be concise and specific."
                 )
-
-                let assistantMessage = ScanChatMessage(role: .assistant, content: response)
-                chatSessions[scanID]?.messages.append(assistantMessage)
-                activeChatMessages = chatSessions[scanID]?.messages ?? []
-                isChatProcessing = false
-                saveChatSessions()
+                let assistantMsg = ScanChatMessage(role: .assistant, content: response)
+                chatMessages.append(assistantMsg)
+                updateRecordChat()
             } catch {
-                let errorMessage = ScanChatMessage(role: .assistant, content: "Error: \(error.localizedDescription)")
-                chatSessions[scanID]?.messages.append(errorMessage)
-                activeChatMessages = chatSessions[scanID]?.messages ?? []
-                isChatProcessing = false
+                let errorMsg = ScanChatMessage(role: .assistant, content: "Error: \(error.localizedDescription)")
+                chatMessages.append(errorMsg)
             }
+            isChatLoading = false
         }
     }
 
-    // MARK: - Transform Pipeline
+    private func buildChatContext() -> String {
+        chatMessages.map { msg in
+            let role = msg.role == .user ? "User" : "Assistant"
+            return "\(role): \(msg.content)"
+        }.joined(separator: "\n")
+    }
 
-    func transformScan(scanID: UUID, target: ScanTransformTarget) {
-        guard let scan = scanIndex[scanID] ?? structuredResult else { return }
+    func sendFollowUpAcrossScans(_ question: String, linkedRecordIDs: [UUID]) {
+        let linkedTexts = linkedRecordIDs.compactMap { contextStore.record(for: $0) }
+            .map { "[\($0.timestamp.formatted())]: \($0.rawText)" }
+            .joined(separator: "\n\n")
+
+        let userMsg = ScanChatMessage(role: .user, content: question)
+        chatMessages.append(userMsg)
+        isChatLoading = true
+
+        Task {
+            do {
+                let prompt = """
+                The user is asking a follow-up question that spans multiple scanned documents.
+
+                --- CURRENT SCAN ---
+                \(extractedText)
+
+                --- LINKED SCANS ---
+                \(linkedTexts)
+
+                --- QUESTION ---
+                \(question)
+                """
+
+                let response = try await AIService.shared.processText(
+                    prompt: prompt,
+                    systemPrompt: "You are a helpful assistant that reasons across multiple scanned documents. Synthesize information from all provided scans to answer accurately."
+                )
+                let assistantMsg = ScanChatMessage(role: .assistant, content: response)
+                chatMessages.append(assistantMsg)
+                updateRecordChat()
+            } catch {
+                let errorMsg = ScanChatMessage(role: .assistant, content: "Error: \(error.localizedDescription)")
+                chatMessages.append(errorMsg)
+            }
+            isChatLoading = false
+        }
+    }
+
+    // MARK: - Transform pipeline
+
+    func transformScan(to format: ScanTransformFormat) {
+        guard !extractedText.isEmpty else { return }
         isTransforming = true
         transformResult = nil
 
         Task {
             do {
-                let prompt = "\(target.prompt)\n\nScanned content:\n\(scan.rawText)"
-                let result = try await aiService.processText(
+                let prompt = "Transform the following scanned content:\n\n\(extractedText)"
+                let response = try await AIService.shared.processText(
                     prompt: prompt,
-                    systemPrompt: target.systemPrompt
+                    systemPrompt: format.systemPrompt
                 )
-
-                transformResult = ScanTransformResult(
-                    target: target,
-                    content: result
-                )
-                isTransforming = false
+                transformResult = response
             } catch {
-                transformResult = ScanTransformResult(
-                    target: target,
-                    content: "Transform failed: \(error.localizedDescription)"
-                )
-                isTransforming = false
+                transformResult = "Error: \(error.localizedDescription)"
             }
+            isTransforming = false
         }
     }
 
-    func applyTransformToWorkspace(result: ScanTransformResult, scanID: UUID) {
-        let manager = NotebooksManager.shared
-        let scan = scanIndex[scanID] ?? structuredResult
+    // MARK: - Persistent context management
 
-        switch result.target {
-        case .note:
-            let nb = manager.createNotebook(name: scan?.displayTitle ?? "Scanned Note")
-            if let folder = manager.addFolder(to: nb.id, name: "Scanned Content") {
-                manager.addPage(to: folder.id, in: nb.id, title: "Scan Result", content: result.content)
-            }
+    private func saveScanRecord() {
+        guard let result = extractionResult else { return }
 
-        case .tasks:
-            if let data = result.content.data(using: .utf8),
-               let tasks = try? JSONDecoder().decode([[String: String]].self, from: data) {
-                let nb = manager.createNotebook(name: "Tasks from Scan")
-                if let folder = manager.addFolder(to: nb.id, name: "Tasks") {
-                    for task in tasks {
-                        let title = task["title"] ?? "Task"
-                        let desc = task["description"] ?? ""
-                        manager.addPage(to: folder.id, in: nb.id, title: title, content: desc)
-                    }
-                }
-            }
+        let previousIDs = contextStore.records.prefix(5).map { $0.id }
 
-        case .presentation:
-            let nb = manager.createNotebook(name: "Presentation from Scan")
-            if let folder = manager.addFolder(to: nb.id, name: "Slides") {
-                manager.addPage(to: folder.id, in: nb.id, title: "Presentation", content: result.content)
-            }
-
-        case .report:
-            let nb = manager.createNotebook(name: scan?.displayTitle ?? "Report")
-            if let folder = manager.addFolder(to: nb.id, name: "Report") {
-                manager.addPage(to: folder.id, in: nb.id, title: "Full Report", content: result.content)
-            }
-
-        case .spreadsheet, .calendarEvent:
-            let nb = manager.createNotebook(name: "\(result.target.rawValue) from Scan")
-            if let folder = manager.addFolder(to: nb.id, name: result.target.rawValue) {
-                manager.addPage(to: folder.id, in: nb.id, title: result.target.rawValue, content: result.content)
-            }
-        }
+        let record = ScanRecord(
+            rawText: extractedText,
+            extractionMode: selectedMode,
+            result: result,
+            detectedData: detectedData,
+            chatMessages: chatMessages,
+            linkedScanIDs: Array(previousIDs)
+        )
+        contextStore.addRecord(record)
+        currentRecord = record
     }
 
-    // MARK: - Persistence (History & Chat)
-
-    private func saveHistory() {
-        do {
-            let data = try JSONEncoder().encode(scanHistory)
-            try data.write(to: historyURL)
-        } catch {
-            print("[ScanEngine] Failed to save history: \(error)")
-        }
-    }
-
-    private func loadHistory() {
-        guard let data = try? Data(contentsOf: historyURL),
-              let decoded = try? JSONDecoder().decode([ScanResult].self, from: data) else { return }
-        scanHistory = decoded
-        scanIndex = Dictionary(uniqueKeysWithValues: decoded.map { ($0.id, $0) })
-    }
-
-    private func saveChatSessions() {
-        do {
-            let sessionsArray = Array(chatSessions.values)
-            let data = try JSONEncoder().encode(sessionsArray)
-            try data.write(to: chatURL)
-        } catch {
-            print("[ScanEngine] Failed to save chat sessions: \(error)")
-        }
-    }
-
-    private func loadChatSessions() {
-        guard let data = try? Data(contentsOf: chatURL),
-              let decoded = try? JSONDecoder().decode([ScanChatSession].self, from: data) else { return }
-        chatSessions = Dictionary(uniqueKeysWithValues: decoded.map { ($0.scanID, $0) })
+    private func updateRecordChat() {
+        guard var record = currentRecord else { return }
+        record.chatMessages = chatMessages
+        contextStore.updateRecord(record)
+        currentRecord = record
     }
 
     // MARK: - Cleanup
@@ -696,6 +649,22 @@ extension ScanNotebooksEngine: AVCapturePhotoCaptureDelegate {
 
             extractText(from: image)
         }
+    }
+}
+
+// MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
+
+extension ScanNotebooksEngine: AVCaptureVideoDataOutputSampleBufferDelegate {
+    nonisolated func captureOutput(_ output: AVCaptureOutput,
+                                   didOutput sampleBuffer: CMSampleBuffer,
+                                   from connection: AVCaptureConnection) {
+        let now = Date()
+        let lastCheck = DispatchQueue.main.sync { self.lastQualityCheck }
+        guard now.timeIntervalSince(lastCheck) > 0.5 else { return }
+        Task { @MainActor in
+            self.lastQualityCheck = now
+        }
+        analyzeFrameQuality(sampleBuffer)
     }
 }
 
