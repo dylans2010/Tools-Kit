@@ -792,7 +792,7 @@ private struct PluginDetailedRow: View {
                         .font(.system(size: 8, weight: .bold))
                         .padding(.horizontal, 6).padding(.vertical, 2)
                         .background(Color.accentColor.opacity(0.1), in: Capsule())
-                        .foregroundStyle(.accentColor)
+                        .foregroundStyle(Color.accentColor)
                 }
             }
 

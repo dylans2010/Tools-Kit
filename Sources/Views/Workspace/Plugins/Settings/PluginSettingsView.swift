@@ -64,7 +64,3 @@ struct PluginSettingsView: View {
         logLevel = .info
     }
 }
-
-private enum PluginLogLevel: String, CaseIterable {
-    case verbose, debug, info, warning, error
-}
