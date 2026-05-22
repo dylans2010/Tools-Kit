@@ -12,6 +12,9 @@ struct WritingStats {
     var complexWordCount: Int = 0
     var uniqueWordCount: Int = 0
     var vocabularyRichness: Double = 0.0
+    var averageSentenceLength: Double = 0.0
+    var lexicalDensity: Double = 0.0
+    var dominantTone: String = "Neutral"
 }
 
 struct ArgumentAnalysis: Codable {
