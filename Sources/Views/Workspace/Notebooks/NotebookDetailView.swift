@@ -62,7 +62,7 @@ struct NotebookDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 14) {
+            VStack(spacing: 18) {
                 heroCard
                 statsCard
                 quickToolsSection
@@ -120,59 +120,91 @@ struct NotebookDetailView: View {
 
     private var heroCard: some View {
         WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(liveNotebook.name)
-                            .font(.title3.weight(.bold))
-                        Text("\(liveNotebook.folders.count) folders, \(totalPages) pages, updated \(liveNotebook.updatedAt.formatted(date: .abbreviated, time: .shortened))")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .accessibilityLabel("\(liveNotebook.folders.count) folders, \(totalPages) pages, updated \(liveNotebook.updatedAt.formatted(date: .abbreviated, time: .shortened))")
+            VStack(alignment: .leading, spacing: 14) {
+                ZStack(alignment: .bottomLeading) {
+                    if let notebookArtwork {
+                        Image(uiImage: notebookArtwork)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 160)
+                            .frame(maxWidth: .infinity)
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    } else {
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        .indigo.opacity(0.35),
+                                        .blue.opacity(0.25),
+                                        .purple.opacity(0.15)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(height: 160)
+                            .overlay(
+                                VStack(spacing: 8) {
+                                    Image(systemName: "book.closed.fill")
+                                        .font(.system(size: 32))
+                                        .foregroundStyle(.white.opacity(0.6))
+                                    Text("Notebook Cover")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.white.opacity(0.5))
+                                }
+                            )
                     }
+
+                    // Gradient overlay for text readability
+                    LinearGradient(
+                        colors: [.clear, .black.opacity(0.45)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                    // Title overlay
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(liveNotebook.name)
+                            .font(.title2.weight(.bold))
+                            .foregroundStyle(.white)
+                        Text("\(liveNotebook.folders.count) folders · \(totalPages) pages")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+                    .padding(14)
+                }
+
+                HStack(spacing: 8) {
+                    Text("Updated \(liveNotebook.updatedAt.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color(.tertiarySystemBackground), in: Capsule())
+
                     Spacer()
+
                     if supportsImagePlayground {
                         Button {
                             showingImagePlayground = true
                         } label: {
                             Image(systemName: "sparkles")
-                                .frame(width: 34, height: 34)
+                                .font(.caption)
                         }
                         .buttonStyle(.borderedProminent)
+                        .buttonBorderShape(.capsule)
+                        .controlSize(.small)
                         .accessibilityLabel("Generate Notebook Artwork")
-                    }
-                }
-
-                if let notebookArtwork {
-                    Image(uiImage: notebookArtwork)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 140)
-                        .frame(maxWidth: .infinity)
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                } else {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(LinearGradient(colors: [.indigo.opacity(0.32), .blue.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(height: 100)
-                        .overlay(
-                            Label("Notebook Cover", systemImage: "photo.on.rectangle")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                        )
-                }
-
-                HStack(spacing: 8) {
-                    if supportsImagePlayground {
-                        Button("Generate", systemImage: "apple.intelligence") {
-                            showingImagePlayground = true
-                        }
-                        .buttonStyle(.borderedProminent)
                     }
 
                     PhotosPicker(selection: $photoPickerItem, matching: .images) {
-                        Label("Upload Cover", systemImage: "photo")
+                        Image(systemName: "photo.badge.plus")
+                            .font(.caption)
                     }
                     .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
+                    .controlSize(.small)
                 }
             }
         }
@@ -181,29 +213,38 @@ struct NotebookDetailView: View {
     private var statsCard: some View {
         WorkspaceSurfaceCard {
             HStack(spacing: 10) {
-                statView("Folders", value: "\(liveNotebook.folders.count)", color: .indigo)
-                statView("Pages", value: "\(totalPages)", color: .blue)
-                statView("Updated", value: liveNotebook.updatedAt.formatted(date: .abbreviated, time: .omitted), color: .teal)
+                modernStatView("Folders", value: "\(liveNotebook.folders.count)", icon: "folder.fill", color: .indigo)
+                modernStatView("Pages", value: "\(totalPages)", icon: "doc.text.fill", color: .blue)
+                modernStatView("Updated", value: liveNotebook.updatedAt.formatted(date: .abbreviated, time: .omitted), icon: "clock.fill", color: .teal)
             }
         }
     }
 
     private var quickToolsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Notebook Tools")
-                .font(.headline)
-                .padding(.horizontal, 4)
+            HStack {
+                Label("Notebook Tools", systemImage: "wrench.and.screwdriver")
+                    .font(.headline)
+                Spacer()
+                Text("\(liveNotebook.folders.count) folders")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color(.tertiarySystemBackground), in: Capsule())
+            }
+            .padding(.horizontal, 4)
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
-                quickTool("Add Folder", icon: "folder.badge.plus") { showingCreateFolder = true }
-                quickTool("Starter", icon: "folder.fill.badge.plus") { addStarterFolder() }
-                quickTool("Duplicate", icon: "doc.on.doc") { duplicateFirstFolder() }
-                quickTool("Sort A–Z", icon: "textformat") { selectedSort = .alphabetical }
-                quickTool("Sort Pages", icon: "number") { selectedSort = .pages }
-                quickTool("Recent", icon: "clock.arrow.circlepath") { selectedSort = .recent }
-                quickTool("Clean", icon: "trash.slash") { removeEmptyFolders() }
-                quickTool("AI Tools", icon: "brain.head.profile") { showingAISheet = true }
-                quickTool("Integrations", icon: "puzzlepiece.extension") { showingIntegrations = true }
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 95))], spacing: 10) {
+                modernQuickTool("Add Folder", icon: "folder.badge.plus", color: .blue) { showingCreateFolder = true }
+                modernQuickTool("Starter", icon: "folder.fill.badge.plus", color: .indigo) { addStarterFolder() }
+                modernQuickTool("Duplicate", icon: "doc.on.doc", color: .purple) { duplicateFirstFolder() }
+                modernQuickTool("Sort A–Z", icon: "textformat", color: .orange) { selectedSort = .alphabetical }
+                modernQuickTool("Sort Pages", icon: "number", color: .teal) { selectedSort = .pages }
+                modernQuickTool("Recent", icon: "clock.arrow.circlepath", color: .cyan) { selectedSort = .recent }
+                modernQuickTool("Clean", icon: "trash.slash", color: .red) { removeEmptyFolders() }
+                modernQuickTool("AI Tools", icon: "brain.head.profile", color: .green) { showingAISheet = true }
+                modernQuickTool("Integrations", icon: "puzzlepiece.extension", color: .mint) { showingIntegrations = true }
             }
         }
     }
@@ -219,36 +260,67 @@ struct NotebookDetailView: View {
                 actionLabel: "Create Folder"
             )
         } else {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Folders")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Label("Folders", systemImage: "folder.fill")
+                        .font(.headline)
+                    Spacer()
+                    Text("\(filteredFolders.count) of \(liveNotebook.folders.count)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
 
                 ForEach(filteredFolders) { folder in
                     NavigationLink {
                         FolderDetailView(folder: folder, notebookID: notebook.id)
                     } label: {
                         WorkspaceSurfaceCard {
-                            HStack(spacing: 12) {
-                                Image(systemName: "folder.fill")
-                                    .foregroundStyle(.yellow)
-                                    .frame(width: 38, height: 38)
-                                    .background(Color.yellow.opacity(0.18), in: RoundedRectangle(cornerRadius: 10))
-                                VStack(alignment: .leading, spacing: 3) {
+                            HStack(spacing: 14) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [.yellow.opacity(0.3), .orange.opacity(0.15)],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                        .frame(width: 44, height: 44)
+                                    Image(systemName: "folder.fill")
+                                        .foregroundStyle(.orange)
+                                        .font(.system(size: 18))
+                                }
+
+                                VStack(alignment: .leading, spacing: 4) {
                                     Text(folder.name)
-                                        .font(.headline)
+                                        .font(.subheadline.weight(.semibold))
                                         .foregroundStyle(.primary)
-                                    Text("\(folder.pages.count) Pages")
+                                    HStack(spacing: 6) {
+                                        Label("\(folder.pages.count)", systemImage: "doc.text")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                        if let latestPage = folder.pages.sorted(by: { $0.updatedAt > $1.updatedAt }).first {
+                                            Text("·")
+                                                .font(.caption2)
+                                                .foregroundStyle(.secondary)
+                                            Text(latestPage.updatedAt.formatted(date: .abbreviated, time: .omitted))
+                                                .font(.caption2)
+                                                .foregroundStyle(.tertiary)
+                                        }
+                                    }
+                                }
+
+                                Spacer()
+
+                                Menu {
+                                    Button("Duplicate Folder", systemImage: "doc.on.doc") { duplicateFolder(folder) }
+                                    Button("Delete Folder", systemImage: "trash", role: .destructive) { deleteFolder(folder) }
+                                } label: {
+                                    Image(systemName: "ellipsis")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
-                                }
-                                Spacer()
-                                Menu {
-                                    Button("Duplicate Folder") { duplicateFolder(folder) }
-                                    Button("Delete Folder", role: .destructive) { deleteFolder(folder) }
-                                } label: {
-                                    Image(systemName: "ellipsis.circle")
-                                        .foregroundStyle(.secondary)
+                                        .frame(width: 30, height: 30)
+                                        .background(Color(.tertiarySystemBackground), in: Circle())
                                 }
                             }
                         }
@@ -334,6 +406,30 @@ struct NotebookDetailView: View {
         .background(color.opacity(0.14), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
+    private func modernStatView(_ label: String, value: String, icon: String, color: Color) -> some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundStyle(color)
+            Text(value)
+                .font(.headline)
+                .lineLimit(1)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(
+            color.opacity(0.1),
+            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(color.opacity(0.15), lineWidth: 1)
+        )
+    }
+
     private func quickTool(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack(spacing: 8) {
@@ -345,6 +441,30 @@ struct NotebookDetailView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
             .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func modernQuickTool(_ title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 18))
+                    .foregroundStyle(color)
+                    .frame(width: 36, height: 36)
+                    .background(color.opacity(0.12), in: Circle())
+                Text(title)
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(Color(.separator).opacity(0.2), lineWidth: 1)
+            )
         }
         .buttonStyle(.plain)
     }

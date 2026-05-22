@@ -334,52 +334,124 @@ class EssayDraftingViewModel: ObservableObject {
         Task {
             do {
                 let systemPrompt = """
-                You are an expert essay humanizer and undetectable rewriter. Your sole job is to
-                rewrite AI-generated essays so they pass every AI detection tool available, including
-                GPTZero, Turnitin, Copyleaks, Originality.ai, Winston AI, and Sapling — while
-                preserving the original meaning, argument structure, and thesis completely.
+                You are an elite-tier essay humanizer and stealth rewriter — the most advanced text
+                transformation engine designed to convert AI-generated prose into writing that is
+                indistinguishable from authentic human authorship. Your rewritten output MUST defeat
+                every major AI detection platform including GPTZero, Turnitin AI Detection, Copyleaks,
+                Originality.ai, Winston AI, Sapling, ZeroGPT, Crossplag, Writer.com AI Detector,
+                Content at Scale, Hive Moderation, and any future detection model — while preserving
+                the original meaning, argument structure, thesis, and factual accuracy completely.
 
-                STRICT RULES — ALWAYS DO:
-                1. Vary sentence length dramatically. Mix very short punchy sentences with longer,
-                   more complex ones. Never produce a paragraph where all sentences are similar length.
-                2. Begin sentences with conjunctions occasionally (But, And, Yet, So) — real humans do this.
-                3. Use contractions naturally: don't, isn't, can't, won't, it's, they're, there's.
-                4. Insert first-person perspective where appropriate: "I would argue", "In my view",
-                   "It strikes me that", "What becomes clear is".
-                5. Use colloquial transitions: "That said,", "Here's the thing:", "Of course,",
-                   "To put it plainly,", "And yet,".
-                6. Include occasional hedging language: "perhaps", "it seems", "arguably", "in many cases",
-                   "for the most part", "more often than not".
-                7. Write at least one sentence per major paragraph that reflects personal observation
-                   or opinion framing, even if abstract.
-                8. Vary paragraph length. Some paragraphs should be 1-2 sentences. Others 4-5.
-                9. Use em dashes — like this — to interrupt or add parenthetical thoughts.
-                10. Replace academic synonyms with simpler, more natural word choices. Prefer "use"
-                    over "utilize", "show" over "demonstrate", "help" over "facilitate".
+                === PHASE 1: STRUCTURAL HUMANIZATION (Always Do) ===
+                1.  Vary sentence length dramatically. Alternate between very short punchy sentences
+                    (4-8 words) and longer complex ones (25-40 words). Never allow 3+ consecutive
+                    sentences of similar length. Aim for a standard deviation in sentence length that
+                    mirrors natural speech (~40-60% variance).
+                2.  Begin sentences with conjunctions occasionally (But, And, Yet, So, Or, Still) —
+                    real humans do this roughly 8-12% of the time. Mirror that frequency.
+                3.  Use contractions naturally and consistently: don't, isn't, can't, won't, it's,
+                    they're, there's, we've, I'd, who's, that's, wouldn't, shouldn't, couldn't.
+                    At least 70% of eligible contractions should be contracted.
+                4.  Insert first-person perspective where appropriate: "I would argue", "In my view",
+                    "It strikes me that", "What becomes clear is", "I find it worth noting",
+                    "From where I stand", "My reading of this suggests".
+                5.  Use colloquial transitions: "That said,", "Here's the thing:", "Of course,",
+                    "To put it plainly,", "And yet,", "Look,", "The point is,", "Now,",
+                    "Granted,", "Fair enough,", "In a way,", "Funny enough,".
+                6.  Include hedging language: "perhaps", "it seems", "arguably", "in many cases",
+                    "for the most part", "more often than not", "to some extent", "broadly speaking",
+                    "as far as I can tell", "if we're being honest".
+                7.  Write at least one sentence per major paragraph that reflects personal observation,
+                    opinion framing, or reflective commentary — even if abstract or speculative.
+                8.  Vary paragraph length intentionally. Some paragraphs should be 1-2 sentences.
+                    Others 4-6. Never produce more than 2 paragraphs of similar sentence count in a row.
+                9.  Use em dashes — like this — to interrupt or add parenthetical thoughts. Use them
+                    2-4 times across the entire essay, not more.
+                10. Replace academic synonyms with simpler, more natural word choices: "use" over
+                    "utilize", "show" over "demonstrate", "help" over "facilitate", "get" over
+                    "obtain", "start" over "commence", "end" over "terminate", "need" over "necessitate",
+                    "try" over "endeavor", "enough" over "sufficient", "basic" over "fundamental".
                 11. Rephrase all list-like or parallel structures so they feel organic, not enumerated.
-                12. Change passive voice to active voice wherever possible.
-                13. Add a subtle imperfection or two — a slight redundancy, an informal aside — that
+                    If the original has "First... Second... Third...", break those into varied
+                    transition styles.
+                12. Change passive voice to active voice wherever possible. Target 85%+ active voice.
+                13. Add subtle imperfections — a slight redundancy, an informal aside, a self-correction
+                    ("or rather,"), a rhetorical question, or a parenthetical clarification — that
                     signals authentic human writing rather than optimized machine output.
 
-                STRICT RULES — NEVER DO:
-                1. Never use the word "delve", "tapestry", "nuanced", "multifaceted", "it is important
-                   to note", "in conclusion", "to summarize", "in today's world", "in the realm of",
-                   "stands as a testament", "pivotal", "crucial role", "underscore", "shed light on",
-                   "embark", "landscape", "moreover" (as an opener), "furthermore" (as an opener),
-                   "in essence", "at the end of the day", "game-changer", "paradigm shift".
-                2. Never produce more than 2 consecutive sentences of similar grammatical structure.
-                3. Never use overly formal academic phrasing that a student would not naturally write.
-                4. Never produce perfectly symmetrical paragraph structures (same sentence count,
-                   same length) — this is a primary AI detection signal.
-                5. Never use bulleted or numbered lists in the output unless the input explicitly
-                   required them.
-                6. Never begin more than 2 sentences in a row with "The", "This", "These", or "It".
-                7. Never introduce new arguments, facts, or claims not present in the original essay.
-                8. Never change the thesis, topic sentences, or core evidence.
-                9. Never output markdown formatting — output plain prose only.
-                10. Never make the essay longer than 115% of the original word count.
+                === PHASE 2: LEXICAL & SEMANTIC HUMANIZATION ===
+                14. Introduce natural vocabulary variation. Don't repeat the same adjective or adverb
+                    within 3 paragraphs. Rotate synonyms but prefer common over exotic words.
+                15. Use idiomatic expressions sparingly but naturally: "at the end of the day" (only
+                    once if ever), "the bottom line", "when push comes to shove", "for what it's
+                    worth", "all things considered" — limit to 1-2 per essay.
+                16. Embed rhetorical questions naturally (1-2 per essay): "But does this really hold
+                    up?", "So what does this actually mean in practice?", "Why should we care?"
+                17. Occasionally front-load subordinate clauses: "While the data suggests otherwise,",
+                    "Even though this seems counterintuitive,", "Despite what critics argue,".
+                18. Use sensory or concrete language where abstract phrasing exists. Replace "this has
+                    significant implications" with "this changes how we think about X in a real way."
+                19. Mirror natural written cadence by occasionally breaking grammar rules the way real
+                    writers do: sentence fragments for emphasis ("Not quite.", "Far from it."),
+                    comma splices in informal contexts, starting with "Because" or "Which".
 
-                OUTPUT: Return only the rewritten essay text. No preamble, no explanation, no labels, ONLY the rewritten essay.
+                === PHASE 3: ANTI-DETECTION COUNTERMEASURES ===
+                20. Perplexity injection: Ensure the text has naturally high perplexity (unpredictable
+                    next-word choices) by avoiding the most statistically probable word in at least
+                    30% of positions. Choose the 2nd or 3rd most natural word instead.
+                21. Burstiness calibration: Human writing has high burstiness (alternating between
+                    complex and simple passages). Ensure at least 3 clear shifts in complexity level
+                    across the essay.
+                22. Avoid formulaic essay patterns: Do NOT follow "Topic sentence → Evidence →
+                    Analysis → Transition" rigidly in every paragraph. Mix up the internal structure.
+                23. Scatter micro-digressions: Brief 1-sentence asides that show the writer's thought
+                    process ("This might seem tangential, but...", "I realize this is a simplification,
+                    but...") placed naturally 1-2 times.
+                24. Avoid over-coherence: Real human essays sometimes have slightly abrupt transitions
+                    or unexpected topic pivots. Don't over-smooth every connection.
+                25. Use demonstrative references naturally: "this idea", "that claim", "these findings"
+                    — but not in a pattern. Vary between demonstrative, pronoun, and noun repetition.
+
+                === ABSOLUTE PROHIBITIONS (Never Do) ===
+                1.  NEVER use these words/phrases — they are primary AI detection markers:
+                    "delve", "tapestry", "nuanced", "multifaceted", "it is important to note",
+                    "in conclusion", "to summarize", "in today's world", "in the realm of",
+                    "stands as a testament", "pivotal", "crucial role", "underscore", "shed light on",
+                    "embark", "landscape" (metaphorical), "moreover" (as opener), "furthermore" (as
+                    opener), "in essence", "game-changer", "paradigm shift", "holistic",
+                    "comprehensive", "robust", "leverage" (as verb), "foster" (as verb), "navigate"
+                    (metaphorical), "intersection of", "myriad", "plethora", "synergy", "catalyst",
+                    "cornerstone", "underpinning", "overarching", "spearhead", "harness",
+                    "groundbreaking", "trailblazing", "thought-provoking", "noteworthy",
+                    "ever-evolving", "fast-paced", "cutting-edge", "realm", "facet", "intricate",
+                    "indispensable", "commendable", "meticulous".
+                2.  NEVER produce more than 2 consecutive sentences of similar grammatical structure.
+                3.  NEVER use overly formal academic phrasing that a real student would not naturally
+                    write in a homework essay.
+                4.  NEVER produce perfectly symmetrical paragraph structures (same sentence count,
+                    same length) — this is a primary AI detection signal.
+                5.  NEVER use bulleted or numbered lists in the output unless the input explicitly
+                    required them.
+                6.  NEVER begin more than 2 sentences in a row with "The", "This", "These", or "It".
+                7.  NEVER introduce new arguments, facts, or claims not present in the original essay.
+                8.  NEVER change the thesis, topic sentences, or core evidence.
+                9.  NEVER output markdown formatting — output plain prose only.
+                10. NEVER make the essay longer than 110% of the original word count or shorter than
+                    90% of the original word count.
+                11. NEVER use the same transition word/phrase more than twice in the entire essay.
+                12. NEVER produce a paragraph where every sentence starts with a subject-verb pattern.
+                13. NEVER use overly enthusiastic or promotional language ("amazing", "incredible",
+                    "revolutionary", "remarkable").
+                14. NEVER use filler phrases that add no meaning: "It goes without saying",
+                    "Needless to say", "It should be noted that", "It is worth mentioning".
+                15. NEVER produce text that sounds like a corporate blog post, press release, or
+                    marketing copy.
+
+                === OUTPUT INSTRUCTIONS ===
+                Return ONLY the rewritten essay text. No preamble, no explanation, no labels, no
+                meta-commentary, no "Here is your rewritten essay:", ONLY the rewritten prose.
+                Maintain the same paragraph breaks as the original. Preserve any citations or
+                references exactly as they appear.
                 """
 
                 let result = try await AIService.shared.processText(prompt: generatedContent, systemPrompt: systemPrompt)
@@ -480,6 +552,9 @@ struct EssayDraftingView: View {
     @StateObject private var viewModel = EssayDraftingViewModel()
     @StateObject private var manager = NotebooksManager.shared
     @State private var didCopy: Bool = false
+    @State private var thesisSuggestAnimating: Bool = false
+    @State private var contentFontSize: CGFloat = 16
+    @State private var contentLineSpacing: CGFloat = 5
 
     private var isAnyLoading: Bool {
         viewModel.isGenerating || viewModel.isHumanizing || viewModel.isTransitioning
@@ -648,10 +723,18 @@ struct EssayDraftingView: View {
                             if viewModel.suggestedThesisLoading {
                                 ProgressView().scaleEffect(0.8)
                             } else {
-                                Button("Suggest") {
+                                Button {
+                                    withAnimation(.easeInOut(duration: 0.35)) {
+                                        thesisSuggestAnimating = true
+                                    }
                                     viewModel.suggestThesis()
+                                } label: {
+                                    Label("Suggest", systemImage: "sparkles")
+                                        .font(.caption.bold())
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(Color.accentColor.opacity(0.15), in: Capsule())
                                 }
-                                .font(.caption)
                                 .disabled(isAnyLoading)
                             }
                         }
@@ -660,6 +743,36 @@ struct EssayDraftingView: View {
                             .padding(8)
                             .background(Color(.secondarySystemBackground))
                             .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(
+                                        thesisSuggestAnimating
+                                            ? Color.accentColor
+                                            : Color.clear,
+                                        lineWidth: 2
+                                    )
+                                    .scaleEffect(thesisSuggestAnimating ? 1.03 : 1.0)
+                                    .opacity(thesisSuggestAnimating ? 1 : 0)
+                                    .animation(
+                                        thesisSuggestAnimating
+                                            ? .easeInOut(duration: 0.6).repeatForever(autoreverses: true)
+                                            : .easeOut(duration: 0.3),
+                                        value: thesisSuggestAnimating
+                                    )
+                            )
+                            .shadow(
+                                color: thesisSuggestAnimating ? Color.accentColor.opacity(0.3) : .clear,
+                                radius: thesisSuggestAnimating ? 8 : 0,
+                                x: 0,
+                                y: 0
+                            )
+                            .onChange(of: viewModel.suggestedThesisLoading) { _, isLoading in
+                                if !isLoading && thesisSuggestAnimating {
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
+                                        thesisSuggestAnimating = false
+                                    }
+                                }
+                            }
                     }
 
                     VStack(alignment: .leading, spacing: 12) {
@@ -876,40 +989,83 @@ struct EssayDraftingView: View {
 
     private var previewContent: some View {
         VStack(alignment: .leading, spacing: 20) {
-            HStack {
-                Label("Generated Content", systemImage: "doc.text.magnifyingglass")
-                    .font(.title3.bold())
-                Spacer()
+            // Header with modern controls
+            VStack(spacing: 12) {
+                HStack {
+                    Label("Generated Content", systemImage: "doc.text.magnifyingglass")
+                        .font(.title3.bold())
+                    Spacer()
+                    Button {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        viewModel.showPreview = false
+                    } label: {
+                        Label("Edit Inputs", systemImage: "slider.horizontal.3")
+                            .font(.caption.bold())
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color(.tertiarySystemBackground), in: Capsule())
+                    }
+                    .disabled(isAnyLoading)
+                }
 
-                HStack(spacing: 16) {
+                // Stats bar
+                let wordCount = viewModel.generatedContent.split { $0.isWhitespace }.count
+                let charCount = viewModel.generatedContent.count
+                let sentenceCount = viewModel.generatedContent.components(separatedBy: CharacterSet(charactersIn: ".!?")).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.count
+                let readingTime = max(1, wordCount / 200)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        previewStatChip(icon: "textformat.123", label: "\(wordCount) words")
+                        previewStatChip(icon: "character.cursor.ibeam", label: "\(charCount) chars")
+                        previewStatChip(icon: "text.alignleft", label: "\(sentenceCount) sentences")
+                        previewStatChip(icon: "clock", label: "~\(readingTime) min read")
+                    }
+                }
+
+                // Action toolbar
+                HStack(spacing: 10) {
                     Button {
                         UIPasteboard.general.string = viewModel.generatedContent
                         didCopy = true
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { didCopy = false }
                     } label: {
-                        Image(systemName: didCopy ? "checkmark" : "doc.on.doc")
+                        Label(didCopy ? "Copied" : "Copy All", systemImage: didCopy ? "checkmark" : "doc.on.doc")
+                            .font(.caption.bold())
                             .foregroundColor(didCopy ? .green : .accentColor)
                     }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
                     .disabled(isAnyLoading)
 
-                    Button {
-                        // Share action dummy
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    } label: {
-                        Image(systemName: "square.and.arrow.up")
-                            .foregroundColor(.accentColor)
+                    ShareLink(item: viewModel.generatedContent) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                            .font(.caption.bold())
                     }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
                     .disabled(isAnyLoading)
 
-                    Button {
-                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                        viewModel.showPreview = false
-                    } label: {
-                        Label("Edit Inputs", systemImage: "slider.horizontal.3")
-                            .font(.caption)
+                    Spacer()
+
+                    HStack(spacing: 4) {
+                        Button {
+                            contentFontSize = max(12, contentFontSize - 2)
+                        } label: {
+                            Image(systemName: "textformat.size.smaller")
+                                .font(.caption2)
+                        }
+                        .buttonStyle(.bordered)
+
+                        Button {
+                            contentFontSize = min(28, contentFontSize + 2)
+                        } label: {
+                            Image(systemName: "textformat.size.larger")
+                                .font(.caption2)
+                        }
+                        .buttonStyle(.bordered)
                     }
-                    .disabled(isAnyLoading)
                 }
             }
 
@@ -919,21 +1075,21 @@ struct EssayDraftingView: View {
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }
 
+            // Content display
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     if !parsed.title.isEmpty {
                         Text(parsed.title)
-                            .font(.title3)
-                            .fontWeight(.bold)
+                            .font(.system(size: contentFontSize + 4, weight: .bold))
                             .foregroundColor(.primary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    ForEach(paragraphs, id: \.self) { paragraph in
+                    ForEach(Array(paragraphs.enumerated()), id: \.offset) { index, paragraph in
                         Text(LocalizedStringKey(paragraph))
-                            .font(.body)
+                            .font(.system(size: contentFontSize))
                             .foregroundColor(.primary)
                             .fixedSize(horizontal: false, vertical: true)
-                            .lineSpacing(5)
+                            .lineSpacing(contentLineSpacing)
                     }
                 }
                 .padding()
@@ -941,15 +1097,21 @@ struct EssayDraftingView: View {
             .frame(maxHeight: 500)
             .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color(.separator).opacity(0.3), lineWidth: 1)
+            )
             .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
 
             AIDetectorSectionView(viewModel: viewModel)
                 .disabled(isAnyLoading)
 
+            // Action buttons
             VStack(spacing: 12) {
                 HStack(spacing: 12) {
                     Button(action: addToNote) {
                         Label("Add To Note", systemImage: "plus.square.on.square")
+                            .bold()
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
                             .background(Color.accentColor)
@@ -959,7 +1121,8 @@ struct EssayDraftingView: View {
                     .disabled(isAnyLoading)
 
                     Button(action: { viewModel.generateEssay() }) {
-                        Label("Try Again", systemImage: "arrow.clockwise")
+                        Label("Regenerate", systemImage: "arrow.clockwise")
+                            .bold()
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
                             .background(Color(.tertiarySystemBackground))
@@ -970,16 +1133,50 @@ struct EssayDraftingView: View {
                 }
 
                 Button(action: { viewModel.humanize() }) {
-                    Label("Humanizer", systemImage: "person.badge.shield.checkmark")
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                    HStack(spacing: 8) {
+                        Image(systemName: "person.badge.shield.checkmark")
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Humanizer")
+                                .font(.subheadline.bold())
+                            Text("Make it sound 100% human-written")
+                                .font(.caption2)
+                                .opacity(0.85)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .opacity(0.7)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .padding(.horizontal, 16)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.green, Color.green.opacity(0.85)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .foregroundColor(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
                 .disabled(isAnyLoading)
             }
         }
+    }
+
+    private func previewStatChip(icon: String, label: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.caption2)
+                .foregroundColor(.accentColor)
+            Text(label)
+                .font(.caption2.weight(.medium))
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color(.tertiarySystemBackground), in: Capsule())
     }
 
     private func addToNote() {
