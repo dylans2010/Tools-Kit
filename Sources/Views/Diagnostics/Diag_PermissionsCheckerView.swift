@@ -127,3 +127,4 @@ struct Diag_PermissionsCheckerView: View {
         case .undetermined: return "questionmark.circle.fill"
         }
     }
+}

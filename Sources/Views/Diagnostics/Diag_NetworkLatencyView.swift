@@ -126,9 +126,3 @@ struct Diag_NetworkLatencyView: View {
     }
 }
 
-private struct PingResult: Identifiable {
-    let id = UUID()
-    let host: String
-    let latencyMs: Double
-    let success: Bool
-}
