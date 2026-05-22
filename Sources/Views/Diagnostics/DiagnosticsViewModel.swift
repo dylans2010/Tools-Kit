@@ -1,0 +1,186 @@
+import SwiftUI
+import Combine
+
+struct DiagnosticTool: Identifiable, Equatable {
+    let id: String
+    let name: String
+    let icon: String
+    let description: String
+    let category: DiagnosticCategory
+
+    static func == (lhs: DiagnosticTool, rhs: DiagnosticTool) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
+enum DiagnosticCategory: String, CaseIterable, Identifiable {
+    case display = "Display"
+    case audio = "Audio"
+    case microphone = "Microphone"
+    case sensors = "Sensors"
+    case haptics = "Haptics"
+    case connectivity = "Connectivity"
+    case performance = "Performance"
+    case battery = "Battery"
+    case camera = "Camera"
+    case storage = "Storage"
+    case system = "System"
+    case accessibility = "Accessibility"
+    case security = "Security"
+
+    var id: String { rawValue }
+
+    var icon: String {
+        switch self {
+        case .display: return "display"
+        case .audio: return "speaker.wave.3.fill"
+        case .microphone: return "mic.fill"
+        case .sensors: return "sensor.fill"
+        case .haptics: return "hand.tap.fill"
+        case .connectivity: return "wifi"
+        case .performance: return "gauge.with.dots.needle.67percent"
+        case .battery: return "battery.100"
+        case .camera: return "camera.fill"
+        case .storage: return "internaldrive.fill"
+        case .system: return "gearshape.fill"
+        case .accessibility: return "accessibility"
+        case .security: return "lock.shield.fill"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .display: return .blue
+        case .audio: return .orange
+        case .microphone: return .red
+        case .sensors: return .purple
+        case .haptics: return .pink
+        case .connectivity: return .green
+        case .performance: return .yellow
+        case .battery: return .mint
+        case .camera: return .indigo
+        case .storage: return .teal
+        case .system: return .gray
+        case .accessibility: return .cyan
+        case .security: return .brown
+        }
+    }
+}
+
+final class DiagnosticsViewModel: ObservableObject {
+    @Published var searchText: String = ""
+    @Published var selectedCategory: DiagnosticCategory?
+
+    let allTools: [DiagnosticTool] = [
+        // Display (7)
+        DiagnosticTool(id: "screen_color", name: "Screen Color Test", icon: "paintpalette.fill", description: "Cycle through RGB colors to check display uniformity", category: .display),
+        DiagnosticTool(id: "dead_pixel", name: "Dead Pixel Detection", icon: "square.grid.3x3.fill", description: "Detect dead or stuck pixels on your display", category: .display),
+        DiagnosticTool(id: "brightness", name: "Brightness Test", icon: "sun.max.fill", description: "Test display brightness range and uniformity", category: .display),
+        DiagnosticTool(id: "touch_response", name: "Touch Responsiveness", icon: "hand.point.up.left.fill", description: "Test touch screen response accuracy", category: .display),
+        DiagnosticTool(id: "multi_touch", name: "Multi-Touch Tracking", icon: "hand.point.up.fill", description: "Track multiple simultaneous touch points", category: .display),
+        DiagnosticTool(id: "true_tone", name: "True Tone Check", icon: "circle.lefthalf.filled", description: "Check True Tone display adaptation status", category: .display),
+        DiagnosticTool(id: "color_accuracy", name: "Color Accuracy", icon: "eyedropper.halffull", description: "Evaluate display color accuracy with test patterns", category: .display),
+
+        // Audio (5)
+        DiagnosticTool(id: "speaker_test", name: "Speaker L/R Test", icon: "speaker.wave.2.fill", description: "Test left and right speaker channels independently", category: .audio),
+        DiagnosticTool(id: "stereo_balance", name: "Stereo Balance", icon: "slider.horizontal.3", description: "Verify stereo audio balance between channels", category: .audio),
+        DiagnosticTool(id: "volume_ramp", name: "Volume Ramp Test", icon: "speaker.wave.3.fill", description: "Test speaker volume ramp from silent to max", category: .audio),
+        DiagnosticTool(id: "distortion", name: "Distortion Detection", icon: "waveform.badge.exclamationmark", description: "Detect audio distortion during playback", category: .audio),
+        DiagnosticTool(id: "audio_latency", name: "Audio Latency", icon: "clock.arrow.2.circlepath", description: "Measure audio output latency", category: .audio),
+
+        // Microphone (4)
+        DiagnosticTool(id: "mic_level", name: "Mic Input Level", icon: "mic.fill", description: "Visualize real-time microphone input levels", category: .microphone),
+        DiagnosticTool(id: "noise_detect", name: "Noise Detection", icon: "ear.fill", description: "Analyze ambient noise levels and patterns", category: .microphone),
+        DiagnosticTool(id: "recording_test", name: "Recording Test", icon: "waveform.circle.fill", description: "Record audio and play it back to verify quality", category: .microphone),
+        DiagnosticTool(id: "mic_switch", name: "Multi-Mic Switching", icon: "mic.badge.plus", description: "Test switching between available microphones", category: .microphone),
+
+        // Sensors (5)
+        DiagnosticTool(id: "accelerometer", name: "Accelerometer", icon: "move.3d", description: "Live graph of accelerometer X, Y, Z data", category: .sensors),
+        DiagnosticTool(id: "gyroscope", name: "Gyroscope", icon: "gyroscope", description: "Visualize gyroscope rotation rate data", category: .sensors),
+        DiagnosticTool(id: "magnetometer", name: "Magnetometer", icon: "location.north.fill", description: "Raw compass and magnetic field data", category: .sensors),
+        DiagnosticTool(id: "proximity", name: "Proximity Sensor", icon: "hand.raised.fill", description: "Test proximity sensor activation", category: .sensors),
+        DiagnosticTool(id: "ambient_light", name: "Ambient Light", icon: "light.max", description: "Monitor ambient light sensor readings", category: .sensors),
+
+        // Haptics (3)
+        DiagnosticTool(id: "haptic_test", name: "Haptic Feedback", icon: "hand.tap.fill", description: "Test various haptic feedback intensities", category: .haptics),
+        DiagnosticTool(id: "haptic_pattern", name: "Pattern Playback", icon: "waveform.path", description: "Play haptic patterns to verify motor function", category: .haptics),
+        DiagnosticTool(id: "taptic_engine", name: "Taptic Engine Test", icon: "iphone.radiowaves.left.and.right", description: "Comprehensive Taptic Engine diagnostic", category: .haptics),
+
+        // Connectivity (5)
+        DiagnosticTool(id: "wifi_strength", name: "WiFi Strength", icon: "wifi", description: "Measure current WiFi signal and connection quality", category: .connectivity),
+        DiagnosticTool(id: "network_latency", name: "Network Latency", icon: "network", description: "Ping simulation to measure network latency", category: .connectivity),
+        DiagnosticTool(id: "internet_speed", name: "Internet Speed", icon: "speedometer", description: "Approximate upload and download speed", category: .connectivity),
+        DiagnosticTool(id: "bluetooth", name: "Bluetooth Scanner", icon: "wave.3.right", description: "Check Bluetooth availability and scan for devices", category: .connectivity),
+        DiagnosticTool(id: "airplane", name: "Airplane Mode", icon: "airplane", description: "Detect airplane mode and network interface status", category: .connectivity),
+
+        // Performance (5)
+        DiagnosticTool(id: "cpu_stress", name: "CPU Stress Test", icon: "cpu", description: "Safe CPU load simulation with real-time metrics", category: .performance),
+        DiagnosticTool(id: "memory_usage", name: "Memory Usage", icon: "memorychip", description: "Display current memory allocation and pressure", category: .performance),
+        DiagnosticTool(id: "fps_monitor", name: "FPS Monitor", icon: "gauge.with.dots.needle.67percent", description: "Real-time frame rate monitoring", category: .performance),
+        DiagnosticTool(id: "thermal_state", name: "Thermal State", icon: "thermometer.medium", description: "Monitor device thermal state in real time", category: .performance),
+        DiagnosticTool(id: "process_info", name: "Process Info", icon: "chart.bar.fill", description: "View active process and system resource details", category: .performance),
+
+        // Battery (3)
+        DiagnosticTool(id: "battery_level", name: "Battery Health", icon: "battery.100", description: "Battery level, state, and health information", category: .battery),
+        DiagnosticTool(id: "charging_state", name: "Charging State", icon: "bolt.fill", description: "Monitor charging status and power source", category: .battery),
+        DiagnosticTool(id: "battery_drain", name: "Battery Drain Sim", icon: "battery.25", description: "Visual simulation of battery drain over time", category: .battery),
+
+        // Camera (4)
+        DiagnosticTool(id: "front_camera", name: "Front Camera", icon: "camera.fill", description: "Preview and test front-facing camera", category: .camera),
+        DiagnosticTool(id: "rear_camera", name: "Rear Camera", icon: "camera.fill", description: "Preview and test rear-facing camera", category: .camera),
+        DiagnosticTool(id: "focus_test", name: "Focus Test", icon: "camera.metering.center.weighted", description: "Test camera autofocus and manual focus", category: .camera),
+        DiagnosticTool(id: "flash_test", name: "Flash Test", icon: "bolt.circle.fill", description: "Test camera flash/torch functionality", category: .camera),
+
+        // Storage (3)
+        DiagnosticTool(id: "disk_usage", name: "Disk Usage", icon: "internaldrive.fill", description: "Detailed breakdown of disk space usage", category: .storage),
+        DiagnosticTool(id: "rw_test", name: "Read/Write Test", icon: "doc.badge.gearshape", description: "Simulate disk read and write speed test", category: .storage),
+        DiagnosticTool(id: "file_system", name: "File System Info", icon: "folder.fill.badge.gearshape", description: "View file system details and attributes", category: .storage),
+
+        // System (5)
+        DiagnosticTool(id: "device_info", name: "Device Info", icon: "iphone", description: "Model, iOS version, and hardware identifiers", category: .system),
+        DiagnosticTool(id: "uptime", name: "System Uptime", icon: "clock.fill", description: "View how long the device has been running", category: .system),
+        DiagnosticTool(id: "permissions", name: "Permissions Checker", icon: "checkmark.shield.fill", description: "Audit app permissions for camera, mic, location, etc.", category: .system),
+        DiagnosticTool(id: "locale_info", name: "Locale & Region", icon: "globe", description: "Current locale, language, and region settings", category: .system),
+        DiagnosticTool(id: "notifications", name: "Notification Status", icon: "bell.badge.fill", description: "Check push notification authorization status", category: .system),
+
+        // Accessibility (3)
+        DiagnosticTool(id: "voiceover", name: "VoiceOver Status", icon: "speaker.badge.exclamationmark.fill", description: "Check if VoiceOver accessibility is enabled", category: .accessibility),
+        DiagnosticTool(id: "dynamic_type", name: "Dynamic Type", icon: "textformat.size", description: "Test current Dynamic Type text size settings", category: .accessibility),
+        DiagnosticTool(id: "reduce_motion", name: "Reduce Motion", icon: "figure.walk", description: "Check reduce motion and transparency settings", category: .accessibility),
+
+        // Security (3)
+        DiagnosticTool(id: "biometric", name: "Biometric Check", icon: "faceid", description: "Test Face ID or Touch ID availability", category: .security),
+        DiagnosticTool(id: "passcode", name: "Passcode Status", icon: "lock.fill", description: "Check if device passcode is set", category: .security),
+        DiagnosticTool(id: "secure_enclave", name: "Secure Enclave", icon: "lock.shield.fill", description: "Verify Secure Enclave availability", category: .security),
+    ]
+
+    var filteredTools: [DiagnosticTool] {
+        var result = allTools
+        if let category = selectedCategory {
+            result = result.filter { $0.category == category }
+        }
+        if !searchText.isEmpty {
+            let query = searchText.lowercased()
+            result = result.filter {
+                $0.name.lowercased().contains(query) ||
+                $0.description.lowercased().contains(query) ||
+                $0.category.rawValue.lowercased().contains(query)
+            }
+        }
+        return result
+    }
+
+    var toolsByCategory: [(DiagnosticCategory, [DiagnosticTool])] {
+        let tools = filteredTools
+        var result: [(DiagnosticCategory, [DiagnosticTool])] = []
+        for category in DiagnosticCategory.allCases {
+            let categoryTools = tools.filter { $0.category == category }
+            if !categoryTools.isEmpty {
+                result.append((category, categoryTools))
+            }
+        }
+        return result
+    }
+
+    var totalToolCount: Int { allTools.count }
+}
