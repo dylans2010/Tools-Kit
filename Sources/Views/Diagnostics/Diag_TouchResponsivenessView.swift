@@ -10,9 +10,9 @@ struct Diag_TouchResponsivenessView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 20) {
-                StatBox(title: "Hits", value: "\(hitCount)", color: .green)
-                StatBox(title: "Misses", value: "\(missCount)", color: .red)
-                StatBox(title: "Accuracy", value: accuracy, color: .blue)
+                TouchStatBox(title: "Hits", value: "\(hitCount)", color: .green)
+                TouchStatBox(title: "Misses", value: "\(missCount)", color: .red)
+                TouchStatBox(title: "Accuracy", value: accuracy, color: .blue)
             }
             .padding()
 
@@ -97,7 +97,7 @@ struct Diag_TouchResponsivenessView: View {
     }
 }
 
-private struct StatBox: View {
+private struct TouchStatBox: View {
     let title: String
     let value: String
     let color: Color

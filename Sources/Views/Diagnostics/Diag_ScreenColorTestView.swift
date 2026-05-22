@@ -8,7 +8,7 @@ struct Diag_ScreenColorTestView: View {
     private let colors: [(Color, String)] = [
         (.red, "Red"), (.green, "Green"), (.blue, "Blue"),
         (.white, "White"), (.black, "Black"), (.yellow, "Yellow"),
-        (.cyan, "Cyan"), (.magenta, "Magenta"), (.orange, "Orange"),
+        (.cyan, "Cyan"), (Color(red: 1.0, green: 0.0, blue: 1.0), "Magenta"), (.orange, "Orange"),
         (.gray, "Gray 50%")
     ]
 

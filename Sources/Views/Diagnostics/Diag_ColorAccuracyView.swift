@@ -36,7 +36,7 @@ struct Diag_ColorAccuracyView: View {
                 Color.yellow.frame(maxHeight: .infinity)
                 Color.cyan.frame(maxHeight: .infinity)
                 Color.green.frame(maxHeight: .infinity)
-                Color.magenta.frame(maxHeight: .infinity)
+                Color(red: 1.0, green: 0.0, blue: 1.0).frame(maxHeight: .infinity)
                 Color.red.frame(maxHeight: .infinity)
                 Color.blue.frame(maxHeight: .infinity)
                 Color.black.frame(maxHeight: .infinity)

@@ -18,18 +18,18 @@ struct Diag_PermissionsCheckerView: View {
                     ForEach(permissions) { perm in
                         HStack {
                             Image(systemName: perm.icon)
-                                .foregroundStyle(perm.statusColor)
+                                .foregroundStyle(color(for: perm.status))
                                 .frame(width: 30)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(perm.name)
                                     .font(.subheadline.weight(.medium))
-                                Text(perm.status)
+                                Text(perm.statusText)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
                             Spacer()
-                            Image(systemName: perm.statusIcon)
-                                .foregroundStyle(perm.statusColor)
+                            Image(systemName: icon(for: perm.status))
+                                .foregroundStyle(color(for: perm.status))
                         }
                     }
                 }
@@ -60,20 +60,20 @@ struct Diag_PermissionsCheckerView: View {
 
         // Camera
         let cameraStatus = AVCaptureDevice.authorizationStatus(for: .video)
-        items.append(PermissionItem(name: "Camera", icon: "camera.fill", status: authStatusString(cameraStatus), statusColor: authStatusColor(cameraStatus), statusIcon: authStatusIcon(cameraStatus)))
+        items.append(PermissionItem(name: "Camera", icon: "camera.fill", status: mapAVStatus(cameraStatus), detail: "Used for QR scanning and media capture"))
 
         // Microphone
         let micStatus = AVCaptureDevice.authorizationStatus(for: .audio)
-        items.append(PermissionItem(name: "Microphone", icon: "mic.fill", status: authStatusString(micStatus), statusColor: authStatusColor(micStatus), statusIcon: authStatusIcon(micStatus)))
+        items.append(PermissionItem(name: "Microphone", icon: "mic.fill", status: mapAVStatus(micStatus), detail: "Used for audio recording features"))
 
         // Location
         let locStatus = CLLocationManager.authorizationStatus()
-        items.append(PermissionItem(name: "Location", icon: "location.fill", status: locationStatusString(locStatus), statusColor: locationStatusColor(locStatus), statusIcon: locationStatusIcon(locStatus)))
+        items.append(PermissionItem(name: "Location", icon: "location.fill", status: mapLocationStatus(locStatus), detail: "Used for location-aware diagnostics"))
 
         // Notifications
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             let notifStatus = settings.authorizationStatus
-            let item = PermissionItem(name: "Notifications", icon: "bell.fill", status: notifStatusString(notifStatus), statusColor: notifStatusColor(notifStatus), statusIcon: notifStatusIcon(notifStatus))
+            let item = PermissionItem(name: "Notifications", icon: "bell.fill", status: mapNotificationStatus(notifStatus), detail: "Used for reminders and alerts")
             DispatchQueue.main.async {
                 items.append(item)
                 permissions = items
@@ -82,98 +82,48 @@ struct Diag_PermissionsCheckerView: View {
         }
     }
 
-    private func authStatusString(_ status: AVAuthorizationStatus) -> String {
+    private func mapAVStatus(_ status: AVAuthorizationStatus) -> PermissionItem.Status {
         switch status {
-        case .authorized: return "Authorized"
-        case .denied: return "Denied"
-        case .restricted: return "Restricted"
-        case .notDetermined: return "Not Determined"
-        @unknown default: return "Unknown"
+        case .authorized: return .granted
+        case .denied: return .denied
+        case .restricted: return .restricted
+        case .notDetermined: return .undetermined
+        @unknown default: return .undetermined
         }
     }
 
-    private func authStatusColor(_ status: AVAuthorizationStatus) -> Color {
+    private func mapLocationStatus(_ status: CLAuthorizationStatus) -> PermissionItem.Status {
         switch status {
-        case .authorized: return .green
-        case .denied, .restricted: return .red
-        case .notDetermined: return .orange
-        @unknown default: return .secondary
+        case .authorizedAlways, .authorizedWhenInUse: return .granted
+        case .denied: return .denied
+        case .restricted: return .restricted
+        case .notDetermined: return .undetermined
+        @unknown default: return .undetermined
         }
     }
 
-    private func authStatusIcon(_ status: AVAuthorizationStatus) -> String {
+    private func mapNotificationStatus(_ status: UNAuthorizationStatus) -> PermissionItem.Status {
         switch status {
-        case .authorized: return "checkmark.circle.fill"
-        case .denied, .restricted: return "xmark.circle.fill"
-        case .notDetermined: return "questionmark.circle.fill"
-        @unknown default: return "questionmark.circle"
+        case .authorized, .provisional, .ephemeral: return .granted
+        case .denied: return .denied
+        case .notDetermined: return .undetermined
+        @unknown default: return .undetermined
         }
     }
 
-    private func locationStatusString(_ status: CLAuthorizationStatus) -> String {
+    private func color(for status: PermissionItem.Status) -> Color {
         switch status {
-        case .authorizedAlways: return "Always"
-        case .authorizedWhenInUse: return "When In Use"
-        case .denied: return "Denied"
-        case .restricted: return "Restricted"
-        case .notDetermined: return "Not Determined"
-        @unknown default: return "Unknown"
-        }
-    }
-
-    private func locationStatusColor(_ status: CLAuthorizationStatus) -> Color {
-        switch status {
-        case .authorizedAlways, .authorizedWhenInUse: return .green
-        case .denied, .restricted: return .red
-        case .notDetermined: return .orange
-        @unknown default: return .secondary
-        }
-    }
-
-    private func locationStatusIcon(_ status: CLAuthorizationStatus) -> String {
-        switch status {
-        case .authorizedAlways, .authorizedWhenInUse: return "checkmark.circle.fill"
-        case .denied, .restricted: return "xmark.circle.fill"
-        case .notDetermined: return "questionmark.circle.fill"
-        @unknown default: return "questionmark.circle"
-        }
-    }
-
-    private func notifStatusString(_ status: UNAuthorizationStatus) -> String {
-        switch status {
-        case .authorized: return "Authorized"
-        case .denied: return "Denied"
-        case .provisional: return "Provisional"
-        case .ephemeral: return "Ephemeral"
-        case .notDetermined: return "Not Determined"
-        @unknown default: return "Unknown"
-        }
-    }
-
-    private func notifStatusColor(_ status: UNAuthorizationStatus) -> Color {
-        switch status {
-        case .authorized, .provisional, .ephemeral: return .green
+        case .granted: return .green
         case .denied: return .red
-        case .notDetermined: return .orange
-        @unknown default: return .secondary
+        case .undetermined: return .orange
+        case .restricted: return .gray
         }
     }
 
-    private func notifStatusIcon(_ status: UNAuthorizationStatus) -> String {
+    private func icon(for status: PermissionItem.Status) -> String {
         switch status {
-        case .authorized, .provisional, .ephemeral: return "checkmark.circle.fill"
-        case .denied: return "xmark.circle.fill"
-        case .notDetermined: return "questionmark.circle.fill"
-        @unknown default: return "questionmark.circle"
+        case .granted: return "checkmark.circle.fill"
+        case .denied, .restricted: return "xmark.circle.fill"
+        case .undetermined: return "questionmark.circle.fill"
         }
     }
-}
-
-private struct PermissionItem: Identifiable {
-    let id = UUID()
-    let name: String
-    let icon: String
-    let status: String
-    let statusColor: Color
-    let statusIcon: String
-}

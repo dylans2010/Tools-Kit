@@ -84,8 +84,8 @@ struct Diag_WiFiStrengthView: View {
 
                 isExpensive = path.isExpensive
                 isConstrained = path.isConstrained
-                supportsIPv4 = path.supportsIPVersion(.v4)
-                supportsIPv6 = path.supportsIPVersion(.v6)
+                supportsIPv4 = path.supportsIPv4
+                supportsIPv6 = path.supportsIPv6
 
                 if path.usesInterfaceType(.wifi) { interfaceType = "WiFi" }
                 else if path.usesInterfaceType(.cellular) { interfaceType = "Cellular" }
