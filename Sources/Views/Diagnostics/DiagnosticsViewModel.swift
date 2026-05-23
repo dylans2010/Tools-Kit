@@ -203,6 +203,53 @@ final class DiagnosticsViewModel: ObservableObject {
         // Accessibility (new)
         DiagnosticTool(id: "bold_text", name: "Bold Text", icon: "bold", description: "Check if system bold text is enabled", category: .accessibility),
         DiagnosticTool(id: "color_filters", name: "Color Filters", icon: "circle.lefthalf.filled", description: "Detect active color filters and inversions", category: .accessibility),
+
+        // === NEW DIAGNOSTIC TOOLS (28) ===
+
+        // GPS & Location
+        DiagnosticTool(id: "gps_location", name: "GPS Location", icon: "location.fill", description: "Real-time GPS coordinates, altitude, speed via CoreLocation", category: .sensors),
+        DiagnosticTool(id: "satellite_connectivity", name: "Satellite Connectivity", icon: "satellite.fill", description: "iPhone 14+ satellite hardware detection and network fallback", category: .connectivity),
+        DiagnosticTool(id: "compass_heading", name: "Compass Heading", icon: "location.north.fill", description: "Magnetic and true heading with raw field data", category: .sensors),
+        DiagnosticTool(id: "altimeter", name: "Altimeter", icon: "mountain.2.fill", description: "Barometric altitude and atmospheric pressure tracking", category: .sensors),
+        DiagnosticTool(id: "location_history", name: "Location History", icon: "map.fill", description: "Track location path, distance, and movement history", category: .sensors),
+        DiagnosticTool(id: "device_orientation", name: "Device Orientation", icon: "rotate.3d", description: "Real-time pitch, roll, yaw with gravity vector", category: .sensors),
+        DiagnosticTool(id: "motion_sensor_fusion", name: "Motion Sensor Fusion", icon: "gyroscope", description: "Combined accelerometer, gyro, magnetometer fusion data", category: .sensors),
+
+        // Networking
+        DiagnosticTool(id: "dns_lookup", name: "DNS Lookup", icon: "server.rack", description: "Real DNS resolution with IPv4/IPv6 address discovery", category: .connectivity),
+        DiagnosticTool(id: "port_scanner", name: "Port Scanner", icon: "network.badge.shield.half.filled", description: "TCP port scanning with concurrent connection testing", category: .connectivity),
+        DiagnosticTool(id: "traceroute", name: "Traceroute", icon: "point.3.connected.trianglepath.dotted", description: "Network path tracing with hop-by-hop RTT analysis", category: .connectivity),
+        DiagnosticTool(id: "bandwidth_monitor", name: "Bandwidth Monitor", icon: "chart.line.uptrend.xyaxis", description: "Real-time network throughput from interface statistics", category: .connectivity),
+        DiagnosticTool(id: "socket_test", name: "Socket Test", icon: "cable.connector", description: "TCP/TLS connection testing with endpoint inspection", category: .connectivity),
+        DiagnosticTool(id: "ssl_certificate", name: "SSL Certificate", icon: "lock.doc.fill", description: "SSL/TLS certificate inspection and validation", category: .connectivity),
+        DiagnosticTool(id: "wifi_analyzer", name: "WiFi Analyzer", icon: "wifi.circle.fill", description: "WiFi network details, signal, and interface statistics", category: .connectivity),
+        DiagnosticTool(id: "network_proxy", name: "Network Proxy", icon: "shield.lefthalf.filled", description: "Proxy settings, VPN detection, and DNS configuration", category: .connectivity),
+        DiagnosticTool(id: "network_interfaces", name: "Network Interfaces", icon: "network", description: "All network interfaces with addresses and traffic stats", category: .connectivity),
+        DiagnosticTool(id: "ping_tool", name: "Ping Tool", icon: "waveform.path.ecg", description: "ICMP-style reachability test with RTT statistics", category: .connectivity),
+        DiagnosticTool(id: "http_headers", name: "HTTP Headers", icon: "doc.text.magnifyingglass", description: "Inspect HTTP request and response headers", category: .connectivity),
+        DiagnosticTool(id: "cellular_detail", name: "Cellular Detail", icon: "antenna.radiowaves.left.and.right.circle.fill", description: "Carrier info, radio technology, SIM, and data usage", category: .connectivity),
+
+        // System
+        DiagnosticTool(id: "system_load", name: "System Load", icon: "cpu", description: "Real-time CPU usage with per-thread monitoring", category: .performance),
+        DiagnosticTool(id: "thread_count", name: "Thread Count", icon: "square.stack.3d.up.fill", description: "Active threads with state, CPU usage, and run times", category: .performance),
+        DiagnosticTool(id: "memory_pressure", name: "Memory Pressure", icon: "memorychip.fill", description: "System and app memory with pressure monitoring", category: .performance),
+        DiagnosticTool(id: "disk_io_benchmark", name: "Disk I/O Benchmark", icon: "gauge.with.dots.needle.bottom.50percent", description: "Sequential read/write speed benchmarking", category: .storage),
+        DiagnosticTool(id: "frame_drop", name: "Frame Drop Monitor", icon: "film.stack", description: "Real-time FPS tracking with drop detection", category: .performance),
+        DiagnosticTool(id: "energy_impact", name: "Energy Impact", icon: "leaf.fill", description: "Estimated energy consumption breakdown", category: .battery),
+        DiagnosticTool(id: "time_sync", name: "Time Sync", icon: "clock.badge.checkmark.fill", description: "NTP time synchronization check with offset analysis", category: .system),
+        DiagnosticTool(id: "kernel_info", name: "Kernel Info", icon: "terminal.fill", description: "Darwin kernel, CPU architecture, sysctl parameters", category: .system),
+        DiagnosticTool(id: "runtime_info", name: "Runtime Info", icon: "swift", description: "Swift runtime, loaded libraries, process details", category: .system),
+        DiagnosticTool(id: "locale_timezone", name: "Locale & Timezone", icon: "globe.americas.fill", description: "Full locale, timezone, formatting, and language details", category: .system),
+        DiagnosticTool(id: "installed_fonts", name: "Installed Fonts", icon: "textformat", description: "Browse all installed font families with previews", category: .system),
+        DiagnosticTool(id: "display_info", name: "Display Info", icon: "rectangle.inset.filled", description: "Resolution, refresh rate, color space, safe areas", category: .display),
+        DiagnosticTool(id: "screen_mirror_detect", name: "Screen Mirror Detection", icon: "tv.and.mediabox", description: "External display and screen recording detection", category: .display),
+        DiagnosticTool(id: "url_scheme_test", name: "URL Scheme Tester", icon: "link.circle.fill", description: "Test URL scheme availability for installed apps", category: .system),
+        DiagnosticTool(id: "device_capabilities", name: "Device Capabilities", icon: "checklist", description: "Hardware capability audit: LiDAR, NFC, UWB, etc.", category: .system),
+        DiagnosticTool(id: "battery_cycle", name: "Battery Cycle", icon: "battery.100.circle.fill", description: "Battery drain rate estimation and usage tracking", category: .battery),
+        DiagnosticTool(id: "crash_log", name: "Crash Log", icon: "ant.fill", description: "App stability metrics and crash diagnostic data", category: .system),
+        DiagnosticTool(id: "system_log", name: "System Log", icon: "doc.text.fill", description: "Live system log entries with level filtering", category: .system),
+        DiagnosticTool(id: "keychain_diag", name: "Keychain Diagnostics", icon: "key.icloud.fill", description: "Keychain CRUD testing and biometric status", category: .security),
+        DiagnosticTool(id: "notification_status", name: "Notification Diagnostics", icon: "bell.badge.circle.fill", description: "Push notification authorization and settings audit", category: .system),
     ]
 
     var filteredTools: [DiagnosticTool] {
