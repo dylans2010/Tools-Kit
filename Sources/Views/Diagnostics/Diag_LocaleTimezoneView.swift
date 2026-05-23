@@ -74,9 +74,11 @@ struct Diag_LocaleTimezoneView: View {
                         Text(now.formatted(.dateTime.hour().minute().second()))
                     }
                     LabeledContent("24-Hour") {
-                        let df = DateFormatter()
-                        df.dateFormat = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: Locale.current)
-                        let is24 = df.dateFormat?.contains("a") == false
+                        let is24: Bool = {
+                            let df = DateFormatter()
+                            df.dateFormat = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: Locale.current)
+                            return df.dateFormat?.contains("a") == false
+                        }()
                         Text(is24 ? "Yes" : "No")
                     }
                     LabeledContent("First Day of Week") {
