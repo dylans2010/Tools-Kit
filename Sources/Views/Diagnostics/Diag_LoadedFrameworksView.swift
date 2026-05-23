@@ -1,5 +1,4 @@
 import SwiftUI
-import Darwin
 
 struct Diag_LoadedFrameworksView: View {
     @State private var frameworks: [FrameworkInfo] = []
@@ -72,12 +71,9 @@ struct Diag_LoadedFrameworksView: View {
 
     private func loadFrameworks() {
         var fws: [FrameworkInfo] = []
-        let count = _dyld_image_count()
-
-        for i in 0..<count {
-            guard let namePtr = _dyld_get_image_name(i) else { continue }
-            let path = String(cString: namePtr)
-            let name = (path as NSString).lastPathComponent
+        for bundle in Bundle.allFrameworks {
+            let path = bundle.bundlePath
+            guard let name = path.components(separatedBy: "/").last else { continue }
             let isSystem = path.hasPrefix("/System/") || path.hasPrefix("/usr/lib/")
             fws.append(FrameworkInfo(name: name, path: path, isSystem: isSystem))
         }
