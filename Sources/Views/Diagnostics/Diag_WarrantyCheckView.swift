@@ -4,11 +4,15 @@ struct Diag_WarrantyCheckView: View {
     @State private var imeiInput: String = ""
     @State private var serialInput: String = ""
     @State private var isLoading = false
-    @State private var result: WarrantyResult?
+    @State private var result: WarrantyDisplayResult?
     @State private var deviceAge: String = ""
+    @State private var checkHistory: [(String, String, Date)] = []
 
-    struct WarrantyResult {
+    private let service = IMEICheckService.shared
+
+    struct WarrantyDisplayResult {
         let status: String
+        let isActive: Bool?
         let details: [(String, String)]
     }
 
@@ -21,7 +25,7 @@ struct Diag_WarrantyCheckView: View {
                         .foregroundStyle(.blue)
                     Text("Apple Warranty Status")
                         .font(.headline)
-                    Text("Check warranty, AppleCare, and coverage status via IMEI or Serial Number")
+                    Text("Check warranty, AppleCare, and coverage status via IMEI or Serial Number using live API")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -41,7 +45,12 @@ struct Diag_WarrantyCheckView: View {
                             .font(.caption2.monospaced())
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
+                            .textSelection(.enabled)
                     }
+                }
+                LabeledContent("CPU Cores") { Text("\(ProcessInfo.processInfo.processorCount)") }
+                LabeledContent("RAM") {
+                    Text(String(format: "%.1f GB", Double(ProcessInfo.processInfo.physicalMemory) / 1_073_741_824.0))
                 }
             }
 
@@ -52,6 +61,13 @@ struct Diag_WarrantyCheckView: View {
                     .onChange(of: imeiInput) { _, newValue in
                         imeiInput = String(newValue.filter { $0.isNumber }.prefix(15))
                     }
+
+                if !imeiInput.isEmpty && imeiInput.count == 15 {
+                    let valid = service.luhnValidate(imeiInput)
+                    Text(valid ? "Valid IMEI" : "Invalid checksum")
+                        .font(.caption)
+                        .foregroundStyle(valid ? .green : .red)
+                }
 
                 TextField("Serial Number (optional)", text: $serialInput)
                     .autocorrectionDisabled()
@@ -74,16 +90,42 @@ struct Diag_WarrantyCheckView: View {
 
             if let result = result {
                 Section("Warranty Result") {
-                    Text(result.status)
-                        .font(.headline)
-                        .foregroundStyle(result.status.contains("Active") ? .green : .orange)
-                        .padding(.vertical, 4)
+                    HStack(spacing: 12) {
+                        Image(systemName: result.isActive == true ? "checkmark.seal.fill" : "xmark.circle.fill")
+                            .font(.title)
+                            .foregroundStyle(result.isActive == true ? .green : .orange)
+                        Text(result.status)
+                            .font(.headline)
+                            .foregroundStyle(result.isActive == true ? .green : .orange)
+                    }
+                    .padding(.vertical, 4)
 
                     ForEach(result.details, id: \.0) { detail in
                         LabeledContent(detail.0) {
                             Text(detail.1)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
+                                .textSelection(.enabled)
+                        }
+                    }
+                }
+            }
+
+            if !checkHistory.isEmpty {
+                Section("Check History") {
+                    ForEach(checkHistory, id: \.0) { entry in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(entry.0)
+                                    .font(.caption.monospaced())
+                                Text(entry.1)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Text(entry.2, style: .time)
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
                         }
                     }
                 }
@@ -116,6 +158,18 @@ struct Diag_WarrantyCheckView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+                Link(destination: URL(string: "https://support.apple.com/en-us/111900")!) {
+                    HStack {
+                        Image(systemName: "safari.fill")
+                            .foregroundStyle(.blue)
+                        Text("Apple Support - Check Your Coverage")
+                            .font(.subheadline)
+                        Spacer()
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
         }
         .navigationTitle("Warranty Check")
@@ -134,80 +188,38 @@ struct Diag_WarrantyCheckView: View {
 
     private func estimateDeviceAge() {
         let uptime = ProcessInfo.processInfo.systemUptime
-        let bootTime = Date().addingTimeInterval(-uptime)
-        let fs = FileManager.default
-        if let attrs = try? fs.attributesOfFileSystem(forPath: NSHomeDirectory()),
-           let creationDate = attrs[.systemSize] as? Date {
-            let formatter = RelativeDateTimeFormatter()
-            formatter.unitsStyle = .full
-            deviceAge = formatter.localizedString(for: creationDate, relativeTo: Date())
-        } else {
-            let formatter = DateComponentsFormatter()
-            formatter.allowedUnits = [.day, .hour]
-            formatter.unitsStyle = .abbreviated
-            deviceAge = "Uptime: \(formatter.string(from: uptime) ?? "N/A")"
-        }
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.day, .hour]
+        formatter.unitsStyle = .abbreviated
+        deviceAge = "Uptime: \(formatter.string(from: uptime) ?? "N/A")"
     }
 
     private func checkWarranty() {
         isLoading = true
         let identifier = imeiInput.isEmpty ? serialInput : imeiInput
 
-        guard let url = URL(string: "https://api.imeicheck.net/v1/checks") else {
-            isLoading = false
-            return
-        }
+        Task {
+            let apiResult = await service.checkWarranty(identifier)
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 20
-
-        let body: [String: Any] = [
-            "deviceId": identifier,
-            "serviceId": 6
-        ]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async {
+            await MainActor.run {
                 isLoading = false
 
-                if let error = error {
-                    result = WarrantyResult(
-                        status: "Check Failed",
-                        details: [
-                            ("Error", error.localizedDescription),
-                            ("Tip", "Visit checkcoverage.apple.com for manual lookup")
-                        ]
-                    )
-                    return
-                }
+                let statusText = apiResult.active == true ? "Warranty Active" : "Warranty Status Retrieved"
+                result = WarrantyDisplayResult(
+                    status: statusText,
+                    isActive: apiResult.active,
+                    details: apiResult.details
+                )
 
-                guard let data = data,
-                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                    result = WarrantyResult(
-                        status: "Service Unavailable",
-                        details: [
-                            ("Identifier", identifier),
-                            ("Note", "Try checkcoverage.apple.com for official warranty info")
-                        ]
-                    )
-                    return
-                }
+                checkHistory.insert((identifier, statusText, Date()), at: 0)
 
-                var details: [(String, String)] = [("Identifier", identifier)]
-                if let warranty = json["warrantyStatus"] as? String { details.append(("Warranty", warranty)) }
-                if let appleCare = json["appleCareEligible"] as? Bool { details.append(("AppleCare Eligible", appleCare ? "Yes" : "No")) }
-                if let purchaseDate = json["estimatedPurchaseDate"] as? String { details.append(("Est. Purchase", purchaseDate)) }
-                if let model = json["model"] as? String { details.append(("Model", model)) }
-                if let coverage = json["coverageType"] as? String { details.append(("Coverage", coverage)) }
-
-                let statusText = (json["warrantyStatus"] as? String)?.lowercased().contains("active") == true
-                    ? "Warranty Active"
-                    : "Warranty Status Retrieved"
-                result = WarrantyResult(status: statusText, details: details)
+                DiagnosticReportManager.shared.logIfEnabled(
+                    toolName: "Warranty Check",
+                    category: "System",
+                    status: apiResult.active == true ? .passed : .warning,
+                    details: "\(identifier): \(statusText)"
+                )
             }
-        }.resume()
+        }
     }
 }

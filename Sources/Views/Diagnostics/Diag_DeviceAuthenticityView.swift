@@ -135,5 +135,12 @@ struct Diag_DeviceAuthenticityView: View {
         let suspiciousCount = results.filter { $0.2 == .suspicious }.count
         overallGenuine = suspiciousCount == 0 ? .genuine : suspiciousCount >= 3 ? .suspicious : .unknown
         hasChecked = true
+
+        DiagnosticReportManager.shared.logIfEnabled(
+            toolName: "Device Authenticity",
+            category: "Security",
+            status: overallGenuine == .genuine ? .passed : overallGenuine == .suspicious ? .failed : .warning,
+            details: "Authenticity: \(overallGenuine == .genuine ? "Genuine" : overallGenuine == .suspicious ? "Suspicious" : "Unknown") (\(suspiciousCount) flags)"
+        )
     }
 }

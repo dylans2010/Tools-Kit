@@ -1745,6 +1745,13 @@
 		DG02000000000000000000000177 /* Diag_GPUBenchmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000177 /* Diag_GPUBenchmarkView.swift */; };
 		DG02000000000000000000000179 /* Diag_NetworkSpeedTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000179 /* Diag_NetworkSpeedTestView.swift */; };
 		DG02000000000000000000000181 /* Diag_CrashLogAnalyzerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000181 /* Diag_CrashLogAnalyzerView.swift */; };
+		DG02000000000000000000000182 /* IMEICheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000182 /* IMEICheckService.swift */; };
+		DG02000000000000000000000183 /* Diag_IMEINetworkCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000183 /* Diag_IMEINetworkCheckView.swift */; };
+		DG02000000000000000000000184 /* Diag_IMEIDeviceLookupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000184 /* Diag_IMEIDeviceLookupView.swift */; };
+		DG02000000000000000000000185 /* Diag_IMEIBatchCheckerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000185 /* Diag_IMEIBatchCheckerView.swift */; };
+		DG02000000000000000000000186 /* Diag_IMEIComprehensiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000186 /* Diag_IMEIComprehensiveView.swift */; };
+		DG02000000000000000000000187 /* Diag_IMEICarrierCompatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000187 /* Diag_IMEICarrierCompatView.swift */; };
+		DG02000000000000000000000188 /* Diag_DeviceValuationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000188 /* Diag_DeviceValuationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3470,6 +3477,13 @@
 		DG01000000000000000000000177 /* Diag_GPUBenchmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_GPUBenchmarkView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000179 /* Diag_NetworkSpeedTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetworkSpeedTestView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000181 /* Diag_CrashLogAnalyzerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CrashLogAnalyzerView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000182 /* IMEICheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMEICheckService.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000183 /* Diag_IMEINetworkCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IMEINetworkCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000184 /* Diag_IMEIDeviceLookupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IMEIDeviceLookupView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000185 /* Diag_IMEIBatchCheckerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IMEIBatchCheckerView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000186 /* Diag_IMEIComprehensiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IMEIComprehensiveView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000187 /* Diag_IMEICarrierCompatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IMEICarrierCompatView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000188 /* Diag_DeviceValuationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DeviceValuationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3654,6 +3668,13 @@
 				DG01000000000000000000000177 /* Diag_GPUBenchmarkView.swift */,
 				DG01000000000000000000000179 /* Diag_NetworkSpeedTestView.swift */,
 				DG01000000000000000000000181 /* Diag_CrashLogAnalyzerView.swift */,
+				DG01000000000000000000000182 /* IMEICheckService.swift */,
+				DG01000000000000000000000183 /* Diag_IMEINetworkCheckView.swift */,
+				DG01000000000000000000000184 /* Diag_IMEIDeviceLookupView.swift */,
+				DG01000000000000000000000185 /* Diag_IMEIBatchCheckerView.swift */,
+				DG01000000000000000000000186 /* Diag_IMEIComprehensiveView.swift */,
+				DG01000000000000000000000187 /* Diag_IMEICarrierCompatView.swift */,
+				DG01000000000000000000000188 /* Diag_DeviceValuationView.swift */,
 			);
 			path = Diagnostics;
 			sourceTree = "<group>";
@@ -10983,6 +11004,13 @@
 				DG02000000000000000000000177 /* Diag_GPUBenchmarkView.swift in Sources */,
 				DG02000000000000000000000179 /* Diag_NetworkSpeedTestView.swift in Sources */,
 				DG02000000000000000000000181 /* Diag_CrashLogAnalyzerView.swift in Sources */,
+				DG02000000000000000000000182 /* IMEICheckService.swift in Sources */,
+				DG02000000000000000000000183 /* Diag_IMEINetworkCheckView.swift in Sources */,
+				DG02000000000000000000000184 /* Diag_IMEIDeviceLookupView.swift in Sources */,
+				DG02000000000000000000000185 /* Diag_IMEIBatchCheckerView.swift in Sources */,
+				DG02000000000000000000000186 /* Diag_IMEIComprehensiveView.swift in Sources */,
+				DG02000000000000000000000187 /* Diag_IMEICarrierCompatView.swift in Sources */,
+				DG02000000000000000000000188 /* Diag_DeviceValuationView.swift in Sources */,
 				WG5FD79044E10FA97C5EC69F /* WorkspaceGraph.swift in Sources */,
 				MDC32FA79B1B70105A53ED19 /* AgenticModels.swift in Sources */,
 				TO7EC7A01B15A8F7BFE4020C /* AgenticToolOutput.swift in Sources */,

@@ -3,17 +3,23 @@ import SwiftUI
 struct Diag_BlacklistCheckView: View {
     @State private var imeiInput: String = ""
     @State private var isLoading = false
-    @State private var checkResult: BlacklistResult?
-    @State private var checkHistory: [BlacklistResult] = []
+    @State private var checkResult: DisplayResult?
+    @State private var checkHistory: [DisplayResult] = []
+    @State private var batchIMEIs: String = ""
+    @State private var showBatchMode = false
+    @State private var batchResults: [DisplayResult] = []
+    @State private var isBatchLoading = false
 
-    struct BlacklistResult: Identifiable {
+    private let service = IMEICheckService.shared
+
+    struct DisplayResult: Identifiable {
         let id = UUID()
         let imei: String
-        let status: BlacklistStatus
+        let status: DisplayStatus
         let details: [(String, String)]
         let timestamp: Date
 
-        enum BlacklistStatus: String {
+        enum DisplayStatus: String {
             case clean = "Clean"
             case blacklisted = "Blacklisted"
             case error = "Error"
@@ -46,9 +52,9 @@ struct Diag_BlacklistCheckView: View {
                     Image(systemName: "shield.lefthalf.filled")
                         .font(.system(size: 44))
                         .foregroundStyle(.blue)
-                    Text("Apple / GSMA Blacklist Lookup")
+                    Text("GSMA Blacklist Lookup")
                         .font(.headline)
-                    Text("Check if a device IMEI has been reported lost, stolen, or has unpaid bills")
+                    Text("Check if a device IMEI has been reported lost, stolen, or has unpaid bills via live API")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -57,7 +63,7 @@ struct Diag_BlacklistCheckView: View {
                 .padding(.vertical, 8)
             }
 
-            Section("Enter IMEI") {
+            Section("Single IMEI Check") {
                 TextField("15-digit IMEI number", text: $imeiInput)
                     .keyboardType(.numberPad)
                     .autocorrectionDisabled()
@@ -72,7 +78,7 @@ struct Diag_BlacklistCheckView: View {
                             .foregroundStyle(imeiInput.count == 15 ? .green : .secondary)
                         Spacer()
                         if imeiInput.count == 15 {
-                            let valid = luhnValidate(imeiInput)
+                            let valid = service.luhnValidate(imeiInput)
                             Text(valid ? "Valid format" : "Invalid checksum")
                                 .font(.caption)
                                 .foregroundStyle(valid ? .green : .red)
@@ -85,8 +91,7 @@ struct Diag_BlacklistCheckView: View {
                 } label: {
                     HStack {
                         if isLoading {
-                            ProgressView()
-                                .scaleEffect(0.8)
+                            ProgressView().scaleEffect(0.8)
                         } else {
                             Image(systemName: "magnifyingglass.circle.fill")
                         }
@@ -117,6 +122,54 @@ struct Diag_BlacklistCheckView: View {
                             Text(detail.1)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
+                                .textSelection(.enabled)
+                        }
+                    }
+                }
+            }
+
+            Section {
+                Toggle("Batch Mode", isOn: $showBatchMode)
+            }
+
+            if showBatchMode {
+                Section("Batch IMEI Check") {
+                    Text("Enter multiple IMEIs (one per line)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    TextEditor(text: $batchIMEIs)
+                        .frame(minHeight: 100)
+                        .font(.caption.monospaced())
+
+                    Button {
+                        performBatchCheck()
+                    } label: {
+                        HStack {
+                            if isBatchLoading {
+                                ProgressView().scaleEffect(0.8)
+                            } else {
+                                Image(systemName: "list.bullet.clipboard")
+                            }
+                            Text("Check All IMEIs")
+                        }
+                    }
+                    .disabled(batchIMEIs.isEmpty || isBatchLoading)
+                }
+
+                if !batchResults.isEmpty {
+                    Section("Batch Results (\(batchResults.count))") {
+                        ForEach(batchResults) { entry in
+                            HStack {
+                                Image(systemName: entry.status.icon)
+                                    .foregroundStyle(entry.status.color)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(entry.imei)
+                                        .font(.caption.monospaced())
+                                    Text(entry.status.rawValue)
+                                        .font(.caption2)
+                                        .foregroundStyle(entry.status.color)
+                                }
+                            }
                         }
                     }
                 }
@@ -157,6 +210,21 @@ struct Diag_BlacklistCheckView: View {
                 }
                 .padding(.vertical, 4)
             }
+
+            Section("Manual Check Resources") {
+                Link(destination: URL(string: "https://swappa.com/imei")!) {
+                    Label("Swappa IMEI Check", systemImage: "safari.fill")
+                        .font(.subheadline)
+                }
+                Link(destination: URL(string: "https://www.imeipro.info")!) {
+                    Label("IMEIPro Lookup", systemImage: "safari.fill")
+                        .font(.subheadline)
+                }
+                Link(destination: URL(string: "https://www.imei.info")!) {
+                    Label("IMEI.info Database", systemImage: "safari.fill")
+                        .font(.subheadline)
+                }
+            }
         }
         .navigationTitle("Blacklist Check")
         .navigationBarTitleDisplayMode(.inline)
@@ -167,96 +235,83 @@ struct Diag_BlacklistCheckView: View {
         guard imei.count == 15 else { return }
         isLoading = true
 
-        guard let url = URL(string: "https://api.imeicheck.net/v1/checks") else {
-            isLoading = false
-            return
-        }
+        Task {
+            let apiResult = await service.checkBlacklist(imei)
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 20
-
-        let body: [String: Any] = [
-            "deviceId": imei,
-            "serviceId": 12
-        ]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async {
+            await MainActor.run {
                 isLoading = false
 
-                if let error = error {
-                    let result = BlacklistResult(
-                        imei: imei,
-                        status: .error,
-                        details: [
-                            ("Error", error.localizedDescription),
-                            ("Suggestion", "Check device IMEI at swappa.com/imei or imeipro.info for free lookup")
-                        ],
-                        timestamp: Date()
-                    )
-                    checkResult = result
-                    checkHistory.insert(result, at: 0)
-                    return
+                let displayStatus: DisplayResult.DisplayStatus
+                switch apiResult.status {
+                case .clean: displayStatus = .clean
+                case .blacklisted: displayStatus = .blacklisted
+                case .error: displayStatus = .error
+                case .unknown: displayStatus = .unknown
                 }
 
-                guard let data = data,
-                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                    let result = BlacklistResult(
-                        imei: imei,
-                        status: .unknown,
-                        details: [
-                            ("IMEI", imei),
-                            ("Response", "Unable to parse response from blacklist service"),
-                            ("Alternative", "Visit swappa.com/imei or imeipro.info for manual check")
-                        ],
-                        timestamp: Date()
-                    )
-                    checkResult = result
-                    checkHistory.insert(result, at: 0)
-                    return
-                }
-
-                var details: [(String, String)] = [("IMEI", imei)]
-                var status: BlacklistResult.BlacklistStatus = .unknown
-
-                if let blacklistStatus = json["blacklistStatus"] as? String {
-                    let upper = blacklistStatus.uppercased()
-                    if upper.contains("CLEAN") || upper.contains("CLEAR") || upper.contains("NOT") {
-                        status = .clean
-                    } else if upper.contains("BLACK") || upper.contains("LOST") || upper.contains("STOLEN") {
-                        status = .blacklisted
-                    }
-                    details.append(("Status", blacklistStatus))
-                }
-
-                if let model = json["model"] as? String {
-                    details.append(("Model", model))
-                }
-                if let brand = json["brand"] as? String {
-                    details.append(("Brand", brand))
-                }
-                if let country = json["country"] as? String {
-                    details.append(("Country", country))
-                }
-
-                let result = BlacklistResult(imei: imei, status: status, details: details, timestamp: Date())
+                let result = DisplayResult(
+                    imei: imei,
+                    status: displayStatus,
+                    details: apiResult.details,
+                    timestamp: Date()
+                )
                 checkResult = result
                 checkHistory.insert(result, at: 0)
+
+                DiagnosticReportManager.shared.logIfEnabled(
+                    toolName: "Blacklist Check",
+                    category: "Security",
+                    status: displayStatus == .clean ? .passed : displayStatus == .blacklisted ? .failed : .warning,
+                    details: "IMEI \(imei): \(displayStatus.rawValue)"
+                )
             }
-        }.resume()
+        }
     }
 
-    private func luhnValidate(_ number: String) -> Bool {
-        let digits = number.compactMap { Int(String($0)) }
-        guard digits.count == 15 else { return false }
-        var sum = 0
-        for (i, d) in digits.enumerated() {
-            if i % 2 == 0 { sum += d }
-            else { let x = d * 2; sum += x > 9 ? x - 9 : x }
+    private func performBatchCheck() {
+        let imeis = batchIMEIs
+            .components(separatedBy: .newlines)
+            .map { $0.filter { $0.isNumber } }
+            .filter { $0.count == 15 }
+
+        guard !imeis.isEmpty else { return }
+        isBatchLoading = true
+        batchResults = []
+
+        Task {
+            for imei in imeis {
+                let apiResult = await service.checkBlacklist(imei)
+
+                let displayStatus: DisplayResult.DisplayStatus
+                switch apiResult.status {
+                case .clean: displayStatus = .clean
+                case .blacklisted: displayStatus = .blacklisted
+                case .error: displayStatus = .error
+                case .unknown: displayStatus = .unknown
+                }
+
+                let result = DisplayResult(
+                    imei: imei,
+                    status: displayStatus,
+                    details: apiResult.details,
+                    timestamp: Date()
+                )
+
+                await MainActor.run {
+                    batchResults.append(result)
+                }
+            }
+
+            await MainActor.run {
+                isBatchLoading = false
+
+                DiagnosticReportManager.shared.logIfEnabled(
+                    toolName: "Blacklist Check",
+                    category: "Security",
+                    status: .info,
+                    details: "Batch checked \(imeis.count) IMEIs"
+                )
+            }
         }
-        return sum % 10 == 0
     }
 }

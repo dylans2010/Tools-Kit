@@ -183,6 +183,13 @@ struct Diag_FindMyStatusView: View {
         let enabledCount = results.filter { $0.2 == .enabled }.count
         overallStatus = enabledCount >= 2 ? .enabled : enabledCount == 0 ? .disabled : .unknown
         hasChecked = true
+
+        DiagnosticReportManager.shared.logIfEnabled(
+            toolName: "Find My Status",
+            category: "Security",
+            status: overallStatus == .enabled ? .warning : overallStatus == .disabled ? .passed : .info,
+            details: "Find My: \(statusTitle) (\(enabledCount)/\(results.count) indicators)"
+        )
     }
 
     private func checkLocationServicesActive() -> Bool {

@@ -8,6 +8,10 @@ struct Diag_CarrierLockView: View {
     @State private var imeiInput: String = ""
     @State private var isCheckingIMEI = false
     @State private var imeiResult: [(String, String)]?
+    @State private var imeiLockStatus: LockStatus = .unknown
+    @State private var checkHistory: [(String, LockStatus, Date)] = []
+
+    private let service = IMEICheckService.shared
 
     enum LockStatus {
         case locked, unlocked, unknown
@@ -77,6 +81,7 @@ struct Diag_CarrierLockView: View {
                         LabeledContent(detail.0) {
                             Text(detail.1)
                                 .font(.caption)
+                                .textSelection(.enabled)
                         }
                     }
                 }
@@ -90,6 +95,16 @@ struct Diag_CarrierLockView: View {
                         imeiInput = String(newValue.filter { $0.isNumber }.prefix(15))
                     }
 
+                if !imeiInput.isEmpty && imeiInput.count == 15 {
+                    let valid = service.luhnValidate(imeiInput)
+                    HStack {
+                        Text(valid ? "Valid IMEI format" : "Invalid checksum")
+                            .font(.caption)
+                            .foregroundStyle(valid ? .green : .red)
+                        Spacer()
+                    }
+                }
+
                 Button {
                     checkIMEILock()
                 } label: {
@@ -99,17 +114,50 @@ struct Diag_CarrierLockView: View {
                         } else {
                             Image(systemName: "antenna.radiowaves.left.and.right")
                         }
-                        Text("Check Lock via IMEI")
+                        Text("Check Lock via API")
                     }
                 }
                 .disabled(imeiInput.count != 15 || isCheckingIMEI)
 
                 if let results = imeiResult {
-                    ForEach(results, id: \.0) { r in
-                        LabeledContent(r.0) {
-                            Text(r.1)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                    VStack(spacing: 0) {
+                        HStack(spacing: 12) {
+                            Image(systemName: imeiLockStatus.icon)
+                                .font(.title2)
+                                .foregroundStyle(imeiLockStatus.color)
+                            Text(imeiLockStatus.title)
+                                .font(.headline)
+                                .foregroundStyle(imeiLockStatus.color)
+                        }
+                        .padding(.vertical, 8)
+
+                        ForEach(results, id: \.0) { r in
+                            LabeledContent(r.0) {
+                                Text(r.1)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .textSelection(.enabled)
+                            }
+                        }
+                    }
+                }
+            }
+
+            if !checkHistory.isEmpty {
+                Section("Check History") {
+                    ForEach(checkHistory, id: \.0) { entry in
+                        HStack {
+                            Image(systemName: entry.1.icon)
+                                .foregroundStyle(entry.1.color)
+                            Text(entry.0)
+                                .font(.caption.monospaced())
+                            Spacer()
+                            Text(entry.1.title)
+                                .font(.caption2)
+                                .foregroundStyle(entry.1.color)
+                            Text(entry.2, style: .time)
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
                         }
                     }
                 }
@@ -121,10 +169,24 @@ struct Diag_CarrierLockView: View {
                         .font(.caption)
                     Label("Unlocked: Device works with any compatible carrier", systemImage: "lock.open.fill")
                         .font(.caption)
+                    Label("Factory Unlocked: Never locked to any carrier", systemImage: "lock.open.rotation")
+                        .font(.caption)
                     Label("Contact carrier or use IMEI to verify unlock eligibility", systemImage: "phone.fill")
                         .font(.caption)
                 }
                 .padding(.vertical, 4)
+            }
+
+            Section("Unlock Resources") {
+                Link(destination: URL(string: "https://www.att.com/deviceunlock/")!) {
+                    Label("AT&T Device Unlock", systemImage: "safari.fill").font(.subheadline)
+                }
+                Link(destination: URL(string: "https://www.t-mobile.com/support/account/unlock-your-mobile-wireless-device")!) {
+                    Label("T-Mobile Unlock", systemImage: "safari.fill").font(.subheadline)
+                }
+                Link(destination: URL(string: "https://www.verizon.com/support/device-locking-background/")!) {
+                    Label("Verizon Unlock Policy", systemImage: "safari.fill").font(.subheadline)
+                }
             }
 
             Section {
@@ -147,7 +209,7 @@ struct Diag_CarrierLockView: View {
         switch lockStatus {
         case .locked: return "This device appears to be locked to a specific carrier"
         case .unlocked: return "This device appears to accept any carrier SIM"
-        case .unknown: return "Unable to definitively determine lock status"
+        case .unknown: return "Unable to definitively determine lock status from local detection"
         }
     }
 
@@ -203,6 +265,13 @@ struct Diag_CarrierLockView: View {
         } else {
             lockStatus = .unknown
         }
+
+        DiagnosticReportManager.shared.logIfEnabled(
+            toolName: "Carrier Lock",
+            category: "Connectivity",
+            status: lockStatus == .unlocked ? .passed : lockStatus == .locked ? .failed : .info,
+            details: "Local detection: \(lockStatus.title)"
+        )
     }
 
     private func friendlyRadioName(_ tech: String) -> String {
@@ -220,60 +289,28 @@ struct Diag_CarrierLockView: View {
         guard imei.count == 15 else { return }
         isCheckingIMEI = true
 
-        guard let url = URL(string: "https://api.imeicheck.net/v1/checks") else {
-            isCheckingIMEI = false
-            return
-        }
+        Task {
+            let apiResult = await service.checkCarrierLock(imei)
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 20
-
-        let body: [String: Any] = [
-            "deviceId": imei,
-            "serviceId": 2
-        ]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async {
+            await MainActor.run {
                 isCheckingIMEI = false
+                imeiResult = apiResult.details
 
-                if let error = error {
-                    imeiResult = [
-                        ("Error", error.localizedDescription),
-                        ("Tip", "Contact your carrier directly for definitive lock status")
-                    ]
-                    return
-                }
-
-                guard let data = data,
-                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                    imeiResult = [
-                        ("IMEI", imei),
-                        ("Status", "Service unavailable"),
-                        ("Alternative", "Call carrier support or check carrier website with IMEI")
-                    ]
-                    return
+                if let locked = apiResult.locked {
+                    imeiLockStatus = locked ? .locked : .unlocked
+                } else {
+                    imeiLockStatus = .unknown
                 }
 
-                var results: [(String, String)] = [("IMEI", imei)]
-                if let lockStatus = json["simLock"] as? String {
-                    results.append(("SIM Lock", lockStatus))
-                }
-                if let carrier = json["carrier"] as? String {
-                    results.append(("Original Carrier", carrier))
-                }
-                if let model = json["model"] as? String {
-                    results.append(("Model", model))
-                }
-                if let country = json["country"] as? String {
-                    results.append(("Country of Origin", country))
-                }
+                checkHistory.insert((imei, imeiLockStatus, Date()), at: 0)
 
-                imeiResult = results
+                DiagnosticReportManager.shared.logIfEnabled(
+                    toolName: "Carrier Lock",
+                    category: "Connectivity",
+                    status: imeiLockStatus == .unlocked ? .passed : imeiLockStatus == .locked ? .failed : .warning,
+                    details: "IMEI \(imei): \(imeiLockStatus.title)"
+                )
             }
-        }.resume()
+        }
     }
 }

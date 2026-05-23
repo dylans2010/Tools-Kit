@@ -325,6 +325,14 @@ final class DiagnosticsViewModel: ObservableObject {
         DiagnosticTool(id: "backup_status", name: "Backup Status", icon: "icloud.fill", description: "Check iCloud backup indicators and storage status", category: .system),
         DiagnosticTool(id: "crash_log_analyzer", name: "Crash Log Analyzer", icon: "exclamationmark.triangle.fill", description: "Scan for crash reports and diagnostic logs", category: .system),
         DiagnosticTool(id: "locale_tz_detail", name: "Locale & Time Zone", icon: "globe", description: "Full locale, currency, calendar, and timezone details", category: .system),
+
+        // New IMEI & Security Tools
+        DiagnosticTool(id: "imei_network_check", name: "IMEI Network Check", icon: "globe.americas.fill", description: "Identify original network, country, and carrier via IMEI API", category: .security),
+        DiagnosticTool(id: "imei_device_lookup", name: "IMEI Device Lookup", icon: "iphone.gen3.circle.fill", description: "Full device specifications from IMEI via live API", category: .security),
+        DiagnosticTool(id: "imei_batch_checker", name: "Batch IMEI Checker", icon: "list.clipboard.fill", description: "Check multiple IMEIs at once for blacklist and lock status", category: .security),
+        DiagnosticTool(id: "imei_comprehensive", name: "Comprehensive IMEI Check", icon: "doc.text.magnifyingglass", description: "Run all IMEI checks at once: blacklist, lock, warranty, iCloud", category: .security),
+        DiagnosticTool(id: "imei_carrier_compat", name: "Carrier Compatibility", icon: "simcard.2.fill", description: "Check band compatibility with major carriers worldwide", category: .connectivity),
+        DiagnosticTool(id: "device_valuation", name: "Device Valuation", icon: "dollarsign.circle.fill", description: "Estimate device trade-in value based on hardware condition", category: .system),
     ]
 
     var filteredTools: [DiagnosticTool] {

@@ -6,6 +6,9 @@ struct Diag_StolenDeviceCheckView: View {
     @State private var isLoading = false
     @State private var result: StolenCheckResult?
     @State private var localChecks: [(String, String, Bool)] = []
+    @State private var checkHistory: [(String, Bool?, Date)] = []
+
+    private let service = IMEICheckService.shared
 
     struct StolenCheckResult {
         let status: String
@@ -22,7 +25,7 @@ struct Diag_StolenDeviceCheckView: View {
                         .foregroundStyle(.blue)
                     Text("Device Theft Database Lookup")
                         .font(.headline)
-                    Text("Cross-reference device identifiers against global theft databases")
+                    Text("Cross-reference device identifiers against global theft databases via live API")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -54,6 +57,13 @@ struct Diag_StolenDeviceCheckView: View {
                     .onChange(of: imeiInput) { _, newValue in
                         imeiInput = String(newValue.filter { $0.isNumber }.prefix(15))
                     }
+
+                if !imeiInput.isEmpty && imeiInput.count == 15 {
+                    let valid = service.luhnValidate(imeiInput)
+                    Text(valid ? "Valid IMEI" : "Invalid checksum")
+                        .font(.caption)
+                        .foregroundStyle(valid ? .green : .red)
+                }
 
                 TextField("Serial Number (optional)", text: $serialInput)
                     .autocorrectionDisabled()
@@ -90,6 +100,24 @@ struct Diag_StolenDeviceCheckView: View {
                             Text(detail.1)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
+                                .textSelection(.enabled)
+                        }
+                    }
+                }
+            }
+
+            if !checkHistory.isEmpty {
+                Section("Check History") {
+                    ForEach(checkHistory, id: \.0) { entry in
+                        HStack {
+                            Image(systemName: entry.1 == true ? "checkmark.shield.fill" : entry.1 == false ? "xmark.shield.fill" : "questionmark.circle.fill")
+                                .foregroundStyle(entry.1 == true ? .green : entry.1 == false ? .red : .orange)
+                            Text(entry.0)
+                                .font(.caption.monospaced())
+                            Spacer()
+                            Text(entry.2, style: .time)
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
                         }
                     }
                 }
@@ -107,6 +135,17 @@ struct Diag_StolenDeviceCheckView: View {
                         .font(.caption)
                 }
                 .padding(.vertical, 4)
+            }
+
+            Section("Report a Stolen Device") {
+                Link(destination: URL(string: "https://support.apple.com/en-us/111894")!) {
+                    Label("Apple - If your device is lost or stolen", systemImage: "safari.fill")
+                        .font(.subheadline)
+                }
+                Link(destination: URL(string: "https://www.stolenphonechecker.org")!) {
+                    Label("CTIA Stolen Phone Checker", systemImage: "safari.fill")
+                        .font(.subheadline)
+                }
             }
         }
         .navigationTitle("Stolen Device Check")
@@ -149,6 +188,13 @@ struct Diag_StolenDeviceCheckView: View {
         results.append(("Setup Assistant", wasReset ? "Setup assistant data present" : "No setup assistant artifacts", !wasReset))
 
         localChecks = results
+
+        DiagnosticReportManager.shared.logIfEnabled(
+            toolName: "Stolen Device Check",
+            category: "Security",
+            status: .info,
+            details: "Local checks: \(results.filter { $0.2 }.count)/\(results.count) passed"
+        )
     }
 
     private func performStolenCheck() {
@@ -156,69 +202,30 @@ struct Diag_StolenDeviceCheckView: View {
         guard imei.count == 15 else { return }
         isLoading = true
 
-        guard let url = URL(string: "https://api.imeicheck.net/v1/checks") else {
-            isLoading = false
-            return
-        }
+        Task {
+            let apiResult = await service.checkBlacklist(imei)
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 20
-
-        let body: [String: Any] = [
-            "deviceId": imei,
-            "serviceId": 12
-        ]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async {
+            await MainActor.run {
                 isLoading = false
 
-                if let error = error {
-                    result = StolenCheckResult(
-                        status: "Check Failed",
-                        isClean: nil,
-                        details: [
-                            ("Error", error.localizedDescription),
-                            ("IMEI", imei),
-                            ("Alternative", "Report stolen devices at your local carrier or police station")
-                        ]
-                    )
-                    return
-                }
-
-                guard let data = data,
-                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                    result = StolenCheckResult(
-                        status: "Service Unavailable",
-                        isClean: nil,
-                        details: [("IMEI", imei), ("Note", "External verification service did not respond")]
-                    )
-                    return
-                }
-
-                var details: [(String, String)] = [("IMEI", imei)]
                 var isClean: Bool?
-
-                if let blacklistStatus = json["blacklistStatus"] as? String {
-                    let upper = blacklistStatus.uppercased()
-                    if upper.contains("CLEAN") || upper.contains("CLEAR") {
-                        isClean = true
-                    } else if upper.contains("BLACK") || upper.contains("STOLEN") || upper.contains("LOST") {
-                        isClean = false
-                    }
-                    details.append(("Blacklist Status", blacklistStatus))
+                switch apiResult.status {
+                case .clean: isClean = true
+                case .blacklisted: isClean = false
+                default: isClean = nil
                 }
-
-                if let model = json["model"] as? String { details.append(("Model", model)) }
-                if let brand = json["brand"] as? String { details.append(("Brand", brand)) }
 
                 let statusText = isClean == true ? "Device Appears Clean" : isClean == false ? "Device Reported Stolen/Lost" : "Status Unknown"
+                result = StolenCheckResult(status: statusText, isClean: isClean, details: apiResult.details)
+                checkHistory.insert((imei, isClean, Date()), at: 0)
 
-                result = StolenCheckResult(status: statusText, isClean: isClean, details: details)
+                DiagnosticReportManager.shared.logIfEnabled(
+                    toolName: "Stolen Device Check",
+                    category: "Security",
+                    status: isClean == true ? .passed : isClean == false ? .failed : .warning,
+                    details: "IMEI \(imei): \(statusText)"
+                )
             }
-        }.resume()
+        }
     }
 }
