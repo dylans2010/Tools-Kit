@@ -64,7 +64,7 @@ struct Diag_RuntimeInfoView: View {
                 }
             }
 
-            Section<String>("Loaded Libraries (\(loadedLibraries.count))") {
+            Section("Loaded Libraries (\(loadedLibraries.count))") {
                 if !loadedLibraries.isEmpty {
                     TextField("Search...", text: $searchText)
                         .textInputAutocapitalization(.never)
@@ -80,7 +80,7 @@ struct Diag_RuntimeInfoView: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(lib.name)
                                 .font(.caption.weight(.medium))
-                                .foregroundStyle(lib.isSystem ? .secondary : .blue)
+                                .foregroundStyle(lib.isSystem ? .secondary : Color.blue)
                             Text(lib.path)
                                 .font(.caption2.monospaced())
                                 .foregroundStyle(.tertiary)
