@@ -348,7 +348,7 @@ struct DiagnosticsHomeView: View {
         case "storage_usage": Diag_StorageUsageView()
         case "backup_status": Diag_BackupStatusView()
         case "crash_log_analyzer": Diag_CrashLogAnalyzerView()
-        case "locale_tz_detail": Diag_LocaleTimeZoneView()
+        case "locale_tz_detail": Diag_LocaleTimezoneView()
         default:
             Text("Tool not found")
         }
