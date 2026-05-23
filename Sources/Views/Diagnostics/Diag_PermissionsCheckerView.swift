@@ -67,7 +67,7 @@ struct Diag_PermissionsCheckerView: View {
         items.append(PermissionItem(name: "Microphone", icon: "mic.fill", status: mapAVStatus(micStatus), detail: "Used for audio recording features"))
 
         // Location
-        let locStatus = CLLocationManager.authorizationStatus()
+        let locStatus = CLLocationManager().authorizationStatus
         items.append(PermissionItem(name: "Location", icon: "location.fill", status: mapLocationStatus(locStatus), detail: "Used for location-aware diagnostics"))
 
         // Notifications
