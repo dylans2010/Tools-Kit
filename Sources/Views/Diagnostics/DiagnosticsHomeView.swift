@@ -4,6 +4,7 @@ struct DiagnosticsHomeView: View {
     @StateObject private var viewModel = DiagnosticsViewModel()
     @StateObject private var diagnosticsMode = DiagnosticsModeManager.shared
     @State private var showSettings = false
+    @State private var showReports = false
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -13,36 +14,80 @@ struct DiagnosticsHomeView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: 20) {
+                    headerSection
                     categoryScrollBar
                     toolsGrid
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 20)
             }
-            .background(Color(.systemGroupedBackground))
+            .background(Color(.systemBackground))
             .searchable(text: $viewModel.searchText, prompt: "Search \(viewModel.totalToolCount) diagnostic tools")
             .navigationTitle("Diagnostics")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        diagnosticsMode.isDiagnosticsModeEnabled = false
-                    } label: {
-                        Image(systemName: "arrow.left")
-                    }
-                }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showSettings = true
-                    } label: {
-                        Image(systemName: "slider.horizontal.3")
+                    HStack(spacing: 12) {
+                        Button {
+                            showReports = true
+                        } label: {
+                            Image(systemName: "doc.text")
+                        }
+                        Button {
+                            showSettings = true
+                        } label: {
+                            Image(systemName: "slider.horizontal.3")
+                        }
                     }
                 }
             }
             .sheet(isPresented: $showSettings) {
                 AIChatSettingsView(settings: .constant(AIChatSettings()))
             }
+            .sheet(isPresented: $showReports) {
+                NavigationStack {
+                    DiagnosticReportsView()
+                        .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                Button("Done") { showReports = false }
+                            }
+                        }
+                }
+            }
         }
+    }
+
+    private var headerSection: some View {
+        VStack(spacing: 8) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("\(viewModel.totalToolCount) Tools")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
+                    if let category = viewModel.selectedCategory {
+                        Text(category.rawValue)
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+                Spacer()
+                NavigationLink {
+                    DiagnosticReportsView()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "doc.text")
+                            .font(.caption)
+                        Text("Reports")
+                            .font(.caption.weight(.medium))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color(.tertiarySystemFill))
+                    .clipShape(Capsule())
+                }
+            }
+        }
+        .padding(.top, 4)
     }
 
     private var categoryScrollBar: some View {
@@ -51,8 +96,7 @@ struct DiagnosticsHomeView: View {
                 DiagnosticsCategoryChip(
                     title: "All",
                     icon: "square.grid.2x2.fill",
-                    isSelected: viewModel.selectedCategory == nil,
-                    tint: .blue
+                    isSelected: viewModel.selectedCategory == nil
                 ) {
                     withAnimation(.spring(response: 0.3)) {
                         viewModel.selectedCategory = nil
@@ -63,8 +107,7 @@ struct DiagnosticsHomeView: View {
                     DiagnosticsCategoryChip(
                         title: category.rawValue,
                         icon: category.icon,
-                        isSelected: viewModel.selectedCategory == category,
-                        tint: category.tint
+                        isSelected: viewModel.selectedCategory == category
                     ) {
                         withAnimation(.spring(response: 0.3)) {
                             viewModel.selectedCategory = (viewModel.selectedCategory == category) ? nil : category
@@ -98,23 +141,32 @@ struct DiagnosticsHomeView: View {
         case "multi_touch": Diag_MultiTouchTrackingView()
         case "true_tone": Diag_TrueToneCheckView()
         case "color_accuracy": Diag_ColorAccuracyView()
+        case "refresh_rate": Diag_RefreshRateView()
+        case "hdr_display": Diag_HDRDisplayView()
+        case "display_zoom": Diag_DisplayZoomView()
         // Audio
         case "speaker_test": Diag_SpeakerTestView()
         case "stereo_balance": Diag_StereoBalanceView()
         case "volume_ramp": Diag_VolumeRampView()
         case "distortion": Diag_DistortionDetectionView()
         case "audio_latency": Diag_AudioLatencyView()
+        case "spatial_audio": Diag_SpatialAudioView()
+        case "audio_routing": Diag_AudioRoutingView()
         // Microphone
         case "mic_level": Diag_MicInputLevelView()
         case "noise_detect": Diag_NoiseDetectionView()
         case "recording_test": Diag_RecordingTestView()
         case "mic_switch": Diag_MultiMicSwitchingView()
+        case "voice_isolation": Diag_VoiceIsolationView()
         // Sensors
         case "accelerometer": Diag_AccelerometerView()
         case "gyroscope": Diag_GyroscopeView()
         case "magnetometer": Diag_MagnetometerView()
         case "proximity": Diag_ProximitySensorView()
         case "ambient_light": Diag_AmbientLightView()
+        case "barometer": Diag_BarometerView()
+        case "pedometer": Diag_PedometerView()
+        case "motion_activity": Diag_MotionActivityView()
         // Haptics
         case "haptic_test": Diag_HapticFeedbackView()
         case "haptic_pattern": Diag_PatternPlaybackView()
@@ -125,39 +177,59 @@ struct DiagnosticsHomeView: View {
         case "internet_speed": Diag_InternetSpeedView()
         case "bluetooth": Diag_BluetoothScannerView()
         case "airplane": Diag_AirplaneModeView()
+        case "cellular_info": Diag_CellularInfoView()
+        case "nfc_check": Diag_NFCCheckView()
+        case "vpn_status": Diag_VPNStatusView()
+        case "network_info": Diag_NetworkInfoView()
         // Performance
         case "cpu_stress": Diag_CPUStressTestView()
         case "memory_usage": Diag_MemoryUsageView()
         case "fps_monitor": Diag_FPSMonitorView()
         case "thermal_state": Diag_ThermalStateView()
         case "process_info": Diag_ProcessInfoView()
+        case "gpu_info": Diag_GPUInfoView()
+        case "app_launch": Diag_AppLaunchTimeView()
         // Battery
         case "battery_level": Diag_BatteryHealthView()
         case "charging_state": Diag_ChargingStateView()
         case "battery_drain": Diag_BatteryDrainSimView()
+        case "low_power": Diag_LowPowerModeView()
         // Camera
         case "front_camera": Diag_FrontCameraView()
         case "rear_camera": Diag_RearCameraView()
         case "focus_test": Diag_FocusTestView()
         case "flash_test": Diag_FlashTestView()
+        case "zoom_range": Diag_ZoomRangeView()
+        case "lidar_check": Diag_LiDARCheckView()
+        case "truedepth": Diag_TrueDepthView()
         // Storage
         case "disk_usage": Diag_DiskUsageView()
         case "rw_test": Diag_ReadWriteTestView()
         case "file_system": Diag_FileSystemInfoView()
+        case "cache_size": Diag_CacheSizeView()
+        case "storage_health": Diag_StorageHealthView()
         // System
         case "device_info": Diag_DeviceInfoView()
         case "uptime": Diag_UptimeView()
         case "permissions": Diag_PermissionsCheckerView()
         case "locale_info": Diag_LocaleInfoView()
         case "notifications": Diag_NotificationStatusView()
+        case "bg_refresh": Diag_BackgroundRefreshView()
+        case "screen_time": Diag_ScreenTimeView()
+        case "hw_buttons": Diag_HardwareButtonsView()
         // Accessibility
         case "voiceover": Diag_VoiceOverStatusView()
         case "dynamic_type": Diag_DynamicTypeView()
         case "reduce_motion": Diag_ReduceMotionView()
+        case "bold_text": Diag_BoldTextCheckView()
+        case "color_filters": Diag_ColorFiltersView()
         // Security
         case "biometric": Diag_BiometricCheckView()
         case "passcode": Diag_PasscodeStatusView()
         case "secure_enclave": Diag_SecureEnclaveView()
+        case "jailbreak": Diag_JailbreakDetectionView()
+        case "ats_check": Diag_ATSCheckView()
+        case "keychain_check": Diag_KeychainCheckView()
         default:
             Text("Tool not found")
         }
@@ -168,7 +240,6 @@ struct DiagnosticsCategoryChip: View {
     let title: String
     let icon: String
     let isSelected: Bool
-    let tint: Color
     let action: () -> Void
 
     var body: some View {
@@ -181,8 +252,8 @@ struct DiagnosticsCategoryChip: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(isSelected ? tint : Color(.tertiarySystemGroupedBackground))
-            .foregroundStyle(isSelected ? .white : .primary)
+            .background(isSelected ? Color.primary : Color(.tertiarySystemFill))
+            .foregroundStyle(isSelected ? Color(.systemBackground) : .primary)
             .clipShape(Capsule())
         }
     }

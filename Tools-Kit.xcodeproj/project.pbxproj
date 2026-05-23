@@ -67,6 +67,37 @@
 		DG02000000000000000000000058 /* DiagnosticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000058 /* DiagnosticsService.swift */; };
 		DG02000000000000000000000059 /* DiagnosticsToolCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000059 /* DiagnosticsToolCardView.swift */; };
 		DG02000000000000000000000060 /* DiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000060 /* DiagnosticsViewModel.swift */; };
+		DG02000000000000000000000061 /* Diag_AppLaunchTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000061 /* Diag_AppLaunchTimeView.swift */; };
+		DG02000000000000000000000062 /* Diag_ATSCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000062 /* Diag_ATSCheckView.swift */; };
+		DG02000000000000000000000063 /* Diag_AudioRoutingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000063 /* Diag_AudioRoutingView.swift */; };
+		DG02000000000000000000000064 /* Diag_BackgroundRefreshView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000064 /* Diag_BackgroundRefreshView.swift */; };
+		DG02000000000000000000000065 /* Diag_BarometerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000065 /* Diag_BarometerView.swift */; };
+		DG02000000000000000000000066 /* Diag_BoldTextCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000066 /* Diag_BoldTextCheckView.swift */; };
+		DG02000000000000000000000067 /* Diag_CacheSizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000067 /* Diag_CacheSizeView.swift */; };
+		DG02000000000000000000000068 /* Diag_CellularInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000068 /* Diag_CellularInfoView.swift */; };
+		DG02000000000000000000000069 /* Diag_ColorFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000069 /* Diag_ColorFiltersView.swift */; };
+		DG02000000000000000000000070 /* Diag_DisplayZoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000070 /* Diag_DisplayZoomView.swift */; };
+		DG02000000000000000000000071 /* Diag_GPUInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000071 /* Diag_GPUInfoView.swift */; };
+		DG02000000000000000000000072 /* Diag_HDRDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000072 /* Diag_HDRDisplayView.swift */; };
+		DG02000000000000000000000073 /* Diag_HardwareButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000073 /* Diag_HardwareButtonsView.swift */; };
+		DG02000000000000000000000074 /* Diag_JailbreakDetectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000074 /* Diag_JailbreakDetectionView.swift */; };
+		DG02000000000000000000000075 /* Diag_KeychainCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000075 /* Diag_KeychainCheckView.swift */; };
+		DG02000000000000000000000076 /* Diag_LiDARCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000076 /* Diag_LiDARCheckView.swift */; };
+		DG02000000000000000000000077 /* Diag_LowPowerModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000077 /* Diag_LowPowerModeView.swift */; };
+		DG02000000000000000000000078 /* Diag_MotionActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000078 /* Diag_MotionActivityView.swift */; };
+		DG02000000000000000000000079 /* Diag_NFCCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000079 /* Diag_NFCCheckView.swift */; };
+		DG02000000000000000000000080 /* Diag_NetworkInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000080 /* Diag_NetworkInfoView.swift */; };
+		DG02000000000000000000000081 /* Diag_PedometerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000081 /* Diag_PedometerView.swift */; };
+		DG02000000000000000000000082 /* Diag_RefreshRateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000082 /* Diag_RefreshRateView.swift */; };
+		DG02000000000000000000000083 /* Diag_ScreenTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000083 /* Diag_ScreenTimeView.swift */; };
+		DG02000000000000000000000084 /* Diag_SpatialAudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000084 /* Diag_SpatialAudioView.swift */; };
+		DG02000000000000000000000085 /* Diag_StorageHealthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000085 /* Diag_StorageHealthView.swift */; };
+		DG02000000000000000000000086 /* Diag_TrueDepthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000086 /* Diag_TrueDepthView.swift */; };
+		DG02000000000000000000000087 /* Diag_VPNStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000087 /* Diag_VPNStatusView.swift */; };
+		DG02000000000000000000000088 /* Diag_VoiceIsolationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000088 /* Diag_VoiceIsolationView.swift */; };
+		DG02000000000000000000000089 /* Diag_ZoomRangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000089 /* Diag_ZoomRangeView.swift */; };
+		DG02000000000000000000000090 /* DiagnosticReportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000090 /* DiagnosticReportManager.swift */; };
+		DG02000000000000000000000091 /* DiagnosticReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000091 /* DiagnosticReportsView.swift */; };
 		FC335125304A4830BFC09FE0 /* DevToolSharedUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5802738C69834F1BBAAA2C66 /* DevToolSharedUtils.swift */; };
 		4493B4F7B7264E1587EBEA36 /* SDKModuleInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B6C5F74C541E188C9AF53 /* SDKModuleInspectorDevTool.swift */; };
 		D11E98ED67F642419A3A23FB /* SDKConfigValidatorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1600644375C34AE78E169D60 /* SDKConfigValidatorDevTool.swift */; };
@@ -1690,6 +1721,37 @@
 		DG01000000000000000000000058 /* DiagnosticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsService.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000059 /* DiagnosticsToolCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsToolCardView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000060 /* DiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsViewModel.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000061 /* Diag_AppLaunchTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AppLaunchTimeView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000062 /* Diag_ATSCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ATSCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000063 /* Diag_AudioRoutingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioRoutingView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000064 /* Diag_BackgroundRefreshView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BackgroundRefreshView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000065 /* Diag_BarometerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BarometerView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000066 /* Diag_BoldTextCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BoldTextCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000067 /* Diag_CacheSizeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CacheSizeView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000068 /* Diag_CellularInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CellularInfoView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000069 /* Diag_ColorFiltersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ColorFiltersView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000070 /* Diag_DisplayZoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DisplayZoomView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000071 /* Diag_GPUInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_GPUInfoView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000072 /* Diag_HDRDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_HDRDisplayView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000073 /* Diag_HardwareButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_HardwareButtonsView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000074 /* Diag_JailbreakDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_JailbreakDetectionView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000075 /* Diag_KeychainCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_KeychainCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000076 /* Diag_LiDARCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_LiDARCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000077 /* Diag_LowPowerModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_LowPowerModeView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000078 /* Diag_MotionActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MotionActivityView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000079 /* Diag_NFCCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NFCCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000080 /* Diag_NetworkInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetworkInfoView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000081 /* Diag_PedometerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PedometerView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000082 /* Diag_RefreshRateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_RefreshRateView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000083 /* Diag_ScreenTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ScreenTimeView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000084 /* Diag_SpatialAudioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SpatialAudioView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000085 /* Diag_StorageHealthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_StorageHealthView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000086 /* Diag_TrueDepthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_TrueDepthView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000087 /* Diag_VPNStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_VPNStatusView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000088 /* Diag_VoiceIsolationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_VoiceIsolationView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000089 /* Diag_ZoomRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ZoomRangeView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000090 /* DiagnosticReportManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticReportManager.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000091 /* DiagnosticReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticReportsView.swift; sourceTree = "<group>"; };
 		5802738C69834F1BBAAA2C66 /* DevToolSharedUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DevToolSharedUtils.swift; sourceTree = "<group>"; };
 		F61B6C5F74C541E188C9AF53 /* SDKModuleInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKModuleInspectorDevTool.swift; sourceTree = "<group>"; };
 		1600644375C34AE78E169D60 /* SDKConfigValidatorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKConfigValidatorDevTool.swift; sourceTree = "<group>"; };
@@ -3300,6 +3362,37 @@
 				DG01000000000000000000000058 /* DiagnosticsService.swift */,
 				DG01000000000000000000000059 /* DiagnosticsToolCardView.swift */,
 				DG01000000000000000000000060 /* DiagnosticsViewModel.swift */,
+				DG01000000000000000000000061 /* Diag_AppLaunchTimeView.swift */,
+				DG01000000000000000000000062 /* Diag_ATSCheckView.swift */,
+				DG01000000000000000000000063 /* Diag_AudioRoutingView.swift */,
+				DG01000000000000000000000064 /* Diag_BackgroundRefreshView.swift */,
+				DG01000000000000000000000065 /* Diag_BarometerView.swift */,
+				DG01000000000000000000000066 /* Diag_BoldTextCheckView.swift */,
+				DG01000000000000000000000067 /* Diag_CacheSizeView.swift */,
+				DG01000000000000000000000068 /* Diag_CellularInfoView.swift */,
+				DG01000000000000000000000069 /* Diag_ColorFiltersView.swift */,
+				DG01000000000000000000000070 /* Diag_DisplayZoomView.swift */,
+				DG01000000000000000000000071 /* Diag_GPUInfoView.swift */,
+				DG01000000000000000000000072 /* Diag_HDRDisplayView.swift */,
+				DG01000000000000000000000073 /* Diag_HardwareButtonsView.swift */,
+				DG01000000000000000000000074 /* Diag_JailbreakDetectionView.swift */,
+				DG01000000000000000000000075 /* Diag_KeychainCheckView.swift */,
+				DG01000000000000000000000076 /* Diag_LiDARCheckView.swift */,
+				DG01000000000000000000000077 /* Diag_LowPowerModeView.swift */,
+				DG01000000000000000000000078 /* Diag_MotionActivityView.swift */,
+				DG01000000000000000000000079 /* Diag_NFCCheckView.swift */,
+				DG01000000000000000000000080 /* Diag_NetworkInfoView.swift */,
+				DG01000000000000000000000081 /* Diag_PedometerView.swift */,
+				DG01000000000000000000000082 /* Diag_RefreshRateView.swift */,
+				DG01000000000000000000000083 /* Diag_ScreenTimeView.swift */,
+				DG01000000000000000000000084 /* Diag_SpatialAudioView.swift */,
+				DG01000000000000000000000085 /* Diag_StorageHealthView.swift */,
+				DG01000000000000000000000086 /* Diag_TrueDepthView.swift */,
+				DG01000000000000000000000087 /* Diag_VPNStatusView.swift */,
+				DG01000000000000000000000088 /* Diag_VoiceIsolationView.swift */,
+				DG01000000000000000000000089 /* Diag_ZoomRangeView.swift */,
+				DG01000000000000000000000090 /* DiagnosticReportManager.swift */,
+				DG01000000000000000000000091 /* DiagnosticReportsView.swift */,
 			);
 			path = Diagnostics;
 			sourceTree = "<group>";
@@ -10511,6 +10604,37 @@
 				DG02000000000000000000000058 /* DiagnosticsService.swift in Sources */,
 				DG02000000000000000000000059 /* DiagnosticsToolCardView.swift in Sources */,
 				DG02000000000000000000000060 /* DiagnosticsViewModel.swift in Sources */,
+				DG02000000000000000000000061 /* Diag_AppLaunchTimeView.swift in Sources */,
+				DG02000000000000000000000062 /* Diag_ATSCheckView.swift in Sources */,
+				DG02000000000000000000000063 /* Diag_AudioRoutingView.swift in Sources */,
+				DG02000000000000000000000064 /* Diag_BackgroundRefreshView.swift in Sources */,
+				DG02000000000000000000000065 /* Diag_BarometerView.swift in Sources */,
+				DG02000000000000000000000066 /* Diag_BoldTextCheckView.swift in Sources */,
+				DG02000000000000000000000067 /* Diag_CacheSizeView.swift in Sources */,
+				DG02000000000000000000000068 /* Diag_CellularInfoView.swift in Sources */,
+				DG02000000000000000000000069 /* Diag_ColorFiltersView.swift in Sources */,
+				DG02000000000000000000000070 /* Diag_DisplayZoomView.swift in Sources */,
+				DG02000000000000000000000071 /* Diag_GPUInfoView.swift in Sources */,
+				DG02000000000000000000000072 /* Diag_HDRDisplayView.swift in Sources */,
+				DG02000000000000000000000073 /* Diag_HardwareButtonsView.swift in Sources */,
+				DG02000000000000000000000074 /* Diag_JailbreakDetectionView.swift in Sources */,
+				DG02000000000000000000000075 /* Diag_KeychainCheckView.swift in Sources */,
+				DG02000000000000000000000076 /* Diag_LiDARCheckView.swift in Sources */,
+				DG02000000000000000000000077 /* Diag_LowPowerModeView.swift in Sources */,
+				DG02000000000000000000000078 /* Diag_MotionActivityView.swift in Sources */,
+				DG02000000000000000000000079 /* Diag_NFCCheckView.swift in Sources */,
+				DG02000000000000000000000080 /* Diag_NetworkInfoView.swift in Sources */,
+				DG02000000000000000000000081 /* Diag_PedometerView.swift in Sources */,
+				DG02000000000000000000000082 /* Diag_RefreshRateView.swift in Sources */,
+				DG02000000000000000000000083 /* Diag_ScreenTimeView.swift in Sources */,
+				DG02000000000000000000000084 /* Diag_SpatialAudioView.swift in Sources */,
+				DG02000000000000000000000085 /* Diag_StorageHealthView.swift in Sources */,
+				DG02000000000000000000000086 /* Diag_TrueDepthView.swift in Sources */,
+				DG02000000000000000000000087 /* Diag_VPNStatusView.swift in Sources */,
+				DG02000000000000000000000088 /* Diag_VoiceIsolationView.swift in Sources */,
+				DG02000000000000000000000089 /* Diag_ZoomRangeView.swift in Sources */,
+				DG02000000000000000000000090 /* DiagnosticReportManager.swift in Sources */,
+				DG02000000000000000000000091 /* DiagnosticReportsView.swift in Sources */,
 				WG5FD79044E10FA97C5EC69F /* WorkspaceGraph.swift in Sources */,
 				MDC32FA79B1B70105A53ED19 /* AgenticModels.swift in Sources */,
 				TO7EC7A01B15A8F7BFE4020C /* AgenticToolOutput.swift in Sources */,
