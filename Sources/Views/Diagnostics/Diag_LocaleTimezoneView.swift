@@ -22,11 +22,13 @@ struct Diag_LocaleTimezoneView: View {
                 LabeledContent("Grouping Separator") { Text(Locale.current.groupingSeparator ?? ",") }
                 LabeledContent("Currency Symbol") { Text(Locale.current.currencySymbol ?? "$") }
                 LabeledContent("Currency Code") { Text(Locale.current.currency?.identifier ?? "N/A") }
-                let nf = NumberFormatter()
                 LabeledContent("Example Number") {
-                    nf.numberStyle = .decimal
-                    nf.locale = Locale.current
-                    return Text(nf.string(from: 1234567.89 as NSNumber) ?? "1,234,567.89")
+                    Text({
+                        let nf = NumberFormatter()
+                        nf.numberStyle = .decimal
+                        nf.locale = Locale.current
+                        return nf.string(from: 1234567.89 as NSNumber) ?? "1,234,567.89"
+                    }())
                 }
             }
 

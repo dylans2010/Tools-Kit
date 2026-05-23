@@ -149,15 +149,15 @@ struct Diag_NetworkProxyView: View {
         settings.append(ProxySetting(type: "HTTP", host: httpHost, port: httpPort, enabled: httpEnabled))
 
         // HTTPS Proxy
-        let httpsEnabled = (proxyDict[kCFNetworkProxiesHTTPSEnable as String] as? Int) == 1
-        let httpsHost = proxyDict[kCFNetworkProxiesHTTPSProxy as String] as? String ?? ""
-        let httpsPort = proxyDict[kCFNetworkProxiesHTTPSPort as String] as? Int ?? 0
+        let httpsEnabled = (proxyDict["HTTPSEnable"] as? Int) == 1
+        let httpsHost = proxyDict["HTTPSProxy"] as? String ?? ""
+        let httpsPort = proxyDict["HTTPSPort"] as? Int ?? 0
         settings.append(ProxySetting(type: "HTTPS", host: httpsHost, port: httpsPort, enabled: httpsEnabled))
 
         // SOCKS Proxy
-        let socksEnabled = (proxyDict[kCFNetworkProxiesSOCKSEnable as String] as? Int) == 1
-        let socksHost = proxyDict[kCFNetworkProxiesSOCKSProxy as String] as? String ?? ""
-        let socksPort = proxyDict[kCFNetworkProxiesSOCKSPort as String] as? Int ?? 0
+        let socksEnabled = (proxyDict["SOCKSEnable"] as? Int) == 1
+        let socksHost = proxyDict["SOCKSProxy"] as? String ?? ""
+        let socksPort = proxyDict["SOCKSPort"] as? Int ?? 0
         settings.append(ProxySetting(type: "SOCKS", host: socksHost, port: socksPort, enabled: socksEnabled))
 
         proxySettings = settings
@@ -191,14 +191,16 @@ struct Diag_NetworkProxyView: View {
             }
         }
 
+        #if os(macOS)
         if servers.isEmpty {
-            // Fallback: try to get from system config
+            // Fallback: try to get from system config (macOS only)
             if let store = SCDynamicStoreCreate(nil, "DNSLookup" as CFString, nil, nil),
                let dns = SCDynamicStoreCopyValue(store, "State:/Network/Global/DNS" as CFString) as? [String: Any],
                let addrs = dns["ServerAddresses"] as? [String] {
                 servers = addrs
             }
         }
+        #endif
         dnsServers = servers
     }
 
