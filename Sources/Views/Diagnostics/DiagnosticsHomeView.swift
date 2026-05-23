@@ -5,6 +5,7 @@ struct DiagnosticsHomeView: View {
     @StateObject private var diagnosticsMode = DiagnosticsModeManager.shared
     @State private var showSettings = false
     @State private var showReports = false
+    @State private var showSupportAssist = false
 
     var body: some View {
         NavigationStack {
@@ -25,12 +26,20 @@ struct DiagnosticsHomeView: View {
                             Image(systemName: "doc.text")
                         }
                         Button {
+                            showSupportAssist = true
+                        } label: {
+                            Image(systemName: "sparkles.rectangle.stack")
+                        }
+                        Button {
                             showSettings = true
                         } label: {
                             Image(systemName: "slider.horizontal.3")
                         }
                     }
                 }
+            }
+            .sheet(isPresented: $showSupportAssist) {
+                DiagnosticsSupportAssistView()
             }
             .sheet(isPresented: $showSettings) {
                 AIChatSettingsView(settings: .constant(AIChatSettings()))

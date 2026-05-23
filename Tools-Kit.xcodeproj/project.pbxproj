@@ -67,6 +67,7 @@
 		DG02000000000000000000000058 /* DiagnosticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000058 /* DiagnosticsService.swift */; };
 		DG02000000000000000000000059 /* DiagnosticsToolCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000059 /* DiagnosticsToolCardView.swift */; };
 		DG02000000000000000000000060 /* DiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000060 /* DiagnosticsViewModel.swift */; };
+		DG0200000000000000000000130 /* DiagnosticsSupportAssistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000130 /* DiagnosticsSupportAssistView.swift */; };
 		DG02000000000000000000000061 /* Diag_AppLaunchTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000061 /* Diag_AppLaunchTimeView.swift */; };
 		DG02000000000000000000000062 /* Diag_ATSCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000062 /* Diag_ATSCheckView.swift */; };
 		DG02000000000000000000000063 /* Diag_AudioRoutingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000063 /* Diag_AudioRoutingView.swift */; };
@@ -1815,6 +1816,7 @@
 		DG01000000000000000000000058 /* DiagnosticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsService.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000059 /* DiagnosticsToolCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsToolCardView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000060 /* DiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsViewModel.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000130 /* DiagnosticsSupportAssistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsSupportAssistView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000061 /* Diag_AppLaunchTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AppLaunchTimeView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000062 /* Diag_ATSCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ATSCheckView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000063 /* Diag_AudioRoutingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioRoutingView.swift; sourceTree = "<group>"; };
@@ -3550,6 +3552,7 @@
 				DG01000000000000000000000058 /* DiagnosticsService.swift */,
 				DG01000000000000000000000059 /* DiagnosticsToolCardView.swift */,
 				DG01000000000000000000000060 /* DiagnosticsViewModel.swift */,
+				DG0100000000000000000000130 /* DiagnosticsSupportAssistView.swift */,
 				DG01000000000000000000000061 /* Diag_AppLaunchTimeView.swift */,
 				DG01000000000000000000000062 /* Diag_ATSCheckView.swift */,
 				DG01000000000000000000000063 /* Diag_AudioRoutingView.swift */,
@@ -10886,6 +10889,7 @@
 				DG02000000000000000000000058 /* DiagnosticsService.swift in Sources */,
 				DG02000000000000000000000059 /* DiagnosticsToolCardView.swift in Sources */,
 				DG02000000000000000000000060 /* DiagnosticsViewModel.swift in Sources */,
+				DG0200000000000000000000130 /* DiagnosticsSupportAssistView.swift in Sources */,
 				DG02000000000000000000000061 /* Diag_AppLaunchTimeView.swift in Sources */,
 				DG02000000000000000000000062 /* Diag_ATSCheckView.swift in Sources */,
 				DG02000000000000000000000063 /* Diag_AudioRoutingView.swift in Sources */,
