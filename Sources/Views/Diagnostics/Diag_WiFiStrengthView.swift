@@ -30,6 +30,10 @@ struct Diag_WiFiStrengthView: View {
 
             Section("Connection Details") {
                 LabeledContent("Interface") { Text(interfaceType) }
+                if interfaceType == "WiFi" {
+                    LabeledContent("SSID", value: "Available in Settings")
+                    LabeledContent("BSSID", value: "Available in Settings")
+                }
                 LabeledContent("Expensive (Cellular)") {
                     Image(systemName: isExpensive ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
                         .foregroundStyle(isExpensive ? .orange : .green)

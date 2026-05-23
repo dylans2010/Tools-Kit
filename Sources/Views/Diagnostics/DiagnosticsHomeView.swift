@@ -6,23 +6,46 @@ struct DiagnosticsHomeView: View {
     @State private var showSettings = false
     @State private var showReports = false
 
-    private let columns = [
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12)
-    ]
-
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    headerSection
-                    categoryScrollBar
-                    toolsGrid
+            List {
+                headerSection
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
+                    .padding(.horizontal)
+
+                categoryScrollBar
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
+                    .padding(.horizontal)
+
+                ForEach(viewModel.toolsByCategory, id: \.0) { category, tools in
+                    Section(header: Text(category.rawValue)) {
+                        ForEach(tools) { tool in
+                            NavigationLink(destination: diagnosticDestination(for: tool)) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: tool.icon)
+                                        .font(.headline)
+                                        .foregroundStyle(.white)
+                                        .frame(width: 32, height: 32)
+                                        .background(category.tint, in: RoundedRectangle(cornerRadius: 8))
+
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(tool.name)
+                                            .font(.subheadline.weight(.medium))
+                                        Text(tool.description)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
+                                    }
+                                }
+                                .padding(.vertical, 4)
+                            }
+                        }
+                    }
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 20)
             }
-            .background(Color(.systemBackground))
+            .listStyle(.insetGrouped)
             .searchable(text: $viewModel.searchText, prompt: "Search \(viewModel.totalToolCount) diagnostic tools")
             .navigationTitle("Diagnostics")
             .toolbar {
@@ -119,16 +142,6 @@ struct DiagnosticsHomeView: View {
         }
     }
 
-    private var toolsGrid: some View {
-        LazyVGrid(columns: columns, spacing: 12) {
-            ForEach(viewModel.filteredTools) { tool in
-                NavigationLink(destination: diagnosticDestination(for: tool)) {
-                    DiagnosticsToolCardView(tool: tool)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
 
     @ViewBuilder
     private func diagnosticDestination(for tool: DiagnosticTool) -> some View {
@@ -167,6 +180,9 @@ struct DiagnosticsHomeView: View {
         case "barometer": Diag_BarometerView()
         case "pedometer": Diag_PedometerView()
         case "motion_activity": Diag_MotionActivityView()
+        case "gps_diag": Diag_GPSView()
+        case "compass": Diag_CompassView()
+        case "altimeter": Diag_AltimeterView()
         // Haptics
         case "haptic_test": Diag_HapticFeedbackView()
         case "haptic_pattern": Diag_PatternPlaybackView()
@@ -181,6 +197,8 @@ struct DiagnosticsHomeView: View {
         case "nfc_check": Diag_NFCCheckView()
         case "vpn_status": Diag_VPNStatusView()
         case "network_info": Diag_NetworkInfoView()
+        case "adv_network": Diag_AdvancedNetworkingView()
+        case "satellite": Diag_SatelliteView()
         // Performance
         case "cpu_stress": Diag_CPUStressTestView()
         case "memory_usage": Diag_MemoryUsageView()

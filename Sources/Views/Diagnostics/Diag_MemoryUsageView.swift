@@ -6,6 +6,9 @@ struct Diag_MemoryUsageView: View {
     @State private var freeMemory: UInt64 = 0
     @State private var timer: Timer?
     @State private var isMonitoring = false
+    @State private var activeMemory: UInt64 = 0
+    @State private var wiredMemory: UInt64 = 0
+    @State private var inactiveMemory: UInt64 = 0
 
     var body: some View {
         Form {
@@ -49,6 +52,21 @@ struct Diag_MemoryUsageView: View {
                         .monospacedDigit()
                         .foregroundStyle(.green)
                 }
+
+                Group {
+                    LabeledContent("Active") {
+                        Text(formatBytes(activeMemory)).monospacedDigit()
+                    }
+                    LabeledContent("Wired") {
+                        Text(formatBytes(wiredMemory)).monospacedDigit()
+                    }
+                    LabeledContent("Inactive") {
+                        Text(formatBytes(inactiveMemory)).monospacedDigit()
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
                 LabeledContent("App Memory") {
                     Text(formatBytes(appMemoryUsage()))
                         .monospacedDigit()
@@ -85,17 +103,12 @@ struct Diag_MemoryUsageView: View {
 
     private func refreshMemory() {
         physicalMemory = ProcessInfo.processInfo.physicalMemory
-        var info = mach_task_basic_info()
-        var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4
-        let result = withUnsafeMutablePointer(to: &info) {
-            $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
-                task_info(mach_task_self_, task_flavor_t(MACH_TASK_BASIC_INFO), $0, &count)
-            }
-        }
-        if result == KERN_SUCCESS {
-            usedMemory = info.resident_size
-            freeMemory = physicalMemory > usedMemory ? physicalMemory - usedMemory : 0
-        }
+        let stats = DiagnosticsService.shared.getMemoryStatistics()
+        activeMemory = stats.active
+        wiredMemory = stats.wired
+        inactiveMemory = stats.inactive
+        freeMemory = stats.free
+        usedMemory = physicalMemory - freeMemory
     }
 
     private func appMemoryUsage() -> UInt64 {

@@ -19,6 +19,8 @@ struct Diag_DeviceInfoView: View {
             Section("System") {
                 LabeledContent("OS") { Text(service.systemName) }
                 LabeledContent("Version") { Text(service.systemVersion) }
+                LabeledContent("Kernel") { Text(service.kernelVersion).font(.caption) }
+                LabeledContent("Hostname") { Text(service.hostname).font(.caption) }
                 LabeledContent("Uptime") { Text(service.formattedUptime).monospacedDigit() }
             }
 

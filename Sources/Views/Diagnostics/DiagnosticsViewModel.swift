@@ -172,12 +172,17 @@ final class DiagnosticsViewModel: ObservableObject {
         DiagnosticTool(id: "barometer", name: "Barometer", icon: "barometer", description: "Measure atmospheric pressure and altitude", category: .sensors),
         DiagnosticTool(id: "pedometer", name: "Pedometer", icon: "figure.walk", description: "Track steps, distance, and floors climbed", category: .sensors),
         DiagnosticTool(id: "motion_activity", name: "Motion Activity", icon: "figure.run", description: "Detect walking, running, driving activity", category: .sensors),
+        DiagnosticTool(id: "gps_diag", name: "GPS Diagnostics", icon: "location.circle.fill", description: "Real-time coordinates and signal accuracy", category: .sensors),
+        DiagnosticTool(id: "compass", name: "Compass", icon: "safari.fill", description: "Magnetic and true north orientation", category: .sensors),
+        DiagnosticTool(id: "altimeter", name: "Altimeter", icon: "elevation", description: "Relative altitude and pressure tracking", category: .sensors),
 
         // Connectivity (new)
         DiagnosticTool(id: "cellular_info", name: "Cellular Info", icon: "antenna.radiowaves.left.and.right", description: "Carrier, radio technology, and signal info", category: .connectivity),
         DiagnosticTool(id: "nfc_check", name: "NFC Check", icon: "wave.3.right.circle.fill", description: "Check NFC reading capability", category: .connectivity),
         DiagnosticTool(id: "vpn_status", name: "VPN Status", icon: "lock.shield.fill", description: "Detect active VPN connections and tunnels", category: .connectivity),
         DiagnosticTool(id: "network_info", name: "Network Info", icon: "network", description: "View network interfaces, IPs, and DNS", category: .connectivity),
+        DiagnosticTool(id: "adv_network", name: "Advanced Networking", icon: "network.badge.shield.half.filled", description: "Local IP, DNS servers, and gateway info", category: .connectivity),
+        DiagnosticTool(id: "satellite", name: "Satellite Support", icon: "satellite.fill", description: "Verify satellite communication hardware", category: .connectivity),
 
         // Performance (new)
         DiagnosticTool(id: "gpu_info", name: "GPU Info", icon: "gpu", description: "Metal GPU capabilities and memory info", category: .performance),

@@ -8,6 +8,7 @@ struct Diag_CPUStressTestView: View {
     @State private var thermalState: String = "Nominal"
     @State private var timer: Timer?
     @State private var stressTask: Task<Void, Never>?
+    @State private var coreUsages: [Double] = []
 
     var body: some View {
         Form {
@@ -35,6 +36,31 @@ struct Diag_CPUStressTestView: View {
                 LabeledContent("Processor Cores") {
                     Text("\(ProcessInfo.processInfo.activeProcessorCount)")
                 }
+
+                if !coreUsages.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Core Load Breakdown")
+                            .font(.caption.bold())
+                            .foregroundStyle(.secondary)
+
+                        ForEach(0..<coreUsages.count, id: \.self) { i in
+                            HStack {
+                                Text("Core \(i)")
+                                    .font(.caption.monospaced())
+                                    .frame(width: 50, alignment: .leading)
+
+                                ProgressView(value: coreUsages[i], total: 100)
+                                    .tint(coreUsages[i] > 80 ? .red : .blue)
+
+                                Text("\(Int(coreUsages[i]))%")
+                                    .font(.caption2.monospacedDigit())
+                                    .frame(width: 35, alignment: .trailing)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+
                 LabeledContent("Thermal State") {
                     Text(thermalState)
                         .foregroundStyle(thermalColor)
@@ -102,6 +128,7 @@ struct Diag_CPUStressTestView: View {
         timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
             elapsedTime = Date().timeIntervalSince(startTime)
             updateThermalState()
+            coreUsages = DiagnosticsService.shared.getProcessorUsage()
         }
 
         let totalIterations = 10_000_000

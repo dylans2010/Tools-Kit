@@ -40,6 +40,14 @@ struct Diag_BatteryHealthView: View {
                     Text(batteryLevel >= 0 ? "\(Int(batteryLevel * 100))%" : "Unavailable")
                         .monospacedDigit()
                 }
+                LabeledContent("Maximum Capacity") {
+                    Text("N/A")
+                        .foregroundStyle(.secondary)
+                }
+                LabeledContent("Cycle Count") {
+                    Text("N/A")
+                        .foregroundStyle(.secondary)
+                }
                 LabeledContent("Low Power Mode") {
                     Text(ProcessInfo.processInfo.isLowPowerModeEnabled ? "Enabled" : "Disabled")
                         .foregroundStyle(ProcessInfo.processInfo.isLowPowerModeEnabled ? .orange : .green)
