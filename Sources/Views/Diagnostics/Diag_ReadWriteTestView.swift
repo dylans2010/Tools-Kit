@@ -75,9 +75,11 @@ struct Diag_ReadWriteTestView: View {
         writeSpeed = 0
         readSpeed = 0
 
+        let requestedSizeMB = testSizeMB
+
         Task.detached(priority: .userInitiated) {
             let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("diag_rw_test.bin")
-            let size = Int(testSizeMB * 1_000_000)
+            let size = Int(requestedSizeMB * 1_000_000)
             let data = Data(repeating: 0xAA, count: size)
 
             // Write test
