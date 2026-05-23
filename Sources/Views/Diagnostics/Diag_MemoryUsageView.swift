@@ -6,6 +6,7 @@ struct Diag_MemoryUsageView: View {
     @State private var freeMemory: UInt64 = 0
     @State private var timer: Timer?
     @State private var isMonitoring = false
+    @State private var ramBreakdown: (wired: UInt64, active: UInt64, inactive: UInt64, compressed: UInt64) = (0, 0, 0, 0)
 
     var body: some View {
         Form {
@@ -55,6 +56,16 @@ struct Diag_MemoryUsageView: View {
                 }
             }
 
+            Section("Breakdown") {
+                VStack(alignment: .leading, spacing: 12) {
+                    MemoryBarRow(label: "Wired", value: formatBytes(ramBreakdown.wired), percent: Double(ramBreakdown.wired) / Double(physicalMemory), color: .red)
+                    MemoryBarRow(label: "Active", value: formatBytes(ramBreakdown.active), percent: Double(ramBreakdown.active) / Double(physicalMemory), color: .orange)
+                    MemoryBarRow(label: "Inactive", value: formatBytes(ramBreakdown.inactive), percent: Double(ramBreakdown.inactive) / Double(physicalMemory), color: .yellow)
+                    MemoryBarRow(label: "Compressed", value: formatBytes(ramBreakdown.compressed), percent: Double(ramBreakdown.compressed) / Double(physicalMemory), color: .blue)
+                }
+                .padding(.vertical, 4)
+            }
+
             Section {
                 Button {
                     if isMonitoring { stopMonitoring() } else { startMonitoring() }
@@ -85,6 +96,8 @@ struct Diag_MemoryUsageView: View {
 
     private func refreshMemory() {
         physicalMemory = ProcessInfo.processInfo.physicalMemory
+        ramBreakdown = DiagnosticsService.shared.ramBreakdown
+
         var info = mach_task_basic_info()
         var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4
         let result = withUnsafeMutablePointer(to: &info) {
@@ -126,5 +139,26 @@ struct Diag_MemoryUsageView: View {
         timer?.invalidate()
         timer = nil
         isMonitoring = false
+    }
+}
+
+struct MemoryBarRow: View {
+    let label: String
+    let value: String
+    let percent: Double
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(label)
+                    .font(.caption)
+                Spacer()
+                Text(value)
+                    .font(.caption.monospacedDigit())
+            }
+            ProgressView(value: max(0, min(1, percent)))
+                .tint(color)
+        }
     }
 }

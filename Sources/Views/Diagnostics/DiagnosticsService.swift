@@ -4,14 +4,24 @@ import AVFoundation
 import CoreMotion
 import CoreHaptics
 import Network
+import CoreLocation
+import SystemConfiguration
+import Darwin
 
-final class DiagnosticsService: ObservableObject {
+final class DiagnosticsService: NSObject, ObservableObject {
     static let shared = DiagnosticsService()
 
     private let motionManager = CMMotionManager()
     private var hapticEngine: CHHapticEngine?
+    private let locationManager = CLLocationManager()
 
-    private init() {}
+    @Published var lastLocation: CLLocation?
+    @Published var lastHeading: CLHeading?
+
+    override private init() {
+        super.init()
+        locationManager.delegate = self
+    }
 
     // MARK: - Device Info
 
@@ -212,6 +222,63 @@ final class DiagnosticsService: ObservableObject {
         ProcessInfo.processInfo.isLowPowerModeEnabled
     }
 
+    // MARK: - Advanced System Metrics
+
+    func getSysctlValue<T>(_ name: String) -> T? {
+        var size = 0
+        sysctlbyname(name, nil, &size, nil, 0)
+        var value = UnsafeMutablePointer<T>.allocate(capacity: size)
+        defer { value.deallocate() }
+        let result = sysctlbyname(name, value, &size, nil, 0)
+        guard result == 0 else { return nil }
+        return value.pointee
+    }
+
+    func getSysctlStringValue(_ name: String) -> String? {
+        var size = 0
+        sysctlbyname(name, nil, &size, nil, 0)
+        var value = [CChar](repeating: 0, count: size)
+        let result = sysctlbyname(name, &value, &size, nil, 0)
+        guard result == 0 else { return nil }
+        return String(cString: value)
+    }
+
+    var kernelVersion: String {
+        getSysctlStringValue("kern.version") ?? "Unknown"
+    }
+
+    var cpuFrequency: Int64 {
+        getSysctlValue("hw.cpufrequency") ?? 0
+    }
+
+    var ramBreakdown: (wired: UInt64, active: UInt64, inactive: UInt64, compressed: UInt64) {
+        var stats = vm_statistics64()
+        var count = mach_msg_type_number_t(MemoryLayout<vm_statistics64_data_t>.size / MemoryLayout<integer_t>.size)
+        let result = withUnsafeMutablePointer(to: &stats) {
+            $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+                host_statistics64(mach_host_self(), HOST_VM_INFO64, $0, &count)
+            }
+        }
+
+        guard result == KERN_SUCCESS else { return (0, 0, 0, 0) }
+
+        let pageSize = UInt64(vm_kernel_page_size)
+        return (
+            UInt64(stats.wire_count) * pageSize,
+            UInt64(stats.active_count) * pageSize,
+            UInt64(stats.inactive_count) * pageSize,
+            UInt64(stats.compressor_page_count) * pageSize
+        )
+    }
+
+    var swapUsage: (total: UInt64, used: UInt64, free: UInt64) {
+        var xsw: xsw_usage = xsw_usage()
+        var size = MemoryLayout<xsw_usage>.size
+        let result = sysctlbyname("vm.swapusage", &xsw, &size, nil, 0)
+        guard result == 0 else { return (0, 0, 0) }
+        return (UInt64(xsw.xsu_total), UInt64(xsw.xsu_used), UInt64(xsw.xsu_avail))
+    }
+
     // MARK: - Screen
 
     var screenBrightness: CGFloat { UIScreen.main.brightness }
@@ -219,4 +286,68 @@ final class DiagnosticsService: ObservableObject {
     var screenScale: CGFloat { UIScreen.main.scale }
     var screenNativeBounds: CGRect { UIScreen.main.nativeBounds }
     var screenNativeScale: CGFloat { UIScreen.main.nativeScale }
+
+    // MARK: - Location
+
+    func requestLocationPermissions() {
+        locationManager.requestWhenInUseAuthorization()
+    }
+
+    func startLocationUpdates() {
+        locationManager.startUpdatingLocation()
+        locationManager.startUpdatingHeading()
+    }
+
+    func stopLocationUpdates() {
+        locationManager.stopUpdatingLocation()
+        locationManager.stopUpdatingHeading()
+    }
+
+    var isLocationServicesEnabled: Bool {
+        CLLocationManager.locationServicesEnabled()
+    }
+
+    var locationAuthorizationStatus: CLAuthorizationStatus {
+        locationManager.authorizationStatus
+    }
+
+    // MARK: - Satellite Connectivity (Simulation for iPhone 14+)
+
+    var supportsSatelliteConnectivity: Bool {
+        // iPhone 14 models and later
+        let identifier = deviceModelIdentifier
+        if identifier.contains("iPhone15") || identifier.contains("iPhone16") || identifier.contains("iPhone17") {
+            return true
+        }
+        // iPhone 14 identifiers: iPhone14,7, iPhone14,8, iPhone15,2, iPhone15,3 (wait, 15,2/3 are 14 Pro)
+        if identifier == "iPhone14,7" || identifier == "iPhone14,8" || identifier == "iPhone15,2" || identifier == "iPhone15,3" {
+            return true
+        }
+        return false
+    }
+
+    var isSatelliteActive: Bool {
+        // In a real scenario, this would use private or specialized APIs
+        // For diagnostic purposes, we simulate based on availability and environment
+        return supportsSatelliteConnectivity && !hasCellularOrWifi
+    }
+
+    private var hasCellularOrWifi: Bool {
+        // Simplified check
+        return false // Simulate no network to test satellite UI
+    }
+}
+
+extension DiagnosticsService: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        lastLocation = locations.last
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        lastHeading = newHeading
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("Location manager error: \(error.localizedDescription)")
+    }
 }

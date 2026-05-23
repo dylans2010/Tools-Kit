@@ -27,6 +27,7 @@ enum DiagnosticCategory: String, CaseIterable, Identifiable {
     case system = "System"
     case accessibility = "Accessibility"
     case security = "Security"
+    case location = "Location"
 
     var id: String { rawValue }
 
@@ -45,6 +46,7 @@ enum DiagnosticCategory: String, CaseIterable, Identifiable {
         case .system: return "gearshape.fill"
         case .accessibility: return "accessibility"
         case .security: return "lock.shield.fill"
+        case .location: return "location.fill"
         }
     }
 
@@ -63,6 +65,7 @@ enum DiagnosticCategory: String, CaseIterable, Identifiable {
         case .system: return .gray
         case .accessibility: return .cyan
         case .security: return .brown
+        case .location: return .blue
         }
     }
 }
@@ -203,6 +206,50 @@ final class DiagnosticsViewModel: ObservableObject {
         // Accessibility (new)
         DiagnosticTool(id: "bold_text", name: "Bold Text", icon: "bold", description: "Check if system bold text is enabled", category: .accessibility),
         DiagnosticTool(id: "color_filters", name: "Color Filters", icon: "circle.lefthalf.filled", description: "Detect active color filters and inversions", category: .accessibility),
+
+        // Location (4)
+        DiagnosticTool(id: "gps_signal", name: "GPS Signal", icon: "location.fill", description: "Detailed GPS coordinates, accuracy and signal strength", category: .location),
+        DiagnosticTool(id: "satellite_conn", name: "Satellite Connectivity", icon: "satellite.fill", description: "Check satellite connectivity status for iPhone 14+", category: .location),
+        DiagnosticTool(id: "heading", name: "Compass & Heading", icon: "location.north.line.fill", description: "Verify true north and magnetic heading accuracy", category: .location),
+        DiagnosticTool(id: "altimeter", name: "Altimeter", icon: "mountain.2.fill", description: "Relative altitude and barometric pressure tracking", category: .location),
+
+        // Connectivity Expanded (6)
+        DiagnosticTool(id: "dns_latency", name: "DNS Latency", icon: "server.rack", description: "Measure DNS resolution time across various providers", category: .connectivity),
+        DiagnosticTool(id: "signal_strength", name: "Signal Strength", icon: "antenna.radiowaves.left.and.right", description: "Analyze cellular RSRP, RSRQ and SINR metrics", category: .connectivity),
+        DiagnosticTool(id: "5g_status", name: "5G Availability", icon: "5.circle.fill", description: "Detect 5G Standalone and Non-Standalone support", category: .connectivity),
+        DiagnosticTool(id: "public_ip", name: "Public IP", icon: "globe", description: "View public IP, ISP and geolocation data", category: .connectivity),
+        DiagnosticTool(id: "local_network", name: "Local Network", icon: "network", description: "Scan and identify devices on the local network", category: .connectivity),
+        DiagnosticTool(id: "proxy_check", name: "Proxy & Tunnel", icon: "shield.lefthalf.filled", description: "Detect active proxies and network tunnels", category: .connectivity),
+
+        // Performance Expanded (6)
+        DiagnosticTool(id: "packet_loss", name: "Packet Loss", icon: "exclamationmark.icloud.fill", description: "Measure network packet loss and jitter", category: .performance),
+        DiagnosticTool(id: "kernel_info", name: "Kernel Info", icon: "terminal.fill", description: "Detailed XNU kernel version and build metrics", category: .performance),
+        DiagnosticTool(id: "ram_latency", name: "RAM Latency", icon: "memorychip.fill", description: "Benchmark memory access latency and bandwidth", category: .performance),
+        DiagnosticTool(id: "thermal_throttling", name: "Thermal Throttling", icon: "thermometer.sun.fill", description: "Monitor CPU frequency scaling due to heat", category: .performance),
+        DiagnosticTool(id: "cpu_freq", name: "CPU Frequency", icon: "bolt.horizontal.fill", description: "Real-time CPU clock frequency monitoring", category: .performance),
+        DiagnosticTool(id: "swap_usage", name: "Swap Usage", icon: "arrow.left.and.right.square", description: "Monitor system swap file activity and size", category: .performance),
+
+        // System Expanded (5)
+        DiagnosticTool(id: "interrupts", name: "System Interrupts", icon: "waveform.path.ecg", description: "Monitor hardware interrupts and context switches", category: .system),
+        DiagnosticTool(id: "power_metrics", name: "Power Metrics", icon: "bolt.batteryblock.fill", description: "Detailed power consumption and energy impact", category: .system),
+        DiagnosticTool(id: "entitlements", name: "App Entitlements", icon: "key.fill", description: "Verify active app capabilities and sandbox rules", category: .system),
+        DiagnosticTool(id: "sandbox_check", name: "Sandbox Audit", icon: "shippingbox.fill", description: "Check sandbox restrictions and file access", category: .system),
+        DiagnosticTool(id: "fs_speed", name: "File System Speed", icon: "doc.badge.gearshape.fill", description: "Benchmark sequential and random I/O performance", category: .system),
+
+        // Hardware (5)
+        DiagnosticTool(id: "oled_check", name: "OLED Uniformity", icon: "rectangle.inset.filled", description: "Test for OLED burn-in and color shifting", category: .display),
+        DiagnosticTool(id: "audio_sweep", name: "Frequency Sweep", icon: "waveform", description: "Play 20Hz - 20kHz sweep to test speaker range", category: .audio),
+        DiagnosticTool(id: "lidar_mesh", name: "LiDAR Mesh", icon: "dot.radiowaves.up.forward", description: "Visualize real-time 3D room reconstruction", category: .camera),
+        DiagnosticTool(id: "truedepth_points", name: "TrueDepth Cloud", icon: "faceid", description: "View raw point cloud from TrueDepth sensor", category: .camera),
+        DiagnosticTool(id: "nfc_data", name: "NFC Field Data", icon: "wave.3.right.circle", description: "Monitor NFC field strength and tech types", category: .connectivity),
+
+        // Security (5)
+        DiagnosticTool(id: "secure_element", name: "Secure Element", icon: "cpu.fill", description: "Verify Apple Pay Secure Element status", category: .security),
+        DiagnosticTool(id: "device_identity", name: "Device Identity", icon: "person.badge.shield.check.fill", description: "Check DeviceCheck and App Attest tokens", category: .security),
+        DiagnosticTool(id: "cert_check", name: "Certificate Trust", icon: "checkmark.seal.fill", description: "Audit system and user-installed certificates", category: .security),
+        DiagnosticTool(id: "screen_res", name: "Screen Resolution", icon: "aspectratio.fill", description: "Verify native resolution and points density", category: .display),
+        DiagnosticTool(id: "taptic_fidelity", name: "Taptic Fidelity", icon: "waveform.path", description: "Test Taptic Engine precision and latency", category: .haptics),
+        DiagnosticTool(id: "camera_metadata", name: "Camera Metadata", icon: "info.circle.fill", description: "View detailed lens and sensor EXIF capabilities", category: .camera),
     ]
 
     var filteredTools: [DiagnosticTool] {

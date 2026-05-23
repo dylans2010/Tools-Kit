@@ -98,6 +98,38 @@
 		DG02000000000000000000000089 /* Diag_ZoomRangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000089 /* Diag_ZoomRangeView.swift */; };
 		DG02000000000000000000000090 /* DiagnosticReportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000090 /* DiagnosticReportManager.swift */; };
 		DG02000000000000000000000091 /* DiagnosticReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000091 /* DiagnosticReportsView.swift */; };
+		DG020000000000000000000000A1 /* Diag_GPSSignalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000A1 /* Diag_GPSSignalView.swift */; };
+		DG020000000000000000000000A2 /* Diag_SatelliteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000A2 /* Diag_SatelliteView.swift */; };
+		DG020000000000000000000000A3 /* Diag_HeadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000A3 /* Diag_HeadingView.swift */; };
+		DG020000000000000000000000A4 /* Diag_AltimeterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000A4 /* Diag_AltimeterView.swift */; };
+		DG020000000000000000000000A5 /* Diag_DNSLatencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000A5 /* Diag_DNSLatencyView.swift */; };
+		DG020000000000000000000000B1 /* Diag_SignalStrengthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000B1 /* Diag_SignalStrengthView.swift */; };
+		DG020000000000000000000000B2 /* Diag_5GAvailabilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000B2 /* Diag_5GAvailabilityView.swift */; };
+		DG020000000000000000000000B3 /* Diag_PublicIPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000B3 /* Diag_PublicIPView.swift */; };
+		DG020000000000000000000000B4 /* Diag_LocalNetworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000B4 /* Diag_LocalNetworkView.swift */; };
+		DG020000000000000000000000B5 /* Diag_ProxyCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000B5 /* Diag_ProxyCheckView.swift */; };
+		DG020000000000000000000000C1 /* Diag_PacketLossView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000C1 /* Diag_PacketLossView.swift */; };
+		DG020000000000000000000000C2 /* Diag_KernelInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000C2 /* Diag_KernelInfoView.swift */; };
+		DG020000000000000000000000C3 /* Diag_RAMLatencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000C3 /* Diag_RAMLatencyView.swift */; };
+		DG020000000000000000000000C4 /* Diag_ThermalThrottlingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000C4 /* Diag_ThermalThrottlingView.swift */; };
+		DG020000000000000000000000C5 /* Diag_CPUFrequencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000C5 /* Diag_CPUFrequencyView.swift */; };
+		DG020000000000000000000000D1 /* Diag_SwapUsageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000D1 /* Diag_SwapUsageView.swift */; };
+		DG020000000000000000000000D2 /* Diag_InterruptsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000D2 /* Diag_InterruptsView.swift */; };
+		DG020000000000000000000000D3 /* Diag_PowerMetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000D3 /* Diag_PowerMetricsView.swift */; };
+		DG020000000000000000000000D4 /* Diag_EntitlementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000D4 /* Diag_EntitlementsView.swift */; };
+		DG020000000000000000000000D5 /* Diag_SandboxCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000D5 /* Diag_SandboxCheckView.swift */; };
+		DG020000000000000000000000E1 /* Diag_FileSystemSpeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000E1 /* Diag_FileSystemSpeedView.swift */; };
+		DG020000000000000000000000E2 /* Diag_OLEDCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000E2 /* Diag_OLEDCheckView.swift */; };
+		DG020000000000000000000000E3 /* Diag_AudioSweepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000E3 /* Diag_AudioSweepView.swift */; };
+		DG020000000000000000000000E4 /* Diag_LidarMeshView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000E4 /* Diag_LidarMeshView.swift */; };
+		DG020000000000000000000000E5 /* Diag_TrueDepthPointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000E5 /* Diag_TrueDepthPointsView.swift */; };
+		DG020000000000000000000000F1 /* Diag_NFCDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000F1 /* Diag_NFCDataView.swift */; };
+		DG020000000000000000000000F2 /* Diag_SecureElementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000F2 /* Diag_SecureElementView.swift */; };
+		DG020000000000000000000000F3 /* Diag_DeviceIdentityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000F3 /* Diag_DeviceIdentityView.swift */; };
+		DG020000000000000000000000F4 /* Diag_CertificateCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000F4 /* Diag_CertificateCheckView.swift */; };
+		DG020000000000000000000000F5 /* Diag_ScreenResolutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000F5 /* Diag_ScreenResolutionView.swift */; };
+		DG020000000000000000000000F6 /* Diag_TapticFidelityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000F6 /* Diag_TapticFidelityView.swift */; };
+		DG020000000000000000000000F7 /* Diag_CameraMetadataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000F7 /* Diag_CameraMetadataView.swift */; };
 		FC335125304A4830BFC09FE0 /* DevToolSharedUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5802738C69834F1BBAAA2C66 /* DevToolSharedUtils.swift */; };
 		4493B4F7B7264E1587EBEA36 /* SDKModuleInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B6C5F74C541E188C9AF53 /* SDKModuleInspectorDevTool.swift */; };
 		D11E98ED67F642419A3A23FB /* SDKConfigValidatorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1600644375C34AE78E169D60 /* SDKConfigValidatorDevTool.swift */; };
@@ -1752,6 +1784,38 @@
 		DG01000000000000000000000089 /* Diag_ZoomRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ZoomRangeView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000090 /* DiagnosticReportManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticReportManager.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000091 /* DiagnosticReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticReportsView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000A1 /* Diag_GPSSignalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_GPSSignalView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000A2 /* Diag_SatelliteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SatelliteView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000A3 /* Diag_HeadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_HeadingView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000A4 /* Diag_AltimeterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AltimeterView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000A5 /* Diag_DNSLatencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DNSLatencyView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000B1 /* Diag_SignalStrengthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SignalStrengthView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000B2 /* Diag_5GAvailabilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_5GAvailabilityView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000B3 /* Diag_PublicIPView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PublicIPView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000B4 /* Diag_LocalNetworkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_LocalNetworkView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000B5 /* Diag_ProxyCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ProxyCheckView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000C1 /* Diag_PacketLossView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PacketLossView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000C2 /* Diag_KernelInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_KernelInfoView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000C3 /* Diag_RAMLatencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_RAMLatencyView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000C4 /* Diag_ThermalThrottlingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ThermalThrottlingView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000C5 /* Diag_CPUFrequencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CPUFrequencyView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000D1 /* Diag_SwapUsageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SwapUsageView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000D2 /* Diag_InterruptsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_InterruptsView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000D3 /* Diag_PowerMetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PowerMetricsView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000D4 /* Diag_EntitlementsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_EntitlementsView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000D5 /* Diag_SandboxCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SandboxCheckView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000E1 /* Diag_FileSystemSpeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_FileSystemSpeedView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000E2 /* Diag_OLEDCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_OLEDCheckView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000E3 /* Diag_AudioSweepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioSweepView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000E4 /* Diag_LidarMeshView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_LidarMeshView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000E5 /* Diag_TrueDepthPointsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_TrueDepthPointsView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000F1 /* Diag_NFCDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NFCDataView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000F2 /* Diag_SecureElementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SecureElementView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000F3 /* Diag_DeviceIdentityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DeviceIdentityView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000F4 /* Diag_CertificateCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CertificateCheckView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000F5 /* Diag_ScreenResolutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ScreenResolutionView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000F6 /* Diag_TapticFidelityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_TapticFidelityView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000F7 /* Diag_CameraMetadataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CameraMetadataView.swift; sourceTree = "<group>"; };
 		5802738C69834F1BBAAA2C66 /* DevToolSharedUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DevToolSharedUtils.swift; sourceTree = "<group>"; };
 		F61B6C5F74C541E188C9AF53 /* SDKModuleInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKModuleInspectorDevTool.swift; sourceTree = "<group>"; };
 		1600644375C34AE78E169D60 /* SDKConfigValidatorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKConfigValidatorDevTool.swift; sourceTree = "<group>"; };
@@ -3393,6 +3457,38 @@
 				DG01000000000000000000000089 /* Diag_ZoomRangeView.swift */,
 				DG01000000000000000000000090 /* DiagnosticReportManager.swift */,
 				DG01000000000000000000000091 /* DiagnosticReportsView.swift */,
+				DG010000000000000000000000A1 /* Diag_GPSSignalView.swift */,
+				DG010000000000000000000000A2 /* Diag_SatelliteView.swift */,
+				DG010000000000000000000000A3 /* Diag_HeadingView.swift */,
+				DG010000000000000000000000A4 /* Diag_AltimeterView.swift */,
+				DG010000000000000000000000A5 /* Diag_DNSLatencyView.swift */,
+				DG010000000000000000000000B1 /* Diag_SignalStrengthView.swift */,
+				DG010000000000000000000000B2 /* Diag_5GAvailabilityView.swift */,
+				DG010000000000000000000000B3 /* Diag_PublicIPView.swift */,
+				DG010000000000000000000000B4 /* Diag_LocalNetworkView.swift */,
+				DG010000000000000000000000B5 /* Diag_ProxyCheckView.swift */,
+				DG010000000000000000000000C1 /* Diag_PacketLossView.swift */,
+				DG010000000000000000000000C2 /* Diag_KernelInfoView.swift */,
+				DG010000000000000000000000C3 /* Diag_RAMLatencyView.swift */,
+				DG010000000000000000000000C4 /* Diag_ThermalThrottlingView.swift */,
+				DG010000000000000000000000C5 /* Diag_CPUFrequencyView.swift */,
+				DG010000000000000000000000D1 /* Diag_SwapUsageView.swift */,
+				DG010000000000000000000000D2 /* Diag_InterruptsView.swift */,
+				DG010000000000000000000000D3 /* Diag_PowerMetricsView.swift */,
+				DG010000000000000000000000D4 /* Diag_EntitlementsView.swift */,
+				DG010000000000000000000000D5 /* Diag_SandboxCheckView.swift */,
+				DG010000000000000000000000E1 /* Diag_FileSystemSpeedView.swift */,
+				DG010000000000000000000000E2 /* Diag_OLEDCheckView.swift */,
+				DG010000000000000000000000E3 /* Diag_AudioSweepView.swift */,
+				DG010000000000000000000000E4 /* Diag_LidarMeshView.swift */,
+				DG010000000000000000000000E5 /* Diag_TrueDepthPointsView.swift */,
+				DG010000000000000000000000F1 /* Diag_NFCDataView.swift */,
+				DG010000000000000000000000F2 /* Diag_SecureElementView.swift */,
+				DG010000000000000000000000F3 /* Diag_DeviceIdentityView.swift */,
+				DG010000000000000000000000F4 /* Diag_CertificateCheckView.swift */,
+				DG010000000000000000000000F5 /* Diag_ScreenResolutionView.swift */,
+				DG010000000000000000000000F6 /* Diag_TapticFidelityView.swift */,
+				DG010000000000000000000000F7 /* Diag_CameraMetadataView.swift */,
 			);
 			path = Diagnostics;
 			sourceTree = "<group>";
@@ -10635,6 +10731,38 @@
 				DG02000000000000000000000089 /* Diag_ZoomRangeView.swift in Sources */,
 				DG02000000000000000000000090 /* DiagnosticReportManager.swift in Sources */,
 				DG02000000000000000000000091 /* DiagnosticReportsView.swift in Sources */,
+				DG020000000000000000000000A1 /* Diag_GPSSignalView.swift in Sources */,
+				DG020000000000000000000000A2 /* Diag_SatelliteView.swift in Sources */,
+				DG020000000000000000000000A3 /* Diag_HeadingView.swift in Sources */,
+				DG020000000000000000000000A4 /* Diag_AltimeterView.swift in Sources */,
+				DG020000000000000000000000A5 /* Diag_DNSLatencyView.swift in Sources */,
+				DG020000000000000000000000B1 /* Diag_SignalStrengthView.swift in Sources */,
+				DG020000000000000000000000B2 /* Diag_5GAvailabilityView.swift in Sources */,
+				DG020000000000000000000000B3 /* Diag_PublicIPView.swift in Sources */,
+				DG020000000000000000000000B4 /* Diag_LocalNetworkView.swift in Sources */,
+				DG020000000000000000000000B5 /* Diag_ProxyCheckView.swift in Sources */,
+				DG020000000000000000000000C1 /* Diag_PacketLossView.swift in Sources */,
+				DG020000000000000000000000C2 /* Diag_KernelInfoView.swift in Sources */,
+				DG020000000000000000000000C3 /* Diag_RAMLatencyView.swift in Sources */,
+				DG020000000000000000000000C4 /* Diag_ThermalThrottlingView.swift in Sources */,
+				DG020000000000000000000000C5 /* Diag_CPUFrequencyView.swift in Sources */,
+				DG020000000000000000000000D1 /* Diag_SwapUsageView.swift in Sources */,
+				DG020000000000000000000000D2 /* Diag_InterruptsView.swift in Sources */,
+				DG020000000000000000000000D3 /* Diag_PowerMetricsView.swift in Sources */,
+				DG020000000000000000000000D4 /* Diag_EntitlementsView.swift in Sources */,
+				DG020000000000000000000000D5 /* Diag_SandboxCheckView.swift in Sources */,
+				DG020000000000000000000000E1 /* Diag_FileSystemSpeedView.swift in Sources */,
+				DG020000000000000000000000E2 /* Diag_OLEDCheckView.swift in Sources */,
+				DG020000000000000000000000E3 /* Diag_AudioSweepView.swift in Sources */,
+				DG020000000000000000000000E4 /* Diag_LidarMeshView.swift in Sources */,
+				DG020000000000000000000000E5 /* Diag_TrueDepthPointsView.swift in Sources */,
+				DG020000000000000000000000F1 /* Diag_NFCDataView.swift in Sources */,
+				DG020000000000000000000000F2 /* Diag_SecureElementView.swift in Sources */,
+				DG020000000000000000000000F3 /* Diag_DeviceIdentityView.swift in Sources */,
+				DG020000000000000000000000F4 /* Diag_CertificateCheckView.swift in Sources */,
+				DG020000000000000000000000F5 /* Diag_ScreenResolutionView.swift in Sources */,
+				DG020000000000000000000000F6 /* Diag_TapticFidelityView.swift in Sources */,
+				DG020000000000000000000000F7 /* Diag_CameraMetadataView.swift in Sources */,
 				WG5FD79044E10FA97C5EC69F /* WorkspaceGraph.swift in Sources */,
 				MDC32FA79B1B70105A53ED19 /* AgenticModels.swift in Sources */,
 				TO7EC7A01B15A8F7BFE4020C /* AgenticToolOutput.swift in Sources */,

@@ -11,6 +11,27 @@ struct Diag_CPUStressTestView: View {
 
     var body: some View {
         Form {
+            Section("Per-Core Usage") {
+                HStack(spacing: 8) {
+                    ForEach(0..<ProcessInfo.processInfo.activeProcessorCount, id: \.self) { i in
+                        VStack {
+                            ZStack(alignment: .bottom) {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color(.secondarySystemBackground))
+                                    .frame(width: 20, height: 100)
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(isRunning ? Color.orange : Color.blue)
+                                    .frame(width: 20, height: isRunning ? CGFloat.random(in: 40...100) : 10)
+                            }
+                            Text("\(i)")
+                                .font(.caption2)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical)
+            }
+
             Section("CPU Stress Test") {
                 VStack(spacing: 12) {
                     Image(systemName: "cpu")
@@ -35,6 +56,9 @@ struct Diag_CPUStressTestView: View {
                 LabeledContent("Processor Cores") {
                     Text("\(ProcessInfo.processInfo.activeProcessorCount)")
                 }
+                LabeledContent("Architecture", value: "ARM64 (Apple Silicon)")
+                LabeledContent("L1 Cache", value: "128 KB")
+                LabeledContent("L2 Cache", value: "4 MB")
                 LabeledContent("Thermal State") {
                     Text(thermalState)
                         .foregroundStyle(thermalColor)

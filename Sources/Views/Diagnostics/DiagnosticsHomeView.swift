@@ -13,16 +13,44 @@ struct DiagnosticsHomeView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
+            List {
+                Section {
                     headerSection
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
                     categoryScrollBar
-                    toolsGrid
+                        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0))
+                        .listRowBackground(Color.clear)
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 20)
+
+                ForEach(DiagnosticCategory.allCases) { category in
+                    let tools = viewModel.filteredTools.filter { $0.category == category }
+                    if !tools.isEmpty {
+                        Section(category.rawValue) {
+                            ForEach(tools) { tool in
+                                NavigationLink(destination: diagnosticDestination(for: tool)) {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: tool.icon)
+                                            .foregroundStyle(category.tint)
+                                            .font(.title3)
+                                            .frame(width: 30)
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(tool.name)
+                                                .font(.body.weight(.medium))
+                                            Text(tool.description)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+                                    .padding(.vertical, 4)
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            .background(Color(.systemBackground))
+            .listStyle(.insetGrouped)
             .searchable(text: $viewModel.searchText, prompt: "Search \(viewModel.totalToolCount) diagnostic tools")
             .navigationTitle("Diagnostics")
             .toolbar {
@@ -119,17 +147,6 @@ struct DiagnosticsHomeView: View {
         }
     }
 
-    private var toolsGrid: some View {
-        LazyVGrid(columns: columns, spacing: 12) {
-            ForEach(viewModel.filteredTools) { tool in
-                NavigationLink(destination: diagnosticDestination(for: tool)) {
-                    DiagnosticsToolCardView(tool: tool)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
     @ViewBuilder
     private func diagnosticDestination(for tool: DiagnosticTool) -> some View {
         switch tool.id {
@@ -223,6 +240,44 @@ struct DiagnosticsHomeView: View {
         case "reduce_motion": Diag_ReduceMotionView()
         case "bold_text": Diag_BoldTextCheckView()
         case "color_filters": Diag_ColorFiltersView()
+        // Location
+        case "gps_signal": Diag_GPSSignalView()
+        case "satellite_conn": Diag_SatelliteView()
+        case "heading": Diag_HeadingView()
+        case "altimeter": Diag_AltimeterView()
+        // Connectivity Expanded
+        case "dns_latency": Diag_DNSLatencyView()
+        case "signal_strength": Diag_SignalStrengthView()
+        case "5g_status": Diag_5GAvailabilityView()
+        case "public_ip": Diag_PublicIPView()
+        case "local_network": Diag_LocalNetworkView()
+        case "proxy_check": Diag_ProxyCheckView()
+        // Performance Expanded
+        case "packet_loss": Diag_PacketLossView()
+        case "kernel_info": Diag_KernelInfoView()
+        case "ram_latency": Diag_RAMLatencyView()
+        case "thermal_throttling": Diag_ThermalThrottlingView()
+        case "cpu_freq": Diag_CPUFrequencyView()
+        case "swap_usage": Diag_SwapUsageView()
+        // System Expanded
+        case "interrupts": Diag_InterruptsView()
+        case "power_metrics": Diag_PowerMetricsView()
+        case "entitlements": Diag_EntitlementsView()
+        case "sandbox_check": Diag_SandboxCheckView()
+        case "fs_speed": Diag_FileSystemSpeedView()
+        // Hardware
+        case "oled_check": Diag_OLEDCheckView()
+        case "audio_sweep": Diag_AudioSweepView()
+        case "lidar_mesh": Diag_LidarMeshView()
+        case "truedepth_points": Diag_TrueDepthPointsView()
+        case "nfc_data": Diag_NFCDataView()
+        // Security Expanded
+        case "secure_element": Diag_SecureElementView()
+        case "device_identity": Diag_DeviceIdentityView()
+        case "cert_check": Diag_CertificateCheckView()
+        case "screen_res": Diag_ScreenResolutionView()
+        case "taptic_fidelity": Diag_TapticFidelityView()
+        case "camera_metadata": Diag_CameraMetadataView()
         // Security
         case "biometric": Diag_BiometricCheckView()
         case "passcode": Diag_PasscodeStatusView()
