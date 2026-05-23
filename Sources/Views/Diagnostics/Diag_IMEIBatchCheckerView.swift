@@ -26,7 +26,7 @@ struct Diag_IMEIBatchCheckerView: View {
                     VStack(spacing: 8) {
                         Image(systemName: "list.clipboard.fill")
                             .font(.system(size: 44))
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(Color.blue)
                         Text("Bulk IMEI Processing")
                             .font(.headline)
                         Text("Check multiple IMEIs at once for blacklist, lock, and device info via live API")
@@ -51,7 +51,7 @@ struct Diag_IMEIBatchCheckerView: View {
                             let imeis = parseIMEIs()
                             Text("\(imeis.count) valid IMEIs detected")
                                 .font(.caption)
-                                .foregroundStyle(imeis.isEmpty ? .secondary : .green)
+                                .foregroundStyle(imeis.isEmpty ? .secondary : Color.green)
                         }
                     }
                     .padding(.horizontal)
@@ -83,7 +83,7 @@ struct Diag_IMEIBatchCheckerView: View {
                         } label: {
                             Image(systemName: "trash")
                                 .padding()
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.red)
                         }
                         .disabled(isLoading)
                     }
@@ -119,12 +119,12 @@ struct Diag_IMEIBatchCheckerView: View {
                                     }
                                     Spacer()
                                     VStack {
-                                        Text("\(cleanCount)").font(.title2.bold().monospacedDigit()).foregroundStyle(.green)
+                                        Text("\(cleanCount)").font(.title2.bold().monospacedDigit()).foregroundStyle(Color.green)
                                         Text("Clean").font(.caption2).foregroundStyle(.secondary)
                                     }
                                     Spacer()
                                     VStack {
-                                        Text("\(flaggedCount)").font(.title2.bold().monospacedDigit()).foregroundStyle(.red)
+                                        Text("\(flaggedCount)").font(.title2.bold().monospacedDigit()).foregroundStyle(Color.red)
                                         Text("Flagged").font(.caption2).foregroundStyle(.secondary)
                                     }
                                 }
@@ -134,7 +134,7 @@ struct Diag_IMEIBatchCheckerView: View {
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack {
                                             Image(systemName: entry.isValid ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                                .foregroundStyle(entry.isValid ? .green : .red)
+                                                .foregroundStyle(entry.isValid ? Color.green : Color.red)
                                             Text(entry.imei)
                                                 .font(.caption.monospaced())
                                             Spacer()
