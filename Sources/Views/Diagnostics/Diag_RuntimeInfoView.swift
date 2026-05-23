@@ -64,7 +64,7 @@ struct Diag_RuntimeInfoView: View {
                 }
             }
 
-            Section {
+            Section("Loaded Libraries (\(loadedLibraries.count))") {
                 if !loadedLibraries.isEmpty {
                     TextField("Search...", text: $searchText)
                         .textInputAutocapitalization(.never)
@@ -93,8 +93,6 @@ struct Diag_RuntimeInfoView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-            } header: {
-                Text("Loaded Libraries (\(loadedLibraries.count))")
             }
 
             if !environmentVars.isEmpty {
