@@ -250,6 +250,81 @@ final class DiagnosticsViewModel: ObservableObject {
         DiagnosticTool(id: "system_log", name: "System Log", icon: "doc.text.fill", description: "Live system log entries with level filtering", category: .system),
         DiagnosticTool(id: "keychain_diag", name: "Keychain Diagnostics", icon: "key.icloud.fill", description: "Keychain CRUD testing and biometric status", category: .security),
         DiagnosticTool(id: "notification_status", name: "Notification Diagnostics", icon: "bell.badge.circle.fill", description: "Push notification authorization and settings audit", category: .system),
+
+        // === REPAIR SHOP & ADVANCED DIAGNOSTICS (51) ===
+
+        // IMEI & Device Identity
+        DiagnosticTool(id: "imei_info", name: "IMEI Info", icon: "number.circle.fill", description: "IMEI validation, structure breakdown, and device identifiers", category: .security),
+        DiagnosticTool(id: "device_authenticity", name: "Device Authenticity", icon: "checkmark.seal.fill", description: "Verify genuine Apple hardware via GPU, CPU, Secure Enclave checks", category: .security),
+        DiagnosticTool(id: "ios_version_detail", name: "iOS Version Detail", icon: "apple.logo", description: "Detailed OS version, kernel, build info and feature support", category: .system),
+
+        // MDM & Enterprise
+        DiagnosticTool(id: "mdm_detection", name: "MDM Detection", icon: "building.2.fill", description: "Detect Mobile Device Management profiles and supervision", category: .security),
+        DiagnosticTool(id: "dep_enrollment", name: "DEP Enrollment", icon: "building.2.crop.circle.fill", description: "Check Device Enrollment Program and Apple Business Manager status", category: .security),
+        DiagnosticTool(id: "enterprise_app", name: "Enterprise App Check", icon: "building.columns.fill", description: "Detect enterprise management, supervision, and MDM certificates", category: .security),
+        DiagnosticTool(id: "config_profile_audit", name: "Config Profile Audit", icon: "doc.badge.gearshape", description: "Scan for MDM, VPN, certificate, and restriction profiles", category: .security),
+        DiagnosticTool(id: "provisioning_profile", name: "Provisioning Profiles", icon: "doc.fill", description: "View provisioning profiles, entitlements, and code signing info", category: .security),
+        DiagnosticTool(id: "restrictions_check", name: "Restrictions Check", icon: "hand.raised.circle.fill", description: "Scan for device restrictions, Screen Time, and MDM limitations", category: .security),
+
+        // Lock & Activation
+        DiagnosticTool(id: "find_my_status", name: "Find My Status", icon: "location.circle.fill", description: "Check Find My iPhone status and activation lock indicators", category: .security),
+        DiagnosticTool(id: "blacklist_check", name: "Blacklist Check", icon: "exclamationmark.shield.fill", description: "IMEI blacklist/stolen device check via external API", category: .security),
+        DiagnosticTool(id: "carrier_lock", name: "Carrier Lock", icon: "lock.circle.fill", description: "Detect carrier lock status, SIM info, and unlock eligibility", category: .connectivity),
+        DiagnosticTool(id: "icloud_lock", name: "iCloud Lock", icon: "icloud.fill", description: "Check iCloud account indicators and activation lock status", category: .security),
+        DiagnosticTool(id: "stolen_device", name: "Stolen Device Check", icon: "exclamationmark.triangle.fill", description: "Check Stolen Device Protection and theft indicators", category: .security),
+        DiagnosticTool(id: "warranty_check", name: "Warranty Check", icon: "shield.fill", description: "Estimate device age and check warranty/AppleCare status", category: .system),
+
+        // Repair Shop Tools
+        DiagnosticTool(id: "full_device_report", name: "Full Device Report", icon: "doc.richtext.fill", description: "Generate comprehensive exportable device diagnostic report", category: .system),
+        DiagnosticTool(id: "device_grading", name: "Device Grading", icon: "star.circle.fill", description: "Grade device condition A-F based on hardware component tests", category: .system),
+        DiagnosticTool(id: "pre_repair_checklist", name: "Pre-Repair Checklist", icon: "checklist.checked", description: "Run all hardware checks before repair for documentation", category: .system),
+        DiagnosticTool(id: "screen_replacement", name: "Screen Replacement Check", icon: "display", description: "Detect non-original display via resolution, scale, and refresh rate", category: .display),
+        DiagnosticTool(id: "battery_replacement", name: "Battery Replacement Check", icon: "battery.100.circle", description: "Detect non-original battery via charging behavior analysis", category: .battery),
+        DiagnosticTool(id: "water_damage", name: "Water Damage Check", icon: "drop.fill", description: "Software-based water damage assessment via sensor checks", category: .sensors),
+
+        // Hardware Tests
+        DiagnosticTool(id: "wireless_charging", name: "Wireless Charging", icon: "bolt.circle.fill", description: "Test wireless/MagSafe charging with live monitoring", category: .battery),
+        DiagnosticTool(id: "charging_diagnostics", name: "Charging Port Diagnostics", icon: "powerplug.fill", description: "Monitor charging speed, port function, and charge rate", category: .battery),
+        DiagnosticTool(id: "force_touch", name: "Force Touch Test", icon: "hand.point.up.left.fill", description: "Test 3D Touch pressure sensitivity and Haptic Touch", category: .display),
+        DiagnosticTool(id: "face_id_diag", name: "Face ID Diagnostics", icon: "faceid", description: "TrueDepth camera system check and Face ID authentication test", category: .security),
+        DiagnosticTool(id: "uwb_chip", name: "UWB Chip", icon: "dot.radiowaves.left.and.right", description: "Check U1/U2 Ultra Wideband chip and spatial awareness", category: .connectivity),
+        DiagnosticTool(id: "nfc_readwrite", name: "NFC Read/Write", icon: "wave.3.right.circle.fill", description: "Read and write NFC tags with NDEF format support", category: .connectivity),
+        DiagnosticTool(id: "lidar_scanner", name: "LiDAR Scanner", icon: "light.recessed.fill", description: "Test LiDAR depth sensor and AR scene reconstruction", category: .camera),
+
+        // Battery & Thermal
+        DiagnosticTool(id: "battery_temperature", name: "Battery Temperature", icon: "thermometer.medium", description: "Real-time thermal state monitoring with history tracking", category: .battery),
+        DiagnosticTool(id: "thermal_history", name: "Thermal History", icon: "thermometer.high", description: "Thermal trend monitoring with graphing and statistics", category: .performance),
+        DiagnosticTool(id: "power_source", name: "Power Source Info", icon: "powerplug.fill", description: "Power source detection, uptime, and battery monitoring", category: .battery),
+
+        // Network & Cellular
+        DiagnosticTool(id: "sim_info", name: "SIM Info", icon: "simcard.fill", description: "SIM card details, carrier info, dual SIM status", category: .connectivity),
+        DiagnosticTool(id: "signal_strength", name: "Signal Strength", icon: "cellularbars", description: "Real-time cellular signal and radio technology monitor", category: .connectivity),
+        DiagnosticTool(id: "esim_status", name: "eSIM Status", icon: "esim.fill", description: "Check eSIM support, active slots, and hardware compatibility", category: .connectivity),
+        DiagnosticTool(id: "apn_config", name: "APN Configuration", icon: "antenna.radiowaves.left.and.right.circle.fill", description: "View carrier APN and data connection settings", category: .connectivity),
+        DiagnosticTool(id: "roaming_status", name: "Roaming Status", icon: "globe.americas.fill", description: "Detect network roaming and carrier country mismatch", category: .connectivity),
+        DiagnosticTool(id: "network_band", name: "Network Band", icon: "dot.radiowaves.up.forward", description: "Monitor active radio band, generation, and max speed", category: .connectivity),
+        DiagnosticTool(id: "network_speed", name: "Network Speed Test", icon: "speedometer", description: "Download speed test and latency measurement", category: .connectivity),
+        DiagnosticTool(id: "network_security", name: "Network Security Scan", icon: "shield.lefthalf.filled", description: "Scan for VPN, proxy, DNS security, and HTTPS verification", category: .security),
+
+        // Security & Privacy
+        DiagnosticTool(id: "certificate_trust", name: "Certificate Trust", icon: "lock.doc.fill", description: "Inspect keychain certificates and SSL trust store", category: .security),
+        DiagnosticTool(id: "data_protection", name: "Data Protection", icon: "lock.rectangle.stack.fill", description: "Test iOS data protection encryption classes", category: .security),
+        DiagnosticTool(id: "sandbox_integrity", name: "Sandbox Integrity", icon: "checkmark.shield.fill", description: "Verify app sandboxing and process isolation", category: .security),
+        DiagnosticTool(id: "storage_encryption", name: "Storage Encryption", icon: "lock.rectangle.fill", description: "Verify device encryption, Secure Enclave, and passcode", category: .security),
+        DiagnosticTool(id: "system_integrity", name: "System Integrity", icon: "shield.fill", description: "Check for jailbreak, code injection, and system tampering", category: .security),
+
+        // System & Performance
+        DiagnosticTool(id: "running_processes", name: "Running Processes", icon: "chart.bar.doc.horizontal.fill", description: "View current process details and system statistics", category: .performance),
+        DiagnosticTool(id: "loaded_frameworks", name: "Loaded Frameworks", icon: "shippingbox.fill", description: "List all dynamically loaded frameworks and libraries", category: .system),
+        DiagnosticTool(id: "cpu_benchmark", name: "CPU Benchmark", icon: "cpu", description: "Single and multi-core integer, float, and memory benchmarks", category: .performance),
+        DiagnosticTool(id: "gpu_benchmark", name: "GPU Benchmark", icon: "gpu", description: "Metal GPU throughput benchmark with buffer operations", category: .performance),
+        DiagnosticTool(id: "memory_monitor", name: "Memory Monitor", icon: "memorychip.fill", description: "Real-time app memory usage with trend graphing", category: .performance),
+
+        // Storage & Data
+        DiagnosticTool(id: "storage_usage", name: "Storage Usage", icon: "chart.pie.fill", description: "Detailed storage usage with directory breakdown", category: .storage),
+        DiagnosticTool(id: "backup_status", name: "Backup Status", icon: "icloud.fill", description: "Check iCloud backup indicators and storage status", category: .system),
+        DiagnosticTool(id: "crash_log_analyzer", name: "Crash Log Analyzer", icon: "exclamationmark.triangle.fill", description: "Scan for crash reports and diagnostic logs", category: .system),
+        DiagnosticTool(id: "locale_tz_detail", name: "Locale & Time Zone", icon: "globe", description: "Full locale, currency, calendar, and timezone details", category: .system),
     ]
 
     var filteredTools: [DiagnosticTool] {

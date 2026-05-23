@@ -285,6 +285,70 @@ struct DiagnosticsHomeView: View {
         case "system_log": Diag_SystemLogView()
         case "keychain_diag": Diag_KeychainDiagView()
         case "notification_status": Diag_NotificationStatusView()
+        // === REPAIR SHOP & ADVANCED DIAGNOSTICS ===
+        // IMEI & Device Identity
+        case "imei_info": Diag_IMEIInfoView()
+        case "device_authenticity": Diag_DeviceAuthenticityView()
+        case "ios_version_detail": Diag_IOSVersionDetailView()
+        // MDM & Enterprise
+        case "mdm_detection": Diag_MDMDetectionView()
+        case "dep_enrollment": Diag_DEPEnrollmentView()
+        case "enterprise_app": Diag_EnterpriseAppCheckView()
+        case "config_profile_audit": Diag_ConfigProfileAuditView()
+        case "provisioning_profile": Diag_ProvisioningProfileView()
+        case "restrictions_check": Diag_RestrictionsCheckView()
+        // Lock & Activation
+        case "find_my_status": Diag_FindMyStatusView()
+        case "blacklist_check": Diag_BlacklistCheckView()
+        case "carrier_lock": Diag_CarrierLockView()
+        case "icloud_lock": Diag_iCloudLockView()
+        case "stolen_device": Diag_StolenDeviceCheckView()
+        case "warranty_check": Diag_WarrantyCheckView()
+        // Repair Shop Tools
+        case "full_device_report": Diag_FullDeviceReportView()
+        case "device_grading": Diag_DeviceGradingView()
+        case "pre_repair_checklist": Diag_PreRepairChecklistView()
+        case "screen_replacement": Diag_ScreenReplacementCheckView()
+        case "battery_replacement": Diag_BatteryReplacementCheckView()
+        case "water_damage": Diag_WaterDamageCheckView()
+        // Hardware Tests
+        case "wireless_charging": Diag_WirelessChargingView()
+        case "charging_diagnostics": Diag_ChargingDiagnosticsView()
+        case "force_touch": Diag_ForceTouchTestView()
+        case "face_id_diag": Diag_FaceIDDiagnosticsView()
+        case "uwb_chip": Diag_UWBChipView()
+        case "nfc_readwrite": Diag_NFCReadWriteView()
+        case "lidar_scanner": Diag_LiDARCheckView()
+        // Battery & Thermal
+        case "battery_temperature": Diag_BatteryTemperatureView()
+        case "thermal_history": Diag_ThermalHistoryView()
+        case "power_source": Diag_PowerSourceInfoView()
+        // Network & Cellular
+        case "sim_info": Diag_SIMInfoView()
+        case "signal_strength": Diag_SignalStrengthView()
+        case "esim_status": Diag_eSIMStatusView()
+        case "apn_config": Diag_APNConfigView()
+        case "roaming_status": Diag_RoamingStatusView()
+        case "network_band": Diag_NetworkBandView()
+        case "network_speed": Diag_NetworkSpeedTestView()
+        case "network_security": Diag_NetworkSecurityScanView()
+        // Security & Privacy
+        case "certificate_trust": Diag_CertificateTrustView()
+        case "data_protection": Diag_DataProtectionCheckView()
+        case "sandbox_integrity": Diag_SandboxIntegrityView()
+        case "storage_encryption": Diag_StorageEncryptionView()
+        case "system_integrity": Diag_SystemIntegrityCheckView()
+        // System & Performance
+        case "running_processes": Diag_RunningProcessesView()
+        case "loaded_frameworks": Diag_LoadedFrameworksView()
+        case "cpu_benchmark": Diag_CPUBenchmarkView()
+        case "gpu_benchmark": Diag_GPUBenchmarkView()
+        case "memory_monitor": Diag_MemoryPressureView()
+        // Storage & Data
+        case "storage_usage": Diag_StorageUsageView()
+        case "backup_status": Diag_BackupStatusView()
+        case "crash_log_analyzer": Diag_CrashLogAnalyzerView()
+        case "locale_tz_detail": Diag_LocaleTimeZoneView()
         default:
             Text("Tool not found")
         }
