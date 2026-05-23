@@ -1,180 +1,106 @@
 import SwiftUI
+import Darwin
 
 struct Diag_MemoryPressureView: View {
-    @State private var physicalMemory: UInt64 = 0
-    @State private var usedMemory: UInt64 = 0
-    @State private var freeMemory: UInt64 = 0
-    @State private var appMemory: UInt64 = 0
-    @State private var compressedMemory: UInt64 = 0
+    @State private var memoryInfo: [(String, String)] = []
     @State private var isMonitoring = false
     @State private var timer: Timer?
-    @State private var peakAppMemory: UInt64 = 0
-    @State private var memoryWarnings: Int = 0
-    @State private var history: [MemorySample] = []
-
-    struct MemorySample: Identifiable {
-        let id = UUID()
-        let timestamp: Date
-        let appMemory: UInt64
-        let systemUsed: UInt64
-    }
+    @State private var memHistory: [(Date, UInt64)] = []
 
     var body: some View {
         Form {
-            Section("Memory Overview") {
-                VStack(spacing: 12) {
-                    ZStack {
-                        Circle()
-                            .stroke(Color(.tertiarySystemGroupedBackground), lineWidth: 14)
-                        Circle()
-                            .trim(from: 0, to: memoryUsageRatio)
-                            .stroke(pressureColor, style: StrokeStyle(lineWidth: 14, lineCap: .round))
-                            .rotationEffect(.degrees(-90))
-                            .animation(.spring(response: 0.5), value: memoryUsageRatio)
-                        VStack(spacing: 2) {
-                            Text(String(format: "%.0f%%", memoryUsageRatio * 100))
-                                .font(.title2.monospacedDigit().bold())
-                            Text("Used")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .frame(width: 120, height: 120)
-
-                    Text(pressureLabel)
+            Section("Memory Pressure") {
+                VStack(spacing: 8) {
+                    Image(systemName: "memorychip")
+                        .font(.system(size: 44))
+                        .foregroundStyle(.blue)
+                    Text("Memory Monitor")
                         .font(.headline)
-                        .foregroundStyle(pressureColor)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
             }
 
-            Section("System Memory") {
-                LabeledContent("Physical RAM") { Text(formatBytes(physicalMemory)) }
-                LabeledContent("Used") { Text(formatBytes(usedMemory)).foregroundStyle(.orange) }
-                LabeledContent("Free") { Text(formatBytes(freeMemory)).foregroundStyle(.green) }
-                LabeledContent("Compressed") { Text(formatBytes(compressedMemory)) }
-            }
-
-            Section("App Memory") {
-                LabeledContent("Current") { Text(formatBytes(appMemory)).monospacedDigit() }
-                LabeledContent("Peak") { Text(formatBytes(peakAppMemory)).monospacedDigit().foregroundStyle(.orange) }
-                LabeledContent("Memory Warnings") {
-                    Text("\(memoryWarnings)")
-                        .foregroundStyle(memoryWarnings > 0 ? .red : .green)
+            Section("Current Usage") {
+                ForEach(memoryInfo, id: \.0) { info in
+                    LabeledContent(info.0) { Text(info.1).font(.caption.monospacedDigit()) }
                 }
             }
 
-            if !history.isEmpty {
-                Section("History") {
-                    ForEach(history.suffix(10)) { sample in
-                        HStack {
-                            Text(sample.timestamp, style: .time)
-                                .font(.caption.monospacedDigit())
-                                .foregroundStyle(.secondary)
-                            Spacer()
-                            Text("App: \(formatBytes(sample.appMemory))")
-                                .font(.caption.monospacedDigit())
+            if memHistory.count > 1 {
+                Section("Memory Trend") {
+                    GeometryReader { geo in
+                        let maxMem = memHistory.map { $0.1 }.max() ?? 1
+                        Path { path in
+                            let stepX = geo.size.width / CGFloat(max(memHistory.count - 1, 1))
+                            for (i, reading) in memHistory.enumerated() {
+                                let y = geo.size.height * (1 - CGFloat(reading.1) / CGFloat(maxMem))
+                                let x = CGFloat(i) * stepX
+                                if i == 0 { path.move(to: CGPoint(x: x, y: y)) }
+                                else { path.addLine(to: CGPoint(x: x, y: y)) }
+                            }
                         }
+                        .stroke(Color.blue, lineWidth: 2)
                     }
+                    .frame(height: 80)
                 }
             }
 
             Section {
-                Button {
-                    if isMonitoring { stopMonitoring() } else { startMonitoring() }
-                } label: {
+                Button { isMonitoring ? stopMonitoring() : startMonitoring() } label: {
                     HStack {
                         Image(systemName: isMonitoring ? "stop.circle.fill" : "play.circle.fill")
-                        Text(isMonitoring ? "Stop Monitoring" : "Start Monitoring")
+                        Text(isMonitoring ? "Stop" : "Start Monitoring")
                     }
                 }
             }
         }
         .navigationTitle("Memory Pressure")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { refreshMemory(); startMonitoring() }
+        .onAppear { refresh() }
         .onDisappear { stopMonitoring() }
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didReceiveMemoryWarningNotification)) { _ in
-            memoryWarnings += 1
+    }
+
+    private func refresh() {
+        var info: [(String, String)] = []
+        let pi = ProcessInfo.processInfo
+        let physicalMem = pi.physicalMemory
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .memory
+
+        info.append(("Physical RAM", formatter.string(fromByteCount: Int64(physicalMem))))
+
+        var taskInfo = mach_task_basic_info()
+        var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4
+        let result = withUnsafeMutablePointer(to: &taskInfo) {
+            $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+                task_info(mach_task_self_, task_flavor_t(MACH_TASK_BASIC_INFO), $0, &count)
+            }
         }
-    }
+        if result == KERN_SUCCESS {
+            let resident = taskInfo.resident_size
+            let virtual = taskInfo.virtual_size
+            info.append(("App Resident", formatter.string(fromByteCount: Int64(resident))))
+            info.append(("App Virtual", formatter.string(fromByteCount: Int64(virtual))))
+            info.append(("Usage %", String(format: "%.1f%%", Double(resident) / Double(physicalMem) * 100)))
+            memHistory.append((Date(), UInt64(resident)))
+            if memHistory.count > 100 { memHistory.removeFirst() }
+        }
 
-    private var memoryUsageRatio: CGFloat {
-        guard physicalMemory > 0 else { return 0 }
-        return CGFloat(usedMemory) / CGFloat(physicalMemory)
-    }
+        info.append(("Thermal", thermalStr(pi.thermalState)))
+        info.append(("Low Power", pi.isLowPowerModeEnabled ? "On" : "Off"))
 
-    private var pressureColor: Color {
-        let ratio = memoryUsageRatio
-        if ratio > 0.9 { return .red }
-        if ratio > 0.7 { return .orange }
-        return .green
-    }
-
-    private var pressureLabel: String {
-        let ratio = memoryUsageRatio
-        if ratio > 0.9 { return "Critical Pressure" }
-        if ratio > 0.7 { return "High Pressure" }
-        if ratio > 0.5 { return "Moderate" }
-        return "Normal"
+        memoryInfo = info
     }
 
     private func startMonitoring() {
         isMonitoring = true
-        timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
-            refreshMemory()
-        }
+        timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { _ in refresh() }
     }
 
-    private func stopMonitoring() {
-        timer?.invalidate()
-        timer = nil
-        isMonitoring = false
-    }
+    private func stopMonitoring() { timer?.invalidate(); timer = nil; isMonitoring = false }
 
-    private func refreshMemory() {
-        physicalMemory = ProcessInfo.processInfo.physicalMemory
-
-        var vmStats = vm_statistics64()
-        var count = mach_msg_type_number_t(MemoryLayout<vm_statistics64>.size / MemoryLayout<integer_t>.size)
-        let result = withUnsafeMutablePointer(to: &vmStats) { ptr in
-            ptr.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { intPtr in
-                host_statistics64(mach_host_self(), HOST_VM_INFO64, intPtr, &count)
-            }
-        }
-
-        if result == KERN_SUCCESS {
-            let pageSize = UInt64(vm_kernel_page_size)
-            let active = UInt64(vmStats.active_count) * pageSize
-            let inactive = UInt64(vmStats.inactive_count) * pageSize
-            let wired = UInt64(vmStats.wire_count) * pageSize
-            let free = UInt64(vmStats.free_count) * pageSize
-            compressedMemory = UInt64(vmStats.compressor_page_count) * pageSize
-
-            usedMemory = active + wired + compressedMemory
-            freeMemory = free + inactive
-        }
-
-        var taskInfo = task_vm_info()
-        var taskCount = mach_msg_type_number_t(MemoryLayout<task_vm_info>.size / MemoryLayout<natural_t>.size)
-        let taskResult = withUnsafeMutablePointer(to: &taskInfo) { ptr in
-            ptr.withMemoryRebound(to: integer_t.self, capacity: Int(taskCount)) { intPtr in
-                task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), intPtr, &taskCount)
-            }
-        }
-        if taskResult == KERN_SUCCESS {
-            appMemory = UInt64(taskInfo.phys_footprint)
-            if appMemory > peakAppMemory { peakAppMemory = appMemory }
-        }
-
-        history.append(MemorySample(timestamp: Date(), appMemory: appMemory, systemUsed: usedMemory))
-        if history.count > 60 { history.removeFirst() }
-    }
-
-    private func formatBytes(_ bytes: UInt64) -> String {
-        let formatter = ByteCountFormatter()
-        formatter.countStyle = .memory
-        return formatter.string(fromByteCount: Int64(bytes))
+    private func thermalStr(_ state: ProcessInfo.ThermalState) -> String {
+        switch state { case .nominal: return "Nominal"; case .fair: return "Fair"; case .serious: return "Serious"; case .critical: return "Critical"; @unknown default: return "Unknown" }
     }
 }

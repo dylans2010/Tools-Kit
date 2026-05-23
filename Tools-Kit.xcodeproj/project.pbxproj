@@ -1695,6 +1695,57 @@
 		DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E813EF936284C389651EA24 /* ColorMixerDevTool.swift */; };
 		21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5619C319AF314C56B15BA1E5 /* DevToolsMainView.swift */; };
 		NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */; };
+		DG02000000000000000000000130 /* Diag_IMEIInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000130 /* Diag_IMEIInfoView.swift */; };
+		DG02000000000000000000000131 /* Diag_MDMDetectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000131 /* Diag_MDMDetectionView.swift */; };
+		DG02000000000000000000000132 /* Diag_FindMyStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000132 /* Diag_FindMyStatusView.swift */; };
+		DG02000000000000000000000133 /* Diag_BlacklistCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000133 /* Diag_BlacklistCheckView.swift */; };
+		DG02000000000000000000000134 /* Diag_CarrierLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000134 /* Diag_CarrierLockView.swift */; };
+		DG02000000000000000000000135 /* Diag_iCloudLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000135 /* Diag_iCloudLockView.swift */; };
+		DG02000000000000000000000136 /* Diag_StolenDeviceCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000136 /* Diag_StolenDeviceCheckView.swift */; };
+		DG02000000000000000000000137 /* Diag_WarrantyCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000137 /* Diag_WarrantyCheckView.swift */; };
+		DG02000000000000000000000138 /* Diag_DeviceAuthenticityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000138 /* Diag_DeviceAuthenticityView.swift */; };
+		DG02000000000000000000000139 /* Diag_ProvisioningProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000139 /* Diag_ProvisioningProfileView.swift */; };
+		DG02000000000000000000000140 /* Diag_FullDeviceReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000140 /* Diag_FullDeviceReportView.swift */; };
+		DG02000000000000000000000141 /* Diag_DeviceGradingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000141 /* Diag_DeviceGradingView.swift */; };
+		DG02000000000000000000000142 /* Diag_PreRepairChecklistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000142 /* Diag_PreRepairChecklistView.swift */; };
+		DG02000000000000000000000143 /* Diag_ScreenReplacementCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000143 /* Diag_ScreenReplacementCheckView.swift */; };
+		DG02000000000000000000000144 /* Diag_BatteryReplacementCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000144 /* Diag_BatteryReplacementCheckView.swift */; };
+		DG02000000000000000000000145 /* Diag_WirelessChargingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000145 /* Diag_WirelessChargingView.swift */; };
+		DG02000000000000000000000146 /* Diag_ForceTouchTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000146 /* Diag_ForceTouchTestView.swift */; };
+		DG02000000000000000000000147 /* Diag_UWBChipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000147 /* Diag_UWBChipView.swift */; };
+		DG02000000000000000000000148 /* Diag_WaterDamageCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000148 /* Diag_WaterDamageCheckView.swift */; };
+		DG02000000000000000000000149 /* Diag_FaceIDDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000149 /* Diag_FaceIDDiagnosticsView.swift */; };
+		DG02000000000000000000000150 /* Diag_BatteryTemperatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000150 /* Diag_BatteryTemperatureView.swift */; };
+		DG02000000000000000000000151 /* Diag_ChargingDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000151 /* Diag_ChargingDiagnosticsView.swift */; };
+		DG02000000000000000000000152 /* Diag_NFCReadWriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000152 /* Diag_NFCReadWriteView.swift */; };
+		DG02000000000000000000000153 /* Diag_CertificateTrustView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000153 /* Diag_CertificateTrustView.swift */; };
+		DG02000000000000000000000154 /* Diag_ConfigProfileAuditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000154 /* Diag_ConfigProfileAuditView.swift */; };
+		DG02000000000000000000000155 /* Diag_DataProtectionCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000155 /* Diag_DataProtectionCheckView.swift */; };
+		DG02000000000000000000000156 /* Diag_SandboxIntegrityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000156 /* Diag_SandboxIntegrityView.swift */; };
+		DG02000000000000000000000157 /* Diag_NetworkSecurityScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000157 /* Diag_NetworkSecurityScanView.swift */; };
+		DG02000000000000000000000158 /* Diag_SIMInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000158 /* Diag_SIMInfoView.swift */; };
+		DG02000000000000000000000159 /* Diag_SignalStrengthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000159 /* Diag_SignalStrengthView.swift */; };
+		DG02000000000000000000000160 /* Diag_eSIMStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000160 /* Diag_eSIMStatusView.swift */; };
+		DG02000000000000000000000161 /* Diag_APNConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000161 /* Diag_APNConfigView.swift */; };
+		DG02000000000000000000000162 /* Diag_RoamingStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000162 /* Diag_RoamingStatusView.swift */; };
+		DG02000000000000000000000163 /* Diag_NetworkBandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000163 /* Diag_NetworkBandView.swift */; };
+		DG02000000000000000000000164 /* Diag_RunningProcessesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000164 /* Diag_RunningProcessesView.swift */; };
+		DG02000000000000000000000165 /* Diag_LoadedFrameworksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000165 /* Diag_LoadedFrameworksView.swift */; };
+		DG02000000000000000000000166 /* Diag_ThermalHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000166 /* Diag_ThermalHistoryView.swift */; };
+		DG02000000000000000000000167 /* Diag_PowerSourceInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000167 /* Diag_PowerSourceInfoView.swift */; };
+		DG02000000000000000000000168 /* Diag_StorageEncryptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000168 /* Diag_StorageEncryptionView.swift */; };
+		DG02000000000000000000000169 /* Diag_SystemIntegrityCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000169 /* Diag_SystemIntegrityCheckView.swift */; };
+		DG02000000000000000000000170 /* Diag_BackupStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000170 /* Diag_BackupStatusView.swift */; };
+		DG02000000000000000000000171 /* Diag_EnterpriseAppCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000171 /* Diag_EnterpriseAppCheckView.swift */; };
+		DG02000000000000000000000172 /* Diag_DEPEnrollmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000172 /* Diag_DEPEnrollmentView.swift */; };
+		DG02000000000000000000000173 /* Diag_RestrictionsCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000173 /* Diag_RestrictionsCheckView.swift */; };
+		DG02000000000000000000000174 /* Diag_StorageUsageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000174 /* Diag_StorageUsageView.swift */; };
+		DG02000000000000000000000175 /* Diag_IOSVersionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000175 /* Diag_IOSVersionDetailView.swift */; };
+		DG02000000000000000000000176 /* Diag_CPUBenchmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000176 /* Diag_CPUBenchmarkView.swift */; };
+		DG02000000000000000000000177 /* Diag_GPUBenchmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000177 /* Diag_GPUBenchmarkView.swift */; };
+		DG02000000000000000000000179 /* Diag_NetworkSpeedTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000179 /* Diag_NetworkSpeedTestView.swift */; };
+		DG02000000000000000000000181 /* Diag_CrashLogAnalyzerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000181 /* Diag_CrashLogAnalyzerView.swift */; };
+		DG02000000000000000000000182 /* Diag_LocaleTimeZoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000182 /* Diag_LocaleTimeZoneView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3370,6 +3421,57 @@
 		8E813EF936284C389651EA24 /* ColorMixerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ColorMixerDevTool.swift; sourceTree = "<group>"; };
 		5619C319AF314C56B15BA1E5 /* DevToolsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DevToolsMainView.swift; sourceTree = "<group>"; };
 		NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/NewDevTools.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000130 /* Diag_IMEIInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IMEIInfoView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000131 /* Diag_MDMDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MDMDetectionView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000132 /* Diag_FindMyStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_FindMyStatusView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000133 /* Diag_BlacklistCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BlacklistCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000134 /* Diag_CarrierLockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CarrierLockView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000135 /* Diag_iCloudLockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_iCloudLockView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000136 /* Diag_StolenDeviceCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_StolenDeviceCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000137 /* Diag_WarrantyCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_WarrantyCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000138 /* Diag_DeviceAuthenticityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DeviceAuthenticityView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000139 /* Diag_ProvisioningProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ProvisioningProfileView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000140 /* Diag_FullDeviceReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_FullDeviceReportView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000141 /* Diag_DeviceGradingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DeviceGradingView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000142 /* Diag_PreRepairChecklistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PreRepairChecklistView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000143 /* Diag_ScreenReplacementCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ScreenReplacementCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000144 /* Diag_BatteryReplacementCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BatteryReplacementCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000145 /* Diag_WirelessChargingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_WirelessChargingView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000146 /* Diag_ForceTouchTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ForceTouchTestView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000147 /* Diag_UWBChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_UWBChipView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000148 /* Diag_WaterDamageCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_WaterDamageCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000149 /* Diag_FaceIDDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_FaceIDDiagnosticsView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000150 /* Diag_BatteryTemperatureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BatteryTemperatureView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000151 /* Diag_ChargingDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ChargingDiagnosticsView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000152 /* Diag_NFCReadWriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NFCReadWriteView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000153 /* Diag_CertificateTrustView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CertificateTrustView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000154 /* Diag_ConfigProfileAuditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ConfigProfileAuditView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000155 /* Diag_DataProtectionCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DataProtectionCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000156 /* Diag_SandboxIntegrityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SandboxIntegrityView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000157 /* Diag_NetworkSecurityScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetworkSecurityScanView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000158 /* Diag_SIMInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SIMInfoView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000159 /* Diag_SignalStrengthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SignalStrengthView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000160 /* Diag_eSIMStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_eSIMStatusView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000161 /* Diag_APNConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_APNConfigView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000162 /* Diag_RoamingStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_RoamingStatusView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000163 /* Diag_NetworkBandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetworkBandView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000164 /* Diag_RunningProcessesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_RunningProcessesView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000165 /* Diag_LoadedFrameworksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_LoadedFrameworksView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000166 /* Diag_ThermalHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ThermalHistoryView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000167 /* Diag_PowerSourceInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PowerSourceInfoView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000168 /* Diag_StorageEncryptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_StorageEncryptionView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000169 /* Diag_SystemIntegrityCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemIntegrityCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000170 /* Diag_BackupStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BackupStatusView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000171 /* Diag_EnterpriseAppCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_EnterpriseAppCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000172 /* Diag_DEPEnrollmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DEPEnrollmentView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000173 /* Diag_RestrictionsCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_RestrictionsCheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000174 /* Diag_StorageUsageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_StorageUsageView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000175 /* Diag_IOSVersionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IOSVersionDetailView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000176 /* Diag_CPUBenchmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CPUBenchmarkView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000177 /* Diag_GPUBenchmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_GPUBenchmarkView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000179 /* Diag_NetworkSpeedTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetworkSpeedTestView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000181 /* Diag_CrashLogAnalyzerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CrashLogAnalyzerView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000182 /* Diag_LocaleTimeZoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_LocaleTimeZoneView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3504,6 +3606,57 @@
 				DG0100000000000000000000126 /* Diag_MotionSensorFusionView.swift */,
 				DG0100000000000000000000128 /* Diag_LocaleTimezoneView.swift */,
 				DG0100000000000000000000129 /* Diag_KeychainDiagView.swift */,
+				DG01000000000000000000000130 /* Diag_IMEIInfoView.swift */,
+				DG01000000000000000000000131 /* Diag_MDMDetectionView.swift */,
+				DG01000000000000000000000132 /* Diag_FindMyStatusView.swift */,
+				DG01000000000000000000000133 /* Diag_BlacklistCheckView.swift */,
+				DG01000000000000000000000134 /* Diag_CarrierLockView.swift */,
+				DG01000000000000000000000135 /* Diag_iCloudLockView.swift */,
+				DG01000000000000000000000136 /* Diag_StolenDeviceCheckView.swift */,
+				DG01000000000000000000000137 /* Diag_WarrantyCheckView.swift */,
+				DG01000000000000000000000138 /* Diag_DeviceAuthenticityView.swift */,
+				DG01000000000000000000000139 /* Diag_ProvisioningProfileView.swift */,
+				DG01000000000000000000000140 /* Diag_FullDeviceReportView.swift */,
+				DG01000000000000000000000141 /* Diag_DeviceGradingView.swift */,
+				DG01000000000000000000000142 /* Diag_PreRepairChecklistView.swift */,
+				DG01000000000000000000000143 /* Diag_ScreenReplacementCheckView.swift */,
+				DG01000000000000000000000144 /* Diag_BatteryReplacementCheckView.swift */,
+				DG01000000000000000000000145 /* Diag_WirelessChargingView.swift */,
+				DG01000000000000000000000146 /* Diag_ForceTouchTestView.swift */,
+				DG01000000000000000000000147 /* Diag_UWBChipView.swift */,
+				DG01000000000000000000000148 /* Diag_WaterDamageCheckView.swift */,
+				DG01000000000000000000000149 /* Diag_FaceIDDiagnosticsView.swift */,
+				DG01000000000000000000000150 /* Diag_BatteryTemperatureView.swift */,
+				DG01000000000000000000000151 /* Diag_ChargingDiagnosticsView.swift */,
+				DG01000000000000000000000152 /* Diag_NFCReadWriteView.swift */,
+				DG01000000000000000000000153 /* Diag_CertificateTrustView.swift */,
+				DG01000000000000000000000154 /* Diag_ConfigProfileAuditView.swift */,
+				DG01000000000000000000000155 /* Diag_DataProtectionCheckView.swift */,
+				DG01000000000000000000000156 /* Diag_SandboxIntegrityView.swift */,
+				DG01000000000000000000000157 /* Diag_NetworkSecurityScanView.swift */,
+				DG01000000000000000000000158 /* Diag_SIMInfoView.swift */,
+				DG01000000000000000000000159 /* Diag_SignalStrengthView.swift */,
+				DG01000000000000000000000160 /* Diag_eSIMStatusView.swift */,
+				DG01000000000000000000000161 /* Diag_APNConfigView.swift */,
+				DG01000000000000000000000162 /* Diag_RoamingStatusView.swift */,
+				DG01000000000000000000000163 /* Diag_NetworkBandView.swift */,
+				DG01000000000000000000000164 /* Diag_RunningProcessesView.swift */,
+				DG01000000000000000000000165 /* Diag_LoadedFrameworksView.swift */,
+				DG01000000000000000000000166 /* Diag_ThermalHistoryView.swift */,
+				DG01000000000000000000000167 /* Diag_PowerSourceInfoView.swift */,
+				DG01000000000000000000000168 /* Diag_StorageEncryptionView.swift */,
+				DG01000000000000000000000169 /* Diag_SystemIntegrityCheckView.swift */,
+				DG01000000000000000000000170 /* Diag_BackupStatusView.swift */,
+				DG01000000000000000000000171 /* Diag_EnterpriseAppCheckView.swift */,
+				DG01000000000000000000000172 /* Diag_DEPEnrollmentView.swift */,
+				DG01000000000000000000000173 /* Diag_RestrictionsCheckView.swift */,
+				DG01000000000000000000000174 /* Diag_StorageUsageView.swift */,
+				DG01000000000000000000000175 /* Diag_IOSVersionDetailView.swift */,
+				DG01000000000000000000000176 /* Diag_CPUBenchmarkView.swift */,
+				DG01000000000000000000000177 /* Diag_GPUBenchmarkView.swift */,
+				DG01000000000000000000000179 /* Diag_NetworkSpeedTestView.swift */,
+				DG01000000000000000000000181 /* Diag_CrashLogAnalyzerView.swift */,
+				DG01000000000000000000000182 /* Diag_LocaleTimeZoneView.swift */,
 			);
 			path = Diagnostics;
 			sourceTree = "<group>";
@@ -10783,6 +10936,57 @@
 				DG0200000000000000000000126 /* Diag_MotionSensorFusionView.swift in Sources */,
 				DG0200000000000000000000128 /* Diag_LocaleTimezoneView.swift in Sources */,
 				DG0200000000000000000000129 /* Diag_KeychainDiagView.swift in Sources */,
+				DG02000000000000000000000130 /* Diag_IMEIInfoView.swift in Sources */,
+				DG02000000000000000000000131 /* Diag_MDMDetectionView.swift in Sources */,
+				DG02000000000000000000000132 /* Diag_FindMyStatusView.swift in Sources */,
+				DG02000000000000000000000133 /* Diag_BlacklistCheckView.swift in Sources */,
+				DG02000000000000000000000134 /* Diag_CarrierLockView.swift in Sources */,
+				DG02000000000000000000000135 /* Diag_iCloudLockView.swift in Sources */,
+				DG02000000000000000000000136 /* Diag_StolenDeviceCheckView.swift in Sources */,
+				DG02000000000000000000000137 /* Diag_WarrantyCheckView.swift in Sources */,
+				DG02000000000000000000000138 /* Diag_DeviceAuthenticityView.swift in Sources */,
+				DG02000000000000000000000139 /* Diag_ProvisioningProfileView.swift in Sources */,
+				DG02000000000000000000000140 /* Diag_FullDeviceReportView.swift in Sources */,
+				DG02000000000000000000000141 /* Diag_DeviceGradingView.swift in Sources */,
+				DG02000000000000000000000142 /* Diag_PreRepairChecklistView.swift in Sources */,
+				DG02000000000000000000000143 /* Diag_ScreenReplacementCheckView.swift in Sources */,
+				DG02000000000000000000000144 /* Diag_BatteryReplacementCheckView.swift in Sources */,
+				DG02000000000000000000000145 /* Diag_WirelessChargingView.swift in Sources */,
+				DG02000000000000000000000146 /* Diag_ForceTouchTestView.swift in Sources */,
+				DG02000000000000000000000147 /* Diag_UWBChipView.swift in Sources */,
+				DG02000000000000000000000148 /* Diag_WaterDamageCheckView.swift in Sources */,
+				DG02000000000000000000000149 /* Diag_FaceIDDiagnosticsView.swift in Sources */,
+				DG02000000000000000000000150 /* Diag_BatteryTemperatureView.swift in Sources */,
+				DG02000000000000000000000151 /* Diag_ChargingDiagnosticsView.swift in Sources */,
+				DG02000000000000000000000152 /* Diag_NFCReadWriteView.swift in Sources */,
+				DG02000000000000000000000153 /* Diag_CertificateTrustView.swift in Sources */,
+				DG02000000000000000000000154 /* Diag_ConfigProfileAuditView.swift in Sources */,
+				DG02000000000000000000000155 /* Diag_DataProtectionCheckView.swift in Sources */,
+				DG02000000000000000000000156 /* Diag_SandboxIntegrityView.swift in Sources */,
+				DG02000000000000000000000157 /* Diag_NetworkSecurityScanView.swift in Sources */,
+				DG02000000000000000000000158 /* Diag_SIMInfoView.swift in Sources */,
+				DG02000000000000000000000159 /* Diag_SignalStrengthView.swift in Sources */,
+				DG02000000000000000000000160 /* Diag_eSIMStatusView.swift in Sources */,
+				DG02000000000000000000000161 /* Diag_APNConfigView.swift in Sources */,
+				DG02000000000000000000000162 /* Diag_RoamingStatusView.swift in Sources */,
+				DG02000000000000000000000163 /* Diag_NetworkBandView.swift in Sources */,
+				DG02000000000000000000000164 /* Diag_RunningProcessesView.swift in Sources */,
+				DG02000000000000000000000165 /* Diag_LoadedFrameworksView.swift in Sources */,
+				DG02000000000000000000000166 /* Diag_ThermalHistoryView.swift in Sources */,
+				DG02000000000000000000000167 /* Diag_PowerSourceInfoView.swift in Sources */,
+				DG02000000000000000000000168 /* Diag_StorageEncryptionView.swift in Sources */,
+				DG02000000000000000000000169 /* Diag_SystemIntegrityCheckView.swift in Sources */,
+				DG02000000000000000000000170 /* Diag_BackupStatusView.swift in Sources */,
+				DG02000000000000000000000171 /* Diag_EnterpriseAppCheckView.swift in Sources */,
+				DG02000000000000000000000172 /* Diag_DEPEnrollmentView.swift in Sources */,
+				DG02000000000000000000000173 /* Diag_RestrictionsCheckView.swift in Sources */,
+				DG02000000000000000000000174 /* Diag_StorageUsageView.swift in Sources */,
+				DG02000000000000000000000175 /* Diag_IOSVersionDetailView.swift in Sources */,
+				DG02000000000000000000000176 /* Diag_CPUBenchmarkView.swift in Sources */,
+				DG02000000000000000000000177 /* Diag_GPUBenchmarkView.swift in Sources */,
+				DG02000000000000000000000179 /* Diag_NetworkSpeedTestView.swift in Sources */,
+				DG02000000000000000000000181 /* Diag_CrashLogAnalyzerView.swift in Sources */,
+				DG02000000000000000000000182 /* Diag_LocaleTimeZoneView.swift in Sources */,
 				WG5FD79044E10FA97C5EC69F /* WorkspaceGraph.swift in Sources */,
 				MDC32FA79B1B70105A53ED19 /* AgenticModels.swift in Sources */,
 				TO7EC7A01B15A8F7BFE4020C /* AgenticToolOutput.swift in Sources */,
