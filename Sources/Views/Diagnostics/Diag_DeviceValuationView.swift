@@ -165,8 +165,9 @@ struct Diag_DeviceValuationView: View {
             checks.append(("Charging Port", "Connect charger to verify port function", batteryState != .unknown))
         }
 
-        if let free = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory())?[.systemFreeSize] as? Int64,
-           let total = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory())?[.systemSize] as? Int64 {
+        if let attrs = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory()),
+           let free = attrs[.systemFreeSize] as? Int64,
+           let total = attrs[.systemSize] as? Int64 {
             let usedPct = Double(total - free) / Double(total) * 100
             let storageOK = usedPct < 90
             checks.append(("Storage Health", storageOK ? "Storage at \(String(format: "%.0f", usedPct))% capacity" : "Storage nearly full", storageOK))
