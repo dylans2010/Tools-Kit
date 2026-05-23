@@ -98,6 +98,43 @@
 		DG02000000000000000000000089 /* Diag_ZoomRangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000089 /* Diag_ZoomRangeView.swift */; };
 		DG02000000000000000000000090 /* DiagnosticReportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000090 /* DiagnosticReportManager.swift */; };
 		DG02000000000000000000000091 /* DiagnosticReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000091 /* DiagnosticReportsView.swift */; };
+		DG0200000000000000000000092 /* Diag_GPSLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000092 /* Diag_GPSLocationView.swift */; };
+		DG0200000000000000000000093 /* Diag_SatelliteConnectivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000093 /* Diag_SatelliteConnectivityView.swift */; };
+		DG0200000000000000000000094 /* Diag_DNSLookupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000094 /* Diag_DNSLookupView.swift */; };
+		DG0200000000000000000000095 /* Diag_PortScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000095 /* Diag_PortScannerView.swift */; };
+		DG0200000000000000000000096 /* Diag_TracerouteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000096 /* Diag_TracerouteView.swift */; };
+		DG0200000000000000000000097 /* Diag_BandwidthMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000097 /* Diag_BandwidthMonitorView.swift */; };
+		DG0200000000000000000000098 /* Diag_SocketTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000098 /* Diag_SocketTestView.swift */; };
+		DG0200000000000000000000099 /* Diag_SSLCertificateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000099 /* Diag_SSLCertificateView.swift */; };
+		DG0200000000000000000000100 /* Diag_SystemLoadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000100 /* Diag_SystemLoadView.swift */; };
+		DG0200000000000000000000101 /* Diag_ThreadCountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000101 /* Diag_ThreadCountView.swift */; };
+		DG0200000000000000000000102 /* Diag_MemoryPressureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000102 /* Diag_MemoryPressureView.swift */; };
+		DG0200000000000000000000103 /* Diag_DiskIOBenchmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000103 /* Diag_DiskIOBenchmarkView.swift */; };
+		DG0200000000000000000000104 /* Diag_TimeSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000104 /* Diag_TimeSyncView.swift */; };
+		DG0200000000000000000000105 /* Diag_InstalledFontsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000105 /* Diag_InstalledFontsView.swift */; };
+		DG0200000000000000000000106 /* Diag_ScreenMirrorDetectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000106 /* Diag_ScreenMirrorDetectView.swift */; };
+		DG0200000000000000000000107 /* Diag_URLSchemeTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000107 /* Diag_URLSchemeTestView.swift */; };
+		DG0200000000000000000000108 /* Diag_DeviceOrientationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000108 /* Diag_DeviceOrientationView.swift */; };
+		DG0200000000000000000000109 /* Diag_AltimeterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000109 /* Diag_AltimeterView.swift */; };
+		DG0200000000000000000000110 /* Diag_CompassHeadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000110 /* Diag_CompassHeadingView.swift */; };
+		DG0200000000000000000000111 /* Diag_BatteryCycleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000111 /* Diag_BatteryCycleView.swift */; };
+		DG0200000000000000000000112 /* Diag_NetworkProxyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000112 /* Diag_NetworkProxyView.swift */; };
+		DG0200000000000000000000113 /* Diag_DeviceCapabilitiesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000113 /* Diag_DeviceCapabilitiesView.swift */; };
+		DG0200000000000000000000114 /* Diag_KernelInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000114 /* Diag_KernelInfoView.swift */; };
+		DG0200000000000000000000115 /* Diag_WiFiAnalyzerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000115 /* Diag_WiFiAnalyzerView.swift */; };
+		DG0200000000000000000000116 /* Diag_SystemLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000116 /* Diag_SystemLogView.swift */; };
+		DG0200000000000000000000117 /* Diag_CrashLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000117 /* Diag_CrashLogView.swift */; };
+		DG0200000000000000000000118 /* Diag_NetworkInterfacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000118 /* Diag_NetworkInterfacesView.swift */; };
+		DG0200000000000000000000119 /* Diag_FrameDropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000119 /* Diag_FrameDropView.swift */; };
+		DG0200000000000000000000120 /* Diag_HTTPHeadersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000120 /* Diag_HTTPHeadersView.swift */; };
+		DG0200000000000000000000121 /* Diag_DisplayInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000121 /* Diag_DisplayInfoView.swift */; };
+		DG0200000000000000000000122 /* Diag_RuntimeInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000122 /* Diag_RuntimeInfoView.swift */; };
+		DG0200000000000000000000123 /* Diag_PingToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000123 /* Diag_PingToolView.swift */; };
+		DG0200000000000000000000124 /* Diag_EnergyImpactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000124 /* Diag_EnergyImpactView.swift */; };
+		DG0200000000000000000000125 /* Diag_LocationHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000125 /* Diag_LocationHistoryView.swift */; };
+		DG0200000000000000000000126 /* Diag_MotionSensorFusionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000126 /* Diag_MotionSensorFusionView.swift */; };
+		DG0200000000000000000000128 /* Diag_LocaleTimezoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000128 /* Diag_LocaleTimezoneView.swift */; };
+		DG0200000000000000000000129 /* Diag_KeychainDiagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000129 /* Diag_KeychainDiagView.swift */; };
 		FC335125304A4830BFC09FE0 /* DevToolSharedUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5802738C69834F1BBAAA2C66 /* DevToolSharedUtils.swift */; };
 		4493B4F7B7264E1587EBEA36 /* SDKModuleInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B6C5F74C541E188C9AF53 /* SDKModuleInspectorDevTool.swift */; };
 		D11E98ED67F642419A3A23FB /* SDKConfigValidatorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1600644375C34AE78E169D60 /* SDKConfigValidatorDevTool.swift */; };
@@ -1752,6 +1789,43 @@
 		DG01000000000000000000000089 /* Diag_ZoomRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ZoomRangeView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000090 /* DiagnosticReportManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticReportManager.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000091 /* DiagnosticReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticReportsView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000092 /* Diag_GPSLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_GPSLocationView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000093 /* Diag_SatelliteConnectivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SatelliteConnectivityView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000094 /* Diag_DNSLookupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DNSLookupView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000095 /* Diag_PortScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PortScannerView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000096 /* Diag_TracerouteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_TracerouteView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000097 /* Diag_BandwidthMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BandwidthMonitorView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000098 /* Diag_SocketTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SocketTestView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000099 /* Diag_SSLCertificateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SSLCertificateView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000100 /* Diag_SystemLoadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemLoadView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000101 /* Diag_ThreadCountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ThreadCountView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000102 /* Diag_MemoryPressureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MemoryPressureView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000103 /* Diag_DiskIOBenchmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DiskIOBenchmarkView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000104 /* Diag_TimeSyncView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_TimeSyncView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000105 /* Diag_InstalledFontsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_InstalledFontsView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000106 /* Diag_ScreenMirrorDetectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ScreenMirrorDetectView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000107 /* Diag_URLSchemeTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_URLSchemeTestView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000108 /* Diag_DeviceOrientationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DeviceOrientationView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000109 /* Diag_AltimeterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AltimeterView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000110 /* Diag_CompassHeadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CompassHeadingView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000111 /* Diag_BatteryCycleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BatteryCycleView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000112 /* Diag_NetworkProxyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetworkProxyView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000113 /* Diag_DeviceCapabilitiesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DeviceCapabilitiesView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000114 /* Diag_KernelInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_KernelInfoView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000115 /* Diag_WiFiAnalyzerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_WiFiAnalyzerView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000116 /* Diag_SystemLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemLogView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000117 /* Diag_CrashLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CrashLogView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000118 /* Diag_NetworkInterfacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetworkInterfacesView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000119 /* Diag_FrameDropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_FrameDropView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000120 /* Diag_HTTPHeadersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_HTTPHeadersView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000121 /* Diag_DisplayInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DisplayInfoView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000122 /* Diag_RuntimeInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_RuntimeInfoView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000123 /* Diag_PingToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PingToolView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000124 /* Diag_EnergyImpactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_EnergyImpactView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000125 /* Diag_LocationHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_LocationHistoryView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000126 /* Diag_MotionSensorFusionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MotionSensorFusionView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000128 /* Diag_LocaleTimezoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_LocaleTimezoneView.swift; sourceTree = "<group>"; };
+		DG0100000000000000000000129 /* Diag_KeychainDiagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_KeychainDiagView.swift; sourceTree = "<group>"; };
 		5802738C69834F1BBAAA2C66 /* DevToolSharedUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DevToolSharedUtils.swift; sourceTree = "<group>"; };
 		F61B6C5F74C541E188C9AF53 /* SDKModuleInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKModuleInspectorDevTool.swift; sourceTree = "<group>"; };
 		1600644375C34AE78E169D60 /* SDKConfigValidatorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKConfigValidatorDevTool.swift; sourceTree = "<group>"; };
@@ -3393,6 +3467,43 @@
 				DG01000000000000000000000089 /* Diag_ZoomRangeView.swift */,
 				DG01000000000000000000000090 /* DiagnosticReportManager.swift */,
 				DG01000000000000000000000091 /* DiagnosticReportsView.swift */,
+				DG0100000000000000000000092 /* Diag_GPSLocationView.swift */,
+				DG0100000000000000000000093 /* Diag_SatelliteConnectivityView.swift */,
+				DG0100000000000000000000094 /* Diag_DNSLookupView.swift */,
+				DG0100000000000000000000095 /* Diag_PortScannerView.swift */,
+				DG0100000000000000000000096 /* Diag_TracerouteView.swift */,
+				DG0100000000000000000000097 /* Diag_BandwidthMonitorView.swift */,
+				DG0100000000000000000000098 /* Diag_SocketTestView.swift */,
+				DG0100000000000000000000099 /* Diag_SSLCertificateView.swift */,
+				DG0100000000000000000000100 /* Diag_SystemLoadView.swift */,
+				DG0100000000000000000000101 /* Diag_ThreadCountView.swift */,
+				DG0100000000000000000000102 /* Diag_MemoryPressureView.swift */,
+				DG0100000000000000000000103 /* Diag_DiskIOBenchmarkView.swift */,
+				DG0100000000000000000000104 /* Diag_TimeSyncView.swift */,
+				DG0100000000000000000000105 /* Diag_InstalledFontsView.swift */,
+				DG0100000000000000000000106 /* Diag_ScreenMirrorDetectView.swift */,
+				DG0100000000000000000000107 /* Diag_URLSchemeTestView.swift */,
+				DG0100000000000000000000108 /* Diag_DeviceOrientationView.swift */,
+				DG0100000000000000000000109 /* Diag_AltimeterView.swift */,
+				DG0100000000000000000000110 /* Diag_CompassHeadingView.swift */,
+				DG0100000000000000000000111 /* Diag_BatteryCycleView.swift */,
+				DG0100000000000000000000112 /* Diag_NetworkProxyView.swift */,
+				DG0100000000000000000000113 /* Diag_DeviceCapabilitiesView.swift */,
+				DG0100000000000000000000114 /* Diag_KernelInfoView.swift */,
+				DG0100000000000000000000115 /* Diag_WiFiAnalyzerView.swift */,
+				DG0100000000000000000000116 /* Diag_SystemLogView.swift */,
+				DG0100000000000000000000117 /* Diag_CrashLogView.swift */,
+				DG0100000000000000000000118 /* Diag_NetworkInterfacesView.swift */,
+				DG0100000000000000000000119 /* Diag_FrameDropView.swift */,
+				DG0100000000000000000000120 /* Diag_HTTPHeadersView.swift */,
+				DG0100000000000000000000121 /* Diag_DisplayInfoView.swift */,
+				DG0100000000000000000000122 /* Diag_RuntimeInfoView.swift */,
+				DG0100000000000000000000123 /* Diag_PingToolView.swift */,
+				DG0100000000000000000000124 /* Diag_EnergyImpactView.swift */,
+				DG0100000000000000000000125 /* Diag_LocationHistoryView.swift */,
+				DG0100000000000000000000126 /* Diag_MotionSensorFusionView.swift */,
+				DG0100000000000000000000128 /* Diag_LocaleTimezoneView.swift */,
+				DG0100000000000000000000129 /* Diag_KeychainDiagView.swift */,
 			);
 			path = Diagnostics;
 			sourceTree = "<group>";
@@ -10635,6 +10746,43 @@
 				DG02000000000000000000000089 /* Diag_ZoomRangeView.swift in Sources */,
 				DG02000000000000000000000090 /* DiagnosticReportManager.swift in Sources */,
 				DG02000000000000000000000091 /* DiagnosticReportsView.swift in Sources */,
+				DG0200000000000000000000092 /* Diag_GPSLocationView.swift in Sources */,
+				DG0200000000000000000000093 /* Diag_SatelliteConnectivityView.swift in Sources */,
+				DG0200000000000000000000094 /* Diag_DNSLookupView.swift in Sources */,
+				DG0200000000000000000000095 /* Diag_PortScannerView.swift in Sources */,
+				DG0200000000000000000000096 /* Diag_TracerouteView.swift in Sources */,
+				DG0200000000000000000000097 /* Diag_BandwidthMonitorView.swift in Sources */,
+				DG0200000000000000000000098 /* Diag_SocketTestView.swift in Sources */,
+				DG0200000000000000000000099 /* Diag_SSLCertificateView.swift in Sources */,
+				DG0200000000000000000000100 /* Diag_SystemLoadView.swift in Sources */,
+				DG0200000000000000000000101 /* Diag_ThreadCountView.swift in Sources */,
+				DG0200000000000000000000102 /* Diag_MemoryPressureView.swift in Sources */,
+				DG0200000000000000000000103 /* Diag_DiskIOBenchmarkView.swift in Sources */,
+				DG0200000000000000000000104 /* Diag_TimeSyncView.swift in Sources */,
+				DG0200000000000000000000105 /* Diag_InstalledFontsView.swift in Sources */,
+				DG0200000000000000000000106 /* Diag_ScreenMirrorDetectView.swift in Sources */,
+				DG0200000000000000000000107 /* Diag_URLSchemeTestView.swift in Sources */,
+				DG0200000000000000000000108 /* Diag_DeviceOrientationView.swift in Sources */,
+				DG0200000000000000000000109 /* Diag_AltimeterView.swift in Sources */,
+				DG0200000000000000000000110 /* Diag_CompassHeadingView.swift in Sources */,
+				DG0200000000000000000000111 /* Diag_BatteryCycleView.swift in Sources */,
+				DG0200000000000000000000112 /* Diag_NetworkProxyView.swift in Sources */,
+				DG0200000000000000000000113 /* Diag_DeviceCapabilitiesView.swift in Sources */,
+				DG0200000000000000000000114 /* Diag_KernelInfoView.swift in Sources */,
+				DG0200000000000000000000115 /* Diag_WiFiAnalyzerView.swift in Sources */,
+				DG0200000000000000000000116 /* Diag_SystemLogView.swift in Sources */,
+				DG0200000000000000000000117 /* Diag_CrashLogView.swift in Sources */,
+				DG0200000000000000000000118 /* Diag_NetworkInterfacesView.swift in Sources */,
+				DG0200000000000000000000119 /* Diag_FrameDropView.swift in Sources */,
+				DG0200000000000000000000120 /* Diag_HTTPHeadersView.swift in Sources */,
+				DG0200000000000000000000121 /* Diag_DisplayInfoView.swift in Sources */,
+				DG0200000000000000000000122 /* Diag_RuntimeInfoView.swift in Sources */,
+				DG0200000000000000000000123 /* Diag_PingToolView.swift in Sources */,
+				DG0200000000000000000000124 /* Diag_EnergyImpactView.swift in Sources */,
+				DG0200000000000000000000125 /* Diag_LocationHistoryView.swift in Sources */,
+				DG0200000000000000000000126 /* Diag_MotionSensorFusionView.swift in Sources */,
+				DG0200000000000000000000128 /* Diag_LocaleTimezoneView.swift in Sources */,
+				DG0200000000000000000000129 /* Diag_KeychainDiagView.swift in Sources */,
 				WG5FD79044E10FA97C5EC69F /* WorkspaceGraph.swift in Sources */,
 				MDC32FA79B1B70105A53ED19 /* AgenticModels.swift in Sources */,
 				TO7EC7A01B15A8F7BFE4020C /* AgenticToolOutput.swift in Sources */,

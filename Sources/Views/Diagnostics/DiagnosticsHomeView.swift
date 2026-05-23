@@ -6,23 +6,14 @@ struct DiagnosticsHomeView: View {
     @State private var showSettings = false
     @State private var showReports = false
 
-    private let columns = [
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12)
-    ]
-
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    headerSection
-                    categoryScrollBar
-                    toolsGrid
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 20)
+            List {
+                headerSection
+                categoryScrollBar
+                toolsList
             }
-            .background(Color(.systemBackground))
+            .listStyle(.insetGrouped)
             .searchable(text: $viewModel.searchText, prompt: "Search \(viewModel.totalToolCount) diagnostic tools")
             .navigationTitle("Diagnostics")
             .toolbar {
@@ -119,13 +110,34 @@ struct DiagnosticsHomeView: View {
         }
     }
 
-    private var toolsGrid: some View {
-        LazyVGrid(columns: columns, spacing: 12) {
-            ForEach(viewModel.filteredTools) { tool in
-                NavigationLink(destination: diagnosticDestination(for: tool)) {
-                    DiagnosticsToolCardView(tool: tool)
+    private var toolsList: some View {
+        ForEach(viewModel.toolsByCategory, id: \.0) { category, tools in
+            Section {
+                ForEach(tools) { tool in
+                    NavigationLink(destination: diagnosticDestination(for: tool)) {
+                        HStack(spacing: 12) {
+                            Image(systemName: tool.icon)
+                                .font(.body)
+                                .foregroundStyle(tool.category.tint)
+                                .frame(width: 28, height: 28)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(tool.name)
+                                    .font(.subheadline.weight(.medium))
+                                Text(tool.description)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                        }
+                        .padding(.vertical, 2)
+                    }
                 }
-                .buttonStyle(.plain)
+            } header: {
+                HStack(spacing: 6) {
+                    Image(systemName: category.icon)
+                        .font(.caption)
+                    Text(category.rawValue)
+                }
             }
         }
     }
@@ -230,6 +242,49 @@ struct DiagnosticsHomeView: View {
         case "jailbreak": Diag_JailbreakDetectionView()
         case "ats_check": Diag_ATSCheckView()
         case "keychain_check": Diag_KeychainCheckView()
+        // === NEW TOOLS ===
+        // GPS & Location
+        case "gps_location": Diag_GPSLocationView()
+        case "satellite_connectivity": Diag_SatelliteConnectivityView()
+        case "compass_heading": Diag_CompassHeadingView()
+        case "altimeter": Diag_AltimeterView()
+        case "location_history": Diag_LocationHistoryView()
+        case "device_orientation": Diag_DeviceOrientationView()
+        case "motion_sensor_fusion": Diag_MotionSensorFusionView()
+        // Networking
+        case "dns_lookup": Diag_DNSLookupView()
+        case "port_scanner": Diag_PortScannerView()
+        case "traceroute": Diag_TracerouteView()
+        case "bandwidth_monitor": Diag_BandwidthMonitorView()
+        case "socket_test": Diag_SocketTestView()
+        case "ssl_certificate": Diag_SSLCertificateView()
+        case "wifi_analyzer": Diag_WiFiAnalyzerView()
+        case "network_proxy": Diag_NetworkProxyView()
+        case "network_interfaces": Diag_NetworkInterfacesView()
+        case "ping_tool": Diag_PingToolView()
+        case "http_headers": Diag_HTTPHeadersView()
+        case "cellular_detail": Diag_CellularInfoView()
+        // System & Performance
+        case "system_load": Diag_SystemLoadView()
+        case "thread_count": Diag_ThreadCountView()
+        case "memory_pressure": Diag_MemoryPressureView()
+        case "disk_io_benchmark": Diag_DiskIOBenchmarkView()
+        case "frame_drop": Diag_FrameDropView()
+        case "energy_impact": Diag_EnergyImpactView()
+        case "time_sync": Diag_TimeSyncView()
+        case "kernel_info": Diag_KernelInfoView()
+        case "runtime_info": Diag_RuntimeInfoView()
+        case "locale_timezone": Diag_LocaleTimezoneView()
+        case "installed_fonts": Diag_InstalledFontsView()
+        case "display_info": Diag_DisplayInfoView()
+        case "screen_mirror_detect": Diag_ScreenMirrorDetectView()
+        case "url_scheme_test": Diag_URLSchemeTestView()
+        case "device_capabilities": Diag_DeviceCapabilitiesView()
+        case "battery_cycle": Diag_BatteryCycleView()
+        case "crash_log": Diag_CrashLogView()
+        case "system_log": Diag_SystemLogView()
+        case "keychain_diag": Diag_KeychainDiagView()
+        case "notification_status": Diag_NotificationStatusView()
         default:
             Text("Tool not found")
         }
