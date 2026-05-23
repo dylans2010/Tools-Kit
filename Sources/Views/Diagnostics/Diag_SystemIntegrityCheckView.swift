@@ -1,6 +1,5 @@
 import SwiftUI
 import Security
-import Darwin
 
 struct Diag_SystemIntegrityCheckView: View {
     @State private var checks: [(String, String, IntegrityStatus)] = []
@@ -66,14 +65,16 @@ struct Diag_SystemIntegrityCheckView: View {
 
         let suspectLibs = ["substrate", "substitute", "frida", "cycript"]
         var foundInjection = false
-        let imgCount = _dyld_image_count()
-        for i in 0..<imgCount {
-            if let name = _dyld_get_image_name(i) {
-                let path = String(cString: name).lowercased()
-                if suspectLibs.contains(where: { path.contains($0) }) {
-                    foundInjection = true
-                    break
-                }
+        let frameworks = Bundle.allFrameworks.compactMap { bundle -> String? in
+            guard let path = bundle.bundlePath.components(
+                separatedBy: "/").last else { return nil }
+            return path
+        }
+        for fw in frameworks {
+            let lowered = fw.lowercased()
+            if suspectLibs.contains(where: { lowered.contains($0) }) {
+                foundInjection = true
+                break
             }
         }
         results.append(("Code Injection", foundInjection ? "Suspicious library injection detected" : "No code injection detected", !foundInjection ? .secure : .compromised))
