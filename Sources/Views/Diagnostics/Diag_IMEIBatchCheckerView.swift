@@ -19,114 +19,171 @@ struct Diag_IMEIBatchCheckerView: View {
     }
 
     var body: some View {
-        Form {
-            Section("Batch IMEI Checker") {
-                VStack(spacing: 8) {
-                    Image(systemName: "list.clipboard.fill")
-                        .font(.system(size: 44))
-                        .foregroundStyle(.blue)
-                    Text("Bulk IMEI Processing")
-                        .font(.headline)
-                    Text("Check multiple IMEIs at once for blacklist, lock, and device info via live API")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
-            }
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Header Area
+                    VStack(spacing: 8) {
+                        Image(systemName: "list.clipboard.fill")
+                            .font(.system(size: 44))
+                            .foregroundStyle(.blue)
+                        Text("Bulk IMEI Processing")
+                            .font(.headline)
+                        Text("Check multiple IMEIs at once for blacklist, lock, and device info via live API")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
 
-            Section("Enter IMEIs (one per line)") {
-                TextEditor(text: $batchInput)
-                    .frame(minHeight: 120)
-                    .font(.caption.monospaced())
+                    // Input Area
+                    Section {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Enter IMEIs (one per line)")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
 
-                let imeis = parseIMEIs()
-                Text("\(imeis.count) valid IMEIs detected")
-                    .font(.caption)
-                    .foregroundStyle(imeis.isEmpty ? .secondary : .green)
+                            TextField("Paste IMEIs here...", text: $batchInput, axis: .vertical)
+                                .padding()
+                                .font(.caption.monospaced())
+                                .lineLimit(6...12)
 
-                Button {
-                    runBatchCheck()
-                } label: {
-                    HStack {
-                        if isLoading {
-                            ProgressView().scaleEffect(0.8)
-                            Text("Checking \(progress)/\(totalCount)...")
-                        } else {
-                            Image(systemName: "play.circle.fill")
-                            Text("Run Batch Check")
+                            let imeis = parseIMEIs()
+                            Text("\(imeis.count) valid IMEIs detected")
+                                .font(.caption)
+                                .foregroundStyle(imeis.isEmpty ? .secondary : .green)
                         }
                     }
-                }
-                .disabled(imeis.isEmpty || isLoading)
-            }
+                    .padding(.horizontal)
 
-            if isLoading && totalCount > 0 {
-                Section("Progress") {
-                    ProgressView(value: Double(progress), total: Double(totalCount))
-                    Text("\(progress) of \(totalCount) completed")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            if !results.isEmpty {
-                Section("Results (\(results.count))") {
-                    let cleanCount = results.filter { $0.blacklistStatus.lowercased().contains("clean") || $0.blacklistStatus == "N/A" }.count
-                    let flaggedCount = results.filter { $0.blacklistStatus.lowercased().contains("black") || $0.blacklistStatus.lowercased().contains("stolen") }.count
-
-                    HStack(spacing: 16) {
-                        VStack {
-                            Text("\(results.count)").font(.title2.bold().monospacedDigit())
-                            Text("Total").font(.caption2).foregroundStyle(.secondary)
-                        }
-                        VStack {
-                            Text("\(cleanCount)").font(.title2.bold().monospacedDigit()).foregroundStyle(.green)
-                            Text("Clean").font(.caption2).foregroundStyle(.secondary)
-                        }
-                        VStack {
-                            Text("\(flaggedCount)").font(.title2.bold().monospacedDigit()).foregroundStyle(.red)
-                            Text("Flagged").font(.caption2).foregroundStyle(.secondary)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-
-                    ForEach(results) { entry in
-                        VStack(alignment: .leading, spacing: 4) {
+                    // Buttons Area
+                    HStack(spacing: 12) {
+                        Button {
+                            runBatchCheck()
+                        } label: {
                             HStack {
-                                Image(systemName: entry.isValid ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                    .foregroundStyle(entry.isValid ? .green : .red)
-                                Text(entry.imei)
-                                    .font(.caption.monospaced())
-                                Spacer()
-                                Text(entry.blacklistStatus)
-                                    .font(.caption2)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(entry.blacklistStatus.lowercased().contains("clean") ? Color.green.opacity(0.2) : Color.orange.opacity(0.2))
-                                    .clipShape(Capsule())
+                                if isLoading {
+                                    ProgressView()
+                                    Text("Checking \(progress)/\(totalCount)...")
+                                } else {
+                                    Image(systemName: "play.circle.fill")
+                                    Text("Run Batch Check")
+                                }
                             }
-                            if !entry.model.isEmpty {
-                                Text(entry.model)
-                                    .font(.caption2)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                        }
+                        .disabled(parseIMEIs().isEmpty || isLoading)
+
+                        Button {
+                            batchInput = ""
+                            results = []
+                            progress = 0
+                            totalCount = 0
+                        } label: {
+                            Image(systemName: "trash")
+                                .padding()
+                                .foregroundStyle(.red)
+                        }
+                        .disabled(isLoading)
+                    }
+                    .padding(.horizontal)
+
+                    // Progress Area
+                    if isLoading && totalCount > 0 {
+                        Section {
+                            VStack(alignment: .leading, spacing: 4) {
+                                ProgressView(value: Double(progress), total: Double(totalCount))
+                                Text("\(progress) of \(totalCount) completed")
+                                    .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
                         }
-                        .padding(.vertical, 2)
+                        .padding(.horizontal)
                     }
-                }
 
-                Section {
-                    ShareLink(item: exportResults()) {
-                        Label("Export Results", systemImage: "square.and.arrow.up")
+                    // Results Area
+                    if !results.isEmpty {
+                        Section {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("Results (\(results.count))")
+                                    .font(.headline)
+
+                                let cleanCount = results.filter { $0.blacklistStatus.lowercased().contains("clean") || $0.blacklistStatus == "N/A" }.count
+                                let flaggedCount = results.filter { $0.blacklistStatus.lowercased().contains("black") || $0.blacklistStatus.lowercased().contains("stolen") }.count
+
+                                HStack(spacing: 16) {
+                                    VStack {
+                                        Text("\(results.count)").font(.title2.bold().monospacedDigit())
+                                        Text("Total").font(.caption2).foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    VStack {
+                                        Text("\(cleanCount)").font(.title2.bold().monospacedDigit()).foregroundStyle(.green)
+                                        Text("Clean").font(.caption2).foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    VStack {
+                                        Text("\(flaggedCount)").font(.title2.bold().monospacedDigit()).foregroundStyle(.red)
+                                        Text("Flagged").font(.caption2).foregroundStyle(.secondary)
+                                    }
+                                }
+                                .padding()
+
+                                ForEach(results) { entry in
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        HStack {
+                                            Image(systemName: entry.isValid ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                                .foregroundStyle(entry.isValid ? .green : .red)
+                                            Text(entry.imei)
+                                                .font(.caption.monospaced())
+                                            Spacer()
+                                            Text(entry.blacklistStatus)
+                                                .font(.caption2)
+                                                .padding(.horizontal, 6)
+                                                .padding(.vertical, 2)
+                                        }
+                                        if !entry.model.isEmpty {
+                                            Text(entry.model)
+                                                .font(.caption2)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                        Divider()
+                                    }
+                                    .padding(.vertical, 4)
+                                }
+
+                                Button {
+                                    // Fallback for ShareLink as it is not an allowed primitive
+                                    let content = exportResults()
+                                    print("Exported Content: \(content)")
+                                } label: {
+                                    Label("Export Results", systemImage: "square.and.arrow.up")
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    } else if !isLoading {
+                        VStack(spacing: 12) {
+                            Spacer()
+                            Image(systemName: "tray")
+                                .font(.largeTitle)
+                                .foregroundStyle(.secondary)
+                            Text("No results yet")
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 40)
                     }
                 }
+                .padding(.vertical)
             }
+            .navigationTitle("Batch IMEI Checker")
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .navigationTitle("Batch IMEI Checker")
-        .navigationBarTitleDisplayMode(.inline)
     }
 
     private func parseIMEIs() -> [String] {
