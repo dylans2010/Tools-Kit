@@ -63,25 +63,27 @@ struct Diag_LocaleTimezoneView: View {
 
             Section("Date/Time Formatting") {
                 let now = Date()
-                LabeledContent("Short Date") {
-                    Text(now.formatted(.dateTime.day().month().year()))
-                }
-                LabeledContent("Long Date") {
-                    Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).year()))
-                }
-                LabeledContent("Time") {
-                    Text(now.formatted(.dateTime.hour().minute().second()))
-                }
-                LabeledContent("24-Hour") {
-                    let df = DateFormatter()
-                    df.dateFormat = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: Locale.current)
-                    let is24 = df.dateFormat?.contains("a") == false
-                    Text(is24 ? "Yes" : "No")
-                }
-                LabeledContent("First Day of Week") {
-                    let day = Calendar.current.firstWeekday
-                    let symbols = Calendar.current.weekdaySymbols
-                    Text(symbols[day - 1])
+                Group {
+                    LabeledContent("Short Date") {
+                        Text(now.formatted(.dateTime.day().month().year()))
+                    }
+                    LabeledContent("Long Date") {
+                        Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).year()))
+                    }
+                    LabeledContent("Time") {
+                        Text(now.formatted(.dateTime.hour().minute().second()))
+                    }
+                    LabeledContent("24-Hour") {
+                        let df = DateFormatter()
+                        df.dateFormat = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: Locale.current)
+                        let is24 = df.dateFormat?.contains("a") == false
+                        Text(is24 ? "Yes" : "No")
+                    }
+                    LabeledContent("First Day of Week") {
+                        let day = Calendar.current.firstWeekday
+                        let symbols = Calendar.current.weekdaySymbols
+                        Text(symbols[day - 1])
+                    }
                 }
             }
 
