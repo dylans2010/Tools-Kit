@@ -23,6 +23,7 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var error: String?
     @Published var pendingAttachments: [ChatAttachment] = []
+    @Published var isWebSearchEnabled: Bool = false
 
     private let aiService = AIService.shared
     private let webSearchTool = WebSearchTool()
@@ -40,7 +41,7 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
     3. You have access to a conceptual "WebSearchTool" if you need more context about specific error codes or device issues.
        To use it, respond ONLY with: [SEARCH: your query]
     4. You can analyze images and files uploaded by the user to identify hardware damage or inspect log files.
-    5. Render all your responses in clear, professional Markdown.
+    5. ALWAYS use Markdown for your responses. Organize your content using '##' headers for sections, bullet points for lists, and code blocks for technical details. Ensure a structured, professional, and clear response.
     6. Be precise, technical, and helpful.
     """
 
@@ -74,8 +75,13 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
     }
 
     private func performChat(attachments: [ChatAttachment]) async throws {
+        var currentSystemPrompt = systemPrompt
+        if isWebSearchEnabled {
+            currentSystemPrompt += "\n\nCRITICAL: Web search is enabled. You MUST use the [SEARCH: query] tool to gather the latest diagnostic information, error codes, or troubleshooting steps before providing your final response."
+        }
+
         var response = try await aiService.processMessages(
-            messages: [ChatMessage(role: "system", content: systemPrompt)] + messages,
+            messages: [ChatMessage(role: "system", content: currentSystemPrompt)] + messages,
             attachments: attachments
         )
 
@@ -87,7 +93,7 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
 
                 // Get final response after search
                 response = try await aiService.processMessages(
-                    messages: [ChatMessage(role: "system", content: systemPrompt)] + messages + [toolResultMessage],
+                    messages: [ChatMessage(role: "system", content: currentSystemPrompt)] + messages + [toolResultMessage],
                     attachments: []
                 )
             }
@@ -149,6 +155,11 @@ struct DiagnosticsSupportAssistView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Close") { dismiss() }
+                }
+                ToolbarItem(placement: .principal) {
+                    Toggle("Web Search", isOn: $viewModel.isWebSearchEnabled)
+                        .toggleStyle(.button)
+                        .controlSize(.small)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: viewModel.clearChat) {
@@ -285,8 +296,18 @@ struct DiagnosticsSupportAssistView: View {
         let accessing = url.startAccessingSecurityScopedResource()
         defer { if accessing { url.stopAccessingSecurityScopedResource() } }
 
-        guard let data = try? Data(contentsOf: url) else { return }
-        let attachment = ChatAttachment(data: data, mimeType: mimeType(for: url.pathExtension), fileName: url.lastPathComponent)
+        guard var data = try? Data(contentsOf: url) else { return }
+        let ext = url.pathExtension.lowercased()
+        let mime = mimeType(for: ext)
+
+        // Compress images to reduce payload size and prevent errors
+        if mime.hasPrefix("image"), let uiImage = UIImage(data: data) {
+            if let compressedData = uiImage.jpegData(compressionQuality: 0.5) {
+                data = compressedData
+            }
+        }
+
+        let attachment = ChatAttachment(data: data, mimeType: mime, fileName: url.lastPathComponent)
         viewModel.addAttachment(attachment)
     }
 
@@ -295,7 +316,12 @@ struct DiagnosticsSupportAssistView: View {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let data):
-                    if let data = data {
+                    if var data = data {
+                        // Compress images to reduce payload size and prevent errors
+                        if let uiImage = UIImage(data: data),
+                           let compressedData = uiImage.jpegData(compressionQuality: 0.5) {
+                            data = compressedData
+                        }
                         let attachment = ChatAttachment(data: data, mimeType: "image/jpeg", fileName: "image.jpg")
                         viewModel.addAttachment(attachment)
                     }
