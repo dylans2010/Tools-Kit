@@ -6,11 +6,38 @@ struct DiagnosticReportsView: View {
     @State private var reportTitle = ""
     @State private var selectedReport: DiagnosticReport?
     @State private var showingExportSheet = false
+    @State private var filterStatus: DiagnosticReportStatus?
 
     var body: some View {
         List {
+            Section("Auto-Logging") {
+                Toggle(isOn: $reportManager.isAutoLoggingEnabled) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Auto-Log Diagnostics")
+                            .font(.subheadline.weight(.medium))
+                        Text(reportManager.isAutoLoggingEnabled
+                            ? "All diagnostic results will be logged automatically"
+                            : "Enable to capture all diagnostic data into reports")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .tint(.blue)
+
+                if reportManager.isAutoLoggingEnabled {
+                    HStack {
+                        Image(systemName: "record.circle")
+                            .foregroundStyle(.red)
+                            .symbolEffect(.pulse, isActive: true)
+                        Text("Recording all diagnostic results...")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+
             if !reportManager.currentItems.isEmpty {
-                Section("Current Session") {
+                Section("Current Session (\(reportManager.currentItems.count) items)") {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("\(reportManager.currentItems.count) items recorded")
@@ -25,7 +52,41 @@ struct DiagnosticReportsView: View {
                             .controlSize(.small)
                     }
 
-                    ForEach(reportManager.currentItems) { item in
+                    HStack(spacing: 12) {
+                        let passed = reportManager.currentItems.filter { $0.status == .passed }.count
+                        let failed = reportManager.currentItems.filter { $0.status == .failed }.count
+                        let warnings = reportManager.currentItems.filter { $0.status == .warning }.count
+                        let info = reportManager.currentItems.filter { $0.status == .info }.count
+                        Label("\(passed)", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                        Label("\(failed)", systemImage: "xmark.circle.fill").foregroundStyle(.red)
+                        Label("\(warnings)", systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                        Label("\(info)", systemImage: "info.circle.fill").foregroundStyle(.blue)
+                    }
+                    .font(.caption2)
+
+                    if filterStatus != nil {
+                        Button("Clear Filter") { filterStatus = nil }
+                            .font(.caption)
+                    }
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(DiagnosticReportStatus.allCases, id: \.self) { status in
+                                Button {
+                                    filterStatus = filterStatus == status ? nil : status
+                                } label: {
+                                    Text(status.rawValue)
+                                        .font(.caption2.weight(.medium))
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(filterStatus == status ? status.color.opacity(0.3) : Color(.tertiarySystemFill))
+                                        .clipShape(Capsule())
+                                }
+                            }
+                        }
+                    }
+
+                    ForEach(filteredCurrentItems) { item in
                         reportItemRow(item)
                     }
                 }
@@ -40,7 +101,7 @@ struct DiagnosticReportsView: View {
                         Text("No saved reports")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        Text("Run diagnostics and save results to create reports")
+                        Text("Enable auto-logging and run diagnostics to create reports")
                             .font(.caption)
                             .foregroundStyle(.tertiary)
                             .multilineTextAlignment(.center)
@@ -74,6 +135,13 @@ struct DiagnosticReportsView: View {
         }
     }
 
+    private var filteredCurrentItems: [DiagnosticReportItem] {
+        if let status = filterStatus {
+            return reportManager.currentItems.filter { $0.status == status }
+        }
+        return reportManager.currentItems
+    }
+
     private func reportItemRow(_ item: DiagnosticReportItem) -> some View {
         HStack(spacing: 10) {
             Image(systemName: item.status.icon)
@@ -84,8 +152,12 @@ struct DiagnosticReportsView: View {
                 Text(item.details)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .lineLimit(2)
             }
+            Spacer()
+            Text(item.timestamp, style: .time)
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
         }
     }
 
@@ -100,6 +172,8 @@ struct DiagnosticReportsView: View {
                     .foregroundStyle(.red)
                 Label("\(report.warningCount)", systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(.orange)
+                Label("\(report.infoCount)", systemImage: "info.circle.fill")
+                    .foregroundStyle(.blue)
             }
             .font(.caption2)
             Text(formattedDate(report.createdAt))
@@ -119,10 +193,20 @@ struct DiagnosticReportsView: View {
                     let passed = reportManager.currentItems.filter { $0.status == .passed }.count
                     let failed = reportManager.currentItems.filter { $0.status == .failed }.count
                     let warnings = reportManager.currentItems.filter { $0.status == .warning }.count
+                    let info = reportManager.currentItems.filter { $0.status == .info }.count
                     LabeledContent("Total Items") { Text("\(reportManager.currentItems.count)") }
                     LabeledContent("Passed") { Text("\(passed)").foregroundStyle(.green) }
                     LabeledContent("Failed") { Text("\(failed)").foregroundStyle(.red) }
                     LabeledContent("Warnings") { Text("\(warnings)").foregroundStyle(.orange) }
+                    LabeledContent("Info") { Text("\(info)").foregroundStyle(.blue) }
+                }
+
+                Section("Categories Covered") {
+                    let categories = Set(reportManager.currentItems.map { $0.category })
+                    ForEach(Array(categories).sorted(), id: \.self) { cat in
+                        let count = reportManager.currentItems.filter { $0.category == cat }.count
+                        LabeledContent(cat) { Text("\(count) items").font(.caption) }
+                    }
                 }
             }
             .navigationTitle("Save Report")
@@ -141,7 +225,7 @@ struct DiagnosticReportsView: View {
                 }
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
     }
 
     private func formattedDate(_ date: Date) -> String {
@@ -155,15 +239,23 @@ struct DiagnosticReportsView: View {
 struct DiagnosticReportDetailView: View {
     let report: DiagnosticReport
     @State private var showingShareSheet = false
+    @State private var exportFormat: ExportFormat = .text
     @StateObject private var reportManager = DiagnosticReportManager.shared
+
+    enum ExportFormat: String, CaseIterable {
+        case text = "Text"
+        case csv = "CSV"
+        case json = "JSON"
+    }
 
     var body: some View {
         List {
             Section("Summary") {
-                HStack(spacing: 20) {
+                HStack(spacing: 16) {
                     statBadge(count: report.passedCount, label: "Passed", color: .green)
                     statBadge(count: report.failedCount, label: "Failed", color: .red)
                     statBadge(count: report.warningCount, label: "Warnings", color: .orange)
+                    statBadge(count: report.infoCount, label: "Info", color: .blue)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
@@ -173,6 +265,20 @@ struct DiagnosticReportDetailView: View {
                 LabeledContent("Model") { Text(report.deviceModel) }
                 LabeledContent("OS") { Text(report.osVersion) }
                 LabeledContent("Date") { Text(formattedDate(report.createdAt)) }
+                LabeledContent("Total Items") { Text("\(report.items.count)") }
+            }
+
+            Section("Export") {
+                Picker("Format", selection: $exportFormat) {
+                    ForEach(ExportFormat.allCases, id: \.self) { format in
+                        Text(format.rawValue).tag(format)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                ShareLink(item: exportContent) {
+                    Label("Export Report (\(exportFormat.rawValue))", systemImage: "square.and.arrow.up")
+                }
             }
 
             Section("Results (\(report.items.count))") {
@@ -194,6 +300,9 @@ struct DiagnosticReportDetailView: View {
                         Text(item.details)
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                        Text(reportManager.formattedDate(item.timestamp))
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
                     }
                     .padding(.vertical, 2)
                 }
@@ -201,12 +310,13 @@ struct DiagnosticReportDetailView: View {
         }
         .navigationTitle(report.title)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                ShareLink(item: reportManager.exportReportAsText(report)) {
-                    Image(systemName: "square.and.arrow.up")
-                }
-            }
+    }
+
+    private var exportContent: String {
+        switch exportFormat {
+        case .text: return reportManager.exportReportAsText(report)
+        case .csv: return reportManager.exportReportAsCSV(report)
+        case .json: return reportManager.exportReportAsJSON(report)
         }
     }
 

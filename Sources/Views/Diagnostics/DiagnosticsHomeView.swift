@@ -348,6 +348,13 @@ struct DiagnosticsHomeView: View {
         case "storage_usage": Diag_StorageUsageView()
         case "backup_status": Diag_BackupStatusView()
         case "crash_log_analyzer": Diag_CrashLogAnalyzerView()
+        // New IMEI & Security Tools
+        case "imei_network_check": Diag_IMEINetworkCheckView()
+        case "imei_device_lookup": Diag_IMEIDeviceLookupView()
+        case "imei_batch_checker": Diag_IMEIBatchCheckerView()
+        case "imei_comprehensive": Diag_IMEIComprehensiveView()
+        case "imei_carrier_compat": Diag_IMEICarrierCompatView()
+        case "device_valuation": Diag_DeviceValuationView()
         default:
             Text("Tool not found")
         }

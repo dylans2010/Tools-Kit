@@ -63,6 +63,7 @@ struct DiagnosticReport: Identifiable, Codable {
     var passedCount: Int { items.filter { $0.status == .passed }.count }
     var failedCount: Int { items.filter { $0.status == .failed }.count }
     var warningCount: Int { items.filter { $0.status == .warning }.count }
+    var infoCount: Int { items.filter { $0.status == .info }.count }
 }
 
 final class DiagnosticReportManager: ObservableObject {
@@ -70,16 +71,30 @@ final class DiagnosticReportManager: ObservableObject {
 
     @Published var reports: [DiagnosticReport] = []
     @Published var currentItems: [DiagnosticReportItem] = []
+    @Published var isAutoLoggingEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(isAutoLoggingEnabled, forKey: autoLoggingKey)
+        }
+    }
 
     private let storageKey = "diagnosticReports"
+    private let autoLoggingKey = "diagnosticAutoLogging"
 
     private init() {
+        isAutoLoggingEnabled = UserDefaults.standard.bool(forKey: autoLoggingKey)
         loadReports()
+    }
+
+    func logIfEnabled(toolName: String, category: String, status: DiagnosticReportStatus, details: String) {
+        guard isAutoLoggingEnabled else { return }
+        addItem(toolName: toolName, category: category, status: status, details: details)
     }
 
     func addItem(toolName: String, category: String, status: DiagnosticReportStatus, details: String) {
         let item = DiagnosticReportItem(toolName: toolName, category: category, status: status, details: details)
-        currentItems.append(item)
+        DispatchQueue.main.async {
+            self.currentItems.append(item)
+        }
     }
 
     func saveReport(title: String) {
@@ -115,6 +130,7 @@ final class DiagnosticReportManager: ObservableObject {
         text += "Passed: \(report.passedCount)\n"
         text += "Failed: \(report.failedCount)\n"
         text += "Warnings: \(report.warningCount)\n"
+        text += "Info: \(report.infoCount)\n"
         text += "Total: \(report.items.count)\n\n"
         text += "DETAILS\n"
         text += "-------\n"
@@ -124,6 +140,25 @@ final class DiagnosticReportManager: ObservableObject {
             text += "  Time: \(formattedDate(item.timestamp))\n\n"
         }
         return text
+    }
+
+    func exportReportAsCSV(_ report: DiagnosticReport) -> String {
+        var csv = "Status,Tool,Category,Details,Timestamp\n"
+        for item in report.items {
+            let details = item.details.replacingOccurrences(of: "\"", with: "\"\"")
+            csv += "\"\(item.status.rawValue)\",\"\(item.toolName)\",\"\(item.category)\",\"\(details)\",\"\(formattedDate(item.timestamp))\"\n"
+        }
+        return csv
+    }
+
+    func exportReportAsJSON(_ report: DiagnosticReport) -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        encoder.dateEncodingStrategy = .iso8601
+        if let data = try? encoder.encode(report) {
+            return String(data: data, encoding: .utf8) ?? "{}"
+        }
+        return "{}"
     }
 
     private func persistReports() {
@@ -139,7 +174,7 @@ final class DiagnosticReportManager: ObservableObject {
         }
     }
 
-    private func formattedDate(_ date: Date) -> String {
+    func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short

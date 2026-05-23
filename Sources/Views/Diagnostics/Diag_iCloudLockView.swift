@@ -7,6 +7,10 @@ struct Diag_iCloudLockView: View {
     @State private var imeiInput: String = ""
     @State private var isCheckingIMEI = false
     @State private var imeiCheckResult: [(String, String)]?
+    @State private var imeiLockDetected: Bool?
+    @State private var checkHistory: [(String, Bool?, Date)] = []
+
+    private let service = IMEICheckService.shared
 
     enum LockIndicator {
         case locked, clear, unknown
@@ -63,6 +67,13 @@ struct Diag_iCloudLockView: View {
                         imeiInput = String(newValue.filter { $0.isNumber }.prefix(15))
                     }
 
+                if !imeiInput.isEmpty && imeiInput.count == 15 {
+                    let valid = service.luhnValidate(imeiInput)
+                    Text(valid ? "Valid IMEI" : "Invalid checksum")
+                        .font(.caption)
+                        .foregroundStyle(valid ? .green : .red)
+                }
+
                 Button {
                     checkIMEIiCloudLock()
                 } label: {
@@ -72,15 +83,45 @@ struct Diag_iCloudLockView: View {
                         } else {
                             Image(systemName: "icloud.and.arrow.up")
                         }
-                        Text("Check iCloud Lock via IMEI")
+                        Text("Check iCloud Lock via API")
                     }
                 }
                 .disabled(imeiInput.count != 15 || isCheckingIMEI)
 
                 if let results = imeiCheckResult {
-                    ForEach(results, id: \.0) { r in
-                        LabeledContent(r.0) {
-                            Text(r.1).font(.caption)
+                    VStack(spacing: 4) {
+                        if let locked = imeiLockDetected {
+                            HStack(spacing: 8) {
+                                Image(systemName: locked ? "lock.icloud.fill" : "checkmark.icloud.fill")
+                                    .font(.title2)
+                                    .foregroundStyle(locked ? .orange : .green)
+                                Text(locked ? "iCloud Lock Detected" : "No iCloud Lock")
+                                    .font(.headline)
+                                    .foregroundStyle(locked ? .orange : .green)
+                            }
+                            .padding(.vertical, 4)
+                        }
+
+                        ForEach(results, id: \.0) { r in
+                            LabeledContent(r.0) {
+                                Text(r.1)
+                                    .font(.caption)
+                                    .textSelection(.enabled)
+                            }
+                        }
+                    }
+                }
+            }
+
+            if !checkHistory.isEmpty {
+                Section("Check History") {
+                    ForEach(checkHistory, id: \.0) { entry in
+                        HStack {
+                            Image(systemName: entry.1 == true ? "lock.icloud.fill" : entry.1 == false ? "checkmark.icloud.fill" : "questionmark.circle.fill")
+                                .foregroundStyle(entry.1 == true ? .orange : entry.1 == false ? .green : .secondary)
+                            Text(entry.0).font(.caption.monospaced())
+                            Spacer()
+                            Text(entry.2, style: .time).font(.caption2).foregroundStyle(.tertiary)
                         }
                     }
                 }
@@ -99,6 +140,15 @@ struct Diag_iCloudLockView: View {
                         .font(.caption)
                 }
                 .padding(.vertical, 4)
+            }
+
+            Section("Resources") {
+                Link(destination: URL(string: "https://support.apple.com/en-us/111896")!) {
+                    Label("Apple - Activation Lock", systemImage: "safari.fill").font(.subheadline)
+                }
+                Link(destination: URL(string: "https://support.apple.com/en-us/111894")!) {
+                    Label("Apple - If your device is lost", systemImage: "safari.fill").font(.subheadline)
+                }
             }
 
             Section {
@@ -127,7 +177,7 @@ struct Diag_iCloudLockView: View {
 
     private var statusSubtitle: String {
         switch overallStatus {
-        case .locked: return "Device has an active iCloud account — Activation Lock likely enabled"
+        case .locked: return "Device has an active iCloud account - Activation Lock likely enabled"
         case .clear: return "No strong indicators of iCloud lock found on this device"
         case .unknown: return "Could not definitively determine iCloud lock status"
         }
@@ -192,6 +242,13 @@ struct Diag_iCloudLockView: View {
         checks = results
         let lockedCount = results.filter { $0.2 == .locked }.count
         overallStatus = lockedCount >= 2 ? .locked : lockedCount == 0 ? .clear : .unknown
+
+        DiagnosticReportManager.shared.logIfEnabled(
+            toolName: "iCloud Lock",
+            category: "Security",
+            status: overallStatus == .clear ? .passed : overallStatus == .locked ? .warning : .info,
+            details: "Local detection: \(statusTitle)"
+        )
     }
 
     private func checkIMEIiCloudLock() {
@@ -199,55 +256,22 @@ struct Diag_iCloudLockView: View {
         guard imei.count == 15 else { return }
         isCheckingIMEI = true
 
-        guard let url = URL(string: "https://api.imeicheck.net/v1/checks") else {
-            isCheckingIMEI = false
-            return
-        }
+        Task {
+            let apiResult = await service.checkiCloudLock(imei)
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 20
-
-        let body: [String: Any] = [
-            "deviceId": imei,
-            "serviceId": 1
-        ]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async {
+            await MainActor.run {
                 isCheckingIMEI = false
+                imeiCheckResult = apiResult.details
+                imeiLockDetected = apiResult.locked
+                checkHistory.insert((imei, apiResult.locked, Date()), at: 0)
 
-                if let error = error {
-                    imeiCheckResult = [
-                        ("Error", error.localizedDescription),
-                        ("Suggestion", "Check at Settings → [your name] → Find My")
-                    ]
-                    return
-                }
-
-                guard let data = data,
-                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                    imeiCheckResult = [
-                        ("IMEI", imei),
-                        ("Status", "Service unavailable — try again later")
-                    ]
-                    return
-                }
-
-                var results: [(String, String)] = [("IMEI", imei)]
-                if let fmiStatus = json["findMyIphone"] as? String {
-                    results.append(("Find My iPhone", fmiStatus))
-                }
-                if let lockStatus = json["activationLock"] as? String {
-                    results.append(("Activation Lock", lockStatus))
-                }
-                if let model = json["model"] as? String {
-                    results.append(("Model", model))
-                }
-                imeiCheckResult = results
+                DiagnosticReportManager.shared.logIfEnabled(
+                    toolName: "iCloud Lock",
+                    category: "Security",
+                    status: apiResult.locked == false ? .passed : apiResult.locked == true ? .warning : .info,
+                    details: "IMEI \(imei): \(apiResult.locked == true ? "Locked" : apiResult.locked == false ? "Clear" : "Unknown")"
+                )
             }
-        }.resume()
+        }
     }
 }
