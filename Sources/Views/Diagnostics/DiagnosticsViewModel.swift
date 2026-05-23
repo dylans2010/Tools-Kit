@@ -148,10 +148,61 @@ final class DiagnosticsViewModel: ObservableObject {
         DiagnosticTool(id: "dynamic_type", name: "Dynamic Type", icon: "textformat.size", description: "Test current Dynamic Type text size settings", category: .accessibility),
         DiagnosticTool(id: "reduce_motion", name: "Reduce Motion", icon: "figure.walk", description: "Check reduce motion and transparency settings", category: .accessibility),
 
-        // Security (3)
+        // Security (5)
         DiagnosticTool(id: "biometric", name: "Biometric Check", icon: "faceid", description: "Test Face ID or Touch ID availability", category: .security),
         DiagnosticTool(id: "passcode", name: "Passcode Status", icon: "lock.fill", description: "Check if device passcode is set", category: .security),
         DiagnosticTool(id: "secure_enclave", name: "Secure Enclave", icon: "lock.shield.fill", description: "Verify Secure Enclave availability", category: .security),
+        DiagnosticTool(id: "jailbreak", name: "Jailbreak Detection", icon: "exclamationmark.shield.fill", description: "Check device for jailbreak indicators", category: .security),
+        DiagnosticTool(id: "ats_check", name: "ATS Check", icon: "lock.doc.fill", description: "Verify App Transport Security configuration", category: .security),
+        DiagnosticTool(id: "keychain_check", name: "Keychain Check", icon: "key.fill", description: "Test Keychain read/write and encryption", category: .security),
+
+        // Display (new)
+        DiagnosticTool(id: "refresh_rate", name: "Refresh Rate", icon: "arrow.clockwise", description: "Detect display refresh rate and ProMotion", category: .display),
+        DiagnosticTool(id: "hdr_display", name: "HDR Display", icon: "sun.max.trianglebadge.exclamationmark.fill", description: "Check HDR and wide color gamut support", category: .display),
+        DiagnosticTool(id: "display_zoom", name: "Display Zoom", icon: "plus.magnifyingglass", description: "Detect Display Zoom mode and screen metrics", category: .display),
+
+        // Audio (new)
+        DiagnosticTool(id: "spatial_audio", name: "Spatial Audio", icon: "ear.fill", description: "Check Spatial Audio and Dolby Atmos support", category: .audio),
+        DiagnosticTool(id: "audio_routing", name: "Audio Routing", icon: "arrow.triangle.branch", description: "View current audio input/output routing", category: .audio),
+
+        // Microphone (new)
+        DiagnosticTool(id: "voice_isolation", name: "Voice Isolation", icon: "person.wave.2.fill", description: "Test voice isolation and noise suppression", category: .microphone),
+
+        // Sensors (new)
+        DiagnosticTool(id: "barometer", name: "Barometer", icon: "barometer", description: "Measure atmospheric pressure and altitude", category: .sensors),
+        DiagnosticTool(id: "pedometer", name: "Pedometer", icon: "figure.walk", description: "Track steps, distance, and floors climbed", category: .sensors),
+        DiagnosticTool(id: "motion_activity", name: "Motion Activity", icon: "figure.run", description: "Detect walking, running, driving activity", category: .sensors),
+
+        // Connectivity (new)
+        DiagnosticTool(id: "cellular_info", name: "Cellular Info", icon: "antenna.radiowaves.left.and.right", description: "Carrier, radio technology, and signal info", category: .connectivity),
+        DiagnosticTool(id: "nfc_check", name: "NFC Check", icon: "wave.3.right.circle.fill", description: "Check NFC reading capability", category: .connectivity),
+        DiagnosticTool(id: "vpn_status", name: "VPN Status", icon: "lock.shield.fill", description: "Detect active VPN connections and tunnels", category: .connectivity),
+        DiagnosticTool(id: "network_info", name: "Network Info", icon: "network", description: "View network interfaces, IPs, and DNS", category: .connectivity),
+
+        // Performance (new)
+        DiagnosticTool(id: "gpu_info", name: "GPU Info", icon: "gpu", description: "Metal GPU capabilities and memory info", category: .performance),
+        DiagnosticTool(id: "app_launch", name: "App Launch Time", icon: "timer", description: "Benchmark operation speed and launch metrics", category: .performance),
+
+        // Battery (new)
+        DiagnosticTool(id: "low_power", name: "Low Power Mode", icon: "bolt.circle.fill", description: "Check Low Power Mode status and impact", category: .battery),
+
+        // Camera (new)
+        DiagnosticTool(id: "zoom_range", name: "Zoom Range", icon: "camera.aperture", description: "Test camera zoom capabilities and lenses", category: .camera),
+        DiagnosticTool(id: "lidar_check", name: "LiDAR Check", icon: "dot.radiowaves.left.and.right", description: "Check LiDAR scanner and depth sensing", category: .camera),
+        DiagnosticTool(id: "truedepth", name: "TrueDepth Camera", icon: "faceid", description: "Test TrueDepth camera and Face ID hardware", category: .camera),
+
+        // Storage (new)
+        DiagnosticTool(id: "cache_size", name: "Cache Size", icon: "archivebox.fill", description: "Analyze app cache and temp storage usage", category: .storage),
+        DiagnosticTool(id: "storage_health", name: "Storage Health", icon: "heart.text.square.fill", description: "Storage capacity, I/O speed, and health", category: .storage),
+
+        // System (new)
+        DiagnosticTool(id: "bg_refresh", name: "Background Refresh", icon: "arrow.clockwise.circle.fill", description: "Check Background App Refresh status", category: .system),
+        DiagnosticTool(id: "screen_time", name: "Screen Time", icon: "hourglass.circle.fill", description: "View session time and display metrics", category: .system),
+        DiagnosticTool(id: "hw_buttons", name: "Hardware Buttons", icon: "iphone.gen3", description: "Test volume buttons and silent switch", category: .system),
+
+        // Accessibility (new)
+        DiagnosticTool(id: "bold_text", name: "Bold Text", icon: "bold", description: "Check if system bold text is enabled", category: .accessibility),
+        DiagnosticTool(id: "color_filters", name: "Color Filters", icon: "circle.lefthalf.filled", description: "Detect active color filters and inversions", category: .accessibility),
     ]
 
     var filteredTools: [DiagnosticTool] {

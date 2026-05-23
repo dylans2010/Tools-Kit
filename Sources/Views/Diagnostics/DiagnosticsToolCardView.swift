@@ -8,13 +8,13 @@ struct DiagnosticsToolCardView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
                 Image(systemName: tool.icon)
-                    .font(.title2)
-                    .foregroundStyle(tool.category.tint)
-                    .frame(width: 38, height: 38)
-                    .background(tool.category.tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+                    .font(.title3)
+                    .foregroundStyle(.primary)
+                    .frame(width: 36, height: 36)
+                    .background(Color(.tertiarySystemFill), in: RoundedRectangle(cornerRadius: 8))
 
                 Text(tool.name)
-                    .font(.subheadline.weight(.semibold))
+                    .font(.subheadline.weight(.medium))
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
             }
@@ -27,7 +27,6 @@ struct DiagnosticsToolCardView: View {
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
