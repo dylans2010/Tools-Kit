@@ -64,7 +64,7 @@ struct Diag_RuntimeInfoView: View {
                 }
             }
 
-            Section("Loaded Libraries (\(loadedLibraries.count))") {
+            Section<String>("Loaded Libraries (\(loadedLibraries.count))") {
                 if !loadedLibraries.isEmpty {
                     TextField("Search...", text: $searchText)
                         .textInputAutocapitalization(.never)

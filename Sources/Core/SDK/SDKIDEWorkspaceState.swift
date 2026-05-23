@@ -392,6 +392,7 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
         return scopes
     }
 
+    @MainActor
     public func setScope(_ key: String, enabled: Bool, for projectManager: SDKProjectManager = .shared) {
         guard var project = projectManager.currentProject else { return }
         if enabled {
@@ -430,6 +431,7 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
         save()
     }
 
+    @MainActor
     public func syncSDKGraphFromProject() {
         syncSDKGraphFromProject(SDKProjectManager.shared.currentProject)
     }
@@ -449,6 +451,7 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
         recalculateDiagnostics()
     }
 
+    @MainActor
     public func recalculateDiagnostics() {
         var next: [SDKRuntimeDiagnostic] = []
         let project = SDKProjectManager.shared.currentProject

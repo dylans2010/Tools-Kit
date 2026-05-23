@@ -1,6 +1,6 @@
 import SwiftUI
 import AVFoundation
-import Vision
+@preconcurrency import Vision
 
 // MARK: - Scan Engine
 
