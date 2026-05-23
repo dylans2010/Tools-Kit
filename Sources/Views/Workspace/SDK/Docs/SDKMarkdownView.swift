@@ -4,12 +4,16 @@ import SwiftUI
 /// Strips raw Markdown syntax characters and preserves structure (headings, lists, code blocks, tables).
 struct SDKMarkdownView: View {
     let text: String
+    @State private var blocks: [MarkdownBlock] = []
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            ForEach(Array(parseBlocks(text).enumerated()), id: \.offset) { _, block in
+            ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
                 renderBlock(block)
             }
+        }
+        .task(id: text) {
+            self.blocks = parseBlocks(text)
         }
     }
 

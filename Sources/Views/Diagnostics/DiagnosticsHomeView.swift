@@ -38,7 +38,7 @@ struct DiagnosticsHomeView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showSupportAssist) {
+            .fullScreenCover(isPresented: $showSupportAssist) {
                 DiagnosticsSupportAssistView()
             }
             .sheet(isPresented: $showSettings) {

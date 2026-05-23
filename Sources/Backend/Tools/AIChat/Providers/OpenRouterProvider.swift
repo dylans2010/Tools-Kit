@@ -48,10 +48,30 @@ final class OpenRouterProvider: AIProvider {
         var apiMessages: [[String: Any]] = messages.dropLast().map { ["role": $0.role, "content": $0.content] }
         if let last = messages.last {
             var content: [[String: Any]] = [["type": "text", "text": last.content]]
+            var additionalTextContext = ""
+
             for att in attachments {
-                let b64 = att.data.base64EncodedString()
-                content.append(["type": "image_url", "image_url": ["url": "data:\(att.mimeType);base64,\(b64)"]])
+                if att.mimeType.hasPrefix("image") {
+                    let b64 = att.data.base64EncodedString()
+                    content.append([
+                        "type": "image_url",
+                        "image_url": ["url": "data:\(att.mimeType);base64,\(b64)"]
+                    ])
+                } else if att.mimeType == "text/plain", let text = String(data: att.data, encoding: .utf8) {
+                    additionalTextContext += "\n\n--- Attachment: \(att.fileName) ---\n\(text)"
+                } else {
+                    additionalTextContext += "\n\n[Attachment: \(att.fileName) (\(att.mimeType)) - Binary content not directly viewable]"
+                }
             }
+
+            if !additionalTextContext.isEmpty {
+                if var textPart = content.first(where: { ($0["type"] as? String) == "text" }),
+                   let originalText = textPart["text"] as? String {
+                    textPart["text"] = originalText + additionalTextContext
+                    content[0] = textPart
+                }
+            }
+
             apiMessages.append(["role": last.role, "content": content])
         }
 
