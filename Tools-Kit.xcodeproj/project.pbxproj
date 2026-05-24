@@ -1343,8 +1343,8 @@
 		SN0200000000000000000002 /* ScanNotebooksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SN0100000000000000000002 /* ScanNotebooksView.swift */; };
 		SN0200000000000000000003 /* ScanNotebooksModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = SN0100000000000000000003 /* ScanNotebooksModels.swift */; };
 		WA0200000000000000000004 /* WritingAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA0100000000000000000004 /* WritingAnalyticsView.swift */; };
-		DV0200000000000000000001 /* DictionaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000001 /* DictionaryViewModel.swift */; };
-		DV0200000000000000000002 /* DictionaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000002 /* DictionaryView.swift */; };
+		DV9200000000000000000001 /* DictionaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV9100000000000000000001 /* DictionaryViewModel.swift */; };
+		DV9200000000000000000002 /* DictionaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV9100000000000000000002 /* DictionaryView.swift */; };
 		SG0200000000000000000001 /* WordSuggestionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = SG0100000000000000000001 /* WordSuggestionsViewModel.swift */; };
 		SG0200000000000000000002 /* WordSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SG0100000000000000000002 /* WordSuggestionsView.swift */; };
 		ML02B9C001F45A2E4FCA868D /* NotebookVersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */; };
@@ -3092,8 +3092,8 @@
 		SN0100000000000000000002 /* ScanNotebooksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanNotebooksView.swift; sourceTree = "<group>"; };
 		SN0100000000000000000003 /* ScanNotebooksModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanNotebooksModels.swift; sourceTree = "<group>"; };
 		WA0100000000000000000004 /* WritingAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingAnalyticsView.swift; sourceTree = "<group>"; };
-		DV0100000000000000000001 /* DictionaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryViewModel.swift; sourceTree = "<group>"; };
-		DV0100000000000000000002 /* DictionaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryView.swift; sourceTree = "<group>"; };
+		DV9100000000000000000001 /* DictionaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryViewModel.swift; sourceTree = "<group>"; };
+		DV9100000000000000000002 /* DictionaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryView.swift; sourceTree = "<group>"; };
 		SG0100000000000000000001 /* WordSuggestionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSuggestionsViewModel.swift; sourceTree = "<group>"; };
 		SG0100000000000000000002 /* WordSuggestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSuggestionsView.swift; sourceTree = "<group>"; };
 		ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookVersionHistoryView.swift; sourceTree = "<group>"; };
@@ -5731,8 +5731,8 @@
 				SN0100000000000000000002 /* ScanNotebooksView.swift */,
 				SN0100000000000000000003 /* ScanNotebooksModels.swift */,
 				WA0100000000000000000004 /* WritingAnalyticsView.swift */,
-				DV0100000000000000000001 /* DictionaryViewModel.swift */,
-				DV0100000000000000000002 /* DictionaryView.swift */,
+				DV9100000000000000000001 /* DictionaryViewModel.swift */,
+				DV9100000000000000000002 /* DictionaryView.swift */,
 				SG0100000000000000000001 /* WordSuggestionsViewModel.swift */,
 				SG0100000000000000000002 /* WordSuggestionsView.swift */,
 			);
@@ -11254,8 +11254,8 @@
 				SN0200000000000000000002 /* ScanNotebooksView.swift in Sources */,
 				SN0200000000000000000003 /* ScanNotebooksModels.swift in Sources */,
 				WA0200000000000000000004 /* WritingAnalyticsView.swift in Sources */,
-				DV0200000000000000000001 /* DictionaryViewModel.swift in Sources */,
-				DV0200000000000000000002 /* DictionaryView.swift in Sources */,
+				DV9200000000000000000001 /* DictionaryViewModel.swift in Sources */,
+				DV9200000000000000000002 /* DictionaryView.swift in Sources */,
 				SG0200000000000000000001 /* WordSuggestionsViewModel.swift in Sources */,
 				SG0200000000000000000002 /* WordSuggestionsView.swift in Sources */,
 				ML02B9C001F45A2E4FCA868D /* NotebookVersionHistoryView.swift in Sources */,
