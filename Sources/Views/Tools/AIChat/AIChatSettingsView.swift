@@ -29,6 +29,7 @@ struct AIChatSettingsView: View {
     @AppStorage("agentEnabled") private var agentEnabled = false
     @AppStorage("agentDebugModeEnabled") private var debugModeEnabled = false
     @AppStorage("selectedAgentType") private var selectedAgentType = AgentType.jules.rawValue
+    @State private var currentAppMode: AppMode = .dashboard
 
     private let registry = AIProviderRegistry.shared
 
@@ -175,6 +176,13 @@ struct AIChatSettingsView: View {
                 await loadProviderModels(force: false)
                 await MainActor.run { featureCheck.refresh() }
             }
+            .onAppear {
+                currentAppMode = resolveCurrentMode()
+            }
+            .onChange(of: musicMode.isMusicModeEnabled) { _, _ in currentAppMode = resolveCurrentMode() }
+            .onChange(of: workoutsMode.isWorkoutsModeEnabled) { _, _ in currentAppMode = resolveCurrentMode() }
+            .onChange(of: workspaceMode.isWorkspaceModeEnabled) { _, _ in currentAppMode = resolveCurrentMode() }
+            .onChange(of: diagnosticsMode.isDiagnosticsModeEnabled) { _, _ in currentAppMode = resolveCurrentMode() }
             .onChange(of: settings.selectedProviderID) { _, _ in
                 Task { await loadProviderModels(force: false) }
             }
@@ -582,7 +590,7 @@ struct AIChatSettingsView: View {
     private var appModeSectionContent: some View {
         NavigationLink(destination: AppModePickerView(selectedAppMode: selectedAppMode)) {
             HStack {
-                Label(currentMode.title, systemImage: currentMode.icon)
+                Label(currentAppMode.title, systemImage: currentAppMode.icon)
                 Spacer()
                 Text("Change Mode")
                     .font(.caption)
@@ -749,7 +757,7 @@ extension AIChatSettingsView {
         }
     }
 
-    var currentMode: AppMode {
+    private func resolveCurrentMode() -> AppMode {
         if musicMode.isMusicModeEnabled { return .music }
         if workoutsMode.isWorkoutsModeEnabled { return .workouts }
         if workspaceMode.isWorkspaceModeEnabled { return .workspace }
@@ -759,12 +767,21 @@ extension AIChatSettingsView {
 
     var selectedAppMode: Binding<AppMode> {
         Binding(
-            get: { currentMode },
+            get: { currentAppMode },
             set: { newMode in
-                musicMode.isMusicModeEnabled = (newMode == .music)
-                workoutsMode.isWorkoutsModeEnabled = (newMode == .workouts)
-                workspaceMode.isWorkspaceModeEnabled = (newMode == .workspace)
-                diagnosticsMode.isDiagnosticsModeEnabled = (newMode == .diagnostics)
+                currentAppMode = newMode
+                if musicMode.isMusicModeEnabled != (newMode == .music) {
+                    musicMode.isMusicModeEnabled = (newMode == .music)
+                }
+                if workoutsMode.isWorkoutsModeEnabled != (newMode == .workouts) {
+                    workoutsMode.isWorkoutsModeEnabled = (newMode == .workouts)
+                }
+                if workspaceMode.isWorkspaceModeEnabled != (newMode == .workspace) {
+                    workspaceMode.isWorkspaceModeEnabled = (newMode == .workspace)
+                }
+                if diagnosticsMode.isDiagnosticsModeEnabled != (newMode == .diagnostics) {
+                    diagnosticsMode.isDiagnosticsModeEnabled = (newMode == .diagnostics)
+                }
             }
         )
     }

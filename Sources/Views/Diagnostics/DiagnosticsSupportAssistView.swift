@@ -62,28 +62,37 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         isLoading = true
         error = nil
 
-        currentTask?.cancel()
-        currentTask = Task { [weak self] in
+        // Cancel any previous in-flight task and wait for it to complete
+        if let existing = currentTask {
+            existing.cancel()
+            currentTask = nil
+        }
+
+        let task = Task { [weak self] in
             guard let self = self else { return }
             do {
                 try Task.checkCancellation()
                 try await self.performChat(attachmentItems: attachmentsToSend)
-                self.isLoading = false
+                if !Task.isCancelled {
+                    self.isLoading = false
+                }
             } catch is CancellationError {
                 self.isLoading = false
             } catch {
-                self.error = error.localizedDescription
-                self.isLoading = false
-                self.inputText = savedInput
-                self.pendingAttachments = attachmentsToSend
+                if !Task.isCancelled {
+                    self.error = error.localizedDescription
+                    self.isLoading = false
+                    self.inputText = savedInput
+                    self.pendingAttachments = attachmentsToSend
+                }
             }
         }
+        currentTask = task
     }
 
     private func performChat(attachmentItems: [AttachmentItem]) async throws {
         var currentSystemPrompt = systemPrompt
 
-        // Decode attachments using FileDecoderHelper
         let chatAttachments = attachmentItems.map { $0.attachment }
         let decoded = await FileDecoderHelper.decodeAttachments(chatAttachments)
 
@@ -108,7 +117,6 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
 
         try Task.checkCancellation()
 
-        // Check if response contains search results metadata
         if isWebSearchEnabled, let query = extractSearchQuery(from: response) {
             searchingStatus = "Searching: \(query)..."
             let searchResponse = await aiService.performFullWebSearch(query: query)
@@ -158,9 +166,9 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         }
     }
 
-    func addImageAttachment(_ image: UIImage, fileName: String = "photo.jpg") {
+    func addImageFromLibrary(_ image: UIImage) {
         Task {
-            let attachment = await FileDecoderHelper.decodeImage(image, fileName: fileName)
+            let attachment = await FileDecoderHelper.decodeImageFromLibrary(image)
             addAttachment(attachment)
         }
     }
@@ -191,71 +199,33 @@ struct DiagnosticsSupportAssistView: View {
     @State private var showFileImporter = false
     @State private var selectedPhotoItem: PhotosPickerItem?
 
+    private let subtleBlue = Color.blue.opacity(0.15)
+
     var body: some View {
         NavigationStack {
-            ZStack {
-                LinearGradient(
-                    colors: [Color.blue.opacity(0.15), Color.blue.opacity(0.05), Color.clear],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-                .drawingGroup()
+            VStack(spacing: 0) {
+                chatScrollView
 
-                VStack(spacing: 0) {
-                    chatScrollView
-
-                    if let status = viewModel.searchingStatus {
-                        HStack(spacing: 12) {
-                            Image(systemName: "sparkles")
-                                .symbolEffect(.variableColor.iterative)
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [.blue, .purple, .cyan],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-
-                            Text(status)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-
-                            Spacer()
-
-                            if !viewModel.lastSearchResults.isEmpty {
-                                Button {
-                                    viewModel.showSearchResults = true
-                                } label: {
-                                    Text("View Sources")
-                                        .font(.caption.weight(.medium))
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 4)
-                                        .background(Color.blue.opacity(0.15))
-                                        .clipShape(Capsule())
-                                }
-                            }
-                        }
-                        .padding()
-                        .background(.ultraThinMaterial)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-
-                    if let error = viewModel.error {
-                        Text(error)
-                            .font(.caption)
-                            .foregroundColor(.red)
-                            .padding()
-                    }
-
-                    attachmentPreviewBar
-
-                    inputArea
+                if let status = viewModel.searchingStatus {
+                    searchStatusBar(status: status)
                 }
+
+                if let error = viewModel.error {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundColor(.red)
+                        .padding(.horizontal)
+                        .padding(.vertical, 4)
+                }
+
+                attachmentPreviewBar
+
+                inputArea
             }
+            .background(subtleBlue.ignoresSafeArea())
             .navigationTitle("Support Assist")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.blue.opacity(0.15), for: .navigationBar)
+            .toolbarBackground(subtleBlue, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -301,38 +271,78 @@ struct DiagnosticsSupportAssistView: View {
         }
     }
 
+    // MARK: - Chat Scroll View
+
     private var chatScrollView: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(spacing: 16) {
+                LazyVStack(spacing: 12) {
                     if viewModel.messages.isEmpty {
                         emptyStateView
                     }
 
                     ForEach(viewModel.messages) { message in
-                        MessageBubble(message: message)
+                        MessageBubbleView(message: message)
                             .id(message.id)
                     }
 
                     if viewModel.isLoading {
-                        HStack {
-                            ProgressView()
-                                .padding()
-                            Spacer()
-                        }
+                        typingIndicator
+                            .id("typing-indicator")
                     }
                 }
                 .padding()
             }
+            .background(subtleBlue)
             .onChange(of: viewModel.messages.count) { _, _ in
-                if let lastId = viewModel.messages.last?.id {
+                scrollToBottom(proxy: proxy)
+            }
+            .onChange(of: viewModel.isLoading) { _, isLoading in
+                if isLoading {
                     withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                        proxy.scrollTo(lastId, anchor: .bottom)
+                        proxy.scrollTo("typing-indicator", anchor: .bottom)
                     }
                 }
             }
         }
     }
+
+    private func scrollToBottom(proxy: ScrollViewProxy) {
+        if let lastId = viewModel.messages.last?.id {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                proxy.scrollTo(lastId, anchor: .bottom)
+            }
+        }
+    }
+
+    // MARK: - Typing Indicator
+
+    private var typingIndicator: some View {
+        HStack {
+            HStack(spacing: 4) {
+                ForEach(0..<3, id: \.self) { index in
+                    Circle()
+                        .fill(Color.secondary)
+                        .frame(width: 8, height: 8)
+                        .opacity(0.6)
+                        .animation(
+                            .easeInOut(duration: 0.6)
+                            .repeatForever()
+                            .delay(Double(index) * 0.2),
+                            value: viewModel.isLoading
+                        )
+                        .scaleEffect(viewModel.isLoading ? 1.0 : 0.5)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+            Spacer()
+        }
+    }
+
+    // MARK: - Empty State
 
     private var emptyStateView: some View {
         VStack(spacing: 12) {
@@ -359,6 +369,46 @@ struct DiagnosticsSupportAssistView: View {
         }
     }
 
+    // MARK: - Search Status Bar
+
+    private func searchStatusBar(status: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "sparkles")
+                .symbolEffect(.variableColor.iterative)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.blue, .purple, .cyan],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
+            Text(status)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+
+            Spacer()
+
+            if !viewModel.lastSearchResults.isEmpty {
+                Button {
+                    viewModel.showSearchResults = true
+                } label: {
+                    Text("View Sources")
+                        .font(.caption.weight(.medium))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.blue.opacity(0.15))
+                        .clipShape(Capsule())
+                }
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+    }
+
+    // MARK: - Attachment Preview
+
     private var attachmentPreviewBar: some View {
         Group {
             if !viewModel.pendingAttachments.isEmpty {
@@ -377,6 +427,8 @@ struct DiagnosticsSupportAssistView: View {
             }
         }
     }
+
+    // MARK: - Input Area
 
     private var inputArea: some View {
         VStack(spacing: 0) {
@@ -407,16 +459,11 @@ struct DiagnosticsSupportAssistView: View {
                         .padding(.vertical, 8)
                         .lineLimit(1...5)
                 }
-                .background(RoundedRectangle(cornerRadius: 20).fill(.ultraThinMaterial))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.primary.opacity(0.1), lineWidth: 0.5)
-                )
+                .background(RoundedRectangle(cornerRadius: 20).stroke(Color.primary.opacity(0.2), lineWidth: 1))
 
                 Button(action: viewModel.sendMessage) {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.system(size: 32))
-                        .symbolRenderingMode(.multicolor)
                         .foregroundColor(viewModel.inputText.isEmpty && viewModel.pendingAttachments.isEmpty ? .secondary : .blue)
                 }
                 .disabled((viewModel.inputText.isEmpty && viewModel.pendingAttachments.isEmpty) || viewModel.isLoading)
@@ -426,6 +473,8 @@ struct DiagnosticsSupportAssistView: View {
             .background(.ultraThinMaterial)
         }
     }
+
+    // MARK: - File Handling
 
     private func handleImportedURLs(_ urls: [URL]) {
         guard let url = urls.first else { return }
@@ -458,11 +507,15 @@ struct DiagnosticsSupportAssistView: View {
             do {
                 if let data = try await item.loadTransferable(type: Data.self) {
                     if let uiImage = UIImage(data: data) {
-                        viewModel.addImageAttachment(uiImage, fileName: "photo_\(UUID().uuidString.prefix(8)).jpg")
+                        await MainActor.run {
+                            viewModel.addImageFromLibrary(uiImage)
+                        }
                     }
                 }
             } catch {
-                viewModel.error = "Failed to load photo: \(error.localizedDescription)"
+                await MainActor.run {
+                    viewModel.error = "Failed to load photo: \(error.localizedDescription)"
+                }
             }
         }
     }
@@ -570,37 +623,40 @@ struct WebSearchResultsSheet: View {
     }
 }
 
-// MARK: - Support Components
+// MARK: - Message Bubble View
 
-struct MessageBubble: View {
+struct MessageBubbleView: View {
     let message: ChatMessage
 
-    var isUser: Bool { message.role == "user" }
+    private var isUser: Bool { message.role == "user" }
 
     var body: some View {
         HStack {
-            if isUser { Spacer() }
+            if isUser { Spacer(minLength: 60) }
 
             VStack(alignment: isUser ? .trailing : .leading) {
                 if isUser {
                     Text(message.content)
-                        .padding()
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
                         .background(Color.blue)
                         .foregroundColor(.white)
-                        .cornerRadius(15)
+                        .clipShape(RoundedRectangle(cornerRadius: 18))
                 } else {
                     SDKMarkdownView(text: message.content)
-                        .padding()
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(15)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(Color(.secondarySystemGroupedBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 18))
                 }
             }
-            .frame(maxWidth: 300, alignment: isUser ? .trailing : .leading)
 
-            if !isUser { Spacer() }
+            if !isUser { Spacer(minLength: 60) }
         }
     }
 }
+
+// MARK: - Attachment Thumbnail
 
 struct AttachmentThumbnail: View {
     let item: AttachmentItem
