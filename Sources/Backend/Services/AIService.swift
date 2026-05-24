@@ -275,29 +275,204 @@ class AIService {
         return String(remaining[..<endRange.lowerBound]).trimmingCharacters(in: .whitespaces)
     }
 
+    // MARK: - Web Search Result Model
+
+    struct WebSearchResult: Identifiable, Codable {
+        let id: UUID
+        let title: String
+        let snippet: String
+        let url: String
+        let source: String
+        let timestamp: Date
+
+        init(title: String, snippet: String, url: String, source: String) {
+            self.id = UUID()
+            self.title = title
+            self.snippet = snippet
+            self.url = url
+            self.source = source
+            self.timestamp = Date()
+        }
+    }
+
+    struct WebSearchResponse {
+        let query: String
+        let results: [WebSearchResult]
+        let summary: String
+        let rawText: String
+    }
+
     func performWebSearch(query: String) async -> String {
-        // Real implementation using a configured search provider
-        // Check for Google Search API or Brave Search keys
+        let response = await performFullWebSearch(query: query)
+        return response.rawText
+    }
+
+    func performFullWebSearch(query: String) async -> WebSearchResponse {
         let googleKey = APIKeyManager.shared.getKey(for: "google-search")
         let cx = APIKeyManager.shared.getKey(for: "google-search-cx")
 
+        var results: [WebSearchResult] = []
+        var rawText = ""
+
         if let key = googleKey, let cx = cx {
             do {
-                return try await performGoogleSearch(query: query, apiKey: key, cx: cx)
+                let (googleResults, googleRaw) = try await performGoogleSearchStructured(query: query, apiKey: key, cx: cx)
+                results = googleResults
+                rawText = googleRaw
             } catch {
-                // Fallback to DuckDuckGo if Google fails
-                return await performDuckDuckGoSearch(query: query)
+                let (ddgResults, ddgRaw) = await performDuckDuckGoSearchStructured(query: query)
+                results = ddgResults
+                rawText = ddgRaw
+            }
+        } else {
+            let (ddgResults, ddgRaw) = await performDuckDuckGoSearchStructured(query: query)
+            results = ddgResults
+            rawText = ddgRaw
+        }
+
+        if results.isEmpty {
+            let (braveResults, braveRaw) = await performBraveHTMLSearch(query: query)
+            if !braveResults.isEmpty {
+                results = braveResults
+                rawText = braveRaw
             }
         }
 
-        // Fallback to a public search interface that doesn't require an API key
-        return await performDuckDuckGoSearch(query: query)
+        // Fetch and append page content for top results
+        var enrichedText = rawText
+        for result in results.prefix(3) {
+            let content = await fetchPageContent(urlString: result.url)
+            if !content.isEmpty {
+                enrichedText += "\n\n--- Content from: \(result.title) (\(result.url)) ---\n\(content)\n--- End ---\n"
+            }
+        }
+
+        return WebSearchResponse(
+            query: query,
+            results: results,
+            summary: enrichedText,
+            rawText: enrichedText
+        )
     }
 
-    private func performDuckDuckGoSearch(query: String) async -> String {
+    private func fetchPageContent(urlString: String) async -> String {
+        guard let url = URL(string: urlString) else { return "" }
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 8
+        request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1", forHTTPHeaderField: "User-Agent")
+        request.setValue("text/html", forHTTPHeaderField: "Accept")
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else { return "" }
+            guard let html = String(data: data, encoding: .utf8) else { return "" }
+            return extractTextFromHTML(html)
+        } catch {
+            return ""
+        }
+    }
+
+    private func extractTextFromHTML(_ html: String) -> String {
+        var text = html
+        // Remove script and style blocks
+        let patterns = ["<script[^>]*>[\\s\\S]*?</script>", "<style[^>]*>[\\s\\S]*?</style>", "<nav[^>]*>[\\s\\S]*?</nav>", "<footer[^>]*>[\\s\\S]*?</footer>", "<header[^>]*>[\\s\\S]*?</header>"]
+        for pattern in patterns {
+            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                text = regex.stringByReplacingMatches(in: text, range: NSRange(text.startIndex..., in: text), withTemplate: "")
+            }
+        }
+        // Remove remaining HTML tags
+        if let tagRegex = try? NSRegularExpression(pattern: "<[^>]+>", options: []) {
+            text = tagRegex.stringByReplacingMatches(in: text, range: NSRange(text.startIndex..., in: text), withTemplate: " ")
+        }
+        // Decode HTML entities
+        text = text.replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: "&lt;", with: "<")
+            .replacingOccurrences(of: "&gt;", with: ">")
+            .replacingOccurrences(of: "&quot;", with: "\"")
+            .replacingOccurrences(of: "&#39;", with: "'")
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+        // Collapse whitespace
+        if let wsRegex = try? NSRegularExpression(pattern: "\\s+", options: []) {
+            text = wsRegex.stringByReplacingMatches(in: text, range: NSRange(text.startIndex..., in: text), withTemplate: " ")
+        }
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Limit to ~2000 chars
+        if trimmed.count > 2000 {
+            return String(trimmed.prefix(2000)) + "..."
+        }
+        return trimmed
+    }
+
+    private func performBraveHTMLSearch(query: String) async -> ([WebSearchResult], String) {
+        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
+        let urlString = "https://search.brave.com/search?q=\(encodedQuery)&source=web"
+        guard let url = URL(string: urlString) else { return ([], "") }
+
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 10
+        request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1", forHTTPHeaderField: "User-Agent")
+        request.setValue("text/html,application/xhtml+xml", forHTTPHeaderField: "Accept")
+        request.setValue("en-US,en;q=0.9", forHTTPHeaderField: "Accept-Language")
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else { return ([], "") }
+            guard let html = String(data: data, encoding: .utf8) else { return ([], "") }
+            return parseBraveResults(html, query: query)
+        } catch {
+            return ([], "")
+        }
+    }
+
+    private func parseBraveResults(_ html: String, query: String) -> ([WebSearchResult], String) {
+        var results: [WebSearchResult] = []
+        var rawText = ""
+
+        // Extract snippets using common Brave result patterns
+        let snippetPattern = "<div class=\"snippet-description[^\"]*\"[^>]*>([^<]+)</div>"
+        let titlePattern = "<a class=\"result-header[^\"]*\"[^>]*href=\"([^\"]+)\"[^>]*>.*?<span class=\"snippet-title\">([^<]+)</span>"
+
+        if let snippetRegex = try? NSRegularExpression(pattern: snippetPattern, options: .caseInsensitive) {
+            let matches = snippetRegex.matches(in: html, range: NSRange(html.startIndex..., in: html))
+            for match in matches.prefix(5) {
+                if let range = Range(match.range(at: 1), in: html) {
+                    let snippet = String(html[range]).trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !snippet.isEmpty {
+                        results.append(WebSearchResult(title: "Result", snippet: snippet, url: "", source: "Brave"))
+                    }
+                }
+            }
+        }
+
+        if let titleRegex = try? NSRegularExpression(pattern: titlePattern, options: [.caseInsensitive, .dotMatchesLineSeparators]) {
+            let matches = titleRegex.matches(in: html, range: NSRange(html.startIndex..., in: html))
+            for (i, match) in matches.prefix(5).enumerated() {
+                if let urlRange = Range(match.range(at: 1), in: html),
+                   let titleRange = Range(match.range(at: 2), in: html) {
+                    let url = String(html[urlRange])
+                    let title = String(html[titleRange]).trimmingCharacters(in: .whitespacesAndNewlines)
+                    if i < results.count {
+                        results[i] = WebSearchResult(title: title, snippet: results[i].snippet, url: url, source: "Brave")
+                    } else {
+                        results.append(WebSearchResult(title: title, snippet: "", url: url, source: "Brave"))
+                    }
+                }
+            }
+        }
+
+        // Build raw text
+        for (index, result) in results.enumerated() {
+            rawText += "\(index + 1). \(result.title)\n\(result.snippet)\nURL: \(result.url)\n\n"
+        }
+
+        return (results, rawText.isEmpty ? "No search results found for '\(query)'." : rawText)
+    }
+
+    private func performDuckDuckGoSearchStructured(query: String) async -> ([WebSearchResult], String) {
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
         let urlString = "https://api.duckduckgo.com/?q=\(encodedQuery)&format=json"
-        guard let url = URL(string: urlString) else { return "Invalid Search URL" }
+        guard let url = URL(string: urlString) else { return ([], "Invalid Search URL") }
 
         var request = URLRequest(url: url)
         request.setValue("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36", forHTTPHeaderField: "User-Agent")
@@ -305,76 +480,75 @@ class AIService {
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
-                return "Search error: Status \((response as? HTTPURLResponse)?.statusCode ?? -1)"
+                return ([], "Search error: Status \((response as? HTTPURLResponse)?.statusCode ?? -1)")
             }
-
             guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                return "Search error: Unable to parse JSON response"
+                return ([], "Search error: Unable to parse JSON response")
             }
-
-            return formatDuckDuckGoResults(json, query: query)
+            return formatDuckDuckGoResultsStructured(json, query: query)
         } catch {
-            return "Search error: \(error.localizedDescription)"
+            return ([], "Search error: \(error.localizedDescription)")
         }
     }
 
-    private func formatDuckDuckGoResults(_ json: [String: Any], query: String) -> String {
-        var results = ""
-        var count = 0
+    private func formatDuckDuckGoResultsStructured(_ json: [String: Any], query: String) -> ([WebSearchResult], String) {
+        var results: [WebSearchResult] = []
+        var rawText = ""
 
-        // 1. Abstract
         if let abstract = json["AbstractText"] as? String, !abstract.isEmpty {
             let source = json["AbstractSource"] as? String ?? "Source"
             let url = json["AbstractURL"] as? String ?? ""
-            results += "Abstract (\(source)):\n\(abstract)\nURL: \(url)\n\n"
+            results.append(WebSearchResult(title: source, snippet: abstract, url: url, source: "DuckDuckGo"))
+            rawText += "Abstract (\(source)):\n\(abstract)\nURL: \(url)\n\n"
         }
 
-        // 2. Related Topics (can be nested)
         if let topics = json["RelatedTopics"] as? [[String: Any]] {
-            let extracted = extractTopics(topics, count: count)
-            results += extracted.text
-            count = extracted.count
+            let extracted = extractTopicsStructured(topics)
+            results.append(contentsOf: extracted.results)
+            rawText += extracted.text
         }
 
-        // 3. Results
         if let directResults = json["Results"] as? [[String: Any]] {
             for res in directResults {
-                guard count < 5 else { break }
+                guard results.count < 8 else { break }
                 if let text = res["Text"] as? String, let url = res["FirstURL"] as? String {
-                    results += "\(count + 1). \(text)\nURL: \(url)\n\n"
-                    count += 1
+                    results.append(WebSearchResult(title: text.components(separatedBy: " - ").first ?? text, snippet: text, url: url, source: "DuckDuckGo"))
+                    rawText += "\(results.count). \(text)\nURL: \(url)\n\n"
                 }
             }
         }
 
-        return results.isEmpty ? "No search results found for '\(query)'." : results
+        if results.isEmpty {
+            return ([], "No search results found for '\(query)'.")
+        }
+        return (results, rawText)
     }
 
-    private func extractTopics(_ topics: [[String: Any]], count: Int) -> (text: String, count: Int) {
+    private func extractTopicsStructured(_ topics: [[String: Any]]) -> (results: [WebSearchResult], text: String) {
+        var results: [WebSearchResult] = []
         var text = ""
-        var currentCount = count
 
         for topic in topics {
-            guard currentCount < 5 else { break }
+            guard results.count < 8 else { break }
             if let nestedTopics = topic["Topics"] as? [[String: Any]] {
-                let nested = extractTopics(nestedTopics, count: currentCount)
+                let nested = extractTopicsStructured(nestedTopics)
+                results.append(contentsOf: nested.results)
                 text += nested.text
-                currentCount = nested.count
             } else if let topicText = topic["Text"] as? String, let url = topic["FirstURL"] as? String {
                 let parts = topicText.components(separatedBy: " - ")
                 let title = parts.first ?? "Result"
                 let snippet = parts.count > 1 ? parts[1] : ""
-                text += "\(currentCount + 1). \(title)\n\(snippet)\nURL: \(url)\n\n"
-                currentCount += 1
+                results.append(WebSearchResult(title: title, snippet: snippet, url: url, source: "DuckDuckGo"))
+                text += "\(results.count). \(title)\n\(snippet)\nURL: \(url)\n\n"
             }
         }
 
-        return (text, currentCount)
+        return (results, text)
     }
 
-    private func performGoogleSearch(query: String, apiKey: String, cx: String) async throws -> String {
+    private func performGoogleSearchStructured(query: String, apiKey: String, cx: String) async throws -> ([WebSearchResult], String) {
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
-        let urlString = "https://www.googleapis.com/customsearch/v1?q=\(encodedQuery)&key=\(apiKey)&cx=\(cx)"
+        let urlString = "https://www.googleapis.com/customsearch/v1?q=\(encodedQuery)&key=\(apiKey)&cx=\(cx)&num=5"
         guard let url = URL(string: urlString) else { throw AIError.networkError("Invalid Search URL") }
 
         let request = URLRequest(url: url)
@@ -385,18 +559,20 @@ class AIService {
 
         let json: [String: Any] = (try JSONSerialization.jsonObject(with: data) as? [String: Any]) ?? [:]
         guard let items = json["items"] as? [[String: Any]] else {
-            return "No results found for '\(query)'."
+            return ([], "No results found for '\(query)'.")
         }
 
-        var results = ""
-        for (index, item) in items.prefix(3).enumerated() {
+        var results: [WebSearchResult] = []
+        var rawText = ""
+        for (index, item) in items.prefix(5).enumerated() {
             let title = item["title"] as? String ?? "No Title"
             let snippet = item["snippet"] as? String ?? "No Snippet"
             let link = item["link"] as? String ?? ""
-            results += "\(index + 1). \(title)\n\(snippet)\nURL: \(link)\n\n"
+            results.append(WebSearchResult(title: title, snippet: snippet, url: link, source: "Google"))
+            rawText += "\(index + 1). \(title)\n\(snippet)\nURL: \(link)\n\n"
         }
 
-        return results.isEmpty ? "No search results available." : results
+        return (results, rawText.isEmpty ? "No search results available." : rawText)
     }
 
     func summarize(text: String) async throws -> String {

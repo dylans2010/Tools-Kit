@@ -1754,6 +1754,17 @@
 		DG02000000000000000000000186 /* Diag_IMEIComprehensiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000186 /* Diag_IMEIComprehensiveView.swift */; };
 		DG02000000000000000000000187 /* Diag_IMEICarrierCompatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000187 /* Diag_IMEICarrierCompatView.swift */; };
 		DG02000000000000000000000188 /* Diag_DeviceValuationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000188 /* Diag_DeviceValuationView.swift */; };
+		DG02000000000000000000000189 /* Diag_NetworkThroughputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000189 /* Diag_NetworkThroughputView.swift */; };
+		DG02000000000000000000000190 /* Diag_TouchLatencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000190 /* Diag_TouchLatencyView.swift */; };
+		DG02000000000000000000000191 /* Diag_ScreenBurnInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000191 /* Diag_ScreenBurnInView.swift */; };
+		DG02000000000000000000000192 /* Diag_RAMStressTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000192 /* Diag_RAMStressTestView.swift */; };
+		DG02000000000000000000000193 /* Diag_VibrationMotorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000193 /* Diag_VibrationMotorView.swift */; };
+		DG02000000000000000000000194 /* Diag_SpeakerFrequencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000194 /* Diag_SpeakerFrequencyView.swift */; };
+		DG02000000000000000000000195 /* Diag_MicrophoneQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000195 /* Diag_MicrophoneQualityView.swift */; };
+		DG02000000000000000000000196 /* Diag_GlassBreakDetectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000196 /* Diag_GlassBreakDetectView.swift */; };
+		DG02000000000000000000000197 /* Diag_ProximityStressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000197 /* Diag_ProximityStressView.swift */; };
+		DG02000000000000000000000198 /* Diag_GravitySensorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000198 /* Diag_GravitySensorView.swift */; };
+		DG02000000000000000000000199 /* Diag_AppResourceMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000199 /* Diag_AppResourceMonitorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3488,6 +3499,17 @@
 		DG01000000000000000000000186 /* Diag_IMEIComprehensiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IMEIComprehensiveView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000187 /* Diag_IMEICarrierCompatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IMEICarrierCompatView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000188 /* Diag_DeviceValuationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DeviceValuationView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000189 /* Diag_NetworkThroughputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetworkThroughputView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000190 /* Diag_TouchLatencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_TouchLatencyView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000191 /* Diag_ScreenBurnInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ScreenBurnInView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000192 /* Diag_RAMStressTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_RAMStressTestView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000193 /* Diag_VibrationMotorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_VibrationMotorView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000194 /* Diag_SpeakerFrequencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SpeakerFrequencyView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000195 /* Diag_MicrophoneQualityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MicrophoneQualityView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000196 /* Diag_GlassBreakDetectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_GlassBreakDetectView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000197 /* Diag_ProximityStressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ProximityStressView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000198 /* Diag_GravitySensorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_GravitySensorView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000199 /* Diag_AppResourceMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AppResourceMonitorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3680,6 +3702,17 @@
 				DG01000000000000000000000186 /* Diag_IMEIComprehensiveView.swift */,
 				DG01000000000000000000000187 /* Diag_IMEICarrierCompatView.swift */,
 				DG01000000000000000000000188 /* Diag_DeviceValuationView.swift */,
+				DG01000000000000000000000189 /* Diag_NetworkThroughputView.swift */,
+				DG01000000000000000000000190 /* Diag_TouchLatencyView.swift */,
+				DG01000000000000000000000191 /* Diag_ScreenBurnInView.swift */,
+				DG01000000000000000000000192 /* Diag_RAMStressTestView.swift */,
+				DG01000000000000000000000193 /* Diag_VibrationMotorView.swift */,
+				DG01000000000000000000000194 /* Diag_SpeakerFrequencyView.swift */,
+				DG01000000000000000000000195 /* Diag_MicrophoneQualityView.swift */,
+				DG01000000000000000000000196 /* Diag_GlassBreakDetectView.swift */,
+				DG01000000000000000000000197 /* Diag_ProximityStressView.swift */,
+				DG01000000000000000000000198 /* Diag_GravitySensorView.swift */,
+				DG01000000000000000000000199 /* Diag_AppResourceMonitorView.swift */,
 			);
 			path = Diagnostics;
 			sourceTree = "<group>";
@@ -11018,6 +11051,17 @@
 				DG02000000000000000000000186 /* Diag_IMEIComprehensiveView.swift in Sources */,
 				DG02000000000000000000000187 /* Diag_IMEICarrierCompatView.swift in Sources */,
 				DG02000000000000000000000188 /* Diag_DeviceValuationView.swift in Sources */,
+				DG02000000000000000000000189 /* Diag_NetworkThroughputView.swift in Sources */,
+				DG02000000000000000000000190 /* Diag_TouchLatencyView.swift in Sources */,
+				DG02000000000000000000000191 /* Diag_ScreenBurnInView.swift in Sources */,
+				DG02000000000000000000000192 /* Diag_RAMStressTestView.swift in Sources */,
+				DG02000000000000000000000193 /* Diag_VibrationMotorView.swift in Sources */,
+				DG02000000000000000000000194 /* Diag_SpeakerFrequencyView.swift in Sources */,
+				DG02000000000000000000000195 /* Diag_MicrophoneQualityView.swift in Sources */,
+				DG02000000000000000000000196 /* Diag_GlassBreakDetectView.swift in Sources */,
+				DG02000000000000000000000197 /* Diag_ProximityStressView.swift in Sources */,
+				DG02000000000000000000000198 /* Diag_GravitySensorView.swift in Sources */,
+				DG02000000000000000000000199 /* Diag_AppResourceMonitorView.swift in Sources */,
 				WG5FD79044E10FA97C5EC69F /* WorkspaceGraph.swift in Sources */,
 				MDC32FA79B1B70105A53ED19 /* AgenticModels.swift in Sources */,
 				TO7EC7A01B15A8F7BFE4020C /* AgenticToolOutput.swift in Sources */,
