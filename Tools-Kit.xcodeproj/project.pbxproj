@@ -64,7 +64,7 @@
 		DG02000000000000000000000055 /* Diag_WiFiStrengthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000055 /* Diag_WiFiStrengthView.swift */; };
 		DG02000000000000000000000056 /* DiagnosticsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000056 /* DiagnosticsHomeView.swift */; };
 		DG02000000000000000000000057 /* DiagnosticsModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000057 /* DiagnosticsModeManager.swift */; };
-		DG02000000000000000000000131 /* DiagnosticsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000131 /* DiagnosticsSettingsView.swift */; };
+		DG02000000000000000000000250 /* DiagnosticsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000250 /* DiagnosticsSettingsView.swift */; };
 		DG02000000000000000000000058 /* DiagnosticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000058 /* DiagnosticsService.swift */; };
 		DG02000000000000000000000059 /* DiagnosticsToolCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000059 /* DiagnosticsToolCardView.swift */; };
 		DG02000000000000000000000060 /* DiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000060 /* DiagnosticsViewModel.swift */; };
@@ -1867,7 +1867,7 @@
 		DG01000000000000000000000055 /* Diag_WiFiStrengthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_WiFiStrengthView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000056 /* DiagnosticsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsHomeView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000057 /* DiagnosticsModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsModeManager.swift; sourceTree = "<group>"; };
-		DG01000000000000000000000131 /* DiagnosticsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsSettingsView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000250 /* DiagnosticsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsSettingsView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000058 /* DiagnosticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsService.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000059 /* DiagnosticsToolCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsToolCardView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000060 /* DiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsViewModel.swift; sourceTree = "<group>"; };
@@ -3657,7 +3657,7 @@
 				DG01000000000000000000000055 /* Diag_WiFiStrengthView.swift */,
 				DG01000000000000000000000056 /* DiagnosticsHomeView.swift */,
 				DG01000000000000000000000057 /* DiagnosticsModeManager.swift */,
-				DG01000000000000000000000131 /* DiagnosticsSettingsView.swift */,
+				DG01000000000000000000000250 /* DiagnosticsSettingsView.swift */,
 				DG01000000000000000000000058 /* DiagnosticsService.swift */,
 				DG01000000000000000000000059 /* DiagnosticsToolCardView.swift */,
 				DG01000000000000000000000060 /* DiagnosticsViewModel.swift */,
@@ -11048,7 +11048,7 @@
 				DG02000000000000000000000055 /* Diag_WiFiStrengthView.swift in Sources */,
 				DG02000000000000000000000056 /* DiagnosticsHomeView.swift in Sources */,
 				DG02000000000000000000000057 /* DiagnosticsModeManager.swift in Sources */,
-				DG02000000000000000000000131 /* DiagnosticsSettingsView.swift in Sources */,
+				DG02000000000000000000000250 /* DiagnosticsSettingsView.swift in Sources */,
 				DG02000000000000000000000058 /* DiagnosticsService.swift in Sources */,
 				DG02000000000000000000000059 /* DiagnosticsToolCardView.swift in Sources */,
 				DG02000000000000000000000060 /* DiagnosticsViewModel.swift in Sources */,
