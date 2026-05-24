@@ -285,14 +285,91 @@ class AIService {
             do {
                 return try await performGoogleSearch(query: query, apiKey: key, cx: cx)
             } catch {
-                return "Google Search Error: \(error.localizedDescription)"
+                // Fallback to DuckDuckGo if Google fails
+                return await performDuckDuckGoSearch(query: query)
             }
         }
 
-        // Fallback to a mock or built-in tool if no key is configured,
-        // though the requirement was for a real network call.
-        // We'll use a public search endpoint if available or document the need for a key.
-        return "Search Result for '\(query)': No search API key (google-search) configured in APIKeyManager. Please add a Google Custom Search key and CX ID."
+        // Fallback to a public search interface that doesn't require an API key
+        return await performDuckDuckGoSearch(query: query)
+    }
+
+    private func performDuckDuckGoSearch(query: String) async -> String {
+        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
+        let urlString = "https://api.duckduckgo.com/?q=\(encodedQuery)&format=json"
+        guard let url = URL(string: urlString) else { return "Invalid Search URL" }
+
+        var request = URLRequest(url: url)
+        request.setValue("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36", forHTTPHeaderField: "User-Agent")
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                return "Search error: Status \((response as? HTTPURLResponse)?.statusCode ?? -1)"
+            }
+
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                return "Search error: Unable to parse JSON response"
+            }
+
+            return formatDuckDuckGoResults(json, query: query)
+        } catch {
+            return "Search error: \(error.localizedDescription)"
+        }
+    }
+
+    private func formatDuckDuckGoResults(_ json: [String: Any], query: String) -> String {
+        var results = ""
+        var count = 0
+
+        // 1. Abstract
+        if let abstract = json["AbstractText"] as? String, !abstract.isEmpty {
+            let source = json["AbstractSource"] as? String ?? "Source"
+            let url = json["AbstractURL"] as? String ?? ""
+            results += "Abstract (\(source)):\n\(abstract)\nURL: \(url)\n\n"
+        }
+
+        // 2. Related Topics (can be nested)
+        if let topics = json["RelatedTopics"] as? [[String: Any]] {
+            let extracted = extractTopics(topics, count: count)
+            results += extracted.text
+            count = extracted.count
+        }
+
+        // 3. Results
+        if let directResults = json["Results"] as? [[String: Any]] {
+            for res in directResults {
+                guard count < 5 else { break }
+                if let text = res["Text"] as? String, let url = res["FirstURL"] as? String {
+                    results += "\(count + 1). \(text)\nURL: \(url)\n\n"
+                    count += 1
+                }
+            }
+        }
+
+        return results.isEmpty ? "No search results found for '\(query)'." : results
+    }
+
+    private func extractTopics(_ topics: [[String: Any]], count: Int) -> (text: String, count: Int) {
+        var text = ""
+        var currentCount = count
+
+        for topic in topics {
+            guard currentCount < 5 else { break }
+            if let nestedTopics = topic["Topics"] as? [[String: Any]] {
+                let nested = extractTopics(nestedTopics, count: currentCount)
+                text += nested.text
+                currentCount = nested.count
+            } else if let topicText = topic["Text"] as? String, let url = topic["FirstURL"] as? String {
+                let parts = topicText.components(separatedBy: " - ")
+                let title = parts.first ?? "Result"
+                let snippet = parts.count > 1 ? parts[1] : ""
+                text += "\(currentCount + 1). \(title)\n\(snippet)\nURL: \(url)\n\n"
+                currentCount += 1
+            }
+        }
+
+        return (text, currentCount)
     }
 
     private func performGoogleSearch(query: String, apiKey: String, cx: String) async throws -> String {

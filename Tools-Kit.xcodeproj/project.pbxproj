@@ -851,6 +851,7 @@
 		B1C2D3E4F5A60708090A0D02 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C02 /* CameraService.swift */; };
 		B1C2D3E4F5A60708090A0D03 /* VisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C03 /* VisionService.swift */; };
 		B1C2D3E4F5A60708090A0D04 /* AppwriteClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C04 /* AppwriteClient.swift */; };
+		B1C2D3E4F5A60708090A0D06 /* FileDecoderHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C06 /* FileDecoderHelper.swift */; };
 		B1B2C3D4E5F60718293A0001 /* UserDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A0001 /* UserDataManager.swift */; };
 		B1B2C3D4E5F60718293A0002 /* AIFeatureCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A0002 /* AIFeatureCheck.swift */; };
 		KB02AIPROTO0000000000001 /* AIProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC01 /* AIProviderProtocol.swift */; };
@@ -2359,6 +2360,7 @@
 		B1C2D3E4F5A60708090A0C02 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraService.swift; sourceTree = "<group>"; };
 		B1C2D3E4F5A60708090A0C03 /* VisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionService.swift; sourceTree = "<group>"; };
 		B1C2D3E4F5A60708090A0C04 /* AppwriteClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppwriteClient.swift; sourceTree = "<group>"; };
+		B1C2D3E4F5A60708090A0C06 /* FileDecoderHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDecoderHelper.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A0001 /* UserDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDataManager.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A0002 /* AIFeatureCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIFeatureCheck.swift; sourceTree = "<group>"; };
 		B1C2D3E4F5A60708090A0C05 /* Config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Config.plist; sourceTree = "<group>"; };
@@ -9117,6 +9119,7 @@
 				B1C2D3E4F5A60708090A0C02 /* CameraService.swift */,
 				B1C2D3E4F5A60708090A0C03 /* VisionService.swift */,
 				B1C2D3E4F5A60708090A0C04 /* AppwriteClient.swift */,
+				B1C2D3E4F5A60708090A0C06 /* FileDecoderHelper.swift */,
 				NT010000000000000000000B /* BackgroundTaskManager.swift */,
 			);
 			path = Services;
@@ -11693,6 +11696,7 @@
 				B1C2D3E4F5A60708090A0D02 /* CameraService.swift in Sources */,
 				B1C2D3E4F5A60708090A0D03 /* VisionService.swift in Sources */,
 				B1C2D3E4F5A60708090A0D04 /* AppwriteClient.swift in Sources */,
+				B1C2D3E4F5A60708090A0D06 /* FileDecoderHelper.swift in Sources */,
 				B1B2C3D4E5F60718293A0001 /* UserDataManager.swift in Sources */,
 				B1B2C3D4E5F60718293A0002 /* AIFeatureCheck.swift in Sources */,
 
