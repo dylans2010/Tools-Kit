@@ -60,9 +60,7 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         guard !trimmedText.isEmpty || !pendingAttachments.isEmpty else { return }
 
         let userMessage = ChatMessage(role: "user", content: trimmedText)
-        await MainActor.run {
-            messages.append(userMessage)
-        }
+        messages.append(userMessage)
 
         let attachmentsToSend = pendingAttachments
         let currentInput = inputText

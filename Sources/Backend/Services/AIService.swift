@@ -377,13 +377,14 @@ class AIService {
         let urlString = "https://www.googleapis.com/customsearch/v1?q=\(encodedQuery)&key=\(apiKey)&cx=\(cx)"
         guard let url = URL(string: urlString) else { throw AIError.networkError("Invalid Search URL") }
 
-        let (data, response) = try await URLSession.shared.data(for: url)
+        let request = URLRequest(url: url)
+        let (data, response): (Data, URLResponse) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw AIError.networkError("Search API returned status \((response as? HTTPURLResponse)?.statusCode ?? -1)")
         }
 
-        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        guard let items = json?["items"] as? [[String: Any]] else {
+        let json: [String: Any] = (try JSONSerialization.jsonObject(with: data) as? [String: Any]) ?? [:]
+        guard let items = json["items"] as? [[String: Any]] else {
             return "No results found for '\(query)'."
         }
 
