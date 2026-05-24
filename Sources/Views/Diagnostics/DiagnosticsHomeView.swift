@@ -364,6 +364,18 @@ struct DiagnosticsHomeView: View {
         case "imei_comprehensive": Diag_IMEIComprehensiveView()
         case "imei_carrier_compat": Diag_IMEICarrierCompatView()
         case "device_valuation": Diag_DeviceValuationView()
+        // === NEW HARDWARE DIAGNOSTIC TOOLS ===
+        case "network_throughput": Diag_NetworkThroughputView()
+        case "touch_latency": Diag_TouchLatencyView()
+        case "screen_burn_in": Diag_ScreenBurnInView()
+        case "ram_stress": Diag_RAMStressTestView()
+        case "vibration_motor": Diag_VibrationMotorView()
+        case "speaker_frequency": Diag_SpeakerFrequencyView()
+        case "mic_quality": Diag_MicrophoneQualityView()
+        case "impact_detection": Diag_GlassBreakDetectView()
+        case "proximity_stress": Diag_ProximityStressView()
+        case "gravity_sensor": Diag_GravitySensorView()
+        case "app_resource_monitor": Diag_AppResourceMonitorView()
         default:
             Text("Tool not found")
         }

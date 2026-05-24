@@ -333,6 +333,19 @@ final class DiagnosticsViewModel: ObservableObject {
         DiagnosticTool(id: "imei_comprehensive", name: "Comprehensive IMEI Check", icon: "doc.text.magnifyingglass", description: "Run all IMEI checks at once: blacklist, lock, warranty, iCloud", category: .security),
         DiagnosticTool(id: "imei_carrier_compat", name: "Carrier Compatibility", icon: "simcard.2.fill", description: "Check band compatibility with major carriers worldwide", category: .connectivity),
         DiagnosticTool(id: "device_valuation", name: "Device Valuation", icon: "dollarsign.circle.fill", description: "Estimate device trade-in value based on hardware condition", category: .system),
+
+        // === NEW HARDWARE DIAGNOSTIC TOOLS ===
+        DiagnosticTool(id: "network_throughput", name: "Network Throughput", icon: "arrow.up.arrow.down.circle.fill", description: "Full download/upload speed test with latency, jitter, and packet loss", category: .connectivity),
+        DiagnosticTool(id: "touch_latency", name: "Touch Latency", icon: "hand.tap.fill", description: "Measure touch screen reaction time and tap accuracy", category: .display),
+        DiagnosticTool(id: "screen_burn_in", name: "Screen Burn-In", icon: "rectangle.inset.filled.and.person.filled", description: "OLED burn-in detection with solid color and pattern tests", category: .display),
+        DiagnosticTool(id: "ram_stress", name: "RAM Stress Test", icon: "memorychip.fill", description: "Memory allocation stress test with write/read speed benchmarks", category: .performance),
+        DiagnosticTool(id: "vibration_motor", name: "Vibration Motor", icon: "iphone.radiowaves.left.and.right", description: "Full Taptic Engine diagnostic with custom haptic patterns", category: .haptics),
+        DiagnosticTool(id: "speaker_frequency", name: "Speaker Frequency", icon: "waveform.badge.mic", description: "Tone generator and frequency sweep for speaker testing", category: .audio),
+        DiagnosticTool(id: "mic_quality", name: "Microphone Quality", icon: "mic.badge.plus", description: "Mic quality analysis with SNR, noise floor, and clipping detection", category: .microphone),
+        DiagnosticTool(id: "impact_detection", name: "Impact Detection", icon: "waveform.badge.magnifyingglass", description: "Ambient sound monitoring for glass break and impact events", category: .sensors),
+        DiagnosticTool(id: "proximity_stress", name: "Proximity Stress", icon: "hand.raised.circle.fill", description: "Proximity sensor stress test with response time tracking", category: .sensors),
+        DiagnosticTool(id: "gravity_sensor", name: "Gravity Sensor", icon: "arrow.down.to.line.circle.fill", description: "Real-time gravity vector visualization with tilt and calibration", category: .sensors),
+        DiagnosticTool(id: "app_resource_monitor", name: "App Resource Monitor", icon: "chart.bar.xaxis", description: "Live CPU, memory, threads, disk I/O, and process monitoring", category: .performance),
     ]
 
     var filteredTools: [DiagnosticTool] {
