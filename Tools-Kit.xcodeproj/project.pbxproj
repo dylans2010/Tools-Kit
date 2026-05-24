@@ -1765,6 +1765,47 @@
 		DG02000000000000000000000197 /* Diag_ProximityStressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000197 /* Diag_ProximityStressView.swift */; };
 		DG02000000000000000000000198 /* Diag_GravitySensorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000198 /* Diag_GravitySensorView.swift */; };
 		DG02000000000000000000000199 /* Diag_AppResourceMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000199 /* Diag_AppResourceMonitorView.swift */; };
+		DG02000000000000000000000200 /* Diag_EarpieceTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000200 /* Diag_EarpieceTestView.swift */; };
+		DG02000000000000000000000201 /* Diag_CameraControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000201 /* Diag_CameraControlView.swift */; };
+		DG02000000000000000000000202 /* Diag_TelephotoLensView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000202 /* Diag_TelephotoLensView.swift */; };
+		DG02000000000000000000000203 /* Diag_UltraWideLensView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000203 /* Diag_UltraWideLensView.swift */; };
+		DG02000000000000000000000204 /* Diag_MacroCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000204 /* Diag_MacroCameraView.swift */; };
+		DG02000000000000000000000205 /* Diag_WideLensView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000205 /* Diag_WideLensView.swift */; };
+		DG02000000000000000000000206 /* Diag_InfraredCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000206 /* Diag_InfraredCameraView.swift */; };
+		DG02000000000000000000000207 /* Diag_LiDARFullView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000207 /* Diag_LiDARFullView.swift */; };
+		DG02000000000000000000000208 /* Diag_MuteSwitchActionButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000208 /* Diag_MuteSwitchActionButtonView.swift */; };
+		DG02000000000000000000000209 /* Diag_VolumeButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000209 /* Diag_VolumeButtonsView.swift */; };
+		DG02000000000000000000000210 /* Diag_DigitizerTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000210 /* Diag_DigitizerTestView.swift */; };
+		DG02000000000000000000000211 /* Diag_NFCDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000211 /* Diag_NFCDiagnosticsView.swift */; };
+		DG02000000000000000000000212 /* Diag_ActionButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000212 /* Diag_ActionButtonView.swift */; };
+		DG02000000000000000000000213 /* Diag_DepthSensorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000213 /* Diag_DepthSensorView.swift */; };
+		DG02000000000000000000000214 /* Diag_CinematicModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000214 /* Diag_CinematicModeView.swift */; };
+		DG02000000000000000000000215 /* Diag_ProRAWProResView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000215 /* Diag_ProRAWProResView.swift */; };
+		DG02000000000000000000000216 /* Diag_NightModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000216 /* Diag_NightModeView.swift */; };
+		DG02000000000000000000000217 /* Diag_PortraitModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000217 /* Diag_PortraitModeView.swift */; };
+		DG02000000000000000000000218 /* Diag_AutofocusTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000218 /* Diag_AutofocusTestView.swift */; };
+		DG02000000000000000000000219 /* Diag_OISTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000219 /* Diag_OISTestView.swift */; };
+		DG02000000000000000000000220 /* Diag_StereoSpeakerTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000220 /* Diag_StereoSpeakerTestView.swift */; };
+		DG02000000000000000000000221 /* Diag_MagSafeTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000221 /* Diag_MagSafeTestView.swift */; };
+		DG02000000000000000000000222 /* Diag_DynamicIslandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000222 /* Diag_DynamicIslandView.swift */; };
+		DG02000000000000000000000223 /* Diag_CrashDetectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000223 /* Diag_CrashDetectionView.swift */; };
+		DG02000000000000000000000224 /* Diag_EmergencySOSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000224 /* Diag_EmergencySOSView.swift */; };
+		DG02000000000000000000000225 /* Diag_AlwaysOnDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000225 /* Diag_AlwaysOnDisplayView.swift */; };
+		DG02000000000000000000000226 /* Diag_ProMotionTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000226 /* Diag_ProMotionTestView.swift */; };
+		DG02000000000000000000000227 /* Diag_TrueToneFlashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000227 /* Diag_TrueToneFlashView.swift */; };
+		DG02000000000000000000000228 /* Diag_MicrophoneArrayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000228 /* Diag_MicrophoneArrayView.swift */; };
+		DG02000000000000000000000229 /* Diag_USBCPortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000229 /* Diag_USBCPortView.swift */; };
+		DG02000000000000000000000230 /* Diag_GPSAccuracyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000230 /* Diag_GPSAccuracyView.swift */; };
+		DG02000000000000000000000231 /* Diag_WirelessAntennaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000231 /* Diag_WirelessAntennaView.swift */; };
+		DG02000000000000000000000232 /* Diag_HapticIntensityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000232 /* Diag_HapticIntensityView.swift */; };
+		DG02000000000000000000000233 /* Diag_PowerDeliveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000233 /* Diag_PowerDeliveryView.swift */; };
+		DG02000000000000000000000234 /* Diag_SideButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000234 /* Diag_SideButtonView.swift */; };
+		DG02000000000000000000000235 /* Diag_PhotonicEngineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000235 /* Diag_PhotonicEngineView.swift */; };
+		DG02000000000000000000000236 /* Diag_FaceIDTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000236 /* Diag_FaceIDTestView.swift */; };
+		DG02000000000000000000000237 /* Diag_TouchIDTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000237 /* Diag_TouchIDTestView.swift */; };
+		DG02000000000000000000000238 /* Diag_ThreadRadioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000238 /* Diag_ThreadRadioView.swift */; };
+		DG02000000000000000000000239 /* Diag_WiFi6ECheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000239 /* Diag_WiFi6ECheckView.swift */; };
+		DG02000000000000000000000240 /* Diag_5GBandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000240 /* Diag_5GBandView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3510,6 +3551,47 @@
 		DG01000000000000000000000197 /* Diag_ProximityStressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ProximityStressView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000198 /* Diag_GravitySensorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_GravitySensorView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000199 /* Diag_AppResourceMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AppResourceMonitorView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000200 /* Diag_EarpieceTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_EarpieceTestView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000201 /* Diag_CameraControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CameraControlView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000202 /* Diag_TelephotoLensView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_TelephotoLensView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000203 /* Diag_UltraWideLensView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_UltraWideLensView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000204 /* Diag_MacroCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MacroCameraView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000205 /* Diag_WideLensView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_WideLensView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000206 /* Diag_InfraredCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_InfraredCameraView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000207 /* Diag_LiDARFullView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_LiDARFullView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000208 /* Diag_MuteSwitchActionButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MuteSwitchActionButtonView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000209 /* Diag_VolumeButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_VolumeButtonsView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000210 /* Diag_DigitizerTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DigitizerTestView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000211 /* Diag_NFCDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NFCDiagnosticsView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000212 /* Diag_ActionButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ActionButtonView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000213 /* Diag_DepthSensorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DepthSensorView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000214 /* Diag_CinematicModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CinematicModeView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000215 /* Diag_ProRAWProResView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ProRAWProResView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000216 /* Diag_NightModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NightModeView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000217 /* Diag_PortraitModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PortraitModeView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000218 /* Diag_AutofocusTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AutofocusTestView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000219 /* Diag_OISTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_OISTestView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000220 /* Diag_StereoSpeakerTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_StereoSpeakerTestView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000221 /* Diag_MagSafeTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MagSafeTestView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000222 /* Diag_DynamicIslandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DynamicIslandView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000223 /* Diag_CrashDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CrashDetectionView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000224 /* Diag_EmergencySOSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_EmergencySOSView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000225 /* Diag_AlwaysOnDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AlwaysOnDisplayView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000226 /* Diag_ProMotionTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ProMotionTestView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000227 /* Diag_TrueToneFlashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_TrueToneFlashView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000228 /* Diag_MicrophoneArrayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MicrophoneArrayView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000229 /* Diag_USBCPortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_USBCPortView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000230 /* Diag_GPSAccuracyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_GPSAccuracyView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000231 /* Diag_WirelessAntennaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_WirelessAntennaView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000232 /* Diag_HapticIntensityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_HapticIntensityView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000233 /* Diag_PowerDeliveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PowerDeliveryView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000234 /* Diag_SideButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SideButtonView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000235 /* Diag_PhotonicEngineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PhotonicEngineView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000236 /* Diag_FaceIDTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_FaceIDTestView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000237 /* Diag_TouchIDTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_TouchIDTestView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000238 /* Diag_ThreadRadioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ThreadRadioView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000239 /* Diag_WiFi6ECheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_WiFi6ECheckView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000240 /* Diag_5GBandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_5GBandView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3713,6 +3795,47 @@
 				DG01000000000000000000000197 /* Diag_ProximityStressView.swift */,
 				DG01000000000000000000000198 /* Diag_GravitySensorView.swift */,
 				DG01000000000000000000000199 /* Diag_AppResourceMonitorView.swift */,
+				DG01000000000000000000000200 /* Diag_EarpieceTestView.swift */,
+				DG01000000000000000000000201 /* Diag_CameraControlView.swift */,
+				DG01000000000000000000000202 /* Diag_TelephotoLensView.swift */,
+				DG01000000000000000000000203 /* Diag_UltraWideLensView.swift */,
+				DG01000000000000000000000204 /* Diag_MacroCameraView.swift */,
+				DG01000000000000000000000205 /* Diag_WideLensView.swift */,
+				DG01000000000000000000000206 /* Diag_InfraredCameraView.swift */,
+				DG01000000000000000000000207 /* Diag_LiDARFullView.swift */,
+				DG01000000000000000000000208 /* Diag_MuteSwitchActionButtonView.swift */,
+				DG01000000000000000000000209 /* Diag_VolumeButtonsView.swift */,
+				DG01000000000000000000000210 /* Diag_DigitizerTestView.swift */,
+				DG01000000000000000000000211 /* Diag_NFCDiagnosticsView.swift */,
+				DG01000000000000000000000212 /* Diag_ActionButtonView.swift */,
+				DG01000000000000000000000213 /* Diag_DepthSensorView.swift */,
+				DG01000000000000000000000214 /* Diag_CinematicModeView.swift */,
+				DG01000000000000000000000215 /* Diag_ProRAWProResView.swift */,
+				DG01000000000000000000000216 /* Diag_NightModeView.swift */,
+				DG01000000000000000000000217 /* Diag_PortraitModeView.swift */,
+				DG01000000000000000000000218 /* Diag_AutofocusTestView.swift */,
+				DG01000000000000000000000219 /* Diag_OISTestView.swift */,
+				DG01000000000000000000000220 /* Diag_StereoSpeakerTestView.swift */,
+				DG01000000000000000000000221 /* Diag_MagSafeTestView.swift */,
+				DG01000000000000000000000222 /* Diag_DynamicIslandView.swift */,
+				DG01000000000000000000000223 /* Diag_CrashDetectionView.swift */,
+				DG01000000000000000000000224 /* Diag_EmergencySOSView.swift */,
+				DG01000000000000000000000225 /* Diag_AlwaysOnDisplayView.swift */,
+				DG01000000000000000000000226 /* Diag_ProMotionTestView.swift */,
+				DG01000000000000000000000227 /* Diag_TrueToneFlashView.swift */,
+				DG01000000000000000000000228 /* Diag_MicrophoneArrayView.swift */,
+				DG01000000000000000000000229 /* Diag_USBCPortView.swift */,
+				DG01000000000000000000000230 /* Diag_GPSAccuracyView.swift */,
+				DG01000000000000000000000231 /* Diag_WirelessAntennaView.swift */,
+				DG01000000000000000000000232 /* Diag_HapticIntensityView.swift */,
+				DG01000000000000000000000233 /* Diag_PowerDeliveryView.swift */,
+				DG01000000000000000000000234 /* Diag_SideButtonView.swift */,
+				DG01000000000000000000000235 /* Diag_PhotonicEngineView.swift */,
+				DG01000000000000000000000236 /* Diag_FaceIDTestView.swift */,
+				DG01000000000000000000000237 /* Diag_TouchIDTestView.swift */,
+				DG01000000000000000000000238 /* Diag_ThreadRadioView.swift */,
+				DG01000000000000000000000239 /* Diag_WiFi6ECheckView.swift */,
+				DG01000000000000000000000240 /* Diag_5GBandView.swift */,
 			);
 			path = Diagnostics;
 			sourceTree = "<group>";
@@ -11062,6 +11185,47 @@
 				DG02000000000000000000000197 /* Diag_ProximityStressView.swift in Sources */,
 				DG02000000000000000000000198 /* Diag_GravitySensorView.swift in Sources */,
 				DG02000000000000000000000199 /* Diag_AppResourceMonitorView.swift in Sources */,
+				DG02000000000000000000000200 /* Diag_EarpieceTestView.swift in Sources */,
+				DG02000000000000000000000201 /* Diag_CameraControlView.swift in Sources */,
+				DG02000000000000000000000202 /* Diag_TelephotoLensView.swift in Sources */,
+				DG02000000000000000000000203 /* Diag_UltraWideLensView.swift in Sources */,
+				DG02000000000000000000000204 /* Diag_MacroCameraView.swift in Sources */,
+				DG02000000000000000000000205 /* Diag_WideLensView.swift in Sources */,
+				DG02000000000000000000000206 /* Diag_InfraredCameraView.swift in Sources */,
+				DG02000000000000000000000207 /* Diag_LiDARFullView.swift in Sources */,
+				DG02000000000000000000000208 /* Diag_MuteSwitchActionButtonView.swift in Sources */,
+				DG02000000000000000000000209 /* Diag_VolumeButtonsView.swift in Sources */,
+				DG02000000000000000000000210 /* Diag_DigitizerTestView.swift in Sources */,
+				DG02000000000000000000000211 /* Diag_NFCDiagnosticsView.swift in Sources */,
+				DG02000000000000000000000212 /* Diag_ActionButtonView.swift in Sources */,
+				DG02000000000000000000000213 /* Diag_DepthSensorView.swift in Sources */,
+				DG02000000000000000000000214 /* Diag_CinematicModeView.swift in Sources */,
+				DG02000000000000000000000215 /* Diag_ProRAWProResView.swift in Sources */,
+				DG02000000000000000000000216 /* Diag_NightModeView.swift in Sources */,
+				DG02000000000000000000000217 /* Diag_PortraitModeView.swift in Sources */,
+				DG02000000000000000000000218 /* Diag_AutofocusTestView.swift in Sources */,
+				DG02000000000000000000000219 /* Diag_OISTestView.swift in Sources */,
+				DG02000000000000000000000220 /* Diag_StereoSpeakerTestView.swift in Sources */,
+				DG02000000000000000000000221 /* Diag_MagSafeTestView.swift in Sources */,
+				DG02000000000000000000000222 /* Diag_DynamicIslandView.swift in Sources */,
+				DG02000000000000000000000223 /* Diag_CrashDetectionView.swift in Sources */,
+				DG02000000000000000000000224 /* Diag_EmergencySOSView.swift in Sources */,
+				DG02000000000000000000000225 /* Diag_AlwaysOnDisplayView.swift in Sources */,
+				DG02000000000000000000000226 /* Diag_ProMotionTestView.swift in Sources */,
+				DG02000000000000000000000227 /* Diag_TrueToneFlashView.swift in Sources */,
+				DG02000000000000000000000228 /* Diag_MicrophoneArrayView.swift in Sources */,
+				DG02000000000000000000000229 /* Diag_USBCPortView.swift in Sources */,
+				DG02000000000000000000000230 /* Diag_GPSAccuracyView.swift in Sources */,
+				DG02000000000000000000000231 /* Diag_WirelessAntennaView.swift in Sources */,
+				DG02000000000000000000000232 /* Diag_HapticIntensityView.swift in Sources */,
+				DG02000000000000000000000233 /* Diag_PowerDeliveryView.swift in Sources */,
+				DG02000000000000000000000234 /* Diag_SideButtonView.swift in Sources */,
+				DG02000000000000000000000235 /* Diag_PhotonicEngineView.swift in Sources */,
+				DG02000000000000000000000236 /* Diag_FaceIDTestView.swift in Sources */,
+				DG02000000000000000000000237 /* Diag_TouchIDTestView.swift in Sources */,
+				DG02000000000000000000000238 /* Diag_ThreadRadioView.swift in Sources */,
+				DG02000000000000000000000239 /* Diag_WiFi6ECheckView.swift in Sources */,
+				DG02000000000000000000000240 /* Diag_5GBandView.swift in Sources */,
 				WG5FD79044E10FA97C5EC69F /* WorkspaceGraph.swift in Sources */,
 				MDC32FA79B1B70105A53ED19 /* AgenticModels.swift in Sources */,
 				TO7EC7A01B15A8F7BFE4020C /* AgenticToolOutput.swift in Sources */,

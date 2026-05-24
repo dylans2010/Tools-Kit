@@ -376,6 +376,60 @@ struct DiagnosticsHomeView: View {
         case "proximity_stress": Diag_ProximityStressView()
         case "gravity_sensor": Diag_GravitySensorView()
         case "app_resource_monitor": Diag_AppResourceMonitorView()
+        // === EXPANDED HARDWARE DIAGNOSTICS ===
+        // Audio & Speaker
+        case "earpiece_test": Diag_EarpieceTestView()
+        case "stereo_speaker_test": Diag_StereoSpeakerTestView()
+        // Camera System
+        case "camera_control": Diag_CameraControlView()
+        case "telephoto_lens": Diag_TelephotoLensView()
+        case "ultra_wide_lens": Diag_UltraWideLensView()
+        case "macro_camera": Diag_MacroCameraView()
+        case "wide_lens": Diag_WideLensView()
+        case "infrared_camera": Diag_InfraredCameraView()
+        case "lidar_full": Diag_LiDARFullView()
+        case "depth_sensor": Diag_DepthSensorView()
+        case "cinematic_mode": Diag_CinematicModeView()
+        case "proraw_prores": Diag_ProRAWProResView()
+        case "night_mode": Diag_NightModeView()
+        case "portrait_mode": Diag_PortraitModeView()
+        case "autofocus_test": Diag_AutofocusTestView()
+        case "ois_test": Diag_OISTestView()
+        case "photonic_engine": Diag_PhotonicEngineView()
+        case "true_tone_flash": Diag_TrueToneFlashView()
+        // Buttons & Hardware
+        case "mute_switch_action": Diag_MuteSwitchActionButtonView()
+        case "volume_buttons": Diag_VolumeButtonsView()
+        case "action_button": Diag_ActionButtonView()
+        case "side_button": Diag_SideButtonView()
+        // Touch & Display
+        case "digitizer_test": Diag_DigitizerTestView()
+        case "always_on_display": Diag_AlwaysOnDisplayView()
+        case "promotion_test": Diag_ProMotionTestView()
+        case "dynamic_island": Diag_DynamicIslandView()
+        // NFC Advanced
+        case "nfc_diagnostics": Diag_NFCDiagnosticsView()
+        // Connectivity & Wireless
+        case "wifi_6e": Diag_WiFi6ECheckView()
+        case "five_g_band": Diag_5GBandView()
+        case "wireless_antenna": Diag_WirelessAntennaView()
+        case "thread_radio": Diag_ThreadRadioView()
+        // Sensors & Safety
+        case "magsafe_test": Diag_MagSafeTestView()
+        case "crash_detection": Diag_CrashDetectionView()
+        case "gps_accuracy": Diag_GPSAccuracyView()
+        // Safety & Features
+        case "emergency_sos": Diag_EmergencySOSView()
+        // Haptics
+        case "haptic_intensity": Diag_HapticIntensityView()
+        // Power
+        case "power_delivery": Diag_PowerDeliveryView()
+        case "usbc_port": Diag_USBCPortView()
+        // Biometrics
+        case "face_id_test": Diag_FaceIDTestView()
+        case "touch_id_test": Diag_TouchIDTestView()
+        // Microphone
+        case "microphone_array": Diag_MicrophoneArrayView()
         default:
             Text("Tool not found")
         }
