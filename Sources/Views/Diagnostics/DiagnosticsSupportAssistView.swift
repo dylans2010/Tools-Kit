@@ -24,6 +24,7 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
     @Published var error: String?
     @Published var pendingAttachments: [ChatAttachment] = []
     @Published var isWebSearchEnabled: Bool = false
+    @Published var searchingStatus: String?
 
     private let aiService = AIService.shared
     private let webSearchTool = WebSearchTool()
@@ -76,29 +77,57 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
 
     private func performChat(attachments: [ChatAttachment]) async throws {
         var currentSystemPrompt = systemPrompt
+
+        // Use FileDecoderHelper to split attachments
+        let decoded = FileDecoderHelper.decodeAttachments(attachments)
+
+        // Prepare messages - inject decoded file text into the last user message if available
+        var chatMessages = messages
+        if !decoded.text.isEmpty && !chatMessages.isEmpty {
+            let lastIdx = chatMessages.count - 1
+            let updatedContent = chatMessages[lastIdx].content + decoded.text
+            chatMessages[lastIdx] = ChatMessage(role: chatMessages[lastIdx].role, content: updatedContent)
+        }
+
         if isWebSearchEnabled {
             currentSystemPrompt += "\n\nCRITICAL: Web search is enabled. You MUST use the [SEARCH: query] tool to gather the latest diagnostic information, error codes, or troubleshooting steps before providing your final response."
+            searchingStatus = "Thinking..."
         }
 
         var response = try await aiService.processMessages(
-            messages: [ChatMessage(role: "system", content: currentSystemPrompt)] + messages,
-            attachments: attachments
+            messages: [ChatMessage(role: "system", content: currentSystemPrompt)] + chatMessages,
+            attachments: decoded.images
         )
 
-        // Basic tool use loop
-        if response.contains("[SEARCH:") {
-            if let query = extractSearchQuery(from: response) {
-                let searchResult = try await webSearchTool.search(query: query)
-                let toolResultMessage = ChatMessage(role: "system", content: "Search Result: \(searchResult)")
+        // Enforce web search if enabled
+        if isWebSearchEnabled {
+            var searchResult: String?
+            var queryToUse: String?
+
+            if response.contains("[SEARCH:"), let query = extractSearchQuery(from: response) {
+                queryToUse = query
+            } else {
+                // Manually trigger search if AI didn't follow the "FULLY REQUIRED" rule
+                queryToUse = messages.last?.content ?? "iOS diagnostic issues"
+            }
+
+            if let query = queryToUse {
+                searchingStatus = "Searching: \(query)"
+                searchResult = try await webSearchTool.search(query: query)
+
+                let toolResultMessage = ChatMessage(role: "system", content: "Search Result: \(searchResult ?? "")")
+
+                searchingStatus = "Analyzing results..."
 
                 // Get final response after search
                 response = try await aiService.processMessages(
-                    messages: [ChatMessage(role: "system", content: currentSystemPrompt)] + messages + [toolResultMessage],
+                    messages: [ChatMessage(role: "system", content: currentSystemPrompt)] + chatMessages + [toolResultMessage],
                     attachments: []
                 )
             }
         }
 
+        searchingStatus = nil
         messages.append(ChatMessage(role: "assistant", content: response))
     }
 
@@ -136,19 +165,46 @@ struct DiagnosticsSupportAssistView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                chatScrollView
+            ZStack {
+                // Subtle blue gradient background
+                LinearGradient(
+                    colors: [Color.blue.opacity(0.05), Color.clear],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
 
-                if let error = viewModel.error {
-                    Text(error)
-                        .font(.caption)
-                        .foregroundColor(.red)
+                VStack(spacing: 0) {
+                    chatScrollView
+
+                    if let status = viewModel.searchingStatus {
+                        HStack(spacing: 12) {
+                            Image(systemName: "sparkles")
+                                .symbolEffect(.variableColor.iterative)
+                                .foregroundColor(.blue)
+
+                            Text(status)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+
+                            Spacer()
+                        }
                         .padding()
+                        .background(.ultraThinMaterial)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+
+                    if let error = viewModel.error {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .padding()
+                    }
+
+                    attachmentPreviewBar
+
+                    inputArea
                 }
-
-                attachmentPreviewBar
-
-                inputArea
             }
             .navigationTitle("Support Assist")
             .navigationBarTitleDisplayMode(.inline)
@@ -206,8 +262,11 @@ struct DiagnosticsSupportAssistView: View {
             }
             .onChange(of: viewModel.messages.count) { _, _ in
                 if let lastId = viewModel.messages.last?.id {
-                    withAnimation {
-                        proxy.scrollTo(lastId, anchor: .bottom)
+                    // Small delay to prevent UI thread saturation during rapid updates
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        withAnimation {
+                            proxy.scrollTo(lastId, anchor: .bottom)
+                        }
                     }
                 }
             }
