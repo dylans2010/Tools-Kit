@@ -14,6 +14,15 @@ struct WebSearchTool {
     }
 }
 
+// MARK: - Models
+
+struct AttachmentItem: Identifiable {
+    let id = UUID()
+    let attachment: ChatAttachment
+    var decodedText: String?
+    var isDecoding: Bool = false
+}
+
 // MARK: - View Model
 
 @MainActor
@@ -22,7 +31,7 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
     @Published var inputText: String = ""
     @Published var isLoading: Bool = false
     @Published var error: String?
-    @Published var pendingAttachments: [ChatAttachment] = []
+    @Published var pendingAttachments: [AttachmentItem] = []
     @Published var isWebSearchEnabled: Bool = false
     @Published var searchingStatus: String?
 
@@ -54,7 +63,7 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         messages.append(userMessage)
 
         let attachmentsToSend = pendingAttachments
-        let currentInput = trimmedText
+        let currentInput = inputText
 
         inputText = ""
         pendingAttachments = []
@@ -63,7 +72,7 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
 
         Task {
             do {
-                try await performChat(attachments: attachmentsToSend)
+                try await performChat(attachmentItems: attachmentsToSend)
                 isLoading = false
             } catch {
                 self.error = error.localizedDescription
@@ -75,28 +84,37 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         }
     }
 
-    private func performChat(attachments: [ChatAttachment]) async throws {
+    private func performChat(attachmentItems: [AttachmentItem]) async throws {
         var currentSystemPrompt = systemPrompt
 
-        // Use FileDecoderHelper to split attachments
-        let decoded = FileDecoderHelper.decodeAttachments(attachments)
+        // Prepare decoded text and images
+        var extractedText = ""
+        var images: [ChatAttachment] = []
+
+        for item in attachmentItems {
+            if item.attachment.mimeType.hasPrefix("image") {
+                images.append(item.attachment)
+            } else if let decoded = item.decodedText {
+                extractedText += "\n\n--- File Content: \(item.attachment.fileName) ---\n\(decoded)\n--- End of File ---\n"
+            }
+        }
 
         // Prepare messages - inject decoded file text into the last user message if available
         var chatMessages = messages
-        if !decoded.text.isEmpty && !chatMessages.isEmpty {
+        if !extractedText.isEmpty && !chatMessages.isEmpty {
             let lastIdx = chatMessages.count - 1
-            let updatedContent = chatMessages[lastIdx].content + decoded.text
+            let updatedContent = chatMessages[lastIdx].content + extractedText
             chatMessages[lastIdx] = ChatMessage(role: chatMessages[lastIdx].role, content: updatedContent)
         }
 
         if isWebSearchEnabled {
-            currentSystemPrompt += "\n\nCRITICAL: Web search is enabled. You MUST use the [SEARCH: query] tool to gather the latest diagnostic information, error codes, or troubleshooting steps before providing your final response."
+            currentSystemPrompt += "\n\nCRITICAL: Web search is enabled. MANDATORY: You MUST use the [SEARCH: query] tool to gather the latest diagnostic information, error codes, or troubleshooting steps before providing your final response. DO NOT answer until you have processed search results."
             searchingStatus = "Thinking..."
         }
 
         var response = try await aiService.processMessages(
             messages: [ChatMessage(role: "system", content: currentSystemPrompt)] + chatMessages,
-            attachments: decoded.images
+            attachments: images
         )
 
         // Enforce web search if enabled
@@ -108,7 +126,7 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
                 queryToUse = query
             } else {
                 // Manually trigger search if AI didn't follow the "FULLY REQUIRED" rule
-                queryToUse = messages.last?.content ?? "iOS diagnostic issues"
+                queryToUse = chatMessages.last?.content ?? "iOS diagnostic issues"
             }
 
             if let query = queryToUse {
@@ -128,6 +146,9 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         }
 
         searchingStatus = nil
+
+        // Use a small delay before appending to avoid UI freeze
+        try? await Task.sleep(nanoseconds: 300_000_000)
         messages.append(ChatMessage(role: "assistant", content: response))
     }
 
@@ -139,7 +160,17 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
     }
 
     func addAttachment(_ attachment: ChatAttachment) {
-        pendingAttachments.append(attachment)
+        let newItem = AttachmentItem(attachment: attachment, isDecoding: true)
+        let id = newItem.id
+        pendingAttachments.append(newItem)
+
+        Task {
+            let decoded = await FileDecoderHelper.decode(attachment)
+            if let index = pendingAttachments.firstIndex(where: { $0.id == id }) {
+                pendingAttachments[index].decodedText = decoded
+                pendingAttachments[index].isDecoding = false
+            }
+        }
     }
 
     func removeAttachment(at index: Int) {
@@ -166,13 +197,14 @@ struct DiagnosticsSupportAssistView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Subtle blue gradient background
+                // Noticeable blue gradient background with Metal acceleration
                 LinearGradient(
-                    colors: [Color.blue.opacity(0.05), Color.clear],
+                    colors: [Color.blue.opacity(0.15), Color.blue.opacity(0.05), Color.clear],
                     startPoint: .top,
                     endPoint: .bottom
                 )
                 .ignoresSafeArea()
+                .drawingGroup()
 
                 VStack(spacing: 0) {
                     chatScrollView
@@ -181,7 +213,13 @@ struct DiagnosticsSupportAssistView: View {
                         HStack(spacing: 12) {
                             Image(systemName: "sparkles")
                                 .symbolEffect(.variableColor.iterative)
-                                .foregroundColor(.blue)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [.blue, .purple, .cyan],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
 
                             Text(status)
                                 .font(.subheadline)
@@ -262,9 +300,10 @@ struct DiagnosticsSupportAssistView: View {
             }
             .onChange(of: viewModel.messages.count) { _, _ in
                 if let lastId = viewModel.messages.last?.id {
-                    // Small delay to prevent UI thread saturation during rapid updates
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        withAnimation {
+                    // Increased delay to prevent UI thread saturation and ensure layout stability
+                    Task {
+                        try? await Task.sleep(nanoseconds: 500_000_000)
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                             proxy.scrollTo(lastId, anchor: .bottom)
                         }
                     }
@@ -275,9 +314,16 @@ struct DiagnosticsSupportAssistView: View {
 
     private var emptyStateView: some View {
         VStack(spacing: 12) {
-            Image(systemName: "cpu.fill")
-                .font(.system(size: 50))
-                .foregroundColor(.blue)
+            Image(systemName: "sparkles")
+                .font(.system(size: 60))
+                .symbolEffect(.variableColor.iterative)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.blue, .purple, .cyan],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .padding(.top, 40)
 
             Text("Intelligent Diagnostics")
@@ -297,7 +343,7 @@ struct DiagnosticsSupportAssistView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         ForEach(viewModel.pendingAttachments.indices, id: \.self) { index in
-                            AttachmentThumbnail(attachment: viewModel.pendingAttachments[index]) {
+                            AttachmentThumbnail(item: viewModel.pendingAttachments[index]) {
                                 viewModel.removeAttachment(at: index)
                             }
                         }
@@ -436,28 +482,39 @@ struct MessageBubble: View {
 }
 
 struct AttachmentThumbnail: View {
-    let attachment: ChatAttachment
+    let item: AttachmentItem
     let onRemove: () -> Void
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
             VStack {
-                if attachment.mimeType.hasPrefix("image") {
-                    if let uiImage = UIImage(data: attachment.data) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFill()
+                ZStack {
+                    if item.attachment.mimeType.hasPrefix("image") {
+                        if let uiImage = UIImage(data: item.attachment.data) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 60, height: 60)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                    } else {
+                        Image(systemName: "doc.fill")
+                            .font(.system(size: 30))
                             .frame(width: 60, height: 60)
+                            .background(Color(.tertiarySystemBackground))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
-                } else {
-                    Image(systemName: "doc.fill")
-                        .font(.system(size: 30))
-                        .frame(width: 60, height: 60)
-                        .background(Color(.tertiarySystemBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                    if item.isDecoding {
+                        Color.black.opacity(0.3)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        ProgressView()
+                            .tint(.white)
+                    }
                 }
-                Text(attachment.fileName)
+                .frame(width: 60, height: 60)
+
+                Text("Attachment")
                     .font(.caption2)
                     .lineLimit(1)
                     .frame(width: 60)
