@@ -60,7 +60,9 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         guard !trimmedText.isEmpty || !pendingAttachments.isEmpty else { return }
 
         let userMessage = ChatMessage(role: "user", content: trimmedText)
-        messages.append(userMessage)
+        await MainActor.run {
+            messages.append(userMessage)
+        }
 
         let attachmentsToSend = pendingAttachments
         let currentInput = inputText
@@ -73,13 +75,17 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         Task {
             do {
                 try await performChat(attachmentItems: attachmentsToSend)
-                isLoading = false
+                await MainActor.run {
+                    self.isLoading = false
+                }
             } catch {
-                self.error = error.localizedDescription
-                self.isLoading = false
-                // Restore input on failure
-                self.inputText = currentInput
-                self.pendingAttachments = attachmentsToSend
+                await MainActor.run {
+                    self.error = error.localizedDescription
+                    self.isLoading = false
+                    // Restore input on failure
+                    self.inputText = currentInput
+                    self.pendingAttachments = attachmentsToSend
+                }
             }
         }
     }
@@ -108,8 +114,10 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         }
 
         if isWebSearchEnabled {
-            currentSystemPrompt += "\n\nCRITICAL: Web search is enabled. MANDATORY: You MUST use the [SEARCH: query] tool to gather the latest diagnostic information, error codes, or troubleshooting steps before providing your final response. DO NOT answer until you have processed search results."
-            searchingStatus = "Thinking..."
+            currentSystemPrompt += "\n\nCRITICAL: Web search is ENABLED. You MUST perform a web search before answering any user question. Identify the core technical query and use the [SEARCH: query] tool. Do not provide a final answer until search results are analyzed."
+            await MainActor.run {
+                searchingStatus = "Thinking..."
+            }
         }
 
         var response = try await aiService.processMessages(
@@ -117,47 +125,22 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
             attachments: images
         )
 
-        // Enforce web search if enabled
-        if isWebSearchEnabled {
-            var searchResult: String?
-            var queryToUse: String?
+        // Web search is now handled natively within AIService.processMessages
+        // The previous manual tool loop here is redundant but can be kept as a secondary safety
+        // if AIService doesn't return a final answer.
+        // However, the instructions were to implement it in AIService.
 
-            if response.contains("[SEARCH:"), let query = extractSearchQuery(from: response) {
-                queryToUse = query
-            } else {
-                // Manually trigger search if AI didn't follow the "FULLY REQUIRED" rule
-                queryToUse = chatMessages.last?.content ?? "iOS diagnostic issues"
-            }
-
-            if let query = queryToUse {
-                searchingStatus = "Searching: \(query)"
-                searchResult = try await webSearchTool.search(query: query)
-
-                let toolResultMessage = ChatMessage(role: "system", content: "Search Result: \(searchResult ?? "")")
-
-                searchingStatus = "Analyzing results..."
-
-                // Get final response after search
-                response = try await aiService.processMessages(
-                    messages: [ChatMessage(role: "system", content: currentSystemPrompt)] + chatMessages + [toolResultMessage],
-                    attachments: []
-                )
-            }
+        await MainActor.run {
+            searchingStatus = nil
         }
-
-        searchingStatus = nil
 
         // Use a small delay before appending to avoid UI freeze
         try? await Task.sleep(nanoseconds: 300_000_000)
-        messages.append(ChatMessage(role: "assistant", content: response))
+        await MainActor.run {
+            messages.append(ChatMessage(role: "assistant", content: response))
+        }
     }
 
-    private func extractSearchQuery(from text: String) -> String? {
-        guard let startRange = text.range(of: "[SEARCH:") else { return nil }
-        let remaining = text[startRange.upperBound...]
-        guard let endRange = remaining.range(of: "]") else { return nil }
-        return String(remaining[..<endRange.lowerBound]).trimmingCharacters(in: .whitespaces)
-    }
 
     func addAttachment(_ attachment: ChatAttachment) {
         let newItem = AttachmentItem(attachment: attachment, isDecoding: true)
@@ -165,10 +148,14 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         pendingAttachments.append(newItem)
 
         Task {
+            // Decoding happens on a background thread in FileDecoderHelper
             let decoded = await FileDecoderHelper.decode(attachment)
-            if let index = pendingAttachments.firstIndex(where: { $0.id == id }) {
-                pendingAttachments[index].decodedText = decoded
-                pendingAttachments[index].isDecoding = false
+
+            await MainActor.run {
+                if let index = pendingAttachments.firstIndex(where: { $0.id == id }) {
+                    pendingAttachments[index].decodedText = decoded
+                    pendingAttachments[index].isDecoding = false
+                }
             }
         }
     }
@@ -246,6 +233,8 @@ struct DiagnosticsSupportAssistView: View {
             }
             .navigationTitle("Support Assist")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color.blue.opacity(0.15), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Close") { dismiss() }
@@ -377,21 +366,30 @@ struct DiagnosticsSupportAssistView: View {
                         .foregroundColor(.blue)
                 }
 
-                TextField("Describe the issue...", text: $viewModel.inputText, axis: .vertical)
-                    .textFieldStyle(.plain)
-                    .padding(8)
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(10)
-                    .lineLimit(1...5)
+                HStack {
+                    TextField("Describe the issue...", text: $viewModel.inputText, axis: .vertical)
+                        .textFieldStyle(.plain)
+                        .font(.body)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .lineLimit(1...5)
+                }
+                .background(RoundedRectangle(cornerRadius: 20).fill(.ultraThinMaterial))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.primary.opacity(0.1), lineWidth: 0.5)
+                )
 
                 Button(action: viewModel.sendMessage) {
                     Image(systemName: "arrow.up.circle.fill")
-                        .font(.system(size: 30))
+                        .font(.system(size: 32))
+                        .symbolRenderingMode(.multicolor)
                         .foregroundColor(viewModel.inputText.isEmpty && viewModel.pendingAttachments.isEmpty ? .secondary : .blue)
                 }
                 .disabled(viewModel.inputText.isEmpty && viewModel.pendingAttachments.isEmpty || viewModel.isLoading)
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.vertical, 10)
             .background(.ultraThinMaterial)
         }
     }
@@ -399,42 +397,49 @@ struct DiagnosticsSupportAssistView: View {
     private func handleImportedURLs(_ urls: [URL]) {
         guard let url = urls.first else { return }
         let accessing = url.startAccessingSecurityScopedResource()
-        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
 
-        guard var data = try? Data(contentsOf: url) else { return }
+        let fileName = url.lastPathComponent
         let ext = url.pathExtension.lowercased()
         let mime = mimeType(for: ext)
 
-        // Compress images to reduce payload size and prevent errors
-        if mime.hasPrefix("image"), let uiImage = UIImage(data: data) {
-            if let compressedData = uiImage.jpegData(compressionQuality: 0.5) {
-                data = compressedData
+        Task.detached(priority: .userInitiated) {
+            defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+            guard var data = try? Data(contentsOf: url) else { return }
+
+            // Compress images to reduce payload size and prevent errors
+            if mime.hasPrefix("image"), let uiImage = UIImage(data: data) {
+                if let compressedData = uiImage.jpegData(compressionQuality: 0.5) {
+                    data = compressedData
+                }
+            }
+
+            let attachment = ChatAttachment(data: data, mimeType: mime, fileName: fileName)
+            await MainActor.run {
+                viewModel.addAttachment(attachment)
             }
         }
-
-        let attachment = ChatAttachment(data: data, mimeType: mime, fileName: url.lastPathComponent)
-        viewModel.addAttachment(attachment)
     }
 
     private func loadPhoto(from item: PhotosPickerItem) {
-        item.loadTransferable(type: Data.self) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let data):
-                    if var data = data {
-                        // Compress images to reduce payload size and prevent errors
+        Task {
+            do {
+                if let data = try await item.loadTransferable(type: Data.self) {
+                    let attachment = await Task.detached(priority: .userInitiated) { () -> ChatAttachment? in
                         if let uiImage = UIImage(data: data),
                            let compressedData = uiImage.jpegData(compressionQuality: 0.5) {
-                            data = compressedData
+                            return ChatAttachment(data: compressedData, mimeType: "image/jpeg", fileName: "image.jpg")
                         }
-                        let attachment = ChatAttachment(data: data, mimeType: "image/jpeg", fileName: "image.jpg")
+                        return nil
+                    }.value
+
+                    if let attachment {
                         viewModel.addAttachment(attachment)
                     }
-                case .failure:
-                    break
                 }
-                self.selectedPhotoItem = nil
+            } catch {
+                print("Failed to load photo: \(error)")
             }
+            selectedPhotoItem = nil
         }
     }
 
