@@ -52,6 +52,16 @@ struct FileDecoderHelper {
         }.value
     }
 
+    /// Decodes a UIImage from the Photo Library into a ChatAttachment.
+    /// Uses 0.8 compression quality and generates a timestamped filename.
+    static func decodeImageFromLibrary(_ image: UIImage) async -> ChatAttachment {
+        return await Task.detached(priority: .userInitiated) {
+            let data = image.jpegData(compressionQuality: 0.8) ?? Data()
+            let fileName = "image_\(Int(Date().timeIntervalSince1970)).jpg"
+            return ChatAttachment(data: data, mimeType: "image/jpeg", fileName: fileName)
+        }.value
+    }
+
     static func decodeAttachments(_ attachments: [ChatAttachment]) async -> (text: String, images: [ChatAttachment]) {
         return await Task.detached(priority: .userInitiated) {
             var extractedText = ""
