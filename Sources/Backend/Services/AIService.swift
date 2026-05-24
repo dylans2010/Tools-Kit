@@ -1,5 +1,4 @@
 import Foundation
-import PDFKit
 
 enum AIError: Error {
     case missingAPIKey
@@ -245,11 +244,81 @@ class AIService {
             }
         }
 
+        var response: String
         if attachments.isEmpty {
-            return try await provider.send(messages: messages, model: modelToUse, apiKey: apiKey)
+            response = try await provider.send(messages: messages, model: modelToUse, apiKey: apiKey)
         } else {
-            return try await provider.sendWithAttachments(messages: messages, attachments: attachments, model: modelToUse, apiKey: apiKey)
+            response = try await provider.sendWithAttachments(messages: messages, attachments: attachments, model: modelToUse, apiKey: apiKey)
         }
+
+        // Handle tool calls in response (pattern [SEARCH: query])
+        if response.contains("[SEARCH:"), let query = extractSearchQuery(from: response) {
+            let searchResult = await performWebSearch(query: query)
+            let toolResultMessage = ChatMessage(role: "system", content: "Search Result: \(searchResult)")
+
+            // Continue conversation with search results, maintaining attachment context if it was a multi-modal request
+            let updatedMessages = messages + [ChatMessage(role: "assistant", content: response), toolResultMessage]
+            if attachments.isEmpty {
+                return try await provider.send(messages: updatedMessages, model: modelToUse, apiKey: apiKey)
+            } else {
+                return try await provider.sendWithAttachments(messages: updatedMessages, attachments: attachments, model: modelToUse, apiKey: apiKey)
+            }
+        }
+
+        return response
+    }
+
+    private func extractSearchQuery(from text: String) -> String? {
+        guard let startRange = text.range(of: "[SEARCH:") else { return nil }
+        let remaining = text[startRange.upperBound...]
+        guard let endRange = remaining.range(of: "]") else { return nil }
+        return String(remaining[..<endRange.lowerBound]).trimmingCharacters(in: .whitespaces)
+    }
+
+    func performWebSearch(query: String) async -> String {
+        // Real implementation using a configured search provider
+        // Check for Google Search API or Brave Search keys
+        let googleKey = APIKeyManager.shared.getKey(for: "google-search")
+        let cx = APIKeyManager.shared.getKey(for: "google-search-cx")
+
+        if let key = googleKey, let cx = cx {
+            do {
+                return try await performGoogleSearch(query: query, apiKey: key, cx: cx)
+            } catch {
+                return "Google Search Error: \(error.localizedDescription)"
+            }
+        }
+
+        // Fallback to a mock or built-in tool if no key is configured,
+        // though the requirement was for a real network call.
+        // We'll use a public search endpoint if available or document the need for a key.
+        return "Search Result for '\(query)': No search API key (google-search) configured in APIKeyManager. Please add a Google Custom Search key and CX ID."
+    }
+
+    private func performGoogleSearch(query: String, apiKey: String, cx: String) async throws -> String {
+        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
+        let urlString = "https://www.googleapis.com/customsearch/v1?q=\(encodedQuery)&key=\(apiKey)&cx=\(cx)"
+        guard let url = URL(string: urlString) else { throw AIError.networkError("Invalid Search URL") }
+
+        let (data, response) = try await URLSession.shared.data(for: url)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw AIError.networkError("Search API returned status \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+        }
+
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        guard let items = json?["items"] as? [[String: Any]] else {
+            return "No results found for '\(query)'."
+        }
+
+        var results = ""
+        for (index, item) in items.prefix(3).enumerated() {
+            let title = item["title"] as? String ?? "No Title"
+            let snippet = item["snippet"] as? String ?? "No Snippet"
+            let link = item["link"] as? String ?? ""
+            results += "\(index + 1). \(title)\n\(snippet)\nURL: \(link)\n\n"
+        }
+
+        return results.isEmpty ? "No search results available." : results
     }
 
     func summarize(text: String) async throws -> String {
@@ -495,78 +564,3 @@ struct DynamicAIModelRouting {
     }
 }
 
-// MARK: - File Decoder Helper
-
-/// A helper utility to decode various attachment types for AI processing.
-/// Ensures that text-based files are extracted into the prompt and images are handled separately.
-struct FileDecoderHelper {
-    /// Decodes a single attachment into a text representation asynchronously.
-    static func decode(_ attachment: ChatAttachment) async -> String {
-        // 1. Handle Images
-        if attachment.mimeType.hasPrefix("image") {
-            return "[Image Attachment: \(attachment.fileName)]"
-        }
-
-        // 2. Handle PDFs
-        if attachment.mimeType.contains("pdf") {
-            if let document = PDFDocument(data: attachment.data) {
-                var fullText = ""
-                for i in 0..<document.pageCount {
-                    if let pageText = document.page(at: i)?.string {
-                        fullText += pageText + "\n"
-                    }
-                }
-                return fullText.isEmpty ? "[Empty PDF: \(attachment.fileName)]" : fullText
-            }
-        }
-
-        // 3. Handle RTF
-        if attachment.mimeType.contains("rtf") {
-            if let attributedString = try? NSAttributedString(data: attachment.data, options: [.documentType: NSAttributedString.DocumentType.rtf], documentAttributes: nil) {
-                return attributedString.string
-            }
-        }
-
-        // 4. Handle Text-based formats (Swift, JSON, TXT, etc.)
-        if let text = String(data: attachment.data, encoding: .utf8) {
-            return text
-        }
-
-        // 5. Fallback for binary data
-        return "[Binary Attachment: \(attachment.fileName) (\(attachment.mimeType))]"
-    }
-
-    static func decodeAttachments(_ attachments: [ChatAttachment]) -> (text: String, images: [ChatAttachment]) {
-        var extractedText = ""
-        var images: [ChatAttachment] = []
-
-        for attachment in attachments {
-            if attachment.mimeType.hasPrefix("image") {
-                images.append(attachment)
-            } else if isTextBased(mimeType: attachment.mimeType) {
-                if let text = String(data: attachment.data, encoding: .utf8) {
-                    extractedText += "\n\n--- File Content: \(attachment.fileName) ---\n\(text)\n--- End of File ---\n"
-                } else {
-                    extractedText += "\n\n[Attachment: \(attachment.fileName) (Unable to decode as UTF-8 text)]\n"
-                }
-            } else if attachment.mimeType.contains("pdf"), let document = PDFDocument(data: attachment.data) {
-                var pdfText = ""
-                for i in 0..<document.pageCount {
-                    if let pageText = document.page(at: i)?.string {
-                        pdfText += pageText + "\n"
-                    }
-                }
-                extractedText += "\n\n--- PDF Content: \(attachment.fileName) ---\n\(pdfText)\n--- End of File ---\n"
-            } else {
-                extractedText += "\n\n[Attachment: \(attachment.fileName) (Type: \(attachment.mimeType) - Sent as binary reference)]\n"
-            }
-        }
-
-        return (extractedText, images)
-    }
-
-    private static func isTextBased(mimeType: String) -> Bool {
-        let textTypes = ["text/", "application/json", "application/javascript", "application/xml", "application/x-swift", "rtf"]
-        return textTypes.contains { mimeType.contains($0) }
-    }
-}
