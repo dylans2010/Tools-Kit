@@ -493,3 +493,36 @@ struct DynamicAIModelRouting {
         throw AIError.networkError("All available free models exhausted. Last error: \(lastError?.localizedDescription ?? "Unknown")")
     }
 }
+
+// MARK: - File Decoder Helper
+
+/// A helper utility to decode various attachment types for AI processing.
+/// Ensures that text-based files are extracted into the prompt and images are handled separately.
+struct FileDecoderHelper {
+    static func decodeAttachments(_ attachments: [ChatAttachment]) -> (text: String, images: [ChatAttachment]) {
+        var extractedText = ""
+        var images: [ChatAttachment] = []
+
+        for attachment in attachments {
+            if attachment.mimeType.hasPrefix("image") {
+                images.append(attachment)
+            } else if isTextBased(mimeType: attachment.mimeType) {
+                if let text = String(data: attachment.data, encoding: .utf8) {
+                    extractedText += "\n\n--- File Content: \(attachment.fileName) ---\n\(text)\n--- End of File ---\n"
+                } else {
+                    extractedText += "\n\n[Attachment: \(attachment.fileName) (Unable to decode as UTF-8 text)]\n"
+                }
+            } else {
+                // Generic handler for other types (PDF, etc. would normally need specialized parsing)
+                extractedText += "\n\n[Attachment: \(attachment.fileName) (Type: \(attachment.mimeType) - Sent as binary reference)]\n"
+            }
+        }
+
+        return (extractedText, images)
+    }
+
+    private static func isTextBased(mimeType: String) -> Bool {
+        let textTypes = ["text/", "application/json", "application/javascript", "application/xml", "application/x-swift"]
+        return textTypes.contains { mimeType.contains($0) }
+    }
+}
