@@ -670,22 +670,6 @@ struct WhiteboardCanvasView: View {
     }
 }
 
-private struct DrawingToolCustomizer: View {
-    let tool: WhiteboardViewTools.ToolEntry
-    @Binding var colorHex: String
-    @Binding var lineWidth: Double
-    @Binding var opacity: Double
-    var body: some View { EmptyView() }
-}
-
-private struct ElementToolbar: View {
-    @Binding var element: CanvasElement
-    var onDelete: () -> Void
-    var onDuplicate: () -> Void
-    var onBringToFront: () -> Void
-    var onSendToBack: () -> Void
-    var body: some View { EmptyView() }
-}
 
 // MARK: - Drawing Path View
 
