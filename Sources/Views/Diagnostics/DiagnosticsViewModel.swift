@@ -346,6 +346,73 @@ final class DiagnosticsViewModel: ObservableObject {
         DiagnosticTool(id: "proximity_stress", name: "Proximity Stress", icon: "hand.raised.circle.fill", description: "Proximity sensor stress test with response time tracking", category: .sensors),
         DiagnosticTool(id: "gravity_sensor", name: "Gravity Sensor", icon: "arrow.down.to.line.circle.fill", description: "Real-time gravity vector visualization with tilt and calibration", category: .sensors),
         DiagnosticTool(id: "app_resource_monitor", name: "App Resource Monitor", icon: "chart.bar.xaxis", description: "Live CPU, memory, threads, disk I/O, and process monitoring", category: .performance),
+
+        // === EXPANDED HARDWARE DIAGNOSTICS (35) ===
+
+        // Audio & Speaker
+        DiagnosticTool(id: "earpiece_test", name: "Earpiece Test", icon: "ear.fill", description: "Test built-in earpiece receiver with tone generation", category: .audio),
+        DiagnosticTool(id: "stereo_speaker_test", name: "Stereo Speaker Test", icon: "hifispeaker.2.fill", description: "Independent left/right stereo speaker testing", category: .audio),
+
+        // Camera System
+        DiagnosticTool(id: "camera_control", name: "Camera Control", icon: "camera.shutter.button.fill", description: "iPhone 16+ Camera Control button detection and features", category: .camera),
+        DiagnosticTool(id: "telephoto_lens", name: "Telephoto Lens", icon: "camera.aperture", description: "Test telephoto camera with optical zoom and preview", category: .camera),
+        DiagnosticTool(id: "ultra_wide_lens", name: "Ultra Wide Lens", icon: "camera.aperture", description: "0.5x ultra wide-angle camera with 120° field of view", category: .camera),
+        DiagnosticTool(id: "macro_camera", name: "Macro Camera", icon: "leaf.fill", description: "Close-up macro photography via ultra wide with autofocus", category: .camera),
+        DiagnosticTool(id: "wide_lens", name: "Wide Lens", icon: "camera.fill", description: "Primary 1x wide-angle camera diagnostics and preview", category: .camera),
+        DiagnosticTool(id: "infrared_camera", name: "Infrared Camera", icon: "camera.filters", description: "TrueDepth infrared emitter, dot projector, and IR sensor", category: .camera),
+        DiagnosticTool(id: "lidar_full", name: "LiDAR Full", icon: "light.recessed.fill", description: "Full LiDAR: depth mapping, mesh reconstruction, measurement", category: .camera),
+        DiagnosticTool(id: "depth_sensor", name: "Depth Sensor", icon: "cube.transparent.fill", description: "TrueDepth, LiDAR, and dual-camera depth capabilities", category: .camera),
+        DiagnosticTool(id: "cinematic_mode", name: "Cinematic Mode", icon: "video.fill", description: "Rack focus video with depth-of-field and focus transitions", category: .camera),
+        DiagnosticTool(id: "proraw_prores", name: "ProRAW & ProRes", icon: "camera.badge.ellipsis.fill", description: "Apple ProRAW photography and ProRes video capabilities", category: .camera),
+        DiagnosticTool(id: "night_mode", name: "Night Mode", icon: "moon.stars.fill", description: "Low-light multi-frame photography and long exposure", category: .camera),
+        DiagnosticTool(id: "portrait_mode", name: "Portrait Mode", icon: "person.crop.square.fill", description: "Depth-based bokeh for photo and video", category: .camera),
+        DiagnosticTool(id: "autofocus_test", name: "Autofocus Test", icon: "camera.metering.center.weighted", description: "Camera autofocus, continuous AF, and tap-to-focus test", category: .camera),
+        DiagnosticTool(id: "ois_test", name: "OIS Test", icon: "hand.raised.slash.fill", description: "Optical and sensor-shift image stabilization test", category: .camera),
+        DiagnosticTool(id: "photonic_engine", name: "Photonic Engine", icon: "cpu.fill", description: "Advanced computational photography pipeline check", category: .camera),
+        DiagnosticTool(id: "true_tone_flash", name: "True Tone Flash", icon: "bolt.circle.fill", description: "Adaptive True Tone LED flash with color temperature matching", category: .camera),
+
+        // Buttons & Hardware
+        DiagnosticTool(id: "mute_switch_action", name: "Mute Switch / Action Button", icon: "button.horizontal.top.press.fill", description: "Ring/Silent toggle or Action Button (iPhone 15 Pro+) test", category: .system),
+        DiagnosticTool(id: "volume_buttons", name: "Volume Buttons", icon: "speaker.wave.2.fill", description: "Volume Up/Down button detection with press history", category: .system),
+        DiagnosticTool(id: "action_button", name: "Action Button", icon: "button.horizontal.top.press.fill", description: "iPhone 15 Pro+ customizable Action Button check", category: .system),
+        DiagnosticTool(id: "side_button", name: "Side Button", icon: "power.circle.fill", description: "Side/Power button test with screenshot detection", category: .system),
+
+        // Touch & Display
+        DiagnosticTool(id: "digitizer_test", name: "Digitizer Test", icon: "hand.draw.fill", description: "Touch screen digitizer zone coverage and dead spot detection", category: .display),
+        DiagnosticTool(id: "always_on_display", name: "Always On Display", icon: "display", description: "LTPO OLED Always On Display detection and info", category: .display),
+        DiagnosticTool(id: "promotion_test", name: "ProMotion Test", icon: "gauge.with.dots.needle.100percent", description: "120Hz ProMotion display with live FPS monitoring", category: .display),
+        DiagnosticTool(id: "dynamic_island", name: "Dynamic Island", icon: "pill.circle.fill", description: "Interactive pill-shaped display cutout detection", category: .display),
+
+        // NFC Advanced
+        DiagnosticTool(id: "nfc_diagnostics", name: "NFC Diagnostics", icon: "wave.3.right.circle.fill", description: "Advanced NFC: NDEF, ISO 14443, MIFARE, FeliCa protocols", category: .connectivity),
+
+        // Connectivity & Wireless
+        DiagnosticTool(id: "wifi_6e", name: "WiFi 6E / WiFi 7", icon: "wifi.circle.fill", description: "6 GHz WiFi band support and WiFi 7 detection", category: .connectivity),
+        DiagnosticTool(id: "five_g_band", name: "5G Band", icon: "antenna.radiowaves.left.and.right.circle.fill", description: "Sub-6 GHz and mmWave 5G connectivity diagnostics", category: .connectivity),
+        DiagnosticTool(id: "wireless_antenna", name: "Wireless Antenna", icon: "antenna.radiowaves.left.and.right", description: "WiFi, Cellular, Bluetooth, GPS, NFC, UWB antenna systems", category: .connectivity),
+        DiagnosticTool(id: "thread_radio", name: "Thread Radio", icon: "circle.grid.cross.fill", description: "Thread/Matter smart home mesh networking radio", category: .connectivity),
+
+        // Sensors & Safety
+        DiagnosticTool(id: "magsafe_test", name: "MagSafe Test", icon: "magsafe.batterypack.fill", description: "MagSafe magnetic alignment with magnetometer monitoring", category: .sensors),
+        DiagnosticTool(id: "crash_detection", name: "Crash Detection", icon: "car.side.front.open.fill", description: "Severe car crash detection sensor and feature check", category: .sensors),
+        DiagnosticTool(id: "gps_accuracy", name: "GPS Accuracy", icon: "location.fill", description: "Real-time GPS accuracy with horizontal/vertical precision", category: .sensors),
+
+        // Safety & Features
+        DiagnosticTool(id: "emergency_sos", name: "Emergency SOS Satellite", icon: "sos.circle.fill", description: "Contact emergency services via satellite when offline", category: .connectivity),
+
+        // Haptics
+        DiagnosticTool(id: "haptic_intensity", name: "Haptic Intensity", icon: "hand.tap.fill", description: "Custom intensity/sharpness haptic testing with presets", category: .haptics),
+
+        // Power
+        DiagnosticTool(id: "power_delivery", name: "Power Delivery", icon: "powerplug.fill", description: "USB-C/Lightning charging speed and power delivery monitor", category: .battery),
+        DiagnosticTool(id: "usbc_port", name: "USB-C Port", icon: "cable.connector", description: "USB-C port diagnostics, speed tier, and DisplayPort", category: .system),
+
+        // Biometrics
+        DiagnosticTool(id: "face_id_test", name: "Face ID Test", icon: "faceid", description: "Face ID enrollment check and authentication test", category: .security),
+        DiagnosticTool(id: "touch_id_test", name: "Touch ID Test", icon: "touchid", description: "Touch ID fingerprint sensor test and authentication", category: .security),
+
+        // Microphone
+        DiagnosticTool(id: "microphone_array", name: "Microphone Array", icon: "mic.fill", description: "All built-in microphones, beamforming, and positions", category: .microphone),
     ]
 
     var filteredTools: [DiagnosticTool] {
