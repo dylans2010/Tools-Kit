@@ -41,8 +41,8 @@ struct DiagnosticsHomeView: View {
             .fullScreenCover(isPresented: $showSupportAssist) {
                 DiagnosticsSupportAssistView()
             }
-            .sheet(isPresented: $showSettings) {
-                AIChatSettingsView(settings: .constant(AIChatSettings()))
+            .fullScreenCover(isPresented: $showSettings) {
+                DiagnosticsSettingsView()
             }
             .sheet(isPresented: $showReports) {
                 NavigationStack {
