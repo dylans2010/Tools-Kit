@@ -34,55 +34,7 @@ struct GamesHomeView: View {
         NavigationStack {
             ZStack {
                 GamingDesignTokens.background.ignoresSafeArea()
-                ScrollView {
-                    VStack(spacing: 16) {
-                        HUDOverlayView(ledger: ledger, xpEngine: xpEngine)
-
-                        GameSearchView(searchText: $searchText)
-                        GameFilterBarView(selectedCategory: $selectedCategory)
-
-                        if searchText.isEmpty && selectedCategory == nil {
-                            featuredCard
-                        }
-
-                        if selectedCategory != nil || !searchText.isEmpty {
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                                ForEach(filteredGames) { game in
-                                    NavigationLink { GamesRouter.destination(for: game) } label: { GamingCardView(game: game, ledger: ledger) }
-                                }
-                            }.padding(.horizontal)
-                        } else {
-                            ForEach(gamesByCategory, id: \.0) { cat, games in
-                                VStack(alignment: .leading, spacing: 8) {
-                                    HStack {
-                                        Image(systemName: cat.icon).foregroundColor(GamingDesignTokens.accentNeon)
-                                        Text(cat.label).font(.headline.bold()).foregroundColor(.white)
-                                        Spacer()
-                                    }.padding(.horizontal)
-
-                                    ScrollView(.horizontal, showsIndicators: false) {
-                                        HStack(spacing: 12) {
-                                            ForEach(games) { game in
-                                                NavigationLink { GamesRouter.destination(for: game) } label: { GamingCardView(game: game, ledger: ledger).frame(width: 160) }
-                                            }
-                                        }.padding(.horizontal)
-                                    }
-                                }
-                            }
-                        }
-
-                        Button { showStore = true } label: {
-                            HStack {
-                                Image(systemName: "bag.fill").foregroundColor(GamingDesignTokens.accentGold)
-                                Text("Currency Store").font(.headline).foregroundColor(.white)
-                                Spacer()
-                                Image(systemName: "chevron.right").foregroundColor(.white.opacity(0.3))
-                            }
-                            .padding()
-                            .background(GamingDesignTokens.cardSurface, in: RoundedRectangle(cornerRadius: 12))
-                        }.padding(.horizontal).padding(.bottom, 20)
-                    }
-                }
+                mainContent
 
                 if xpEngine.didLevelUp {
                     LevelUpPopupView(level: xpEngine.newLevel, bonusCoins: xpEngine.bonusCoinsAwarded) { xpEngine.clearLevelUp() }
@@ -97,6 +49,73 @@ struct GamesHomeView: View {
         }
     }
 
+    private var mainContent: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                HUDOverlayView(ledger: ledger, xpEngine: xpEngine)
+                GameSearchView(searchText: $searchText)
+                GameFilterBarView(selectedCategory: $selectedCategory)
+
+                if searchText.isEmpty && selectedCategory == nil {
+                    featuredCard
+                }
+
+                if selectedCategory != nil || !searchText.isEmpty {
+                    resultsGrid
+                } else {
+                    categorizedLists
+                }
+
+                storeButton
+            }
+        }
+    }
+
+    private var resultsGrid: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            ForEach(filteredGames) { game in
+                NavigationLink { GamesRouter.destination(for: game) } label: {
+                    GamingCardView(game: game, ledger: ledger)
+                }
+            }
+        }.padding(.horizontal)
+    }
+
+    private var categorizedLists: some View {
+        ForEach(gamesByCategory, id: \.0) { cat, games in
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: cat.icon).foregroundColor(GamingDesignTokens.accentNeon)
+                    Text(cat.label).font(.headline.bold()).foregroundColor(.white)
+                    Spacer()
+                }.padding(.horizontal)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(games) { game in
+                            NavigationLink { GamesRouter.destination(for: game) } label: {
+                                GamingCardView(game: game, ledger: ledger).frame(width: 160)
+                            }
+                        }
+                    }.padding(.horizontal)
+                }
+            }
+        }
+    }
+
+    private var storeButton: some View {
+        Button { showStore = true } label: {
+            HStack {
+                Image(systemName: "bag.fill").foregroundColor(GamingDesignTokens.accentGold)
+                Text("Currency Store").font(.headline).foregroundColor(.white)
+                Spacer()
+                Image(systemName: "chevron.right").foregroundColor(.white.opacity(0.3))
+            }
+            .padding()
+            .background(GamingDesignTokens.cardSurface, in: RoundedRectangle(cornerRadius: 12))
+        }.padding(.horizontal).padding(.bottom, 20)
+    }
+
     private var featuredCard: some View {
         NavigationLink { GamesRouter.destination(for: featuredGame) } label: {
             ZStack {
@@ -106,28 +125,36 @@ struct GamesHomeView: View {
                     .shimmer()
 
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("FEATURED").font(.caption.bold()).foregroundColor(.white.opacity(0.8))
-                            .padding(.horizontal, 8).padding(.vertical, 2)
-                            .background(Color.white.opacity(0.2), in: Capsule())
-                        Spacer()
-                        Text(featuredGame.category.label).font(.caption).foregroundColor(.white.opacity(0.6))
-                    }
+                    featuredHeader
                     Spacer()
                     Text(featuredGame.title).font(.title2.bold()).foregroundColor(.white)
-                    HStack {
-                        Image(systemName: featuredGame.icon).foregroundColor(.white)
-                        Text(featuredGame.shortDescription).font(.subheadline).foregroundColor(.white.opacity(0.8))
-                        Spacer()
-                        let highScore = ledger.highScore(for: featuredGame.id)
-                        if highScore > 0 {
-                            Text("High: \(highScore)").font(.caption.bold().monospacedDigit()).foregroundColor(GamingDesignTokens.accentGold)
-                        }
-                        Image(systemName: "play.fill").foregroundColor(.white).font(.title3)
-                            .padding(8).background(Color.white.opacity(0.2), in: Circle())
-                    }
+                    featuredFooter
                 }.padding()
             }.padding(.horizontal)
+        }
+    }
+
+    private var featuredHeader: some View {
+        HStack {
+            Text("FEATURED").font(.caption.bold()).foregroundColor(.white.opacity(0.8))
+                .padding(.horizontal, 8).padding(.vertical, 2)
+                .background(Color.white.opacity(0.2), in: Capsule())
+            Spacer()
+            Text(featuredGame.category.label).font(.caption).foregroundColor(.white.opacity(0.6))
+        }
+    }
+
+    private var featuredFooter: some View {
+        HStack {
+            Image(systemName: featuredGame.icon).foregroundColor(.white)
+            Text(featuredGame.shortDescription).font(.subheadline).foregroundColor(.white.opacity(0.8))
+            Spacer()
+            let highScore = ledger.highScore(for: featuredGame.id)
+            if highScore > 0 {
+                Text("High: \(highScore)").font(.caption.bold().monospacedDigit()).foregroundColor(GamingDesignTokens.accentGold)
+            }
+            Image(systemName: "play.fill").foregroundColor(.white).font(.title3)
+                .padding(8).background(Color.white.opacity(0.2), in: Circle())
         }
     }
 }

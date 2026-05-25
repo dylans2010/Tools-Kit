@@ -9,9 +9,9 @@ struct NeonGlowModifier: ViewModifier {
         content
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(color.opacity(0.6 + 0.4 * sin(phase)), lineWidth: 2)
+                    .stroke(color.opacity(0.6 + 0.4 * Darwin.sin(phase)), lineWidth: 2)
             )
-            .shadow(color: color.opacity(0.4 + 0.3 * sin(phase)), radius: 8)
+            .shadow(color: color.opacity(0.4 + 0.3 * Darwin.sin(phase)), radius: 8)
             .onAppear {
                 withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
                     phase = .pi
