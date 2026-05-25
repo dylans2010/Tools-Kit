@@ -29,6 +29,9 @@ final class BlackjackProLogic: ObservableObject, GamesRewardable {
     @Published var surrenderAvailable = true
     @Published var biggestWin = 0
     @Published var totalBet = 0
+    @Published var gameOver: Bool = false
+
+    func newHand() { dealNewHand() }
 
     private var deck = CardDeck()
 

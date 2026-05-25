@@ -84,7 +84,7 @@ struct BlackjackProView: View {
             Text("Your Hand: \(logic.playerTotal)").font(.headline).foregroundColor(.white)
             HStack { ForEach(logic.playerHand) { c in cardView(c) } }.padding(.horizontal)
             Text("Bet: \(logic.bet)").font(.caption).foregroundColor(.white.opacity(0.6))
-            if !logic.result.isEmpty { Text(logic.result).font(.title3.bold()).foregroundColor(logic.result.contains("Win") || logic.result.contains("Blackjack") ? GamingDesignTokens.accentGold : GamingDesignTokens.dangerRed) }
+            if logic.result != .playing { Text(logic.result.rawValue).font(.title3.bold()).foregroundColor(logic.result.rawValue.contains("Win") || logic.result.rawValue.contains("Blackjack") ? GamingDesignTokens.accentGold : GamingDesignTokens.dangerRed) }
         }
     }
 
