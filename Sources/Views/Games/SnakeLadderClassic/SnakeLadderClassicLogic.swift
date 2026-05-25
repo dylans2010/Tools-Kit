@@ -27,11 +27,12 @@ final class SnakeLadderClassicLogic: ObservableObject, GamesRewardable {
     @Published var streakMultiplier: Double = 1.0
     @Published var isRolling = false
     @Published var score = 0
-    @Published var laddersClimbed = 0
+    @Published var laddersHit = 0
     @Published var snakesHit = 0
     @Published var turnCount = 0
     @Published var doublesRolled = 0
     @Published var powerUpsAvailable: Int = 0
+    @Published var powerUpsUsed: Int = 0
     @Published var totalMoves: Int = 0
     @Published var powerUpAvailable = true
     @Published var difficulty = 0
@@ -45,7 +46,7 @@ final class SnakeLadderClassicLogic: ObservableObject, GamesRewardable {
         for i in 0..<cpuCount { playerList.append(SnakeLadderPlayer(id: i + 1, name: "CPU \(i + 1)", isHuman: false)) }
         players = playerList
         currentPlayerIndex = 0; gameOver = false; winner = nil; message = ""; score = 0
-        laddersClimbed = 0; snakesHit = 0; turnCount = 0; doublesRolled = 0; powerUpAvailable = true
+        laddersHit = 0; snakesHit = 0; turnCount = 0; doublesRolled = 0; powerUpAvailable = true; powerUpsUsed = 0; totalMoves = 0
         phase = .playing
     }
 
@@ -58,6 +59,7 @@ final class SnakeLadderClassicLogic: ObservableObject, GamesRewardable {
         guard powerUpAvailable, players[currentPlayerIndex].isHuman, !gameOver, !isRolling else { return }
         do { try CurrencyLedger.shared.spendCoins(25) } catch { return }
         powerUpAvailable = false
+        powerUpsUsed += 1
         let dice1 = Int.random(in: 1...6)
         let dice2 = Int.random(in: 1...6)
         lastDice = max(dice1, dice2)
@@ -67,6 +69,7 @@ final class SnakeLadderClassicLogic: ObservableObject, GamesRewardable {
     private func performRoll(playerIndex: Int) {
         isRolling = true
         turnCount += 1
+        if players[playerIndex].isHuman { totalMoves += 1 }
         let dice = Int.random(in: 1...6)
         lastDice = dice
         processMove(playerIndex: playerIndex, dice: dice)
@@ -101,7 +104,7 @@ final class SnakeLadderClassicLogic: ObservableObject, GamesRewardable {
             message = "\(players[playerIndex].name) climbed a ladder! \(newPos)\u{2192}\(dest)"
             players[playerIndex].position = dest
             if players[playerIndex].isHuman {
-                score += 15; laddersClimbed += 1
+                score += 15; laddersHit += 1
                 streakMultiplier = min(3.0, streakMultiplier + 0.05)
             }
         } else {
@@ -133,7 +136,7 @@ final class SnakeLadderClassicLogic: ObservableObject, GamesRewardable {
         let coins = baseCoinReward + (won ? winCoinBonus : 0)
         let diffBonus = difficulty * 15
         var badge: String?
-        if won && laddersClimbed >= 5 { badge = "Lucky Climber" }
+        if won && laddersHit >= 5 { badge = "Lucky Climber" }
         if won && snakesHit == 0 { badge = badge ?? "Snake Dodger" }
         if won && turnCount <= 15 { badge = badge ?? "Speed Racer" }
         let gems = won && difficulty >= 2 ? 1 : 0

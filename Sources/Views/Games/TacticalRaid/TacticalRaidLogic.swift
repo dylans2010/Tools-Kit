@@ -33,7 +33,7 @@ final class TacticalRaidLogic: ObservableObject, GamesRewardable {
     @Published var difficulty = 0
     @Published var cardsPlayed: Int = 0
     @Published var turnsPlayed = 0
-    @Published var damageDealt = 0
+    @Published var totalDamageDealt = 0
     @Published var damageBlocked = 0
     @Published var healsUsed = 0
     @Published var perfectBlocks = 0
@@ -75,7 +75,7 @@ final class TacticalRaidLogic: ObservableObject, GamesRewardable {
         playerHealth = 30
         enemyHealth = 30 + healthBonus
         score = 0; gameOver = false; lastPlayerCard = nil; lastEnemyCard = nil; message = ""
-        turnsPlayed = 0; damageDealt = 0; damageBlocked = 0; healsUsed = 0; perfectBlocks = 0
+        turnsPlayed = 0; totalDamageDealt = 0; damageBlocked = 0; healsUsed = 0; perfectBlocks = 0; cardsPlayed = 0
         phase = .playing
     }
 
@@ -84,6 +84,7 @@ final class TacticalRaidLogic: ObservableObject, GamesRewardable {
         playerHand.remove(at: idx)
         lastPlayerCard = card
         turnsPlayed += 1
+        cardsPlayed += 1
 
         let enemyCard: TRCard?
         if difficulty >= 2 {
@@ -124,13 +125,13 @@ final class TacticalRaidLogic: ObservableObject, GamesRewardable {
         case (.attack, .attack):
             enemyHealth -= playerCard.power
             playerHealth -= enemyCard.power
-            damageDealt += playerCard.power
+            totalDamageDealt += playerCard.power
             score += playerCard.power * 10
             message = "Clash! Both take damage."
         case (.attack, .defense):
             let dmg = max(0, playerCard.power - enemyCard.power)
             enemyHealth -= dmg
-            damageDealt += dmg
+            totalDamageDealt += dmg
             score += dmg * 10
             message = dmg > 0 ? "Broke through defense for \(dmg)!" : "Attack blocked!"
         case (.defense, .attack):
@@ -143,17 +144,17 @@ final class TacticalRaidLogic: ObservableObject, GamesRewardable {
         case (.special, _):
             if playerCard.name == "Heal Pulse" || playerCard.name == "Drain Life" {
                 playerHealth += playerCard.power; healsUsed += 1
-                if playerCard.name == "Drain Life" { enemyHealth -= playerCard.power / 2; damageDealt += playerCard.power / 2 }
+                if playerCard.name == "Drain Life" { enemyHealth -= playerCard.power / 2; totalDamageDealt += playerCard.power / 2 }
                 score += playerCard.power * 8
                 message = "Healed \(playerCard.power) HP!"
             } else if playerCard.name == "Double Edge" {
                 enemyHealth -= playerCard.power; playerHealth -= playerCard.power / 2
-                damageDealt += playerCard.power
+                totalDamageDealt += playerCard.power
                 score += playerCard.power * 15
                 message = "Double Edge: dealt \(playerCard.power), took \(playerCard.power / 2)!"
             } else {
                 enemyHealth -= playerCard.power
-                damageDealt += playerCard.power
+                totalDamageDealt += playerCard.power
                 score += playerCard.power * 12
                 message = "Special: \(playerCard.name) for \(playerCard.power)!"
             }
@@ -191,7 +192,7 @@ final class TacticalRaidLogic: ObservableObject, GamesRewardable {
         var badge: String?
         if playerWon && playerHealth >= 25 { badge = "Flawless Victory" }
         if perfectBlocks >= 3 { badge = badge ?? "Shield Master" }
-        if damageDealt >= 50 { badge = badge ?? "Damage Dealer" }
+        if totalDamageDealt >= 50 { badge = badge ?? "Damage Dealer" }
         if bestConsecutiveWins >= 3 { badge = badge ?? "Raid Streak" }
         if playerWon && difficulty >= 2 { badge = badge ?? "Tactical Master" }
         let gems = totalWins > 0 && totalWins % 5 == 0 ? 1 : 0

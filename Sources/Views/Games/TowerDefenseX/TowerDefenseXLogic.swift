@@ -66,9 +66,8 @@ final class TowerDefenseXLogic: ObservableObject, GamesRewardable {
     @Published var streakMultiplier: Double = 1.0
     @Published var waveInProgress = false
     @Published var difficulty = 0
-    @Published var totalKills = 0
+    @Published var enemiesKilled = 0
     @Published var bossesKilled = 0
-    @Published var towersPlaced = 0
     @Published var totalUpgrades = 0
     @Published var selectedTowerType: TDTower.TowerType = .basic
     @Published var totalWaves = 10
@@ -91,7 +90,7 @@ final class TowerDefenseXLogic: ObservableObject, GamesRewardable {
         towers = []; enemies = []; wave = 0; lives = 20 - difficulty * 3
         gold = 200 + difficulty * 50; score = 0
         gameOver = false; won = false; waveInProgress = false
-        totalKills = 0; bossesKilled = 0; towersPlaced = 0; totalUpgrades = 0
+        enemiesKilled = 0; bossesKilled = 0; towersBuilt = 0; totalUpgrades = 0
         totalWaves = 10 + difficulty * 5
         phase = .playing
     }
@@ -109,7 +108,7 @@ final class TowerDefenseXLogic: ObservableObject, GamesRewardable {
             }
         }()
         towers.append(TDTower(row: row, col: col, damage: dmg, range: range, cost: cost, towerType: selectedTowerType))
-        gold -= cost; towersPlaced += 1
+        gold -= cost; towersBuilt += 1
     }
 
     func upgradeTower(_ towerId: UUID) {
@@ -183,7 +182,7 @@ final class TowerDefenseXLogic: ObservableObject, GamesRewardable {
     }
 
     private func handleKill(_ idx: Int) {
-        gold += enemies[idx].reward; score += enemies[idx].reward; totalKills += 1
+        gold += enemies[idx].reward; score += enemies[idx].reward; enemiesKilled += 1
         if enemies[idx].isBoss { bossesKilled += 1; score += 200 }
     }
 
@@ -206,7 +205,7 @@ final class TowerDefenseXLogic: ObservableObject, GamesRewardable {
         if won { badge = "Tower Master" }
         if won && lives >= 15 { badge = badge ?? "Perfect Defense" }
         if bossesKilled >= 3 { badge = badge ?? "Boss Slayer" }
-        if totalKills >= 100 { badge = badge ?? "Mass Destroyer" }
+        if enemiesKilled >= 100 { badge = badge ?? "Mass Destroyer" }
         if won && difficulty >= 2 { badge = badge ?? "Tower Legend" }
         let gems = won ? 1 : 0
         return GameReward(xp: max(1, xp + diffBonus), coins: coins, gems: gems, badgeUnlocked: badge)

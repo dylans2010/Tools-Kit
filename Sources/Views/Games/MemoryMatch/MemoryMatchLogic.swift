@@ -17,7 +17,7 @@ final class MemoryMatchLogic: ObservableObject, GamesRewardable {
     @Published var cards: [MemoryCard] = []
     @Published var firstFlipped: Int?
     @Published var moves = 0
-    @Published var matchesFound = 0
+    @Published var matchedPairs = 0
     @Published var totalPairs = 0
     @Published var difficulty = 0
     @Published var isTimerMode = false
@@ -30,7 +30,8 @@ final class MemoryMatchLogic: ObservableObject, GamesRewardable {
     @Published var streakMultiplier: Double = 1.0
     @Published var isProcessing = false
     @Published var consecutiveMatches = 0
-    @Published var perfectGame = true
+    @Published var bestConsecutiveMatches = 0
+    @Published var isPerfectGame = true
     @Published var hintsUsed = 0
     @Published var maxHints = 3
 
@@ -52,12 +53,13 @@ final class MemoryMatchLogic: ObservableObject, GamesRewardable {
         let deck = (selected + selected).shuffled()
         cards = deck.map { MemoryCard(symbol: $0) }
         moves = 0
-        matchesFound = 0
+        matchedPairs = 0
         score = 0
         gameOver = false
         firstFlipped = nil
         consecutiveMatches = 0
-        perfectGame = true
+        bestConsecutiveMatches = 0
+        isPerfectGame = true
         hintsUsed = 0
         let gameLevel = CurrencyLedger.shared.gameStats(for: gameIdentifier).gameLevel
         maxHints = max(1, 3 - difficulty + (gameLevel >= 5 ? 1 : 0))
@@ -85,8 +87,9 @@ final class MemoryMatchLogic: ObservableObject, GamesRewardable {
             if cards[first].symbol == cards[index].symbol {
                 cards[first].isMatched = true
                 cards[index].isMatched = true
-                matchesFound += 1
+                matchedPairs += 1
                 consecutiveMatches += 1
+                bestConsecutiveMatches = max(bestConsecutiveMatches, consecutiveMatches)
 
                 let comboBonus = min(consecutiveMatches, 5)
                 let baseScore = max(10, 50 - moves)
@@ -97,11 +100,11 @@ final class MemoryMatchLogic: ObservableObject, GamesRewardable {
                 firstFlipped = nil
                 isProcessing = false
                 if isTimerMode && consecutiveMatches >= 2 { timeRemaining += Double(consecutiveMatches) }
-                if matchesFound == totalPairs { endGame() }
+                if matchedPairs == totalPairs { endGame() }
             } else {
                 streakMultiplier = max(1.0, streakMultiplier - 0.1)
                 consecutiveMatches = 0
-                perfectGame = false
+                isPerfectGame = false
                 let f = first
                 let s = index
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
@@ -137,26 +140,26 @@ final class MemoryMatchLogic: ObservableObject, GamesRewardable {
     private func endGame() {
         timer?.invalidate()
         gameOver = true
-        let won = matchesFound == totalPairs
+        let won = matchedPairs == totalPairs
         if won {
             score += max(0, 200 - moves * 3)
             score += difficulty * 50
-            if perfectGame { score += 300 }
+            if isPerfectGame { score += 300 }
             if isTimerMode { score += Int(timeRemaining) * 2 }
         }
         phase = .results
     }
 
     func finalReward() -> GameReward {
-        let won = matchesFound == totalPairs
+        let won = matchedPairs == totalPairs
         var reward = calculateFinalReward(won: won, score: score, streakMultiplier: streakMultiplier)
         let difficultyBonus = difficulty * 15
         var gems = reward.gems
-        if perfectGame && won { gems += 1 }
+        if isPerfectGame && won { gems += 1 }
         var badge = reward.badgeUnlocked
-        if perfectGame && won && difficulty >= 2 { badge = badge ?? "Perfect Memory" }
+        if isPerfectGame && won && difficulty >= 2 { badge = badge ?? "Perfect Memory" }
         if moves <= totalPairs && won { badge = badge ?? "Memory Genius" }
-        reward = GameReward(xp: reward.xp + difficultyBonus, coins: reward.coins + (perfectGame ? 20 : 0), gems: gems, badgeUnlocked: badge)
+        reward = GameReward(xp: reward.xp + difficultyBonus, coins: reward.coins + (isPerfectGame ? 20 : 0), gems: gems, badgeUnlocked: badge)
         return reward
     }
 
