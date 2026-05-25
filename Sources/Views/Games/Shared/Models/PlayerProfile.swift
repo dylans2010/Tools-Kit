@@ -12,6 +12,8 @@ struct GameStat: Codable, Equatable {
     var totalXPEarned: Int
     var gameLevel: Int
 
+    var gameXP: Int { totalXPEarned }
+
     init(highScore: Int = 0, gamesPlayed: Int = 0, wins: Int = 0, personalBest: String? = nil,
          currentStreak: Int = 0, bestStreak: Int = 0, lastPlayedDate: Date? = nil,
          totalCoinsEarned: Int = 0, totalXPEarned: Int = 0, gameLevel: Int = 1) {
