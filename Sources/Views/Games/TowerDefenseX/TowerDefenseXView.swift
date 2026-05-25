@@ -72,7 +72,7 @@ struct TowerDefenseXView: View {
             }.padding(.horizontal)
 
             HStack(spacing: 8) {
-                ForEach(TowerType.allCases, id: \.self) { type in
+                ForEach(TDTower.TowerType.allCases, id: \.self) { type in
                     Button { logic.selectedTowerType = type } label: {
                         VStack(spacing: 2) {
                             Image(systemName: type.icon).font(.caption).foregroundColor(logic.selectedTowerType == type ? GamingDesignTokens.accentNeon : .white.opacity(0.5))
@@ -84,13 +84,14 @@ struct TowerDefenseXView: View {
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 2), count: logic.gridSize), spacing: 2) {
                 ForEach(0..<logic.gridSize * logic.gridSize, id: \.self) { idx in
-                    let r = idx / logic.gridSize; let c = idx % logic.gridSize
+                    let r = idx / logic.gridSize
+                    let c = idx % logic.gridSize
                     let isPath = logic.path.contains(where: { $0.row == r && $0.col == c })
                     let tower = logic.towers.first(where: { $0.row == r && $0.col == c })
                     let hasEnemy = logic.enemies.contains(where: { $0.hp > 0 && $0.pathIndex < logic.path.count && logic.path[$0.pathIndex].row == r && logic.path[$0.pathIndex].col == c })
                     ZStack {
                         Rectangle().fill(isPath ? Color.brown.opacity(0.3) : GamingDesignTokens.cardSurface)
-                        if let t = tower { Image(systemName: t.type.icon).font(.caption).foregroundColor(GamingDesignTokens.accentPurple) }
+                        if let t = tower { Image(systemName: t.towerType.icon).font(.caption).foregroundColor(GamingDesignTokens.accentPurple) }
                         if hasEnemy { Circle().fill(GamingDesignTokens.dangerRed).frame(width: 12) }
                     }.frame(height: 36).onTapGesture { logic.placeTower(row: r, col: c) }
                 }
@@ -128,6 +129,15 @@ struct TowerDefenseXView: View {
                 }
             }.padding()
         }.onAppear { ledger.recordGame(identifier: logic.gameIdentifier, won: logic.won, score: logic.score, reward: reward) }
+    }
+
+    private var towerCost: Int {
+        switch logic.selectedTowerType {
+        case .basic: return 50
+        case .sniper: return 100
+        case .splash: return 75
+        case .slow: return 60
+        }
     }
 
     private func statRow(_ label: String, _ value: String) -> some View {

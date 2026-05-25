@@ -17,6 +17,8 @@ final class WarZoneStrikeLogic: ObservableObject, GamesRewardable {
     @Published var streakMultiplier: Double = 1.0
     @Published var difficulty = 0
     @Published var totalKills = 0
+    @Published var killStreak: Int = 0
+    @Published var bestKillStreak: Int = 0
     @Published var bossesKilled = 0
     @Published var consecutiveKills = 0
     @Published var bestConsecutiveKills = 0

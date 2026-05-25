@@ -31,6 +31,8 @@ final class SnakeLadderClassicLogic: ObservableObject, GamesRewardable {
     @Published var snakesHit = 0
     @Published var turnCount = 0
     @Published var doublesRolled = 0
+    @Published var powerUpsAvailable: Int = 0
+    @Published var totalMoves: Int = 0
     @Published var powerUpAvailable = true
     @Published var difficulty = 0
 

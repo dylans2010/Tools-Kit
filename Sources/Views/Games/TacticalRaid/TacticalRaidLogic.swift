@@ -31,6 +31,7 @@ final class TacticalRaidLogic: ObservableObject, GamesRewardable {
     @Published var streakMultiplier: Double = 1.0
     @Published var message = ""
     @Published var difficulty = 0
+    @Published var cardsPlayed: Int = 0
     @Published var turnsPlayed = 0
     @Published var damageDealt = 0
     @Published var damageBlocked = 0

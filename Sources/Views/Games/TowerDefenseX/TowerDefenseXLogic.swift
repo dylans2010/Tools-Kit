@@ -19,7 +19,25 @@ struct TDTower: Identifiable {
     let cost: Int
     var towerType: TowerType = .basic
 
-    enum TowerType: String, CaseIterable { case basic, sniper, splash, slow }
+    enum TowerType: String, CaseIterable {
+        case basic, sniper, splash, slow
+        var icon: String {
+            switch self {
+            case .basic: return "house.fill"
+            case .sniper: return "scope"
+            case .splash: return "sun.max.fill"
+            case .slow: return "snow"
+            }
+        }
+        var cost: Int {
+            switch self {
+            case .basic: return 50
+            case .sniper: return 100
+            case .splash: return 75
+            case .slow: return 60
+            }
+        }
+    }
 
     var upgradeCost: Int { cost * level }
     var maxLevel: Int { 5 }
@@ -40,6 +58,7 @@ final class TowerDefenseXLogic: ObservableObject, GamesRewardable {
     @Published var wave = 0
     @Published var lives = 20
     @Published var gold = 200
+    @Published var towersBuilt: Int = 0
     @Published var score = 0
     @Published var gameOver = false
     @Published var won = false

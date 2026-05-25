@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 final class ColorRushLogic: ObservableObject, GamesRewardable {
     let gameIdentifier = "color_rush"
@@ -25,6 +26,8 @@ final class ColorRushLogic: ObservableObject, GamesRewardable {
     @Published var correctAnswers = 0
     @Published var bonusTimeEarned: Double = 0
     @Published var mode = 0
+    @Published var targetColorName: String = ""
+    @Published var displayColor: Color = .red
 
     private var timer: Timer?
 

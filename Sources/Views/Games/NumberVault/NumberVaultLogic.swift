@@ -11,6 +11,8 @@ final class NumberVaultLogic: ObservableObject, GamesRewardable {
     @Published var playerGrid: [[Int?]] = []
     @Published var gridSize = 3
     @Published var isMemorizing = true
+    @Published var perfectStreak: Int = 0
+    @Published var correctCount: Int = 0
     @Published var score = 0
     @Published var round = 0
     @Published var totalRounds = 3

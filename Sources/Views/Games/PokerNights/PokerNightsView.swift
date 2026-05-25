@@ -92,7 +92,7 @@ struct PokerNightsView: View {
                 HStack(spacing: 12) {
                     Button("Call") { logic.call() }.font(.subheadline.bold()).foregroundColor(.black).padding(.horizontal, 20).padding(.vertical, 8).background(GamingDesignTokens.accentNeon, in: Capsule())
                     Button("Raise \(raiseAmount)") { logic.raise(amount: raiseAmount) }.font(.subheadline.bold()).foregroundColor(.black).padding(.horizontal, 20).padding(.vertical, 8).background(GamingDesignTokens.accentGold, in: Capsule())
-                    Button("Bluff") { logic.bluff() }.font(.subheadline.bold()).foregroundColor(.white).padding(.horizontal, 20).padding(.vertical, 8).background(GamingDesignTokens.accentPurple, in: Capsule())
+                    Button("Bluff") { logic.bluff(amount: raiseAmount) }.font(.subheadline.bold()).foregroundColor(.white).padding(.horizontal, 20).padding(.vertical, 8).background(GamingDesignTokens.accentPurple, in: Capsule())
                     Button("Fold") { logic.fold() }.font(.subheadline.bold()).foregroundColor(.white).padding(.horizontal, 20).padding(.vertical, 8).background(GamingDesignTokens.dangerRed, in: Capsule())
                 }
             }

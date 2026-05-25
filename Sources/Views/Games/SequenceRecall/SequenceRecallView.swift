@@ -105,7 +105,7 @@ struct SequenceRecallView: View {
                     statRow("Score", "\(logic.score)")
                     statRow("Lives Left", "\(logic.lives)")
                     statRow("Best Round", "\(logic.bestRound)")
-                    statRow("Streak Multiplier", "String(format: "%.1fx", logic.streakMultiplier)")
+                    statRow("Streak Multiplier", String(format: "%.1fx", logic.streakMultiplier))
                 }.padding(12).background(GamingDesignTokens.cardSurface, in: RoundedRectangle(cornerRadius: 12))
 
                 RewardToastView(reward: reward)

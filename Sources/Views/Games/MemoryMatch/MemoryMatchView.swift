@@ -42,9 +42,9 @@ struct MemoryMatchView: View {
                 HStack { Text("Best:").foregroundColor(.white.opacity(0.6)); Text("\(ledger.highScore(for: logic.gameIdentifier))").font(GamingDesignTokens.fontMono).foregroundColor(GamingDesignTokens.accentGold) }
 
                 VStack(spacing: 12) {
-                    Button("4×4 Easy") { logic.startGame(difficulty: 0) }.font(.headline).foregroundColor(.black).frame(maxWidth: .infinity).padding(.vertical, 12).background(GamingDesignTokens.accentNeon, in: Capsule())
-                    Button("5×4 Medium") { logic.startGame(difficulty: 1) }.font(.headline).foregroundColor(.black).frame(maxWidth: .infinity).padding(.vertical, 12).background(GamingDesignTokens.accentGold, in: Capsule())
-                    Button("6×5 Hard") { logic.startGame(difficulty: 2) }.font(.headline).foregroundColor(.black).frame(maxWidth: .infinity).padding(.vertical, 12).background(GamingDesignTokens.dangerRed, in: Capsule())
+                    Button("4×4 Easy") { logic.startGame(difficulty: 0, timerMode: logic.timerMode) }.font(.headline).foregroundColor(.black).frame(maxWidth: .infinity).padding(.vertical, 12).background(GamingDesignTokens.accentNeon, in: Capsule())
+                    Button("5×4 Medium") { logic.startGame(difficulty: 1, timerMode: logic.timerMode) }.font(.headline).foregroundColor(.black).frame(maxWidth: .infinity).padding(.vertical, 12).background(GamingDesignTokens.accentGold, in: Capsule())
+                    Button("6×5 Hard") { logic.startGame(difficulty: 2, timerMode: logic.timerMode) }.font(.headline).foregroundColor(.black).frame(maxWidth: .infinity).padding(.vertical, 12).background(GamingDesignTokens.dangerRed, in: Capsule())
                 }.padding(.horizontal, 32)
 
                 if ledger.canClaimDailyBonus(for: logic.gameIdentifier) {

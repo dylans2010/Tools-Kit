@@ -86,21 +86,23 @@ struct CheckersArenaView: View {
     }
 
     private func checkerCell(row: Int, col: Int, size: CGFloat) -> some View {
-        let piece = row < logic.board.count && col < logic.board[row].count ? logic.board[row][col] : 0
-        let isSelected = logic.selectedPiece?.row == row && logic.selectedPiece?.col == col
+        let piece = row < logic.board.count && col < logic.board[row].count ? logic.board[row][col] : nil
+        let isSelected = logic.selectedPos?.row == row && logic.selectedPos?.col == col
         return ZStack {
             Rectangle().fill((row + col) % 2 == 0 ? Color.white.opacity(0.08) : Color.brown.opacity(0.3))
                 .border(isSelected ? GamingDesignTokens.accentNeon : Color.clear, width: isSelected ? 2 : 0)
-            if piece == 1 || piece == 3 {
-                Circle().fill(GamingDesignTokens.accentNeon).frame(width: size * 0.7, height: size * 0.7)
-                    .overlay { if piece == 3 { Image(systemName: "crown.fill").font(.system(size: size * 0.25)).foregroundColor(.white) } }
-            } else if piece == 2 || piece == 4 {
-                Circle().fill(GamingDesignTokens.dangerRed).frame(width: size * 0.7, height: size * 0.7)
-                    .overlay { if piece == 4 { Image(systemName: "crown.fill").font(.system(size: size * 0.25)).foregroundColor(.white) } }
+            if let p = piece {
+                if p.player == 1 {
+                    Circle().fill(GamingDesignTokens.accentNeon).frame(width: size * 0.7, height: size * 0.7)
+                        .overlay { if p.isKing { Image(systemName: "crown.fill").font(.system(size: size * 0.25)).foregroundColor(.white) } }
+                } else if p.player == 2 {
+                    Circle().fill(GamingDesignTokens.dangerRed).frame(width: size * 0.7, height: size * 0.7)
+                        .overlay { if p.isKing { Image(systemName: "crown.fill").font(.system(size: size * 0.25)).foregroundColor(.white) } }
+                }
             }
         }
         .frame(width: size, height: size)
-        .onTapGesture { logic.tapCell(row: row, col: col) }
+        .onTapGesture { logic.selectCell(row: row, col: col) }
     }
 
     private var resultsView: some View {

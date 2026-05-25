@@ -14,6 +14,8 @@ final class BlackjackProLogic: ObservableObject, GamesRewardable {
     @Published var result: HandResult = .playing
     @Published var score = 0
     @Published var handsPlayed = 0
+    @Published var wins: Int = 0
+    @Published var dealerTotal: Int = 0
     @Published var phase: GamePhase = .lobby
     @Published var streakMultiplier: Double = 1.0
     @Published var canDoubleDown = true

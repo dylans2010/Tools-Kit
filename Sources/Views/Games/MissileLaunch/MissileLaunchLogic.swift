@@ -11,7 +11,7 @@ final class MissileLaunchLogic: ObservableObject, GamesRewardable {
     @Published var citiesRemaining = 5; @Published var maxCitiesRemaining = 5
     @Published var enemies: [WaveEnemy] = []; @Published var totalKills = 0
     @Published var consecutiveKills = 0; @Published var bestKillStreak = 0
-    @Published var intercepted = 0; @Published var citiesRemaining = 5; @Published var totalCities = 5
+    @Published var intercepted = 0; @Published var totalCities = 5
     var accuracy: Double { totalKills + (totalWaves * 3 - intercepted) > 0 ? Double(intercepted) / Double(intercepted + totalWaves) * 100 : 0 }
 
     struct WaveEnemy: Identifiable {

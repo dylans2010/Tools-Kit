@@ -12,6 +12,7 @@ final class ReactionTapLogic: ObservableObject, GamesRewardable {
     @Published var tooEarly = false
     @Published var reactionTime: Double?
     @Published var bestTime: Double = 999
+    @Published var perfectTaps: Int = 0
     @Published var round = 0
     @Published var totalRounds = 5
     @Published var times: [Double] = []
