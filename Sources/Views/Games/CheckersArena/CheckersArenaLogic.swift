@@ -21,14 +21,25 @@ final class CheckersArenaLogic: ObservableObject, GamesRewardable {
     @Published var score = 0
     @Published var phase: GamePhase = .lobby
     @Published var streakMultiplier: Double = 1.0
+    @Published var difficulty = 0
+    @Published var captureCount = 0
+    @Published var kingsPromoted = 0
+    @Published var moveCount = 0
+    @Published var multiJumpActive = false
 
     enum GamePhase { case lobby, playing, results }
 
-    func startGame() {
+    var difficultyName: String {
+        switch difficulty { case 0: return "Easy"; case 1: return "Medium"; default: return "Hard" }
+    }
+
+    func startGame(difficulty: Int = 0) {
+        self.difficulty = difficulty
         board = Array(repeating: Array(repeating: nil as CheckerPiece?, count: 8), count: 8)
         for r in 0..<3 { for c in 0..<8 { if (r + c) % 2 == 1 { board[r][c] = CheckerPiece(player: 2) } } }
         for r in 5..<8 { for c in 0..<8 { if (r + c) % 2 == 1 { board[r][c] = CheckerPiece(player: 1) } } }
         currentPlayer = 1; gameOver = false; winner = 0; score = 0; selectedPos = nil; validMoves = []
+        captureCount = 0; kingsPromoted = 0; moveCount = 0; multiJumpActive = false
         phase = .playing
     }
 
@@ -48,12 +59,29 @@ final class CheckersArenaLogic: ObservableObject, GamesRewardable {
         var piece = board[from.row][from.col]!
         board[from.row][from.col] = nil
         let dr = to.row - from.row; let dc = to.col - from.col
+        var captured = false
         if abs(dr) == 2 {
             let mr = from.row + dr / 2; let mc = from.col + dc / 2
-            board[mr][mc] = nil; score += 20
+            board[mr][mc] = nil; score += 20; captureCount += 1; captured = true
+            streakMultiplier = min(3.0, streakMultiplier + 0.05)
         }
-        if (piece.player == 1 && to.row == 0) || (piece.player == 2 && to.row == 7) { piece.isKing = true; score += 10 }
+        if (piece.player == 1 && to.row == 0) || (piece.player == 2 && to.row == 7) {
+            piece.isKing = true; score += 15; kingsPromoted += 1
+        }
         board[to.row][to.col] = piece
+        moveCount += 1
+
+        if captured {
+            let continueMoves = getValidMoves(from: (to.row, to.col), player: 1).filter { abs($0.row - to.row) == 2 }
+            if !continueMoves.isEmpty {
+                multiJumpActive = true
+                selectedPos = (to.row, to.col)
+                validMoves = continueMoves
+                return
+            }
+        }
+
+        multiJumpActive = false
         selectedPos = nil; validMoves = []
         if checkGameOver() { return }
         currentPlayer = 2
@@ -68,7 +96,18 @@ final class CheckersArenaLogic: ObservableObject, GamesRewardable {
             }
         }}
         let jumps = allMoves.filter { abs($0.from.0 - $0.to.0) == 2 }
-        if let move = (jumps.isEmpty ? allMoves : jumps).randomElement() {
+        let moves = jumps.isEmpty ? allMoves : jumps
+
+        let selectedMove: (from: (Int, Int), to: (Int, Int))?
+        if difficulty >= 1 && !jumps.isEmpty {
+            selectedMove = jumps.randomElement()
+        } else if difficulty >= 2 {
+            selectedMove = moves.max(by: { scoreMove($0) < scoreMove($1) })
+        } else {
+            selectedMove = moves.randomElement()
+        }
+
+        if let move = selectedMove {
             var piece = board[move.from.0][move.from.1]!
             board[move.from.0][move.from.1] = nil
             if abs(move.from.0 - move.to.0) == 2 {
@@ -80,6 +119,14 @@ final class CheckersArenaLogic: ObservableObject, GamesRewardable {
         }
         if checkGameOver() { return }
         currentPlayer = 1
+    }
+
+    private func scoreMove(_ move: (from: (Int, Int), to: (Int, Int))) -> Int {
+        var s = 0
+        if abs(move.from.0 - move.to.0) == 2 { s += 10 }
+        if move.to.0 == 7 { s += 5 }
+        s += abs(3 - move.to.1)
+        return s
     }
 
     private func getValidMoves(from pos: (row: Int, col: Int), player: Int) -> [(row: Int, col: Int)] {
@@ -102,8 +149,8 @@ final class CheckersArenaLogic: ObservableObject, GamesRewardable {
     private func checkGameOver() -> Bool {
         let p1 = board.flatMap { $0 }.compactMap { $0 }.filter { $0.player == 1 }.count
         let p2 = board.flatMap { $0 }.compactMap { $0 }.filter { $0.player == 2 }.count
-        if p1 == 0 { gameOver = true; winner = 2; phase = .results; streakMultiplier = 1.0; return true }
-        if p2 == 0 { gameOver = true; winner = 1; score += 50; phase = .results; streakMultiplier = min(3.0, streakMultiplier + 0.1); return true }
+        if p1 == 0 { gameOver = true; winner = 2; phase = .results; streakMultiplier = max(1.0, streakMultiplier - 0.2); return true }
+        if p2 == 0 { gameOver = true; winner = 1; score += 50 + (difficulty * 30); phase = .results; streakMultiplier = min(3.0, streakMultiplier + 0.15); return true }
         return false
     }
 
@@ -111,6 +158,13 @@ final class CheckersArenaLogic: ObservableObject, GamesRewardable {
         let won = winner == 1
         let xp = Int(Double(baseXPReward + (won ? winXPBonus : 0)) * streakMultiplier) + (score / 10)
         let coins = baseCoinReward + (won ? winCoinBonus : 0)
-        return GameReward(xp: max(1, xp), coins: coins, gems: 0, badgeUnlocked: won ? "Checker Champion" : nil)
+        let diffBonus = difficulty * 25
+        var badge: String?
+        if won && captureCount >= 10 { badge = "Checker King" }
+        if won && kingsPromoted >= 3 { badge = badge ?? "Crown Collector" }
+        if won && difficulty >= 2 { badge = badge ?? "Checkers Champion" }
+        if moveCount <= 30 && won { badge = badge ?? "Speed Checker" }
+        let gems = won && difficulty >= 2 ? 1 : 0
+        return GameReward(xp: max(1, xp + diffBonus), coins: coins, gems: gems, badgeUnlocked: badge)
     }
 }

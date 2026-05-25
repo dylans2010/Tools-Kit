@@ -18,25 +18,41 @@ protocol GamesRewardable {
 
 extension GamesRewardable {
     func calculateFinalReward(won: Bool, score: Int, streakMultiplier: Double) -> GameReward {
-        let xp = Int(Double(baseXPReward + (won ? winXPBonus : 0)) * streakMultiplier) + (score / 10)
-        let coins = Int(Double(baseCoinReward + (won ? winCoinBonus : 0)) * streakMultiplier) + (score / 20)
-        return GameReward(xp: max(1, xp), coins: max(0, coins), gems: 0, badgeUnlocked: nil)
+        let dailyMult = CurrencyLedger.shared.dailyStreakMultiplier()
+        let gameBonus = CurrencyLedger.shared.streakBonus(for: gameIdentifier)
+        let combinedMult = streakMultiplier * dailyMult * gameBonus
+        let gameLevel = CurrencyLedger.shared.gameStats(for: gameIdentifier).gameLevel
+        let levelBonus = 1.0 + Double(gameLevel - 1) * 0.02
+        let xp = Int(Double(baseXPReward + (won ? winXPBonus : 0)) * combinedMult * levelBonus) + (score / 10)
+        let coins = Int(Double(baseCoinReward + (won ? winCoinBonus : 0)) * combinedMult * levelBonus) + (score / 20)
+        let gems = gameLevel >= 10 && won ? 1 : 0
+        let stat = CurrencyLedger.shared.gameStats(for: gameIdentifier)
+        var badge: String?
+        if stat.bestStreak >= 10 { badge = "\(gameIdentifier)_streak_master" }
+        if stat.gamesPlayed >= 100 { badge = "\(gameIdentifier)_veteran" }
+        return GameReward(xp: max(1, xp), coins: max(0, coins), gems: gems, badgeUnlocked: badge)
     }
 }
 
 enum BCUnitType: String, CaseIterable {
-    case infantry, tank, artillery, scout, medic
+    case infantry, tank, artillery, scout, medic, sniper
     var attack: Int {
-        switch self { case .infantry: return 3; case .tank: return 6; case .artillery: return 8; case .scout: return 2; case .medic: return 1 }
+        switch self { case .infantry: return 3; case .tank: return 6; case .artillery: return 8; case .scout: return 2; case .medic: return 1; case .sniper: return 10 }
     }
     var defense: Int {
-        switch self { case .infantry: return 3; case .tank: return 7; case .artillery: return 2; case .scout: return 1; case .medic: return 2 }
+        switch self { case .infantry: return 3; case .tank: return 7; case .artillery: return 2; case .scout: return 1; case .medic: return 2; case .sniper: return 1 }
     }
     var health: Int {
-        switch self { case .infantry: return 10; case .tank: return 20; case .artillery: return 8; case .scout: return 6; case .medic: return 8 }
+        switch self { case .infantry: return 10; case .tank: return 20; case .artillery: return 8; case .scout: return 6; case .medic: return 8; case .sniper: return 5 }
     }
     var icon: String {
-        switch self { case .infantry: return "figure.walk"; case .tank: return "shield.fill"; case .artillery: return "scope"; case .scout: return "binoculars.fill"; case .medic: return "cross.fill" }
+        switch self { case .infantry: return "figure.walk"; case .tank: return "shield.fill"; case .artillery: return "scope"; case .scout: return "binoculars.fill"; case .medic: return "cross.fill"; case .sniper: return "target" }
+    }
+    var movementRange: Int {
+        switch self { case .infantry: return 2; case .tank: return 2; case .artillery: return 1; case .scout: return 3; case .medic: return 2; case .sniper: return 1 }
+    }
+    var attackRange: Int {
+        switch self { case .infantry: return 1; case .tank: return 2; case .artillery: return 4; case .scout: return 2; case .medic: return 1; case .sniper: return 5 }
     }
 }
 
@@ -75,10 +91,23 @@ final class BattlefieldCommanderLogic: ObservableObject, GamesRewardable {
     @Published var turnCount = 0
     @Published var phase: GamePhase = .lobby
     @Published var streakMultiplier: Double = 1.0
+    @Published var difficulty = 0
+    @Published var currentWave = 1
+    @Published var totalWaves = 3
+    @Published var killCount = 0
+    @Published var comboKills = 0
+    @Published var turnKills = 0
+    @Published var message = ""
+    @Published var hintsRemaining = 3
 
     enum GamePhase { case lobby, placement, playing, results }
 
-    func startGame() {
+    private var difficultyNames = ["Recruit", "Veteran", "Commander"]
+
+    var difficultyName: String { difficultyNames[min(difficulty, difficultyNames.count - 1)] }
+
+    func startGame(difficulty: Int = 0) {
+        self.difficulty = difficulty
         playerUnits = []
         enemyUnits = []
         score = 0
@@ -86,16 +115,54 @@ final class BattlefieldCommanderLogic: ObservableObject, GamesRewardable {
         isPlayerTurn = true
         gameOver = false
         playerWon = false
+        currentWave = 1
+        killCount = 0
+        comboKills = 0
+        turnKills = 0
+        message = ""
+        hintsRemaining = 3 - difficulty
+        totalWaves = 2 + difficulty
 
-        let playerTypes: [BCUnitType] = [.infantry, .infantry, .tank, .artillery, .scout, .medic]
+        let gameLevel = CurrencyLedger.shared.gameStats(for: gameIdentifier).gameLevel
+        let hasSniper = gameLevel >= 3
+        var playerTypes: [BCUnitType] = [.infantry, .infantry, .tank, .artillery, .scout, .medic]
+        if hasSniper { playerTypes.append(.sniper) }
+
         for (i, type) in playerTypes.enumerated() {
             playerUnits.append(BCUnit(type: type, isPlayer: true, row: gridSize - 1 - (i / 3), col: (i % 3) * 3 + 1))
         }
-        let enemyTypes: [BCUnitType] = [.infantry, .infantry, .tank, .artillery, .scout, .medic]
-        for (i, type) in enemyTypes.enumerated() {
-            enemyUnits.append(BCUnit(type: type, isPlayer: false, row: i / 3, col: (i % 3) * 3 + 2))
-        }
+
+        spawnEnemyWave()
         phase = .playing
+    }
+
+    private func spawnEnemyWave() {
+        let baseTypes: [BCUnitType] = [.infantry, .infantry, .tank, .artillery, .scout, .medic]
+        let waveExtra = currentWave - 1
+        var types = baseTypes
+        for _ in 0..<(waveExtra + difficulty) { types.append([BCUnitType.infantry, .tank, .artillery, .scout].randomElement()!) }
+
+        for (i, type) in types.enumerated() {
+            let row = i / 3
+            let col = (i % 3) * 3 + 2
+            guard row < gridSize, col < gridSize else { continue }
+            guard !enemyUnits.contains(where: { $0.row == row && $0.col == col }) else { continue }
+            var unit = BCUnit(type: type, isPlayer: false, row: row, col: col)
+            if difficulty >= 1 { unit.health += currentWave * 2 }
+            if difficulty >= 2 { unit.health += currentWave * 3 }
+            enemyUnits.append(unit)
+        }
+        message = "Wave \(currentWave)/\(totalWaves)"
+    }
+
+    func useHint() -> (row: Int, col: Int)? {
+        guard hintsRemaining > 0, !enemyUnits.isEmpty else { return nil }
+        hintsRemaining -= 1
+        if let weakest = enemyUnits.min(by: { $0.health < $1.health }) {
+            message = "Target the \(weakest.type.rawValue) at (\(weakest.row),\(weakest.col))!"
+            return (weakest.row, weakest.col)
+        }
+        return nil
     }
 
     func selectUnit(_ unit: BCUnit) {
@@ -174,17 +241,43 @@ final class BattlefieldCommanderLogic: ObservableObject, GamesRewardable {
 
     private func checkWinCondition() {
         if enemyUnits.isEmpty {
-            gameOver = true
-            playerWon = true
-            phase = .results
+            if currentWave < totalWaves {
+                currentWave += 1
+                score += 100 * currentWave
+                message = "Wave cleared! +\(100 * currentWave) pts"
+                streakMultiplier = min(3.0, streakMultiplier + 0.15)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                    self?.spawnEnemyWave()
+                }
+            } else {
+                gameOver = true
+                playerWon = true
+                score += 500 * (difficulty + 1)
+                message = "All waves cleared!"
+                streakMultiplier = min(3.0, streakMultiplier + 0.2)
+                phase = .results
+            }
         } else if playerUnits.isEmpty {
             gameOver = true
             playerWon = false
+            streakMultiplier = 1.0
+            message = "Defeated on wave \(currentWave)"
             phase = .results
         }
     }
 
     func finalReward() -> GameReward {
-        calculateFinalReward(won: playerWon, score: score, streakMultiplier: streakMultiplier)
+        var reward = calculateFinalReward(won: playerWon, score: score, streakMultiplier: streakMultiplier)
+        let difficultyBonus = difficulty * 30
+        let waveBonus = (currentWave - 1) * 20
+        let totalXP = reward.xp + difficultyBonus + waveBonus
+        let totalCoins = reward.coins + (playerWon ? difficulty * 20 : 0)
+        let gems = playerWon && difficulty >= 2 ? 1 : reward.gems
+        var badge = reward.badgeUnlocked
+        if playerWon && difficulty >= 2 { badge = "Battlefield Commander" }
+        if killCount >= 20 { badge = badge ?? "Warmonger" }
+        if turnCount <= 15 && playerWon { badge = badge ?? "Blitz Commander" }
+        reward = GameReward(xp: totalXP, coins: totalCoins, gems: gems, badgeUnlocked: badge)
+        return reward
     }
 }
