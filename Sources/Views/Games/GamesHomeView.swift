@@ -74,8 +74,9 @@ struct GamesHomeView: View {
     private var resultsGrid: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             ForEach(filteredGames) { game in
+                let highScore = ledger.highScore(for: game.id)
                 NavigationLink { GamesRouter.destination(for: game) } label: {
-                    GamingCardView(game: game, ledger: ledger)
+                    GamingCardView(game: game, highScore: highScore, onTap: { })
                 }
             }
         }.padding(.horizontal)
@@ -93,8 +94,10 @@ struct GamesHomeView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ForEach(games) { game in
+                            let highScore = ledger.highScore(for: game.id)
                             NavigationLink { GamesRouter.destination(for: game) } label: {
-                                GamingCardView(game: game, ledger: ledger).frame(width: 160)
+                                GamingCardView(game: game, highScore: highScore, onTap: { })
+                                    .frame(width: 160)
                             }
                         }
                     }.padding(.horizontal)
