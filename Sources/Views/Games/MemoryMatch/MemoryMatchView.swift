@@ -59,31 +59,45 @@ struct MemoryMatchView: View {
 
     private var gameView: some View {
         VStack(spacing: 12) {
-            HStack {
-                Text("Moves: \(logic.moves)").font(.caption.bold()).foregroundColor(.white)
-                Spacer()
-                if logic.consecutiveMatches > 0 { Text("🔥\(logic.consecutiveMatches)").font(.caption.bold()).foregroundColor(GamingDesignTokens.accentGold) }
-                if logic.timerMode { Text(String(format: "⏱ %.0f", logic.timeRemaining)).font(.caption.bold()).foregroundColor(logic.timeRemaining < 15 ? GamingDesignTokens.dangerRed : .white) }
-                Spacer()
-                Text("Matched: \(logic.matchedPairs)/\(logic.totalPairs)").font(.caption.bold()).foregroundColor(GamingDesignTokens.accentNeon)
-            }.padding(.horizontal)
-
-            let cols = logic.gridCols
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: cols), spacing: 6) {
-                ForEach(logic.cards.indices, id: \.self) { i in
-                    let card = logic.cards[i]
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 8).fill(card.isMatched ? GamingDesignTokens.successGreen.opacity(0.3) : (card.isFaceUp ? GamingDesignTokens.cardSurface : GamingDesignTokens.accentPurple))
-                        if card.isFaceUp || card.isMatched {
-                            Text(card.symbol).font(.title2)
-                        } else {
-                            Image(systemName: "questionmark").font(.headline).foregroundColor(.white.opacity(0.4))
-                        }
-                    }.frame(height: 56).onTapGesture { logic.flipCard(at: i) }
-                }
-            }.padding(.horizontal, 8)
+            gameHeader
+            gameGrid
             Spacer()
         }
+    }
+
+    @ViewBuilder
+    private var gameHeader: some View {
+        HStack {
+            Text("Moves: \(logic.moves)").font(.caption.bold()).foregroundColor(.white)
+            Spacer()
+            if logic.consecutiveMatches > 0 { Text("🔥\(logic.consecutiveMatches)").font(.caption.bold()).foregroundColor(GamingDesignTokens.accentGold) }
+            if logic.timerMode { Text(String(format: "⏱ %.0f", logic.timeRemaining)).font(.caption.bold()).foregroundColor(logic.timeRemaining < 15 ? GamingDesignTokens.dangerRed : .white) }
+            Spacer()
+            Text("Matched: \(logic.matchedPairs)/\(logic.totalPairs)").font(.caption.bold()).foregroundColor(GamingDesignTokens.accentNeon)
+        }.padding(.horizontal)
+    }
+
+    @ViewBuilder
+    private var gameGrid: some View {
+        let cols = logic.gridCols
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: cols), spacing: 6) {
+            ForEach(logic.cards.indices, id: \.self) { i in
+                cardCell(at: i)
+            }
+        }.padding(.horizontal, 8)
+    }
+
+    @ViewBuilder
+    private func cardCell(at index: Int) -> some View {
+        let card = logic.cards[index]
+        ZStack {
+            RoundedRectangle(cornerRadius: 8).fill(card.isMatched ? GamingDesignTokens.successGreen.opacity(0.3) : (card.isFaceUp ? GamingDesignTokens.cardSurface : GamingDesignTokens.accentPurple))
+            if card.isFaceUp || card.isMatched {
+                Text(card.symbol).font(.title2)
+            } else {
+                Image(systemName: "questionmark").font(.headline).foregroundColor(.white.opacity(0.4))
+            }
+        }.frame(height: 56).onTapGesture { logic.flipCard(at: index) }
     }
 
     private var resultsView: some View {

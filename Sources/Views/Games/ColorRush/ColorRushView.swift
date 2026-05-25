@@ -61,31 +61,46 @@ struct ColorRushView: View {
 
     private var gameView: some View {
         VStack(spacing: 16) {
-            HStack {
-                Text(String(format: "⏱ %.0f", logic.timeRemaining)).font(.caption.bold()).foregroundColor(logic.timeRemaining < 10 ? GamingDesignTokens.dangerRed : .white)
-                Spacer()
-                if logic.consecutiveCorrect > 0 { Text("🔥\(logic.consecutiveCorrect)").font(.caption.bold()).foregroundColor(GamingDesignTokens.accentGold) }
-                Spacer()
-                Text("Score: \(logic.score)").font(GamingDesignTokens.fontMono).foregroundColor(GamingDesignTokens.accentGold).contentTransition(.numericText())
-            }.padding(.horizontal)
-
-            Text(logic.targetColorName).font(.system(size: 40, weight: .black)).foregroundColor(logic.displayColor)
-            Text(logic.mode == 0 ? "Tap the matching color" : "Tap what the word says").font(.caption).foregroundColor(.white.opacity(0.6))
-
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 12) {
-                ForEach(logic.choices.indices, id: \.self) { i in
-                    Button { logic.selectColor(i) } label: {
-                        RoundedRectangle(cornerRadius: 12).fill(logic.choiceColors[i]).frame(height: 60)
-                            .overlay(Text(logic.choices[i]).font(.caption.bold()).foregroundColor(.white))
-                    }
-                }
-            }.padding(.horizontal)
+            gameHeader
+            gameTarget
+            gameGrid
 
             if logic.bonusTimeEarned > 0 {
                 Text("+\(Int(logic.bonusTimeEarned))s bonus time earned").font(.caption2).foregroundColor(GamingDesignTokens.successGreen)
             }
             Spacer()
         }
+    }
+
+    @ViewBuilder
+    private var gameHeader: some View {
+        HStack {
+            Text(String(format: "⏱ %.0f", logic.timeRemaining)).font(.caption.bold()).foregroundColor(logic.timeRemaining < 10 ? GamingDesignTokens.dangerRed : .white)
+            Spacer()
+            if logic.consecutiveCorrect > 0 { Text("🔥\(logic.consecutiveCorrect)").font(.caption.bold()).foregroundColor(GamingDesignTokens.accentGold) }
+            Spacer()
+            Text("Score: \(logic.score)").font(GamingDesignTokens.fontMono).foregroundColor(GamingDesignTokens.accentGold).contentTransition(.numericText())
+        }.padding(.horizontal)
+    }
+
+    @ViewBuilder
+    private var gameTarget: some View {
+        VStack(spacing: 8) {
+            Text(logic.targetColorName).font(.system(size: 40, weight: .black)).foregroundColor(logic.displayColor)
+            Text(logic.mode == 0 ? "Tap the matching color" : "Tap what the word says").font(.caption).foregroundColor(.white.opacity(0.6))
+        }
+    }
+
+    @ViewBuilder
+    private var gameGrid: some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 12) {
+            ForEach(logic.choices.indices, id: \.self) { i in
+                Button { logic.selectColor(i) } label: {
+                    RoundedRectangle(cornerRadius: 12).fill(logic.choiceColors[i]).frame(height: 60)
+                        .overlay(Text(logic.choices[i]).font(.caption.bold()).foregroundColor(.white))
+                }
+            }
+        }.padding(.horizontal)
     }
 
     private var resultsView: some View {

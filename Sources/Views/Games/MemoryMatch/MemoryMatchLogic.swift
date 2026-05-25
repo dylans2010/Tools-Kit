@@ -19,6 +19,7 @@ final class MemoryMatchLogic: ObservableObject, GamesRewardable {
     @Published var moves = 0
     @Published var matchedPairs = 0
     @Published var totalPairs = 0
+    @Published var gridCols = 4
     @Published var difficulty = 0
     @Published var isTimerMode = false
     @Published var timeRemaining: Double = 60
@@ -45,6 +46,7 @@ final class MemoryMatchLogic: ObservableObject, GamesRewardable {
         self.difficulty = difficulty
         self.isTimerMode = timerMode
         let (rows, cols) = grids[min(difficulty, grids.count - 1)]
+        self.gridCols = cols
         totalPairs = (rows * cols) / 2
         let symbols = ["star.fill", "heart.fill", "bolt.fill", "moon.fill", "sun.max.fill", "cloud.fill",
                        "flame.fill", "leaf.fill", "drop.fill", "snowflake", "wind", "tornado",

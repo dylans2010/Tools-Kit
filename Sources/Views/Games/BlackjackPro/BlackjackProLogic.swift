@@ -16,6 +16,7 @@ final class BlackjackProLogic: ObservableObject, GamesRewardable {
     @Published var handsPlayed = 0
     @Published var wins: Int = 0
     @Published var dealerTotal: Int = 0
+    @Published var playerTotal: Int = 0
     @Published var phase: GamePhase = .lobby
     @Published var streakMultiplier: Double = 1.0
     @Published var canDoubleDown = true
@@ -33,6 +34,10 @@ final class BlackjackProLogic: ObservableObject, GamesRewardable {
 
     enum GamePhase { case lobby, playing, results }
     enum HandResult: String { case playing, playerWin = "You Win!", dealerWin = "Dealer Wins", push = "Push", blackjack = "Blackjack!", bust = "Bust", surrender = "Surrendered" }
+
+    func startGame() {
+        // begin a new game
+    }
 
     func startSession() {
         score = 0

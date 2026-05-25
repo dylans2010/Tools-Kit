@@ -56,6 +56,18 @@ struct BlackjackProView: View {
     private var gameView: some View {
         VStack(spacing: 16) {
             HUDOverlayView(ledger: ledger, xpEngine: xpEngine)
+            dealerSection
+            Divider().background(Color.white.opacity(0.2))
+            playerSection
+            gameControls
+            HStack { Text("Bet:").foregroundColor(.white); Stepper("\(logic.bet)", value: $logic.bet, in: 10...min(200, max(10, ledger.profile.coins)), step: 10).foregroundColor(.white) }.padding(.horizontal, 32)
+            Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private var dealerSection: some View {
+        VStack(spacing: 12) {
             HStack {
                 Text("Dealer: \(logic.dealerTotal)").font(.headline).foregroundColor(.white)
                 Spacer()
@@ -63,26 +75,33 @@ struct BlackjackProView: View {
                 if logic.streakMultiplier > 1.0 { Text("×\(String(format: "%.1f", logic.streakMultiplier))").font(.caption.bold()).foregroundColor(GamingDesignTokens.accentPurple) }
             }.padding(.horizontal)
             HStack { ForEach(logic.dealerHand) { c in cardView(c) } }.padding(.horizontal)
-            Divider().background(Color.white.opacity(0.2))
+        }
+    }
+
+    @ViewBuilder
+    private var playerSection: some View {
+        VStack(spacing: 12) {
             Text("Your Hand: \(logic.playerTotal)").font(.headline).foregroundColor(.white)
             HStack { ForEach(logic.playerHand) { c in cardView(c) } }.padding(.horizontal)
             Text("Bet: \(logic.bet)").font(.caption).foregroundColor(.white.opacity(0.6))
             if !logic.result.isEmpty { Text(logic.result).font(.title3.bold()).foregroundColor(logic.result.contains("Win") || logic.result.contains("Blackjack") ? GamingDesignTokens.accentGold : GamingDesignTokens.dangerRed) }
-            HStack(spacing: 12) {
-                if !logic.gameOver {
-                    Button("Hit") { logic.hit() }.font(.headline).foregroundColor(.black).padding(.horizontal, 20).padding(.vertical, 10).background(GamingDesignTokens.accentNeon, in: Capsule())
-                    Button("Stand") { logic.stand() }.font(.headline).foregroundColor(.black).padding(.horizontal, 20).padding(.vertical, 10).background(GamingDesignTokens.accentGold, in: Capsule())
-                    if logic.playerHand.count == 2 {
-                        Button("Double") { logic.doubleDown() }.font(.caption.bold()).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 8).background(GamingDesignTokens.accentPurple, in: Capsule())
-                        Button("Surrender") { logic.surrender() }.font(.caption.bold()).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 8).background(GamingDesignTokens.dangerRed.opacity(0.7), in: Capsule())
-                    }
-                } else {
-                    Button("New Hand") { logic.newHand() }.font(.headline).foregroundColor(.black).padding(.horizontal, 28).padding(.vertical, 12).background(GamingDesignTokens.accentGold, in: Capsule())
-                    Button("End") { logic.endSession() }.font(.caption).foregroundColor(.white.opacity(0.5))
+        }
+    }
+
+    @ViewBuilder
+    private var gameControls: some View {
+        HStack(spacing: 12) {
+            if !logic.gameOver {
+                Button("Hit") { logic.hit() }.font(.headline).foregroundColor(.black).padding(.horizontal, 20).padding(.vertical, 10).background(GamingDesignTokens.accentNeon, in: Capsule())
+                Button("Stand") { logic.stand() }.font(.headline).foregroundColor(.black).padding(.horizontal, 20).padding(.vertical, 10).background(GamingDesignTokens.accentGold, in: Capsule())
+                if logic.playerHand.count == 2 {
+                    Button("Double") { logic.doubleDown() }.font(.caption.bold()).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 8).background(GamingDesignTokens.accentPurple, in: Capsule())
+                    Button("Surrender") { logic.surrender() }.font(.caption.bold()).foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 8).background(GamingDesignTokens.dangerRed.opacity(0.7), in: Capsule())
                 }
+            } else {
+                Button("New Hand") { logic.newHand() }.font(.headline).foregroundColor(.black).padding(.horizontal, 28).padding(.vertical, 12).background(GamingDesignTokens.accentGold, in: Capsule())
+                Button("End") { logic.endSession() }.font(.caption).foregroundColor(.white.opacity(0.5))
             }
-            HStack { Text("Bet:").foregroundColor(.white); Stepper("\(logic.bet)", value: $logic.bet, in: 10...min(200, max(10, ledger.profile.coins)), step: 10).foregroundColor(.white) }.padding(.horizontal, 32)
-            Spacer()
         }
     }
 
