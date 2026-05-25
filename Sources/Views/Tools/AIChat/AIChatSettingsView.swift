@@ -12,6 +12,7 @@ struct AIChatSettingsView: View {
     @StateObject private var workoutsMode = WorkoutsModeManager.shared
     @StateObject private var workspaceMode = WorkspaceModeManager.shared
     @StateObject private var diagnosticsMode = DiagnosticsModeManager.shared
+    @StateObject private var gamesMode = GamesModeManager.shared
     @StateObject private var skillsManager = AIService.SkillsManager.shared
 
     @State private var isUploadingToCloud = false
@@ -183,6 +184,7 @@ struct AIChatSettingsView: View {
             .onChange(of: workoutsMode.isWorkoutsModeEnabled) { _, _ in currentAppMode = resolveCurrentMode() }
             .onChange(of: workspaceMode.isWorkspaceModeEnabled) { _, _ in currentAppMode = resolveCurrentMode() }
             .onChange(of: diagnosticsMode.isDiagnosticsModeEnabled) { _, _ in currentAppMode = resolveCurrentMode() }
+            .onChange(of: gamesMode.isGamesModeEnabled) { _, _ in currentAppMode = resolveCurrentMode() }
             .onChange(of: settings.selectedProviderID) { _, _ in
                 Task { await loadProviderModels(force: false) }
             }
@@ -717,7 +719,7 @@ struct AppModePickerView: View {
 
 extension AIChatSettingsView {
     enum AppMode: String, CaseIterable, Identifiable {
-        case dashboard, music, workouts, workspace, diagnostics
+        case dashboard, music, workouts, workspace, diagnostics, games
         var id: String { rawValue }
         var title: String {
             switch self {
@@ -726,6 +728,7 @@ extension AIChatSettingsView {
             case .workouts: return "Workouts"
             case .workspace: return "Workspace"
             case .diagnostics: return "Diagnostics"
+            case .games: return "Games"
             }
         }
         var icon: String {
@@ -735,6 +738,7 @@ extension AIChatSettingsView {
             case .workouts: return "figure.strengthtraining.traditional"
             case .workspace: return "rectangle.3.group"
             case .diagnostics: return "stethoscope"
+            case .games: return "gamecontroller.fill"
             }
         }
         var tint: Color {
@@ -744,6 +748,7 @@ extension AIChatSettingsView {
             case .workouts: return .mint
             case .workspace: return .indigo
             case .diagnostics: return .teal
+            case .games: return .purple
             }
         }
         var description: String {
@@ -753,6 +758,7 @@ extension AIChatSettingsView {
             case .workouts: return "AI Fitness Tracking"
             case .workspace: return "Production Workspace"
             case .diagnostics: return "iOS Device Diagnostics Suite"
+            case .games: return "Play 29+ games, earn XP & coins"
             }
         }
     }
@@ -762,6 +768,7 @@ extension AIChatSettingsView {
         if workoutsMode.isWorkoutsModeEnabled { return .workouts }
         if workspaceMode.isWorkspaceModeEnabled { return .workspace }
         if diagnosticsMode.isDiagnosticsModeEnabled { return .diagnostics }
+        if gamesMode.isGamesModeEnabled { return .games }
         return .dashboard
     }
 
@@ -781,6 +788,9 @@ extension AIChatSettingsView {
                 }
                 if diagnosticsMode.isDiagnosticsModeEnabled != (newMode == .diagnostics) {
                     diagnosticsMode.isDiagnosticsModeEnabled = (newMode == .diagnostics)
+                }
+                if gamesMode.isGamesModeEnabled != (newMode == .games) {
+                    gamesMode.isGamesModeEnabled = (newMode == .games)
                 }
             }
         )

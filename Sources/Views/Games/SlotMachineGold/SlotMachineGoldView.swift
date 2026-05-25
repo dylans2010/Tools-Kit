@@ -1,0 +1,88 @@
+import SwiftUI
+
+struct SlotMachineGoldView: View {
+    @StateObject private var logic = SlotMachineGoldLogic()
+    @ObservedObject var ledger = CurrencyLedger.shared
+    @ObservedObject var xpEngine = XPEngine.shared
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        ZStack {
+            GamingDesignTokens.background.ignoresSafeArea()
+            switch logic.phase {
+            case .lobby: lobbyView
+            case .playing: gameView
+            case .results: resultsView
+            }
+            if xpEngine.didLevelUp { LevelUpPopupView(level: xpEngine.newLevel, bonusCoins: xpEngine.bonusCoinsAwarded) { xpEngine.clearLevelUp() } }
+        }
+        .navigationTitle("Slot Machine Gold").navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(GamingDesignTokens.cardSurface, for: .navigationBar).toolbarBackground(.visible, for: .navigationBar).toolbarColorScheme(.dark, for: .navigationBar)
+    }
+
+    private var lobbyView: some View {
+        VStack(spacing: 24) {
+            Image(systemName: "dollarsign.circle.fill").font(.system(size: 64)).foregroundColor(GamingDesignTokens.accentGold)
+            Text("Slot Machine Gold").font(.title.bold()).foregroundColor(.white)
+            Text("3-reel slot machine with animated reels.\nMatch symbols to win big!").font(.subheadline).foregroundColor(.white.opacity(0.7)).multilineTextAlignment(.center)
+            payoutTable
+            HStack { Text("Best:").foregroundColor(.white.opacity(0.6)); Text("\(ledger.highScore(for: logic.gameIdentifier))").font(GamingDesignTokens.fontMono).foregroundColor(GamingDesignTokens.accentGold) }
+            Button("Play Slots") { logic.startGame() }.font(.headline).foregroundColor(.black).padding(.horizontal, 48).padding(.vertical, 14).background(GamingDesignTokens.accentGold, in: Capsule()).pulseAnimation()
+        }.padding()
+    }
+
+    private var payoutTable: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Payout Table").font(.caption.bold()).foregroundColor(GamingDesignTokens.accentNeon)
+            ForEach(SlotSymbol.allSymbols, id: \.name) { sym in
+                HStack {
+                    Image(systemName: sym.icon).font(.caption).foregroundColor(GamingDesignTokens.accentGold)
+                    Text("3x \(sym.name)").font(.caption2).foregroundColor(.white.opacity(0.7))
+                    Spacer()
+                    Text("\(Int(sym.multiplier))x bet").font(.caption2.bold()).foregroundColor(GamingDesignTokens.accentGold)
+                }
+            }
+        }.padding(12).background(GamingDesignTokens.cardSurface, in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var gameView: some View {
+        VStack(spacing: 20) {
+            HUDOverlayView(ledger: ledger, xpEngine: xpEngine)
+            HStack(spacing: 16) {
+                ForEach(0..<3, id: \.self) { i in
+                    VStack {
+                        Image(systemName: logic.reels[i].icon).font(.system(size: 40)).foregroundColor(GamingDesignTokens.accentGold)
+                            .frame(width: 80, height: 80).background(GamingDesignTokens.cardSurface, in: RoundedRectangle(cornerRadius: 12))
+                            .scaleEffect(logic.isSpinning ? 0.9 : 1.0).animation(.easeInOut(duration: 0.08).repeatCount(logic.isSpinning ? 100 : 0, autoreverses: true), value: logic.isSpinning)
+                        Text(logic.reels[i].name).font(.caption2).foregroundColor(.white.opacity(0.6))
+                    }
+                }
+            }
+            if logic.lastWin > 0 {
+                Text("WIN: \(logic.lastWin) coins!").font(.title2.bold()).foregroundColor(GamingDesignTokens.accentGold).transition(.scale).contentTransition(.numericText())
+            }
+            HStack {
+                Text("Bet:").foregroundColor(.white)
+                Stepper("\(logic.bet)", value: $logic.bet, in: logic.minBet...min(logic.maxBet, ledger.profile.coins), step: 10).foregroundColor(.white)
+            }.padding(.horizontal, 32)
+            Button(logic.isSpinning ? "Spinning..." : "SPIN") { logic.spin() }.font(.title2.bold()).foregroundColor(.black).padding(.horizontal, 60).padding(.vertical, 16)
+                .background(logic.isSpinning ? Color.gray : GamingDesignTokens.accentGold, in: Capsule()).disabled(logic.isSpinning)
+            Button("End Session") { logic.endSession() }.font(.caption).foregroundColor(.white.opacity(0.5))
+            Spacer()
+        }
+    }
+
+    private var resultsView: some View {
+        let reward = logic.finalReward()
+        return VStack(spacing: 20) {
+            Image(systemName: "dollarsign.circle.fill").font(.system(size: 64)).foregroundColor(GamingDesignTokens.accentGold)
+            Text("Session Over").font(.title.bold()).foregroundColor(.white)
+            Text("Spins: \(logic.spins) | Won: \(logic.totalWon)").font(GamingDesignTokens.fontMono).foregroundColor(GamingDesignTokens.accentGold)
+            RewardToastView(reward: reward)
+            HStack(spacing: 16) {
+                Button("Play Again") { logic.phase = .lobby }.font(.headline).foregroundColor(.black).padding(.horizontal, 24).padding(.vertical, 12).background(GamingDesignTokens.accentNeon, in: Capsule())
+                Button("Back") { dismiss() }.font(.headline).foregroundColor(.white).padding(.horizontal, 24).padding(.vertical, 12).background(Color.white.opacity(0.15), in: Capsule())
+            }
+        }.padding().onAppear { ledger.recordGame(identifier: logic.gameIdentifier, won: logic.totalWon > 0, score: logic.score, reward: reward) }
+    }
+}

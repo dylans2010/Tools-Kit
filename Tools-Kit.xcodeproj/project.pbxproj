@@ -1807,6 +1807,96 @@
 		DG02000000000000000000000238 /* Diag_ThreadRadioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000238 /* Diag_ThreadRadioView.swift */; };
 		DG02000000000000000000000239 /* Diag_WiFi6ECheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000239 /* Diag_WiFi6ECheckView.swift */; };
 		DG02000000000000000000000240 /* Diag_5GBandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000240 /* Diag_5GBandView.swift */; };
+		GM0200000000000000000001 /* AsteroidDodgeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000001 /* AsteroidDodgeLogic.swift */; };
+		GM0200000000000000000002 /* AsteroidDodgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000002 /* AsteroidDodgeView.swift */; };
+		GM0200000000000000000003 /* BattlefieldCommanderAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000003 /* BattlefieldCommanderAssets.swift */; };
+		GM0200000000000000000004 /* BattlefieldCommanderLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000004 /* BattlefieldCommanderLogic.swift */; };
+		GM0200000000000000000005 /* BattlefieldCommanderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000005 /* BattlefieldCommanderView.swift */; };
+		GM0200000000000000000006 /* BlackjackProLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000006 /* BlackjackProLogic.swift */; };
+		GM0200000000000000000007 /* BlackjackProView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000007 /* BlackjackProView.swift */; };
+		GM0200000000000000000008 /* CardDeckModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000008 /* CardDeckModel.swift */; };
+		GM0200000000000000000009 /* BubblePopFrenzyLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000009 /* BubblePopFrenzyLogic.swift */; };
+		GM0200000000000000000010 /* BubblePopFrenzyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000010 /* BubblePopFrenzyView.swift */; };
+		GM0200000000000000000011 /* CheckersArenaLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000011 /* CheckersArenaLogic.swift */; };
+		GM0200000000000000000012 /* CheckersArenaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000012 /* CheckersArenaView.swift */; };
+		GM0200000000000000000013 /* ChessLiteLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000013 /* ChessLiteLogic.swift */; };
+		GM0200000000000000000014 /* ChessLiteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000014 /* ChessLiteView.swift */; };
+		GM0200000000000000000015 /* ColorRushLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000015 /* ColorRushLogic.swift */; };
+		GM0200000000000000000016 /* ColorRushView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000016 /* ColorRushView.swift */; };
+		GM0200000000000000000017 /* ConnectFourBlitzLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000017 /* ConnectFourBlitzLogic.swift */; };
+		GM0200000000000000000018 /* ConnectFourBlitzView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000018 /* ConnectFourBlitzView.swift */; };
+		GM0200000000000000000019 /* DiceRollFortuneLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000019 /* DiceRollFortuneLogic.swift */; };
+		GM0200000000000000000020 /* DiceRollFortuneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000020 /* DiceRollFortuneView.swift */; };
+		GM0200000000000000000021 /* FlipCardDuelLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000021 /* FlipCardDuelLogic.swift */; };
+		GM0200000000000000000022 /* FlipCardDuelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000022 /* FlipCardDuelView.swift */; };
+		GM0200000000000000000023 /* GamesAppMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000023 /* GamesAppMode.swift */; };
+		GM0200000000000000000024 /* GamesHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000024 /* GamesHomeView.swift */; };
+		GM0200000000000000000025 /* GamesModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000025 /* GamesModeManager.swift */; };
+		GM0200000000000000000026 /* GamesRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000026 /* GamesRouter.swift */; };
+		GM0200000000000000000027 /* MathBlitzLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000027 /* MathBlitzLogic.swift */; };
+		GM0200000000000000000028 /* MathBlitzView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000028 /* MathBlitzView.swift */; };
+		GM0200000000000000000029 /* MemoryMatchLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000029 /* MemoryMatchLogic.swift */; };
+		GM0200000000000000000030 /* MemoryMatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000030 /* MemoryMatchView.swift */; };
+		GM0200000000000000000031 /* MinesweeperXLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000031 /* MinesweeperXLogic.swift */; };
+		GM0200000000000000000032 /* MinesweeperXView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000032 /* MinesweeperXView.swift */; };
+		GM0200000000000000000033 /* NumberVaultLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000033 /* NumberVaultLogic.swift */; };
+		GM0200000000000000000034 /* NumberVaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000034 /* NumberVaultView.swift */; };
+		GM0200000000000000000035 /* PokerHandEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000035 /* PokerHandEvaluator.swift */; };
+		GM0200000000000000000036 /* PokerNightsLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000036 /* PokerNightsLogic.swift */; };
+		GM0200000000000000000037 /* PokerNightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000037 /* PokerNightsView.swift */; };
+		GM0200000000000000000038 /* ReactionTapLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000038 /* ReactionTapLogic.swift */; };
+		GM0200000000000000000039 /* ReactionTapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000039 /* ReactionTapView.swift */; };
+		GM0200000000000000000040 /* RouletteRoyalLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000040 /* RouletteRoyalLogic.swift */; };
+		GM0200000000000000000041 /* RouletteRoyalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000041 /* RouletteRoyalView.swift */; };
+		GM0200000000000000000042 /* ScratchAndWinLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000042 /* ScratchAndWinLogic.swift */; };
+		GM0200000000000000000043 /* ScratchAndWinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000043 /* ScratchAndWinView.swift */; };
+		GM0200000000000000000044 /* SequenceRecallLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000044 /* SequenceRecallLogic.swift */; };
+		GM0200000000000000000045 /* SequenceRecallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000045 /* SequenceRecallView.swift */; };
+		GM0200000000000000000046 /* CurrencyLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000046 /* CurrencyLedger.swift */; };
+		GM0200000000000000000047 /* GameCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000047 /* GameCategory.swift */; };
+		GM0200000000000000000048 /* GameDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000048 /* GameDefinition.swift */; };
+		GM0200000000000000000049 /* PlayerProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000049 /* PlayerProfile.swift */; };
+		GM0200000000000000000050 /* XPEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000050 /* XPEngine.swift */; };
+		GM0200000000000000000051 /* GamesPersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000051 /* GamesPersistenceManager.swift */; };
+		GM0200000000000000000052 /* GamesUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000052 /* GamesUserDefaults.swift */; };
+		GM0200000000000000000053 /* CurrencyStoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000053 /* CurrencyStoreView.swift */; };
+		GM0200000000000000000054 /* RedemptionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000054 /* RedemptionEngine.swift */; };
+		GM0200000000000000000055 /* StoreItemModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000055 /* StoreItemModel.swift */; };
+		GM0200000000000000000056 /* CurrencyBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000056 /* CurrencyBadgeView.swift */; };
+		GM0200000000000000000057 /* GameFilterBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000057 /* GameFilterBarView.swift */; };
+		GM0200000000000000000058 /* GameGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000058 /* GameGridView.swift */; };
+		GM0200000000000000000059 /* GameSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000059 /* GameSearchView.swift */; };
+		GM0200000000000000000060 /* GamingCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000060 /* GamingCardView.swift */; };
+		GM0200000000000000000061 /* GamingModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000061 /* GamingModifiers.swift */; };
+		GM0200000000000000000062 /* HUDOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000062 /* HUDOverlayView.swift */; };
+		GM0200000000000000000063 /* LevelUpPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000063 /* LevelUpPopupView.swift */; };
+		GM0200000000000000000064 /* RewardToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000064 /* RewardToastView.swift */; };
+		GM0200000000000000000065 /* XPProgressBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000065 /* XPProgressBarView.swift */; };
+		GM0200000000000000000066 /* SlotMachineGoldLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000066 /* SlotMachineGoldLogic.swift */; };
+		GM0200000000000000000067 /* SlotMachineGoldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000067 /* SlotMachineGoldView.swift */; };
+		GM0200000000000000000068 /* SlotReelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000068 /* SlotReelView.swift */; };
+		GM0200000000000000000069 /* SnakeLadderClassicLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000069 /* SnakeLadderClassicLogic.swift */; };
+		GM0200000000000000000070 /* SnakeLadderClassicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000070 /* SnakeLadderClassicView.swift */; };
+		GM0200000000000000000071 /* SpinWheelPrizeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000071 /* SpinWheelPrizeLogic.swift */; };
+		GM0200000000000000000072 /* SpinWheelPrizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000072 /* SpinWheelPrizeView.swift */; };
+		GM0200000000000000000073 /* SudokuGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000073 /* SudokuGenerator.swift */; };
+		GM0200000000000000000074 /* SudokuMasterLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000074 /* SudokuMasterLogic.swift */; };
+		GM0200000000000000000075 /* SudokuMasterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000075 /* SudokuMasterView.swift */; };
+		GM0200000000000000000076 /* TacticalRaidLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000076 /* TacticalRaidLogic.swift */; };
+		GM0200000000000000000077 /* TacticalRaidView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000077 /* TacticalRaidView.swift */; };
+		GM0200000000000000000078 /* TicTacToeProLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000078 /* TicTacToeProLogic.swift */; };
+		GM0200000000000000000079 /* TicTacToeProView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000079 /* TicTacToeProView.swift */; };
+		GM0200000000000000000080 /* TowerDefenseXLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000080 /* TowerDefenseXLogic.swift */; };
+		GM0200000000000000000081 /* TowerDefenseXView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000081 /* TowerDefenseXView.swift */; };
+		GM0200000000000000000082 /* TriviaCrushLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000082 /* TriviaCrushLogic.swift */; };
+		GM0200000000000000000083 /* TriviaCrushQuestionBank.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000083 /* TriviaCrushQuestionBank.swift */; };
+		GM0200000000000000000084 /* TriviaCrushView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000084 /* TriviaCrushView.swift */; };
+		GM0200000000000000000085 /* WarZoneMapModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000085 /* WarZoneMapModel.swift */; };
+		GM0200000000000000000086 /* WarZoneStrikeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000086 /* WarZoneStrikeLogic.swift */; };
+		GM0200000000000000000087 /* WarZoneStrikeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000087 /* WarZoneStrikeView.swift */; };
+		GM0200000000000000000088 /* WordStormDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000088 /* WordStormDictionary.swift */; };
+		GM0200000000000000000089 /* WordStormLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000089 /* WordStormLogic.swift */; };
+		GM0200000000000000000090 /* WordStormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000090 /* WordStormView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3594,6 +3684,96 @@
 		DG01000000000000000000000238 /* Diag_ThreadRadioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ThreadRadioView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000239 /* Diag_WiFi6ECheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_WiFi6ECheckView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000240 /* Diag_5GBandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_5GBandView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000001 /* AsteroidDodgeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsteroidDodgeLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000002 /* AsteroidDodgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsteroidDodgeView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000003 /* BattlefieldCommanderAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlefieldCommanderAssets.swift; sourceTree = "<group>"; };
+		GM0100000000000000000004 /* BattlefieldCommanderLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlefieldCommanderLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000005 /* BattlefieldCommanderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlefieldCommanderView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000006 /* BlackjackProLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackjackProLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000007 /* BlackjackProView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackjackProView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000008 /* CardDeckModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDeckModel.swift; sourceTree = "<group>"; };
+		GM0100000000000000000009 /* BubblePopFrenzyLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BubblePopFrenzyLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000010 /* BubblePopFrenzyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BubblePopFrenzyView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000011 /* CheckersArenaLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckersArenaLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000012 /* CheckersArenaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckersArenaView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000013 /* ChessLiteLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessLiteLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000014 /* ChessLiteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessLiteView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000015 /* ColorRushLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorRushLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000016 /* ColorRushView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorRushView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000017 /* ConnectFourBlitzLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectFourBlitzLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000018 /* ConnectFourBlitzView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectFourBlitzView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000019 /* DiceRollFortuneLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiceRollFortuneLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000020 /* DiceRollFortuneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiceRollFortuneView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000021 /* FlipCardDuelLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlipCardDuelLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000022 /* FlipCardDuelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlipCardDuelView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000023 /* GamesAppMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesAppMode.swift; sourceTree = "<group>"; };
+		GM0100000000000000000024 /* GamesHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesHomeView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000025 /* GamesModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesModeManager.swift; sourceTree = "<group>"; };
+		GM0100000000000000000026 /* GamesRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesRouter.swift; sourceTree = "<group>"; };
+		GM0100000000000000000027 /* MathBlitzLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathBlitzLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000028 /* MathBlitzView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathBlitzView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000029 /* MemoryMatchLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryMatchLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000030 /* MemoryMatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryMatchView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000031 /* MinesweeperXLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinesweeperXLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000032 /* MinesweeperXView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinesweeperXView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000033 /* NumberVaultLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberVaultLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000034 /* NumberVaultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberVaultView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000035 /* PokerHandEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerHandEvaluator.swift; sourceTree = "<group>"; };
+		GM0100000000000000000036 /* PokerNightsLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerNightsLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000037 /* PokerNightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerNightsView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000038 /* ReactionTapLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionTapLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000039 /* ReactionTapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionTapView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000040 /* RouletteRoyalLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouletteRoyalLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000041 /* RouletteRoyalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouletteRoyalView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000042 /* ScratchAndWinLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScratchAndWinLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000043 /* ScratchAndWinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScratchAndWinView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000044 /* SequenceRecallLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceRecallLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000045 /* SequenceRecallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceRecallView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000046 /* CurrencyLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyLedger.swift; sourceTree = "<group>"; };
+		GM0100000000000000000047 /* GameCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCategory.swift; sourceTree = "<group>"; };
+		GM0100000000000000000048 /* GameDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDefinition.swift; sourceTree = "<group>"; };
+		GM0100000000000000000049 /* PlayerProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerProfile.swift; sourceTree = "<group>"; };
+		GM0100000000000000000050 /* XPEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XPEngine.swift; sourceTree = "<group>"; };
+		GM0100000000000000000051 /* GamesPersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesPersistenceManager.swift; sourceTree = "<group>"; };
+		GM0100000000000000000052 /* GamesUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesUserDefaults.swift; sourceTree = "<group>"; };
+		GM0100000000000000000053 /* CurrencyStoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyStoreView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000054 /* RedemptionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedemptionEngine.swift; sourceTree = "<group>"; };
+		GM0100000000000000000055 /* StoreItemModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreItemModel.swift; sourceTree = "<group>"; };
+		GM0100000000000000000056 /* CurrencyBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyBadgeView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000057 /* GameFilterBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameFilterBarView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000058 /* GameGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameGridView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000059 /* GameSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSearchView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000060 /* GamingCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamingCardView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000061 /* GamingModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamingModifiers.swift; sourceTree = "<group>"; };
+		GM0100000000000000000062 /* HUDOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDOverlayView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000063 /* LevelUpPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelUpPopupView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000064 /* RewardToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardToastView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000065 /* XPProgressBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XPProgressBarView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000066 /* SlotMachineGoldLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlotMachineGoldLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000067 /* SlotMachineGoldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlotMachineGoldView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000068 /* SlotReelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlotReelView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000069 /* SnakeLadderClassicLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnakeLadderClassicLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000070 /* SnakeLadderClassicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnakeLadderClassicView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000071 /* SpinWheelPrizeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinWheelPrizeLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000072 /* SpinWheelPrizeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinWheelPrizeView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000073 /* SudokuGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudokuGenerator.swift; sourceTree = "<group>"; };
+		GM0100000000000000000074 /* SudokuMasterLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudokuMasterLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000075 /* SudokuMasterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudokuMasterView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000076 /* TacticalRaidLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TacticalRaidLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000077 /* TacticalRaidView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TacticalRaidView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000078 /* TicTacToeProLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicTacToeProLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000079 /* TicTacToeProView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicTacToeProView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000080 /* TowerDefenseXLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerDefenseXLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000081 /* TowerDefenseXView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerDefenseXView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000082 /* TriviaCrushLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriviaCrushLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000083 /* TriviaCrushQuestionBank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriviaCrushQuestionBank.swift; sourceTree = "<group>"; };
+		GM0100000000000000000084 /* TriviaCrushView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriviaCrushView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000085 /* WarZoneMapModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarZoneMapModel.swift; sourceTree = "<group>"; };
+		GM0100000000000000000086 /* WarZoneStrikeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarZoneStrikeLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000087 /* WarZoneStrikeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarZoneStrikeView.swift; sourceTree = "<group>"; };
+		GM0100000000000000000088 /* WordStormDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordStormDictionary.swift; sourceTree = "<group>"; };
+		GM0100000000000000000089 /* WordStormLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordStormLogic.swift; sourceTree = "<group>"; };
+		GM0100000000000000000090 /* WordStormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordStormView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -5326,6 +5506,7 @@
 				CC9801202AB9B5F922B82837 /* Auth */,
 				D1CC39CE437180739A6432C7 /* Tools */,
 				DC2D175B29C54118833E3C57 /* Music */,
+				GM0300000000000000000001 /* Games */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -10825,6 +11006,375 @@
 			path = Agentic;
 			sourceTree = "<group>";
 		};
+		GM0300000000000000000001 /* Games */ = {
+			isa = PBXGroup;
+			children = (
+				GM0300000000000000000002 /* AsteroidDodge */,
+				GM0300000000000000000003 /* BattlefieldCommander */,
+				GM0300000000000000000004 /* BlackjackPro */,
+				GM0300000000000000000005 /* BubblePopFrenzy */,
+				GM0300000000000000000006 /* CheckersArena */,
+				GM0300000000000000000007 /* ChessLite */,
+				GM0300000000000000000008 /* ColorRush */,
+				GM0300000000000000000009 /* ConnectFourBlitz */,
+				GM0300000000000000000010 /* DiceRollFortune */,
+				GM0300000000000000000011 /* FlipCardDuel */,
+				GM0300000000000000000012 /* MathBlitz */,
+				GM0300000000000000000013 /* MemoryMatch */,
+				GM0300000000000000000014 /* MinesweeperX */,
+				GM0300000000000000000015 /* NumberVault */,
+				GM0300000000000000000016 /* PokerNights */,
+				GM0300000000000000000017 /* ReactionTap */,
+				GM0300000000000000000018 /* RouletteRoyal */,
+				GM0300000000000000000019 /* ScratchAndWin */,
+				GM0300000000000000000020 /* SequenceRecall */,
+				GM0300000000000000000021 /* Shared */,
+				GM0300000000000000000026 /* SlotMachineGold */,
+				GM0300000000000000000027 /* SnakeLadderClassic */,
+				GM0300000000000000000028 /* SpinWheelPrize */,
+				GM0300000000000000000029 /* SudokuMaster */,
+				GM0300000000000000000030 /* TacticalRaid */,
+				GM0300000000000000000031 /* TicTacToePro */,
+				GM0300000000000000000032 /* TowerDefenseX */,
+				GM0300000000000000000033 /* TriviaCrush */,
+				GM0300000000000000000034 /* WarZoneStrike */,
+				GM0300000000000000000035 /* WordStorm */,
+				GM0100000000000000000023 /* GamesAppMode.swift */,
+				GM0100000000000000000024 /* GamesHomeView.swift */,
+				GM0100000000000000000025 /* GamesModeManager.swift */,
+				GM0100000000000000000026 /* GamesRouter.swift */,
+			);
+			path = Games;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000002 /* AsteroidDodge */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000001 /* AsteroidDodgeLogic.swift */,
+				GM0100000000000000000002 /* AsteroidDodgeView.swift */,
+			);
+			path = AsteroidDodge;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000003 /* BattlefieldCommander */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000003 /* BattlefieldCommanderAssets.swift */,
+				GM0100000000000000000004 /* BattlefieldCommanderLogic.swift */,
+				GM0100000000000000000005 /* BattlefieldCommanderView.swift */,
+			);
+			path = BattlefieldCommander;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000004 /* BlackjackPro */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000006 /* BlackjackProLogic.swift */,
+				GM0100000000000000000007 /* BlackjackProView.swift */,
+				GM0100000000000000000008 /* CardDeckModel.swift */,
+			);
+			path = BlackjackPro;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000005 /* BubblePopFrenzy */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000009 /* BubblePopFrenzyLogic.swift */,
+				GM0100000000000000000010 /* BubblePopFrenzyView.swift */,
+			);
+			path = BubblePopFrenzy;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000006 /* CheckersArena */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000011 /* CheckersArenaLogic.swift */,
+				GM0100000000000000000012 /* CheckersArenaView.swift */,
+			);
+			path = CheckersArena;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000007 /* ChessLite */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000013 /* ChessLiteLogic.swift */,
+				GM0100000000000000000014 /* ChessLiteView.swift */,
+			);
+			path = ChessLite;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000008 /* ColorRush */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000015 /* ColorRushLogic.swift */,
+				GM0100000000000000000016 /* ColorRushView.swift */,
+			);
+			path = ColorRush;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000009 /* ConnectFourBlitz */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000017 /* ConnectFourBlitzLogic.swift */,
+				GM0100000000000000000018 /* ConnectFourBlitzView.swift */,
+			);
+			path = ConnectFourBlitz;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000010 /* DiceRollFortune */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000019 /* DiceRollFortuneLogic.swift */,
+				GM0100000000000000000020 /* DiceRollFortuneView.swift */,
+			);
+			path = DiceRollFortune;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000011 /* FlipCardDuel */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000021 /* FlipCardDuelLogic.swift */,
+				GM0100000000000000000022 /* FlipCardDuelView.swift */,
+			);
+			path = FlipCardDuel;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000012 /* MathBlitz */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000027 /* MathBlitzLogic.swift */,
+				GM0100000000000000000028 /* MathBlitzView.swift */,
+			);
+			path = MathBlitz;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000013 /* MemoryMatch */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000029 /* MemoryMatchLogic.swift */,
+				GM0100000000000000000030 /* MemoryMatchView.swift */,
+			);
+			path = MemoryMatch;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000014 /* MinesweeperX */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000031 /* MinesweeperXLogic.swift */,
+				GM0100000000000000000032 /* MinesweeperXView.swift */,
+			);
+			path = MinesweeperX;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000015 /* NumberVault */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000033 /* NumberVaultLogic.swift */,
+				GM0100000000000000000034 /* NumberVaultView.swift */,
+			);
+			path = NumberVault;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000016 /* PokerNights */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000035 /* PokerHandEvaluator.swift */,
+				GM0100000000000000000036 /* PokerNightsLogic.swift */,
+				GM0100000000000000000037 /* PokerNightsView.swift */,
+			);
+			path = PokerNights;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000017 /* ReactionTap */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000038 /* ReactionTapLogic.swift */,
+				GM0100000000000000000039 /* ReactionTapView.swift */,
+			);
+			path = ReactionTap;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000018 /* RouletteRoyal */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000040 /* RouletteRoyalLogic.swift */,
+				GM0100000000000000000041 /* RouletteRoyalView.swift */,
+			);
+			path = RouletteRoyal;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000019 /* ScratchAndWin */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000042 /* ScratchAndWinLogic.swift */,
+				GM0100000000000000000043 /* ScratchAndWinView.swift */,
+			);
+			path = ScratchAndWin;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000020 /* SequenceRecall */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000044 /* SequenceRecallLogic.swift */,
+				GM0100000000000000000045 /* SequenceRecallView.swift */,
+			);
+			path = SequenceRecall;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000021 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				GM0300000000000000000022 /* Models */,
+				GM0300000000000000000023 /* Persistence */,
+				GM0300000000000000000024 /* Store */,
+				GM0300000000000000000025 /* UI */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000022 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000046 /* CurrencyLedger.swift */,
+				GM0100000000000000000047 /* GameCategory.swift */,
+				GM0100000000000000000048 /* GameDefinition.swift */,
+				GM0100000000000000000049 /* PlayerProfile.swift */,
+				GM0100000000000000000050 /* XPEngine.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000023 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000051 /* GamesPersistenceManager.swift */,
+				GM0100000000000000000052 /* GamesUserDefaults.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000024 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000053 /* CurrencyStoreView.swift */,
+				GM0100000000000000000054 /* RedemptionEngine.swift */,
+				GM0100000000000000000055 /* StoreItemModel.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000025 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000056 /* CurrencyBadgeView.swift */,
+				GM0100000000000000000057 /* GameFilterBarView.swift */,
+				GM0100000000000000000058 /* GameGridView.swift */,
+				GM0100000000000000000059 /* GameSearchView.swift */,
+				GM0100000000000000000060 /* GamingCardView.swift */,
+				GM0100000000000000000061 /* GamingModifiers.swift */,
+				GM0100000000000000000062 /* HUDOverlayView.swift */,
+				GM0100000000000000000063 /* LevelUpPopupView.swift */,
+				GM0100000000000000000064 /* RewardToastView.swift */,
+				GM0100000000000000000065 /* XPProgressBarView.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000026 /* SlotMachineGold */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000066 /* SlotMachineGoldLogic.swift */,
+				GM0100000000000000000067 /* SlotMachineGoldView.swift */,
+				GM0100000000000000000068 /* SlotReelView.swift */,
+			);
+			path = SlotMachineGold;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000027 /* SnakeLadderClassic */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000069 /* SnakeLadderClassicLogic.swift */,
+				GM0100000000000000000070 /* SnakeLadderClassicView.swift */,
+			);
+			path = SnakeLadderClassic;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000028 /* SpinWheelPrize */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000071 /* SpinWheelPrizeLogic.swift */,
+				GM0100000000000000000072 /* SpinWheelPrizeView.swift */,
+			);
+			path = SpinWheelPrize;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000029 /* SudokuMaster */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000073 /* SudokuGenerator.swift */,
+				GM0100000000000000000074 /* SudokuMasterLogic.swift */,
+				GM0100000000000000000075 /* SudokuMasterView.swift */,
+			);
+			path = SudokuMaster;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000030 /* TacticalRaid */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000076 /* TacticalRaidLogic.swift */,
+				GM0100000000000000000077 /* TacticalRaidView.swift */,
+			);
+			path = TacticalRaid;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000031 /* TicTacToePro */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000078 /* TicTacToeProLogic.swift */,
+				GM0100000000000000000079 /* TicTacToeProView.swift */,
+			);
+			path = TicTacToePro;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000032 /* TowerDefenseX */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000080 /* TowerDefenseXLogic.swift */,
+				GM0100000000000000000081 /* TowerDefenseXView.swift */,
+			);
+			path = TowerDefenseX;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000033 /* TriviaCrush */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000082 /* TriviaCrushLogic.swift */,
+				GM0100000000000000000083 /* TriviaCrushQuestionBank.swift */,
+				GM0100000000000000000084 /* TriviaCrushView.swift */,
+			);
+			path = TriviaCrush;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000034 /* WarZoneStrike */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000085 /* WarZoneMapModel.swift */,
+				GM0100000000000000000086 /* WarZoneStrikeLogic.swift */,
+				GM0100000000000000000087 /* WarZoneStrikeView.swift */,
+			);
+			path = WarZoneStrike;
+			sourceTree = "<group>";
+		};
+		GM0300000000000000000035 /* WordStorm */ = {
+			isa = PBXGroup;
+			children = (
+				GM0100000000000000000088 /* WordStormDictionary.swift */,
+				GM0100000000000000000089 /* WordStormLogic.swift */,
+				GM0100000000000000000090 /* WordStormView.swift */,
+			);
+			path = WordStorm;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -10991,6 +11541,96 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				GM0200000000000000000001 /* AsteroidDodgeLogic.swift in Sources */,
+				GM0200000000000000000002 /* AsteroidDodgeView.swift in Sources */,
+				GM0200000000000000000003 /* BattlefieldCommanderAssets.swift in Sources */,
+				GM0200000000000000000004 /* BattlefieldCommanderLogic.swift in Sources */,
+				GM0200000000000000000005 /* BattlefieldCommanderView.swift in Sources */,
+				GM0200000000000000000006 /* BlackjackProLogic.swift in Sources */,
+				GM0200000000000000000007 /* BlackjackProView.swift in Sources */,
+				GM0200000000000000000008 /* CardDeckModel.swift in Sources */,
+				GM0200000000000000000009 /* BubblePopFrenzyLogic.swift in Sources */,
+				GM0200000000000000000010 /* BubblePopFrenzyView.swift in Sources */,
+				GM0200000000000000000011 /* CheckersArenaLogic.swift in Sources */,
+				GM0200000000000000000012 /* CheckersArenaView.swift in Sources */,
+				GM0200000000000000000013 /* ChessLiteLogic.swift in Sources */,
+				GM0200000000000000000014 /* ChessLiteView.swift in Sources */,
+				GM0200000000000000000015 /* ColorRushLogic.swift in Sources */,
+				GM0200000000000000000016 /* ColorRushView.swift in Sources */,
+				GM0200000000000000000017 /* ConnectFourBlitzLogic.swift in Sources */,
+				GM0200000000000000000018 /* ConnectFourBlitzView.swift in Sources */,
+				GM0200000000000000000019 /* DiceRollFortuneLogic.swift in Sources */,
+				GM0200000000000000000020 /* DiceRollFortuneView.swift in Sources */,
+				GM0200000000000000000021 /* FlipCardDuelLogic.swift in Sources */,
+				GM0200000000000000000022 /* FlipCardDuelView.swift in Sources */,
+				GM0200000000000000000023 /* GamesAppMode.swift in Sources */,
+				GM0200000000000000000024 /* GamesHomeView.swift in Sources */,
+				GM0200000000000000000025 /* GamesModeManager.swift in Sources */,
+				GM0200000000000000000026 /* GamesRouter.swift in Sources */,
+				GM0200000000000000000027 /* MathBlitzLogic.swift in Sources */,
+				GM0200000000000000000028 /* MathBlitzView.swift in Sources */,
+				GM0200000000000000000029 /* MemoryMatchLogic.swift in Sources */,
+				GM0200000000000000000030 /* MemoryMatchView.swift in Sources */,
+				GM0200000000000000000031 /* MinesweeperXLogic.swift in Sources */,
+				GM0200000000000000000032 /* MinesweeperXView.swift in Sources */,
+				GM0200000000000000000033 /* NumberVaultLogic.swift in Sources */,
+				GM0200000000000000000034 /* NumberVaultView.swift in Sources */,
+				GM0200000000000000000035 /* PokerHandEvaluator.swift in Sources */,
+				GM0200000000000000000036 /* PokerNightsLogic.swift in Sources */,
+				GM0200000000000000000037 /* PokerNightsView.swift in Sources */,
+				GM0200000000000000000038 /* ReactionTapLogic.swift in Sources */,
+				GM0200000000000000000039 /* ReactionTapView.swift in Sources */,
+				GM0200000000000000000040 /* RouletteRoyalLogic.swift in Sources */,
+				GM0200000000000000000041 /* RouletteRoyalView.swift in Sources */,
+				GM0200000000000000000042 /* ScratchAndWinLogic.swift in Sources */,
+				GM0200000000000000000043 /* ScratchAndWinView.swift in Sources */,
+				GM0200000000000000000044 /* SequenceRecallLogic.swift in Sources */,
+				GM0200000000000000000045 /* SequenceRecallView.swift in Sources */,
+				GM0200000000000000000046 /* CurrencyLedger.swift in Sources */,
+				GM0200000000000000000047 /* GameCategory.swift in Sources */,
+				GM0200000000000000000048 /* GameDefinition.swift in Sources */,
+				GM0200000000000000000049 /* PlayerProfile.swift in Sources */,
+				GM0200000000000000000050 /* XPEngine.swift in Sources */,
+				GM0200000000000000000051 /* GamesPersistenceManager.swift in Sources */,
+				GM0200000000000000000052 /* GamesUserDefaults.swift in Sources */,
+				GM0200000000000000000053 /* CurrencyStoreView.swift in Sources */,
+				GM0200000000000000000054 /* RedemptionEngine.swift in Sources */,
+				GM0200000000000000000055 /* StoreItemModel.swift in Sources */,
+				GM0200000000000000000056 /* CurrencyBadgeView.swift in Sources */,
+				GM0200000000000000000057 /* GameFilterBarView.swift in Sources */,
+				GM0200000000000000000058 /* GameGridView.swift in Sources */,
+				GM0200000000000000000059 /* GameSearchView.swift in Sources */,
+				GM0200000000000000000060 /* GamingCardView.swift in Sources */,
+				GM0200000000000000000061 /* GamingModifiers.swift in Sources */,
+				GM0200000000000000000062 /* HUDOverlayView.swift in Sources */,
+				GM0200000000000000000063 /* LevelUpPopupView.swift in Sources */,
+				GM0200000000000000000064 /* RewardToastView.swift in Sources */,
+				GM0200000000000000000065 /* XPProgressBarView.swift in Sources */,
+				GM0200000000000000000066 /* SlotMachineGoldLogic.swift in Sources */,
+				GM0200000000000000000067 /* SlotMachineGoldView.swift in Sources */,
+				GM0200000000000000000068 /* SlotReelView.swift in Sources */,
+				GM0200000000000000000069 /* SnakeLadderClassicLogic.swift in Sources */,
+				GM0200000000000000000070 /* SnakeLadderClassicView.swift in Sources */,
+				GM0200000000000000000071 /* SpinWheelPrizeLogic.swift in Sources */,
+				GM0200000000000000000072 /* SpinWheelPrizeView.swift in Sources */,
+				GM0200000000000000000073 /* SudokuGenerator.swift in Sources */,
+				GM0200000000000000000074 /* SudokuMasterLogic.swift in Sources */,
+				GM0200000000000000000075 /* SudokuMasterView.swift in Sources */,
+				GM0200000000000000000076 /* TacticalRaidLogic.swift in Sources */,
+				GM0200000000000000000077 /* TacticalRaidView.swift in Sources */,
+				GM0200000000000000000078 /* TicTacToeProLogic.swift in Sources */,
+				GM0200000000000000000079 /* TicTacToeProView.swift in Sources */,
+				GM0200000000000000000080 /* TowerDefenseXLogic.swift in Sources */,
+				GM0200000000000000000081 /* TowerDefenseXView.swift in Sources */,
+				GM0200000000000000000082 /* TriviaCrushLogic.swift in Sources */,
+				GM0200000000000000000083 /* TriviaCrushQuestionBank.swift in Sources */,
+				GM0200000000000000000084 /* TriviaCrushView.swift in Sources */,
+				GM0200000000000000000085 /* WarZoneMapModel.swift in Sources */,
+				GM0200000000000000000086 /* WarZoneStrikeLogic.swift in Sources */,
+				GM0200000000000000000087 /* WarZoneStrikeView.swift in Sources */,
+				GM0200000000000000000088 /* WordStormDictionary.swift in Sources */,
+				GM0200000000000000000089 /* WordStormLogic.swift in Sources */,
+				GM0200000000000000000090 /* WordStormView.swift in Sources */,
 				DG02000000000000000000000001 /* Diag_AccelerometerView.swift in Sources */,
 				DG02000000000000000000000002 /* Diag_AirplaneModeView.swift in Sources */,
 				DG02000000000000000000000003 /* Diag_AmbientLightView.swift in Sources */,
