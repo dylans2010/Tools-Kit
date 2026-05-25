@@ -11,6 +11,8 @@ enum GameCategory: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
+    var label: String { rawValue }
+
     var filterLabel: String {
         switch self {
         case .warBattle: return "War"

@@ -23,16 +23,16 @@ struct GamingCardView: View {
                 HStack {
                     Image(systemName: game.icon)
                         .font(.title2)
-                        .foregroundColor(Color(hex: game.accentColorHex) ?? GamingDesignTokens.accentNeon)
+                        .foregroundColor(Color(hex: game.accentColorHex))
                     Spacer()
                     Text(game.category.filterLabel)
                         .font(.caption2)
                         .fontWeight(.semibold)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(Color(hex: game.accentColorHex)?.opacity(0.2) ?? GamingDesignTokens.accentPurple.opacity(0.2))
+                        .background(Color(hex: game.accentColorHex).opacity(0.2))
                         .clipShape(Capsule())
-                        .foregroundColor(Color(hex: game.accentColorHex) ?? GamingDesignTokens.accentNeon)
+                        .foregroundColor(Color(hex: game.accentColorHex))
                 }
 
                 Text(game.title)
@@ -59,22 +59,9 @@ struct GamingCardView: View {
             .background(
                 RoundedRectangle(cornerRadius: 16)
                     .fill(GamingDesignTokens.cardSurface)
-                    .shadow(color: (Color(hex: game.accentColorHex) ?? .blue).opacity(0.3), radius: 8, y: 4)
+                    .shadow(color: Color(hex: game.accentColorHex).opacity(0.3), radius: 8, y: 4)
             )
         }
         .buttonStyle(.plain)
-    }
-}
-
-extension Color {
-    init?(hex: String) {
-        var cleaned = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-        if cleaned.hasPrefix("#") { cleaned.removeFirst() }
-        guard cleaned.count == 6, let rgb = UInt64(cleaned, radix: 16) else { return nil }
-        self.init(
-            red: Double((rgb >> 16) & 0xFF) / 255.0,
-            green: Double((rgb >> 8) & 0xFF) / 255.0,
-            blue: Double(rgb & 0xFF) / 255.0
-        )
     }
 }
