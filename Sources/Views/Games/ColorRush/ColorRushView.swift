@@ -93,14 +93,28 @@ struct ColorRushView: View {
 
     @ViewBuilder
     private var gameGrid: some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 12) {
-            ForEach(logic.choices.indices, id: \.self) { i in
-                Button { logic.selectColor(i) } label: {
-                    RoundedRectangle(cornerRadius: 12).fill(logic.choiceColors[i]).frame(height: 60)
-                        .overlay(Text(logic.choices[i]).font(.caption.bold()).foregroundColor(.white))
-                }
+        let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 3)
+        LazyVGrid(columns: columns, spacing: 12) {
+            ForEach(logic.choices.indices, id: \.self) { index in
+                colorButton(at: index)
             }
         }.padding(.horizontal)
+    }
+
+    @ViewBuilder
+    private func colorButton(at index: Int) -> some View {
+        Button {
+            logic.selectColor(index)
+        } label: {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(logic.choiceColors[index])
+                .frame(height: 60)
+                .overlay(
+                    Text(logic.choices[index])
+                        .font(.caption.bold())
+                        .foregroundColor(.white)
+                )
+        }
     }
 
     private var resultsView: some View {
@@ -133,5 +147,22 @@ struct ColorRushView: View {
 
     private func statRow(_ label: String, _ value: String) -> some View {
         HStack { Text(label).font(.caption).foregroundColor(.white.opacity(0.6)); Spacer(); Text(value).font(.caption.bold()).foregroundColor(.white) }
+    }
+}
+
+extension ColorRushLogic {
+    var choices: [String] { colorNames }
+    var choiceColors: [Color] {
+        colorNames.map { name in
+            switch name {
+            case "Red": return .red
+            case "Blue": return .blue
+            case "Green": return .green
+            case "Yellow": return .yellow
+            case "Purple": return .purple
+            case "Orange": return .orange
+            default: return .gray
+            }
+        }
     }
 }
