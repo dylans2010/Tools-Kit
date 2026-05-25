@@ -13,6 +13,7 @@ final class WordStormLogic: ObservableObject, GamesRewardable {
     @Published var solvedWords: [String] = []
     @Published var wordsToSolve = 5
     @Published var currentWordIndex = 0
+    @Published var hintsAvailable: Int = 0
     @Published var timeRemaining: Double = 60
     @Published var score = 0
     @Published var gameOver = false
@@ -35,11 +36,12 @@ final class WordStormLogic: ObservableObject, GamesRewardable {
     func startGame(difficulty: Int = 0) {
         self.difficulty = difficulty
         score = 0; currentWordIndex = 0; solvedWords = []; gameOver = false
-        consecutiveCorrect = 0; longestWord = 0; hintsUsed = 0; bonusTimeEarned = 0; perfectRound = true
+        consecutiveCorrect = 0; consecutiveSolves = 0; bestConsecutiveSolves = 0; longestWord = 0; hintsUsed = 0; bonusTimeEarned = 0; perfectRound = true
         wordsToSolve = 5 + difficulty * 3
         timeRemaining = Double(60 + difficulty * 15)
         let gameLevel = CurrencyLedger.shared.gameStats(for: gameIdentifier).gameLevel
         maxHints = max(1, 3 + (gameLevel >= 5 ? 1 : 0) - difficulty)
+        hintsAvailable = maxHints
         phase = .playing; nextWord(); startTimer()
     }
 
@@ -67,6 +69,8 @@ final class WordStormLogic: ObservableObject, GamesRewardable {
         if playerInput.lowercased() == originalWord.lowercased() {
             solvedWords.append(originalWord)
             consecutiveCorrect += 1
+            consecutiveSolves = consecutiveCorrect
+            bestConsecutiveSolves = max(bestConsecutiveSolves, consecutiveSolves)
             longestWord = max(longestWord, originalWord.count)
 
             let lengthBonus = originalWord.count * 10
@@ -88,6 +92,7 @@ final class WordStormLogic: ObservableObject, GamesRewardable {
         } else {
             streakMultiplier = max(1.0, streakMultiplier - 0.05)
             consecutiveCorrect = 0
+            consecutiveSolves = 0
             perfectRound = false
             playerInput = ""
         }
@@ -104,6 +109,7 @@ final class WordStormLogic: ObservableObject, GamesRewardable {
         guard hintsUsed < maxHints, !gameOver else { return }
         do { try CurrencyLedger.shared.spendCoins(20) } catch { return }
         hintsUsed += 1
+        hintsAvailable = maxHints - hintsUsed
         let revealed = playerInput.count
         if revealed < originalWord.count {
             playerInput = String(originalWord.prefix(revealed + 1))
