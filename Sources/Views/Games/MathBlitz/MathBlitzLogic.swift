@@ -18,15 +18,22 @@ final class MathBlitzLogic: ObservableObject, GamesRewardable {
     @Published var phase: GamePhase = .lobby
     @Published var streakMultiplier: Double = 1.0
     @Published var lastCorrect: Bool?
+    @Published var difficulty = 0
+    @Published var consecutiveCorrect = 0
+    @Published var bestConsecutive = 0
+    @Published var bonusTimeEarned: Double = 0
 
     private var timer: Timer?
     private var playerLevel: Int { GamesPersistenceManager.shared.load().level }
 
     enum GamePhase { case lobby, playing, results }
 
-    func startGame() {
-        correctCount = 0; totalCount = 0; score = 0; timeRemaining = 60
-        gameOver = false; phase = .playing; generateQuestion(); startTimer()
+    func startGame(difficulty: Int = 0) {
+        self.difficulty = difficulty
+        correctCount = 0; totalCount = 0; score = 0
+        timeRemaining = Double(60 + difficulty * 10)
+        gameOver = false; consecutiveCorrect = 0; bestConsecutive = 0; bonusTimeEarned = 0
+        phase = .playing; generateQuestion(); startTimer()
     }
 
     private func startTimer() {
@@ -39,7 +46,7 @@ final class MathBlitzLogic: ObservableObject, GamesRewardable {
     }
 
     func generateQuestion() {
-        let lvl = playerLevel
+        let lvl = playerLevel + difficulty
         if lvl <= 5 {
             let a = Int.random(in: 1...50)
             let b = Int.random(in: 1...50)
@@ -48,27 +55,34 @@ final class MathBlitzLogic: ObservableObject, GamesRewardable {
         } else if lvl <= 10 {
             if Bool.random() {
                 let a = Int.random(in: 2...12); let b = Int.random(in: 2...12)
-                question = "\(a) × \(b)"; answer = a * b
+                question = "\(a) \u{00D7} \(b)"; answer = a * b
             } else {
                 let b = Int.random(in: 2...12); let r = Int.random(in: 1...12)
-                question = "\(b * r) ÷ \(b)"; answer = r
+                question = "\(b * r) \u{00F7} \(b)"; answer = r
             }
         } else {
             let a = Int.random(in: 1...50); let b = Int.random(in: 1...50)
             switch Int.random(in: 0...3) {
             case 0: question = "\(a) + \(b)"; answer = a + b
             case 1: question = "\(a) - \(b)"; answer = a - b
-            case 2: let m1 = Int.random(in: 2...12); let m2 = Int.random(in: 2...12); question = "\(m1) × \(m2)"; answer = m1 * m2
-            default: let d = Int.random(in: 2...12); let r = Int.random(in: 1...12); question = "\(d * r) ÷ \(d)"; answer = r
+            case 2: let m1 = Int.random(in: 2...15); let m2 = Int.random(in: 2...15); question = "\(m1) \u{00D7} \(m2)"; answer = m1 * m2
+            default: let d = Int.random(in: 2...12); let r = Int.random(in: 1...15); question = "\(d * r) \u{00F7} \(d)"; answer = r
             }
         }
+
+        if difficulty >= 2 && Bool.random() {
+            let a = Int.random(in: 2...10); let b = Int.random(in: 1...20); let c = Int.random(in: 1...10)
+            if Bool.random() { question = "\(a) \u{00D7} \(b) + \(c)"; answer = a * b + c }
+            else { question = "\(a) \u{00D7} \(b) - \(c)"; answer = a * b - c }
+        }
+
         generateOptions()
     }
 
     private func generateOptions() {
         var opts = Set<Int>([answer])
         while opts.count < 4 {
-            let offset = Int.random(in: 1...10) * (Bool.random() ? 1 : -1)
+            let offset = Int.random(in: 1...max(10, abs(answer / 4) + 1)) * (Bool.random() ? 1 : -1)
             opts.insert(answer + offset)
         }
         options = Array(opts).shuffled()
@@ -77,9 +91,23 @@ final class MathBlitzLogic: ObservableObject, GamesRewardable {
     func selectAnswer(_ value: Int) {
         totalCount += 1
         if value == answer {
-            correctCount += 1; score += 10
-            streakMultiplier = min(3.0, streakMultiplier + 0.1); lastCorrect = true
-        } else { streakMultiplier = 1.0; lastCorrect = false }
+            correctCount += 1
+            consecutiveCorrect += 1
+            bestConsecutive = max(bestConsecutive, consecutiveCorrect)
+            let comboBonus = min(consecutiveCorrect, 10)
+            score += 10 * comboBonus
+            streakMultiplier = min(3.0, streakMultiplier + 0.05 * Double(comboBonus))
+            lastCorrect = true
+            if consecutiveCorrect >= 5 && consecutiveCorrect % 5 == 0 {
+                let bonusTime = Double(consecutiveCorrect / 5) * 3.0
+                timeRemaining += bonusTime
+                bonusTimeEarned += bonusTime
+            }
+        } else {
+            consecutiveCorrect = 0
+            streakMultiplier = max(1.0, streakMultiplier - 0.1)
+            lastCorrect = false
+        }
         generateQuestion()
     }
 
@@ -88,7 +116,15 @@ final class MathBlitzLogic: ObservableObject, GamesRewardable {
     func finalReward() -> GameReward {
         let xp = Int(Double(baseXPReward * correctCount) * streakMultiplier)
         let coins = baseCoinReward * correctCount
-        return GameReward(xp: max(1, xp), coins: coins, gems: 0, badgeUnlocked: correctCount >= 30 ? "Math Wizard" : nil)
+        let diffBonus = difficulty * 10
+        var badge: String?
+        if correctCount >= 30 { badge = "Math Wizard" }
+        if bestConsecutive >= 20 { badge = badge ?? "Math Streak" }
+        if correctCount >= 50 { badge = badge ?? "Math Genius" }
+        let accuracy = totalCount > 0 ? Double(correctCount) / Double(totalCount) : 0
+        if accuracy >= 0.95 && totalCount >= 20 { badge = badge ?? "Perfect Calculator" }
+        let gems = correctCount >= 40 && difficulty >= 1 ? 1 : 0
+        return GameReward(xp: max(1, xp + diffBonus), coins: coins, gems: gems, badgeUnlocked: badge)
     }
 
     deinit { timer?.invalidate() }

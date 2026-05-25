@@ -36,16 +36,39 @@ final class ScratchAndWinLogic: ObservableObject, GamesRewardable {
     @Published var lastWin = 0
     @Published var phase: GamePhase = .lobby
     @Published var streakMultiplier: Double = 1.0
+    @Published var cardsPlayed = 0
+    @Published var totalWinnings = 0
+    @Published var biggestWin = 0
+    @Published var matchCount = 0
+    @Published var consecutiveWins = 0
+    @Published var bestConsecutiveWins = 0
+    @Published var freeCardAvailable = false
+    @Published var cardTier = 0
 
-    let cardCost = 50
+    let cardCosts = [50, 100, 250]
+    var cardCost: Int { cardCosts[min(cardTier, cardCosts.count - 1)] }
 
     enum GamePhase { case lobby, playing, results }
 
-    func buyCard() {
-        do { try CurrencyLedger.shared.spendCoins(cardCost) } catch { return }
-        tiles = (0..<9).map { _ in (symbol: ScratchSymbol.randomSymbol(), revealed: false) }
-        lastWin = 0
-        phase = .playing
+    func buyCard(tier: Int = 0) {
+        cardTier = tier
+        let cost = cardCosts[min(tier, cardCosts.count - 1)]
+        if !freeCardAvailable {
+            do { try CurrencyLedger.shared.spendCoins(cost) } catch { return }
+        } else {
+            freeCardAvailable = false
+        }
+        cardsPlayed += 1
+        let multiplier = 1.0 + Double(tier) * 0.5
+        tiles = (0..<9).map { _ in
+            var sym = ScratchSymbol.randomSymbol()
+            if tier >= 1 && Double.random(in: 0...1) < 0.1 {
+                sym = ScratchSymbol.allSymbols.last!
+            }
+            return (symbol: ScratchSymbol(icon: sym.icon, rarity: sym.rarity, prize: Int(Double(sym.prize) * multiplier)),
+                    revealed: false)
+        }
+        lastWin = 0; phase = .playing
     }
 
     func revealTile(_ index: Int) {
@@ -63,21 +86,37 @@ final class ScratchAndWinLogic: ObservableObject, GamesRewardable {
         let icons = tiles.map { $0.symbol.icon }
         let counts = icons.reduce(into: [String: Int]()) { $0[$1, default: 0] += 1 }
         var maxWin = 0
+        var matches = 0
         for (icon, count) in counts where count >= 3 {
-            if let sym = ScratchSymbol.allSymbols.first(where: { $0.icon == icon }) {
-                maxWin = max(maxWin, sym.prize)
+            if let sym = tiles.first(where: { $0.symbol.icon == icon }) {
+                maxWin = max(maxWin, sym.symbol.prize)
+                matches += 1
             }
         }
+        matchCount += matches
         if maxWin > 0 {
-            lastWin = maxWin; score += maxWin
+            lastWin = maxWin; score += maxWin; totalWinnings += maxWin
+            biggestWin = max(biggestWin, maxWin)
+            consecutiveWins += 1
+            bestConsecutiveWins = max(bestConsecutiveWins, consecutiveWins)
             CurrencyLedger.shared.awardCoins(maxWin, reason: "Scratch card win")
             streakMultiplier = min(3.0, streakMultiplier + 0.1)
-        } else { streakMultiplier = 1.0 }
+            if consecutiveWins >= 3 { freeCardAvailable = true }
+        } else {
+            consecutiveWins = 0
+            streakMultiplier = max(1.0, streakMultiplier - 0.1)
+        }
         phase = .results
     }
 
     func finalReward() -> GameReward {
         let xp = Int(Double(baseXPReward) * streakMultiplier) + (score / 10)
-        return GameReward(xp: max(1, xp), coins: 0, gems: 0, badgeUnlocked: lastWin >= 5000 ? "Lucky Scratcher" : nil)
+        var badge: String?
+        if lastWin >= 5000 { badge = "Lucky Scratcher" }
+        if biggestWin >= 1000 { badge = badge ?? "Big Scratch Win" }
+        if bestConsecutiveWins >= 3 { badge = badge ?? "Scratch Streak" }
+        if totalWinnings >= 2000 { badge = badge ?? "Scratch Master" }
+        let gems = biggestWin >= 5000 ? 1 : 0
+        return GameReward(xp: max(1, xp), coins: 0, gems: gems, badgeUnlocked: badge)
     }
 }

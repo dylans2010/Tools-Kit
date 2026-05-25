@@ -30,6 +30,14 @@ final class TacticalRaidLogic: ObservableObject, GamesRewardable {
     @Published var phase: GamePhase = .lobby
     @Published var streakMultiplier: Double = 1.0
     @Published var message = ""
+    @Published var difficulty = 0
+    @Published var turnsPlayed = 0
+    @Published var damageDealt = 0
+    @Published var damageBlocked = 0
+    @Published var healsUsed = 0
+    @Published var perfectBlocks = 0
+    @Published var consecutiveWins = 0
+    @Published var bestConsecutiveWins = 0
 
     enum GamePhase { case lobby, playing, results }
 
@@ -56,18 +64,17 @@ final class TacticalRaidLogic: ObservableObject, GamesRewardable {
         TRCard(name: "Fortify", type: .defense, power: 8, icon: "building.columns.fill"),
     ]
 
-    func startGame() {
+    func startGame(difficulty: Int = 0) {
+        self.difficulty = difficulty
         var deck = Self.fullDeck.shuffled()
         playerHand = Array(deck.prefix(10))
         deck.removeFirst(10)
         enemyHand = Array(deck.prefix(10))
+        let healthBonus = difficulty * 5
         playerHealth = 30
-        enemyHealth = 30
-        score = 0
-        gameOver = false
-        lastPlayerCard = nil
-        lastEnemyCard = nil
-        message = ""
+        enemyHealth = 30 + healthBonus
+        score = 0; gameOver = false; lastPlayerCard = nil; lastEnemyCard = nil; message = ""
+        turnsPlayed = 0; damageDealt = 0; damageBlocked = 0; healsUsed = 0; perfectBlocks = 0
         phase = .playing
     }
 
@@ -75,8 +82,20 @@ final class TacticalRaidLogic: ObservableObject, GamesRewardable {
         guard !gameOver, let idx = playerHand.firstIndex(where: { $0.id == card.id }) else { return }
         playerHand.remove(at: idx)
         lastPlayerCard = card
+        turnsPlayed += 1
 
-        let enemyCard = enemyHand.randomElement()
+        let enemyCard: TRCard?
+        if difficulty >= 2 {
+            enemyCard = pickSmartCard(against: card)
+        } else if difficulty >= 1 {
+            let attacks = enemyHand.filter { $0.type == .attack }
+            enemyCard = (card.type == .attack && !attacks.isEmpty) ?
+                enemyHand.filter { $0.type == .defense }.max(by: { $0.power < $1.power }) ?? enemyHand.randomElement() :
+                enemyHand.randomElement()
+        } else {
+            enemyCard = enemyHand.randomElement()
+        }
+
         if let ec = enemyCard, let eIdx = enemyHand.firstIndex(where: { $0.id == ec.id }) {
             enemyHand.remove(at: eIdx)
             lastEnemyCard = ec
@@ -88,31 +107,52 @@ final class TacticalRaidLogic: ObservableObject, GamesRewardable {
         }
     }
 
+    private func pickSmartCard(against playerCard: TRCard) -> TRCard? {
+        switch playerCard.type {
+        case .attack:
+            return enemyHand.filter { $0.type == .defense }.max(by: { $0.power < $1.power }) ?? enemyHand.randomElement()
+        case .defense:
+            return enemyHand.filter { $0.type == .special || $0.type == .attack }.max(by: { $0.power < $1.power }) ?? enemyHand.randomElement()
+        case .special:
+            return enemyHand.filter { $0.type == .attack }.max(by: { $0.power < $1.power }) ?? enemyHand.randomElement()
+        }
+    }
+
     private func resolveTurn(playerCard: TRCard, enemyCard: TRCard) {
         switch (playerCard.type, enemyCard.type) {
         case (.attack, .attack):
             enemyHealth -= playerCard.power
             playerHealth -= enemyCard.power
+            damageDealt += playerCard.power
             score += playerCard.power * 10
             message = "Clash! Both take damage."
         case (.attack, .defense):
             let dmg = max(0, playerCard.power - enemyCard.power)
             enemyHealth -= dmg
+            damageDealt += dmg
             score += dmg * 10
             message = dmg > 0 ? "Broke through defense for \(dmg)!" : "Attack blocked!"
         case (.defense, .attack):
             let dmg = max(0, enemyCard.power - playerCard.power)
             playerHealth -= dmg
+            if dmg == 0 { perfectBlocks += 1; score += 30 }
+            damageBlocked += max(0, enemyCard.power - dmg)
             score += (playerCard.power > enemyCard.power ? 15 : 5)
             message = dmg > 0 ? "Took \(dmg) damage through guard." : "Perfect block!"
         case (.special, _):
             if playerCard.name == "Heal Pulse" || playerCard.name == "Drain Life" {
-                playerHealth += playerCard.power
-                if playerCard.name == "Drain Life" { enemyHealth -= playerCard.power / 2 }
+                playerHealth += playerCard.power; healsUsed += 1
+                if playerCard.name == "Drain Life" { enemyHealth -= playerCard.power / 2; damageDealt += playerCard.power / 2 }
                 score += playerCard.power * 8
                 message = "Healed \(playerCard.power) HP!"
+            } else if playerCard.name == "Double Edge" {
+                enemyHealth -= playerCard.power; playerHealth -= playerCard.power / 2
+                damageDealt += playerCard.power
+                score += playerCard.power * 15
+                message = "Double Edge: dealt \(playerCard.power), took \(playerCard.power / 2)!"
             } else {
                 enemyHealth -= playerCard.power
+                damageDealt += playerCard.power
                 score += playerCard.power * 12
                 message = "Special: \(playerCard.name) for \(playerCard.power)!"
             }
@@ -128,20 +168,33 @@ final class TacticalRaidLogic: ObservableObject, GamesRewardable {
             message = "Both defended."
             score += 5
         }
+        streakMultiplier = min(3.0, streakMultiplier + (playerHealth > enemyHealth ? 0.05 : 0.02))
     }
 
     private func endGame() {
         gameOver = true
         playerWon = playerHealth > enemyHealth
-        if playerWon { totalWins += 1; streakMultiplier = min(3.0, streakMultiplier + 0.1) }
-        else { streakMultiplier = 1.0 }
+        if playerWon {
+            totalWins += 1; consecutiveWins += 1
+            bestConsecutiveWins = max(bestConsecutiveWins, consecutiveWins)
+            streakMultiplier = min(3.0, streakMultiplier + 0.1)
+        } else {
+            consecutiveWins = 0; streakMultiplier = max(1.0, streakMultiplier - 0.1)
+        }
         phase = .results
     }
 
     func finalReward() -> GameReward {
         var reward = calculateFinalReward(won: playerWon, score: score, streakMultiplier: streakMultiplier)
+        let diffBonus = difficulty * 30
+        var badge: String?
+        if playerWon && playerHealth >= 25 { badge = "Flawless Victory" }
+        if perfectBlocks >= 3 { badge = badge ?? "Shield Master" }
+        if damageDealt >= 50 { badge = badge ?? "Damage Dealer" }
+        if bestConsecutiveWins >= 3 { badge = badge ?? "Raid Streak" }
+        if playerWon && difficulty >= 2 { badge = badge ?? "Tactical Master" }
         let gems = totalWins > 0 && totalWins % 5 == 0 ? 1 : 0
-        reward = GameReward(xp: reward.xp, coins: reward.coins, gems: gems, badgeUnlocked: reward.badgeUnlocked)
+        reward = GameReward(xp: reward.xp + diffBonus, coins: reward.coins, gems: gems, badgeUnlocked: badge)
         return reward
     }
 }

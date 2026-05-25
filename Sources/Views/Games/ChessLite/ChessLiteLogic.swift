@@ -7,7 +7,7 @@ struct ChessPiece: Equatable {
     var hasMoved: Bool = false
 
     var symbol: String {
-        let symbols: [PieceType: (String, String)] = [.king: ("♔","♚"), .queen: ("♕","♛"), .rook: ("♖","♜"), .bishop: ("♗","♝"), .knight: ("♘","♞"), .pawn: ("♙","♟")]
+        let symbols: [PieceType: (String, String)] = [.king: ("\u{2654}","\u{265A}"), .queen: ("\u{2655}","\u{265B}"), .rook: ("\u{2656}","\u{265C}"), .bishop: ("\u{2657}","\u{265D}"), .knight: ("\u{2658}","\u{265E}"), .pawn: ("\u{2659}","\u{265F}")]
         return color == 1 ? symbols[type]!.0 : symbols[type]!.1
     }
 }
@@ -31,12 +31,20 @@ final class ChessLiteLogic: ObservableObject, GamesRewardable {
     @Published var phase: GamePhase = .lobby
     @Published var streakMultiplier: Double = 1.0
     @Published var moveCount = 0
+    @Published var difficulty = 0
+    @Published var playerCaptureValue = 0
+    @Published var aiCaptureValue = 0
+    @Published var checksGiven = 0
+    @Published var promotions = 0
 
     enum GamePhase { case lobby, playing, results }
 
-    func startGame() {
+    func startGame(difficulty: Int = 0) {
+        self.difficulty = difficulty
         setupBoard(); currentPlayer = 1; gameOver = false; winner = 0; score = 0; moveCount = 0
-        capturedByPlayer = []; capturedByAI = []; selectedPos = nil; validMoves = []; phase = .playing
+        capturedByPlayer = []; capturedByAI = []; selectedPos = nil; validMoves = []
+        playerCaptureValue = 0; aiCaptureValue = 0; checksGiven = 0; promotions = 0
+        phase = .playing
     }
 
     private func setupBoard() {
@@ -62,16 +70,51 @@ final class ChessLiteLogic: ObservableObject, GamesRewardable {
 
     private func makeMove(from: (row: Int, col: Int), to: (row: Int, col: Int)) {
         if let captured = board[to.row][to.col] {
-            if currentPlayer == 1 { capturedByPlayer.append(captured); score += pieceValue(captured.type) }
-            else { capturedByAI.append(captured) }
-            if captured.type == .king { gameOver = true; winner = currentPlayer; phase = .results; if currentPlayer == 1 { score += 200 }; return }
+            let val = pieceValue(captured.type)
+            if currentPlayer == 1 {
+                capturedByPlayer.append(captured); score += val; playerCaptureValue += val
+            } else {
+                capturedByAI.append(captured); aiCaptureValue += val
+            }
+            if captured.type == .king {
+                gameOver = true; winner = currentPlayer; phase = .results
+                if currentPlayer == 1 { score += 200 }
+                return
+            }
         }
         var piece = board[from.row][from.col]!; piece.hasMoved = true
-        if piece.type == .pawn && (to.row == 0 || to.row == 7) { piece = ChessPiece(type: .queen, color: piece.color, hasMoved: true); score += 50 }
+        if piece.type == .pawn && (to.row == 0 || to.row == 7) {
+            piece = ChessPiece(type: .queen, color: piece.color, hasMoved: true)
+            score += 50; promotions += 1
+        }
         board[to.row][to.col] = piece; board[from.row][from.col] = nil
         selectedPos = nil; validMoves = []; moveCount += 1
+
+        if isKingInCheck(color: currentPlayer == 1 ? 2 : 1) {
+            if currentPlayer == 1 { checksGiven += 1; score += 30 }
+        }
+
         currentPlayer = currentPlayer == 1 ? 2 : 1
         if currentPlayer == 2 { DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in self?.aiTurn() } }
+    }
+
+    private func isKingInCheck(color: Int) -> Bool {
+        guard let kingPos = findKing(color: color) else { return false }
+        let attackerColor = color == 1 ? 2 : 1
+        for r in 0..<8 { for c in 0..<8 {
+            if let piece = board[r][c], piece.color == attackerColor {
+                let moves = getBasicMoves(from: (r, c))
+                if moves.contains(where: { $0.row == kingPos.row && $0.col == kingPos.col }) { return true }
+            }
+        }}
+        return false
+    }
+
+    private func findKing(color: Int) -> (row: Int, col: Int)? {
+        for r in 0..<8 { for c in 0..<8 {
+            if let piece = board[r][c], piece.type == .king, piece.color == color { return (r, c) }
+        }}
+        return nil
     }
 
     private func aiTurn() {
@@ -84,10 +127,34 @@ final class ChessLiteLogic: ObservableObject, GamesRewardable {
                 }
             }
         }}
-        let captures = allMoves.filter { $0.value > 0 }.sorted { $0.value > $1.value }
-        if let best = captures.first { makeMove(from: best.from, to: best.to) }
-        else if let random = allMoves.randomElement() { makeMove(from: random.from, to: random.to) }
+
+        let chosen: (from: (Int, Int), to: (Int, Int), value: Int)?
+        if difficulty >= 2 {
+            let captures = allMoves.filter { $0.value > 0 }.sorted { $0.value > $1.value }
+            if let bestCapture = captures.first, bestCapture.value >= 30 {
+                chosen = bestCapture
+            } else {
+                chosen = allMoves.max(by: { scoreAIMove($0) < scoreAIMove($1) })
+            }
+        } else if difficulty >= 1 {
+            let captures = allMoves.filter { $0.value > 0 }.sorted { $0.value > $1.value }
+            chosen = captures.first ?? allMoves.randomElement()
+        } else {
+            let captures = allMoves.filter { $0.value > 0 }.sorted { $0.value > $1.value }
+            if let best = captures.first { chosen = best }
+            else { chosen = allMoves.randomElement() }
+        }
+
+        if let move = chosen { makeMove(from: move.from, to: move.to) }
         else { gameOver = true; winner = 1; score += 100; phase = .results }
+    }
+
+    private func scoreAIMove(_ move: (from: (Int, Int), to: (Int, Int), value: Int)) -> Int {
+        var s = move.value * 10
+        let centerDist = abs(move.to.0 - 4) + abs(move.to.1 - 4)
+        s += max(0, 8 - centerDist)
+        if move.to.0 >= 5 { s += 3 }
+        return s
     }
 
     private func getBasicMoves(from pos: (row: Int, col: Int)) -> [(row: Int, col: Int)] {
@@ -138,7 +205,15 @@ final class ChessLiteLogic: ObservableObject, GamesRewardable {
         let won = winner == 1
         let xp = Int(Double(baseXPReward + (won ? winXPBonus : 0)) * streakMultiplier) + (score / 10)
         let coins = baseCoinReward + (won ? winCoinBonus : 0)
-        let gems = won && moveCount < 30 ? 1 : 0
-        return GameReward(xp: max(1, xp), coins: coins, gems: gems, badgeUnlocked: won ? "Chess Strategist" : nil)
+        let diffBonus = difficulty * 40
+        var badge: String?
+        if won { badge = "Chess Strategist" }
+        if won && moveCount < 30 { badge = badge ?? "Speed Checkmate" }
+        if checksGiven >= 5 { badge = badge ?? "Check Machine" }
+        if promotions >= 2 { badge = badge ?? "Promotion Master" }
+        if won && playerCaptureValue >= 200 { badge = badge ?? "Material Advantage" }
+        if won && difficulty >= 2 { badge = badge ?? "Chess Master" }
+        let gems = won && (difficulty >= 1 || moveCount < 30) ? 1 : 0
+        return GameReward(xp: max(1, xp + diffBonus), coins: coins, gems: gems, badgeUnlocked: badge)
     }
 }

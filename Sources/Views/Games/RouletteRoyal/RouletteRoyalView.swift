@@ -21,13 +21,36 @@ struct RouletteRoyalView: View {
     }
 
     private var lobbyView: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "circle.hexagongrid.fill").font(.system(size: 64)).foregroundColor(GamingDesignTokens.dangerRed)
-            Text("Roulette Royal").font(.title.bold()).foregroundColor(.white)
-            Text("European roulette (single zero).\nStraight, red/black, odd/even, and more.").font(.subheadline).foregroundColor(.white.opacity(0.7)).multilineTextAlignment(.center)
-            HStack { Text("Best:").foregroundColor(.white.opacity(0.6)); Text("\(ledger.highScore(for: logic.gameIdentifier))").font(GamingDesignTokens.fontMono).foregroundColor(GamingDesignTokens.accentGold) }
-            Button("Spin the Wheel") { logic.startGame() }.font(.headline).foregroundColor(.black).padding(.horizontal, 48).padding(.vertical, 14).background(GamingDesignTokens.accentGold, in: Capsule()).pulseAnimation()
-        }.padding()
+        ScrollView {
+            VStack(spacing: 20) {
+                Image(systemName: "circle.hexagongrid.fill").font(.system(size: 64)).foregroundColor(GamingDesignTokens.dangerRed)
+                Text("Roulette Royal").font(.title.bold()).foregroundColor(.white)
+                Text("European roulette (single zero).\nStraight, red/black, odd/even, and more.").font(.subheadline).foregroundColor(.white.opacity(0.7)).multilineTextAlignment(.center)
+
+                let stats = ledger.gameStats(for: logic.gameIdentifier)
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Game Level \(stats.gameLevel)").font(.caption.bold()).foregroundColor(GamingDesignTokens.accentNeon)
+                        ProgressView(value: Double(stats.gameXP % 100), total: 100).tint(GamingDesignTokens.accentNeon)
+                    }
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("Games: \(stats.gamesPlayed)").font(.caption2).foregroundColor(.white.opacity(0.6))
+                        Text("Best: \(stats.highScore)").font(.caption2).foregroundColor(GamingDesignTokens.accentGold)
+                    }
+                }.padding(10).background(GamingDesignTokens.cardSurface, in: RoundedRectangle(cornerRadius: 10))
+
+                HStack { Text("Best:").foregroundColor(.white.opacity(0.6)); Text("\(ledger.highScore(for: logic.gameIdentifier))").font(GamingDesignTokens.fontMono).foregroundColor(GamingDesignTokens.accentGold) }
+
+                Button("Spin the Wheel") { logic.startGame() }.font(.headline).foregroundColor(.black).padding(.horizontal, 48).padding(.vertical, 14).background(GamingDesignTokens.accentGold, in: Capsule()).pulseAnimation()
+
+                if ledger.canClaimDailyBonus(for: logic.gameIdentifier) {
+                    Button { ledger.claimDailyBonus(for: logic.gameIdentifier) } label: {
+                        Label("Claim Daily Bonus", systemImage: "gift.fill").font(.subheadline.bold()).foregroundColor(.black)
+                            .padding(.horizontal, 24).padding(.vertical, 10).background(GamingDesignTokens.accentGold, in: Capsule())
+                    }
+                }
+            }.padding()
+        }
     }
 
     private var gameView: some View {
@@ -39,13 +62,21 @@ struct RouletteRoyalView: View {
                     .scaleEffect(logic.isSpinning ? 0.8 : 1.0).animation(.easeInOut(duration: 0.06).repeatCount(logic.isSpinning ? 100 : 0, autoreverses: true), value: logic.isSpinning)
             }
             if logic.lastWin > 0 { Text("WIN: \(logic.lastWin) coins!").font(.title3.bold()).foregroundColor(GamingDesignTokens.accentGold).contentTransition(.numericText()) }
+
+            HStack(spacing: 12) {
+                if logic.consecutiveWins > 0 { Text("🔥\(logic.consecutiveWins)").font(.caption.bold()).foregroundColor(GamingDesignTokens.accentGold) }
+                if logic.freeSpinsAvailable > 0 { Text("Free: \(logic.freeSpinsAvailable)").font(.caption.bold()).foregroundColor(GamingDesignTokens.successGreen) }
+            }
+
             Picker("Bet Type", selection: $logic.selectedBetType) { ForEach(RouletteBetType.allCases, id: \.self) { Text($0.rawValue).tag($0) } }.pickerStyle(.menu).tint(GamingDesignTokens.accentNeon)
             if logic.selectedBetType == .straight {
                 Stepper("Number: \(logic.straightNumber)", value: $logic.straightNumber, in: 0...36).foregroundColor(.white).padding(.horizontal, 24)
             }
-            HStack { Text("Bet:").foregroundColor(.white); Stepper("\(logic.bet)", value: $logic.bet, in: 5...min(1000, ledger.profile.coins), step: 5).foregroundColor(.white) }.padding(.horizontal, 24)
-            Button(logic.isSpinning ? "Spinning..." : "SPIN") { logic.spin() }.font(.title2.bold()).foregroundColor(.black).padding(.horizontal, 60).padding(.vertical, 14)
-                .background(logic.isSpinning ? Color.gray : GamingDesignTokens.dangerRed, in: Capsule()).disabled(logic.isSpinning)
+            HStack { Text("Bet:").foregroundColor(.white); Stepper("\(logic.bet)", value: $logic.bet, in: 5...min(1000, max(5, ledger.profile.coins)), step: 5).foregroundColor(.white) }.padding(.horizontal, 24)
+
+            Button(logic.isSpinning ? "Spinning..." : (logic.freeSpinsAvailable > 0 ? "FREE SPIN" : "SPIN")) { logic.spin() }
+                .font(.title2.bold()).foregroundColor(.black).padding(.horizontal, 60).padding(.vertical, 14)
+                .background(logic.isSpinning ? Color.gray : (logic.freeSpinsAvailable > 0 ? GamingDesignTokens.successGreen : GamingDesignTokens.dangerRed), in: Capsule()).disabled(logic.isSpinning)
             Button("End Session") { logic.endSession() }.font(.caption).foregroundColor(.white.opacity(0.5))
             Spacer()
         }
@@ -53,14 +84,33 @@ struct RouletteRoyalView: View {
 
     private var resultsView: some View {
         let reward = logic.finalReward()
-        return VStack(spacing: 20) {
-            Text("Session Over").font(.title.bold()).foregroundColor(.white)
-            Text("Spins: \(logic.spins) | Won: \(logic.totalWon)").font(GamingDesignTokens.fontMono).foregroundColor(GamingDesignTokens.accentGold)
-            RewardToastView(reward: reward)
-            HStack(spacing: 16) {
-                Button("Play Again") { logic.phase = .lobby }.font(.headline).foregroundColor(.black).padding(.horizontal, 24).padding(.vertical, 12).background(GamingDesignTokens.accentNeon, in: Capsule())
-                Button("Back") { dismiss() }.font(.headline).foregroundColor(.white).padding(.horizontal, 24).padding(.vertical, 12).background(Color.white.opacity(0.15), in: Capsule())
-            }
-        }.padding().onAppear { ledger.recordGame(identifier: logic.gameIdentifier, won: logic.totalWon > 0, score: logic.score, reward: reward) }
+        return ScrollView {
+            VStack(spacing: 20) {
+                Image(systemName: "circle.hexagongrid.fill").font(.system(size: 64)).foregroundColor(GamingDesignTokens.dangerRed)
+                Text("Session Over").font(.title.bold()).foregroundColor(.white)
+
+                VStack(spacing: 8) {
+                    statRow("Spins", "\(logic.spins)")
+                    statRow("Total Won", "\(logic.totalWon)")
+                    statRow("Biggest Win", "\(logic.biggestWin)")
+                    statRow("Best Streak", "\(logic.bestConsecutiveWins)")
+                    statRow("Score", "\(logic.score)")
+                    statRow("Streak Multiplier", String(format: "%.1fx", logic.streakMultiplier))
+                }.padding(12).background(GamingDesignTokens.cardSurface, in: RoundedRectangle(cornerRadius: 12))
+
+                RewardToastView(reward: reward)
+                if let badge = reward.badgeUnlocked {
+                    Label(badge, systemImage: "star.fill").font(.headline).foregroundColor(GamingDesignTokens.accentGold).padding(8).background(GamingDesignTokens.cardSurface, in: Capsule())
+                }
+                HStack(spacing: 16) {
+                    Button("Play Again") { logic.phase = .lobby }.font(.headline).foregroundColor(.black).padding(.horizontal, 24).padding(.vertical, 12).background(GamingDesignTokens.accentNeon, in: Capsule())
+                    Button("Back") { dismiss() }.font(.headline).foregroundColor(.white).padding(.horizontal, 24).padding(.vertical, 12).background(Color.white.opacity(0.15), in: Capsule())
+                }
+            }.padding()
+        }.onAppear { ledger.recordGame(identifier: logic.gameIdentifier, won: logic.totalWon > 0, score: logic.score, reward: reward) }
+    }
+
+    private func statRow(_ label: String, _ value: String) -> some View {
+        HStack { Text(label).font(.caption).foregroundColor(.white.opacity(0.6)); Spacer(); Text(value).font(.caption.bold()).foregroundColor(.white) }
     }
 }

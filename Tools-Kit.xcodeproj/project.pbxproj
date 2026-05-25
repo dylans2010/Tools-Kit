@@ -1897,6 +1897,116 @@
 		GM0200000000000000000088 /* WordStormDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000088 /* WordStormDictionary.swift */; };
 		GM0200000000000000000089 /* WordStormLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000089 /* WordStormLogic.swift */; };
 		GM0200000000000000000090 /* WordStormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000090 /* WordStormView.swift */; };
+		GM020000000000000000000000091 /* AirStrikeForceLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000091 /* AirStrikeForceLogic.swift */; };
+		GM020000000000000000000000092 /* AirStrikeForceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000092 /* AirStrikeForceView.swift */; };
+		GM020000000000000000000000093 /* BackgammonLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000093 /* BackgammonLogic.swift */; };
+		GM020000000000000000000000094 /* BackgammonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000094 /* BackgammonView.swift */; };
+		GM020000000000000000000000095 /* BaccaratEliteLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000095 /* BaccaratEliteLogic.swift */; };
+		GM020000000000000000000000096 /* BaccaratEliteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000096 /* BaccaratEliteView.swift */; };
+		GM020000000000000000000000097 /* BallBounceLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000097 /* BallBounceLogic.swift */; };
+		GM020000000000000000000000098 /* BallBounceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000098 /* BallBounceView.swift */; };
+		GM020000000000000000000000099 /* BattleshipLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000099 /* BattleshipLogic.swift */; };
+		GM020000000000000000000000100 /* BattleshipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000100 /* BattleshipView.swift */; };
+		GM020000000000000000000000101 /* CoinFlipDuelLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000101 /* CoinFlipDuelLogic.swift */; };
+		GM020000000000000000000000102 /* CoinFlipDuelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000102 /* CoinFlipDuelView.swift */; };
+		GM020000000000000000000000103 /* ColorMemoryLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000103 /* ColorMemoryLogic.swift */; };
+		GM020000000000000000000000104 /* ColorMemoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000104 /* ColorMemoryView.swift */; };
+		GM020000000000000000000000105 /* CrapsKingLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000105 /* CrapsKingLogic.swift */; };
+		GM020000000000000000000000106 /* CrapsKingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000106 /* CrapsKingView.swift */; };
+		GM020000000000000000000000107 /* CrosswordMiniLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000107 /* CrosswordMiniLogic.swift */; };
+		GM020000000000000000000000108 /* CrosswordMiniView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000108 /* CrosswordMiniView.swift */; };
+		GM020000000000000000000000109 /* CrystalBallLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000109 /* CrystalBallLogic.swift */; };
+		GM020000000000000000000000110 /* CrystalBallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000110 /* CrystalBallView.swift */; };
+		GM020000000000000000000000111 /* DigitDashLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000111 /* DigitDashLogic.swift */; };
+		GM020000000000000000000000112 /* DigitDashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000112 /* DigitDashView.swift */; };
+		GM020000000000000000000000113 /* DominoesLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000113 /* DominoesLogic.swift */; };
+		GM020000000000000000000000114 /* DominoesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000114 /* DominoesView.swift */; };
+		GM020000000000000000000000115 /* DuelArenaLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000115 /* DuelArenaLogic.swift */; };
+		GM020000000000000000000000116 /* DuelArenaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000116 /* DuelArenaView.swift */; };
+		GM020000000000000000000000117 /* FaceRecallLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000117 /* FaceRecallLogic.swift */; };
+		GM020000000000000000000000118 /* FaceRecallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000118 /* FaceRecallView.swift */; };
+		GM020000000000000000000000119 /* FortressDefendLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000119 /* FortressDefendLogic.swift */; };
+		GM020000000000000000000000120 /* FortressDefendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000120 /* FortressDefendView.swift */; };
+		GM020000000000000000000000121 /* FourInRowLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000121 /* FourInRowLogic.swift */; };
+		GM020000000000000000000000122 /* FourInRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000122 /* FourInRowView.swift */; };
+		GM020000000000000000000000123 /* FruitSliceLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000123 /* FruitSliceLogic.swift */; };
+		GM020000000000000000000000124 /* FruitSliceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000124 /* FruitSliceView.swift */; };
+		GM020000000000000000000000125 /* GachaRollLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000125 /* GachaRollLogic.swift */; };
+		GM020000000000000000000000126 /* GachaRollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000126 /* GachaRollView.swift */; };
+		GM020000000000000000000000127 /* GemMinerLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000127 /* GemMinerLogic.swift */; };
+		GM020000000000000000000000128 /* GemMinerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000128 /* GemMinerView.swift */; };
+		GM020000000000000000000000129 /* GoSimpleLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000129 /* GoSimpleLogic.swift */; };
+		GM020000000000000000000000130 /* GoSimpleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000130 /* GoSimpleView.swift */; };
+		GM020000000000000000000000131 /* HighLowBattleLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000131 /* HighLowBattleLogic.swift */; };
+		GM020000000000000000000000132 /* HighLowBattleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000132 /* HighLowBattleView.swift */; };
+		GM020000000000000000000000133 /* KakuroChallengeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000133 /* KakuroChallengeLogic.swift */; };
+		GM020000000000000000000000134 /* KakuroChallengeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000134 /* KakuroChallengeView.swift */; };
+		GM020000000000000000000000135 /* KenoBlastLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000135 /* KenoBlastLogic.swift */; };
+		GM020000000000000000000000136 /* KenoBlastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000136 /* KenoBlastView.swift */; };
+		GM020000000000000000000000137 /* LightsOutLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000137 /* LightsOutLogic.swift */; };
+		GM020000000000000000000000138 /* LightsOutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000138 /* LightsOutView.swift */; };
+		GM020000000000000000000000139 /* LogicGatesLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000139 /* LogicGatesLogic.swift */; };
+		GM020000000000000000000000140 /* LogicGatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000140 /* LogicGatesView.swift */; };
+		GM020000000000000000000000141 /* LotteryDrawLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000141 /* LotteryDrawLogic.swift */; };
+		GM020000000000000000000000142 /* LotteryDrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000142 /* LotteryDrawView.swift */; };
+		GM020000000000000000000000143 /* LuckyPickLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000143 /* LuckyPickLogic.swift */; };
+		GM020000000000000000000000144 /* LuckyPickView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000144 /* LuckyPickView.swift */; };
+		GM020000000000000000000000145 /* ManCalaMasterLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000145 /* ManCalaMasterLogic.swift */; };
+		GM020000000000000000000000146 /* ManCalaMasterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000146 /* ManCalaMasterView.swift */; };
+		GM020000000000000000000000147 /* MazeRunnerLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000147 /* MazeRunnerLogic.swift */; };
+		GM020000000000000000000000148 /* MazeRunnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000148 /* MazeRunnerView.swift */; };
+		GM020000000000000000000000149 /* MissileLaunchLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000149 /* MissileLaunchLogic.swift */; };
+		GM020000000000000000000000150 /* MissileLaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000150 /* MissileLaunchView.swift */; };
+		GM020000000000000000000000151 /* MysteryBoxLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000151 /* MysteryBoxLogic.swift */; };
+		GM020000000000000000000000152 /* MysteryBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000152 /* MysteryBoxView.swift */; };
+		GM020000000000000000000000153 /* NavalCombatLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000153 /* NavalCombatLogic.swift */; };
+		GM020000000000000000000000154 /* NavalCombatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000154 /* NavalCombatView.swift */; };
+		GM020000000000000000000000155 /* NineManMorrisLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000155 /* NineManMorrisLogic.swift */; };
+		GM020000000000000000000000156 /* NineManMorrisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000156 /* NineManMorrisView.swift */; };
+		GM020000000000000000000000157 /* NonogramSolverLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000157 /* NonogramSolverLogic.swift */; };
+		GM020000000000000000000000158 /* NonogramSolverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000158 /* NonogramSolverView.swift */; };
+		GM020000000000000000000000159 /* OthelloFlipLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000159 /* OthelloFlipLogic.swift */; };
+		GM020000000000000000000000160 /* OthelloFlipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000160 /* OthelloFlipView.swift */; };
+		GM020000000000000000000000161 /* PatternPulseLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000161 /* PatternPulseLogic.swift */; };
+		GM020000000000000000000000162 /* PatternPulseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000162 /* PatternPulseView.swift */; };
+		GM020000000000000000000000163 /* PipeConnectLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000163 /* PipeConnectLogic.swift */; };
+		GM020000000000000000000000164 /* PipeConnectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000164 /* PipeConnectView.swift */; };
+		GM020000000000000000000000165 /* PongDuelLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000165 /* PongDuelLogic.swift */; };
+		GM020000000000000000000000166 /* PongDuelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000166 /* PongDuelView.swift */; };
+		GM020000000000000000000000167 /* PrizeClawLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000167 /* PrizeClawLogic.swift */; };
+		GM020000000000000000000000168 /* PrizeClawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000168 /* PrizeClawView.swift */; };
+		GM020000000000000000000000169 /* RhythmTapLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000169 /* RhythmTapLogic.swift */; };
+		GM020000000000000000000000170 /* RhythmTapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000170 /* RhythmTapView.swift */; };
+		GM020000000000000000000000171 /* SlidePuzzleLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000171 /* SlidePuzzleLogic.swift */; };
+		GM020000000000000000000000172 /* SlidePuzzleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000172 /* SlidePuzzleView.swift */; };
+		GM020000000000000000000000173 /* SnakeClassicLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000173 /* SnakeClassicLogic.swift */; };
+		GM020000000000000000000000174 /* SnakeClassicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000174 /* SnakeClassicView.swift */; };
+		GM020000000000000000000000175 /* SoundMatchLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000175 /* SoundMatchLogic.swift */; };
+		GM020000000000000000000000176 /* SoundMatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000176 /* SoundMatchView.swift */; };
+		GM020000000000000000000000177 /* SpaceInvaderLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000177 /* SpaceInvaderLogic.swift */; };
+		GM020000000000000000000000178 /* SpaceInvaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000178 /* SpaceInvaderView.swift */; };
+		GM020000000000000000000000179 /* SpeedReadLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000179 /* SpeedReadLogic.swift */; };
+		GM020000000000000000000000180 /* SpeedReadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000180 /* SpeedReadView.swift */; };
+		GM020000000000000000000000181 /* StackTowerLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000181 /* StackTowerLogic.swift */; };
+		GM020000000000000000000000182 /* StackTowerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000182 /* StackTowerView.swift */; };
+		GM020000000000000000000000183 /* SymbolSnapLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000183 /* SymbolSnapLogic.swift */; };
+		GM020000000000000000000000184 /* SymbolSnapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000184 /* SymbolSnapView.swift */; };
+		GM020000000000000000000000185 /* TankAssaultLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000185 /* TankAssaultLogic.swift */; };
+		GM020000000000000000000000186 /* TankAssaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000186 /* TankAssaultView.swift */; };
+		GM020000000000000000000000187 /* TargetShootLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000187 /* TargetShootLogic.swift */; };
+		GM020000000000000000000000188 /* TargetShootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000188 /* TargetShootView.swift */; };
+		GM020000000000000000000000189 /* TowerOfHanoiLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000189 /* TowerOfHanoiLogic.swift */; };
+		GM020000000000000000000000190 /* TowerOfHanoiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000190 /* TowerOfHanoiView.swift */; };
+		GM020000000000000000000000191 /* TreasureChestLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000191 /* TreasureChestLogic.swift */; };
+		GM020000000000000000000000192 /* TreasureChestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000192 /* TreasureChestView.swift */; };
+		GM020000000000000000000000193 /* VideoPokerProLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000193 /* VideoPokerProLogic.swift */; };
+		GM020000000000000000000000194 /* VideoPokerProView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000194 /* VideoPokerProView.swift */; };
+		GM020000000000000000000000195 /* WhackAMoleLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000195 /* WhackAMoleLogic.swift */; };
+		GM020000000000000000000000196 /* WhackAMoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000196 /* WhackAMoleView.swift */; };
+		GM020000000000000000000000197 /* WheelOfRichesLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000197 /* WheelOfRichesLogic.swift */; };
+		GM020000000000000000000000198 /* WheelOfRichesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000198 /* WheelOfRichesView.swift */; };
+		GM020000000000000000000000199 /* ZombieSiegeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000199 /* ZombieSiegeLogic.swift */; };
+		GM020000000000000000000000200 /* ZombieSiegeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM010000000000000000000000200 /* ZombieSiegeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3774,6 +3884,116 @@
 		GM0100000000000000000088 /* WordStormDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordStormDictionary.swift; sourceTree = "<group>"; };
 		GM0100000000000000000089 /* WordStormLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordStormLogic.swift; sourceTree = "<group>"; };
 		GM0100000000000000000090 /* WordStormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordStormView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000091 /* AirStrikeForceLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirStrikeForceLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000092 /* AirStrikeForceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirStrikeForceView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000093 /* BackgammonLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgammonLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000094 /* BackgammonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgammonView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000095 /* BaccaratEliteLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaccaratEliteLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000096 /* BaccaratEliteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaccaratEliteView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000097 /* BallBounceLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BallBounceLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000098 /* BallBounceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BallBounceView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000099 /* BattleshipLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattleshipLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000100 /* BattleshipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattleshipView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000101 /* CoinFlipDuelLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinFlipDuelLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000102 /* CoinFlipDuelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinFlipDuelView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000103 /* ColorMemoryLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorMemoryLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000104 /* ColorMemoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorMemoryView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000105 /* CrapsKingLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrapsKingLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000106 /* CrapsKingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrapsKingView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000107 /* CrosswordMiniLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrosswordMiniLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000108 /* CrosswordMiniView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrosswordMiniView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000109 /* CrystalBallLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrystalBallLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000110 /* CrystalBallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrystalBallView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000111 /* DigitDashLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DigitDashLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000112 /* DigitDashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DigitDashView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000113 /* DominoesLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DominoesLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000114 /* DominoesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DominoesView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000115 /* DuelArenaLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuelArenaLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000116 /* DuelArenaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuelArenaView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000117 /* FaceRecallLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceRecallLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000118 /* FaceRecallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceRecallView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000119 /* FortressDefendLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FortressDefendLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000120 /* FortressDefendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FortressDefendView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000121 /* FourInRowLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FourInRowLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000122 /* FourInRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FourInRowView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000123 /* FruitSliceLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FruitSliceLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000124 /* FruitSliceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FruitSliceView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000125 /* GachaRollLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaRollLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000126 /* GachaRollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaRollView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000127 /* GemMinerLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GemMinerLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000128 /* GemMinerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GemMinerView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000129 /* GoSimpleLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoSimpleLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000130 /* GoSimpleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoSimpleView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000131 /* HighLowBattleLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighLowBattleLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000132 /* HighLowBattleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighLowBattleView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000133 /* KakuroChallengeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakuroChallengeLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000134 /* KakuroChallengeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakuroChallengeView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000135 /* KenoBlastLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KenoBlastLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000136 /* KenoBlastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KenoBlastView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000137 /* LightsOutLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsOutLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000138 /* LightsOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsOutView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000139 /* LogicGatesLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicGatesLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000140 /* LogicGatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicGatesView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000141 /* LotteryDrawLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LotteryDrawLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000142 /* LotteryDrawView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LotteryDrawView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000143 /* LuckyPickLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LuckyPickLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000144 /* LuckyPickView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LuckyPickView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000145 /* ManCalaMasterLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManCalaMasterLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000146 /* ManCalaMasterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManCalaMasterView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000147 /* MazeRunnerLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MazeRunnerLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000148 /* MazeRunnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MazeRunnerView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000149 /* MissileLaunchLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileLaunchLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000150 /* MissileLaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileLaunchView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000151 /* MysteryBoxLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MysteryBoxLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000152 /* MysteryBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MysteryBoxView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000153 /* NavalCombatLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavalCombatLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000154 /* NavalCombatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavalCombatView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000155 /* NineManMorrisLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NineManMorrisLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000156 /* NineManMorrisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NineManMorrisView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000157 /* NonogramSolverLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonogramSolverLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000158 /* NonogramSolverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonogramSolverView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000159 /* OthelloFlipLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OthelloFlipLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000160 /* OthelloFlipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OthelloFlipView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000161 /* PatternPulseLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatternPulseLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000162 /* PatternPulseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatternPulseView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000163 /* PipeConnectLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipeConnectLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000164 /* PipeConnectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipeConnectView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000165 /* PongDuelLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PongDuelLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000166 /* PongDuelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PongDuelView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000167 /* PrizeClawLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrizeClawLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000168 /* PrizeClawView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrizeClawView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000169 /* RhythmTapLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RhythmTapLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000170 /* RhythmTapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RhythmTapView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000171 /* SlidePuzzleLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlidePuzzleLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000172 /* SlidePuzzleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlidePuzzleView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000173 /* SnakeClassicLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnakeClassicLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000174 /* SnakeClassicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnakeClassicView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000175 /* SoundMatchLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundMatchLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000176 /* SoundMatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundMatchView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000177 /* SpaceInvaderLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceInvaderLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000178 /* SpaceInvaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceInvaderView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000179 /* SpeedReadLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedReadLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000180 /* SpeedReadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedReadView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000181 /* StackTowerLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackTowerLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000182 /* StackTowerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackTowerView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000183 /* SymbolSnapLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolSnapLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000184 /* SymbolSnapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolSnapView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000185 /* TankAssaultLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TankAssaultLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000186 /* TankAssaultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TankAssaultView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000187 /* TargetShootLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetShootLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000188 /* TargetShootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetShootView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000189 /* TowerOfHanoiLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerOfHanoiLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000190 /* TowerOfHanoiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerOfHanoiView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000191 /* TreasureChestLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreasureChestLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000192 /* TreasureChestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreasureChestView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000193 /* VideoPokerProLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPokerProLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000194 /* VideoPokerProView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPokerProView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000195 /* WhackAMoleLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhackAMoleLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000196 /* WhackAMoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhackAMoleView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000197 /* WheelOfRichesLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WheelOfRichesLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000198 /* WheelOfRichesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WheelOfRichesView.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000199 /* ZombieSiegeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZombieSiegeLogic.swift; sourceTree = "<group>"; };
+		GM010000000000000000000000200 /* ZombieSiegeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZombieSiegeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -11039,6 +11259,61 @@
 				GM0300000000000000000033 /* TriviaCrush */,
 				GM0300000000000000000034 /* WarZoneStrike */,
 				GM0300000000000000000035 /* WordStorm */,
+				GM030000000000000000000000036 /* AirStrikeForce */,
+				GM030000000000000000000000037 /* Backgammon */,
+				GM030000000000000000000000038 /* BaccaratElite */,
+				GM030000000000000000000000039 /* BallBounce */,
+				GM030000000000000000000000040 /* Battleship */,
+				GM030000000000000000000000041 /* CoinFlipDuel */,
+				GM030000000000000000000000042 /* ColorMemory */,
+				GM030000000000000000000000043 /* CrapsKing */,
+				GM030000000000000000000000044 /* CrosswordMini */,
+				GM030000000000000000000000045 /* CrystalBall */,
+				GM030000000000000000000000046 /* DigitDash */,
+				GM030000000000000000000000047 /* Dominoes */,
+				GM030000000000000000000000048 /* DuelArena */,
+				GM030000000000000000000000049 /* FaceRecall */,
+				GM030000000000000000000000050 /* FortressDefend */,
+				GM030000000000000000000000051 /* FourInRow */,
+				GM030000000000000000000000052 /* FruitSlice */,
+				GM030000000000000000000000053 /* GachaRoll */,
+				GM030000000000000000000000054 /* GemMiner */,
+				GM030000000000000000000000055 /* GoSimple */,
+				GM030000000000000000000000056 /* HighLowBattle */,
+				GM030000000000000000000000057 /* KakuroChallenge */,
+				GM030000000000000000000000058 /* KenoBlast */,
+				GM030000000000000000000000059 /* LightsOut */,
+				GM030000000000000000000000060 /* LogicGates */,
+				GM030000000000000000000000061 /* LotteryDraw */,
+				GM030000000000000000000000062 /* LuckyPick */,
+				GM030000000000000000000000063 /* ManCalaMaster */,
+				GM030000000000000000000000064 /* MazeRunner */,
+				GM030000000000000000000000065 /* MissileLaunch */,
+				GM030000000000000000000000066 /* MysteryBox */,
+				GM030000000000000000000000067 /* NavalCombat */,
+				GM030000000000000000000000068 /* NineManMorris */,
+				GM030000000000000000000000069 /* NonogramSolver */,
+				GM030000000000000000000000070 /* OthelloFlip */,
+				GM030000000000000000000000071 /* PatternPulse */,
+				GM030000000000000000000000072 /* PipeConnect */,
+				GM030000000000000000000000073 /* PongDuel */,
+				GM030000000000000000000000074 /* PrizeClaw */,
+				GM030000000000000000000000075 /* RhythmTap */,
+				GM030000000000000000000000076 /* SlidePuzzle */,
+				GM030000000000000000000000077 /* SnakeClassic */,
+				GM030000000000000000000000078 /* SoundMatch */,
+				GM030000000000000000000000079 /* SpaceInvader */,
+				GM030000000000000000000000080 /* SpeedRead */,
+				GM030000000000000000000000081 /* StackTower */,
+				GM030000000000000000000000082 /* SymbolSnap */,
+				GM030000000000000000000000083 /* TankAssault */,
+				GM030000000000000000000000084 /* TargetShoot */,
+				GM030000000000000000000000085 /* TowerOfHanoi */,
+				GM030000000000000000000000086 /* TreasureChest */,
+				GM030000000000000000000000087 /* VideoPokerPro */,
+				GM030000000000000000000000088 /* WhackAMole */,
+				GM030000000000000000000000089 /* WheelOfRiches */,
+				GM030000000000000000000000090 /* ZombieSiege */,
 				GM0100000000000000000023 /* GamesAppMode.swift */,
 				GM0100000000000000000024 /* GamesHomeView.swift */,
 				GM0100000000000000000025 /* GamesModeManager.swift */,
@@ -11375,6 +11650,501 @@
 			path = WordStorm;
 			sourceTree = "<group>";
 		};
+		GM030000000000000000000000036 /* AirStrikeForce */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000091 /* AirStrikeForceLogic.swift */,
+				GM010000000000000000000000092 /* AirStrikeForceView.swift */,
+			);
+			path = AirStrikeForce;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000037 /* Backgammon */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000093 /* BackgammonLogic.swift */,
+				GM010000000000000000000000094 /* BackgammonView.swift */,
+			);
+			path = Backgammon;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000038 /* BaccaratElite */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000095 /* BaccaratEliteLogic.swift */,
+				GM010000000000000000000000096 /* BaccaratEliteView.swift */,
+			);
+			path = BaccaratElite;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000039 /* BallBounce */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000097 /* BallBounceLogic.swift */,
+				GM010000000000000000000000098 /* BallBounceView.swift */,
+			);
+			path = BallBounce;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000040 /* Battleship */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000099 /* BattleshipLogic.swift */,
+				GM010000000000000000000000100 /* BattleshipView.swift */,
+			);
+			path = Battleship;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000041 /* CoinFlipDuel */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000101 /* CoinFlipDuelLogic.swift */,
+				GM010000000000000000000000102 /* CoinFlipDuelView.swift */,
+			);
+			path = CoinFlipDuel;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000042 /* ColorMemory */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000103 /* ColorMemoryLogic.swift */,
+				GM010000000000000000000000104 /* ColorMemoryView.swift */,
+			);
+			path = ColorMemory;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000043 /* CrapsKing */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000105 /* CrapsKingLogic.swift */,
+				GM010000000000000000000000106 /* CrapsKingView.swift */,
+			);
+			path = CrapsKing;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000044 /* CrosswordMini */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000107 /* CrosswordMiniLogic.swift */,
+				GM010000000000000000000000108 /* CrosswordMiniView.swift */,
+			);
+			path = CrosswordMini;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000045 /* CrystalBall */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000109 /* CrystalBallLogic.swift */,
+				GM010000000000000000000000110 /* CrystalBallView.swift */,
+			);
+			path = CrystalBall;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000046 /* DigitDash */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000111 /* DigitDashLogic.swift */,
+				GM010000000000000000000000112 /* DigitDashView.swift */,
+			);
+			path = DigitDash;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000047 /* Dominoes */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000113 /* DominoesLogic.swift */,
+				GM010000000000000000000000114 /* DominoesView.swift */,
+			);
+			path = Dominoes;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000048 /* DuelArena */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000115 /* DuelArenaLogic.swift */,
+				GM010000000000000000000000116 /* DuelArenaView.swift */,
+			);
+			path = DuelArena;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000049 /* FaceRecall */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000117 /* FaceRecallLogic.swift */,
+				GM010000000000000000000000118 /* FaceRecallView.swift */,
+			);
+			path = FaceRecall;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000050 /* FortressDefend */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000119 /* FortressDefendLogic.swift */,
+				GM010000000000000000000000120 /* FortressDefendView.swift */,
+			);
+			path = FortressDefend;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000051 /* FourInRow */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000121 /* FourInRowLogic.swift */,
+				GM010000000000000000000000122 /* FourInRowView.swift */,
+			);
+			path = FourInRow;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000052 /* FruitSlice */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000123 /* FruitSliceLogic.swift */,
+				GM010000000000000000000000124 /* FruitSliceView.swift */,
+			);
+			path = FruitSlice;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000053 /* GachaRoll */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000125 /* GachaRollLogic.swift */,
+				GM010000000000000000000000126 /* GachaRollView.swift */,
+			);
+			path = GachaRoll;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000054 /* GemMiner */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000127 /* GemMinerLogic.swift */,
+				GM010000000000000000000000128 /* GemMinerView.swift */,
+			);
+			path = GemMiner;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000055 /* GoSimple */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000129 /* GoSimpleLogic.swift */,
+				GM010000000000000000000000130 /* GoSimpleView.swift */,
+			);
+			path = GoSimple;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000056 /* HighLowBattle */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000131 /* HighLowBattleLogic.swift */,
+				GM010000000000000000000000132 /* HighLowBattleView.swift */,
+			);
+			path = HighLowBattle;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000057 /* KakuroChallenge */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000133 /* KakuroChallengeLogic.swift */,
+				GM010000000000000000000000134 /* KakuroChallengeView.swift */,
+			);
+			path = KakuroChallenge;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000058 /* KenoBlast */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000135 /* KenoBlastLogic.swift */,
+				GM010000000000000000000000136 /* KenoBlastView.swift */,
+			);
+			path = KenoBlast;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000059 /* LightsOut */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000137 /* LightsOutLogic.swift */,
+				GM010000000000000000000000138 /* LightsOutView.swift */,
+			);
+			path = LightsOut;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000060 /* LogicGates */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000139 /* LogicGatesLogic.swift */,
+				GM010000000000000000000000140 /* LogicGatesView.swift */,
+			);
+			path = LogicGates;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000061 /* LotteryDraw */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000141 /* LotteryDrawLogic.swift */,
+				GM010000000000000000000000142 /* LotteryDrawView.swift */,
+			);
+			path = LotteryDraw;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000062 /* LuckyPick */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000143 /* LuckyPickLogic.swift */,
+				GM010000000000000000000000144 /* LuckyPickView.swift */,
+			);
+			path = LuckyPick;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000063 /* ManCalaMaster */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000145 /* ManCalaMasterLogic.swift */,
+				GM010000000000000000000000146 /* ManCalaMasterView.swift */,
+			);
+			path = ManCalaMaster;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000064 /* MazeRunner */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000147 /* MazeRunnerLogic.swift */,
+				GM010000000000000000000000148 /* MazeRunnerView.swift */,
+			);
+			path = MazeRunner;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000065 /* MissileLaunch */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000149 /* MissileLaunchLogic.swift */,
+				GM010000000000000000000000150 /* MissileLaunchView.swift */,
+			);
+			path = MissileLaunch;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000066 /* MysteryBox */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000151 /* MysteryBoxLogic.swift */,
+				GM010000000000000000000000152 /* MysteryBoxView.swift */,
+			);
+			path = MysteryBox;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000067 /* NavalCombat */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000153 /* NavalCombatLogic.swift */,
+				GM010000000000000000000000154 /* NavalCombatView.swift */,
+			);
+			path = NavalCombat;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000068 /* NineManMorris */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000155 /* NineManMorrisLogic.swift */,
+				GM010000000000000000000000156 /* NineManMorrisView.swift */,
+			);
+			path = NineManMorris;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000069 /* NonogramSolver */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000157 /* NonogramSolverLogic.swift */,
+				GM010000000000000000000000158 /* NonogramSolverView.swift */,
+			);
+			path = NonogramSolver;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000070 /* OthelloFlip */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000159 /* OthelloFlipLogic.swift */,
+				GM010000000000000000000000160 /* OthelloFlipView.swift */,
+			);
+			path = OthelloFlip;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000071 /* PatternPulse */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000161 /* PatternPulseLogic.swift */,
+				GM010000000000000000000000162 /* PatternPulseView.swift */,
+			);
+			path = PatternPulse;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000072 /* PipeConnect */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000163 /* PipeConnectLogic.swift */,
+				GM010000000000000000000000164 /* PipeConnectView.swift */,
+			);
+			path = PipeConnect;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000073 /* PongDuel */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000165 /* PongDuelLogic.swift */,
+				GM010000000000000000000000166 /* PongDuelView.swift */,
+			);
+			path = PongDuel;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000074 /* PrizeClaw */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000167 /* PrizeClawLogic.swift */,
+				GM010000000000000000000000168 /* PrizeClawView.swift */,
+			);
+			path = PrizeClaw;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000075 /* RhythmTap */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000169 /* RhythmTapLogic.swift */,
+				GM010000000000000000000000170 /* RhythmTapView.swift */,
+			);
+			path = RhythmTap;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000076 /* SlidePuzzle */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000171 /* SlidePuzzleLogic.swift */,
+				GM010000000000000000000000172 /* SlidePuzzleView.swift */,
+			);
+			path = SlidePuzzle;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000077 /* SnakeClassic */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000173 /* SnakeClassicLogic.swift */,
+				GM010000000000000000000000174 /* SnakeClassicView.swift */,
+			);
+			path = SnakeClassic;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000078 /* SoundMatch */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000175 /* SoundMatchLogic.swift */,
+				GM010000000000000000000000176 /* SoundMatchView.swift */,
+			);
+			path = SoundMatch;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000079 /* SpaceInvader */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000177 /* SpaceInvaderLogic.swift */,
+				GM010000000000000000000000178 /* SpaceInvaderView.swift */,
+			);
+			path = SpaceInvader;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000080 /* SpeedRead */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000179 /* SpeedReadLogic.swift */,
+				GM010000000000000000000000180 /* SpeedReadView.swift */,
+			);
+			path = SpeedRead;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000081 /* StackTower */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000181 /* StackTowerLogic.swift */,
+				GM010000000000000000000000182 /* StackTowerView.swift */,
+			);
+			path = StackTower;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000082 /* SymbolSnap */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000183 /* SymbolSnapLogic.swift */,
+				GM010000000000000000000000184 /* SymbolSnapView.swift */,
+			);
+			path = SymbolSnap;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000083 /* TankAssault */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000185 /* TankAssaultLogic.swift */,
+				GM010000000000000000000000186 /* TankAssaultView.swift */,
+			);
+			path = TankAssault;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000084 /* TargetShoot */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000187 /* TargetShootLogic.swift */,
+				GM010000000000000000000000188 /* TargetShootView.swift */,
+			);
+			path = TargetShoot;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000085 /* TowerOfHanoi */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000189 /* TowerOfHanoiLogic.swift */,
+				GM010000000000000000000000190 /* TowerOfHanoiView.swift */,
+			);
+			path = TowerOfHanoi;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000086 /* TreasureChest */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000191 /* TreasureChestLogic.swift */,
+				GM010000000000000000000000192 /* TreasureChestView.swift */,
+			);
+			path = TreasureChest;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000087 /* VideoPokerPro */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000193 /* VideoPokerProLogic.swift */,
+				GM010000000000000000000000194 /* VideoPokerProView.swift */,
+			);
+			path = VideoPokerPro;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000088 /* WhackAMole */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000195 /* WhackAMoleLogic.swift */,
+				GM010000000000000000000000196 /* WhackAMoleView.swift */,
+			);
+			path = WhackAMole;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000089 /* WheelOfRiches */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000197 /* WheelOfRichesLogic.swift */,
+				GM010000000000000000000000198 /* WheelOfRichesView.swift */,
+			);
+			path = WheelOfRiches;
+			sourceTree = "<group>";
+		};
+		GM030000000000000000000000090 /* ZombieSiege */ = {
+			isa = PBXGroup;
+			children = (
+				GM010000000000000000000000199 /* ZombieSiegeLogic.swift */,
+				GM010000000000000000000000200 /* ZombieSiegeView.swift */,
+			);
+			path = ZombieSiege;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -11631,6 +12401,116 @@
 				GM0200000000000000000088 /* WordStormDictionary.swift in Sources */,
 				GM0200000000000000000089 /* WordStormLogic.swift in Sources */,
 				GM0200000000000000000090 /* WordStormView.swift in Sources */,
+				GM020000000000000000000000091 /* AirStrikeForceLogic.swift in Sources */,
+				GM020000000000000000000000092 /* AirStrikeForceView.swift in Sources */,
+				GM020000000000000000000000093 /* BackgammonLogic.swift in Sources */,
+				GM020000000000000000000000094 /* BackgammonView.swift in Sources */,
+				GM020000000000000000000000095 /* BaccaratEliteLogic.swift in Sources */,
+				GM020000000000000000000000096 /* BaccaratEliteView.swift in Sources */,
+				GM020000000000000000000000097 /* BallBounceLogic.swift in Sources */,
+				GM020000000000000000000000098 /* BallBounceView.swift in Sources */,
+				GM020000000000000000000000099 /* BattleshipLogic.swift in Sources */,
+				GM020000000000000000000000100 /* BattleshipView.swift in Sources */,
+				GM020000000000000000000000101 /* CoinFlipDuelLogic.swift in Sources */,
+				GM020000000000000000000000102 /* CoinFlipDuelView.swift in Sources */,
+				GM020000000000000000000000103 /* ColorMemoryLogic.swift in Sources */,
+				GM020000000000000000000000104 /* ColorMemoryView.swift in Sources */,
+				GM020000000000000000000000105 /* CrapsKingLogic.swift in Sources */,
+				GM020000000000000000000000106 /* CrapsKingView.swift in Sources */,
+				GM020000000000000000000000107 /* CrosswordMiniLogic.swift in Sources */,
+				GM020000000000000000000000108 /* CrosswordMiniView.swift in Sources */,
+				GM020000000000000000000000109 /* CrystalBallLogic.swift in Sources */,
+				GM020000000000000000000000110 /* CrystalBallView.swift in Sources */,
+				GM020000000000000000000000111 /* DigitDashLogic.swift in Sources */,
+				GM020000000000000000000000112 /* DigitDashView.swift in Sources */,
+				GM020000000000000000000000113 /* DominoesLogic.swift in Sources */,
+				GM020000000000000000000000114 /* DominoesView.swift in Sources */,
+				GM020000000000000000000000115 /* DuelArenaLogic.swift in Sources */,
+				GM020000000000000000000000116 /* DuelArenaView.swift in Sources */,
+				GM020000000000000000000000117 /* FaceRecallLogic.swift in Sources */,
+				GM020000000000000000000000118 /* FaceRecallView.swift in Sources */,
+				GM020000000000000000000000119 /* FortressDefendLogic.swift in Sources */,
+				GM020000000000000000000000120 /* FortressDefendView.swift in Sources */,
+				GM020000000000000000000000121 /* FourInRowLogic.swift in Sources */,
+				GM020000000000000000000000122 /* FourInRowView.swift in Sources */,
+				GM020000000000000000000000123 /* FruitSliceLogic.swift in Sources */,
+				GM020000000000000000000000124 /* FruitSliceView.swift in Sources */,
+				GM020000000000000000000000125 /* GachaRollLogic.swift in Sources */,
+				GM020000000000000000000000126 /* GachaRollView.swift in Sources */,
+				GM020000000000000000000000127 /* GemMinerLogic.swift in Sources */,
+				GM020000000000000000000000128 /* GemMinerView.swift in Sources */,
+				GM020000000000000000000000129 /* GoSimpleLogic.swift in Sources */,
+				GM020000000000000000000000130 /* GoSimpleView.swift in Sources */,
+				GM020000000000000000000000131 /* HighLowBattleLogic.swift in Sources */,
+				GM020000000000000000000000132 /* HighLowBattleView.swift in Sources */,
+				GM020000000000000000000000133 /* KakuroChallengeLogic.swift in Sources */,
+				GM020000000000000000000000134 /* KakuroChallengeView.swift in Sources */,
+				GM020000000000000000000000135 /* KenoBlastLogic.swift in Sources */,
+				GM020000000000000000000000136 /* KenoBlastView.swift in Sources */,
+				GM020000000000000000000000137 /* LightsOutLogic.swift in Sources */,
+				GM020000000000000000000000138 /* LightsOutView.swift in Sources */,
+				GM020000000000000000000000139 /* LogicGatesLogic.swift in Sources */,
+				GM020000000000000000000000140 /* LogicGatesView.swift in Sources */,
+				GM020000000000000000000000141 /* LotteryDrawLogic.swift in Sources */,
+				GM020000000000000000000000142 /* LotteryDrawView.swift in Sources */,
+				GM020000000000000000000000143 /* LuckyPickLogic.swift in Sources */,
+				GM020000000000000000000000144 /* LuckyPickView.swift in Sources */,
+				GM020000000000000000000000145 /* ManCalaMasterLogic.swift in Sources */,
+				GM020000000000000000000000146 /* ManCalaMasterView.swift in Sources */,
+				GM020000000000000000000000147 /* MazeRunnerLogic.swift in Sources */,
+				GM020000000000000000000000148 /* MazeRunnerView.swift in Sources */,
+				GM020000000000000000000000149 /* MissileLaunchLogic.swift in Sources */,
+				GM020000000000000000000000150 /* MissileLaunchView.swift in Sources */,
+				GM020000000000000000000000151 /* MysteryBoxLogic.swift in Sources */,
+				GM020000000000000000000000152 /* MysteryBoxView.swift in Sources */,
+				GM020000000000000000000000153 /* NavalCombatLogic.swift in Sources */,
+				GM020000000000000000000000154 /* NavalCombatView.swift in Sources */,
+				GM020000000000000000000000155 /* NineManMorrisLogic.swift in Sources */,
+				GM020000000000000000000000156 /* NineManMorrisView.swift in Sources */,
+				GM020000000000000000000000157 /* NonogramSolverLogic.swift in Sources */,
+				GM020000000000000000000000158 /* NonogramSolverView.swift in Sources */,
+				GM020000000000000000000000159 /* OthelloFlipLogic.swift in Sources */,
+				GM020000000000000000000000160 /* OthelloFlipView.swift in Sources */,
+				GM020000000000000000000000161 /* PatternPulseLogic.swift in Sources */,
+				GM020000000000000000000000162 /* PatternPulseView.swift in Sources */,
+				GM020000000000000000000000163 /* PipeConnectLogic.swift in Sources */,
+				GM020000000000000000000000164 /* PipeConnectView.swift in Sources */,
+				GM020000000000000000000000165 /* PongDuelLogic.swift in Sources */,
+				GM020000000000000000000000166 /* PongDuelView.swift in Sources */,
+				GM020000000000000000000000167 /* PrizeClawLogic.swift in Sources */,
+				GM020000000000000000000000168 /* PrizeClawView.swift in Sources */,
+				GM020000000000000000000000169 /* RhythmTapLogic.swift in Sources */,
+				GM020000000000000000000000170 /* RhythmTapView.swift in Sources */,
+				GM020000000000000000000000171 /* SlidePuzzleLogic.swift in Sources */,
+				GM020000000000000000000000172 /* SlidePuzzleView.swift in Sources */,
+				GM020000000000000000000000173 /* SnakeClassicLogic.swift in Sources */,
+				GM020000000000000000000000174 /* SnakeClassicView.swift in Sources */,
+				GM020000000000000000000000175 /* SoundMatchLogic.swift in Sources */,
+				GM020000000000000000000000176 /* SoundMatchView.swift in Sources */,
+				GM020000000000000000000000177 /* SpaceInvaderLogic.swift in Sources */,
+				GM020000000000000000000000178 /* SpaceInvaderView.swift in Sources */,
+				GM020000000000000000000000179 /* SpeedReadLogic.swift in Sources */,
+				GM020000000000000000000000180 /* SpeedReadView.swift in Sources */,
+				GM020000000000000000000000181 /* StackTowerLogic.swift in Sources */,
+				GM020000000000000000000000182 /* StackTowerView.swift in Sources */,
+				GM020000000000000000000000183 /* SymbolSnapLogic.swift in Sources */,
+				GM020000000000000000000000184 /* SymbolSnapView.swift in Sources */,
+				GM020000000000000000000000185 /* TankAssaultLogic.swift in Sources */,
+				GM020000000000000000000000186 /* TankAssaultView.swift in Sources */,
+				GM020000000000000000000000187 /* TargetShootLogic.swift in Sources */,
+				GM020000000000000000000000188 /* TargetShootView.swift in Sources */,
+				GM020000000000000000000000189 /* TowerOfHanoiLogic.swift in Sources */,
+				GM020000000000000000000000190 /* TowerOfHanoiView.swift in Sources */,
+				GM020000000000000000000000191 /* TreasureChestLogic.swift in Sources */,
+				GM020000000000000000000000192 /* TreasureChestView.swift in Sources */,
+				GM020000000000000000000000193 /* VideoPokerProLogic.swift in Sources */,
+				GM020000000000000000000000194 /* VideoPokerProView.swift in Sources */,
+				GM020000000000000000000000195 /* WhackAMoleLogic.swift in Sources */,
+				GM020000000000000000000000196 /* WhackAMoleView.swift in Sources */,
+				GM020000000000000000000000197 /* WheelOfRichesLogic.swift in Sources */,
+				GM020000000000000000000000198 /* WheelOfRichesView.swift in Sources */,
+				GM020000000000000000000000199 /* ZombieSiegeLogic.swift in Sources */,
+				GM020000000000000000000000200 /* ZombieSiegeView.swift in Sources */,
 				DG02000000000000000000000001 /* Diag_AccelerometerView.swift in Sources */,
 				DG02000000000000000000000002 /* Diag_AirplaneModeView.swift in Sources */,
 				DG02000000000000000000000003 /* Diag_AmbientLightView.swift in Sources */,
