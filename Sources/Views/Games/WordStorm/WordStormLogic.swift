@@ -19,7 +19,9 @@ final class WordStormLogic: ObservableObject, GamesRewardable {
     @Published var phase: GamePhase = .lobby
     @Published var streakMultiplier: Double = 1.0
     @Published var difficulty = 0
+    @Published var consecutiveSolves: Int = 0
     @Published var consecutiveCorrect = 0
+    @Published var bestConsecutiveSolves: Int = 0
     @Published var longestWord = 0
     @Published var hintsUsed = 0
     @Published var maxHints = 3

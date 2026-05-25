@@ -33,7 +33,9 @@ final class SlotMachineGoldLogic: ObservableObject, GamesRewardable {
     @Published var streakMultiplier: Double = 1.0
     @Published var score = 0
     @Published var freeSpins = 0
+    @Published var freeSpinsAvailable: Int = 0
     @Published var consecutiveWins = 0
+    @Published var bestConsecutiveWins: Int = 0
     @Published var biggestWin = 0
     @Published var jackpotProgress: Double = 0
     @Published var autoSpinEnabled = false

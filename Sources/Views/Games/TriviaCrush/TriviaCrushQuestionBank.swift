@@ -6,6 +6,7 @@ struct TriviaQuestion: Identifiable {
     let question: String
     let answers: [String]
     let correctIndex: Int
+    var options: [String] { answers }
 }
 
 struct TriviaCrushQuestionBank {

@@ -34,6 +34,8 @@ final class ScratchAndWinLogic: ObservableObject, GamesRewardable {
     @Published var tiles: [(symbol: ScratchSymbol, revealed: Bool)] = []
     @Published var score = 0
     @Published var lastWin = 0
+    @Published var freeCardsAvailable: Int = 0
+    @Published var cardsScratched: Int = 0
     @Published var phase: GamePhase = .lobby
     @Published var streakMultiplier: Double = 1.0
     @Published var cardsPlayed = 0

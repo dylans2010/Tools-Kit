@@ -26,6 +26,7 @@ final class CheckersArenaLogic: ObservableObject, GamesRewardable {
     @Published var kingsPromoted = 0
     @Published var moveCount = 0
     @Published var multiJumpActive = false
+    @Published var selectedPiece: Int? = nil
 
     enum GamePhase { case lobby, playing, results }
 
@@ -42,6 +43,8 @@ final class CheckersArenaLogic: ObservableObject, GamesRewardable {
         captureCount = 0; kingsPromoted = 0; moveCount = 0; multiJumpActive = false
         phase = .playing
     }
+
+    func tapCell(_ index: Int) { }
 
     func selectCell(row: Int, col: Int) {
         guard !gameOver, currentPlayer == 1 else { return }

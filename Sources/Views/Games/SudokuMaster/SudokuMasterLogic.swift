@@ -13,6 +13,7 @@ final class SudokuMasterLogic: ObservableObject, GamesRewardable {
     @Published var isOriginal: [[Bool]] = []
     @Published var selectedCell: (row: Int, col: Int)?
     @Published var difficulty = 0
+    @Published var hintsRemaining: Int = 3
     @Published var score = 0
     @Published var hintsUsed = 0
     @Published var maxHints = 5

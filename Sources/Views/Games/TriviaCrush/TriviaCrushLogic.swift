@@ -15,6 +15,8 @@ final class TriviaCrushLogic: ObservableObject, GamesRewardable {
     @Published var gameOver = false
     @Published var phase: GamePhase = .lobby
     @Published var streakMultiplier: Double = 1.0
+    @Published var timerRemaining: Int = 30
+    @Published var bestConsecutiveCorrect: Int = 0
     @Published var consecutiveCorrect = 0
     @Published var bestConsecutive = 0
     @Published var difficulty = 0

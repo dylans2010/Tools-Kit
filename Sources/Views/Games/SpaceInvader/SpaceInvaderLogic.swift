@@ -11,7 +11,7 @@ final class SpaceInvaderLogic: ObservableObject, GamesRewardable {
     @Published var lives = 3; @Published var maxLives = 3
     @Published var enemies: [WaveEnemy] = []; @Published var totalKills = 0
     @Published var consecutiveKills = 0; @Published var bestKillStreak = 0
-    @Published var aliensDestroyed = 0; @Published var lives = 3; @Published var level = 1
+    @Published var aliensDestroyed = 0; @Published var level = 1
     var accuracy: Double { aliensDestroyed > 0 ? Double(aliensDestroyed) / Double(aliensDestroyed + lives) * 100 : 0 }
 
     struct WaveEnemy: Identifiable {

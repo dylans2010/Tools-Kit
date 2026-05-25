@@ -22,6 +22,7 @@ struct BattlefieldAssets {
         case .artillery: return "Long-range power, but fragile."
         case .scout: return "Fast and nimble, low damage."
         case .medic: return "Support unit."
+        default: return "Unit type: \(type.rawValue)"
         }
     }
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-enum PokerHandRank: Int, Comparable {
+enum PokerHandRank: Int, Comparable, CaseIterable {
     case highCard = 0, pair, twoPair, threeOfAKind, straight, flush, fullHouse, fourOfAKind, straightFlush, royalFlush
     static func < (lhs: PokerHandRank, rhs: PokerHandRank) -> Bool { lhs.rawValue < rhs.rawValue }
     var name: String {

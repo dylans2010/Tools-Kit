@@ -12,6 +12,7 @@ final class SequenceRecallLogic: ObservableObject, GamesRewardable {
     @Published var playerInput: [Int] = []
     @Published var round = 0
     @Published var score = 0
+    @Published var lives: Int = 3
     @Published var isShowingSequence = false
     @Published var currentShowIndex = 0
     @Published var gameOver = false
@@ -20,6 +21,7 @@ final class SequenceRecallLogic: ObservableObject, GamesRewardable {
     @Published var bestRound = 0
     @Published var difficulty = 0
     @Published var activeColorCount = 4
+    var colorCount: Int { activeColorCount }
     @Published var consecutiveRounds = 0
     @Published var speedMultiplier = 1.0
     @Published var livesRemaining = 1

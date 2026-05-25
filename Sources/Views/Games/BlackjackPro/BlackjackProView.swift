@@ -88,8 +88,9 @@ struct BlackjackProView: View {
 
     private func cardView(_ card: PlayingCard) -> some View {
         VStack(spacing: 2) {
-            Text(card.display).font(.title3.bold()).foregroundColor(card.suit == "♥" || card.suit == "♦" ? .red : .white)
-            Text(card.suit).font(.caption)
+            let suitRaw = card.suit.rawValue
+            Text(card.display).font(.title3.bold()).foregroundColor(suitRaw == "♥️" || suitRaw == "♦️" ? .red : .white)
+            Text(suitRaw).font(.caption)
         }.frame(width: 50, height: 70).background(GamingDesignTokens.cardSurface, in: RoundedRectangle(cornerRadius: 8)).overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.2)))
     }
 

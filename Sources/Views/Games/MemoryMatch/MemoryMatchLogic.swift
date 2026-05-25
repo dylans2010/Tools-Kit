@@ -24,6 +24,8 @@ final class MemoryMatchLogic: ObservableObject, GamesRewardable {
     @Published var timeRemaining: Double = 60
     @Published var score = 0
     @Published var gameOver = false
+    @Published var timerMode: Bool = false
+    @Published var won: Bool = false
     @Published var phase: GamePhase = .lobby
     @Published var streakMultiplier: Double = 1.0
     @Published var isProcessing = false

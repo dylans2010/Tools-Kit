@@ -64,12 +64,12 @@ struct BubblePopFrenzyView: View {
             ZStack {
                 ForEach(logic.bubbles) { b in
                     Circle()
-                        .fill(b.isBomb ? GamingDesignTokens.dangerRed : (b.isGolden ? GamingDesignTokens.accentGold : b.color))
+                        .fill(b.isBomb ? GamingDesignTokens.dangerRed : (b.isGolden ? GamingDesignTokens.accentGold : Color.blue))
                         .frame(width: b.size, height: b.size)
                         .overlay { if b.isGolden { Image(systemName: "star.fill").font(.caption).foregroundColor(.white) }
                             else if b.isBomb { Image(systemName: "bolt.fill").font(.caption).foregroundColor(.white) } }
                         .position(x: b.x * geo.size.width, y: b.y * geo.size.height)
-                        .onTapGesture { logic.popBubble(b) }
+                        .onTapGesture { logic.popBubble(b.id) }
                 }
             }
             .overlay(alignment: .top) {
