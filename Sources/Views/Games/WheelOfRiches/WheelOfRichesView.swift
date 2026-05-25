@@ -2,8 +2,8 @@ import SwiftUI
 
 struct WheelOfRichesView: View {
     @StateObject private var logic = WheelOfRichesLogic()
-    @ObservedObject var ledger = CurrencyLedger.shared
-    @ObservedObject var xpEngine = XPEngine.shared
+    @StateObject private var ledger = CurrencyLedger.shared
+    @StateObject private var xpEngine = XPEngine.shared
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
