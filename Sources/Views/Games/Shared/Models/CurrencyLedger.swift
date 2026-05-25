@@ -107,6 +107,14 @@ final class CurrencyLedger: ObservableObject {
         return bonus
     }
 
+    func canClaimDailyBonus(for identifier: String) -> Bool {
+        profile.isDailyBonusAvailable
+    }
+
+    func claimDailyBonus(for identifier: String) {
+        _ = collectDailyBonus()
+    }
+
     func highScore(for gameIdentifier: String) -> Int {
         profile.perGameStats[gameIdentifier]?.highScore ?? 0
     }

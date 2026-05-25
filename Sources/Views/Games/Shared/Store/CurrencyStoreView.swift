@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CurrencyStoreView: View {
-    @ObservedObject var ledger = CurrencyLedger.shared
+    @StateObject private var ledger = CurrencyLedger.shared
     @ObservedObject var redemption = RedemptionEngine.shared
     @Environment(\.dismiss) private var dismiss
     @State private var showingInsufficientFunds = false

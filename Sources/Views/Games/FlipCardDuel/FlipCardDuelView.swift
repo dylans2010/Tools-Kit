@@ -2,8 +2,8 @@ import SwiftUI
 
 struct FlipCardDuelView: View {
     @StateObject private var logic = FlipCardDuelLogic()
-    @ObservedObject var ledger = CurrencyLedger.shared
-    @ObservedObject var xpEngine = XPEngine.shared
+    @StateObject private var ledger = CurrencyLedger.shared
+    @StateObject private var xpEngine = XPEngine.shared
     @Environment(\.dismiss) private var dismiss
 
     private let rankNames = ["", "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
