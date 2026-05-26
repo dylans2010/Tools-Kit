@@ -70,9 +70,9 @@ struct SDKFlowNode: Identifiable {
         self.position = position
     }
 
-    init(from dependency: DependencyNode) {
-        self.id = UUID()
-        self.name = dependency.title
+    init(from dependency: SDKDependencyNode) {
+        self.id = dependency.id
+        self.name = dependency.name
         self.type = .action
         self.position = CGPoint(x: 100, y: 100)
     }

@@ -284,7 +284,7 @@ struct SDKBuildView: View {
 
     // MARK: - Metrics
 
-    private var currentMetrics: SDKTelemetryMetrics {
+    private var currentMetrics: TelemetryMetrics {
         telemetry.getMetrics()
     }
 
@@ -297,7 +297,7 @@ struct SDKBuildView: View {
     }
 
     @ViewBuilder
-    private func metricsContent(for metrics: SDKTelemetryMetrics) -> some View {
+    private func metricsContent(for metrics: TelemetryMetrics) -> some View {
         Grid(verticalSpacing: 16) {
             GridRow {
                 MetricStatCard(title: "Executions", value: "\(metrics.totalTraces)", icon: "waveform.path.ecg", color: .blue)
