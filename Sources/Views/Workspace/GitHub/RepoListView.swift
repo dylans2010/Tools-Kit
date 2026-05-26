@@ -26,7 +26,7 @@ struct RepoListView: View {
 
                 if isLoading && repositories.isEmpty {
                     ProgressView("Fetching Repositories...")
-            } else if repositories.isEmpty && !isLoading {
+                } else if repositories.isEmpty && !isLoading {
                 ContentUnavailableView(
                     "No Repositories",
                     systemImage: "folder.badge.questionmark",
