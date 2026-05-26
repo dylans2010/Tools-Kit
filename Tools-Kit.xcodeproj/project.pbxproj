@@ -1833,6 +1833,20 @@
 		DG02000000000000000000000238 /* Diag_ThreadRadioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000238 /* Diag_ThreadRadioView.swift */; };
 		DG02000000000000000000000239 /* Diag_WiFi6ECheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000239 /* Diag_WiFi6ECheckView.swift */; };
 		DG02000000000000000000000240 /* Diag_5GBandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000240 /* Diag_5GBandView.swift */; };
+		DG02000000000000000000000241 /* Diag_PrivacyReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000241 /* Diag_PrivacyReportView.swift */; };
+		DG02000000000000000000000242 /* Diag_MetalCapabilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000242 /* Diag_MetalCapabilityView.swift */; };
+		DG02000000000000000000000243 /* Diag_CPUTopologyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000243 /* Diag_CPUTopologyView.swift */; };
+		DG02000000000000000000000244 /* Diag_DiskSpaceLeakView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000244 /* Diag_DiskSpaceLeakView.swift */; };
+		DG02000000000000000000000245 /* Diag_BluetoothPacketView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000245 /* Diag_BluetoothPacketView.swift */; };
+		DG02000000000000000000000246 /* Diag_NetworkTraceRouteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000246 /* Diag_NetworkTraceRouteView.swift */; };
+		DG02000000000000000000000247 /* Diag_MemoryMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000247 /* Diag_MemoryMapView.swift */; };
+		DG02000000000000000000000248 /* Diag_SensorDriftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000248 /* Diag_SensorDriftView.swift */; };
+		DG02000000000000000000000249 /* Diag_DisplayWhitePointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000249 /* Diag_DisplayWhitePointView.swift */; };
+		DG02000000000000000000000250 /* Diag_AudioPhaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000250 /* Diag_AudioPhaseView.swift */; };
+		DG02000000000000000000000251 /* DiagnosticChatHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000251 /* DiagnosticChatHistory.swift */; };
+		DG02000000000000000000000252 /* DiagnosticChatNamingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000252 /* DiagnosticChatNamingService.swift */; };
+		DG02000000000000000000000253 /* DiagnosticChatStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000253 /* DiagnosticChatStore.swift */; };
+		DG02000000000000000000000254 /* DiagnosticPresetPrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000254 /* DiagnosticPresetPrompts.swift */; };
 		GM0200000000000000000001 /* AsteroidDodgeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000001 /* AsteroidDodgeLogic.swift */; };
 		GM0200000000000000000002 /* AsteroidDodgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000002 /* AsteroidDodgeView.swift */; };
 		GM0200000000000000000003 /* BattlefieldCommanderAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000003 /* BattlefieldCommanderAssets.swift */; };
@@ -3846,6 +3860,20 @@
 		DG01000000000000000000000238 /* Diag_ThreadRadioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_ThreadRadioView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000239 /* Diag_WiFi6ECheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_WiFi6ECheckView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000240 /* Diag_5GBandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_5GBandView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000241 /* Diag_PrivacyReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PrivacyReportView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000242 /* Diag_MetalCapabilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MetalCapabilityView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000243 /* Diag_CPUTopologyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CPUTopologyView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000244 /* Diag_DiskSpaceLeakView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DiskSpaceLeakView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000245 /* Diag_BluetoothPacketView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BluetoothPacketView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000246 /* Diag_NetworkTraceRouteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetworkTraceRouteView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000247 /* Diag_MemoryMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MemoryMapView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000248 /* Diag_SensorDriftView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorDriftView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000249 /* Diag_DisplayWhitePointView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DisplayWhitePointView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000250 /* Diag_AudioPhaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioPhaseView.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000251 /* DiagnosticChatHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticChatHistory.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000252 /* DiagnosticChatNamingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticChatNamingService.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000253 /* DiagnosticChatStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticChatStore.swift; sourceTree = "<group>"; };
+		DG01000000000000000000000254 /* DiagnosticPresetPrompts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticPresetPrompts.swift; sourceTree = "<group>"; };
 		GM0100000000000000000001 /* AsteroidDodgeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsteroidDodgeLogic.swift; sourceTree = "<group>"; };
 		GM0100000000000000000002 /* AsteroidDodgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsteroidDodgeView.swift; sourceTree = "<group>"; };
 		GM0100000000000000000003 /* BattlefieldCommanderAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlefieldCommanderAssets.swift; sourceTree = "<group>"; };
@@ -4291,6 +4319,20 @@
 				DG01000000000000000000000238 /* Diag_ThreadRadioView.swift */,
 				DG01000000000000000000000239 /* Diag_WiFi6ECheckView.swift */,
 				DG01000000000000000000000240 /* Diag_5GBandView.swift */,
+				DG01000000000000000000000241 /* Diag_PrivacyReportView.swift */,
+				DG01000000000000000000000242 /* Diag_MetalCapabilityView.swift */,
+				DG01000000000000000000000243 /* Diag_CPUTopologyView.swift */,
+				DG01000000000000000000000244 /* Diag_DiskSpaceLeakView.swift */,
+				DG01000000000000000000000245 /* Diag_BluetoothPacketView.swift */,
+				DG01000000000000000000000246 /* Diag_NetworkTraceRouteView.swift */,
+				DG01000000000000000000000247 /* Diag_MemoryMapView.swift */,
+				DG01000000000000000000000248 /* Diag_SensorDriftView.swift */,
+				DG01000000000000000000000249 /* Diag_DisplayWhitePointView.swift */,
+				DG01000000000000000000000250 /* Diag_AudioPhaseView.swift */,
+				DG01000000000000000000000251 /* DiagnosticChatHistory.swift */,
+				DG01000000000000000000000252 /* DiagnosticChatNamingService.swift */,
+				DG01000000000000000000000253 /* DiagnosticChatStore.swift */,
+				DG01000000000000000000000254 /* DiagnosticPresetPrompts.swift */,
 			);
 			path = Diagnostics;
 			sourceTree = "<group>";
@@ -12900,6 +12942,20 @@
 				DG02000000000000000000000238 /* Diag_ThreadRadioView.swift in Sources */,
 				DG02000000000000000000000239 /* Diag_WiFi6ECheckView.swift in Sources */,
 				DG02000000000000000000000240 /* Diag_5GBandView.swift in Sources */,
+				DG02000000000000000000000241 /* Diag_PrivacyReportView.swift in Sources */,
+				DG02000000000000000000000242 /* Diag_MetalCapabilityView.swift in Sources */,
+				DG02000000000000000000000243 /* Diag_CPUTopologyView.swift in Sources */,
+				DG02000000000000000000000244 /* Diag_DiskSpaceLeakView.swift in Sources */,
+				DG02000000000000000000000245 /* Diag_BluetoothPacketView.swift in Sources */,
+				DG02000000000000000000000246 /* Diag_NetworkTraceRouteView.swift in Sources */,
+				DG02000000000000000000000247 /* Diag_MemoryMapView.swift in Sources */,
+				DG02000000000000000000000248 /* Diag_SensorDriftView.swift in Sources */,
+				DG02000000000000000000000249 /* Diag_DisplayWhitePointView.swift in Sources */,
+				DG02000000000000000000000250 /* Diag_AudioPhaseView.swift in Sources */,
+				DG02000000000000000000000251 /* DiagnosticChatHistory.swift in Sources */,
+				DG02000000000000000000000252 /* DiagnosticChatNamingService.swift in Sources */,
+				DG02000000000000000000000253 /* DiagnosticChatStore.swift in Sources */,
+				DG02000000000000000000000254 /* DiagnosticPresetPrompts.swift in Sources */,
 				WG5FD79044E10FA97C5EC69F /* WorkspaceGraph.swift in Sources */,
 				MDC32FA79B1B70105A53ED19 /* AgenticModels.swift in Sources */,
 				TO7EC7A01B15A8F7BFE4020C /* AgenticToolOutput.swift in Sources */,

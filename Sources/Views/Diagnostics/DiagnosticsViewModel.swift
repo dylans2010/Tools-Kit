@@ -413,6 +413,18 @@ final class DiagnosticsViewModel: ObservableObject {
 
         // Microphone
         DiagnosticTool(id: "microphone_array", name: "Microphone Array", icon: "mic.fill", description: "All built-in microphones, beamforming, and positions", category: .microphone),
+
+        // === DEEPER DIAGNOSTICS (10) ===
+        DiagnosticTool(id: "privacy_report", name: "App Privacy Report", icon: "hand.raised.square.on.square.fill", description: "Audit app access to photos, location, and sensors", category: .security),
+        DiagnosticTool(id: "metal_capability", name: "Metal Capabilities", icon: "cpu.fill", description: "Detailed GPU architecture and feature support", category: .performance),
+        DiagnosticTool(id: "cpu_topology", name: "CPU Topology", icon: "cpu", description: "View P-cores and E-cores load and layout", category: .performance),
+        DiagnosticTool(id: "disk_leak", name: "Disk Space Leak", icon: "internaldrive.fill", description: "Find hidden storage consumers and temporary files", category: .storage),
+        DiagnosticTool(id: "bt_packet", name: "BT Packet Monitor", icon: "wave.3.right.circle", description: "Simulated Bluetooth packet traffic analysis", category: .connectivity),
+        DiagnosticTool(id: "adv_traceroute", name: "Advanced TraceRoute", icon: "point.3.connected.trianglepath.dotted", description: "Detailed hop-by-hop network path analysis", category: .connectivity),
+        DiagnosticTool(id: "memory_map", name: "Memory Mapping", icon: "memorychip", description: "View virtual memory regions and protections", category: .performance),
+        DiagnosticTool(id: "sensor_drift", name: "Sensor Drift Analysis", icon: "sensor", description: "Check calibration and drift for all motion sensors", category: .sensors),
+        DiagnosticTool(id: "white_point", name: "White Point Test", icon: "sun.max.circle", description: "Verify D65 calibration and color temperature", category: .display),
+        DiagnosticTool(id: "audio_phase", name: "Audio Phase Test", icon: "waveform.path", description: "Check phase correlation between stereo speakers", category: .audio),
     ]
 
     var filteredTools: [DiagnosticTool] {

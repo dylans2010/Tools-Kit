@@ -7,14 +7,18 @@ struct DiagnosticReportItem: Identifiable, Codable {
     let status: DiagnosticReportStatus
     let details: String
     let timestamp: Date
+    var grade: String? // A, B, C, D, F for Repair Shop Mode
+    var technicianNote: String?
 
-    init(toolName: String, category: String, status: DiagnosticReportStatus, details: String) {
+    init(toolName: String, category: String, status: DiagnosticReportStatus, details: String, grade: String? = nil, technicianNote: String? = nil) {
         self.id = UUID()
         self.toolName = toolName
         self.category = category
         self.status = status
         self.details = details
         self.timestamp = Date()
+        self.grade = grade
+        self.technicianNote = technicianNote
     }
 }
 
@@ -51,13 +55,23 @@ struct DiagnosticReport: Identifiable, Codable {
     let deviceModel: String
     let osVersion: String
 
-    init(title: String, items: [DiagnosticReportItem]) {
+    // Repair Shop Metadata
+    var technicianName: String?
+    var customerName: String?
+    var shopName: String?
+    var deviceSerial: String?
+
+    init(title: String, items: [DiagnosticReportItem], technicianName: String? = nil, customerName: String? = nil, shopName: String? = nil, deviceSerial: String? = nil) {
         self.id = UUID()
         self.title = title
         self.createdAt = Date()
         self.items = items
         self.deviceModel = UIDevice.current.model
         self.osVersion = "\(UIDevice.current.systemName) \(UIDevice.current.systemVersion)"
+        self.technicianName = technicianName
+        self.customerName = customerName
+        self.shopName = shopName
+        self.deviceSerial = deviceSerial
     }
 
     var passedCount: Int { items.filter { $0.status == .passed }.count }
@@ -121,9 +135,13 @@ final class DiagnosticReportManager: ObservableObject {
     func exportReportAsText(_ report: DiagnosticReport) -> String {
         var text = "DIAGNOSTIC REPORT\n"
         text += "=================\n"
+        if let shop = report.shopName { text += "Shop: \(shop)\n" }
         text += "Title: \(report.title)\n"
         text += "Date: \(formattedDate(report.createdAt))\n"
+        if let tech = report.technicianName { text += "Technician: \(tech)\n" }
+        if let cust = report.customerName { text += "Customer: \(cust)\n" }
         text += "Device: \(report.deviceModel)\n"
+        if let serial = report.deviceSerial { text += "Serial: \(serial)\n" }
         text += "OS: \(report.osVersion)\n\n"
         text += "SUMMARY\n"
         text += "-------\n"
@@ -135,8 +153,11 @@ final class DiagnosticReportManager: ObservableObject {
         text += "DETAILS\n"
         text += "-------\n"
         for item in report.items {
-            text += "[\(item.status.rawValue.uppercased())] \(item.toolName) (\(item.category))\n"
+            var statusStr = item.status.rawValue.uppercased()
+            if let grade = item.grade { statusStr += " | GRADE: \(grade)" }
+            text += "[\(statusStr)] \(item.toolName) (\(item.category))\n"
             text += "  \(item.details)\n"
+            if let note = item.technicianNote { text += "  Note: \(note)\n" }
             text += "  Time: \(formattedDate(item.timestamp))\n\n"
         }
         return text

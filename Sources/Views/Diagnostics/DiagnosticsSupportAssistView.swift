@@ -15,6 +15,7 @@ struct AttachmentItem: Identifiable {
 
 @MainActor
 final class DiagnosticsSupportAssistViewModel: ObservableObject {
+    @Published var currentSession = DiagnosticChatSession()
     @Published var messages: [ChatMessage] = []
     @Published var inputText: String = ""
     @Published var isLoading: Bool = false
@@ -51,33 +52,34 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         guard !trimmedText.isEmpty || !pendingAttachments.isEmpty else { return }
         guard !isLoading else { return }
 
+        // Cancel any previous in-flight task
+        currentTask?.cancel()
+        currentTask = nil
+
         let userMessage = ChatMessage(role: "user", content: trimmedText)
-        messages.append(userMessage)
+
+        // Ensure UI updates are isolated
+        withAnimation(.spring(response: 0.3)) {
+            messages.append(userMessage)
+            isLoading = true
+        }
 
         let attachmentsToSend = pendingAttachments
         let savedInput = inputText
 
         inputText = ""
         pendingAttachments = []
-        isLoading = true
         error = nil
 
-        // Cancel any previous in-flight task and wait for it to complete
-        if let existing = currentTask {
-            existing.cancel()
-            currentTask = nil
-        }
-
-        let task = Task { [weak self] in
-            guard let self = self else { return }
+        currentTask = Task {
             do {
-                try Task.checkCancellation()
                 try await self.performChat(attachmentItems: attachmentsToSend)
                 if !Task.isCancelled {
-                    self.isLoading = false
+                    withAnimation { self.isLoading = false }
+                    self.autoSaveAndNameSession()
                 }
             } catch is CancellationError {
-                self.isLoading = false
+                // Silently handle cancellation
             } catch {
                 if !Task.isCancelled {
                     self.error = error.localizedDescription
@@ -87,7 +89,30 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
                 }
             }
         }
-        currentTask = task
+    }
+
+    func regenerateLastResponse() {
+        guard !messages.isEmpty else { return }
+        if messages.last?.role == "assistant" {
+            messages.removeLast()
+        }
+
+        isLoading = true
+        currentTask?.cancel()
+
+        currentTask = Task {
+            do {
+                try await self.performChat(attachmentItems: [])
+                if !Task.isCancelled {
+                    withAnimation { self.isLoading = false }
+                }
+            } catch {
+                if !Task.isCancelled {
+                    self.error = error.localizedDescription
+                    self.isLoading = false
+                }
+            }
+        }
     }
 
     private func performChat(attachmentItems: [AttachmentItem]) async throws {
@@ -96,16 +121,20 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         let chatAttachments = attachmentItems.map { $0.attachment }
         let decoded = await FileDecoderHelper.decodeAttachments(chatAttachments)
 
-        var chatMessages = messages
+        try Task.checkCancellation()
+
+        var chatMessages = messages.filter { $0.role != "system" }
         if !decoded.text.isEmpty, !chatMessages.isEmpty {
             let lastIdx = chatMessages.count - 1
-            let updatedContent = chatMessages[lastIdx].content + decoded.text
-            chatMessages[lastIdx] = ChatMessage(role: chatMessages[lastIdx].role, content: updatedContent)
+            if chatMessages[lastIdx].role == "user" {
+                let updatedContent = chatMessages[lastIdx].content + "\n\n[Attachment Data]:\n" + decoded.text
+                chatMessages[lastIdx] = ChatMessage(id: chatMessages[lastIdx].id, role: chatMessages[lastIdx].role, content: updatedContent, timestamp: chatMessages[lastIdx].timestamp)
+            }
         }
 
         if isWebSearchEnabled {
             currentSystemPrompt += "\n\nCRITICAL: Web search is ENABLED. You MUST perform a web search before answering any user question. Identify the core technical query and use the [SEARCH: query] tool. Do not provide a final answer until search results are analyzed."
-            searchingStatus = "Thinking..."
+            await MainActor.run { searchingStatus = "Thinking..." }
         }
 
         try Task.checkCancellation()
@@ -118,15 +147,16 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         try Task.checkCancellation()
 
         if isWebSearchEnabled, let query = extractSearchQuery(from: response) {
-            searchingStatus = "Searching: \(query)..."
+            await MainActor.run { searchingStatus = "Searching: \(query)..." }
             let searchResponse = await aiService.performFullWebSearch(query: query)
 
             try Task.checkCancellation()
 
-            lastSearchResults = searchResponse.results
-            lastSearchQuery = query
-
-            searchingStatus = "Analyzing results..."
+            await MainActor.run {
+                lastSearchResults = searchResponse.results
+                lastSearchQuery = query
+                searchingStatus = "Analyzing results..."
+            }
 
             let searchContext = ChatMessage(role: "system", content: "Search results for '\(query)':\n\(searchResponse.summary)")
             let updatedMessages = [ChatMessage(role: "system", content: currentSystemPrompt)] + chatMessages + [ChatMessage(role: "assistant", content: response), searchContext]
@@ -137,11 +167,19 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
             )
 
             try Task.checkCancellation()
-            searchingStatus = nil
-            messages.append(ChatMessage(role: "assistant", content: finalResponse))
+            await MainActor.run {
+                searchingStatus = nil
+                withAnimation {
+                    messages.append(ChatMessage(role: "assistant", content: finalResponse))
+                }
+            }
         } else {
-            searchingStatus = nil
-            messages.append(ChatMessage(role: "assistant", content: response))
+            await MainActor.run {
+                searchingStatus = nil
+                withAnimation {
+                    messages.append(ChatMessage(role: "assistant", content: response))
+                }
+            }
         }
     }
 
@@ -182,10 +220,33 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
     func clearChat() {
         currentTask?.cancel()
         currentTask = nil
+        currentSession = DiagnosticChatSession()
         messages = []
         isLoading = false
         error = nil
         searchingStatus = nil
+    }
+
+    func loadSession(_ session: DiagnosticChatSession) {
+        currentSession = session
+        messages = session.messages
+    }
+
+    private func autoSaveAndNameSession() {
+        currentSession.messages = messages
+        DiagnosticChatStore.shared.saveSession(currentSession)
+
+        // Auto-name if it's still default and has enough context
+        if currentSession.title == "New Diagnostic Session" && messages.count >= 2 {
+            Task {
+                if let suggestedTitle = await DiagnosticChatNamingService.shared.suggestTitle(for: messages) {
+                    await MainActor.run {
+                        self.currentSession.title = suggestedTitle
+                        DiagnosticChatStore.shared.saveSession(self.currentSession)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -197,9 +258,11 @@ struct DiagnosticsSupportAssistView: View {
 
     @State private var showPhotoPicker = false
     @State private var showFileImporter = false
+    @State private var showHistory = false
+    @State private var showPresets = false
     @State private var selectedPhotoItem: PhotosPickerItem?
 
-    private let subtleBlue = Color.blue.opacity(0.15)
+    private let subtleBlue = Color.blue.opacity(0.05)
 
     var body: some View {
         NavigationStack {
@@ -222,11 +285,19 @@ struct DiagnosticsSupportAssistView: View {
 
                 inputArea
             }
-            .background(subtleBlue.ignoresSafeArea())
+            .background(
+                ZStack {
+                    subtleBlue.ignoresSafeArea()
+                    LinearGradient(
+                        colors: [Color.blue.opacity(0.05), Color.purple.opacity(0.02)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ).ignoresSafeArea()
+                }
+            )
             .navigationTitle("Support Assist")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(subtleBlue, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Close") { dismiss() }
@@ -245,8 +316,22 @@ struct DiagnosticsSupportAssistView: View {
                                 Image(systemName: "globe.badge.chevron.backward")
                             }
                         }
-                        Button(action: viewModel.clearChat) {
-                            Image(systemName: "trash")
+
+                        Button {
+                            showHistory = true
+                        } label: {
+                            Image(systemName: "clock.arrow.circlepath")
+                        }
+
+                        Menu {
+                            Button(role: .destructive, action: viewModel.clearChat) {
+                                Label("New Chat", systemImage: "plus.bubble")
+                            }
+                            Button(action: viewModel.clearChat) {
+                                Label("Clear Messages", systemImage: "trash")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
                         }
                     }
                 }
@@ -268,6 +353,17 @@ struct DiagnosticsSupportAssistView: View {
                     results: viewModel.lastSearchResults
                 )
             }
+            .sheet(isPresented: $showHistory) {
+                DiagnosticChatHistory { session in
+                    viewModel.loadSession(session)
+                }
+            }
+            .sheet(isPresented: $showPresets) {
+                DiagnosticPresetPromptsSheet { prompt in
+                    viewModel.inputText = prompt
+                }
+                .presentationDetents([.medium, .large])
+            }
         }
     }
 
@@ -282,8 +378,10 @@ struct DiagnosticsSupportAssistView: View {
                     }
 
                     ForEach(viewModel.messages) { message in
-                        MessageBubbleView(message: message)
-                            .id(message.id)
+                        MessageBubbleView(message: message) {
+                            viewModel.regenerateLastResponse()
+                        }
+                        .id(message.id)
                     }
 
                     if viewModel.isLoading {
@@ -436,6 +534,11 @@ struct DiagnosticsSupportAssistView: View {
             HStack(spacing: 12) {
                 Menu {
                     Button {
+                        showPresets = true
+                    } label: {
+                        Label("Preset Prompts", systemImage: "sparkles.rectangle.stack")
+                    }
+                    Button {
                         showPhotoPicker = true
                     } label: {
                         Label("Photo Library", systemImage: "photo.on.rectangle")
@@ -459,7 +562,20 @@ struct DiagnosticsSupportAssistView: View {
                         .padding(.vertical, 8)
                         .lineLimit(1...5)
                 }
-                .background(RoundedRectangle(cornerRadius: 20).stroke(Color.primary.opacity(0.2), lineWidth: 1))
+                .background(
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color.blue.opacity(0.08), Color.purple.opacity(0.05)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                    }
+                )
 
                 Button(action: viewModel.sendMessage) {
                     Image(systemName: "arrow.up.circle.fill")
@@ -627,6 +743,7 @@ struct WebSearchResultsSheet: View {
 
 struct MessageBubbleView: View {
     let message: ChatMessage
+    var onRegenerate: () -> Void = {}
 
     private var isUser: Bool { message.role == "user" }
 
@@ -634,24 +751,136 @@ struct MessageBubbleView: View {
         HStack {
             if isUser { Spacer(minLength: 60) }
 
-            VStack(alignment: isUser ? .trailing : .leading) {
+            VStack(alignment: isUser ? .trailing : .leading, spacing: 4) {
                 if isUser {
                     Text(message.content)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
-                        .background(Color.blue)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(
+                            LinearGradient(
+                                colors: [.blue, Color.blue.opacity(0.8)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
                         .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 18))
+                        .clipShape(ChatBubbleShape(isUser: true))
+                        .shadow(color: .blue.opacity(0.2), radius: 4, x: 0, y: 2)
                 } else {
-                    SDKMarkdownView(text: message.content)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
-                        .background(Color(.secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 18))
+                    VStack(alignment: .leading, spacing: 8) {
+                        SDKMarkdownView(text: message.content)
+
+                        HStack(spacing: 16) {
+                            Button {
+                                UIPasteboard.general.string = message.content
+                            } label: {
+                                Label("Copy", systemImage: "doc.on.doc")
+                                    .font(.caption2)
+                            }
+                            .buttonStyle(.plain)
+                            .foregroundStyle(.secondary)
+
+                            Button(action: onRegenerate) {
+                                Label("Regenerate", systemImage: "arrow.clockwise")
+                                    .font(.caption2)
+                            }
+                            .buttonStyle(.plain)
+                            .foregroundStyle(.secondary)
+                        }
+                        .padding(.top, 4)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(.secondarySystemGroupedBackground), Color(.systemGray6)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .clipShape(ChatBubbleShape(isUser: false))
+                    .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
                 }
+
+                Text(message.timestamp, style: .time)
+                    .font(.system(size: 10))
+                    .foregroundStyle(.tertiary)
+                    .padding(.horizontal, 4)
             }
 
             if !isUser { Spacer(minLength: 60) }
+        }
+    }
+}
+
+struct ChatBubbleShape: Shape {
+    let isUser: Bool
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: isUser ?
+                [.topLeft, .bottomLeft, .bottomRight] :
+                [.topRight, .bottomLeft, .bottomRight],
+            cornerRadii: CGSize(width: 18, height: 18)
+        )
+        return Path(path.cgPath)
+    }
+}
+
+// MARK: - Preset Prompts Sheet
+
+struct DiagnosticPresetPromptsSheet: View {
+    var onSelect: (String) -> Void
+    @Environment(\.dismiss) private var dismiss
+    @State private var displayedPrompts: [DiagnosticPresetPrompt] = []
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    ForEach(displayedPrompts) { item in
+                        Button {
+                            onSelect(item.prompt)
+                            dismiss()
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(item.title)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(.primary)
+                                Text(item.prompt)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(2)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                } header: {
+                    HStack {
+                        Text("Suggested Diagnostics")
+                        Spacer()
+                        Button(action: shuffle) {
+                            Label("Shuffle", systemImage: "arrow.2.squarepath")
+                                .font(.caption)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Diagnostic Presets")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Close") { dismiss() }
+                }
+            }
+            .onAppear(perform: shuffle)
+        }
+    }
+
+    private func shuffle() {
+        withAnimation {
+            displayedPrompts = Array(DiagnosticPresetPrompts.all.shuffled().prefix(5))
         }
     }
 }

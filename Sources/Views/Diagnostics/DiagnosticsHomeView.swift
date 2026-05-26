@@ -4,8 +4,9 @@ struct DiagnosticsHomeView: View {
     @StateObject private var viewModel = DiagnosticsViewModel()
     @StateObject private var diagnosticsMode = DiagnosticsModeManager.shared
     @State private var showSettings = false
-    @State private var showReports = false
     @State private var showSupportAssist = false
+
+    @AppStorage("diagnostics_enableAIAssist") private var enableAIAssist = true
 
     var body: some View {
         NavigationStack {
@@ -20,15 +21,12 @@ struct DiagnosticsHomeView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 12) {
-                        Button {
-                            showReports = true
-                        } label: {
-                            Image(systemName: "doc.text")
-                        }
-                        Button {
-                            showSupportAssist = true
-                        } label: {
-                            Image(systemName: "sparkles.rectangle.stack")
+                        if enableAIAssist {
+                            Button {
+                                showSupportAssist = true
+                            } label: {
+                                Image(systemName: "sparkles.rectangle.stack")
+                            }
                         }
                         Button {
                             showSettings = true
@@ -44,50 +42,18 @@ struct DiagnosticsHomeView: View {
             .fullScreenCover(isPresented: $showSettings) {
                 DiagnosticsSettingsView()
             }
-            .sheet(isPresented: $showReports) {
-                NavigationStack {
-                    DiagnosticReportsView()
-                        .toolbar {
-                            ToolbarItem(placement: .topBarLeading) {
-                                Button("Done") { showReports = false }
-                            }
-                        }
-                }
-            }
         }
     }
 
     private var headerSection: some View {
-        VStack(spacing: 8) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("\(viewModel.totalToolCount) Tools")
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(.secondary)
-                    if let category = viewModel.selectedCategory {
-                        Text(category.rawValue)
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                    }
-                }
-                Spacer()
-                NavigationLink {
-                    DiagnosticReportsView()
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "doc.text")
-                            .font(.caption)
-                        Text("Reports")
-                            .font(.caption.weight(.medium))
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(Color(.tertiarySystemFill))
-                    .clipShape(Capsule())
-                }
-            }
+        VStack(alignment: .leading, spacing: 4) {
+            Text("\(viewModel.totalToolCount) Diagnostic Tools")
+                .font(.headline)
+            Text("Select a category to filter or search for a specific hardware test.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
-        .padding(.top, 4)
+        .padding(.vertical, 8)
     }
 
     private var categoryScrollBar: some View {
@@ -124,22 +90,31 @@ struct DiagnosticsHomeView: View {
             Section {
                 ForEach(tools) { tool in
                     NavigationLink(destination: diagnosticDestination(for: tool)) {
-                        HStack(spacing: 12) {
-                            Image(systemName: tool.icon)
-                                .font(.body)
-                                .foregroundStyle(tool.category.tint)
-                                .frame(width: 28, height: 28)
+                        HStack(spacing: 16) {
+                            ZStack {
+                                Circle()
+                                    .fill(tool.category.tint.opacity(0.1))
+                                    .frame(width: 36, height: 36)
+                                Image(systemName: tool.icon)
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundStyle(tool.category.tint)
+                            }
+
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(tool.name)
-                                    .font(.subheadline.weight(.medium))
+                                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                                    .foregroundStyle(.primary)
+
                                 Text(tool.description)
-                                    .font(.caption)
+                                    .font(.system(size: 12))
                                     .foregroundStyle(.secondary)
-                                    .lineLimit(1)
+                                    .lineLimit(2)
                             }
                         }
-                        .padding(.vertical, 2)
+                        .padding(.vertical, 4)
                     }
+                    .listRowSeparator(.visible)
+                    .listRowBackground(Color(.secondarySystemGroupedBackground))
                 }
             } header: {
                 HStack(spacing: 6) {
@@ -430,6 +405,17 @@ struct DiagnosticsHomeView: View {
         case "touch_id_test": Diag_TouchIDTestView()
         // Microphone
         case "microphone_array": Diag_MicrophoneArrayView()
+        // Deeper Diagnostics
+        case "privacy_report": Diag_PrivacyReportView()
+        case "metal_capability": Diag_MetalCapabilityView()
+        case "cpu_topology": Diag_CPUTopologyView()
+        case "disk_leak": Diag_DiskSpaceLeakView()
+        case "bt_packet": Diag_BluetoothPacketView()
+        case "adv_traceroute": Diag_NetworkTraceRouteView()
+        case "memory_map": Diag_MemoryMapView()
+        case "sensor_drift": Diag_SensorDriftView()
+        case "white_point": Diag_DisplayWhitePointView()
+        case "audio_phase": Diag_AudioPhaseView()
         default:
             Text("Tool not found")
         }
