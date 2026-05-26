@@ -14445,6 +14445,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		KB0400000000000000000201 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
 			files = (
 				KB0200000000000000000001 /* KeyboardViewController.swift in Sources */,
 				KB0200000000000000000002 /* KeyboardRootView.swift in Sources */,
@@ -14477,6 +14478,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		MS0400000000000000000201 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
 			files = (
 				MS0207C4CA60A1926E94DEC9 /* MessagesViewController.swift in Sources */,
 				MS02F387A7A65E6019196A12 /* MessagesRootView.swift in Sources */,
