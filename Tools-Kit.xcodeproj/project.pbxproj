@@ -1426,6 +1426,12 @@
 		PL020000000000000000000022 /* SDKActionConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000022 /* SDKActionConsoleView.swift */; };
 		PL020000000000000000000023 /* SDKIntegrationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000023 /* SDKIntegrationTestView.swift */; };
 		PL020000000000000000000024 /* SDKEventStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000024 /* SDKEventStreamView.swift */; };
+		PL020000000000000000000030 /* SDKPipelineOptimizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000030 /* SDKPipelineOptimizerView.swift */; };
+		PL020000000000000000000031 /* SDKBuildStatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000031 /* SDKBuildStatView.swift */; };
+		PL020000000000000000000032 /* SDKResourceInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000032 /* SDKResourceInspectorView.swift */; };
+		PL020000000000000000000033 /* SDKBuildAnalyzerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000033 /* SDKBuildAnalyzerDevTool.swift */; };
+		PL020000000000000000000034 /* SDKAssetOptimizerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000034 /* SDKAssetOptimizerDevTool.swift */; };
+		PL020000000000000000000035 /* SDKSecurityAuditDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000035 /* SDKSecurityAuditDevTool.swift */; };
 		PL020000000000000000000025 /* SDKSecurityMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000025 /* SDKSecurityMonitorView.swift */; };
 		PL020000000000000000000026 /* SDKInternalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000026 /* SDKInternalView.swift */; };
 		PL02000000000000000000000D /* SDKDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000D /* SDKDebugView.swift */; };
@@ -3455,6 +3461,12 @@
 		PL010000000000000000000022 /* SDKActionConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKActionConsoleView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000023 /* SDKIntegrationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKIntegrationTestView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000024 /* SDKEventStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKEventStreamView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000030 /* SDKPipelineOptimizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Builder/More Tools/SDKPipelineOptimizerView.swift"; sourceTree = "<group>"; };
+		PL010000000000000000000031 /* SDKBuildStatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Builder/More Tools/SDKBuildStatView.swift"; sourceTree = "<group>"; };
+		PL010000000000000000000032 /* SDKResourceInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Builder/More Tools/SDKResourceInspectorView.swift"; sourceTree = "<group>"; };
+		PL010000000000000000000033 /* SDKBuildAnalyzerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Builder/More Tools/SDKBuildAnalyzerDevTool.swift"; sourceTree = "<group>"; };
+		PL010000000000000000000034 /* SDKAssetOptimizerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Builder/More Tools/SDKAssetOptimizerDevTool.swift"; sourceTree = "<group>"; };
+		PL010000000000000000000035 /* SDKSecurityAuditDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Builder/More Tools/SDKSecurityAuditDevTool.swift"; sourceTree = "<group>"; };
 		PL010000000000000000000025 /* SDKSecurityMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKSecurityMonitorView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000000D /* SDKDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKDebugView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000000E /* SDKFlowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKFlowBuilderView.swift; sourceTree = "<group>"; };
@@ -8960,6 +8972,12 @@
 				94F7CA9EB7294F5194434142 /* SDKAppBuilderView.swift */,
 				D09A5B508388459689A2623D /* SDKAutomationView.swift */,
 				PL010000000000000000000007 /* SDKBuildView.swift */,
+				PL010000000000000000000030 /* SDKPipelineOptimizerView.swift */,
+				PL010000000000000000000031 /* SDKBuildStatView.swift */,
+				PL010000000000000000000032 /* SDKResourceInspectorView.swift */,
+				PL010000000000000000000033 /* SDKBuildAnalyzerDevTool.swift */,
+				PL010000000000000000000034 /* SDKAssetOptimizerDevTool.swift */,
+				PL010000000000000000000035 /* SDKSecurityAuditDevTool.swift */,
 				PL010000000000000000000008 /* SDKProjectDashboardView.swift */,
 				PL010000000000000000000009 /* SDKDeploymentView.swift */,
 				PL01000000000000000000000A /* SDKSystemExplorerView.swift */,
@@ -14305,6 +14323,12 @@
 				PL020000000000000000000022 /* SDKActionConsoleView.swift in Sources */,
 				PL020000000000000000000023 /* SDKIntegrationTestView.swift in Sources */,
 				PL020000000000000000000024 /* SDKEventStreamView.swift in Sources */,
+				PL020000000000000000000030 /* SDKPipelineOptimizerView.swift in Sources */,
+				PL020000000000000000000031 /* SDKBuildStatView.swift in Sources */,
+				PL020000000000000000000032 /* SDKResourceInspectorView.swift in Sources */,
+				PL020000000000000000000033 /* SDKBuildAnalyzerDevTool.swift in Sources */,
+				PL020000000000000000000034 /* SDKAssetOptimizerDevTool.swift in Sources */,
+				PL020000000000000000000035 /* SDKSecurityAuditDevTool.swift in Sources */,
 				PL020000000000000000000025 /* SDKSecurityMonitorView.swift in Sources */,
 				PL02000000000000000000000D /* SDKDebugView.swift in Sources */,
 				PL02000000000000000000000E /* SDKFlowBuilderView.swift in Sources */,

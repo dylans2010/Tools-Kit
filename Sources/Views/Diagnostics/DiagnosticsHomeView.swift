@@ -3,7 +3,6 @@ import SwiftUI
 struct DiagnosticsHomeView: View {
     @StateObject private var viewModel = DiagnosticsViewModel()
     @StateObject private var diagnosticsMode = DiagnosticsModeManager.shared
-    @State private var showSettings = false
     @State private var showSupportAssist = false
 
     @AppStorage("diagnostics_enableAIAssist") private var enableAIAssist = true
@@ -28,8 +27,8 @@ struct DiagnosticsHomeView: View {
                                 Image(systemName: "sparkles.rectangle.stack")
                             }
                         }
-                        Button {
-                            showSettings = true
+                        NavigationLink {
+                            DiagnosticsSettingsView()
                         } label: {
                             Image(systemName: "slider.horizontal.3")
                         }
@@ -38,9 +37,6 @@ struct DiagnosticsHomeView: View {
             }
             .fullScreenCover(isPresented: $showSupportAssist) {
                 DiagnosticsSupportAssistView()
-            }
-            .fullScreenCover(isPresented: $showSettings) {
-                DiagnosticsHomeSettingsView()
             }
         }
     }
@@ -445,17 +441,4 @@ struct DiagnosticsCategoryChip: View {
     }
 }
 
-private struct DiagnosticsHomeSettingsView: View {
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section("Settings") {
-                    Text("Diagnostics settings are currently unavailable.")
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .navigationTitle("Diagnostics Settings")
-        }
-    }
-}
 

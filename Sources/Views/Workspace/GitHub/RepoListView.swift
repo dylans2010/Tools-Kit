@@ -57,6 +57,15 @@ struct RepoListView: View {
             }
         }
         .navigationTitle("Repositories")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(role: .destructive) {
+                    logout()
+                } label: {
+                    Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
+                }
+            }
+        }
         .searchable(text: $searchText, prompt: "Search Repositories")
         .alert("Error", isPresented: Binding(get: { errorMessage != nil }, set: { _ in errorMessage = nil })) {
             Button("OK", role: .cancel) {}
@@ -98,6 +107,12 @@ struct RepoListView: View {
         } else {
             filteredRepositories = repositories.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
         }
+    }
+
+    func logout() {
+        GitHubAuthManager.shared.deleteToken()
+        UserDefaults.standard.removeObject(forKey: "github_pat_token")
+        // The parent view (GitHubRouterView) should refresh via its .task when this view is dismissed or state changes
     }
 
     func toggleStar(for repo: GitHubRepository) {
