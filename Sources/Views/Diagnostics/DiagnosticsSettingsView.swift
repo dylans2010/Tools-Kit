@@ -1,6 +1,7 @@
 import SwiftUI
 
-struct DiagnosticsSettingsView: View {
+public struct DiagnosticsSettingsView: View {
+    public init() {}
     @Environment(\.dismiss) private var dismiss
     @StateObject private var diagnosticsMode = DiagnosticsModeManager.shared
     @StateObject private var settingsManager = AIChatSettingsManager.shared
