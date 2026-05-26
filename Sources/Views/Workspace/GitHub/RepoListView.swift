@@ -72,11 +72,11 @@ struct RepoListView: View {
         }
     }
 
-    private var displayRepositories: [GitHubRepository] {
+    var displayRepositories: [GitHubRepository] {
         searchText.isEmpty ? repositories : filteredRepositories
     }
 
-    private func fetchRepositories() async {
+    func fetchRepositories() async {
         isLoading = true
         do {
             let repos: [GitHubRepository] = try await GitHubAPIClient.shared.request(.userRepos)
@@ -93,7 +93,7 @@ struct RepoListView: View {
         }
     }
 
-    private func filterRepositories() {
+    func filterRepositories() {
         if searchText.isEmpty {
             filteredRepositories = repositories
         } else {
@@ -101,7 +101,7 @@ struct RepoListView: View {
         }
     }
 
-    private func toggleStar(for repo: GitHubRepository) {
+    func toggleStar(for repo: GitHubRepository) {
         Task {
             do {
                 try await GitHubAPIClient.shared.requestEmpty(.starred(owner: repo.owner.login, repo: repo.name))
