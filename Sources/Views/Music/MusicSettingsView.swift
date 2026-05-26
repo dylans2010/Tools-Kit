@@ -204,7 +204,7 @@ struct MusicSettingsView: View {
             .sheet(isPresented: $showSpotifySheet) { SpotifyLinkSheet() }
             .sheet(isPresented: $showBackupExporter, onDismiss: { backupURL = nil }) {
                 if let backupURL {
-                    ActivityView(activityItems: [backupURL])
+                    MusicShareSheet(activityItems: [backupURL])
                 }
             }
             .sheet(isPresented: $showBackupImporter) {
@@ -267,7 +267,7 @@ struct MusicSettingsView: View {
     }
 }
 
-private struct ActivityView: UIViewControllerRepresentable {
+private struct MusicShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
