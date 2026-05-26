@@ -2,20 +2,29 @@ import SwiftUI
 
 struct CalendarEventCategoryManagerView: View {
     @State private var categories: [EventCategory] = [
-        EventCategory(name: "Work", color: .blue, icon: "briefcase.fill"),
-        EventCategory(name: "Personal", color: .green, icon: "person.fill"),
-        EventCategory(name: "Health", color: .red, icon: "heart.fill"),
-        EventCategory(name: "Education", color: .purple, icon: "book.fill")
+        EventCategory(name: "Work", colorHex: "#007AFF", icon: "briefcase.fill"),
+        EventCategory(name: "Personal", colorHex: "#34C759", icon: "person.fill"),
+        EventCategory(name: "Health", colorHex: "#FF3B30", icon: "heart.fill"),
+        EventCategory(name: "Education", colorHex: "#AF52DE", icon: "book.fill")
     ]
     @State private var showingAdd = false
     @State private var newName = ""
     @State private var selectedColor: Color = .blue
 
     struct EventCategory: Identifiable, Codable {
-        let id = UUID()
+        let id: UUID
         var name: String
-        var color: Color
+        var colorHex: String
         var icon: String
+
+        var color: Color { Color(hex: colorHex) }
+
+        init(id: UUID = UUID(), name: String, colorHex: String = "#007AFF", icon: String = "tag.fill") {
+            self.id = id
+            self.name = name
+            self.colorHex = colorHex
+            self.icon = icon
+        }
     }
 
     var body: some View {
@@ -39,7 +48,8 @@ struct CalendarEventCategoryManagerView: View {
                     TextField("Name", text: $newName)
                     ColorPicker("Color", selection: $selectedColor)
                     Button("Create") {
-                        categories.append(EventCategory(name: newName, color: selectedColor, icon: "tag.fill"))
+                        let hex = selectedColor.toHex() ?? "#007AFF"
+                        categories.append(EventCategory(name: newName, colorHex: hex, icon: "tag.fill"))
                         newName = ""
                         showingAdd = false
                     }

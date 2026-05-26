@@ -21,8 +21,8 @@ struct PRDetailView: View {
 
                     HStack {
                         Capsule()
-                            .fill(pullRequest.state == "open" ? Color.accentColor : .secondary)
-                            .overlay(Text(pullRequest.state.capitalized).font(.caption.bold()).foregroundStyle(.white))
+                            .fill(pullRequest.state == .open ? Color.accentColor : .secondary)
+                            .overlay(Text(pullRequest.state.rawValue.capitalized).font(.caption.bold()).foregroundStyle(.white))
                             .frame(width: 60, height: 24)
 
                         Text("\(pullRequest.user.login) wants to merge \(pullRequest.head.ref) into \(pullRequest.base.ref)")
@@ -52,7 +52,7 @@ struct PRDetailView: View {
                     }
                 }
 
-                if pullRequest.state == "open" {
+                if pullRequest.state == .open {
                     VStack(spacing: 12) {
                         Button {
                             mergePullRequest()
@@ -124,9 +124,9 @@ struct PRDetailView: View {
     private func closePullRequest() {
         isMerging = true
         struct UpdatePRPayload: Encodable {
-            let state: String
+            let state: PRState
         }
-        let payload = UpdatePRPayload(state: "closed")
+        let payload = UpdatePRPayload(state: .closed)
 
         Task {
             do {

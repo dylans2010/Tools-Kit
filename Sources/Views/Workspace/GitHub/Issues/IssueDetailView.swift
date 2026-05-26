@@ -31,7 +31,7 @@ struct IssueDetailView: View {
                     }
                     HStack {
                         if let assignee = issue.assignee {
-                            Label(assignee, systemImage: "person")
+                            Label(assignee.login, systemImage: "person")
                         }
                         Spacer()
                         Text("Opened \(issue.createdAt.formatted(date: .abbreviated, time: .shortened))")
@@ -41,7 +41,7 @@ struct IssueDetailView: View {
                     if !issue.labels.isEmpty {
                         HStack {
                             ForEach(issue.labels, id: \.self) { label in
-                                Text(label)
+                                Text(label.name)
                                     .font(.caption2)
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)

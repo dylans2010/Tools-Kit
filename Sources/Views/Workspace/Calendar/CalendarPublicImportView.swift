@@ -8,10 +8,19 @@ struct CalendarPublicImportView: View {
     @State private var importedCalendars: [PublicCalendar] = []
 
     struct PublicCalendar: Identifiable, Codable {
-        let id = UUID()
+        let id: UUID
         let name: String
         let url: String
-        var color: Color = .blue
+        var colorHex: String
+
+        var color: Color { Color(hex: colorHex) }
+
+        init(id: UUID = UUID(), name: String, url: String, colorHex: String = "#007AFF") {
+            self.id = id
+            self.name = name
+            self.url = url
+            self.colorHex = colorHex
+        }
     }
 
     var body: some View {
