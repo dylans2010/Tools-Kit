@@ -362,7 +362,7 @@ struct DiagnosticsSupportAssistView: View {
                 DiagnosticPresetPromptsSheet { prompt in
                     viewModel.inputText = prompt
                 }
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.medium])
             }
         }
     }

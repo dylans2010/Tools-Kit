@@ -232,6 +232,11 @@ final class DevToolRegistry: ObservableObject {
 
         // New Tools - Performance
         register(BundleSizeAnalyzerDevTool())
+
+        // SDK Builder Specialized Tools
+        register(SDKBuildAnalyzerDevTool())
+        register(SDKAssetOptimizerDevTool())
+        register(SDKSecurityAuditDevTool())
     }
 }
 

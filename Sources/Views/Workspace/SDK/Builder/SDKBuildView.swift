@@ -46,6 +46,7 @@ struct SDKBuildView: View {
                 architectureSection(project)
                 stabilitySection
                 explorationSection
+                moreToolsSection
                 deploymentSection(project)
             } else {
                 emptyProjectSection
@@ -429,6 +430,32 @@ struct SDKBuildView: View {
             NavigationLink(destination: SDKAPIBrowserView()) { Label("Internal API Surface", systemImage: "network.badge.shield.half.filled") }
         } header: {
             Label("Exploration", systemImage: "flashlight.on.fill")
+        }
+    }
+
+    // MARK: - More Tools
+
+    private var moreToolsSection: some View {
+        Section {
+            NavigationLink {
+                List {
+                    NavigationLink(destination: SDKPipelineOptimizerView()) {
+                        Label("Pipeline Optimizer", systemImage: "bolt.badge.a")
+                    }
+                    NavigationLink(destination: SDKBuildStatView()) {
+                        Label("Build Statistics", systemImage: "chart.xyaxis.line")
+                    }
+                    NavigationLink(destination: SDKResourceInspectorView()) {
+                        Label("Resource Inspector", systemImage: "magnifyingglass.circle")
+                    }
+                }
+                .navigationTitle("More Tools")
+            } label: {
+                Label("Advanced Tools & Analytics", systemImage: "plus.circle.fill")
+                    .foregroundStyle(.blue)
+            }
+        } header: {
+            Label("Extended Toolset", systemImage: "ellipsis.circle.fill")
         }
     }
 
