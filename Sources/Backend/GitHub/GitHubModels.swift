@@ -186,3 +186,137 @@ struct GitHubLabel: Codable, Hashable {
     let color: String
     let description: String?
 }
+
+// MARK: - New Models for Controls & Features
+
+struct GitHubAuthenticatedUser: Codable, Identifiable, Hashable {
+    let id: Int
+    let login: String
+    let avatarUrl: String
+    let name: String?
+    let company: String?
+    let blog: String?
+    let location: String?
+    let email: String?
+    let bio: String?
+    let publicRepos: Int
+    let publicGists: Int
+    let followers: Int
+    let following: Int
+    let createdAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case id, login, name, company, blog, location, email, bio, followers, following
+        case avatarUrl = "avatar_url"
+        case publicRepos = "public_repos"
+        case publicGists = "public_gists"
+        case createdAt = "created_at"
+    }
+}
+
+struct GitHubEvent: Codable, Identifiable, Hashable {
+    let id: String
+    let type: String
+    let actor: GitHubUser
+    let repo: GitHubEventRepo
+    let payload: GitHubEventPayload?
+    let `public`: Bool
+    let createdAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case id, type, actor, repo, payload, public
+        case createdAt = "created_at"
+    }
+}
+
+struct GitHubEventRepo: Codable, Hashable {
+    let id: Int
+    let name: String
+    let url: String
+}
+
+struct GitHubEventPayload: Codable, Hashable {
+    let action: String?
+    let ref: String?
+    let refType: String?
+    let description: String?
+
+    enum CodingKeys: String, CodingKey {
+        case action, ref, description
+        case refType = "ref_type"
+    }
+}
+
+struct GitHubNotification: Codable, Identifiable, Hashable {
+    let id: String
+    let unread: Bool
+    let reason: String
+    let updatedAt: Date
+    let lastReadAt: Date?
+    let subject: GitHubNotificationSubject
+    let repository: GitHubRepository
+
+    enum CodingKeys: String, CodingKey {
+        case id, unread, reason, subject, repository
+        case updatedAt = "updated_at"
+        case lastReadAt = "last_read_at"
+    }
+}
+
+struct GitHubNotificationSubject: Codable, Hashable {
+    let title: String
+    let url: String?
+    let latestCommentUrl: String?
+    let type: String
+
+    enum CodingKeys: String, CodingKey {
+        case title, url, type
+        case latestCommentUrl = "latest_comment_url"
+    }
+}
+
+struct GitHubGist: Codable, Identifiable, Hashable {
+    let id: String
+    let htmlUrl: String
+    let files: [String: GitHubGistFile]
+    let `public`: Bool
+    let createdAt: Date
+    let description: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, public, description
+        case htmlUrl = "html_url"
+        case createdAt = "created_at"
+        case files
+    }
+}
+
+struct GitHubGistFile: Codable, Hashable {
+    let filename: String
+    let type: String
+    let language: String?
+    let rawUrl: String?
+    let size: Int
+
+    enum CodingKeys: String, CodingKey {
+        case filename, type, language, size
+        case rawUrl = "raw_url"
+    }
+}
+
+struct GitHubRateLimitResponse: Codable {
+    let resources: GitHubRateLimitResources
+}
+
+struct GitHubRateLimitResources: Codable {
+    let core: GitHubRateLimit
+    let search: GitHubRateLimit
+    let graphql: GitHubRateLimit
+}
+
+struct GitHubRateLimit: Codable, Hashable {
+    let limit: Int
+    let remaining: Int
+    let reset: Int
+    let used: Int
+}

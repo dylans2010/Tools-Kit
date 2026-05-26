@@ -7,6 +7,7 @@ struct RepoListView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var searchText = ""
+    @State private var showingControls = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -17,6 +18,12 @@ struct RepoListView: View {
                     }
                     NavigationLink(destination: GitHubRepoComparisonView()) {
                         QuickGitHubTool(title: "Compare", icon: "arrow.left.and.right.square", color: .blue)
+                    }
+                    NavigationLink(destination: GitHubNotificationsView()) {
+                        QuickGitHubTool(title: "Notifications", icon: "bell", color: .red)
+                    }
+                    NavigationLink(destination: GitHubGistListView()) {
+                        QuickGitHubTool(title: "Gists", icon: "doc.plaintext", color: .green)
                     }
                 }
                 .padding()
@@ -58,13 +65,22 @@ struct RepoListView: View {
         }
         .navigationTitle("Repositories")
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button {
+                    showingControls = true
+                } label: {
+                    Label("Controls", systemImage: "gearshape")
+                }
+
                 Button(role: .destructive) {
                     logout()
                 } label: {
                     Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
                 }
             }
+        }
+        .sheet(isPresented: $showingControls) {
+            GitHubControlsView()
         }
         .searchable(text: $searchText, prompt: "Search Repositories")
         .alert("Error", isPresented: Binding(get: { errorMessage != nil }, set: { _ in errorMessage = nil })) {

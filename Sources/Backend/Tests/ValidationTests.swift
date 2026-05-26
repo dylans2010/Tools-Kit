@@ -17,6 +17,7 @@ struct ValidationTests {
         testConnectorsSystem()
         await testWorkspaceOS()
         await testSDKPlatform()
+        await GitHubValidationTests.run()
 
         print("All Validation Tests Passed!")
     }
