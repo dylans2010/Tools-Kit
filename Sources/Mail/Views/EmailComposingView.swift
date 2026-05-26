@@ -32,7 +32,7 @@ struct EmailComposingView: View {
     @State private var showingTableBuilder = false
     @State private var showingAIWrite = false
     @State private var showingCCBCC = false
-    @State private var showingFormattingBar = true
+    @State private var showingFormattingBar = false
     @State private var showingDraftsSheet = false
     @State private var showingCancelAlert = false
 
@@ -59,12 +59,13 @@ struct EmailComposingView: View {
             ZStack(alignment: .bottomTrailing) {
                 Color(.systemGroupedBackground).ignoresSafeArea()
 
-                VStack(spacing: 16) {
+                VStack(spacing: 0) {
                     header
 
                     ScrollView {
                         VStack(spacing: 16) {
                             fieldsContainer
+                                .padding(.top, 16)
 
                             editorContainer
 
@@ -85,21 +86,26 @@ struct EmailComposingView: View {
 
                 VStack {
                     Spacer()
-                    if showingFormattingBar {
+                    if focusedField == .body {
                         formattingBar
                             .clipShape(Capsule())
                             .shadow(radius: 4)
                             .padding(.horizontal, 20)
-                            .padding(.bottom, 80)
+                            .padding(.bottom, 20)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    } else {
+                        composeToolbar
+                            .clipShape(Capsule())
+                            .shadow(radius: 4)
+                            .padding(.horizontal, 20)
+                            .padding(.bottom, 20)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
-                    composeToolbar
-                        .clipShape(Capsule())
-                        .shadow(radius: 4)
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 20)
                 }
 
-                sendButton
+                if !isSending {
+                    sendButton
+                }
             }
             .navigationBarHidden(true)
             .onAppear(perform: prefillReply)
@@ -114,7 +120,7 @@ struct EmailComposingView: View {
             .overlay(alignment: .bottom) {
                 if showUndoSendBanner {
                     undoSendBannerView
-                        .padding(.bottom, 80)
+                        .padding(.bottom, 100)
                 }
             }
             .sheet(isPresented: $showingAIPanel) {
@@ -195,16 +201,12 @@ struct EmailComposingView: View {
                 if hasUnsavedContent { showingCancelAlert = true }
                 else { dismiss() }
             }
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.primary)
 
             Spacer()
 
-            Text(replyTo == nil ? "Compose" : "Reply")
+            Text(replyTo == nil ? "New Message" : "Reply")
                 .font(.headline)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 8)
-                .background(Color(.secondarySystemBackground))
-                .clipShape(Capsule())
 
             Spacer()
 
@@ -215,7 +217,8 @@ struct EmailComposingView: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 8)
+        .padding(.vertical, 12)
+        .background(Color(.systemBackground))
     }
 
     private var fieldsContainer: some View {
@@ -233,7 +236,7 @@ struct EmailComposingView: View {
             subjectRow
         }
         .background(Color(.secondarySystemBackground))
-        .cornerRadius(18)
+        .cornerRadius(16)
         .padding(.horizontal, 16)
     }
 
@@ -330,7 +333,7 @@ struct EmailComposingView: View {
         }
         .padding(12)
         .background(Color(.secondarySystemBackground))
-        .cornerRadius(22)
+        .cornerRadius(16)
         .padding(.horizontal, 16)
     }
 
@@ -343,15 +346,15 @@ struct EmailComposingView: View {
                 ProgressView().tint(.white)
             } else {
                 Image(systemName: scheduleDate != nil ? "calendar.badge.clock" : "paperplane.fill")
-                    .font(.system(size: 24, weight: .bold))
+                    .font(.system(size: 20, weight: .bold))
             }
         }
-        .frame(width: 64, height: 64)
+        .frame(width: 52, height: 52)
         .background(Color.accentColor)
         .foregroundColor(.white)
         .clipShape(Circle())
         .padding(20)
-        .shadow(radius: 6)
+        .shadow(radius: 4)
     }
 
     // MARK: - Body Editor
@@ -365,7 +368,7 @@ struct EmailComposingView: View {
                 .padding(.horizontal, 12)
 
             if messageBody.isEmpty {
-                Text("Compose")
+                Text("Compose your email...")
                     .font(.body)
                     .foregroundStyle(.tertiary)
                     .padding(.top, 8)
@@ -406,37 +409,6 @@ struct EmailComposingView: View {
     private var formattingBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 4) {
-                Button {
-                    showingDraftsSheet = true
-                } label: {
-                    Image(systemName: "tray.full")
-                        .font(.system(size: 15, weight: .medium))
-                        .frame(width: 36, height: 36)
-                        .foregroundStyle(.secondary)
-                }
-
-                Button {
-                    saveDraft()
-                } label: {
-                    Image(systemName: "square.and.arrow.down")
-                        .font(.system(size: 15, weight: .medium))
-                        .frame(width: 36, height: 36)
-                        .foregroundStyle(.orange)
-                }
-
-                Button {
-                    showingAIPanel = true
-                } label: {
-                    Image(systemName: "sparkles.rectangle.stack")
-                        .font(.system(size: 15, weight: .medium))
-                        .frame(width: 36, height: 36)
-                        .foregroundStyle(LinearGradient(colors: [.aiGradientStart, .aiGradientEnd], startPoint: .topLeading, endPoint: .bottomTrailing))
-                }
-
-                Divider()
-                    .frame(height: 24)
-                    .padding(.horizontal, 4)
-
                 formatButton("bold", "**bold**")
                 formatButton("italic", "_italic_")
                 formatButton("textformat.size", "## ")
@@ -459,6 +431,13 @@ struct EmailComposingView: View {
                     Image(systemName: "tablecells")
                         .font(.system(size: 15, weight: .medium))
                         .frame(width: 36, height: 36)
+                }
+
+                Button { focusedField = nil } label: {
+                    Image(systemName: "keyboard.chevron.compact.down")
+                        .font(.system(size: 15, weight: .medium))
+                        .frame(width: 36, height: 36)
+                        .foregroundStyle(.blue)
                 }
             }
             .padding(.horizontal, 12)
@@ -491,9 +470,7 @@ struct EmailComposingView: View {
                     toolbarButton("sparkles.rectangle.stack", .purple) { showingAIWrite = true }
                     toolbarButton("globe", .cyan) { showingTranslateSheet = true }
                     toolbarButton("calendar.badge.clock", .green) { showingScheduleSheet = true }
-                    toolbarButton("textformat", .indigo) {
-                        withAnimation { showingFormattingBar.toggle() }
-                    }
+                    toolbarButton("sparkles", .indigo) { showingAIPanel = true }
                 }
                 .padding(.horizontal, 12)
             }
@@ -552,27 +529,6 @@ struct EmailComposingView: View {
         if contentType.hasPrefix("video/") { return "film.fill" }
         if contentType.contains("pdf") { return "doc.richtext" }
         return "doc.fill"
-    }
-
-    // MARK: - Schedule Section
-
-    private var scheduleIndicator: some View {
-        Group {
-            if let date = scheduleDate {
-                HStack {
-                    Label("Scheduled: \(date.formatted())", systemImage: "clock.fill")
-                        .font(.caption.bold())
-                        .foregroundStyle(.orange)
-                    Spacer()
-                    Button("Clear") { scheduleDate = nil }
-                        .font(.caption2.bold())
-                        .foregroundStyle(.red)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(Color.orange.opacity(0.1))
-            }
-        }
     }
 
     // MARK: - Undo Send Banner
@@ -1015,7 +971,7 @@ struct EmailComposeDraftsView: View {
         NavigationStack {
             Group {
                 if drafts.isEmpty {
-                    ContentUnavailableView("No Drafts", systemImage: "tray", description: Text("All ypur saved drafts will appear here."))
+                    ContentUnavailableView("No Drafts", systemImage: "tray", description: Text("All your saved drafts will appear here."))
                 } else {
                     List {
                         ForEach(drafts) { draft in
