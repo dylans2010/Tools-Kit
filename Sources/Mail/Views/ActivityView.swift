@@ -1,7 +1,49 @@
 import SwiftUI
 
+@MainActor
+final class ActivityViewModel: ObservableObject {
+    @Published var recentThreads: [MailThread] = []
+    @Published var highlightedThreads: [MailThread] = []
+    @Published var followUpThreads: [MailThread] = []
+    @Published var recentAttachments: [(MailThread, MailMessage.MailAttachment)] = []
+
+    private let storage = MailStorageService.shared
+    private let mailStore = MailStore.shared
+
+    func refresh() {
+        let threads = storage.threads
+
+        self.recentThreads = Array(threads.sorted { $0.lastMessageDate > $1.lastMessageDate }.prefix(10))
+
+        self.highlightedThreads = Array(threads.filter { thread in
+            let msg = thread.messages.last
+            let hasAttachments = !(msg?.attachments.isEmpty ?? true)
+            let content = ((msg?.subject ?? "") + (msg?.body ?? "")).lowercased()
+            let isCalendar = content.contains("meeting") || content.contains("schedule")
+            let isFinancial = content.contains("invoice") || content.contains("payment")
+            return hasAttachments || isCalendar || isFinancial
+        }.prefix(10))
+
+        self.followUpThreads = Array(threads.filter { thread in
+            let isUnread = !thread.isRead
+            let lastMsgFromMe = thread.messages.last?.from.lowercased().contains(mailStore.activeAccount?.emailAddress.lowercased() ?? "____") ?? false
+            return isUnread || !lastMsgFromMe
+        }.prefix(10))
+
+        var allAttachments: [(MailThread, MailMessage.MailAttachment)] = []
+        for thread in threads {
+            for msg in thread.messages {
+                for att in msg.attachments {
+                    allAttachments.append((thread, att))
+                }
+            }
+        }
+        self.recentAttachments = Array(allAttachments.sorted { $0.0.lastMessageDate > $1.0.lastMessageDate }.prefix(10))
+    }
+}
+
 struct ActivityView: View {
-    @StateObject private var storage = MailStorageService.shared
+    @StateObject private var viewModel = ActivityViewModel()
     @StateObject private var mailStore = MailStore.shared
 
     @State private var selectedEmail: MailMessage?
@@ -32,6 +74,9 @@ struct ActivityView: View {
                     InboxDetailView(account: account, message: message)
                 }
             }
+            .onAppear {
+                viewModel.refresh()
+            }
         }
     }
 
@@ -45,7 +90,7 @@ struct ActivityView: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    ForEach(recentAttachments, id: \.1.id) { (thread, attachment) in
+                    ForEach(viewModel.recentAttachments, id: \.1.id) { (thread, attachment) in
                         Button {
                             selectedEmail = thread.messages.last
                         } label: {
@@ -82,7 +127,7 @@ struct ActivityView: View {
                 .padding(.horizontal, 16)
 
             VStack(spacing: 10) {
-                ForEach(recentThreads.prefix(5)) { thread in
+                ForEach(viewModel.recentThreads) { thread in
                     if let message = thread.messages.last {
                         activityRow(email: message)
                             .onTapGesture {
@@ -102,7 +147,7 @@ struct ActivityView: View {
                 .padding(.horizontal, 16)
 
             VStack(spacing: 10) {
-                ForEach(highlightedThreads.prefix(5)) { thread in
+                ForEach(viewModel.highlightedThreads) { thread in
                     if let message = thread.messages.last {
                         activityRow(email: message)
                             .onTapGesture {
@@ -122,7 +167,7 @@ struct ActivityView: View {
                 .padding(.horizontal, 16)
 
             VStack(spacing: 10) {
-                ForEach(followUpThreads.prefix(5)) { thread in
+                ForEach(viewModel.followUpThreads) { thread in
                     if let message = thread.messages.last {
                         activityRow(email: message)
                             .onTapGesture {
@@ -174,42 +219,7 @@ struct ActivityView: View {
         }
     }
 
-    // MARK: - Data Helpers
-
-    private var recentThreads: [MailThread] {
-        storage.threads.sorted { $0.lastMessageDate > $1.lastMessageDate }
-    }
-
-    private var highlightedThreads: [MailThread] {
-        storage.threads.filter { thread in
-            let msg = thread.messages.last
-            let hasAttachments = !(msg?.attachments.isEmpty ?? true)
-            let content = ((msg?.subject ?? "") + (msg?.body ?? "")).lowercased()
-            let isCalendar = content.contains("meeting") || content.contains("schedule")
-            let isFinancial = content.contains("invoice") || content.contains("payment")
-            return hasAttachments || isCalendar || isFinancial
-        }
-    }
-
-    private var followUpThreads: [MailThread] {
-        storage.threads.filter { thread in
-            let isUnread = !thread.isRead
-            let lastMsgFromMe = thread.messages.last?.from.lowercased().contains(mailStore.activeAccount?.emailAddress.lowercased() ?? "____") ?? false
-            return isUnread || !lastMsgFromMe
-        }
-    }
-
-    private var recentAttachments: [(MailThread, MailMessage.MailAttachment)] {
-        var all: [(MailThread, MailMessage.MailAttachment)] = []
-        for thread in storage.threads {
-            for msg in thread.messages {
-                for att in msg.attachments {
-                    all.append((thread, att))
-                }
-            }
-        }
-        return all.sorted { $0.0.lastMessageDate > $1.0.lastMessageDate }.prefix(10).map { $0 }
-    }
+    // MARK: - Helpers
 
     private func senderName(from value: String) -> String {
         if let range = value.range(of: "<") {

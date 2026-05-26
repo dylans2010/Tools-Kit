@@ -62,6 +62,7 @@ struct InboxView: View {
                                     Button { showingAIFeatures = true } label: { Label("AI Features", systemImage: "sparkles") }
                                     Button { showingAIDashboard = true } label: { Label("AI Dashboard", systemImage: "gauge") }
                                     NavigationLink(destination: PriorityQueueView()) { Label("Priority Queue", systemImage: "line.3.horizontal.decrease.circle") }
+                                    NavigationLink(destination: WorkflowExecutionMonitor()) { Label("Workflow Monitor", systemImage: "cpu") }
                                 } label: {
                                     Image(systemName: "sparkles")
                                         .foregroundStyle(LinearGradient(colors: [.aiGradientStart, .aiGradientEnd], startPoint: .topLeading, endPoint: .bottomTrailing))

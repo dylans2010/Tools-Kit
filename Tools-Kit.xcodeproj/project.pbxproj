@@ -283,6 +283,8 @@
 		NBTB02000000000000000001 /* NotebookTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NBTB01000000000000000001 /* NotebookTableView.swift */; };
 		ML0200000000000000000001 /* IMAPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000001 /* IMAPClient.swift */; };
 		ML0200000000000000000002 /* EmailMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000002 /* EmailMessage.swift */; };
+		ML0200000000000000000008 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000008 /* ActivityView.swift */; };
+		ML0200000000000000000009 /* InboxDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000009 /* InboxDetailView.swift */; };
 		ML0200000000000000000003 /* MailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000003 /* MailViewModel.swift */; };
 		ML0200000000000000000004 /* EmailDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000004 /* EmailDetailView.swift */; };
 		ML0200000000000000000006 /* MetadataInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000006 /* MetadataInspectorView.swift */; };
@@ -2314,6 +2316,8 @@
 		MP0100000000000000000003 /* YahooMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YahooMailProvider.swift; sourceTree = "<group>"; };
 		GP0100000000000000000001 /* GoogleMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMailProvider.swift; sourceTree = "<group>"; };
 		MS0100000000000000000001 /* MicrosoftMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrosoftMailProvider.swift; sourceTree = "<group>"; };
+		ML0100000000000000000008 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
+		ML0100000000000000000009 /* InboxDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxDetailView.swift; sourceTree = "<group>"; };
 		MS0100000000000000000002 /* UniversalInboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalInboxView.swift; sourceTree = "<group>"; };
 		MS0100000000000000000003 /* OAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthManager.swift; sourceTree = "<group>"; };
 		MS0100000000000000000004 /* AccountManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountManager.swift; sourceTree = "<group>"; };
@@ -10211,6 +10215,8 @@
 				ML0100000000000000000004 /* EmailDetailView.swift */,
 				ML0100000000000000000006 /* MetadataInspectorView.swift */,
 				ML0100000000000000000007 /* MailDocScanView.swift */,
+				ML0100000000000000000008 /* ActivityView.swift */,
+				ML0100000000000000000009 /* InboxDetailView.swift */,
 				MS0100000000000000000002 /* UniversalInboxView.swift */,
 				MS0100000000000000000005 /* MailSettingsView.swift */,
 				MT0100000000000000000001 /* MailTableView.swift */,
@@ -13911,6 +13917,8 @@
 				WK0200000000000000000005 /* WorkoutDetailView.swift in Sources */,
 				WK0200000000000000000006 /* NutritionView.swift in Sources */,
 				WK0200000000000000000007 /* MealScannerView.swift in Sources */,
+				ML0200000000000000000008 /* ActivityView.swift in Sources */,
+				ML0200000000000000000009 /* InboxDetailView.swift in Sources */,
 				WK0200000000000000000008 /* StreaksView.swift in Sources */,
 				WK0200000000000000000009 /* BadgesView.swift in Sources */,
 				WK020000000000000000000A /* ProgressView.swift in Sources */,

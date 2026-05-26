@@ -828,3 +828,199 @@ struct EmailComposingView: View {
     }
     #endif
 }
+
+struct WrappingFlowLayout: Layout {
+    var spacing: CGFloat = 8
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
+        var height: CGFloat = 0
+        var width: CGFloat = 0
+        var currentX: CGFloat = 0
+        var currentY: CGFloat = 0
+        let maxWidth = proposal.width ?? .infinity
+        for size in sizes {
+            if currentX + size.width > maxWidth {
+                currentX = 0
+                currentY += height + spacing
+                height = 0
+            }
+            currentX += size.width + spacing
+            height = max(height, size.height)
+            width = max(width, currentX)
+        }
+        return CGSize(width: width, height: currentY + height)
+    }
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
+        var currentX: CGFloat = bounds.minX
+        var currentY: CGFloat = bounds.minY
+        var lineHeight: CGFloat = 0
+        for (index, subview) in subviews.enumerated() {
+            if currentX + sizes[index].width > bounds.maxX {
+                currentX = bounds.minX
+                currentY += lineHeight + spacing
+                lineHeight = 0
+            }
+            subview.place(at: CGPoint(x: currentX, y: currentY), proposal: .unspecified)
+            currentX += sizes[index].width + spacing
+            lineHeight = max(lineHeight, sizes[index].height)
+        }
+    }
+}
+
+struct MarkdownPreview: View {
+    let text: String
+    var body: some View {
+        let normalized = EmailBodyNormalizer.normalize(text)
+        if let attributed = try? AttributedString(markdown: normalized, options: .init(interpretedSyntax: .full)) {
+            Text(attributed)
+                .lineSpacing(2)
+        } else {
+            Text(normalized)
+                .lineSpacing(2)
+        }
+    }
+}
+
+// MARK: - Email Body Normalizer
+
+enum EmailBodyNormalizer {
+    static func normalize(_ body: String) -> String {
+        var result = body
+        result = result.replacingOccurrences(of: "\\n", with: "\n")
+        result = result.replacingOccurrences(of: "\r\n", with: "\n")
+        return result
+    }
+
+    static func toHTML(_ body: String) -> String {
+        let normalized = normalize(body)
+        let escaped = normalized
+            .replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
+        return escaped.replacingOccurrences(of: "\n", with: "<br>")
+    }
+}
+
+// MARK: - Compose Draft Model
+
+struct EmailComposeDraft: Codable, Identifiable {
+    let id: String
+    var toRecipients: [String]
+    var ccRecipients: [String]
+    var bccRecipients: [String]
+    var subject: String
+    var body: String
+    var savedAt: Date
+}
+
+// MARK: - Compose Draft Store
+
+final class EmailComposeDraftStore {
+    static let shared = EmailComposeDraftStore()
+    private let fileManager = FileManager.default
+
+    private var storageURL: URL {
+        let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let dir = docs.appendingPathComponent("Workspace/Mail/ComposeDrafts", isDirectory: true)
+        if !fileManager.fileExists(atPath: dir.path) {
+            try? fileManager.createDirectory(at: dir, withIntermediateDirectories: true)
+        }
+        return dir.appendingPathComponent("drafts.json")
+    }
+
+    func save(_ draft: EmailComposeDraft) {
+        var drafts = loadAll()
+        if let idx = drafts.firstIndex(where: { $0.id == draft.id }) {
+            drafts[idx] = draft
+        } else {
+            drafts.insert(draft, at: 0)
+        }
+        persist(drafts)
+    }
+
+    func loadAll() -> [EmailComposeDraft] {
+        guard fileManager.fileExists(atPath: storageURL.path),
+              let data = try? Data(contentsOf: storageURL),
+              let decoded = try? JSONDecoder().decode([EmailComposeDraft].self, from: data) else {
+            return []
+        }
+        return decoded.sorted { $0.savedAt > $1.savedAt }
+    }
+
+    func delete(_ draftID: String) {
+        var drafts = loadAll()
+        drafts.removeAll { $0.id == draftID }
+        persist(drafts)
+    }
+
+    private func persist(_ drafts: [EmailComposeDraft]) {
+        guard let data = try? JSONEncoder().encode(drafts) else { return }
+        try? data.write(to: storageURL)
+    }
+}
+
+// MARK: - Compose Drafts View
+
+struct EmailComposeDraftsView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var drafts: [EmailComposeDraft] = []
+    let onSelect: (EmailComposeDraft) -> Void
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if drafts.isEmpty {
+                    ContentUnavailableView("No Drafts", systemImage: "tray", description: Text("All your saved drafts will appear here."))
+                } else {
+                    List {
+                        ForEach(drafts) { draft in
+                            Button {
+                                onSelect(draft)
+                                dismiss()
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(draft.subject.isEmpty ? "(No Subject)" : draft.subject)
+                                        .font(.subheadline.bold())
+                                        .foregroundStyle(.primary)
+                                        .lineLimit(1)
+                                    if !draft.toRecipients.isEmpty {
+                                        Text("To: \(draft.toRecipients.joined(separator: ", "))")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
+                                    }
+                                    Text(draft.body)
+                                        .font(.caption)
+                                        .foregroundStyle(.tertiary)
+                                        .lineLimit(2)
+                                    Text(draft.savedAt.formatted(date: .abbreviated, time: .shortened))
+                                        .font(.caption2)
+                                        .foregroundStyle(.quaternary)
+                                }
+                                .padding(.vertical, 4)
+                            }
+                        }
+                        .onDelete { offsets in
+                            let idsToDelete = offsets.map { drafts[$0].id }
+                            for id in idsToDelete {
+                                EmailComposeDraftStore.shared.delete(id)
+                            }
+                            drafts.remove(atOffsets: offsets)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Saved Drafts")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }.bold()
+                }
+            }
+            .onAppear {
+                drafts = EmailComposeDraftStore.shared.loadAll()
+            }
+        }
+    }
+}
