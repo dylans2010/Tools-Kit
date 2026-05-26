@@ -114,6 +114,14 @@ final class DiagnosticsService: ObservableObject {
     var isGyroAvailable: Bool { motionManager.isGyroAvailable }
     var isMagnetometerAvailable: Bool { motionManager.isMagnetometerAvailable }
 
+    var logDetailLevel: String {
+        UserDefaults.standard.string(forKey: "diagnostics_diagnosticDetailLevel") ?? "Standard"
+    }
+
+    var stressTestDuration: TimeInterval {
+        UserDefaults.standard.double(forKey: "diagnostics_stressTestDuration")
+    }
+
     // MARK: - Haptics
 
     var supportsHaptics: Bool {

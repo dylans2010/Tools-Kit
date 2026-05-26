@@ -25,11 +25,27 @@ struct DiagnosticsSettingsView: View {
     @AppStorage("diagnostics_thermalAlertEnabled") private var thermalAlertEnabled = true
     @AppStorage("diagnostics_showPassFail") private var showPassFail = true
 
+    // New Settings
+    @AppStorage("diagnostics_soundEffectsEnabled") private var soundEffectsEnabled = true
+    @AppStorage("diagnostics_diagnosticDetailLevel") private var detailLevel = "Standard"
+    @AppStorage("diagnostics_technicianName") private var technicianName = ""
+    @AppStorage("diagnostics_customerName") private var customerName = ""
+    @AppStorage("diagnostics_shopName") private var shopName = ""
+    @AppStorage("diagnostics_autoExportOnCompletion") private var autoExport = false
+    @AppStorage("diagnostics_logLevel") private var logLevel = "Info"
+    @AppStorage("diagnostics_theme") private var theme = "System"
+    @AppStorage("diagnostics_stressTestDuration") private var stressDuration: Double = 30
+    @AppStorage("diagnostics_includeHardwareSerials") private var includeSerials = false
+    @AppStorage("diagnostics_enableAIAssist") private var enableAIAssist = true
+
     @State private var showAppSettings = false
     @State private var showResetConfirmation = false
 
     private let exportFormats = ["PDF", "JSON", "CSV", "Plain Text"]
     private let categories = ["All"] + DiagnosticCategory.allCases.map(\.rawValue)
+    private let detailLevels = ["Basic", "Standard", "Deep", "Technician"]
+    private let logLevels = ["Error", "Warning", "Info", "Debug", "Verbose"]
+    private let themes = ["System", "Light", "Dark", "High Contrast"]
 
     var body: some View {
         NavigationStack {
@@ -126,10 +142,18 @@ struct DiagnosticsSettingsView: View {
                     Slider(value: $sensorPollingRate, in: 10...100, step: 5)
                 }
             }
+            VStack(alignment: .leading, spacing: 4) {
+                Label("Stress Test Duration: \(String(format: "%.0f", stressDuration))s", systemImage: "timer")
+                    .font(.subheadline)
+                Slider(value: $stressDuration, in: 10...300, step: 10)
+            }
+            Picker("Diagnostic Detail", selection: $detailLevel) {
+                ForEach(detailLevels, id: \.self) { level in
+                    Text(level).tag(level)
+                }
+            }
         } header: {
-            Label("Monitoring", systemImage: "gauge.with.dots.needle.67percent")
-        } footer: {
-            Text("Continuous monitoring runs diagnostics in the background at the set interval.")
+            Label("Monitoring & Testing", systemImage: "gauge.with.dots.needle.67percent")
         }
     }
 
@@ -172,13 +196,24 @@ struct DiagnosticsSettingsView: View {
             Toggle(isOn: $enableRepairShopMode) {
                 Label("Repair Shop Mode", systemImage: "hammer.fill")
             }
+            if enableRepairShopMode {
+                TextField("Technician Name", text: $technicianName)
+                TextField("Customer Name", text: $customerName)
+                TextField("Shop / Branch Name", text: $shopName)
+                Toggle(isOn: $includeSerials) {
+                    Label("Include Serial Numbers", systemImage: "number.square")
+                }
+            }
             Toggle(isOn: $networkToolsEnabled) {
                 Label("Network Tools", systemImage: "network")
+            }
+            Toggle(isOn: $enableAIAssist) {
+                Label("AI Support Assist", systemImage: "sparkles")
             }
         } header: {
             Label("Tool Categories", systemImage: "folder.fill")
         } footer: {
-            Text("Repair Shop Mode enables IMEI lookups, device grading, and pre-repair checklists.")
+            Text(enableRepairShopMode ? "Repair Shop Mode is active. Reports will include technician and customer metadata." : "Repair Shop Mode enables IMEI lookups, device grading, and pre-repair checklists.")
         }
     }
 
@@ -211,8 +246,14 @@ struct DiagnosticsSettingsView: View {
             } label: {
                 Label("View All Reports", systemImage: "doc.text.magnifyingglass")
             }
+
+            NavigationLink {
+                DiagnosticChatHistory { _ in }
+            } label: {
+                Label("Diagnostic Chat History", systemImage: "clock.arrow.circlepath")
+            }
         } header: {
-            Label("Advanced", systemImage: "slider.horizontal.below.square.and.square.filled")
+            Label("Advanced & Data", systemImage: "slider.horizontal.below.square.and.square.filled")
         }
     }
 
@@ -242,6 +283,19 @@ struct DiagnosticsSettingsView: View {
 
     private var resetSection: some View {
         Section {
+            Picker("Theme", selection: $theme) {
+                ForEach(themes, id: \.self) { t in
+                    Text(t).tag(t)
+                }
+            }
+            Picker("Log Level", selection: $logLevel) {
+                ForEach(logLevels, id: \.self) { l in
+                    Text(l).tag(l)
+                }
+            }
+            Toggle(isOn: $soundEffectsEnabled) {
+                Label("Sound Effects", systemImage: "speaker.wave.2")
+            }
             Button(role: .destructive) {
                 showResetConfirmation = true
             } label: {
@@ -272,5 +326,16 @@ struct DiagnosticsSettingsView: View {
         batteryAlertThreshold = 20
         thermalAlertEnabled = true
         showPassFail = true
+        soundEffectsEnabled = true
+        detailLevel = "Standard"
+        technicianName = ""
+        customerName = ""
+        shopName = ""
+        autoExport = false
+        logLevel = "Info"
+        theme = "System"
+        stressDuration = 30
+        includeSerials = false
+        enableAIAssist = true
     }
 }
