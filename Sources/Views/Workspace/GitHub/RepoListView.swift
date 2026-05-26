@@ -10,8 +10,22 @@ struct RepoListView: View {
 
     var body: some View {
         Group {
-            if isLoading && repositories.isEmpty {
-                ProgressView("Fetching Repositories...")
+            VStack(spacing: 0) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        NavigationLink(destination: GitHubTrendingExplorerView()) {
+                            QuickGitHubTool(title: "Trending", icon: "chart.line.uptrend.xyaxis", color: .orange)
+                        }
+                        NavigationLink(destination: GitHubRepoComparisonView()) {
+                            QuickGitHubTool(title: "Compare", icon: "arrow.left.and.right.square", color: .blue)
+                        }
+                    }
+                    .padding()
+                }
+                .background(Color(.secondarySystemBackground))
+
+                if isLoading && repositories.isEmpty {
+                    ProgressView("Fetching Repositories...")
             } else if repositories.isEmpty && !isLoading {
                 ContentUnavailableView(
                     "No Repositories",
@@ -98,6 +112,23 @@ struct RepoListView: View {
                 }
             }
         }
+    }
+}
+
+private struct QuickGitHubTool: View {
+    let title: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+            Text(title).font(.caption.bold())
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(color.opacity(0.1), in: Capsule())
+        .foregroundStyle(color)
     }
 }
 

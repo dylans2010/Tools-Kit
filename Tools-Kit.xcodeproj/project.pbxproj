@@ -7,6 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		92E13A73A39F4878870CCFF1 /* SDKResourceAuditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4F9C14598E4858BAC1F522 /* SDKResourceAuditView.swift */; };
+		0603EBECCB2849248F4BD1D4 /* SDKGlobalSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1436207771E4304B9145E91 /* SDKGlobalSearchView.swift */; };
+		6FCAA43DB3294F3586F66864 /* SDKDependencyVisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75D52D2ECF24F66B1A2B767 /* SDKDependencyVisualizerView.swift */; };
+		00C5FB7E53C14764A78B77A5 /* SDKCapabilityMatrixView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA9A1B0FEE48442284CEC774 /* SDKCapabilityMatrixView.swift */; };
+		B3725843730043C5BDD2E3D8 /* PluginSecurityScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29492A9E0C99440CB0FB7D12 /* PluginSecurityScannerView.swift */; };
+		5985120BA14245ACA8D9D6C7 /* PluginPerformanceProfilerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6482ABD7CAA1424BBECD13E3 /* PluginPerformanceProfilerView.swift */; };
+		9D53439974DB4797B41EFD55 /* PluginEventMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4976A1D0A0B04F9EBF58496C /* PluginEventMonitorView.swift */; };
+		087ACCF3A0424144A0872A6E /* PluginSandboxCustomizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04324EDCE992488FA869DCED /* PluginSandboxCustomizerView.swift */; };
+		C4DE3D82BB5A48B1B5921C55 /* ConnectorTrafficAnalyzerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E14343EA348424CA5025121 /* ConnectorTrafficAnalyzerView.swift */; };
+		6BCABADA193848E89EE79E3F /* ConnectorSchemaMapperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCBA9C2BCD794FFC9C0FC253 /* ConnectorSchemaMapperView.swift */; };
+		66D162E9118B4514888125EA /* ConnectorAuthStatusDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F452C58924FA4095BCFE2A0F /* ConnectorAuthStatusDashboardView.swift */; };
+		E30A68384CFD46EC9CB96444 /* ConnectorRetryPolicyEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF490DF5E6D342B2B72EB752 /* ConnectorRetryPolicyEditorView.swift */; };
+		353A525730724E30887EAB1D /* CalendarAvailabilityHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17EEA7756144893ACDED52E /* CalendarAvailabilityHeatmapView.swift */; };
+		0B995C085BAC4AA28EB27756 /* CalendarPublicImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B1AF6576FA428889DA5969 /* CalendarPublicImportView.swift */; };
+		6BEF9444ED5B42F1B5A5849E /* CalendarEventCategoryManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE901176F0D497793B4B208 /* CalendarEventCategoryManagerView.swift */; };
+		3FDFF3A38E5E427AA8168723 /* CalendarScheduleOptimizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09620122BD6047EDA8FBBF81 /* CalendarScheduleOptimizerView.swift */; };
+		EC83DE3BC2FD4451AD9D6A69 /* GitHubContributionGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AA18FD3052468A976BE7AC /* GitHubContributionGraphView.swift */; };
+		1A6496F6484343F69B964CC6 /* GitHubProjectKanbanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DB9E924C56B44C589BE128E /* GitHubProjectKanbanView.swift */; };
+		490E0EC6F3FA4357AC1E10FD /* GitHubRepoComparisonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12AF1F56F4474A21B545104E /* GitHubRepoComparisonView.swift */; };
+		D72C7E51E03349B3A93BB057 /* GitHubTrendingExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC2807D296E41B7AC4D8E84 /* GitHubTrendingExplorerView.swift */; };
+		5AD62026E5CC482C99826B89 /* NotebookTaskConsolidationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28ADD91748014AAE8A6A0089 /* NotebookTaskConsolidationView.swift */; };
+		3C4BA717BB4E4B2D8FEE73D2 /* NotebookMindMapGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6563FC84C724428A42E34ED /* NotebookMindMapGeneratorView.swift */; };
+		6A9D90D2F3D24941ADE70DEB /* NotebookFlashcardGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B1965563BB04C78A251E8D0 /* NotebookFlashcardGeneratorView.swift */; };
+		BF8785E0E1A648C88279E678 /* NotebookReferenceManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A877A0386AEA4256BFAA73D1 /* NotebookReferenceManagerView.swift */; };
 		DG02000000000000000000000001 /* Diag_AccelerometerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000001 /* Diag_AccelerometerView.swift */; };
 		DG02000000000000000000000002 /* Diag_AirplaneModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000002 /* Diag_AirplaneModeView.swift */; };
 		DG02000000000000000000000003 /* Diag_AmbientLightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000003 /* Diag_AmbientLightView.swift */; };
@@ -2012,6 +2036,30 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1E4F9C14598E4858BAC1F522 /* SDKResourceAuditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Explorer/SDKResourceAuditView.swift; sourceTree = "<group>"; };
+		C1436207771E4304B9145E91 /* SDKGlobalSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Explorer/SDKGlobalSearchView.swift; sourceTree = "<group>"; };
+		E75D52D2ECF24F66B1A2B767 /* SDKDependencyVisualizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Explorer/SDKDependencyVisualizerView.swift; sourceTree = "<group>"; };
+		DA9A1B0FEE48442284CEC774 /* SDKCapabilityMatrixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Explorer/SDKCapabilityMatrixView.swift; sourceTree = "<group>"; };
+		29492A9E0C99440CB0FB7D12 /* PluginSecurityScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Security/PluginSecurityScannerView.swift; sourceTree = "<group>"; };
+		6482ABD7CAA1424BBECD13E3 /* PluginPerformanceProfilerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Analytics/PluginPerformanceProfilerView.swift; sourceTree = "<group>"; };
+		4976A1D0A0B04F9EBF58496C /* PluginEventMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Analytics/PluginEventMonitorView.swift; sourceTree = "<group>"; };
+		04324EDCE992488FA869DCED /* PluginSandboxCustomizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Security/PluginSandboxCustomizerView.swift; sourceTree = "<group>"; };
+		6E14343EA348424CA5025121 /* ConnectorTrafficAnalyzerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Connectors/Analytics/ConnectorTrafficAnalyzerView.swift; sourceTree = "<group>"; };
+		BCBA9C2BCD794FFC9C0FC253 /* ConnectorSchemaMapperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Connectors/Mapping/ConnectorSchemaMapperView.swift; sourceTree = "<group>"; };
+		F452C58924FA4095BCFE2A0F /* ConnectorAuthStatusDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Connectors/Auth/ConnectorAuthStatusDashboardView.swift; sourceTree = "<group>"; };
+		DF490DF5E6D342B2B72EB752 /* ConnectorRetryPolicyEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Connectors/Execution/ConnectorRetryPolicyEditorView.swift; sourceTree = "<group>"; };
+		D17EEA7756144893ACDED52E /* CalendarAvailabilityHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Calendar/CalendarAvailabilityHeatmapView.swift; sourceTree = "<group>"; };
+		B4B1AF6576FA428889DA5969 /* CalendarPublicImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Calendar/CalendarPublicImportView.swift; sourceTree = "<group>"; };
+		7BE901176F0D497793B4B208 /* CalendarEventCategoryManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Calendar/CalendarEventCategoryManagerView.swift; sourceTree = "<group>"; };
+		09620122BD6047EDA8FBBF81 /* CalendarScheduleOptimizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Calendar/CalendarScheduleOptimizerView.swift; sourceTree = "<group>"; };
+		05AA18FD3052468A976BE7AC /* GitHubContributionGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/GitHub/GitHubContributionGraphView.swift; sourceTree = "<group>"; };
+		4DB9E924C56B44C589BE128E /* GitHubProjectKanbanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/GitHub/GitHubProjectKanbanView.swift; sourceTree = "<group>"; };
+		12AF1F56F4474A21B545104E /* GitHubRepoComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/GitHub/GitHubRepoComparisonView.swift; sourceTree = "<group>"; };
+		DBC2807D296E41B7AC4D8E84 /* GitHubTrendingExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/GitHub/GitHubTrendingExplorerView.swift; sourceTree = "<group>"; };
+		28ADD91748014AAE8A6A0089 /* NotebookTaskConsolidationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Notebooks/Features/NotebookTaskConsolidationView.swift; sourceTree = "<group>"; };
+		F6563FC84C724428A42E34ED /* NotebookMindMapGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Notebooks/Features/NotebookMindMapGeneratorView.swift; sourceTree = "<group>"; };
+		6B1965563BB04C78A251E8D0 /* NotebookFlashcardGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Notebooks/Features/NotebookFlashcardGeneratorView.swift; sourceTree = "<group>"; };
+		A877A0386AEA4256BFAA73D1 /* NotebookReferenceManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Notebooks/Features/NotebookReferenceManagerView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000001 /* Diag_AccelerometerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AccelerometerView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000002 /* Diag_AirplaneModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AirplaneModeView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000003 /* Diag_AmbientLightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AmbientLightView.swift; sourceTree = "<group>"; };
@@ -12317,6 +12365,102 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92E13A73A39F4878870CCFF1 /* SDKResourceAuditView.swift in Sources */,
+				0603EBECCB2849248F4BD1D4 /* SDKGlobalSearchView.swift in Sources */,
+				6FCAA43DB3294F3586F66864 /* SDKDependencyVisualizerView.swift in Sources */,
+				00C5FB7E53C14764A78B77A5 /* SDKCapabilityMatrixView.swift in Sources */,
+				B3725843730043C5BDD2E3D8 /* PluginSecurityScannerView.swift in Sources */,
+				5985120BA14245ACA8D9D6C7 /* PluginPerformanceProfilerView.swift in Sources */,
+				9D53439974DB4797B41EFD55 /* PluginEventMonitorView.swift in Sources */,
+				087ACCF3A0424144A0872A6E /* PluginSandboxCustomizerView.swift in Sources */,
+				C4DE3D82BB5A48B1B5921C55 /* ConnectorTrafficAnalyzerView.swift in Sources */,
+				6BCABADA193848E89EE79E3F /* ConnectorSchemaMapperView.swift in Sources */,
+				66D162E9118B4514888125EA /* ConnectorAuthStatusDashboardView.swift in Sources */,
+				E30A68384CFD46EC9CB96444 /* ConnectorRetryPolicyEditorView.swift in Sources */,
+				353A525730724E30887EAB1D /* CalendarAvailabilityHeatmapView.swift in Sources */,
+				0B995C085BAC4AA28EB27756 /* CalendarPublicImportView.swift in Sources */,
+				6BEF9444ED5B42F1B5A5849E /* CalendarEventCategoryManagerView.swift in Sources */,
+				3FDFF3A38E5E427AA8168723 /* CalendarScheduleOptimizerView.swift in Sources */,
+				EC83DE3BC2FD4451AD9D6A69 /* GitHubContributionGraphView.swift in Sources */,
+				1A6496F6484343F69B964CC6 /* GitHubProjectKanbanView.swift in Sources */,
+				490E0EC6F3FA4357AC1E10FD /* GitHubRepoComparisonView.swift in Sources */,
+				D72C7E51E03349B3A93BB057 /* GitHubTrendingExplorerView.swift in Sources */,
+				5AD62026E5CC482C99826B89 /* NotebookTaskConsolidationView.swift in Sources */,
+				3C4BA717BB4E4B2D8FEE73D2 /* NotebookMindMapGeneratorView.swift in Sources */,
+				6A9D90D2F3D24941ADE70DEB /* NotebookFlashcardGeneratorView.swift in Sources */,
+				BF8785E0E1A648C88279E678 /* NotebookReferenceManagerView.swift in Sources */,
+				D7EA7C19718145D08B63A28D /* D7EA7C19718145D08B63A28D in sources */,
+				96DDA9BD50244EF6907E96B4 /* 96DDA9BD50244EF6907E96B4 in sources */,
+				2242FF4E64804717A66B3045 /* 2242FF4E64804717A66B3045 in sources */,
+				256D0C413C734C0183912231 /* 256D0C413C734C0183912231 in sources */,
+				D5471DF20CF9437CBC29A247 /* D5471DF20CF9437CBC29A247 in sources */,
+				09848D0E33A145C3AA5A5DFA /* 09848D0E33A145C3AA5A5DFA in sources */,
+				9AEF4042C0AF42998A3BB6E4 /* 9AEF4042C0AF42998A3BB6E4 in sources */,
+				75370F0157DD4BB486985DD6 /* 75370F0157DD4BB486985DD6 in sources */,
+				3173C6ED19C24E4BB08FA2E1 /* 3173C6ED19C24E4BB08FA2E1 in sources */,
+				D394F270664C4352B56442A8 /* D394F270664C4352B56442A8 in sources */,
+				559C5DDC43A94F75B19768CB /* 559C5DDC43A94F75B19768CB in sources */,
+				8D7D4D1C78F5437397E02482 /* 8D7D4D1C78F5437397E02482 in sources */,
+				BA247780FD8D4D6EB29472A3 /* BA247780FD8D4D6EB29472A3 in sources */,
+				412CEF7F17114D7E9D0AAE06 /* 412CEF7F17114D7E9D0AAE06 in sources */,
+				DCF477D56E4443359EE28D60 /* DCF477D56E4443359EE28D60 in sources */,
+				0D763984EBCB4A7988857995 /* 0D763984EBCB4A7988857995 in sources */,
+				2EEBB4BE26F54F9A972F64FB /* 2EEBB4BE26F54F9A972F64FB in sources */,
+				334028A30798400DB05ACC48 /* 334028A30798400DB05ACC48 in sources */,
+				4B37FC095A4F463894DE173A /* 4B37FC095A4F463894DE173A in sources */,
+				13F8A974F3E944E7BF13ED6C /* 13F8A974F3E944E7BF13ED6C in sources */,
+				836AC6046ECF41DE9B094F5B /* 836AC6046ECF41DE9B094F5B in sources */,
+				E06A88F4D7EB4C6181FFA181 /* E06A88F4D7EB4C6181FFA181 in sources */,
+				C09FA2C6B25D4C06A52321C1 /* C09FA2C6B25D4C06A52321C1 in sources */,
+				F7FEE1CE5FE541F1B41DA067 /* F7FEE1CE5FE541F1B41DA067 in sources */,
+				B77207A1EE1B4F71B1DFB460 /* new file in sources */,
+				2A5779D18DD54BC983D08873 /* new file in sources */,
+				53A3FB6522EF4EE1AD6471CB /* new file in sources */,
+				53CFE1E2169B4678A087D3AB /* new file in sources */,
+				B92BEE4FE29D4430B3A87C2C /* new file in sources */,
+				51E7D57B897D4388AD761DD5 /* new file in sources */,
+				0BF676E3EAF54BEAB97B745B /* new file in sources */,
+				898B4C6A3B2E4DC4BF2DC1F2 /* new file in sources */,
+				664139DCAFCD4087B9B64183 /* new file in sources */,
+				F5318D80D20840C9BB8F3948 /* new file in sources */,
+				F24BD7C86BDF4E0DA52EB5A1 /* new file in sources */,
+				F0E826222C6E438EA936F1E9 /* new file in sources */,
+				672D922D641E4832B8D0DF54 /* new file in sources */,
+				AF1967F6DF02459B9EA33A5C /* new file in sources */,
+				4DAB09DE95194B2C92648998 /* new file in sources */,
+				34E894BE94254F898066F6AB /* new file in sources */,
+				23AD2847E1C04EA2B81035F7 /* new file in sources */,
+				0922C37221B843528F076DC0 /* new file in sources */,
+				4730E2FC39A749FA91AE62A9 /* new file in sources */,
+				E215963A2EA44AD9BCB95E63 /* new file in sources */,
+				6676F24C28074AC7A11E1168 /* new file in sources */,
+				3E19B7BE47974E12A35B729D /* new file in sources */,
+				7C2C145F125D40348BCB5FE6 /* new file in sources */,
+				0EEC1F5EE40847B0B8B040B5 /* new file in sources */,
+				54E87B928EA1464CB3CDDAF8 /* new file */,
+				19BAF9BCBB114798A65E548B /* new file */,
+				9C9F9BF6179947A3A592A4C9 /* new file */,
+				0B44A72DB8F24D2F832C8DEB /* new file */,
+				BC9894FC9D494E25BF2C0DF6 /* new file */,
+				95740083B0AE4A7F825F5B8E /* new file */,
+				50BB058600B0460D84FF1F74 /* new file */,
+				6D5BBCDFA57545669D4BE72A /* new file */,
+				6CC1FA07893346D79C781C9D /* new file */,
+				14EFE60C48014425A0E9833D /* new file */,
+				7DAD7251EAE14F3BA8DBF3E9 /* new file */,
+				A7C85A7F930C482C9B5E2233 /* new file */,
+				10753B0BC74D41E98886D7FE /* new file */,
+				A82C4E22C09D48AA958F4DD7 /* new file */,
+				AC6888F6C71348199F543FEC /* new file */,
+				9B48F6971214463898536B2E /* new file */,
+				2C80E630BAC249BE8BCC0D1E /* new file */,
+				8F0BFB2BBBB647459F24C8E0 /* new file */,
+				EE268479D1FE4A31928BFC43 /* new file */,
+				EAFED91949CD4D77BB1365A0 /* new file */,
+				59E9644759664988A59C3B32 /* new file */,
+				86FE868870CA47A887661BF1 /* new file */,
+				ABE1727AD8AE4511A8AFC91C /* new file */,
+				8CAE619BB4A6492DB629E2E3 /* new file */,
 				GM0200000000000000000001 /* AsteroidDodgeLogic.swift in Sources */,
 				GM0200000000000000000002 /* AsteroidDodgeView.swift in Sources */,
 				GM0200000000000000000003 /* BattlefieldCommanderAssets.swift in Sources */,
@@ -13429,7 +13573,6 @@
 				BFA001000000000000000003 /* AuthDatabaseService.swift in Sources */,
 				BFA001000000000000000005 /* GmailServerConfiguration.swift in Sources */,
 				BFA001000000000000000006 /* GmailMailProvider.swift in Sources */,
-
 				B1C2D3E4F5A60708090A0D11 /* AIService.swift in Sources */,
 				B1C2D3E4F5A60708090A0D02 /* CameraService.swift in Sources */,
 				B1C2D3E4F5A60708090A0D03 /* VisionService.swift in Sources */,
@@ -13437,7 +13580,6 @@
 				B1C2D3E4F5A60708090A0D06 /* FileDecoderHelper.swift in Sources */,
 				B1B2C3D4E5F60718293A0001 /* UserDataManager.swift in Sources */,
 				B1B2C3D4E5F60718293A0002 /* AIFeatureCheck.swift in Sources */,
-
 				B1C2D3E4F5A60708090A0B01 /* WeatherModels.swift in Sources */,
 				B1C2D3E4F5A60708090A0B02 /* WeatherService.swift in Sources */,
 				B1C2D3E4F5A60708090A0B03 /* WeatherRepository.swift in Sources */,
@@ -13445,7 +13587,6 @@
 				B1C2D3E4F5A60708090A0B05 /* WeatherView.swift in Sources */,
 				B1C2D3E4F5A60708090A0B06 /* WeatherMiniCard.swift in Sources */,
 				B1C2D3E4F5A60708090A0B07 /* WeatherComponents.swift in Sources */,
-
 				1391D868D54B47CB842E2A80 /* Tool.swift in Sources */,
 				C8B89D342FDA412F89C64396 /* ToolRegistry.swift in Sources */,
 				90C0DAB9340E467CB6AE1F59 /* APITesterBackend.swift in Sources */,
@@ -14059,7 +14200,6 @@
 				AI0200000000000000000019 /* AdvancedMailViewModels.swift in Sources */,
 				E1020000000000000000002F /* MailMarkdownRenderer.swift in Sources */,
 				FA12000000000000000000A0 /* PersonaChatExporter.swift in Sources */,
-
 				AA100000000000000000000A /* WorkspaceAutomationView.swift in Sources */,
 				AA100000000000000000000C /* ContentGraphView.swift in Sources */,
 				AA100000000000000000000E /* WorkspaceSnapshotView.swift in Sources */,
@@ -14249,8 +14389,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		KB0400000000000000000201 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				KB0200000000000000000001 /* KeyboardViewController.swift in Sources */,
 				KB0200000000000000000002 /* KeyboardRootView.swift in Sources */,
@@ -14279,93 +14417,10 @@
 				KB02OPENRT00000000000001 /* OpenRouterService.swift in Sources */,
 				KB02AIPROTO0000000000001 /* AIProviderProtocol.swift in Sources */,
 				KB02AICHAT00000000000001 /* AIChatSettings.swift in Sources */,
-							ED1AB19FBD8A4AFA9E6A46DC /* DNSLookupDevTool.swift in Sources */,
-				0D46F6A690CC4DF0AF6E6A2E /* XMLFormatterDevTool.swift in Sources */,
-				71B11BC1C1D245B0A07447FA /* JSONDiffDevTool.swift in Sources */,
-				28ADF54F26984B3C8B68D2AA /* SFSymbolsBrowserDevTool.swift in Sources */,
-				42E388FC9A374CC0955891C5 /* UUIDBulkGeneratorDevTool.swift in Sources */,
-				20DD481ED0E945F49CD92768 /* IPInfoDevTool.swift in Sources */,
-				97E108EB013F49199E5DEE80 /* RegexTesterDevTool.swift in Sources */,
-				C4B1CC0FD9F641F68A4DA2F8 /* HashGeneratorDevTool.swift in Sources */,
-				2240473323064CDF9C050884 /* KeychainViewerDevTool.swift in Sources */,
-				21F88283FE684B77AD310DEB /* MemoryMonitorDevTool.swift in Sources */,
-				FC9161E6F50E480D81CB8E06 /* OSVersionInspectorDevTool.swift in Sources */,
-				DEB7E864D5CE43E9A3B251DE /* CPUMonitorDevTool.swift in Sources */,
-				FE1DEC260CD747F19B73FD0E /* WebSocketMonitorDevTool.swift in Sources */,
-				FFFF693F6AE54F029914271D /* CacheViewerDevTool.swift in Sources */,
-				39BDFC31FA2844F48B8D5D76 /* CSVParserDevTool.swift in Sources */,
-				CCCE149428844A32BA4744B8 /* URLParserDevTool.swift in Sources */,
-				D8B1C7623F1D43BDA3C7A8A0 /* BatteryStatusDevTool.swift in Sources */,
-				BAE2E551E11D48F8A161A389 /* DateFormatterDevTool.swift in Sources */,
-				8E0A491D9A6E4C8685DBCB8D /* ScriptRunnerDevTool.swift in Sources */,
-				5E01FF2BF539408A8BEF750B /* BreakpointManagerDevTool.swift in Sources */,
-				5D873D36F51148BC9365C62C /* MarkdownPreviewDevTool.swift in Sources */,
-				7A19E85841104ED68A8DC2E0 /* VerboseLoggerDevTool.swift in Sources */,
-				FF383AC1D4C24BDA8DD22E14 /* FileExplorerDevTool.swift in Sources */,
-				2FD0897DB32D40AE8D618DC1 /* EnergyImpactMonitorDevTool.swift in Sources */,
-				F2C0EB90D01949BABF3BDE96 /* RuntimeInspectorDevTool.swift in Sources */,
-				DE739BEEF3004AC6AC1C5642 /* UserDefaultsInspectorDevTool.swift in Sources */,
-				81716F71A9784DA085DDE24E /* ViewHierarchyInspectorDevTool.swift in Sources */,
-				A0E236942FA74C48AA29FD2C /* JSONValidatorDevTool.swift in Sources */,
-				0D0E80E93D984FE2B04B56B7 /* UUIDGeneratorDevTool.swift in Sources */,
-				DD6EF973ACFA422FB4E188DA /* DeviceInfoDevTool.swift in Sources */,
-				DDF855E26E4F4CCBBA702016 /* DiskUsageAnalyzerDevTool.swift in Sources */,
-				C7075BE22621453AB028BD03 /* AppStateInspectorDevTool.swift in Sources */,
-				694070CB68E24C13AEB67444 /* LayoutGridPreviewDevTool.swift in Sources */,
-				A919A0A4BDBC470AA7C7D746 /* HTTPRequestTesterDevTool.swift in Sources */,
-				CE59FCA9737F4C019685672E /* ShadowGeneratorDevTool.swift in Sources */,
-				E268F89B32FB49AE879E1250 /* ClipboardInspectorDevTool.swift in Sources */,
-				973BFEDF813E4DA3A1F1F73E /* GradientBuilderDevTool.swift in Sources */,
-				603DBB721B0A4948BFB55AAA /* HTMLEntityEncoderDevTool.swift in Sources */,
-				DECB39F447004B598EE21A75 /* YAMLParserDevTool.swift in Sources */,
-				E6C67F296FA04BDCB74DDBE5 /* LoremIpsumGeneratorDevTool.swift in Sources */,
-				ABB00809F5814D2BACB28E80 /* PermissionInspectorDevTool.swift in Sources */,
-				096FA3D6396F4067881183B7 /* JWTDecoderDevTool.swift in Sources */,
-				713E0533E5E542B3860C049B /* Base64EncoderDevTool.swift in Sources */,
-				FC335125304A4830BFC09FE0 /* DevToolSharedUtils.swift in Sources */,
-				4493B4F7B7264E1587EBEA36 /* SDKModuleInspectorDevTool.swift in Sources */,
-				D11E98ED67F642419A3A23FB /* SDKConfigValidatorDevTool.swift in Sources */,
-				1970D9D8550E4BA4AAE4F97F /* SDKEventLoggerDevTool.swift in Sources */,
-				FDBC20CE109040A7B92BCFD3 /* SDKRuntimeStateDevTool.swift in Sources */,
-				104490A6DB0547939DA483B4 /* SDKDependencyGraphDevTool.swift in Sources */,
-				D4FEDB1E90F2441D922BDFE3 /* SDKIntegrationValidatorDevTool.swift in Sources */,
-				91EDD00757C94E1290B9C798 /* ColorConverterDevTool.swift in Sources */,
-				412F48260334428A8AFD5FB0 /* TimezoneConverterDevTool.swift in Sources */,
-				286434D0455549E996B295D6 /* APIResponseViewerDevTool.swift in Sources */,
-				F8B6C0E9AD5F41CB8F62B97E /* TextCaseConverterDevTool.swift in Sources */,
-				CABBB807363A40E4A47EA995 /* URLEncoderDevTool.swift in Sources */,
-				0B00347173954E3C8B35B0C4 /* HeaderInspectorDevTool.swift in Sources */,
-				06B8202E869F49A1A5B53993 /* UnicodeInspectorDevTool.swift in Sources */,
-				68795524235641ACB5E2FE21 /* EncryptionToolDevTool.swift in Sources */,
-				B53340373D2843B59FE0F5C4 /* LaunchTimeTrackerDevTool.swift in Sources */,
-				44896C6269FE4C4B9D3D238A /* SQLiteBrowserDevTool.swift in Sources */,
-				EF1D47D690D248348EF35A87 /* Base64DecoderDevTool.swift in Sources */,
-				57B11F6819304C2A9A1A6F51 /* JSONFormatterDevTool.swift in Sources */,
-				344B9B374DA945B6B825A46B /* FPSMonitorDevTool.swift in Sources */,
-				E9A6D245BD7F48EFAE76AD96 /* ColorPaletteGeneratorDevTool.swift in Sources */,
-				D37FD0C9C9E44EB8AD034EDC /* TaskAutomationDevTool.swift in Sources */,
-				36AE11CC78F44F24950A4C0B /* ThreadInspectorDevTool.swift in Sources */,
-				E0E13F12D52E4ED096946FAB /* BezierCurveVisualizerDevTool.swift in Sources */,
-				F698D02D289D4D13A2B10FFD /* LogStreamViewerDevTool.swift in Sources */,
-				25D8C4FF832B4C6190D19009 /* URLDecoderDevTool.swift in Sources */,
-				F7933A1A179942D990E817EA /* QueryStringParserDevTool.swift in Sources */,
-				1A357B7704DE48D4B63D1216 /* ContrastCheckerDevTool.swift in Sources */,
-				A2C6459A3F04486AA6D4E826 /* ASCIIHexConverterDevTool.swift in Sources */,
-				D288D29B004347BB9549CD13 /* NumberFormatterDevTool.swift in Sources */,
-				7D74185EED73411D82CFD77E /* HTMLEntityDecoderDevTool.swift in Sources */,
-				52C2DB224C394C79B0F196F3 /* TextDiffDevTool.swift in Sources */,
-				86E3529AA8304F859D947AE9 /* NetworkReachabilityDevTool.swift in Sources */,
-				E5A4F4933C484DEBBE959EFB /* CrashLogViewerDevTool.swift in Sources */,
-				3ACD485C621F41389BE35DB5 /* TypographyScaleDevTool.swift in Sources */,
-				DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */,
-				21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */,
-				NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		MS0400000000000000000201 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				MS0207C4CA60A1926E94DEC9 /* MessagesViewController.swift in Sources */,
 				MS02F387A7A65E6019196A12 /* MessagesRootView.swift in Sources */,
@@ -14406,87 +14461,6 @@
 				A00200000000000000000114 /* PaletteGalleryDemo.swift in Sources */,
 				A00200000000000000000116 /* MoodDemo.swift in Sources */,
 				A00200000000000000000118 /* LoadingDemo.swift in Sources */,
-							ED1AB19FBD8A4AFA9E6A46DC /* DNSLookupDevTool.swift in Sources */,
-				0D46F6A690CC4DF0AF6E6A2E /* XMLFormatterDevTool.swift in Sources */,
-				71B11BC1C1D245B0A07447FA /* JSONDiffDevTool.swift in Sources */,
-				28ADF54F26984B3C8B68D2AA /* SFSymbolsBrowserDevTool.swift in Sources */,
-				42E388FC9A374CC0955891C5 /* UUIDBulkGeneratorDevTool.swift in Sources */,
-				20DD481ED0E945F49CD92768 /* IPInfoDevTool.swift in Sources */,
-				97E108EB013F49199E5DEE80 /* RegexTesterDevTool.swift in Sources */,
-				C4B1CC0FD9F641F68A4DA2F8 /* HashGeneratorDevTool.swift in Sources */,
-				2240473323064CDF9C050884 /* KeychainViewerDevTool.swift in Sources */,
-				21F88283FE684B77AD310DEB /* MemoryMonitorDevTool.swift in Sources */,
-				FC9161E6F50E480D81CB8E06 /* OSVersionInspectorDevTool.swift in Sources */,
-				DEB7E864D5CE43E9A3B251DE /* CPUMonitorDevTool.swift in Sources */,
-				FE1DEC260CD747F19B73FD0E /* WebSocketMonitorDevTool.swift in Sources */,
-				FFFF693F6AE54F029914271D /* CacheViewerDevTool.swift in Sources */,
-				39BDFC31FA2844F48B8D5D76 /* CSVParserDevTool.swift in Sources */,
-				CCCE149428844A32BA4744B8 /* URLParserDevTool.swift in Sources */,
-				D8B1C7623F1D43BDA3C7A8A0 /* BatteryStatusDevTool.swift in Sources */,
-				BAE2E551E11D48F8A161A389 /* DateFormatterDevTool.swift in Sources */,
-				8E0A491D9A6E4C8685DBCB8D /* ScriptRunnerDevTool.swift in Sources */,
-				5E01FF2BF539408A8BEF750B /* BreakpointManagerDevTool.swift in Sources */,
-				5D873D36F51148BC9365C62C /* MarkdownPreviewDevTool.swift in Sources */,
-				7A19E85841104ED68A8DC2E0 /* VerboseLoggerDevTool.swift in Sources */,
-				FF383AC1D4C24BDA8DD22E14 /* FileExplorerDevTool.swift in Sources */,
-				2FD0897DB32D40AE8D618DC1 /* EnergyImpactMonitorDevTool.swift in Sources */,
-				F2C0EB90D01949BABF3BDE96 /* RuntimeInspectorDevTool.swift in Sources */,
-				DE739BEEF3004AC6AC1C5642 /* UserDefaultsInspectorDevTool.swift in Sources */,
-				81716F71A9784DA085DDE24E /* ViewHierarchyInspectorDevTool.swift in Sources */,
-				A0E236942FA74C48AA29FD2C /* JSONValidatorDevTool.swift in Sources */,
-				0D0E80E93D984FE2B04B56B7 /* UUIDGeneratorDevTool.swift in Sources */,
-				DD6EF973ACFA422FB4E188DA /* DeviceInfoDevTool.swift in Sources */,
-				DDF855E26E4F4CCBBA702016 /* DiskUsageAnalyzerDevTool.swift in Sources */,
-				C7075BE22621453AB028BD03 /* AppStateInspectorDevTool.swift in Sources */,
-				694070CB68E24C13AEB67444 /* LayoutGridPreviewDevTool.swift in Sources */,
-				A919A0A4BDBC470AA7C7D746 /* HTTPRequestTesterDevTool.swift in Sources */,
-				CE59FCA9737F4C019685672E /* ShadowGeneratorDevTool.swift in Sources */,
-				E268F89B32FB49AE879E1250 /* ClipboardInspectorDevTool.swift in Sources */,
-				973BFEDF813E4DA3A1F1F73E /* GradientBuilderDevTool.swift in Sources */,
-				603DBB721B0A4948BFB55AAA /* HTMLEntityEncoderDevTool.swift in Sources */,
-				DECB39F447004B598EE21A75 /* YAMLParserDevTool.swift in Sources */,
-				E6C67F296FA04BDCB74DDBE5 /* LoremIpsumGeneratorDevTool.swift in Sources */,
-				ABB00809F5814D2BACB28E80 /* PermissionInspectorDevTool.swift in Sources */,
-				096FA3D6396F4067881183B7 /* JWTDecoderDevTool.swift in Sources */,
-				713E0533E5E542B3860C049B /* Base64EncoderDevTool.swift in Sources */,
-				FC335125304A4830BFC09FE0 /* DevToolSharedUtils.swift in Sources */,
-				4493B4F7B7264E1587EBEA36 /* SDKModuleInspectorDevTool.swift in Sources */,
-				D11E98ED67F642419A3A23FB /* SDKConfigValidatorDevTool.swift in Sources */,
-				1970D9D8550E4BA4AAE4F97F /* SDKEventLoggerDevTool.swift in Sources */,
-				FDBC20CE109040A7B92BCFD3 /* SDKRuntimeStateDevTool.swift in Sources */,
-				104490A6DB0547939DA483B4 /* SDKDependencyGraphDevTool.swift in Sources */,
-				D4FEDB1E90F2441D922BDFE3 /* SDKIntegrationValidatorDevTool.swift in Sources */,
-				91EDD00757C94E1290B9C798 /* ColorConverterDevTool.swift in Sources */,
-				412F48260334428A8AFD5FB0 /* TimezoneConverterDevTool.swift in Sources */,
-				286434D0455549E996B295D6 /* APIResponseViewerDevTool.swift in Sources */,
-				F8B6C0E9AD5F41CB8F62B97E /* TextCaseConverterDevTool.swift in Sources */,
-				CABBB807363A40E4A47EA995 /* URLEncoderDevTool.swift in Sources */,
-				0B00347173954E3C8B35B0C4 /* HeaderInspectorDevTool.swift in Sources */,
-				06B8202E869F49A1A5B53993 /* UnicodeInspectorDevTool.swift in Sources */,
-				68795524235641ACB5E2FE21 /* EncryptionToolDevTool.swift in Sources */,
-				B53340373D2843B59FE0F5C4 /* LaunchTimeTrackerDevTool.swift in Sources */,
-				44896C6269FE4C4B9D3D238A /* SQLiteBrowserDevTool.swift in Sources */,
-				EF1D47D690D248348EF35A87 /* Base64DecoderDevTool.swift in Sources */,
-				57B11F6819304C2A9A1A6F51 /* JSONFormatterDevTool.swift in Sources */,
-				344B9B374DA945B6B825A46B /* FPSMonitorDevTool.swift in Sources */,
-				E9A6D245BD7F48EFAE76AD96 /* ColorPaletteGeneratorDevTool.swift in Sources */,
-				D37FD0C9C9E44EB8AD034EDC /* TaskAutomationDevTool.swift in Sources */,
-				36AE11CC78F44F24950A4C0B /* ThreadInspectorDevTool.swift in Sources */,
-				E0E13F12D52E4ED096946FAB /* BezierCurveVisualizerDevTool.swift in Sources */,
-				F698D02D289D4D13A2B10FFD /* LogStreamViewerDevTool.swift in Sources */,
-				25D8C4FF832B4C6190D19009 /* URLDecoderDevTool.swift in Sources */,
-				F7933A1A179942D990E817EA /* QueryStringParserDevTool.swift in Sources */,
-				1A357B7704DE48D4B63D1216 /* ContrastCheckerDevTool.swift in Sources */,
-				A2C6459A3F04486AA6D4E826 /* ASCIIHexConverterDevTool.swift in Sources */,
-				D288D29B004347BB9549CD13 /* NumberFormatterDevTool.swift in Sources */,
-				7D74185EED73411D82CFD77E /* HTMLEntityDecoderDevTool.swift in Sources */,
-				52C2DB224C394C79B0F196F3 /* TextDiffDevTool.swift in Sources */,
-				86E3529AA8304F859D947AE9 /* NetworkReachabilityDevTool.swift in Sources */,
-				E5A4F4933C484DEBBE959EFB /* CrashLogViewerDevTool.swift in Sources */,
-				3ACD485C621F41389BE35DB5 /* TypographyScaleDevTool.swift in Sources */,
-				DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */,
-				21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */,
-				NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

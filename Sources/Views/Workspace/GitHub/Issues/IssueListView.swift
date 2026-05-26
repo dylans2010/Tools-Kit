@@ -82,22 +82,23 @@ struct IssueListView: View {
 
     private func loadIssues() async {
         isLoading = true
-        // Issues are fetched from the GitHub API; start empty until connected to a repository.
-        issues = []
-        isLoading = false
+        do {
+            let fetched: [GitHubIssue] = try await GitHubAPIClient.shared.request(.repoIssues(owner: repository.owner.login, repo: repository.name))
+            await MainActor.run {
+                self.issues = fetched
+                self.isLoading = false
+            }
+        } catch {
+            print("Failed to load issues: \(error)")
+            isLoading = false
+        }
     }
 }
 
-struct GitHubIssue: Identifiable {
-    let id = UUID()
-    let number: Int
-    let title: String
-    let state: IssueState
-    let labels: [String]
-    let createdAt: Date
-    var body: String = ""
-    var assignee: String? = nil
-    var commentCount: Int = 0
-}
-
 enum IssueState: String, Codable { case open, closed }
+
+extension GitHubIssue {
+    var mappedState: IssueState {
+        state == "open" ? .open : .closed
+    }
+}

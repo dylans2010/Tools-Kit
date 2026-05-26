@@ -31,7 +31,27 @@ struct ConnectorsMainView: View {
 
     @ViewBuilder
     private var overviewSection: some View {
-        Section(header: Text("Overview")) {
+        Section(header: Text("Intelligent Management")) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    NavigationLink(destination: ConnectorTrafficAnalyzerView()) {
+                        QuickToolCard(title: "Traffic", icon: "waveform.path.ecg", color: .blue)
+                    }
+                    NavigationLink(destination: ConnectorSchemaMapperView()) {
+                        QuickToolCard(title: "Mapping", icon: "arrow.triangle.merge", color: .purple)
+                    }
+                    NavigationLink(destination: ConnectorAuthStatusDashboardView()) {
+                        QuickToolCard(title: "Auth", icon: "key.fill", color: .green)
+                    }
+                    NavigationLink(destination: ConnectorRetryPolicyEditorView()) {
+                        QuickToolCard(title: "Retry", icon: "arrow.clockwise.circle", color: .orange)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets())
+
             HStack(spacing: 16) {
                 VStack(spacing: 2) {
                     Text("\(totalCount)")
@@ -153,6 +173,26 @@ struct ConnectorsMainView: View {
             AnyView(ConnectorDetailView(connector: c))
         }
         return open(connector)
+    }
+}
+
+private struct QuickToolCard: View {
+    let title: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.headline)
+                .foregroundStyle(color)
+                .frame(width: 40, height: 40)
+                .background(color.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+            Text(title)
+                .font(.caption2.bold())
+                .foregroundStyle(.primary)
+        }
+        .frame(width: 70)
     }
 }
 

@@ -37,6 +37,10 @@ struct PageEditorView: View {
     @State private var showingAnalytics = false
     @State private var showingEssayDrafting = false
     @State private var showingScanNotebooks = false
+    @State private var showingTaskConsolidation = false
+    @State private var showingMindMap = false
+    @State private var showingFlashcards = false
+    @State private var showingReferences = false
 
     // Existing Sheets
     @State private var showingSearch = false
@@ -131,6 +135,18 @@ struct PageEditorView: View {
         }
         .sheet(isPresented: $showingScanNotebooks) {
             ScanNotebooksView()
+        }
+        .sheet(isPresented: $showingTaskConsolidation) {
+            NavigationStack { NotebookTaskConsolidationView() }
+        }
+        .sheet(isPresented: $showingMindMap) {
+            NavigationStack { NotebookMindMapGeneratorView() }
+        }
+        .sheet(isPresented: $showingFlashcards) {
+            NavigationStack { NotebookFlashcardGeneratorView(content: content) }
+        }
+        .sheet(isPresented: $showingReferences) {
+            NavigationStack { NotebookReferenceManagerView(content: content) }
         }
         .sheet(isPresented: $showingPageInfo) {
             PageInfoView(page: page, content: content, title: $title, isPresented: $showingPageInfo)
@@ -355,6 +371,14 @@ struct PageEditorView: View {
                     toolbarButton(icon: "doc.text.badge.plus", label: "Draft") { showingEssayDrafting = true }
 
                     toolbarButton(icon: "doc.text.viewfinder", label: "Scan") { showingScanNotebooks = true }
+
+                    toolbarButton(icon: "checklist", label: "Tasks") { showingTaskConsolidation = true }
+
+                    toolbarButton(icon: "circle.grid.cross", label: "Mind Map") { showingMindMap = true }
+
+                    toolbarButton(icon: "rectangle.stack.badge.person.crop", label: "Study") { showingFlashcards = true }
+
+                    toolbarButton(icon: "link.circle", label: "Refs") { showingReferences = true }
 
                     toolbarButton(icon: "book.closed", label: "Dictionary") { showingDictionary = true }
 

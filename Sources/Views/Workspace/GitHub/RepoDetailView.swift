@@ -76,6 +76,14 @@ struct RepoDetailView: View {
             }
 
             Section {
+                NavigationLink(destination: GitHubProjectKanbanView(owner: repository.owner.login, repo: repository.name)) {
+                    Label("Project Board", systemImage: "square.grid.3x2.fill")
+                }
+
+                NavigationLink(destination: GitHubContributionGraphView(owner: repository.owner.login, repo: repository.name)) {
+                    Label("Contribution Stats", systemImage: "chart.bar.xaxis")
+                }
+
                 NavigationLink(destination: BranchListView(owner: repository.owner.login, repo: repository.name, selectedBranch: selectedBranch) { branch in
                     selectedBranch = branch
                 }) {

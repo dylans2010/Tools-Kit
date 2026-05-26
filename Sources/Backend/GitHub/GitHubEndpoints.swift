@@ -20,6 +20,8 @@ enum GitHubEndpoints {
     case fork(owner: String, repo: String)
     case createRef(owner: String, repo: String)
     case deleteRef(owner: String, repo: String, ref: String)
+    case repoIssues(owner: String, repo: String)
+    case trending(language: String)
 
     var url: URL {
         switch self {
@@ -61,12 +63,16 @@ enum GitHubEndpoints {
         case .deleteRef(let owner, let repo, let ref):
             let encodedRef = ref.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ref
             return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/git/refs/\(encodedRef)")!
+        case .repoIssues(let owner, let repo):
+            return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/issues?state=all")!
+        case .trending(let language):
+            return URL(string: "\(GitHubEndpoints.baseURL)/search/repositories?q=language:\(language)&sort=stars&order=desc")!
         }
     }
 
     var method: String {
         switch self {
-        case .userRepos, .searchRepos, .repoDetails, .branches, .commits, .pullRequests, .prDetails, .contents, .compare:
+        case .userRepos, .searchRepos, .repoDetails, .branches, .commits, .pullRequests, .prDetails, .contents, .compare, .repoIssues, .trending:
             return "GET"
         case .starred:
             return "PUT"
