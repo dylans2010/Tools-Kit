@@ -36,8 +36,8 @@ struct PluginPerformanceProfilerView: View {
                 }
 
                 Section("Security Profile") {
-                    if plugin.permissions.contains(.all) {
-                        Label("Critical: Wildcard permissions detected.", systemImage: "exclamationmark.shield.fill")
+                    if Set(plugin.permissions) == Set(PluginPermission.allCases) {
+                        Label("Critical: All available permissions requested.", systemImage: "exclamationmark.shield.fill")
                             .foregroundStyle(.red)
                     } else if plugin.permissions.count > 3 {
                         Label("High: Multiple sensitive scopes requested.", systemImage: "shield.fill")

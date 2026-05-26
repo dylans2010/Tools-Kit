@@ -84,8 +84,8 @@ struct PluginSecurityScannerView: View {
                     var findings: [String] = []
                     var risk: PluginScanResult.RiskLevel = .low
 
-                    if plugin.permissions.contains(.all) {
-                        findings.append("Requests unrestricted system access (Wildcard).")
+                    if Set(plugin.permissions) == Set(PluginPermission.allCases) {
+                        findings.append("Requests all available plugin permissions.")
                         risk = .critical
                     }
 
