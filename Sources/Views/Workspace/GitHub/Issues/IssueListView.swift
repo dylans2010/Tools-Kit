@@ -49,7 +49,7 @@ struct IssueListView: View {
                                         if !issue.labels.isEmpty {
                                             HStack(spacing: 4) {
                                                 ForEach(issue.labels, id: \.self) { label in
-                                                    Text(label)
+                                                    Text(label.name)
                                                         .font(.caption2)
                                                         .padding(.horizontal, 6)
                                                         .padding(.vertical, 2)
@@ -95,10 +95,3 @@ struct IssueListView: View {
     }
 }
 
-enum IssueState: String, Codable { case open, closed }
-
-extension GitHubIssue {
-    var mappedState: IssueState {
-        state == "open" ? .open : .closed
-    }
-}

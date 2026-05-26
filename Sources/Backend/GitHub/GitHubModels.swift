@@ -81,13 +81,15 @@ struct GitHubCommitAuthor: Codable, Hashable {
     let date: Date
 }
 
+enum PRState: String, Codable { case open, closed }
+
 /// Represents a Pull Request.
 struct GitHubPullRequest: Codable, Identifiable, Hashable {
     let id: Int
     let number: Int
     let title: String
     let body: String?
-    let state: String
+    let state: PRState
     let user: GitHubUser
     let htmlUrl: String
     let createdAt: Date
@@ -154,21 +156,24 @@ struct GitHubFileDiff: Codable, Hashable {
     let patch: String?
 }
 
+enum IssueState: String, Codable { case open, closed }
+
 /// Represents a GitHub Issue.
 struct GitHubIssue: Identifiable, Codable, Hashable {
     let id: Int
     let number: Int
     let title: String
-    let state: String
+    let state: IssueState
     let body: String?
     let user: GitHubUser?
     let labels: [GitHubLabel]
+    let assignee: GitHubUser?
     let createdAt: Date
     let updatedAt: Date
     let closedAt: Date?
 
     enum CodingKeys: String, CodingKey {
-        case id, number, title, state, body, user, labels
+        case id, number, title, state, body, user, labels, assignee
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case closedAt = "closed_at"

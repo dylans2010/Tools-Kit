@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// Extension to handle hex color conversion for Codable conformance.
 extension Color {
     /// Initializes a Color from a hex string.
     /// Supports formats: #RGB, #RRGGBB, #RRGGBBAA, and their counterparts without the # prefix.
