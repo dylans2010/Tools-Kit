@@ -65,7 +65,7 @@ struct InboxAIFeaturesView: View {
             }
             .navigationDestination(item: $selectedEmail) { message in
                 if let account {
-                    InboxMessageDetailView(account: account, message: message)
+                    InboxDetailView(account: account, message: message)
                 } else {
                     VStack(spacing: 20) {
                         Image(systemName: "envelope.fill")
