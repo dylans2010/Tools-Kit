@@ -40,7 +40,7 @@ struct DiagnosticsHomeView: View {
                 DiagnosticsSupportAssistView()
             }
             .fullScreenCover(isPresented: $showSettings) {
-                DiagnosticsSettingsView()
+                DiagnosticsHomeSettingsView()
             }
         }
     }
@@ -444,3 +444,10 @@ struct DiagnosticsCategoryChip: View {
         }
     }
 }
+
+private struct DiagnosticsHomeSettingsView: View {
+    var body: some View {
+        DiagnosticsSettingsView()
+    }
+}
+
