@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-public struct SDKPlugin: Identifiable, Codable {
+public struct SDKPlugin: Identifiable, Codable, Hashable {
     public var id: UUID
     public var name: String
     public var version: String
@@ -14,6 +14,8 @@ public struct SDKPlugin: Identifiable, Codable {
 
 public enum PluginPermission: String, Codable, CaseIterable {
     case readData, writeData, network, notifications, fileAccess
+
+    public static var all: [PluginPermission] { allCases }
 }
 
 @MainActor

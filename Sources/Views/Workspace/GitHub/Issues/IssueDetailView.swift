@@ -25,8 +25,8 @@ struct IssueDetailView: View {
                     }
                     Text(issue.title)
                         .font(.title3.bold())
-                    if !issue.body.isEmpty {
-                        Text(issue.body)
+                    if issue.body?.isEmpty == false {
+                        Text(issue.body ?? "")
                             .font(.body)
                     }
                     HStack {
