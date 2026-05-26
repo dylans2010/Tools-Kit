@@ -40,7 +40,13 @@ struct CalendarHomeView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button { showingAISheet = true } label: {
+                    Menu {
+                        Button { showingAISheet = true } label: { Label("AI Assistant", systemImage: "sparkles") }
+                        NavigationLink(destination: CalendarAvailabilityHeatmapView()) { Label("Availability Heatmap", systemImage: "chart.bar.fill") }
+                        NavigationLink(destination: CalendarPublicImportView()) { Label("Public Import (.ics)", systemImage: "arrow.down.doc") }
+                        NavigationLink(destination: CalendarEventCategoryManagerView()) { Label("Manage Categories", systemImage: "tag") }
+                        NavigationLink(destination: CalendarScheduleOptimizerView()) { Label("Schedule Optimizer", systemImage: "wand.and.stars") }
+                    } label: {
                         Image(systemName: "sparkles")
                     }
                 }

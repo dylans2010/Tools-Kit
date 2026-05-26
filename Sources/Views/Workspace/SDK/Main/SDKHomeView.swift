@@ -33,6 +33,9 @@ struct SDKHomeView: View {
             }
 
             Section {
+                NavigationLink(destination: SDKGlobalSearchView()) {
+                    Label("Global Search", systemImage: "magnifyingglass")
+                }
                 NavigationLink(destination: SDKBuildView()) {
                     Label("App Builder", systemImage: "hammer")
                 }
@@ -176,6 +179,15 @@ struct SDKHomeView: View {
             } label: {
                 Label("Create New Project", systemImage: "plus.rectangle")
             }
+                NavigationLink(destination: SDKResourceAuditView()) {
+                    Label("Resource Audit", systemImage: "chart.bar.xaxis")
+                }
+                NavigationLink(destination: SDKDependencyVisualizerView()) {
+                    Label("Dependency Visualizer", systemImage: "circle.grid.cross")
+                }
+                NavigationLink(destination: SDKCapabilityMatrixView()) {
+                    Label("Capability Matrix", systemImage: "checkerboard.rectangle")
+                }
             NavigationLink(destination: SDKDiagnosticsView()) {
                 Label("Run Diagnostics", systemImage: "stethoscope")
             }

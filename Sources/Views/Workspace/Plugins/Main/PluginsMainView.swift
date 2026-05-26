@@ -154,6 +154,22 @@ struct PluginsMainView: View {
                         PluginQuickActionButton(icon: "bolt.fill", label: "Bulk", color: .blue) {
                             showingBulkActions = true
                         }
+                        NavigationLink(destination: PluginPerformanceProfilerView()) {
+                            PluginQuickActionButton(icon: "gauge.with.needle.fill", label: "Profile", color: .purple) {}
+                        }
+                        .buttonStyle(.plain)
+                        NavigationLink(destination: PluginSecurityScannerView()) {
+                            PluginQuickActionButton(icon: "shield.viewfinder", label: "Scanner", color: .red) {}
+                        }
+                        .buttonStyle(.plain)
+                        NavigationLink(destination: PluginEventMonitorView()) {
+                            PluginQuickActionButton(icon: "waveform.path.ecg", label: "Events", color: .indigo) {}
+                        }
+                        .buttonStyle(.plain)
+                        NavigationLink(destination: PluginSandboxCustomizerView()) {
+                            PluginQuickActionButton(icon: "lock.rectangle", label: "Sandbox", color: .orange) {}
+                        }
+                        .buttonStyle(.plain)
                         PluginQuickActionButton(icon: "chart.bar.fill", label: "Health", color: .green) {
                             showingHealthDashboard = true
                         }

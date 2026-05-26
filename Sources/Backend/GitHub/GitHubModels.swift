@@ -153,3 +153,31 @@ struct GitHubFileDiff: Codable, Hashable {
     let changes: Int
     let patch: String?
 }
+
+/// Represents a GitHub Issue.
+struct GitHubIssue: Identifiable, Codable, Hashable {
+    let id: Int
+    let number: Int
+    let title: String
+    let state: String
+    let body: String?
+    let user: GitHubUser?
+    let labels: [GitHubLabel]
+    let createdAt: Date
+    let updatedAt: Date
+    let closedAt: Date?
+
+    enum CodingKeys: String, CodingKey {
+        case id, number, title, state, body, user, labels
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case closedAt = "closed_at"
+    }
+}
+
+struct GitHubLabel: Codable, Hashable {
+    let id: Int
+    let name: String
+    let color: String
+    let description: String?
+}

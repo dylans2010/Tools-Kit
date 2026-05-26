@@ -9,23 +9,29 @@ public struct AIAnimationCoreModifier: ViewModifier {
     public func body(content: Content) -> some View {
         ZStack {
             content
+                .disabled(isLoading)
+                .allowsHitTesting(!isLoading)
 
             if isLoading {
-                AuroraGlow(.dramatic)
-                    .washSweepDuration(1.00)
-                    .washPulseWidth(1.00)
-                    .washPeak(0.80)
-                    .direction(alternateDirection ? .topToBottom : .bottomToTop)
-                    .introStyle(.borderFill)
-                    .introDuration(0.15)
-                    .ignoresSafeArea()
-                    .transition(.opacity)
-                    .zIndex(100)
-                    .onAppear {
-                        withAnimation(.linear(duration: 1.0).repeatForever(autoreverses: true)) {
-                            alternateDirection.toggle()
+                ZStack {
+                    Color.black.opacity(0.001) // Invisible but captures touches
+
+                    AuroraGlow(.dramatic)
+                        .washSweepDuration(1.00)
+                        .washPulseWidth(1.00)
+                        .washPeak(0.80)
+                        .direction(alternateDirection ? .topToBottom : .bottomToTop)
+                        .introStyle(.borderFill)
+                        .introDuration(0.15)
+                        .onAppear {
+                            withAnimation(.linear(duration: 1.0).repeatForever(autoreverses: true)) {
+                                alternateDirection.toggle()
+                            }
                         }
-                    }
+                }
+                .ignoresSafeArea()
+                .transition(.opacity)
+                .zIndex(999)
             }
         }
         .animation(.easeInOut(duration: 0.3), value: isLoading)
