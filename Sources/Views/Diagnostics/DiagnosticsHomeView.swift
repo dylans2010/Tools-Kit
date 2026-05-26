@@ -447,7 +447,15 @@ struct DiagnosticsCategoryChip: View {
 
 private struct DiagnosticsHomeSettingsView: View {
     var body: some View {
-        DiagnosticsSettingsView()
+        NavigationStack {
+            Form {
+                Section("Settings") {
+                    Text("Diagnostics settings are currently unavailable.")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle("Diagnostics Settings")
+        }
     }
 }
 
