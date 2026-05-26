@@ -22,6 +22,11 @@ enum GitHubEndpoints {
     case deleteRef(owner: String, repo: String, ref: String)
     case repoIssues(owner: String, repo: String)
     case trending(language: String)
+    case user
+    case userEvents(username: String)
+    case notifications
+    case gists
+    case rateLimit
 
     var url: URL {
         switch self {
@@ -67,12 +72,22 @@ enum GitHubEndpoints {
             return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/issues?state=all")!
         case .trending(let language):
             return URL(string: "\(GitHubEndpoints.baseURL)/search/repositories?q=language:\(language)&sort=stars&order=desc")!
+        case .user:
+            return URL(string: "\(GitHubEndpoints.baseURL)/user")!
+        case .userEvents(let username):
+            return URL(string: "\(GitHubEndpoints.baseURL)/users/\(username)/events")!
+        case .notifications:
+            return URL(string: "\(GitHubEndpoints.baseURL)/notifications")!
+        case .gists:
+            return URL(string: "\(GitHubEndpoints.baseURL)/gists")!
+        case .rateLimit:
+            return URL(string: "\(GitHubEndpoints.baseURL)/rate_limit")!
         }
     }
 
     var method: String {
         switch self {
-        case .userRepos, .searchRepos, .repoDetails, .branches, .commits, .pullRequests, .prDetails, .contents, .compare, .repoIssues, .trending:
+        case .userRepos, .searchRepos, .repoDetails, .branches, .commits, .pullRequests, .prDetails, .contents, .compare, .repoIssues, .trending, .user, .userEvents, .notifications, .gists, .rateLimit:
             return "GET"
         case .starred:
             return "PUT"

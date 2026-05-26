@@ -83,6 +83,42 @@ final class GitHubAPIClient {
         }
     }
 
+    /// Performs a request and returns both the decoded model and the response headers.
+    func requestWithHeaders<T: Decodable>(_ endpoint: GitHubEndpoints, body: Encodable? = nil) async throws -> (T, [AnyHashable: Any]) {
+        let request = try buildRequest(for: endpoint, body: body)
+
+        do {
+            let (data, response) = try await session.data(for: request)
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw APIError.invalidResponse
+            }
+
+            switch httpResponse.statusCode {
+            case 200...299:
+                do {
+                    let decoded = try decoder.decode(T.self, from: data)
+                    return (decoded, httpResponse.allHeaderFields)
+                } catch {
+                    throw APIError.decodingError(error)
+                }
+            case 401:
+                throw APIError.unauthorized
+            case 403:
+                let message = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["message"] as? String ?? "Forbidden"
+                throw APIError.forbidden(message)
+            case 404:
+                throw APIError.notFound
+            default:
+                throw APIError.serverError(httpResponse.statusCode)
+            }
+        } catch let error as APIError {
+            throw error
+        } catch {
+            throw APIError.networkError(error)
+        }
+    }
+
     /// Specialized request for endpoints that return no body (e.g., Star/Unstar).
     func requestEmpty(_ endpoint: GitHubEndpoints, body: Encodable? = nil) async throws {
         let request = try buildRequest(for: endpoint, body: body)
