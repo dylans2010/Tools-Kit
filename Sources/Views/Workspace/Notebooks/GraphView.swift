@@ -39,7 +39,7 @@ struct GraphView: View {
 
                 // Draw nodes
                 ForEach($nodes) { $node in
-                    NodeView(node: $node)
+                    NotebookGraphNodeView(node: $node)
                 }
             }
             .scaleEffect(zoomScale)
@@ -85,7 +85,7 @@ struct GraphView: View {
     }
 }
 
-private struct NodeView: View {
+private struct NotebookGraphNodeView: View {
     @Binding var node: GraphView.Node
 
     var body: some View {

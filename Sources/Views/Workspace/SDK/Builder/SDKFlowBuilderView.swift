@@ -18,7 +18,7 @@ struct SDKFlowBuilderView: View {
                 .frame(width: 2000, height: 2000)
 
                 ForEach(nodes) { node in
-                    NodeView(node: node)
+                    SDKFlowBuilderNodeView(node: node)
                         .position(node.position)
                 }
             }
@@ -54,7 +54,7 @@ struct SDKFlowBuilderView: View {
 }
 
 struct SDKFlowNode: Identifiable {
-    let id = UUID()
+    let id: UUID
     var name: String
     var type: NodeType
     var position: CGPoint
@@ -62,9 +62,23 @@ struct SDKFlowNode: Identifiable {
     enum NodeType {
         case trigger, condition, action
     }
+
+    init(id: UUID = UUID(), name: String, type: NodeType, position: CGPoint) {
+        self.id = id
+        self.name = name
+        self.type = type
+        self.position = position
+    }
+
+    init(from dependency: DependencyNode) {
+        self.id = UUID()
+        self.name = dependency.title
+        self.type = .action
+        self.position = CGPoint(x: 100, y: 100)
+    }
 }
 
-struct NodeView: View {
+struct SDKFlowBuilderNodeView: View {
     let node: SDKFlowNode
     var body: some View {
         VStack(spacing: 4) {
