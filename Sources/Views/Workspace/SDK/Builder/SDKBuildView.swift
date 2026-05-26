@@ -284,23 +284,31 @@ struct SDKBuildView: View {
 
     // MARK: - Metrics
 
+    private var currentMetrics: SDKTelemetryMetrics {
+        telemetry.getMetrics()
+    }
+
     private var metricsSection: some View {
         Section {
-            let metrics = telemetry.getMetrics()
-            Grid(verticalSpacing: 16) {
-                GridRow {
-                    MetricStatCard(title: "Executions", value: "\(metrics.totalTraces)", icon: "waveform.path.ecg", color: .blue)
-                    MetricStatCard(title: "Success Rate", value: "\(metrics.totalTraces > 0 ? Int(Double(metrics.successCount) / Double(metrics.totalTraces) * 100) : 0)%", icon: "checkmark.circle.fill", color: .green)
-                }
-                GridRow {
-                    MetricStatCard(title: "Avg Latency", value: "\(Int(metrics.averageDurationMs))ms", icon: "timer", color: .orange)
-                    MetricStatCard(title: "Logs", value: "\(logStore.entries.count)", icon: "doc.text.fill", color: .purple)
-                }
-            }
-            .padding(.vertical, 8)
+            metricsContent(for: currentMetrics)
         } header: {
             Label("Build Telemetry", systemImage: "chart.bar.fill")
         }
+    }
+
+    @ViewBuilder
+    private func metricsContent(for metrics: SDKTelemetryMetrics) -> some View {
+        Grid(verticalSpacing: 16) {
+            GridRow {
+                MetricStatCard(title: "Executions", value: "\(metrics.totalTraces)", icon: "waveform.path.ecg", color: .blue)
+                MetricStatCard(title: "Success Rate", value: "\(metrics.totalTraces > 0 ? Int(Double(metrics.successCount) / Double(metrics.totalTraces) * 100) : 0)%", icon: "checkmark.circle.fill", color: .green)
+            }
+            GridRow {
+                MetricStatCard(title: "Avg Latency", value: "\(Int(metrics.averageDurationMs))ms", icon: "timer", color: .orange)
+                MetricStatCard(title: "Logs", value: "\(logStore.entries.count)", icon: "doc.text.fill", color: .purple)
+            }
+        }
+        .padding(.vertical, 8)
     }
 
     struct MetricStatCard: View {

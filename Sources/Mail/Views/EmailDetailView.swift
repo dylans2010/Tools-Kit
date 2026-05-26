@@ -454,8 +454,7 @@ struct EmailDetailView: View {
 
     // MARK: - Intelligence Panels
 
-    @ViewBuilder
-    private var intelligencePanels: some View {
+    private var intelligenceThread: MailThread {
         let resolved = resolvedEmail
         let mailMessage = MailMessage(
             id: String(resolved.uid),
@@ -472,12 +471,21 @@ struct EmailDetailView: View {
             isStarred: false,
             attachments: []
         )
-        let thread = MailThread(
+        return MailThread(
             id: String(resolved.uid),
             subject: resolved.subject,
             messages: [mailMessage],
             lastMessageDate: resolved.date
         )
+    }
+
+    @ViewBuilder
+    private var intelligencePanels: some View {
+        intelligenceContent(for: intelligenceThread)
+    }
+
+    @ViewBuilder
+    private func intelligenceContent(for thread: MailThread) -> some View {
         EmailInsightPanel(thread: thread)
 
         if thread.subject.lowercased().contains("negotiation") || thread.subject.lowercased().contains("offer") {

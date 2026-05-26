@@ -9,24 +9,23 @@ struct RepoListView: View {
     @State private var searchText = ""
 
     var body: some View {
-        Group {
-            VStack(spacing: 0) {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        NavigationLink(destination: GitHubTrendingExplorerView()) {
-                            QuickGitHubTool(title: "Trending", icon: "chart.line.uptrend.xyaxis", color: .orange)
-                        }
-                        NavigationLink(destination: GitHubRepoComparisonView()) {
-                            QuickGitHubTool(title: "Compare", icon: "arrow.left.and.right.square", color: .blue)
-                        }
+        VStack(spacing: 0) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    NavigationLink(destination: GitHubTrendingExplorerView()) {
+                        QuickGitHubTool(title: "Trending", icon: "chart.line.uptrend.xyaxis", color: .orange)
                     }
-                    .padding()
+                    NavigationLink(destination: GitHubRepoComparisonView()) {
+                        QuickGitHubTool(title: "Compare", icon: "arrow.left.and.right.square", color: .blue)
+                    }
                 }
-                .background(Color(.secondarySystemBackground))
+                .padding()
+            }
+            .background(Color(.secondarySystemBackground))
 
-                if isLoading && repositories.isEmpty {
-                    ProgressView("Fetching Repositories...")
-                } else if repositories.isEmpty && !isLoading {
+            if isLoading && repositories.isEmpty {
+                ProgressView("Fetching Repositories...")
+            } else if repositories.isEmpty && !isLoading {
                 ContentUnavailableView(
                     "No Repositories",
                     systemImage: "folder.badge.questionmark",

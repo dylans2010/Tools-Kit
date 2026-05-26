@@ -127,6 +127,13 @@ struct Diag_BatteryCycleView: View {
         .onDisappear { stopMonitoring() }
     }
 
+    private var sessionChangeView: some View {
+        let change = (batteryLevel - sessionStartLevel) * 100
+        return Text(String(format: "%+.1f%%", change))
+            .monospacedDigit()
+            .foregroundStyle(change >= 0 ? .green : .red)
+    }
+
     private var levelColor: Color {
         if batteryLevel > 0.5 { return .green }
         if batteryLevel > 0.2 { return .orange }
