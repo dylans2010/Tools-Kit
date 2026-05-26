@@ -6,6 +6,7 @@ struct GamesHomeView: View {
     @State private var searchText = ""
     @State private var selectedCategory: GameCategory?
     @State private var showStore = false
+    @State private var showSettings = false
     @State private var showDailyBonus = false
     @State private var dailyBonusResult: (coins: Int, gems: Int)?
 
@@ -44,10 +45,23 @@ struct GamesHomeView: View {
             }
             .navigationTitle("Games")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundColor(.white)
+                    }
+                }
+            }
             .toolbarBackground(GamingDesignTokens.cardSurface, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .sheet(isPresented: $showStore) { NavigationStack { CurrencyStoreView() } }
+            .fullScreenCover(isPresented: $showSettings) {
+                AIChatSettingsView(settings: AIChatSettingsManager.shared.settingsBinding)
+            }
         }
     }
 

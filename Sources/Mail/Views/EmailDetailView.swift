@@ -38,26 +38,45 @@ struct EmailDetailView: View {
 
     var body: some View {
         GeometryReader { geo in
-            VStack(spacing: 0) {
-                headerBar
+            ZStack {
+                Color(.systemGroupedBackground).ignoresSafeArea()
 
-                Picker("Tab", selection: $selectedContentTab) {
-                    ForEach(ContentTab.allCases, id: \.self) { tab in
-                        Text(tab.rawValue).tag(tab)
+                VStack(spacing: 0) {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 20) {
+                            headerBar
+
+                            subjectAndToCards
+
+                            Picker("Tab", selection: $selectedContentTab) {
+                                ForEach(ContentTab.allCases, id: \.self) { tab in
+                                    Text(tab.rawValue).tag(tab)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+
+                            switch selectedContentTab {
+                            case .body:
+                                emailBodyContent(geo: geo)
+                            case .ai:
+                                aiToolsContent
+                            }
+
+                            if !resolvedEmail.attachments.isEmpty {
+                                attachmentsSection
+                            }
+
+                            Spacer(minLength: 100)
+                        }
+                        .padding(16)
                     }
                 }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
 
-                switch selectedContentTab {
-                case .body:
-                    emailBodyContent(geo: geo)
-                case .ai:
-                    aiToolsContent
+                VStack {
+                    Spacer()
+                    bottomActions
                 }
             }
-            .background(Color.workspaceBackground.ignoresSafeArea())
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -150,72 +169,148 @@ struct EmailDetailView: View {
     // MARK: - Header Bar
 
     private var headerBar: some View {
+        HStack(spacing: 12) {
+            Circle()
+                .fill(Color.accentColor.opacity(0.2))
+                .frame(width: 40, height: 40)
+                .overlay(Text(resolvedEmail.sender.prefix(1).uppercased()).bold().foregroundColor(.accentColor))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(resolvedEmail.sender)
+                    .font(.headline)
+                Text("To: Me")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+            Text(resolvedEmail.date.formatted(date: .abbreviated, time: .shortened))
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(12)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(Capsule())
+    }
+
+    private var subjectAndToCards: some View {
+        VStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Subject")
+                    .font(.caption.bold())
+                    .foregroundColor(.secondary)
+                Text(resolvedEmail.subject)
+                    .font(.headline)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(16)
+
+            // To field is not explicitly in EmailMessage but we can show it if we had it.
+            // Using placeholder or sender for now if needed, but following prompt style.
+        }
+    }
+
+    private var attachmentsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(resolvedEmail.subject)
-                .font(.title3.bold())
-                .foregroundStyle(.primary)
-                .lineLimit(3)
-
-            HStack(spacing: 10) {
-                Circle()
-                    .fill(Color.blue.opacity(0.2))
-                    .frame(width: 36, height: 36)
-                    .overlay(Text(resolvedEmail.sender.prefix(1).uppercased()).font(.caption.bold()))
-
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(resolvedEmail.sender)
-                        .font(.subheadline.bold())
-                    Text(resolvedEmail.date.formatted(date: .abbreviated, time: .shortened))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                if account != nil {
-                    Button {
-                        showReplyComposer = true
-                    } label: {
-                        Image(systemName: "arrowshape.turn.up.left.fill")
-                            .font(.body)
-                            .padding(8)
-                            .background(Color.accentColor.opacity(0.15), in: Circle())
+            Text("Attachments")
+                .font(.headline)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(resolvedEmail.attachments) { attachment in
+                        VStack {
+                            Image(systemName: "doc.fill")
+                                .font(.title)
+                            Text(attachment.filename)
+                                .font(.caption)
+                                .lineLimit(1)
+                        }
+                        .frame(width: 80, height: 80)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(12)
                     }
                 }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(.ultraThinMaterial)
+    }
+
+    private var bottomActions: some View {
+        HStack(spacing: 16) {
+            Button {
+                showReplyComposer = true
+            } label: {
+                Text("Reply")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.accentColor)
+                    .cornerRadius(16)
+            }
+            .disabled(account == nil)
+
+            Button {
+                showingInsights = true
+            } label: {
+                Image(systemName: "brain.head.profile")
+                    .font(.title2)
+                    .foregroundColor(.primary)
+                    .frame(width: 56, height: 56)
+                    .background(Color(.secondarySystemBackground))
+                    .clipShape(Circle())
+            }
+
+            Button {
+                Task { await archiveEmail() }
+            } label: {
+                Image(systemName: "archivebox")
+                    .font(.title2)
+                    .foregroundColor(.primary)
+                    .frame(width: 56, height: 56)
+                    .background(Color(.secondarySystemBackground))
+                    .clipShape(Circle())
+            }
+
+            Button(role: .destructive) {
+                Task { await deleteEmail() }
+            } label: {
+                Image(systemName: "trash")
+                    .font(.title2)
+                    .foregroundColor(.red)
+                    .frame(width: 56, height: 56)
+                    .background(Color(.secondarySystemBackground))
+                    .clipShape(Circle())
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 10)
     }
 
     // MARK: - Email Body Content (full-screen rendering)
 
     @ViewBuilder
     private func emailBodyContent(geo: GeometryProxy) -> some View {
-        if let content = renderContent(from: resolvedEmail) {
-            if content.hasHTML, let html = content.htmlBody {
-                MailWebView(htmlString: html, dynamicHeight: $bodyWebViewHeight)
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: geo.size.height - 160)
-                    .background(Color.white)
-                    .ignoresSafeArea(.container, edges: .bottom)
-            } else if let plain = content.plainBody {
-                ScrollView {
+        VStack {
+            if let content = renderContent(from: resolvedEmail) {
+                if content.hasHTML, let html = content.htmlBody {
+                    MailWebView(htmlString: html, dynamicHeight: $bodyWebViewHeight)
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: 400)
+                        .background(Color.white)
+                        .cornerRadius(12)
+                } else if let plain = content.plainBody {
                     Text(plain)
                         .font(.body)
-                        .padding(16)
                         .frame(maxWidth: .infinity, alignment: .topLeading)
                         .textSelection(.enabled)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-        } else {
-            VStack {
+            } else {
                 ProgressView("Loading…")
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
     }
 
     // MARK: - AI Tools Content

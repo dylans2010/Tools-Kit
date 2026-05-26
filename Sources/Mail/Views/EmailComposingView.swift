@@ -56,81 +56,52 @@ struct EmailComposingView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        fromRow
-                        Divider().padding(.leading, 16)
-                        toRow
-                        Divider().padding(.leading, 16)
+            ZStack(alignment: .bottomTrailing) {
+                Color(.systemGroupedBackground).ignoresSafeArea()
 
-                        if showingCCBCC {
-                            ccRow
-                            Divider().padding(.leading, 16)
-                            bccRow
-                            Divider().padding(.leading, 16)
-                        }
+                VStack(spacing: 16) {
+                    header
 
-                        subjectRow
-                        Divider().padding(.leading, 16)
+                    ScrollView {
+                        VStack(spacing: 16) {
+                            fieldsContainer
 
-                        bodyEditor
-                            .padding(.top, 8)
+                            editorContainer
 
-                        if !draftAttachments.isEmpty {
-                            attachmentsSection
-                                .padding(.horizontal, 16)
-                                .padding(.top, 12)
-                        }
+                            if !draftAttachments.isEmpty {
+                                attachmentsSection
+                                    .padding(.horizontal, 16)
+                            }
 
-                        if !messageBody.isEmpty && showingPreviewSheet == false {
-                            livePreview
-                                .padding(.horizontal, 16)
-                                .padding(.top, 16)
+                            if !messageBody.isEmpty && showingPreviewSheet == false {
+                                livePreview
+                                    .padding(.horizontal, 16)
+                            }
+
+                            Spacer(minLength: 120)
                         }
                     }
                 }
 
-                Divider()
-
-                if showingFormattingBar {
-                    formattingBar
+                VStack {
+                    Spacer()
+                    if showingFormattingBar {
+                        formattingBar
+                            .clipShape(Capsule())
+                            .shadow(radius: 4)
+                            .padding(.horizontal, 20)
+                            .padding(.bottom, 80)
+                    }
+                    composeToolbar
+                        .clipShape(Capsule())
+                        .shadow(radius: 4)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 20)
                 }
 
-                composeToolbar
+                sendButton
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle(replyTo == nil ? "Compose" : "Reply")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
-                        if hasUnsavedContent {
-                            showingCancelAlert = true
-                        } else {
-                            dismiss()
-                        }
-                    }
-                    .foregroundStyle(.secondary)
-                }
-
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button {
-                        if scheduleDate != nil {
-                            Task { await handleScheduledOrImmediateSend() }
-                        } else {
-                            sendNow()
-                        }
-                    } label: {
-                        if isSending {
-                            ProgressView()
-                        } else {
-                            Image(systemName: scheduleDate != nil ? "calendar.badge.clock" : "paperplane.fill")
-                                .font(.body.bold())
-                        }
-                    }
-                }
-            }
+            .navigationBarHidden(true)
             .onAppear(perform: prefillReply)
             .onAppear {
                 selectedFromAccountID = resolvedDefaultAccountID()
@@ -218,94 +189,100 @@ struct EmailComposingView: View {
         }
     }
 
-    // MARK: - From Row
-
-    private var fromRow: some View {
-        HStack(spacing: 8) {
-            Text("From")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .frame(width: 50, alignment: .leading)
-
-            Picker("", selection: $selectedFromAccountID) {
-                ForEach(availableAccounts) { account in
-                    Text(account.emailAddress).tag(account.id)
-                }
+    private var header: some View {
+        HStack {
+            Button("Cancel") {
+                if hasUnsavedContent { showingCancelAlert = true }
+                else { dismiss() }
             }
-            .pickerStyle(.menu)
-            .labelsHidden()
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-    }
+            .foregroundStyle(.secondary)
 
-    // MARK: - To Row
+            Spacer()
 
-    private var toRow: some View {
-        HStack(alignment: .top, spacing: 8) {
-            Text("To")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .frame(width: 50, alignment: .leading)
-                .padding(.top, 10)
-
-            VStack(alignment: .leading, spacing: 6) {
-                if !toRecipients.isEmpty {
-                    WrappingFlowLayout(spacing: 6) {
-                        ForEach(toRecipients, id: \.self) { recipient in
-                            recipientChip(recipient) {
-                                toRecipients.removeAll { $0 == recipient }
-                            }
-                        }
-                    }
-                }
-
-                TextField("Add Recipient", text: $newRecipient)
-                    .textInputAutocapitalization(.never)
-                    .keyboardType(.emailAddress)
-                    .focused($focusedField, equals: .to)
-                    .onSubmit { commitRecipient() }
-            }
+            Text(replyTo == nil ? "Compose" : "Reply")
+                .font(.headline)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 8)
+                .background(Color(.secondarySystemBackground))
+                .clipShape(Capsule())
 
             Spacer()
 
             Button {
-                withAnimation { showingCCBCC.toggle() }
+                showingDraftsSheet = true
             } label: {
-                Text(showingCCBCC ? "Hide" : "Cc/Bcc")
-                    .font(.caption)
-                    .foregroundStyle(.blue)
+                Image(systemName: "tray.full")
             }
-            .padding(.top, 10)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 6)
+        .padding(.top, 8)
     }
 
-    // MARK: - CC Row
+    private var fieldsContainer: some View {
+        VStack(spacing: 0) {
+            fromRow
+            Divider().padding(.leading, 16)
+            toRow
+            Divider().padding(.leading, 16)
+            if showingCCBCC {
+                ccRow
+                Divider().padding(.leading, 16)
+                bccRow
+                Divider().padding(.leading, 16)
+            }
+            subjectRow
+        }
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(18)
+        .padding(.horizontal, 16)
+    }
 
-    private var ccRow: some View {
-        HStack(alignment: .top, spacing: 8) {
-            Text("Cc")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .frame(width: 50, alignment: .leading)
-                .padding(.top, 10)
+    private var fromRow: some View {
+        HStack {
+            Text("From:").foregroundColor(.secondary)
+            Picker("", selection: $selectedFromAccountID) {
+                ForEach(availableAccounts) { acc in Text(acc.emailAddress).tag(acc.id) }
+            }
+            .pickerStyle(.menu)
+            Spacer()
+        }
+        .padding(12)
+    }
 
+    private var toRow: some View {
+        HStack(alignment: .top) {
+            Text("To:").foregroundColor(.secondary).padding(.top, 8)
             VStack(alignment: .leading, spacing: 6) {
-                if !ccRecipients.isEmpty {
+                if !toRecipients.isEmpty {
                     WrappingFlowLayout(spacing: 6) {
-                        ForEach(ccRecipients, id: \.self) { recipient in
-                            recipientChip(recipient) {
-                                ccRecipients.removeAll { $0 == recipient }
-                            }
+                        ForEach(toRecipients, id: \.self) { r in
+                            recipientChip(r) { toRecipients.removeAll { $0 == r } }
                         }
                     }
                 }
+                TextField("Recipient", text: $newRecipient)
+                    .focused($focusedField, equals: .to)
+                    .onSubmit { commitRecipient() }
+            }
+            Button { withAnimation { showingCCBCC.toggle() } } label: {
+                Text(showingCCBCC ? "Hide" : "Cc/Bcc").font(.caption)
+            }
+        }
+        .padding(12)
+    }
 
-                TextField("Add Cc", text: $newCCRecipient)
-                    .textInputAutocapitalization(.never)
-                    .keyboardType(.emailAddress)
+    private var ccRow: some View {
+        HStack(alignment: .top) {
+            Text("Cc:").foregroundColor(.secondary).padding(.top, 8)
+            VStack(alignment: .leading, spacing: 6) {
+                if !ccRecipients.isEmpty {
+                    WrappingFlowLayout(spacing: 6) {
+                        ForEach(ccRecipients, id: \.self) { r in
+                            recipientChip(r) { ccRecipients.removeAll { $0 == r } }
+                        }
+                    }
+                }
+                TextField("Cc", text: $newCCRecipient)
                     .focused($focusedField, equals: .cc)
                     .onSubmit {
                         let trimmed = newCCRecipient.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -313,34 +290,21 @@ struct EmailComposingView: View {
                     }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 6)
+        .padding(12)
     }
 
-    // MARK: - BCC Row
-
     private var bccRow: some View {
-        HStack(alignment: .top, spacing: 8) {
-            Text("Bcc")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .frame(width: 50, alignment: .leading)
-                .padding(.top, 10)
-
+        HStack(alignment: .top) {
+            Text("Bcc:").foregroundColor(.secondary).padding(.top, 8)
             VStack(alignment: .leading, spacing: 6) {
                 if !bccRecipients.isEmpty {
                     WrappingFlowLayout(spacing: 6) {
-                        ForEach(bccRecipients, id: \.self) { recipient in
-                            recipientChip(recipient) {
-                                bccRecipients.removeAll { $0 == recipient }
-                            }
+                        ForEach(bccRecipients, id: \.self) { r in
+                            recipientChip(r) { bccRecipients.removeAll { $0 == r } }
                         }
                     }
                 }
-
-                TextField("Add Bcc", text: $newBCCRecipient)
-                    .textInputAutocapitalization(.never)
-                    .keyboardType(.emailAddress)
+                TextField("Bcc", text: $newBCCRecipient)
                     .focused($focusedField, equals: .bcc)
                     .onSubmit {
                         let trimmed = newBCCRecipient.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -348,24 +312,46 @@ struct EmailComposingView: View {
                     }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 6)
+        .padding(12)
     }
 
-    // MARK: - Subject Row
-
     private var subjectRow: some View {
-        HStack(spacing: 8) {
-            Text("Subject")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .frame(width: 50, alignment: .leading)
-
+        HStack {
+            Text("Subject:").foregroundColor(.secondary)
             TextField("Subject", text: $subject)
                 .focused($focusedField, equals: .subject)
         }
+        .padding(12)
+    }
+
+    private var editorContainer: some View {
+        VStack {
+            bodyEditor
+        }
+        .padding(12)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(22)
         .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+    }
+
+    private var sendButton: some View {
+        Button(action: {
+            if scheduleDate != nil { Task { await handleScheduledOrImmediateSend() } }
+            else { sendNow() }
+        }) {
+            if isSending {
+                ProgressView().tint(.white)
+            } else {
+                Image(systemName: scheduleDate != nil ? "calendar.badge.clock" : "paperplane.fill")
+                    .font(.system(size: 24, weight: .bold))
+            }
+        }
+        .frame(width: 64, height: 64)
+        .background(Color.accentColor)
+        .foregroundColor(.white)
+        .clipShape(Circle())
+        .padding(20)
+        .shadow(radius: 6)
     }
 
     // MARK: - Body Editor

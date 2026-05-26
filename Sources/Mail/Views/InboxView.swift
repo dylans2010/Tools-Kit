@@ -24,6 +24,7 @@ struct InboxView: View {
     @State private var showingAIFeatures = false
     @State private var showingAIDashboard = false
     @State private var showingUniversalInbox = false
+    @State private var showingSearch = false
     @State private var showingFetchingLabel = false
     @State private var selectedMessage: MailMessage?
     @State private var actionError: String?
@@ -34,64 +35,35 @@ struct InboxView: View {
 
     var body: some View {
         ZStack {
-            Color.workspaceBackground.ignoresSafeArea()
-
+            Color(.systemGroupedBackground).ignoresSafeArea()
             VStack(spacing: 0) {
-                filterPicker
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-
+                topBar
                 if viewModel.isInitialLoading {
                     skeletonList
                         .transition(.opacity)
+                        .padding(.top, 10)
                 } else {
-                    contentList
+                    listContent
                         .transition(.opacity)
+                }
+            }
+
+            VStack {
+                Spacer()
+                bottomTabBar
+            }
+
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    floatingComposeButton
                 }
             }
         }
         .navigationTitle(folder.name)
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarHidden(true)
         .searchable(text: $searchText, prompt: "Search emails")
-        .refreshable {
-            showingFetchingLabel = true
-            await viewModel.refresh(fetchFromServer: true)
-            showingFetchingLabel = false
-        }
-        .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                Menu {
-                    Button {
-                        showingAIFeatures = true
-                    } label: {
-                        Label("AI Features", systemImage: "sparkles")
-                    }
-
-                    Button {
-                        showingAIDashboard = true
-                    } label: {
-                        Label("AI Dashboard", systemImage: "gauge.with.dots.needle.bottom.100percent")
-                    }
-
-                    NavigationLink(destination: PriorityQueueView()) {
-                        Label("Priority Queue", systemImage: "line.3.horizontal.decrease.circle")
-                    }
-
-                    NavigationLink(destination: WorkflowExecutionMonitor()) {
-                        Label("Workflow Monitor", systemImage: "cpu")
-                    }
-                } label: {
-                    Image(systemName: "sparkles")
-                        .foregroundStyle(LinearGradient(colors: [.aiGradientStart, .aiGradientEnd], startPoint: .topLeading, endPoint: .bottomTrailing))
-                }
-
-                Button {
-                    showingCompose = true
-                } label: {
-                    Image(systemName: "square.and.pencil")
-                }
-            }
-        }
         .fullScreenCover(isPresented: $showingCompose) {
             if let active = activeAccount {
                 EmailComposingView(account: active)
@@ -127,15 +99,6 @@ struct InboxView: View {
         }
     }
 
-    private var filterPicker: some View {
-        Picker("Filter", selection: $filter) {
-            ForEach(InboxFilter.allCases) { filter in
-                Text(filter.rawValue).tag(filter)
-            }
-        }
-        .pickerStyle(.segmented)
-    }
-
     private var activeAccount: MailAccount? {
         mailStore.activeAccount ?? account
     }
@@ -163,81 +126,148 @@ struct InboxView: View {
         return base
     }
 
-    private var contentList: some View {
-        List {
-            if showingFetchingLabel {
-                Section {
-                    HStack(spacing: 10) {
-                        ProgressView().tint(.white)
-                        Text("Fetching email")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.white)
-                    }
-                    .padding(.vertical, 4)
+    private var topBar: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Button {
+                    showingUniversalInbox = true
+                } label: {
+                    Image(systemName: "line.3.horizontal")
+                        .font(.title3)
+                        .foregroundStyle(.primary)
                 }
-                .listRowBackground(Color(hex: "#161622"))
+
+                Spacer()
+
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(Color.red)
+                        .frame(width: 6, height: 6)
+                    Text(filter.rawValue)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color(.secondarySystemBackground))
+                .clipShape(Capsule())
+
+                Spacer()
+
+                Button {
+                    withAnimation {
+                        showingSearch.toggle()
+                    }
+                } label: {
+                    Image(systemName: "magnifyingglass")
+                        .font(.title3)
+                        .foregroundStyle(showingSearch ? .blue : .primary)
+                }
+
+                Menu {
+                    Button {
+                        showingAIFeatures = true
+                    } label: {
+                        Label("AI Features", systemImage: "sparkles")
+                    }
+
+                    Button {
+                        showingAIDashboard = true
+                    } label: {
+                        Label("AI Dashboard", systemImage: "gauge.with.dots.needle.bottom.100percent")
+                    }
+
+                    NavigationLink(destination: PriorityQueueView()) {
+                        Label("Priority Queue", systemImage: "line.3.horizontal.decrease.circle")
+                    }
+
+                    NavigationLink(destination: WorkflowExecutionMonitor()) {
+                        Label("Workflow Monitor", systemImage: "cpu")
+                    }
+                } label: {
+                    Image(systemName: "sparkles")
+                        .font(.title3)
+                        .foregroundStyle(LinearGradient(colors: [.aiGradientStart, .aiGradientEnd], startPoint: .topLeading, endPoint: .bottomTrailing))
+                }
             }
 
-            if visibleThreads.isEmpty {
-                Section {
-                    VStack(spacing: 12) {
-                        Image(systemName: filter == .attention ? "sparkles" : "tray")
-                            .font(.system(size: 44))
-                            .foregroundStyle(.secondary)
-                        Text(filter == .attention ? "Inbox Zero Reached" : "No messages")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                        Text(filter == .attention ? "You've cleared everything that needs immediate attention." : "Pull to refresh to fetch latest email.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
+            if showingSearch {
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.secondary)
+                    TextField("Search emails...", text: $searchText)
+                        .textFieldStyle(.plain)
+                    if !searchText.isEmpty {
+                        Button { searchText = "" } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.secondary)
+                        }
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 40)
                 }
-                .listRowBackground(Color.clear)
-            } else {
-                ForEach(visibleThreads) { thread in
-                    if let message = thread.messages.last {
-                        Button {
-                            selectedMessage = message
-                        } label: {
-                            inboxRow(thread: thread, message: message)
-                        }
-                        .buttonStyle(.plain)
-                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                            swipeActionButton(for: leadingSwipeAction, thread: thread, message: message)
-                        }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            swipeActionButton(for: trailingSwipeAction, thread: thread, message: message)
-                        }
-                        .contextMenu {
-                            if contextMenuActionsEnabled {
-                                Button { Task { await performThreadAction("delete", thread: thread, message: message) } } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                                Button { Task { await performThreadAction("archive", thread: thread, message: message) } } label: {
-                                    Label("Archive", systemImage: "archivebox")
-                                }
-                                Button { Task { await performThreadAction("flag", thread: thread, message: message) } } label: {
-                                    Label("Flag Important", systemImage: "flag.fill")
-                                }
-                                Button {
-                                    Task {
-                                        _ = try? await ExecutionBridge.shared.convertThreadToCalendarEvent(thread: thread)
-                                    }
-                                } label: {
-                                    Label("Create Calendar Event", systemImage: "calendar.badge.plus")
-                                }
-                            }
-                        }
-                        .listRowBackground(Color.clear)
+                .padding(10)
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(12)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+    }
+
+    private var listContent: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                if showingFetchingLabel {
+                    HStack(spacing: 10) {
+                        ProgressView()
+                        Text("Fetching email...")
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(12)
+                }
+
+                if visibleThreads.isEmpty {
+                    emptyStateView
+                } else {
+                    let today = visibleThreads.filter { Calendar.current.isDateInToday($0.lastMessageDate) }
+                    let yesterday = visibleThreads.filter { Calendar.current.isDateInYesterday($0.lastMessageDate) }
+                    let week = visibleThreads.filter {
+                        let date = $0.lastMessageDate
+                        let calendar = Calendar.current
+                        return !calendar.isDateInToday(date) && !calendar.isDateInYesterday(date) && calendar.isDate(date, equalTo: Date(), toGranularity: .weekOfYear)
+                    }
+                    let older = visibleThreads.filter {
+                        let date = $0.lastMessageDate
+                        let calendar = Calendar.current
+                        return !calendar.isDate(date, equalTo: Date(), toGranularity: .weekOfYear) && date < Date()
+                    }
+
+                    if !today.isEmpty {
+                        sectionView(title: "Today", threads: today)
+                    }
+                    if !yesterday.isEmpty {
+                        sectionView(title: "Yesterday", threads: yesterday)
+                    }
+                    if !week.isEmpty {
+                        sectionView(title: "This Week", threads: week)
+                    }
+                    if !older.isEmpty {
+                        sectionView(title: "Older", threads: older)
                     }
                 }
             }
+            .padding(.horizontal, 16)
+            .padding(.top, 10)
+            .padding(.bottom, 100)
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
+        .refreshable {
+            showingFetchingLabel = true
+            await viewModel.refresh(fetchFromServer: true)
+            showingFetchingLabel = false
+        }
         .navigationDestination(item: $selectedMessage) { message in
             InboxMessageDetailView(account: activeAccount ?? account, message: message)
         }
@@ -248,73 +278,142 @@ struct InboxView: View {
         }
     }
 
-    private func inboxRow(thread: MailThread, message: MailMessage) -> some View {
-        HStack(alignment: .top, spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(thread.isRead ? Color.secondary.opacity(0.1) : providerColor((activeAccount ?? account).providerType).opacity(0.2))
-                    .frame(width: 44, height: 44)
+    private var emptyStateView: some View {
+        VStack(spacing: 12) {
+            Image(systemName: filter == .attention ? "sparkles" : "tray")
+                .font(.system(size: 44))
+                .foregroundStyle(.secondary)
+            Text(filter == .attention ? "Inbox Zero Reached" : "No messages")
+                .font(.headline)
+            Text(filter == .attention ? "You've cleared everything that needs immediate attention." : "Pull to refresh to fetch latest email.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+    }
 
-                Text(senderInitials(from: message.from))
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .foregroundColor(thread.isRead ? .secondary : providerColor((activeAccount ?? account).providerType))
-
-                if !thread.isRead {
-                    Circle()
-                        .fill(providerColor((activeAccount ?? account).providerType))
-                        .frame(width: 10, height: 10)
-                        .overlay(Circle().stroke(Color.workspaceBackground ?? .black, lineWidth: 2))
-                        .offset(x: 16, y: -16)
+    private func sectionView(title: String, threads: [MailThread]) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.headline)
+                .padding(.horizontal, 4)
+            VStack(spacing: 0) {
+                ForEach(threads) { thread in
+                    if let message = thread.messages.last {
+                        emailRow(thread: thread, message: message)
+                        if thread.id != threads.last?.id {
+                            Divider().padding(.leading, 60)
+                        }
+                    }
                 }
             }
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+        }
+    }
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .firstTextBaseline) {
+    private func emailRow(thread: MailThread, message: MailMessage) -> some View {
+        Button(action: {
+            selectedMessage = message
+        }) {
+            HStack(spacing: 12) {
+                avatarView(message: message)
+                VStack(alignment: .leading, spacing: 4) {
                     Text(senderName(from: message.from))
-                        .font(.system(size: 15, weight: thread.isRead ? .semibold : .bold))
-                        .foregroundColor(thread.isRead ? .primary.opacity(0.8) : .white)
-                        .lineLimit(1)
-
-                    Spacer()
-
-                    Text(relativeTimestamp(message.date))
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-
-                HStack(spacing: 8) {
+                        .font(.headline)
+                        .foregroundColor(.primary)
                     Text(message.subject)
-                        .font(.system(size: 14, weight: thread.isRead ? .regular : .semibold))
-                        .foregroundColor(thread.isRead ? .secondary : .white)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
                         .lineLimit(1)
-
-                    if let intent = thread.intent {
-                        Text(intent.replacingOccurrences(of: "_", with: " ").capitalized)
-                            .font(.system(size: 8, weight: .black))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(providerColor((activeAccount ?? account).providerType).opacity(0.2))
-                            .foregroundColor(providerColor((activeAccount ?? account).providerType))
-                            .cornerRadius(4)
-                    }
-
-                    if (thread.priorityScore ?? 0) > 0.8 {
-                        Image(systemName: "exclamationmark.circle.fill")
-                            .font(.caption2)
-                            .foregroundColor(.red)
-                    }
                 }
-
-                Text(previewText(for: message))
-                    .font(.caption)
+                Spacer()
+                Text(relativeTimestamp(message.date))
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
-                    .lineLimit(2)
-                    .padding(.top, 1)
+            }
+            .padding(14)
+        }
+        .buttonStyle(.plain)
+        .contextMenu {
+            if contextMenuActionsEnabled {
+                Button { Task { await performThreadAction("delete", thread: thread, message: message) } } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+                Button { Task { await performThreadAction("archive", thread: thread, message: message) } } label: {
+                    Label("Archive", systemImage: "archivebox")
+                }
+                Button { Task { await performThreadAction("flag", thread: thread, message: message) } } label: {
+                    Label("Flag Important", systemImage: "flag.fill")
+                }
+                Button {
+                    Task {
+                        _ = try? await ExecutionBridge.shared.convertThreadToCalendarEvent(thread: thread)
+                    }
+                } label: {
+                    Label("Create Calendar Event", systemImage: "calendar.badge.plus")
+                }
             }
         }
-        .padding(.vertical, 12)
-        .padding(.horizontal, 14)
     }
+
+    private func avatarView(message: MailMessage) -> some View {
+        ZStack {
+            Circle()
+                .fill(providerColor((activeAccount ?? account).providerType).opacity(0.2))
+                .frame(width: 44, height: 44)
+
+            Text(senderInitials(from: message.from))
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundColor(providerColor((activeAccount ?? account).providerType))
+        }
+    }
+
+    private var bottomTabBar: some View {
+        HStack {
+            tabItem(icon: "envelope.fill", label: "Inbox", isActive: filter == .all)
+                .onTapGesture { filter = .all }
+            tabItem(icon: "star.fill", label: "Important", isActive: filter == .attention)
+                .onTapGesture { filter = .attention }
+            tabItem(icon: "square.grid.2x2.fill", label: "Library", isActive: false)
+        }
+        .padding(10)
+        .background(Color(.systemBackground))
+        .clipShape(Capsule())
+        .shadow(radius: 6)
+        .padding(.horizontal, 40)
+        .padding(.bottom, 10)
+    }
+
+    private func tabItem(icon: String, label: String, isActive: Bool) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+            Text(label)
+                .font(.caption2)
+        }
+        .foregroundColor(isActive ? .accentColor : .secondary)
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
+    }
+
+    private var floatingComposeButton: some View {
+        Button(action: {
+            showingCompose = true
+        }) {
+            Image(systemName: "plus")
+                .font(.system(size: 22, weight: .bold))
+                .frame(width: 60, height: 60)
+                .background(Color.accentColor)
+                .foregroundColor(.white)
+                .clipShape(Circle())
+        }
+        .padding()
+        .shadow(radius: 4)
+    }
+
 
     private func senderInitials(from value: String) -> String {
         let name = senderName(from: value)
@@ -390,38 +489,6 @@ struct InboxView: View {
         return decoded
     }
 
-    @ViewBuilder
-    private func swipeActionButton(for actionID: String, thread: MailThread, message: MailMessage) -> some View {
-        switch actionID {
-        case "archive":
-            Button {
-                Task { await performThreadAction("archive", thread: thread, message: message) }
-            } label: {
-                Label("Archive", systemImage: "archivebox")
-            }
-            .tint(.blue)
-        case "flag":
-            Button {
-                Task { await performThreadAction("flag", thread: thread, message: message) }
-            } label: {
-                Label("Flag", systemImage: "flag.fill")
-            }
-            .tint(.orange)
-        case "move":
-            Button {
-                Task { await performThreadAction("move", thread: thread, message: message) }
-            } label: {
-                Label("Move", systemImage: "folder")
-            }
-            .tint(.indigo)
-        default:
-            Button(role: .destructive) {
-                Task { await performThreadAction("delete", thread: thread, message: message) }
-            } label: {
-                Label("Delete", systemImage: "trash")
-            }
-        }
-    }
 
     private func performThreadAction(_ actionID: String, thread: MailThread, message: MailMessage) async {
         switch actionID {
@@ -631,38 +698,186 @@ struct InboxMessageDetailView: View {
 
     var body: some View {
         GeometryReader { geo in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    header
+            ZStack {
+                Color(.systemGroupedBackground).ignoresSafeArea()
 
-                    if isSummarizing {
-                        summarizingIndicator
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        detailHeader
+
+                        subjectAndToCards
+
+                        if isSummarizing {
+                            summarizingIndicator
+                        }
+
+                        if let summary, !summary.isEmpty {
+                            summarySection(summary: summary)
+                        }
+
+                        bodyContainer(geo: geo)
+
+                        if !message.attachments.isEmpty {
+                            attachmentsSection
+                        }
+
+                        if let actionError {
+                            Text(actionError)
+                                .font(.footnote)
+                                .foregroundStyle(.red)
+                        }
+
+                        Spacer(minLength: 100)
                     }
-
-                    if let summary, !summary.isEmpty {
-                        summarySection(summary: summary)
-                    }
-
-                    messageContent(geo: geo)
-
-                    if let actionError {
-                        Text(actionError)
-                            .font(.footnote)
-                            .foregroundStyle(.red)
-                    }
+                    .padding(16)
                 }
-                .padding(16)
+
+                VStack {
+                    Spacer()
+                    bottomActions
+                }
             }
-            .background(Color.workspaceBackground ?? .black)
             .navigationTitle("Message")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                messageToolbar
-            }
             .fullScreenCover(isPresented: $showReply) {
                 EmailComposingView(account: account, replyTo: message)
             }
         }
+    }
+
+    private var detailHeader: some View {
+        HStack(spacing: 12) {
+            Circle()
+                .fill(Color.accentColor.opacity(0.2))
+                .frame(width: 40, height: 40)
+                .overlay(Text(message.from.prefix(1).uppercased()).bold().foregroundColor(.accentColor))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(message.from)
+                    .font(.headline)
+                Text("To: Me")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+            Text(message.date.formatted(date: .abbreviated, time: .shortened))
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(12)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(Capsule())
+    }
+
+    private var subjectAndToCards: some View {
+        VStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Subject")
+                    .font(.caption.bold())
+                    .foregroundColor(.secondary)
+                Text(message.subject)
+                    .font(.headline)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(16)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("To")
+                    .font(.caption.bold())
+                    .foregroundColor(.secondary)
+                Text(message.to.joined(separator: ", "))
+                    .font(.subheadline)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(16)
+        }
+    }
+
+    private func bodyContainer(geo: GeometryProxy) -> some View {
+        VStack {
+            messageContent(geo: geo)
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+    }
+
+    private var attachmentsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Attachments")
+                .font(.headline)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(message.attachments) { attachment in
+                        VStack {
+                            Image(systemName: "doc.fill")
+                                .font(.title)
+                            Text(attachment.fileName)
+                                .font(.caption)
+                                .lineLimit(1)
+                        }
+                        .frame(width: 80, height: 80)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(12)
+                    }
+                }
+            }
+        }
+    }
+
+    private var bottomActions: some View {
+        HStack(spacing: 16) {
+            Button {
+                showReply = true
+            } label: {
+                Text("Reply")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.accentColor)
+                    .cornerRadius(16)
+            }
+
+            Button {
+                summarize()
+            } label: {
+                Image(systemName: "sparkles")
+                    .font(.title2)
+                    .foregroundColor(.primary)
+                    .frame(width: 56, height: 56)
+                    .background(Color(.secondarySystemBackground))
+                    .clipShape(Circle())
+            }
+
+            Button {
+                Task { await archiveMessage() }
+            } label: {
+                Image(systemName: "archivebox")
+                    .font(.title2)
+                    .foregroundColor(.primary)
+                    .frame(width: 56, height: 56)
+                    .background(Color(.secondarySystemBackground))
+                    .clipShape(Circle())
+            }
+
+            Button(role: .destructive) {
+                Task { await deleteMessage() }
+            } label: {
+                Image(systemName: "trash")
+                    .font(.title2)
+                    .foregroundColor(.red)
+                    .frame(width: 56, height: 56)
+                    .background(Color(.secondarySystemBackground))
+                    .clipShape(Circle())
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 10)
     }
 
     private var summarizingIndicator: some View {
@@ -720,49 +935,6 @@ struct InboxMessageDetailView: View {
         }
     }
 
-    private var messageToolbar: some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
-            Menu {
-                Button {
-                    summarize()
-                } label: {
-                    Label("Summarize", systemImage: "text.justify.leading")
-                }
-
-                Button {
-                    showReply = true
-                } label: {
-                    Label("Reply", systemImage: "arrowshape.turn.up.left")
-                }
-
-                Button {
-                    Task { await archiveMessage() }
-                } label: {
-                    Label("Archive", systemImage: "archivebox")
-                }
-
-                Button(role: .destructive) {
-                    Task { await deleteMessage() }
-                } label: {
-                    Label("Delete", systemImage: "trash")
-                }
-            } label: {
-                Image(systemName: "ellipsis.circle")
-            }
-        }
-    }
-
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(message.subject)
-                .font(.title3.bold())
-                .foregroundStyle(.white)
-
-            Text(message.from)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-    }
 
     private func summarize() {
         guard !isSummarizing else { return }
