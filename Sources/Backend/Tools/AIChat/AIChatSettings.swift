@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 struct PromptVariable: Codable, Identifiable {
     var id = UUID()
@@ -138,6 +139,13 @@ class AIChatSettingsManager: ObservableObject {
 
     @Published var settings: AIChatSettings {
         didSet { save() }
+    }
+
+    var settingsBinding: Binding<AIChatSettings> {
+        Binding(
+            get: { self.settings },
+            set: { self.settings = $0 }
+        )
     }
 
     private let key = "AIChatSettings"
