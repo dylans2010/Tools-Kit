@@ -125,7 +125,7 @@ private struct AuditEventRow: View {
             }
             .padding(.top, 4)
         } label: {
-            Text("Metadata").font(.caption2).foregroundStyle(.accent)
+            Text("Metadata").font(.caption2).foregroundStyle(Color.accentColor)
         }
     }
 }
