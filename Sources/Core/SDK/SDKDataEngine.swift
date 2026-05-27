@@ -102,6 +102,8 @@ extension SDKScope {
 public final class SDKDataEngine: ObservableObject {
     public static let shared = SDKDataEngine()
 
+    @Published public private(set) var isInitialized = false
+
     private let cache = NSCache<NSString, CacheEntry>()
     private let cacheTTL: TimeInterval = 300
     private var cacheTimestamps: [String: Date] = [:]
@@ -110,6 +112,7 @@ public final class SDKDataEngine: ObservableObject {
     private init() {
         cache.countLimit = 100
         cache.totalCostLimit = 50 * 1024 * 1024
+        isInitialized = true
     }
 
     private class CacheEntry {

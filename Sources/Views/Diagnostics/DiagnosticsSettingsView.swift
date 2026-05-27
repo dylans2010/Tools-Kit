@@ -48,7 +48,7 @@ public struct DiagnosticsSettingsView: View {
     private let logLevels = ["Error", "Warning", "Info", "Debug", "Verbose"]
     private let themes = ["System", "Light", "Dark", "High Contrast"]
 
-    var body: some View {
+    public var body: some View {
         NavigationStack {
             Form {
                 generalSection
