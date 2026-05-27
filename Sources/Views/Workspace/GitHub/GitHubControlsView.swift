@@ -96,6 +96,9 @@ struct GitHubControlsView: View {
                 NavigationLink(destination: GitHubUserActivityView(username: login)) {
                     Label("Recent Activity", systemImage: "bolt.horizontal")
                 }
+            } else {
+                Label("Recent Activity", systemImage: "bolt.horizontal")
+                    .foregroundStyle(.secondary)
             }
             NavigationLink(destination: GitHubGistListView()) {
                 Label("My Gists", systemImage: "doc.plaintext")
