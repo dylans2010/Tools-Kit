@@ -22,8 +22,18 @@ struct SpeechPresetPrompts {
         SpeechPresetPrompt(title: "Fix Transcription", prompt: "Correct any obvious transcription errors in the text.", category: "Refinement"),
         SpeechPresetPrompt(title: "Professional Polish", prompt: "Rewrite the key points in a more professional and formal tone.", category: "Refinement"),
         SpeechPresetPrompt(title: "Simplify Jargon", prompt: "Explain any technical jargon used in this recording in simple terms.", category: "Refinement"),
+
+        // Strategy & Planning
+        SpeechPresetPrompt(title: "SWOT Analysis", prompt: "Perform a SWOT analysis based on the recording.", category: "Strategy"),
+        SpeechPresetPrompt(title: "Risk Assessment", prompt: "Identify potential risks mentioned or implied in this discussion.", category: "Strategy"),
+        SpeechPresetPrompt(title: "Next Steps Roadmap", prompt: "Create a 30-60-90 day roadmap based on these discussions.", category: "Strategy"),
+
+        // Questions & Exploration
+        SpeechPresetPrompt(title: "Missing Information", prompt: "What crucial information is missing from this recording to make a final decision?", category: "Questions"),
+        SpeechPresetPrompt(title: "Assumption Audit", prompt: "List all assumptions made by the speakers in this audio.", category: "Questions"),
+        SpeechPresetPrompt(title: "Counter-Arguments", prompt: "Generate strong counter-arguments to the main points presented.", category: "Questions")
     ] + (1...300).map { i in
-        let categories = ["Analysis", "Creative", "Refinement", "Questions", "Insights", "Summary", "Planning"]
+        let categories = ["Analysis", "Creative", "Refinement", "Questions", "Insights", "Summary", "Planning", "Strategy", "Education", "Legal", "Financial"]
         let category = categories[i % categories.count]
 
         let templates = [
@@ -36,11 +46,16 @@ struct SpeechPresetPrompts {
             "Compare the different viewpoints on \(category.lowercased()) presented in the audio.",
             "Draft a proposal for \(category.lowercased()) based on these notes.",
             "What follow-up questions should I ask about \(category.lowercased())?",
-            "Identify the emotional cues related to \(category.lowercased()) in the speaker's voice."
+            "Identify the emotional cues related to \(category.lowercased()) in the speaker's voice.",
+            "Create a checklist for \(category.lowercased()) from this content.",
+            "Analyze the impact of \(category.lowercased()) on the project timeline.",
+            "Who are the key stakeholders for \(category.lowercased()) mentioned?",
+            "Extract any metrics or data related to \(category.lowercased()).",
+            "How should we communicate the \(category.lowercased()) updates to the team?"
         ]
 
         return SpeechPresetPrompt(
-            title: "\(category) Insight \(i)",
+            title: "\(category) Deep Dive \(i)",
             prompt: templates[i % templates.count],
             category: category
         )
