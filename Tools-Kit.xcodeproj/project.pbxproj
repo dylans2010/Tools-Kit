@@ -1392,6 +1392,11 @@
 		SP020000000000000000000001 /* SpeechManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP010000000000000000000001 /* SpeechManager.swift */; };
 		SP020000000000000000000002 /* SpeechNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP010000000000000000000002 /* SpeechNotesView.swift */; };
 		SP020000000000000000000003 /* SpeechModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP010000000000000000000003 /* SpeechModels.swift */; };
+		SP020000000000000000000004 /* SpeechHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP010000000000000000000004 /* SpeechHistoryStore.swift */; };
+		SP020000000000000000000005 /* SpeechHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP010000000000000000000005 /* SpeechHistoryView.swift */; };
+		SP020000000000000000000006 /* SpeechPresetPrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP010000000000000000000006 /* SpeechPresetPrompts.swift */; };
+		SP020000000000000000000007 /* SpeechPresetPromptsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP010000000000000000000007 /* SpeechPresetPromptsSheet.swift */; };
+		SP020000000000000000000008 /* SpeechTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP010000000000000000000008 /* SpeechTimelineView.swift */; };
 		PL020000000000000000000004 /* PluginSecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000004 /* PluginSecurityView.swift */; };
 		PL020000000000000000000101 /* ConnectorsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000101 /* ConnectorsMainView.swift */; };
 		PL020000000000000000000102 /* ConnectorBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000102 /* ConnectorBuilderView.swift */; };
@@ -3455,6 +3460,11 @@
 		SP010000000000000000000001 /* SpeechManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechManager.swift; sourceTree = "<group>"; };
 		SP010000000000000000000002 /* SpeechNotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechNotesView.swift; sourceTree = "<group>"; };
 		SP010000000000000000000003 /* SpeechModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechModels.swift; sourceTree = "<group>"; };
+		SP010000000000000000000004 /* SpeechHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechHistoryStore.swift; sourceTree = "<group>"; };
+		SP010000000000000000000005 /* SpeechHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechHistoryView.swift; sourceTree = "<group>"; };
+		SP010000000000000000000006 /* SpeechPresetPrompts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechPresetPrompts.swift; sourceTree = "<group>"; };
+		SP010000000000000000000007 /* SpeechPresetPromptsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechPresetPromptsSheet.swift; sourceTree = "<group>"; };
+		SP010000000000000000000008 /* SpeechTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechTimelineView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000004 /* PluginSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/PluginSecurityView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000005 /* PluginLimitedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/PluginLimitedView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000006 /* SecurityScopeApplicationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/SecurityScopeApplicationView.swift; sourceTree = "<group>"; };
@@ -6442,6 +6452,11 @@
 				SP010000000000000000000001 /* SpeechManager.swift */,
 				SP010000000000000000000002 /* SpeechNotesView.swift */,
 				SP010000000000000000000003 /* SpeechModels.swift */,
+				SP010000000000000000000004 /* SpeechHistoryStore.swift */,
+				SP010000000000000000000005 /* SpeechHistoryView.swift */,
+				SP010000000000000000000006 /* SpeechPresetPrompts.swift */,
+				SP010000000000000000000007 /* SpeechPresetPromptsSheet.swift */,
+				SP010000000000000000000008 /* SpeechTimelineView.swift */,
 			);
 			path = Speech;
 			sourceTree = "<group>";
@@ -13266,6 +13281,11 @@
 				SP020000000000000000000001 /* SpeechManager.swift in Sources */,
 				SP020000000000000000000002 /* SpeechNotesView.swift in Sources */,
 				SP020000000000000000000003 /* SpeechModels.swift in Sources */,
+				SP020000000000000000000004 /* SpeechHistoryStore.swift in Sources */,
+				SP020000000000000000000005 /* SpeechHistoryView.swift in Sources */,
+				SP020000000000000000000006 /* SpeechPresetPrompts.swift in Sources */,
+				SP020000000000000000000007 /* SpeechPresetPromptsSheet.swift in Sources */,
+				SP020000000000000000000008 /* SpeechTimelineView.swift in Sources */,
 				WA0200000000000000000001 /* WritingAnalyticsModels.swift in Sources */,
 				WA0200000000000000000002 /* WritingAnalyticsEngine.swift in Sources */,
 				WA0200000000000000000003 /* WritingAnalyticsViewModel.swift in Sources */,
