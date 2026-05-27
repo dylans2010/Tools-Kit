@@ -297,9 +297,10 @@ struct GitHubGistFile: Codable, Hashable {
     let language: String?
     let rawUrl: String?
     let size: Int
+    let content: String?
 
     enum CodingKeys: String, CodingKey {
-        case filename, type, language, size
+        case filename, type, language, size, content
         case rawUrl = "raw_url"
     }
 }
@@ -319,4 +320,69 @@ struct GitHubRateLimit: Codable, Hashable {
     let remaining: Int
     let reset: Int
     let used: Int
+}
+
+struct GitHubPRComment: Codable, Identifiable, Hashable {
+    let id: Int
+    let body: String
+    let user: GitHubUser
+    let createdAt: Date
+    let updatedAt: Date
+    let htmlUrl: String
+
+    enum CodingKeys: String, CodingKey {
+        case id, body, user
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case htmlUrl = "html_url"
+    }
+}
+
+struct GitHubPRReview: Codable, Identifiable, Hashable {
+    let id: Int
+    let user: GitHubUser
+    let body: String?
+    let state: String // APPROVED, CHANGES_REQUESTED, COMMENTED, etc.
+    let htmlUrl: String
+    let submittedAt: Date?
+
+    enum CodingKeys: String, CodingKey {
+        case id, user, body, state
+        case htmlUrl = "html_url"
+        case submittedAt = "submitted_at"
+    }
+}
+
+struct GitHubContributor: Codable, Identifiable, Hashable {
+    let id: Int
+    let login: String
+    let avatarUrl: String
+    let contributions: Int
+
+    enum CodingKeys: String, CodingKey {
+        case id, login, contributions
+        case avatarUrl = "avatar_url"
+    }
+}
+
+struct GitHubLanguageStats: Codable {
+    // This is a dictionary of [String: Int] (Language Name: Bytes)
+    let languages: [String: Int]
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.languages = try container.decode([String: Int].self)
+    }
+}
+
+struct GitHubGlobalSearchResponse<T: Codable>: Codable {
+    let totalCount: Int
+    let incompleteResults: Bool
+    let items: [T]
+
+    enum CodingKeys: String, CodingKey {
+        case items
+        case totalCount = "total_count"
+        case incompleteResults = "incomplete_results"
+    }
 }

@@ -108,6 +108,10 @@ struct GitHubControlsView: View {
     @ViewBuilder
     private var toolsSection: some View {
         Section("Tools & Services") {
+            NavigationLink(destination: GitHubGlobalSearchView()) {
+                Label("Global Search", systemImage: "magnifyingglass")
+            }
+
             NavigationLink(destination: GitHubNotificationsView()) {
                 Label("Notifications", systemImage: "bell.badge")
             }
@@ -124,6 +128,10 @@ struct GitHubControlsView: View {
 
             NavigationLink(destination: GitHubTrendingExplorerView()) {
                 Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
+            }
+
+            NavigationLink(destination: GitHubRepoComparisonView()) {
+                Label("Compare Repos", systemImage: "arrow.left.and.right.square")
             }
         }
     }

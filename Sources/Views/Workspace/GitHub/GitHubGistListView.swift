@@ -17,6 +17,7 @@ struct GitHubGistListView: View {
                 )
             } else {
                 List(gists) { gist in
+                    NavigationLink(destination: GistDetailView(gistId: gist.id)) {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Image(systemName: "doc.text.fill")
@@ -53,15 +54,13 @@ struct GitHubGistListView: View {
                         HStack {
                             Text("Created \(gist.createdAt.formatted(date: .abbreviated, time: .omitted))")
                             Spacer()
-                            Link(destination: URL(string: gist.htmlUrl)!) {
-                                Label("View on Web", systemImage: "arrow.up.right.square")
-                                    .font(.caption2.bold())
-                            }
+                            Text("\(gist.files.count) files")
                         }
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                     }
                     .padding(.vertical, 6)
+                    }
                 }
                 .listStyle(.insetGrouped)
                 .refreshable {
@@ -70,6 +69,13 @@ struct GitHubGistListView: View {
             }
         }
         .navigationTitle("Your Gists")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                NavigationLink(destination: GistEditorView()) {
+                    Image(systemName: "plus")
+                }
+            }
+        }
         .task {
             await fetchGists()
         }

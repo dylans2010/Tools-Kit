@@ -13,11 +13,14 @@ struct RepoListView: View {
         VStack(spacing: 0) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
+                    NavigationLink(destination: GitHubGlobalSearchView()) {
+                        QuickGitHubTool(title: "Search", icon: "magnifyingglass", color: .blue)
+                    }
                     NavigationLink(destination: GitHubTrendingExplorerView()) {
                         QuickGitHubTool(title: "Trending", icon: "chart.line.uptrend.xyaxis", color: .orange)
                     }
                     NavigationLink(destination: GitHubRepoComparisonView()) {
-                        QuickGitHubTool(title: "Compare", icon: "arrow.left.and.right.square", color: .blue)
+                        QuickGitHubTool(title: "Compare", icon: "arrow.left.and.right.square", color: .purple)
                     }
                     NavigationLink(destination: GitHubNotificationsView()) {
                         QuickGitHubTool(title: "Notifications", icon: "bell", color: .red)

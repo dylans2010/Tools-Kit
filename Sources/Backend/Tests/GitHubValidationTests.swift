@@ -42,7 +42,15 @@ struct GitHubValidationTests {
         let rateLimitUrl = GitHubEndpoints.rateLimit.url
         assert(rateLimitUrl.absoluteString == "https://api.github.com/rate_limit")
 
+        let gistDetailsUrl = GitHubEndpoints.gistDetails(id: "123").url
+        assert(gistDetailsUrl.absoluteString == "https://api.github.com/gists/123")
+
+        let globalSearchUrl = GitHubEndpoints.globalSearch(type: "repositories", query: "swift").url
+        assert(globalSearchUrl.absoluteString == "https://api.github.com/search/repositories?q=swift")
+
         assert(GitHubEndpoints.user.method == "GET")
+        assert(GitHubEndpoints.createGist.method == "POST")
+        assert(GitHubEndpoints.deleteGist(id: "123").method == "DELETE")
     }
 
     private static func testModels() {
