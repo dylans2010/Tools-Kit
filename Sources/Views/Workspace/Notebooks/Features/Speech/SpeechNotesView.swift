@@ -164,7 +164,7 @@ struct SpeechNotesView: View {
             } else {
                 Image(systemName: "mic.circle.fill")
                     .font(.system(size: 80))
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
                 Text("Ready to Record")
                     .font(.headline)
             }
@@ -302,7 +302,7 @@ struct SpeechNotesView: View {
                 ScrollView {
                     VStack(spacing: 16) {
                         ForEach(speechManager.chatHistory) { message in
-                            ChatBubble(message: message)
+                            SpeechChatBubble(message: message)
                                 .id(message.id)
                         }
                     }
@@ -479,7 +479,7 @@ struct SpeechNotesView: View {
     }
 }
 
-struct ChatBubble: View {
+struct SpeechChatBubble: View {
     let message: ChatMessage
 
     var body: some View {
