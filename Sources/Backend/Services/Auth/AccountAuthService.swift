@@ -123,8 +123,8 @@ final class AccountAuthService: ObservableObject {
     func syncGitHubToken() async {
         do {
             let session = try await AppwriteService.account.getSession(sessionId: "current")
-            if let token = session.providerAccessToken, !token.isEmpty {
-                GitHubAuthManager.shared.saveToken(token)
+            if !session.providerAccessToken.isEmpty {
+                GitHubAuthManager.shared.saveToken(session.providerAccessToken)
                 print("Successfully synced GitHub token from OAuth session.")
             }
         } catch {
