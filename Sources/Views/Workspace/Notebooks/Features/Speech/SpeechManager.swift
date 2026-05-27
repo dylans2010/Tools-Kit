@@ -235,7 +235,7 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
         let prompt = """
         Analyze the following transcript from a speech recording.
         Provide a concise summary, key points, action items, and segment the transcript into topics with timestamps.
-        The recording duration is \(audioRecorder?.duration ?? 0) seconds.
+        The recording duration is \(playbackDuration) seconds.
 
         Transcript:
         \(transcription)
@@ -243,7 +243,7 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
 
         do {
             let jsonString = try await AIService.shared.generateStructuredJSON(prompt: prompt, jsonSchema: schema)
-            if let data = jsonString.data(using: .utf8) {
+            if let data = jsonString.data(using: String.Encoding.utf8) {
                 let decoded = try JSONDecoder().decode(SpeechAnalysis.self, from: data)
                 self.analysis = decoded
                 self.analysis?.fullTranscript = transcription
