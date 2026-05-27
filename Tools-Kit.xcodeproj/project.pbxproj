@@ -88,7 +88,7 @@
 		DG02000000000000000000000055 /* Diag_WiFiStrengthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000055 /* Diag_WiFiStrengthView.swift */; };
 		DG02000000000000000000000056 /* DiagnosticsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000056 /* DiagnosticsHomeView.swift */; };
 		DG02000000000000000000000057 /* DiagnosticsModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000057 /* DiagnosticsModeManager.swift */; };
-		DG02000000000000000000000250 /* DiagnosticsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000250 /* DiagnosticsSettingsView.swift */; };
+		DG020000000000000000000251 /* DiagnosticsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000251 /* DiagnosticsSettingsView.swift */; };
 		DG02000000000000000000000058 /* DiagnosticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000058 /* DiagnosticsService.swift */; };
 		DG02000000000000000000000059 /* DiagnosticsToolCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000059 /* DiagnosticsToolCardView.swift */; };
 		DG02000000000000000000000060 /* DiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000060 /* DiagnosticsViewModel.swift */; };
@@ -1437,6 +1437,8 @@
 		PL020000000000000000000033 /* SDKBuildAnalyzerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000033 /* SDKBuildAnalyzerDevTool.swift */; };
 		PL020000000000000000000034 /* SDKAssetOptimizerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000034 /* SDKAssetOptimizerDevTool.swift */; };
 		PL020000000000000000000035 /* SDKSecurityAuditDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000035 /* SDKSecurityAuditDevTool.swift */; };
+		PL020000000000000000000036 /* SDKAssetOptimizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000036 /* SDKAssetOptimizerView.swift */; };
+		PL020000000000000000000037 /* SDKSecurityAuditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000037 /* SDKSecurityAuditView.swift */; };
 		PL020000000000000000000025 /* SDKSecurityMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000025 /* SDKSecurityMonitorView.swift */; };
 		PL020000000000000000000026 /* SDKInternalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000026 /* SDKInternalView.swift */; };
 		PL02000000000000000000000D /* SDKDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000D /* SDKDebugView.swift */; };
@@ -2142,7 +2144,7 @@
 		DG01000000000000000000000055 /* Diag_WiFiStrengthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_WiFiStrengthView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000056 /* DiagnosticsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsHomeView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000057 /* DiagnosticsModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsModeManager.swift; sourceTree = "<group>"; };
-		DG01000000000000000000000250 /* DiagnosticsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsSettingsView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000251 /* DiagnosticsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsSettingsView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000058 /* DiagnosticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsService.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000059 /* DiagnosticsToolCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsToolCardView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000060 /* DiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsViewModel.swift; sourceTree = "<group>"; };
@@ -3477,6 +3479,8 @@
 		PL010000000000000000000033 /* SDKBuildAnalyzerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Builder/More Tools/SDKBuildAnalyzerDevTool.swift"; sourceTree = "<group>"; };
 		PL010000000000000000000034 /* SDKAssetOptimizerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Builder/More Tools/SDKAssetOptimizerDevTool.swift"; sourceTree = "<group>"; };
 		PL010000000000000000000035 /* SDKSecurityAuditDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Builder/More Tools/SDKSecurityAuditDevTool.swift"; sourceTree = "<group>"; };
+		PL010000000000000000000036 /* SDKAssetOptimizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Builder/More Tools/SDKAssetOptimizerView.swift"; sourceTree = "<group>"; };
+		PL010000000000000000000037 /* SDKSecurityAuditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Builder/More Tools/SDKSecurityAuditView.swift"; sourceTree = "<group>"; };
 		PL010000000000000000000025 /* SDKSecurityMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKSecurityMonitorView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000000D /* SDKDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKDebugView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000000E /* SDKFlowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKFlowBuilderView.swift; sourceTree = "<group>"; };
@@ -4159,7 +4163,7 @@
 				DG01000000000000000000000055 /* Diag_WiFiStrengthView.swift */,
 				DG01000000000000000000000056 /* DiagnosticsHomeView.swift */,
 				DG01000000000000000000000057 /* DiagnosticsModeManager.swift */,
-				DG01000000000000000000000250 /* DiagnosticsSettingsView.swift */,
+				DG010000000000000000000251 /* DiagnosticsSettingsView.swift */,
 				DG01000000000000000000000058 /* DiagnosticsService.swift */,
 				DG01000000000000000000000059 /* DiagnosticsToolCardView.swift */,
 				DG01000000000000000000000060 /* DiagnosticsViewModel.swift */,
@@ -8993,6 +8997,8 @@
 				PL010000000000000000000033 /* SDKBuildAnalyzerDevTool.swift */,
 				PL010000000000000000000034 /* SDKAssetOptimizerDevTool.swift */,
 				PL010000000000000000000035 /* SDKSecurityAuditDevTool.swift */,
+				PL010000000000000000000036 /* SDKAssetOptimizerView.swift */,
+				PL010000000000000000000037 /* SDKSecurityAuditView.swift */,
 				PL010000000000000000000008 /* SDKProjectDashboardView.swift */,
 				PL010000000000000000000009 /* SDKDeploymentView.swift */,
 				PL01000000000000000000000A /* SDKSystemExplorerView.swift */,
@@ -12793,7 +12799,7 @@
 				DG02000000000000000000000055 /* Diag_WiFiStrengthView.swift in Sources */,
 				DG02000000000000000000000056 /* DiagnosticsHomeView.swift in Sources */,
 				DG02000000000000000000000057 /* DiagnosticsModeManager.swift in Sources */,
-				DG02000000000000000000000250 /* DiagnosticsSettingsView.swift in Sources */,
+				DG020000000000000000000251 /* DiagnosticsSettingsView.swift in Sources */,
 				DG02000000000000000000000058 /* DiagnosticsService.swift in Sources */,
 				DG02000000000000000000000059 /* DiagnosticsToolCardView.swift in Sources */,
 				DG02000000000000000000000060 /* DiagnosticsViewModel.swift in Sources */,
@@ -14349,6 +14355,8 @@
 				PL020000000000000000000033 /* SDKBuildAnalyzerDevTool.swift in Sources */,
 				PL020000000000000000000034 /* SDKAssetOptimizerDevTool.swift in Sources */,
 				PL020000000000000000000035 /* SDKSecurityAuditDevTool.swift in Sources */,
+				PL020000000000000000000036 /* SDKAssetOptimizerView.swift in Sources */,
+				PL020000000000000000000037 /* SDKSecurityAuditView.swift in Sources */,
 				PL020000000000000000000025 /* SDKSecurityMonitorView.swift in Sources */,
 				PL02000000000000000000000D /* SDKDebugView.swift in Sources */,
 				PL02000000000000000000000E /* SDKFlowBuilderView.swift in Sources */,
