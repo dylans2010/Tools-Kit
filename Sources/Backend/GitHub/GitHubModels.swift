@@ -224,7 +224,7 @@ struct GitHubEvent: Codable, Identifiable, Hashable {
     let createdAt: Date
 
     enum CodingKeys: String, CodingKey {
-        case id, type, actor, repo, payload, public
+        case id, type, actor, repo, payload, `public`
         case createdAt = "created_at"
     }
 }
@@ -284,7 +284,7 @@ struct GitHubGist: Codable, Identifiable, Hashable {
     let description: String?
 
     enum CodingKeys: String, CodingKey {
-        case id, public, description
+        case id, `public`, description
         case htmlUrl = "html_url"
         case createdAt = "created_at"
         case files

@@ -12,133 +12,11 @@ struct GitHubControlsView: View {
     var body: some View {
         NavigationStack {
             List {
-                if let user = user {
-                    Section {
-                        HStack(spacing: 16) {
-                            AsyncImage(url: URL(string: user.avatarUrl)) { image in
-                                image.resizable()
-                            } placeholder: {
-                                Image(systemName: "person.crop.circle.fill")
-                                    .font(.system(size: 60))
-                                    .foregroundStyle(.secondary)
-                            }
-                            .frame(width: 60, height: 60)
-                            .clipShape(Circle())
-
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(user.name ?? user.login)
-                                    .font(.headline)
-                                Text("@\(user.login)")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .padding(.vertical, 8)
-
-                        if let bio = user.bio {
-                            Text(bio)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-
-                        HStack {
-                            StatItem(title: "Repos", value: "\(user.publicRepos)")
-                            Divider()
-                            StatItem(title: "Gists", value: "\(user.publicGists)")
-                            Divider()
-                            StatItem(title: "Followers", value: "\(user.followers)")
-                        }
-                        .padding(.vertical, 4)
-                    } header: {
-                        Text("Authenticated User")
-                    }
-                }
-
-                Section {
-                    NavigationLink(destination: GitHubNotificationsView()) {
-                        Label("Notifications", systemImage: "bell.badge")
-                    }
-                    if let login = user?.login {
-                        NavigationLink(destination: GitHubUserActivityView(username: login)) {
-                            Label("Recent Activity", systemImage: "bolt.horizontal")
-                        }
-                    }
-                    NavigationLink(destination: GitHubGistListView()) {
-                        Label("My Gists", systemImage: "doc.plaintext")
-                    }
-                } header: {
-                    Text("Tools & Services")
-                }
-
-                Section {
-                    HStack {
-                        Text("Token")
-                        Spacer()
-                        Text(maskedToken)
-                            .font(.system(.subheadline, design: .monospaced))
-                            .foregroundStyle(.secondary)
-                    }
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Authorized Scopes")
-                            .font(.caption.bold())
-                        if scopes.isEmpty {
-                            Text("No specific scopes detected.")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        } else {
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 6) {
-                                    ForEach(scopes, id: \.self) { scope in
-                                        Text(scope)
-                                            .font(.system(size: 10, weight: .bold, design: .monospaced))
-                                            .padding(.horizontal, 8)
-                                            .padding(.vertical, 4)
-                                            .background(Color.green.opacity(0.1))
-                                            .foregroundStyle(.green)
-                                            .clipShape(Capsule())
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .padding(.vertical, 4)
-
-                    Button(role: .destructive) {
-                        logout()
-                    } label: {
-                        Label("Revoke Token & Logout", systemImage: "key.slash")
-                    }
-                } header: {
-                    Text("Authentication")
-                }
-
-                if let rl = rateLimit {
-                    Section {
-                        RateLimitRow(title: "Core API", limit: rl.core)
-                        RateLimitRow(title: "Search API", limit: rl.search)
-                        RateLimitRow(title: "GraphQL", limit: rl.graphql)
-                    } header: {
-                        Text("API Rate Limits")
-                    }
-                }
-
-                Section {
-                    Button {
-                        Task { await refreshData() }
-                    } label: {
-                        Label("Validate Connection", systemImage: "checkmark.seal")
-                    }
-
-                    Button {
-                        WorkspaceNotificationService.shared.post(title: "Cache Cleared", body: "GitHub API local cache has been reset.", category: .info)
-                    } label: {
-                        Label("Clear API Cache", systemImage: "trash")
-                    }
-                    .foregroundStyle(.secondary)
-                } header: {
-                    Text("Management")
-                }
+                userSection
+                toolsSection
+                authSection
+                rateLimitSection
+                managementSection
             }
             .navigationTitle("GitHub Controls")
             .navigationBarTitleDisplayMode(.inline)
@@ -160,6 +38,149 @@ struct GitHubControlsView: View {
             } message: {
                 Text(errorMessage ?? "Unknown Error")
             }
+        }
+    }
+
+    @ViewBuilder
+    private var userSection: some View {
+        if let user = user {
+            Section {
+                HStack(spacing: 16) {
+                    AsyncImage(url: URL(string: user.avatarUrl)) { image in
+                        image.resizable()
+                    } placeholder: {
+                        Image(systemName: "person.crop.circle.fill")
+                            .font(.system(size: 60))
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(width: 60, height: 60)
+                    .clipShape(Circle())
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(user.name ?? user.login)
+                            .font(.headline)
+                        Text("@\(user.login)")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.vertical, 8)
+
+                if let bio = user.bio {
+                    Text(bio)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                HStack {
+                    StatItem(title: "Repos", value: "\(user.publicRepos)")
+                    Divider()
+                    StatItem(title: "Gists", value: "\(user.publicGists)")
+                    Divider()
+                    StatItem(title: "Followers", value: "\(user.followers)")
+                }
+                .padding(.vertical, 4)
+            } header: {
+                Text("Authenticated User")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var toolsSection: some View {
+        Section {
+            NavigationLink(destination: GitHubNotificationsView()) {
+                Label("Notifications", systemImage: "bell.badge")
+            }
+            if let login = user?.login {
+                NavigationLink(destination: GitHubUserActivityView(username: login)) {
+                    Label("Recent Activity", systemImage: "bolt.horizontal")
+                }
+            }
+            NavigationLink(destination: GitHubGistListView()) {
+                Label("My Gists", systemImage: "doc.plaintext")
+            }
+        } header: {
+            Text("Tools & Services")
+        }
+    }
+
+    @ViewBuilder
+    private var authSection: some View {
+        Section {
+            HStack {
+                Text("Token")
+                Spacer()
+                Text(maskedToken)
+                    .font(.system(.subheadline, design: .monospaced))
+                    .foregroundStyle(.secondary)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Authorized Scopes")
+                    .font(.caption.bold())
+                if scopes.isEmpty {
+                    Text("No specific scopes detected.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) {
+                            ForEach(scopes, id: \.self) { scope in
+                                Text(scope)
+                                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.green.opacity(0.1))
+                                    .foregroundStyle(.green)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.vertical, 4)
+
+            Button(role: .destructive) {
+                logout()
+            } label: {
+                Label("Revoke Token & Logout", systemImage: "key.slash")
+            }
+        } header: {
+            Text("Authentication")
+        }
+    }
+
+    @ViewBuilder
+    private var rateLimitSection: some View {
+        if let rl = rateLimit {
+            Section {
+                RateLimitRow(title: "Core API", limit: rl.core)
+                RateLimitRow(title: "Search API", limit: rl.search)
+                RateLimitRow(title: "GraphQL", limit: rl.graphql)
+            } header: {
+                Text("API Rate Limits")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var managementSection: some View {
+        Section {
+            Button {
+                Task { await refreshData() }
+            } label: {
+                Label("Validate Connection", systemImage: "checkmark.seal")
+            }
+
+            Button {
+                WorkspaceNotificationService.shared.post(title: "Cache Cleared", body: "GitHub API local cache has been reset.", category: .info)
+            } label: {
+                Label("Clear API Cache", systemImage: "trash")
+            }
+            .foregroundStyle(.secondary)
+        } header: {
+            Text("Management")
         }
     }
 
