@@ -59,24 +59,45 @@ final class GitHubAuthManager {
         SecItemDelete(query as CFDictionary)
     }
 
-    /// Validates the stored token by calling GitHub's user endpoint.
-    /// - Returns: Boolean indicating if the token is valid.
-    func validateToken() async -> Bool {
-        guard let token = getToken() else { return false }
+    /// Validates a token by calling GitHub's user endpoint.
+    /// - Parameter token: Optional token to validate. If nil, uses the stored token.
+    /// - Returns: Result with user info or error.
+    func validateToken(token: String? = nil) async -> Result<GitHubAuthenticatedUser, Error> {
+        guard let tokenToValidate = token ?? getToken() else {
+            return .failure(GitHubAPIClient.APIError.unauthorized)
+        }
 
         var request = URLRequest(url: URL(string: "https://api.github.com/user")!)
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(tokenToValidate)", forHTTPHeaderField: "Authorization")
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
         request.setValue("Tools-Kit-iOS", forHTTPHeaderField: "User-Agent")
 
         do {
-            let (_, response) = try await URLSession.shared.data(for: request)
-            if let httpResponse = response as? HTTPURLResponse {
-                return httpResponse.statusCode == 200
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                return .failure(GitHubAPIClient.APIError.invalidResponse)
             }
-            return false
+
+            switch httpResponse.statusCode {
+            case 200...299:
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategy = .iso8601
+                do {
+                    let user = try decoder.decode(GitHubAuthenticatedUser.self, from: data)
+                    return .success(user)
+                } catch {
+                    return .failure(GitHubAPIClient.APIError.decodingError(error))
+                }
+            case 401:
+                return .failure(GitHubAPIClient.APIError.unauthorized)
+            case 403:
+                let message = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["message"] as? String ?? "Forbidden"
+                return .failure(GitHubAPIClient.APIError.forbidden(message))
+            default:
+                return .failure(GitHubAPIClient.APIError.serverError(httpResponse.statusCode))
+            }
         } catch {
-            return false
+            return .failure(GitHubAPIClient.APIError.networkError(error))
         }
     }
 }

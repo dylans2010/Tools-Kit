@@ -103,6 +103,11 @@ final class AccountAuthService: ObservableObject {
                     name: currentUser.name,
                     provider: provider.lowercased()
                 )
+
+                // Sync GitHub Token if provider is GitHub
+                if provider.lowercased() == "github" {
+                    await syncGitHubToken()
+                }
             } catch {
                 print("OAuth profile save failed: \(error.localizedDescription)")
             }
@@ -111,6 +116,19 @@ final class AccountAuthService: ObservableObject {
         } catch {
             lastErrorMessage = error.localizedDescription
             throw error
+        }
+    }
+
+    /// Attempts to retrieve the GitHub access token from the AppWrite session and save it.
+    func syncGitHubToken() async {
+        do {
+            let session = try await AppwriteService.account.getSession(sessionId: "current")
+            if let token = session.providerAccessToken, !token.isEmpty {
+                GitHubAuthManager.shared.saveToken(token)
+                print("Successfully synced GitHub token from OAuth session.")
+            }
+        } catch {
+            print("Failed to sync GitHub token from session: \(error.localizedDescription)")
         }
     }
 
