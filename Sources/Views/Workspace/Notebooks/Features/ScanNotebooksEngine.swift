@@ -121,11 +121,9 @@ final class ScanNotebooksEngine: NSObject, ObservableObject {
         captureSession.commitConfiguration()
         currentDevice = device
 
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            self?.captureSession.startRunning()
-            Task { @MainActor in
-                self?.isCameraReady = true
-            }
+        Task { @MainActor in
+            self.captureSession.startRunning()
+            self.isCameraReady = true
         }
     }
 
@@ -150,8 +148,10 @@ final class ScanNotebooksEngine: NSObject, ObservableObject {
         detectedStructures = []
 
         if !captureSession.isRunning {
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                self?.captureSession.startRunning()
+            Task { @MainActor in
+                if !self.captureSession.isRunning {
+                    self.captureSession.startRunning()
+                }
             }
         }
     }
@@ -672,8 +672,10 @@ final class ScanNotebooksEngine: NSObject, ObservableObject {
 
     func stopSession() {
         if captureSession.isRunning {
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                self?.captureSession.stopRunning()
+            Task { @MainActor in
+                if self.captureSession.isRunning {
+                    self.captureSession.stopRunning()
+                }
             }
         }
     }

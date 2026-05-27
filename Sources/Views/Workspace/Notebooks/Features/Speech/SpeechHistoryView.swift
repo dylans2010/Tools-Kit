@@ -38,12 +38,14 @@ struct SpeechHistoryView: View {
             }
             .navigationTitle("Recording History")
             .searchable(text: $searchText, prompt: "Search recordings...")
-            .toolbar(content: {
+            .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }
                 }
-                EditButton()
-            })
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    EditButton()
+                }
+            }
             .overlay {
                 if historyStore.recordings.isEmpty {
                     ContentUnavailableView("No Recordings", systemImage: "mic.slash", description: Text("Your saved recordings will appear here."))
