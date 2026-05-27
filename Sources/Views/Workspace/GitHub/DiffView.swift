@@ -29,6 +29,11 @@ struct DiffView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
+
+    init(fileDiff: GitHubFileDiff) {
+        self.fileDiff = fileDiff
+    }
+
     /// Convenience initializer that generates a unified patch from raw original/modified strings.
     init(original: String, modified: String, filename: String = "Untitled") {
         let patch = Self.generatePatch(original: original, modified: modified)
