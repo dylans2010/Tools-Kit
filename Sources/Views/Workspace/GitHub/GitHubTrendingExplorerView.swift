@@ -4,49 +4,81 @@ struct GitHubTrendingExplorerView: View {
     @State private var trendingRepos: [GitHubRepository] = []
     @State private var isLoading = false
     @State private var selectedLanguage = "Swift"
+    @State private var timeRange = "daily"
+
+    let languages = ["Swift", "Kotlin", "Python", "Rust", "Go", "TypeScript", "C++", "Ruby"]
+    let ranges = ["daily", "weekly", "monthly"]
 
     var body: some View {
         List {
             Section {
-                Picker("Language", selection: $selectedLanguage) {
-                    Text("Swift").tag("Swift")
-                    Text("Kotlin").tag("Kotlin")
-                    Text("Python").tag("Python")
-                    Text("Rust").tag("Rust")
-                    Text("Go").tag("Go")
+                HStack {
+                    Picker("Language", selection: $selectedLanguage) {
+                        ForEach(languages, id: \.self) { Text($0).tag($0) }
+                    }
+                    .pickerStyle(.menu)
+
+                    Spacer()
+
+                    Picker("Range", selection: $timeRange) {
+                        Text("Today").tag("daily")
+                        Text("This Week").tag("weekly")
+                        Text("This Month").tag("monthly")
+                    }
+                    .pickerStyle(.segmented)
                 }
-                .pickerStyle(.menu)
                 .onChange(of: selectedLanguage) { _, _ in fetchTrending() }
+                .onChange(of: timeRange) { _, _ in fetchTrending() }
             }
 
             if isLoading {
-                ProgressView().frame(maxWidth: .infinity).padding()
+                HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
+                .padding()
             } else {
                 ForEach(trendingRepos) { repo in
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack {
-                            Text("\(repo.owner.login) /").foregroundStyle(.secondary)
-                            Text(repo.name).bold()
-                        }
-                        .font(.subheadline)
+                    NavigationLink(destination: RepoDetailView(repository: repo)) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                AsyncImage(url: URL(string: repo.owner.avatarUrl)) { image in
+                                    image.resizable()
+                                } placeholder: {
+                                    Image(systemName: "person.circle.fill")
+                                }
+                                .frame(width: 20, height: 20)
+                                .clipShape(Circle())
 
-                        if let desc = repo.description {
-                            Text(desc)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
-                        }
-
-                        HStack(spacing: 12) {
-                            Label("\(repo.stargazersCount)", systemImage: "star.fill")
-                            if let lang = repo.language {
-                                Label(lang, systemImage: "circle.fill")
+                                Text("\(repo.owner.login) /").foregroundStyle(.secondary)
+                                Text(repo.name).bold()
                             }
+                            .font(.subheadline)
+
+                            if let desc = repo.description {
+                                Text(desc)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(2)
+                            }
+
+                            HStack(spacing: 16) {
+                                Label("\(repo.stargazersCount.formatted(.number.notation(.compactName)))", systemImage: "star.fill")
+                                    .foregroundStyle(.orange)
+
+                                Label("\(repo.forksCount.formatted(.number.notation(.compactName)))", systemImage: "arrow.triangle.branch")
+                                    .foregroundStyle(.blue)
+
+                                if let lang = repo.language {
+                                    Label(lang, systemImage: "circle.fill")
+                                        .foregroundStyle(.primary)
+                                }
+                            }
+                            .font(.system(size: 10, weight: .bold))
                         }
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(.orange)
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
                 }
             }
         }
@@ -58,10 +90,12 @@ struct GitHubTrendingExplorerView: View {
         isLoading = true
         Task {
             do {
-                // Using search API for trending
-                let response: GitHubSearchResponse = try await GitHubAPIClient.shared.request(.trending(language: selectedLanguage))
+                // Approximate trending using search API
+                // In a real app, you might use a specific trending scraper/API
+                let query = "language:\(selectedLanguage) created:>\(dateString(for: timeRange))"
+                let response: GitHubSearchResponse = try await GitHubAPIClient.shared.request(.searchRepos(query: query))
                 await MainActor.run {
-                    self.trendingRepos = response.items
+                    self.trendingRepos = response.items.sorted { $0.stargazersCount > $1.stargazersCount }
                     self.isLoading = false
                 }
             } catch {
@@ -69,6 +103,20 @@ struct GitHubTrendingExplorerView: View {
                 isLoading = false
             }
         }
+    }
+
+    private func dateString(for range: String) -> String {
+        let calendar = Calendar.current
+        let date: Date
+        switch range {
+        case "daily": date = calendar.date(byAdding: .day, value: -1, to: Date())!
+        case "weekly": date = calendar.date(byAdding: .day, value: -7, to: Date())!
+        case "monthly": date = calendar.date(byAdding: .month, value: -1, to: Date())!
+        default: date = Date()
+        }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
     }
 }
 

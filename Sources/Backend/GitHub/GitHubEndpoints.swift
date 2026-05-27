@@ -26,6 +26,20 @@ enum GitHubEndpoints {
     case userEvents(username: String)
     case notifications
     case gists
+    case gistDetails(id: String)
+    case createGist
+    case updateGist(id: String)
+    case deleteGist(id: String)
+    case starGist(id: String)
+    case unstarGist(id: String)
+    case checkGistStarred(id: String)
+    case repoContributors(owner: String, repo: String)
+    case repoLanguages(owner: String, repo: String)
+    case prComments(owner: String, repo: String, number: Int)
+    case prReviews(owner: String, repo: String, number: Int)
+    case globalSearch(type: String, query: String)
+    case starredRepos
+    case userOrgs
     case rateLimit
 
     var url: URL {
@@ -80,6 +94,35 @@ enum GitHubEndpoints {
             return URL(string: "\(GitHubEndpoints.baseURL)/notifications")!
         case .gists:
             return URL(string: "\(GitHubEndpoints.baseURL)/gists")!
+        case .gistDetails(let id):
+            return URL(string: "\(GitHubEndpoints.baseURL)/gists/\(id)")!
+        case .createGist:
+            return URL(string: "\(GitHubEndpoints.baseURL)/gists")!
+        case .updateGist(let id):
+            return URL(string: "\(GitHubEndpoints.baseURL)/gists/\(id)")!
+        case .deleteGist(let id):
+            return URL(string: "\(GitHubEndpoints.baseURL)/gists/\(id)")!
+        case .starGist(let id):
+            return URL(string: "\(GitHubEndpoints.baseURL)/gists/\(id)/star")!
+        case .unstarGist(let id):
+            return URL(string: "\(GitHubEndpoints.baseURL)/gists/\(id)/star")!
+        case .checkGistStarred(let id):
+            return URL(string: "\(GitHubEndpoints.baseURL)/gists/\(id)/star")!
+        case .repoContributors(let owner, let repo):
+            return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/contributors")!
+        case .repoLanguages(let owner, let repo):
+            return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/languages")!
+        case .prComments(let owner, let repo, let number):
+            return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/pulls/\(number)/comments")!
+        case .prReviews(let owner, let repo, let number):
+            return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/pulls/\(number)/reviews")!
+        case .globalSearch(let type, let query):
+            let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            return URL(string: "\(GitHubEndpoints.baseURL)/search/\(type)?q=\(encodedQuery)")!
+        case .starredRepos:
+            return URL(string: "\(GitHubEndpoints.baseURL)/user/starred")!
+        case .userOrgs:
+            return URL(string: "\(GitHubEndpoints.baseURL)/user/orgs")!
         case .rateLimit:
             return URL(string: "\(GitHubEndpoints.baseURL)/rate_limit")!
         }
@@ -87,17 +130,17 @@ enum GitHubEndpoints {
 
     var method: String {
         switch self {
-        case .userRepos, .searchRepos, .repoDetails, .branches, .commits, .pullRequests, .prDetails, .contents, .compare, .repoIssues, .trending, .user, .userEvents, .notifications, .gists, .rateLimit:
+        case .userRepos, .searchRepos, .repoDetails, .branches, .commits, .pullRequests, .prDetails, .contents, .compare, .repoIssues, .trending, .user, .userEvents, .notifications, .gists, .gistDetails, .checkGistStarred, .repoContributors, .repoLanguages, .prComments, .prReviews, .globalSearch, .starredRepos, .userOrgs, .rateLimit:
             return "GET"
-        case .starred:
+        case .starred, .starGist:
             return "PUT"
         case .mergePR:
             return "PUT"
-        case .updatePR:
+        case .updatePR, .updateGist:
             return "PATCH"
-        case .fork, .createPR, .createRef:
+        case .fork, .createPR, .createRef, .createGist:
             return "POST"
-        case .deleteRef:
+        case .deleteRef, .deleteGist, .unstarGist:
             return "DELETE"
         }
     }

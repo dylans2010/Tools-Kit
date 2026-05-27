@@ -44,13 +44,37 @@ struct PRDetailView: View {
                 if let comparison = comparison {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Changes").font(.headline)
+                        NavigationLink(destination: PRFilesView(owner: owner, repo: repo, pullRequest: pullRequest)) {
                         HStack {
                             StatBox(label: "Commits", value: "\(comparison.commits.count)", color: .blue)
                             StatBox(label: "Files", value: "\(comparison.files.count)", color: .orange)
                             StatBox(label: "Additions", value: "+\(comparison.files.reduce(0) { $0 + $1.additions })", color: .green)
                         }
+                        .padding()
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Activity").font(.headline)
+                    NavigationLink(destination: PRCommentsView(owner: owner, repo: repo, pullRequest: pullRequest)) {
+                        HStack {
+                            Image(systemName: "bubble.left.and.bubble.right.fill")
+                            Text("Discussion & Reviews")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption.bold())
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding()
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                 }
+                .padding(.horizontal)
 
                 if pullRequest.state == .open {
                     VStack(spacing: 12) {

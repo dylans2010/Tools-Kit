@@ -306,6 +306,11 @@
 		GH0200000000000000000021 /* GitHubUserActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000021 /* GitHubUserActivityView.swift */; };
 		GH0200000000000000000022 /* GitHubGistListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000022 /* GitHubGistListView.swift */; };
 		GH0200000000000000000023 /* GitHubControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000023 /* GitHubControlsView.swift */; };
+		GH0200000000000000000030 /* GistDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000030 /* GistDetailView.swift */; };
+		GH0200000000000000000031 /* GistEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000031 /* GistEditorView.swift */; };
+		GH0200000000000000000032 /* GitHubGlobalSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000032 /* GitHubGlobalSearchView.swift */; };
+		GH0200000000000000000040 /* PRFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000040 /* PRFilesView.swift */; };
+		GH0200000000000000000041 /* PRCommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000041 /* PRCommentsView.swift */; };
 		RP0200000000000000000001 /* RepoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RP0100000000000000000001 /* RepoListView.swift */; };
 		RP0200000000000000000002 /* RepoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RP0100000000000000000002 /* RepoDetailView.swift */; };
 		NBDB02000000000000000001 /* NotebookDatabaseEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = NBDB01000000000000000001 /* NotebookDatabaseEngine.swift */; };
@@ -2343,6 +2348,11 @@
 		GH0100000000000000000021 /* GitHubUserActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubUserActivityView.swift; sourceTree = "<group>"; };
 		GH0100000000000000000022 /* GitHubGistListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubGistListView.swift; sourceTree = "<group>"; };
 		GH0100000000000000000023 /* GitHubControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubControlsView.swift; sourceTree = "<group>"; };
+		GH0100000000000000000030 /* GistDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GistDetailView.swift; sourceTree = "<group>"; };
+		GH0100000000000000000031 /* GistEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GistEditorView.swift; sourceTree = "<group>"; };
+		GH0100000000000000000032 /* GitHubGlobalSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubGlobalSearchView.swift; sourceTree = "<group>"; };
+		GH0100000000000000000040 /* PRFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PRFilesView.swift; sourceTree = "<group>"; };
+		GH0100000000000000000041 /* PRCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PRCommentsView.swift; sourceTree = "<group>"; };
 		RP0100000000000000000001 /* RepoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoListView.swift; sourceTree = "<group>"; };
 		RP0100000000000000000002 /* RepoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoDetailView.swift; sourceTree = "<group>"; };
 		NBDB01000000000000000001 /* NotebookDatabaseEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookDatabaseEngine.swift; sourceTree = "<group>"; };
@@ -8268,6 +8278,10 @@
 				GH0100000000000000000023 /* GitHubControlsView.swift */,
 				RP0100000000000000000001 /* RepoListView.swift */,
 				RP0100000000000000000002 /* RepoDetailView.swift */,
+				GH0100000000000000000030 /* GistDetailView.swift */,
+				GH0100000000000000000031 /* GistEditorView.swift */,
+				GH0100000000000000000032 /* GitHubGlobalSearchView.swift */,
+				NG0300000000000000000006 /* PR */,
 			);
 			path = GitHub;
 			sourceTree = "<group>";
@@ -11196,6 +11210,15 @@
 			path = Issues;
 			sourceTree = "<group>";
 		};
+		NG0300000000000000000006 /* PR */ = {
+			isa = PBXGroup;
+			children = (
+				GH0100000000000000000040 /* PRFilesView.swift */,
+				GH0100000000000000000041 /* PRCommentsView.swift */,
+			);
+			path = PR;
+			sourceTree = "<group>";
+		};
 		NG0300000000000000000002 /* Discussions */ = {
 			isa = PBXGroup;
 			children = (
@@ -13411,6 +13434,11 @@
 				GH028AB61F627BFB4C1B9771 /* GitHubSyncStatusDashboardView.swift in Sources */,
 				GH025535BE3C29864A279256 /* GitHubToolDashboardView.swift in Sources */,
 				GH02D6A009D86B3F41F2B926 /* GitHubWorkspaceSnapshotView.swift in Sources */,
+				GH0200000000000000000030 /* GistDetailView.swift in Sources */,
+				GH0200000000000000000031 /* GistEditorView.swift in Sources */,
+				GH0200000000000000000032 /* GitHubGlobalSearchView.swift in Sources */,
+				GH0200000000000000000040 /* PRFilesView.swift in Sources */,
+				GH0200000000000000000041 /* PRCommentsView.swift in Sources */,
 				SV0200000000000000000001 /* SecurityOnboardingView.swift in Sources */,
 				SV0200000000000000000002 /* SecurityHomeView.swift in Sources */,
 				SV0200000000000000000003 /* VaultListView.swift in Sources */,
