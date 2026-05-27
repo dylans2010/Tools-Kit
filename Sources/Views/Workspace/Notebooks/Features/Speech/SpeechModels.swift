@@ -157,7 +157,7 @@ struct PromptExecutionRecord: Codable, Identifiable, Hashable {
     }
 }
 
-struct SpeechAnalysis: Codable {
+struct SpeechAnalysis: Codable, Hashable, Equatable {
     var summary: String
     var keyPoints: [String]
     var actionItems: [String]
