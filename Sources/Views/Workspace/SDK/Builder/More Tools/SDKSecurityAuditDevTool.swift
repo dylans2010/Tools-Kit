@@ -8,6 +8,6 @@ struct SDKSecurityAuditDevTool: DevTool {
     let description = "Run security scans on SDK source and dependencies"
 
     func render() -> some View {
-        SDKPipelineOptimizerView() // Reuse or specific
+        SDKSecurityAuditView()
     }
 }
