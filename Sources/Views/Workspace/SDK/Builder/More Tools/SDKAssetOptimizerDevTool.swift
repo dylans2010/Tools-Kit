@@ -8,6 +8,6 @@ struct SDKAssetOptimizerDevTool: DevTool {
     let description = "Optimize and compress SDK assets for production"
 
     func render() -> some View {
-        SDKResourceInspectorView() // Reuse or specific
+        SDKAssetOptimizerView()
     }
 }
