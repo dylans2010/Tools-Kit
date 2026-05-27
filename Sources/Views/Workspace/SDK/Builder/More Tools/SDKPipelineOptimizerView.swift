@@ -1,12 +1,11 @@
 import SwiftUI
 
 struct SDKPipelineOptimizerView: View {
+    @StateObject private var projectManager = SDKProjectManager.shared
     @State private var optimizationLevel: Double = 0.5
     @State private var selectedDirectives: Set<String> = ["Dead Code Elimination", "Module Inlining"]
-    @State private var isOptimizing = false
-    @State private var progress: Double = 0.0
     @State private var showingSuccess = false
-    @State private var performanceGain: String = ""
+    @State private var message: String = ""
 
     let availableDirectives = [
         "Dead Code Elimination",
@@ -24,7 +23,6 @@ struct SDKPipelineOptimizerView: View {
                 VStack(alignment: .leading) {
                     Text("Optimization Aggression: \(Int(optimizationLevel * 100))%")
                     Slider(value: $optimizationLevel)
-                        .disabled(isOptimizing)
                 }
             }
 
@@ -40,47 +38,69 @@ struct SDKPipelineOptimizerView: View {
                             }
                         }
                     ))
-                    .disabled(isOptimizing)
                 }
             }
 
             Section {
-                if isOptimizing {
-                    VStack {
-                        ProgressView(value: progress)
-                        Text("Optimizing Pipeline... \(Int(progress * 100))%")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 8)
+                Button(action: saveSettings) {
+                    Label("Apply Pipeline Settings", systemImage: "bolt.fill")
+                }
+                .disabled(selectedDirectives.isEmpty || projectManager.currentProject == nil)
+            }
+
+            Section("Active Pipeline") {
+                if let project = projectManager.currentProject {
+                    LabeledContent("Project", value: project.name)
+                    LabeledContent("Directives", value: "\(selectedDirectives.count) active")
                 } else {
-                    Button(action: runOptimization) {
-                        Label("Run Analysis & Optimize", systemImage: "bolt.fill")
-                    }
-                    .disabled(selectedDirectives.isEmpty)
+                    Text("No active project").foregroundStyle(.secondary)
                 }
             }
         }
         .navigationTitle("Pipeline Optimizer")
-        .alert("Optimization Complete", isPresented: $showingSuccess) {
+        .alert("Settings Applied", isPresented: $showingSuccess) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text("Successfully applied \(selectedDirectives.count) directives. Estimated performance gain: \(performanceGain)")
+            Text(message)
+        }
+        .onAppear {
+            loadSettings()
         }
     }
 
-    private func runOptimization() {
-        isOptimizing = true
-        progress = 0.0
+    private func loadSettings() {
+        guard let project = projectManager.currentProject,
+              let database = project.vulnerabilityDatabase else { return }
 
-        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
-            progress += 0.04
-            if progress >= 1.0 {
-                timer.invalidate()
-                isOptimizing = false
-                performanceGain = "\(String(format: "%.1f", optimizationLevel * 15 + Double.random(in: 1...5)))%"
-                showingSuccess = true
-            }
+        if let levelStr = database["opt_level"], let level = Double(levelStr) {
+            optimizationLevel = level
         }
+
+        if let directivesStr = database["opt_directives"] {
+            selectedDirectives = Set(directivesStr.components(separatedBy: ",").filter { !$0.isEmpty })
+        }
+    }
+
+    private func saveSettings() {
+        guard var project = projectManager.currentProject else { return }
+
+        if project.vulnerabilityDatabase == nil {
+            project.vulnerabilityDatabase = [:]
+        }
+
+        project.vulnerabilityDatabase?["opt_level"] = "\(optimizationLevel)"
+        project.vulnerabilityDatabase?["opt_directives"] = Array(selectedDirectives).joined(separator: ",")
+        project.updatedAt = Date()
+
+        projectManager.updateProject(project)
+        message = "Build pipeline configuration updated for \(project.name). These settings will be applied to the next 'Execute Pipeline' run."
+        showingSuccess = true
+
+        SDKAuditLogger.shared.log(
+            eventType: .execution,
+            projectID: project.id,
+            scope: "pipeline.optimizer",
+            message: "Updated pipeline build directives: \(project.vulnerabilityDatabase?["opt_directives"] ?? "")"
+        )
     }
 }

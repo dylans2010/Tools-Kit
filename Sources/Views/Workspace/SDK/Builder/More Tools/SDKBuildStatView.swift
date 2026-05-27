@@ -1,22 +1,12 @@
 import SwiftUI
 
 struct SDKBuildStatView: View {
-    @State private var stats = [
-        BuildStat(name: "Average Build Time", value: "4.2s", trend: -0.5),
-        BuildStat(name: "Binary Size", value: "12.4 MB", trend: 1.2),
-        BuildStat(name: "Test Coverage", value: "88.5%", trend: 2.1),
-        BuildStat(name: "Warning Count", value: "14", trend: -5.0)
-    ]
+    @StateObject private var telemetry = SDKTelemetryEngine.shared
+    @StateObject private var logStore = SDKLogStore.shared
+    @StateObject private var projectManager = SDKProjectManager.shared
 
-    @State private var isAnalyzing = false
     @State private var lastUpdate = Date()
-
-    struct BuildStat: Identifiable {
-        let id = UUID()
-        let name: String
-        let value: String
-        let trend: Double
-    }
+    @State private var binarySize: String = "Calculating..."
 
     var body: some View {
         List {
@@ -26,67 +16,103 @@ struct SDKBuildStatView: View {
                         Text("Build Health")
                             .font(.headline)
                         Spacer()
-                        if isAnalyzing {
-                            ProgressView()
-                        } else {
-                            Button(action: runNewAnalysis) {
-                                Label("Refresh", systemImage: "arrow.clockwise")
-                                    .font(.caption.bold())
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .controlSize(.small)
+                        Button(action: refreshData) {
+                            Label("Refresh", systemImage: "arrow.clockwise")
+                                .font(.caption.bold())
                         }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
                     }
 
-                    Text("Last analysis: \(lastUpdate, style: .time)")
+                    Text("Last refreshed: \(lastUpdate, style: .time)")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 4)
             }
 
-            Section("Historical Performance") {
-                ForEach(stats) { stat in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(stat.name).font(.subheadline).foregroundStyle(.secondary)
-                            Text(stat.value).font(.headline)
-                        }
-                        Spacer()
-                        HStack(spacing: 4) {
-                            Image(systemName: stat.trend >= 0 ? "arrow.up.right" : "arrow.down.right")
-                            Text("\(String(format: "%.1f", abs(stat.trend)))%")
-                        }
-                        .font(.caption.bold())
-                        .foregroundStyle(stat.trend >= 0 ? (stat.name == "Binary Size" ? .red : .green) : (stat.name == "Average Build Time" ? .green : .red))
-                    }
-                }
+            Section("Build Metrics") {
+                let metrics = telemetry.getMetrics()
+
+                MetricRow(name: "Total Trace Executions", value: "\(metrics.totalTraces)", icon: "waveform.path.ecg")
+                MetricRow(name: "Average Execution Time", value: String(format: "%.2f ms", metrics.averageDurationMs), icon: "timer")
+                MetricRow(name: "Success Rate", value: String(format: "%.1f%%", metrics.totalTraces > 0 ? (Double(metrics.successCount) / Double(metrics.totalTraces) * 100) : 0), icon: "checkmark.circle")
+                MetricRow(name: "Active Operations", value: "\(metrics.activeTraces)", icon: "bolt.fill")
             }
 
-            Section("Resource Allocation") {
-                LabeledContent("Thread Count", value: "8")
-                LabeledContent("Memory Usage", value: "256 MB")
-                LabeledContent("Cache Hit Rate", value: "92%")
+            Section("System Status") {
+                let warnings = logStore.entries.filter { $0.level == .warning }.count
+                let errors = logStore.entries.filter { $0.level == .error }.count
+
+                MetricRow(name: "Warning Count", value: "\(warnings)", icon: "exclamationmark.triangle", color: warnings > 0 ? .orange : .green)
+                MetricRow(name: "Error Count", value: "\(errors)", icon: "xmark.octagon", color: errors > 0 ? .red : .green)
+                MetricRow(name: "Binary Size", value: binarySize, icon: "doc.zipper")
+            }
+
+            Section("Project Context") {
+                if let project = projectManager.currentProject {
+                    LabeledContent("Project Name", value: project.name)
+                    LabeledContent("Version", value: "\(project.version)")
+                    LabeledContent("Health", value: project.healthStatus.rawValue.capitalized)
+                } else {
+                    Text("No active project").foregroundStyle(.secondary)
+                }
             }
         }
         .navigationTitle("Build Statistics")
+        .task {
+            refreshData()
+        }
     }
 
-    private func runNewAnalysis() {
-        isAnalyzing = true
+    private func refreshData() {
+        updateBinarySize()
+        lastUpdate = Date()
+    }
 
-        // Simulate analysis delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            isAnalyzing = false
-            lastUpdate = Date()
+    private func updateBinarySize() {
+        let fileManager = FileManager.default
+        let tempDir = fileManager.temporaryDirectory
 
-            // Randomly update stats for demonstration
-            stats = [
-                BuildStat(name: "Average Build Time", value: String(format: "%.1fs", Double.random(in: 3.5...5.0)), trend: Double.random(in: -1.0...1.0)),
-                BuildStat(name: "Binary Size", value: String(format: "%.1f MB", Double.random(in: 11.5...13.0)), trend: Double.random(in: -0.5...1.5)),
-                BuildStat(name: "Test Coverage", value: String(format: "%.1f%%", Double.random(in: 85.0...92.0)), trend: Double.random(in: -1.0...2.5)),
-                BuildStat(name: "Warning Count", value: "\(Int.random(in: 5...20))", trend: Double.random(in: -5.0...5.0))
-            ]
+        do {
+            let files = try fileManager.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey])
+            let sdkBundles = files.filter { $0.pathExtension == "sdkbundle" }
+                .sorted { (url1, url2) -> Bool in
+                    let date1 = (try? url1.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? Date.distantPast
+                    let date2 = (try? url2.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? Date.distantPast
+                    return date1 > date2
+                }
+
+            if let latestBundle = sdkBundles.first {
+                let resourceValues = try latestBundle.resourceValues(forKeys: [.fileSizeKey])
+                if let size = resourceValues.fileSize {
+                    let formatter = ByteCountFormatter()
+                    formatter.countStyle = .file
+                    binarySize = formatter.string(fromByteCount: Int64(size))
+                    return
+                }
+            }
+        } catch {
+            binarySize = "Unknown"
+        }
+        binarySize = "No build found"
+    }
+}
+
+struct MetricRow: View {
+    let name: String
+    let value: String
+    let icon: String
+    var color: Color = .primary
+
+    var body: some View {
+        HStack {
+            Label(name, systemImage: icon)
+                .font(.subheadline)
+            Spacer()
+            Text(value)
+                .font(.headline)
+                .foregroundStyle(color)
         }
     }
 }

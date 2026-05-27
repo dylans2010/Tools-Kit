@@ -1,101 +1,110 @@
 import SwiftUI
 
 struct SDKSecurityAuditView: View {
+    @StateObject private var auditLogger = SDKAuditLogger.shared
+    @StateObject private var projectManager = SDKProjectManager.shared
     @State private var isScanning = false
-    @State private var scanProgress: Double = 0.0
-    @State private var findings: [SecurityFinding] = []
-
-    struct SecurityFinding: Identifiable {
-        let id = UUID()
-        let severity: Severity
-        let title: String
-        let description: String
-
-        enum Severity: String {
-            case high = "High"
-            case medium = "Medium"
-            case low = "Low"
-
-            var color: Color {
-                switch self {
-                case .high: return .red
-                case .medium: return .orange
-                case .low: return .yellow
-                }
-            }
-        }
-    }
 
     var body: some View {
         List {
             Section("Security Controls") {
-                if isScanning {
-                    VStack {
-                        ProgressView(value: scanProgress)
-                        Text("Scanning SDK source and dependencies... \(Int(scanProgress * 100))%")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 8)
-                } else {
-                    Button(action: startScan) {
-                        Label("Start Security Scan", systemImage: "shield.checkerboard")
+                Button(action: refreshAudit) {
+                    HStack {
+                        Label("Refresh Audit Logs", systemImage: "arrow.clockwise.shield")
+                        Spacer()
+                        if isScanning { ProgressView() }
                     }
                 }
+                .disabled(isScanning)
             }
 
-            if !findings.isEmpty {
-                Section("Findings") {
-                    ForEach(findings) { finding in
-                        VStack(alignment: .leading, spacing: 4) {
+            Section("Audit Logs") {
+                let currentProjectID = projectManager.currentProject?.id
+                let events = auditLogger.events.filter { event in
+                    if let id = currentProjectID {
+                        return event.projectID == id || event.projectID == nil
+                    }
+                    return true
+                }
+
+                if events.isEmpty {
+                    ContentUnavailableView("No Events Found", systemImage: "checkmark.shield", description: Text("No security or privacy events have been recorded yet."))
+                } else {
+                    ForEach(events) { event in
+                        VStack(alignment: .leading, spacing: 6) {
                             HStack {
-                                Text(finding.severity.rawValue)
+                                Text(event.eventType.rawValue.uppercased())
                                     .font(.caption2.bold())
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
-                                    .background(finding.severity.color.opacity(0.2), in: Capsule())
-                                    .foregroundStyle(finding.severity.color)
+                                    .background(color(for: event.eventType).opacity(0.2), in: Capsule())
+                                    .foregroundStyle(color(for: event.eventType))
 
-                                Text(finding.title)
-                                    .font(.subheadline.bold())
+                                Spacer()
+
+                                Text(event.timestamp, style: .time)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
                             }
 
-                            Text(finding.description)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                            Text(event.message)
+                                .font(.subheadline.bold())
+
+                            if !event.scope.isEmpty {
+                                Text("Scope: \(event.scope)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            if !event.metadata.isEmpty {
+                                DisclosureGroup {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        ForEach(Array(event.metadata.keys).sorted(), id: \.self) { key in
+                                            HStack {
+                                                Text(key).bold()
+                                                Spacer()
+                                                Text(event.metadata[key] ?? "")
+                                            }
+                                            .font(.system(size: 10, design: .monospaced))
+                                        }
+                                    }
+                                    .padding(.top, 4)
+                                } label: {
+                                    Text("Metadata").font(.caption2).foregroundStyle(.accent)
+                                }
+                            }
                         }
                         .padding(.vertical, 4)
                     }
-                }
-            } else if !isScanning && scanProgress > 0 {
-                Section {
-                    ContentUnavailableView("No Issues Found", systemImage: "checkmark.shield", description: Text("Your SDK passed all security checks."))
                 }
             }
         }
         .navigationTitle("Security Audit")
     }
 
-    private func startScan() {
+    private func refreshAudit() {
         isScanning = true
-        scanProgress = 0.0
-        findings = []
 
-        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
-            scanProgress += 0.03
-            if scanProgress >= 1.0 {
-                timer.invalidate()
-                isScanning = false
-                generateSimulatedFindings()
-            }
-        }
+        // Record the audit event
+        auditLogger.log(
+            eventType: .security,
+            projectID: projectManager.currentProject?.id,
+            scope: "security.audit",
+            message: "Manual security audit performed by user."
+        )
+
+        // Immediate completion as we are just refreshing existing logs
+        isScanning = false
     }
 
-    private func generateSimulatedFindings() {
-        findings = [
-            SecurityFinding(severity: .medium, title: "Insecure API Usage", description: "Deprecated API found in NetworkingLayer.swift (vulnerable to man-in-the-middle)."),
-            SecurityFinding(severity: .low, title: "Excessive Permissions", description: "SDK requests Location access which is not used in the core functionality."),
-            SecurityFinding(severity: .medium, title: "Outdated Dependency", description: "Package 'CryptoHelper' is 3 versions behind. Known security fix in v2.1.0.")
-        ]
+    private func color(for eventType: SDKAuditLogger.Event.EventType) -> Color {
+        switch eventType {
+        case .security: return .red
+        case .privacy: return .orange
+        case .dataAccess: return .blue
+        case .scopeUsage: return .purple
+        case .externalAPICall: return .green
+        case .execution: return .gray
+        }
     }
 }

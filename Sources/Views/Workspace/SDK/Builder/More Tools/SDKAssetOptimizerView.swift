@@ -1,60 +1,54 @@
 import SwiftUI
 
 struct SDKAssetOptimizerView: View {
-    @State private var compressionLevel: Double = 0.7
-    @State private var isOptimizing = false
-    @State private var progress: Double = 0.0
-    @State private var optimizationResults: String?
-    @State private var selectedAssetTypes: Set<String> = ["Images", "JSON", "Strings"]
+    @StateObject private var dataEngine = SDKDataEngine.shared
+    @StateObject private var projectManager = SDKProjectManager.shared
 
-    let assetTypes = ["Images", "JSON", "Strings", "Bundles", "Metadata"]
+    @State private var optimizationResults: String?
+    @State private var selectedOptions: Set<String> = ["Cache", "Temporary Files"]
+
+    let options = ["Cache", "Temporary Files", "Diagnostic Logs"]
 
     var body: some View {
         List {
-            Section("Optimization Settings") {
-                VStack(alignment: .leading) {
-                    Text("Compression Quality: \(Int(compressionLevel * 100))%")
-                    Slider(value: $compressionLevel, in: 0...1)
-                        .disabled(isOptimizing)
-                }
+            Section("Optimization Targets") {
+                Text("Select components to optimize and clear to reduce the SDK's footprint during development.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
 
-                ForEach(assetTypes, id: \.self) { type in
-                    Toggle(type, isOn: Binding(
-                        get: { selectedAssetTypes.contains(type) },
+                ForEach(options, id: \.self) { option in
+                    Toggle(option, isOn: Binding(
+                        get: { selectedOptions.contains(option) },
                         set: { isOn in
                             if isOn {
-                                selectedAssetTypes.insert(type)
+                                selectedOptions.insert(option)
                             } else {
-                                selectedAssetTypes.remove(type)
+                                selectedOptions.remove(option)
                             }
                         }
                     ))
-                    .disabled(isOptimizing)
                 }
             }
 
             Section("Action") {
-                if isOptimizing {
-                    VStack {
-                        ProgressView(value: progress)
-                        Text("Optimizing assets... \(Int(progress * 100))%")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 8)
-                } else {
-                    Button(action: runOptimizer) {
-                        Label("Run Asset Optimizer", systemImage: "wand.and.stars")
-                    }
-                    .disabled(selectedAssetTypes.isEmpty)
+                Button(action: runOptimizer) {
+                    Label("Run Asset Optimizer", systemImage: "wand.and.stars")
                 }
+                .disabled(selectedOptions.isEmpty)
             }
 
             if let results = optimizationResults {
                 Section("Results") {
-                    Text(results)
+                    Label(results, systemImage: "checkmark.circle.fill")
                         .font(.subheadline)
                         .foregroundStyle(.green)
+                }
+            }
+
+            Section("Status") {
+                LabeledContent("Cache Status", value: dataEngine.isInitialized ? "Active" : "Invalid")
+                if let project = projectManager.currentProject {
+                    LabeledContent("Project", value: project.name)
                 }
             }
         }
@@ -62,17 +56,36 @@ struct SDKAssetOptimizerView: View {
     }
 
     private func runOptimizer() {
-        isOptimizing = true
-        progress = 0.0
         optimizationResults = nil
 
-        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
-            progress += 0.05
-            if progress >= 1.0 {
-                timer.invalidate()
-                isOptimizing = false
-                optimizationResults = "Successfully optimized \(selectedAssetTypes.count) asset categories. Reduced size by \(String(format: "%.1f", Double.random(in: 5...15)))%."
+        // Perform real cache invalidation if selected
+        if selectedOptions.contains("Cache") {
+            dataEngine.invalidateCache()
+        }
+
+        // Perform real temporary file cleanup if selected
+        if selectedOptions.contains("Temporary Files") {
+            let fileManager = FileManager.default
+            let tempDir = fileManager.temporaryDirectory
+            if let files = try? fileManager.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil) {
+                for file in files where file.pathExtension == "sdkbundle" || file.lastPathComponent.contains("encoded_") {
+                    try? fileManager.removeItem(at: file)
+                }
             }
         }
+
+        // Clear logs if selected
+        if selectedOptions.contains("Diagnostic Logs") {
+            SDKLogStore.shared.clear()
+        }
+
+        optimizationResults = "Successfully optimized \(selectedOptions.count) targets. System resources reclaimed."
+
+        SDKAuditLogger.shared.log(
+            eventType: .security,
+            projectID: projectManager.currentProject?.id,
+            scope: "system.optimization",
+            message: "Performed asset optimization: \(selectedOptions.joined(separator: ", "))"
+        )
     }
 }
