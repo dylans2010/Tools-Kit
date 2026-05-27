@@ -423,14 +423,15 @@ struct SpeechNotesView: View {
 
     private func startWaveformTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
-            if speechManager.isRecording {
-                withAnimation(.easeInOut(duration: 0.1)) {
-                    for i in 0..<12 {
-                        waveformLevels[i] = CGFloat.random(in: 10...60)
+            Task { @MainActor in
+                let isRecording = speechManager.isRecording
+                if isRecording {
+                    withAnimation(.easeInOut(duration: 0.1)) {
+                        for i in 0..<12 {
+                            waveformLevels[i] = CGFloat.random(in: 10...60)
+                        }
                     }
-                }
-            } else {
-                if waveformLevels.first != 10 {
+                } else if waveformLevels.first != 10 {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         waveformLevels = Array(repeating: 10, count: 12)
                     }
