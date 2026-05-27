@@ -41,6 +41,7 @@ struct PageEditorView: View {
     @State private var showingMindMap = false
     @State private var showingFlashcards = false
     @State private var showingReferences = false
+    @State private var showingSpeechNotes = false
 
     // Existing Sheets
     @State private var showingSearch = false
@@ -147,6 +148,11 @@ struct PageEditorView: View {
         }
         .sheet(isPresented: $showingReferences) {
             NavigationStack { NotebookReferenceManagerView(content: content) }
+        }
+        .sheet(isPresented: $showingSpeechNotes) {
+            SpeechNotesView { text in
+                appendContent("\n\n\(text)")
+            }
         }
         .sheet(isPresented: $showingPageInfo) {
             PageInfoView(page: page, content: content, title: $title, isPresented: $showingPageInfo)
@@ -379,6 +385,8 @@ struct PageEditorView: View {
                     toolbarButton(icon: "rectangle.stack.badge.person.crop", label: "Study") { showingFlashcards = true }
 
                     toolbarButton(icon: "link.circle", label: "Refs") { showingReferences = true }
+
+                    toolbarButton(icon: "mic", label: "Speech") { showingSpeechNotes = true }
 
                     toolbarButton(icon: "book.closed", label: "Dictionary") { showingDictionary = true }
 

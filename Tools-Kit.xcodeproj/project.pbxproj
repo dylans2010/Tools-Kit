@@ -1389,6 +1389,9 @@
 		ML020000000000000000000012 /* NotebookComparePagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000012 /* NotebookComparePagesView.swift */; };
 		ML020000000000000000000013 /* NotebookAddCommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000013 /* NotebookAddCommentsView.swift */; };
 		ML020000000000000000000014 /* NotebookAuditLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000014 /* NotebookAuditLogsView.swift */; };
+		SP020000000000000000000001 /* SpeechManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP010000000000000000000001 /* SpeechManager.swift */; };
+		SP020000000000000000000002 /* SpeechNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP010000000000000000000002 /* SpeechNotesView.swift */; };
+		SP020000000000000000000003 /* SpeechModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP010000000000000000000003 /* SpeechModels.swift */; };
 		PL020000000000000000000004 /* PluginSecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000004 /* PluginSecurityView.swift */; };
 		PL020000000000000000000101 /* ConnectorsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000101 /* ConnectorsMainView.swift */; };
 		PL020000000000000000000102 /* ConnectorBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000102 /* ConnectorBuilderView.swift */; };
@@ -3449,6 +3452,9 @@
 		ML010000000000000000000012 /* NotebookComparePagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookComparePagesView.swift; sourceTree = "<group>"; };
 		ML010000000000000000000013 /* NotebookAddCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookAddCommentsView.swift; sourceTree = "<group>"; };
 		ML010000000000000000000014 /* NotebookAuditLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookAuditLogsView.swift; sourceTree = "<group>"; };
+		SP010000000000000000000001 /* SpeechManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechManager.swift; sourceTree = "<group>"; };
+		SP010000000000000000000002 /* SpeechNotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechNotesView.swift; sourceTree = "<group>"; };
+		SP010000000000000000000003 /* SpeechModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechModels.swift; sourceTree = "<group>"; };
 		PL010000000000000000000004 /* PluginSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/PluginSecurityView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000005 /* PluginLimitedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/PluginLimitedView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000006 /* SecurityScopeApplicationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/SecurityScopeApplicationView.swift; sourceTree = "<group>"; };
@@ -6425,8 +6431,19 @@
 				DV9100000000000000000002 /* DictionaryView.swift */,
 				SG0100000000000000000001 /* WordSuggestionsViewModel.swift */,
 				SG0100000000000000000002 /* WordSuggestionsView.swift */,
+				SP000000000000000000000000 /* Speech */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		SP000000000000000000000000 /* Speech */ = {
+			isa = PBXGroup;
+			children = (
+				SP010000000000000000000001 /* SpeechManager.swift */,
+				SP010000000000000000000002 /* SpeechNotesView.swift */,
+				SP010000000000000000000003 /* SpeechModels.swift */,
+			);
+			path = Speech;
 			sourceTree = "<group>";
 		};
 		6405EFCF04B342CB95C74ADD /* Tools */ = {
@@ -13246,6 +13263,9 @@
 				ML02B06DC3006D57495DB2DC /* SpatialWhiteboardsHomeView.swift in Sources */,
 				ML028FFC6949369149FA8496 /* SpatialWhiteboardCanvasView.swift in Sources */,
 				ML022F1EBBD1C64D48F4A5F8 /* CitationFormatsView.swift in Sources */,
+				SP020000000000000000000001 /* SpeechManager.swift in Sources */,
+				SP020000000000000000000002 /* SpeechNotesView.swift in Sources */,
+				SP020000000000000000000003 /* SpeechModels.swift in Sources */,
 				WA0200000000000000000001 /* WritingAnalyticsModels.swift in Sources */,
 				WA0200000000000000000002 /* WritingAnalyticsEngine.swift in Sources */,
 				WA0200000000000000000003 /* WritingAnalyticsViewModel.swift in Sources */,

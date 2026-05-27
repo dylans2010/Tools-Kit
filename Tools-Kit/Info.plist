@@ -29,6 +29,10 @@
 	<string>Your location is used to provide accurate local weather data and forecasts, even when the app is in the background.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Face ID is used to secure your mail settings and private messages.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Your microphone is used to record spoken notes for transcription.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Speech recognition is used to convert your spoken notes into text.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
