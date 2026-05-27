@@ -21,62 +21,78 @@ struct SpeechPresetPromptsSheet: View {
     var body: some View {
         NavigationStack {
             List {
-                if !searchText.isEmpty {
-                    searchResultsSection
-                } else {
-                    ForEach(categories, id: \.self) { category in
-                        Section {
-                            let categoryPrompts = prompts.filter { $0.category == category }
-                            let rotatedPrompts = getRotatedPrompts(for: categoryPrompts)
-
-                            ForEach(rotatedPrompts) { prompt in
-                                promptRow(prompt)
-                            }
-                        } header: {
-                            HStack {
-                                Text(category)
-                                Spacer()
-                                if prompts.filter({ $0.category == category }).count > 5 {
-                                    Button("Shuffle") {
-                                        withAnimation {
-                                            rotationToken = UUID()
-                                        }
-                                    }
-                                    .font(.caption)
-                                    .foregroundStyle(.accent)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Section("Custom Prompts") {
-                    Button {
-                        showingCustomBuilder = true
-                    } label: {
-                        Label("Create Custom Prompt", systemImage: "plus.circle.fill")
-                            .font(.subheadline.bold())
-                    }
-                }
+                promptListContent
             }
             .navigationTitle("AI Prompt Hub")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "Search 300+ prompts...")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { dismiss() }
+            .toolbar { promptsToolbarItems }
+            .sheet(isPresented: $showingCustomBuilder) {
+                customBuilderView
+            }
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var promptsToolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button("Close") { dismiss() }
+        }
+        ToolbarItem(placement: .primaryAction) {
+            Button {
+                prompts.shuffle()
+                rotationToken = UUID()
+            } label: {
+                Image(systemName: "shuffle")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var promptListContent: some View {
+        if !searchText.isEmpty {
+            searchResultsSection
+        } else {
+            categorySections
+        }
+
+        customPromptsSection
+    }
+
+    private var categorySections: some View {
+        ForEach(categories, id: \.self) { category in
+            Section {
+                let categoryPrompts = prompts.filter { $0.category == category }
+                let rotatedPrompts = getRotatedPrompts(for: categoryPrompts)
+
+                ForEach(rotatedPrompts) { prompt in
+                    promptRow(prompt)
                 }
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        prompts.shuffle()
-                        rotationToken = UUID()
-                    } label: {
-                        Image(systemName: "shuffle")
+            } header: {
+                HStack {
+                    Text(category)
+                    Spacer()
+                    if prompts.filter({ $0.category == category }).count > 5 {
+                        Button("Shuffle") {
+                            withAnimation {
+                                rotationToken = UUID()
+                            }
+                        }
+                        .font(.caption)
+                        .foregroundStyle(Color.accentColor)
                     }
                 }
             }
-            .sheet(isPresented: $showingCustomBuilder) {
-                customBuilderView
+        }
+    }
+
+    private var customPromptsSection: some View {
+        Section("Custom Prompts") {
+            Button {
+                showingCustomBuilder = true
+            } label: {
+                Label("Create Custom Prompt", systemImage: "plus.circle.fill")
+                    .font(.subheadline.bold())
             }
         }
     }

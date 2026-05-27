@@ -48,15 +48,7 @@ struct SpeechNotesView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { dismiss() }
-                }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    exportMenu
-                }
-            }
+            .toolbar { mainToolbarContent }
             .sheet(isPresented: $showingHistory) {
                 SpeechHistoryView { recording in
                     loadRecording(recording)
@@ -87,6 +79,17 @@ struct SpeechNotesView: View {
     }
 
     // MARK: - Components
+
+    @ToolbarContentBuilder
+    private var mainToolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button("Close") { dismiss() }
+        }
+
+        ToolbarItem(placement: .confirmationAction) {
+            exportMenu
+        }
+    }
 
     private var dynamicHeader: some View {
         VStack(spacing: 12) {
@@ -372,31 +375,7 @@ struct SpeechNotesView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 if let analysis = speechManager.analysis {
-                    // Smart Suggestions
-                    if !speechManager.suggestions.isEmpty {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(speechManager.suggestions) { suggestion in
-                                    Button {
-                                        Task { await speechManager.applySuggestion(suggestion) }
-                                    } label: {
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(suggestion.category)
-                                                .font(.caption2.bold())
-                                                .foregroundStyle(.accent)
-                                            Text(suggestion.text)
-                                                .font(.caption)
-                                                .lineLimit(1)
-                                        }
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 8)
-                                        .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
+                    suggestionsSection
 
                     if !analysis.topics.isEmpty {
                         SpeechTimelineView(
@@ -410,55 +389,9 @@ struct SpeechNotesView: View {
                         }
                     }
 
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Label("Summary", systemImage: "text.alignleft")
-                                .font(.headline)
-                            Spacer()
-                            Button {
-                                withAnimation {
-                                    dataDensity = dataDensity > 0.5 ? 0.3 : 0.8
-                                }
-                            } label: {
-                                Image(systemName: "line.3.horizontal.decrease.circle")
-                                    .foregroundStyle(dataDensity > 0.5 ? .accent : .secondary)
-                            }
-                        }
-
-                        Text(analysis.summary)
-                            .font(.body)
-                            .lineLimit(dataDensity < 0.5 ? 3 : nil)
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
-                    }
-                    .padding(.horizontal)
-
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Key Points", systemImage: "list.bullet")
-                            .font(.headline)
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(analysis.keyPoints, id: \.self) { point in
-                                HStack(alignment: .top, spacing: 8) {
-                                    Text("•").foregroundColor(.accentColor)
-                                    Text(point)
-                                }
-                            }
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
-                    }
-                    .padding(.horizontal)
-
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Insights", systemImage: "lightbulb")
-                            .font(.headline)
-                        ForEach(analysis.insights) { insight in
-                            InsightView(insight: insight)
-                        }
-                    }
-                    .padding(.horizontal)
+                    summarySection(analysis)
+                    keyPointsSection(analysis)
+                    insightsSection(analysis)
                 } else {
                     ContentUnavailableView(
                         "No Analysis",
@@ -478,59 +411,149 @@ struct SpeechNotesView: View {
         }
     }
 
-    private var chatTab: some View {
-        VStack(spacing: 0) {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(spacing: 16) {
-                        ForEach(speechManager.chatHistory) { message in
-                            SpeechChatBubble(message: message)
-                                .id(message.id)
+    @ViewBuilder
+    private var suggestionsSection: some View {
+        if !speechManager.suggestions.isEmpty {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(speechManager.suggestions) { suggestion in
+                        Button {
+                            Task { await speechManager.applySuggestion(suggestion) }
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(suggestion.category)
+                                    .font(.caption2.bold())
+                                    .foregroundStyle(Color.accentColor)
+                                Text(suggestion.text)
+                                    .font(.caption)
+                                    .lineLimit(1)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
                         }
                     }
-                    .padding()
-                }
-                .onChange(of: speechManager.chatHistory.count) { _, _ in
-                    if let last = speechManager.chatHistory.last {
-                        withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
-                    }
-                }
-            }
-
-            Divider()
-
-            VStack(spacing: 12) {
-                HStack {
-                    Button {
-                        showingPrompts = true
-                    } label: {
-                        Image(systemName: "wand.and.stars")
-                            .font(.title3)
-                            .padding(8)
-                            .background(Color.accentColor.opacity(0.1), in: Circle())
-                    }
-
-                    TextField("Ask or use /command...", text: $chatInput)
-                        .textFieldStyle(.roundedBorder)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
-
-                    Button {
-                        let text = chatInput
-                        chatInput = ""
-                        Task { await speechManager.sendMessage(text) }
-                    } label: {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.title2)
-                    }
-                    .disabled(chatInput.isEmpty || speechManager.isProcessingAI)
                 }
                 .padding(.horizontal)
-                .padding(.top, 8)
-                .padding(.bottom, 4)
             }
-            .background(.ultraThinMaterial)
         }
+    }
+
+    private func summarySection(_ analysis: SpeechAnalysis) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("Summary", systemImage: "text.alignleft")
+                    .font(.headline)
+                Spacer()
+                Button {
+                    withAnimation {
+                        dataDensity = dataDensity > 0.5 ? 0.3 : 0.8
+                    }
+                } label: {
+                    Image(systemName: "line.3.horizontal.decrease.circle")
+                        .foregroundStyle(dataDensity > 0.5 ? Color.accentColor : .secondary)
+                }
+            }
+
+            Text(analysis.summary)
+                .font(.body)
+                .lineLimit(dataDensity < 0.5 ? 3 : nil)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+        }
+        .padding(.horizontal)
+    }
+
+    private func keyPointsSection(_ analysis: SpeechAnalysis) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Key Points", systemImage: "list.bullet")
+                .font(.headline)
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(analysis.keyPoints, id: \.self) { point in
+                    HStack(alignment: .top, spacing: 8) {
+                        Text("•").foregroundColor(.accentColor)
+                        Text(point)
+                    }
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+        }
+        .padding(.horizontal)
+    }
+
+    private func insightsSection(_ analysis: SpeechAnalysis) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Insights", systemImage: "lightbulb")
+                .font(.headline)
+            ForEach(analysis.insights) { insight in
+                InsightView(insight: insight)
+            }
+        }
+        .padding(.horizontal)
+    }
+
+    private var chatTab: some View {
+        VStack(spacing: 0) {
+            chatMessageList
+            Divider()
+            chatInputArea
+        }
+    }
+
+    private var chatMessageList: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(spacing: 16) {
+                    ForEach(speechManager.chatHistory) { message in
+                        SpeechChatBubble(message: message)
+                            .id(message.id)
+                    }
+                }
+                .padding()
+            }
+            .onChange(of: speechManager.chatHistory.count) { _, _ in
+                if let last = speechManager.chatHistory.last {
+                    withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
+                }
+            }
+        }
+    }
+
+    private var chatInputArea: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Button {
+                    showingPrompts = true
+                } label: {
+                    Image(systemName: "wand.and.stars")
+                        .font(.title3)
+                        .padding(8)
+                        .background(Color.accentColor.opacity(0.1), in: Circle())
+                }
+
+                TextField("Ask or use /command...", text: $chatInput)
+                    .textFieldStyle(.roundedBorder)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+
+                Button {
+                    let text = chatInput
+                    chatInput = ""
+                    Task { await speechManager.sendMessage(text) }
+                } label: {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.title2)
+                }
+                .disabled(chatInput.isEmpty || speechManager.isProcessingAI)
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+        }
+        .background(.ultraThinMaterial)
     }
 
     // MARK: - Helpers
@@ -773,7 +796,7 @@ struct InsightView: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: insightIcon)
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
                 .font(.title3)
 
             VStack(alignment: .leading, spacing: 2) {
