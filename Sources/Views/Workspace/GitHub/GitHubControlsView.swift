@@ -143,7 +143,7 @@ struct GitHubControlsView: View {
                                 }
 
                                 Button {
-                                    WorkspaceNotificationService.shared.post(title: "Cache Cleared", body: "GitHub API local cache has been reset.", category: .info)
+                                    WorkspaceNotificationService.shared.post(title: "Cache Cleared", body: "GitHub API local cache has been reset.", category: .update)
                                 } label: {
                                     Label("Clear API Cache", systemImage: "trash")
                                 }
@@ -282,19 +282,17 @@ struct GitHubControlsView: View {
     @ViewBuilder
     private var rateLimitSection: some View {
         if let rl = rateLimit {
-            Section {
+            Section("API Rate Limits") {
                 RateLimitRow(title: "Core API", limit: rl.core)
                 RateLimitRow(title: "Search API", limit: rl.search)
                 RateLimitRow(title: "GraphQL", limit: rl.graphql)
-            } header: {
-                Text("API Rate Limits")
             }
         }
     }
 
     @ViewBuilder
     private var managementSection: some View {
-        Section {
+        Section("Management") {
             Button {
                 Task { await refreshData() }
             } label: {
@@ -302,13 +300,11 @@ struct GitHubControlsView: View {
             }
 
             Button {
-                WorkspaceNotificationService.shared.post(title: "Cache Cleared", body: "GitHub API local cache has been reset.", category: .info)
+                WorkspaceNotificationService.shared.post(title: "Cache Cleared", body: "GitHub API local cache has been reset.", category: .update)
             } label: {
                 Label("Clear API Cache", systemImage: "trash")
             }
             .foregroundStyle(.secondary)
-        } header: {
-            Text("Management")
         }
     }
 
