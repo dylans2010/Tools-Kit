@@ -1,5 +1,23 @@
 import SwiftUI
 
+enum SpeechFocusMode: String, CaseIterable, Identifiable {
+    case standard = "Standard"
+    case review = "Review"
+    case study = "Study"
+    case action = "Action"
+
+    var id: String { self.rawValue }
+
+    var icon: String {
+        switch self {
+        case .standard: return "square.grid.2x2"
+        case .review: return "eye"
+        case .study: return "book"
+        case .action: return "bolt"
+        }
+    }
+}
+
 struct SpeechNotesView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var speechManager = SpeechManager()
@@ -11,6 +29,9 @@ struct SpeechNotesView: View {
     @State private var chatInput = ""
     @State private var recordingTitle = "New Recording"
     @State private var isEditingTitle = false
+    @State private var focusMode: SpeechFocusMode = .standard
+    @State private var isSyncModeEnabled = false
+    @State private var dataDensity: Double = 0.5 // 0.0 to 1.0
 
     // Waveform state
     @State private var waveformLevels: [CGFloat] = Array(repeating: 10, count: 12)
@@ -21,52 +42,11 @@ struct SpeechNotesView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Header with Recording Title
-                HStack {
-                    if isEditingTitle {
-                        TextField("Title", text: $recordingTitle, onCommit: { isEditingTitle = false })
-                            .textFieldStyle(.roundedBorder)
-                    } else {
-                        Text(recordingTitle)
-                            .font(.headline)
-                            .onTapGesture { isEditingTitle = true }
-                    }
+                dynamicHeader
 
-                    Spacer()
-
-                    Button {
-                        showingHistory = true
-                    } label: {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .font(.title3)
-                    }
-                }
-                .padding()
-
-                // Tabs
-                Picker("View", selection: $selectedTab) {
-                    Text("Record").tag(0)
-                    Text("Analysis").tag(1)
-                    Text("Chat").tag(2)
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
-                .padding(.bottom)
-
-                ZStack {
-                    switch selectedTab {
-                    case 0:
-                        recordingTab
-                    case 1:
-                        analysisTab
-                    case 2:
-                        chatTab
-                    default:
-                        EmptyView()
-                    }
-                }
+                adaptiveContent
             }
-            .navigationTitle("Speech Hub")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -74,39 +54,7 @@ struct SpeechNotesView: View {
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Menu {
-                        Button {
-                            saveCurrentRecording()
-                        } label: {
-                            Label("Save to History", systemImage: "tray.and.arrow.down")
-                        }
-
-                        Button {
-                            onComplete(speechManager.transcription)
-                            dismiss()
-                        } label: {
-                            Label("Insert Transcript", systemImage: "doc.append")
-                        }
-
-                        if let analysis = speechManager.analysis {
-                            Button {
-                                onComplete(analysis.summary)
-                                dismiss()
-                            } label: {
-                                Label("Insert Summary", systemImage: "text.alignleft")
-                            }
-
-                            Button {
-                                let tasks = analysis.actionItems.map { "- [ ] \($0)" }.joined(separator: "\n")
-                                onComplete(tasks)
-                                dismiss()
-                            } label: {
-                                Label("Insert Action Items", systemImage: "checkmark.circle")
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "square.and.arrow.up")
-                    }
+                    exportMenu
                 }
             }
             .sheet(isPresented: $showingHistory) {
@@ -126,17 +74,7 @@ struct SpeechNotesView: View {
             }
             .overlay {
                 if speechManager.isProcessingAI {
-                    ZStack {
-                        Color.black.opacity(0.15).ignoresSafeArea()
-                        VStack(spacing: 16) {
-                            ProgressView()
-                                .scaleEffect(1.2)
-                            Text("AI is thinking...")
-                                .font(.subheadline.weight(.medium))
-                        }
-                        .padding(24)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-                    }
+                    processingOverlay
                 }
             }
             .onAppear {
@@ -148,7 +86,221 @@ struct SpeechNotesView: View {
         }
     }
 
-    // MARK: - Tabs
+    // MARK: - Components
+
+    private var dynamicHeader: some View {
+        VStack(spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    if isEditingTitle {
+                        TextField("Title", text: $recordingTitle, onCommit: { isEditingTitle = false })
+                            .textFieldStyle(.plain)
+                            .font(.headline)
+                    } else {
+                        Text(recordingTitle)
+                            .font(.headline)
+                            .onTapGesture { isEditingTitle = true }
+                    }
+
+                    Text(Date().formatted(date: .abbreviated, time: .shortened))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                HStack(spacing: 16) {
+                    Menu {
+                        Picker("Focus Mode", selection: $focusMode) {
+                            ForEach(SpeechFocusMode.allCases) { mode in
+                                Label(mode.rawValue, systemImage: mode.icon).tag(mode)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: focusMode.icon)
+                            .font(.title3)
+                            .padding(8)
+                            .background(Color.accentColor.opacity(0.1), in: Circle())
+                    }
+
+                    Button {
+                        showingHistory = true
+                    } label: {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.title3)
+                    }
+                }
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
+
+            if focusMode == .standard {
+                Picker("View", selection: $selectedTab) {
+                    Text("Record").tag(0)
+                    Text("Analysis").tag(1)
+                    Text("Chat").tag(2)
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+            }
+        }
+        .padding(.bottom, 8)
+        .background(Color(.systemGroupedBackground))
+    }
+
+    private var adaptiveContent: some View {
+        ZStack {
+            if focusMode != .standard {
+                focusModeContent
+            } else {
+                standardTabContent
+            }
+        }
+    }
+
+    private var standardTabContent: some View {
+        ZStack {
+            switch selectedTab {
+            case 0:
+                recordingTab
+            case 1:
+                analysisTab
+            case 2:
+                chatTab
+            default:
+                EmptyView()
+            }
+        }
+    }
+
+    private var focusModeContent: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                switch focusMode {
+                case .review:
+                    reviewModeContent
+                case .study:
+                    studyModeContent
+                case .action:
+                    actionModeContent
+                default:
+                    EmptyView()
+                }
+            }
+            .padding()
+        }
+    }
+
+    private var reviewModeContent: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            HStack {
+                Text("Review Highlights")
+                    .font(.title2.bold())
+                Spacer()
+                Toggle(isOn: $isSyncModeEnabled) {
+                    Label("Sync Playback", systemImage: "clock.arrow.2.circlepath")
+                }
+                .toggleStyle(.button)
+                .controlSize(.small)
+            }
+
+            if let analysis = speechManager.analysis {
+                ForEach(analysis.highlights) { highlight in
+                    HighlightCard(highlight: highlight) {
+                        speechManager.seek(to: highlight.startTime)
+                        speechManager.startPlayback()
+                    }
+                    .opacity(!isSyncModeEnabled || (speechManager.playbackProgress >= highlight.startTime && speechManager.playbackProgress <= highlight.endTime) ? 1.0 : 0.5)
+                    .scaleEffect(!isSyncModeEnabled || (speechManager.playbackProgress >= highlight.startTime && speechManager.playbackProgress <= highlight.endTime) ? 1.0 : 0.98)
+                }
+            } else {
+                Text("Analyze to see highlights")
+            }
+        }
+    }
+
+    private var studyModeContent: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            Text("Learning Insights")
+                .font(.title2.bold())
+
+            if let analysis = speechManager.analysis {
+                ForEach(analysis.insights) { insight in
+                    InsightView(insight: insight)
+                }
+            }
+        }
+    }
+
+    private var actionModeContent: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            Text("Action Items")
+                .font(.title2.bold())
+
+            if let analysis = speechManager.analysis {
+                ForEach(analysis.actionItems, id: \.self) { item in
+                    HStack {
+                        Image(systemName: "circle")
+                        Text(item)
+                    }
+                    .padding()
+                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+    }
+
+    private var exportMenu: some View {
+        Menu {
+            Button {
+                saveCurrentRecording()
+            } label: {
+                Label("Save to History", systemImage: "tray.and.arrow.down")
+            }
+
+            Button {
+                onComplete(speechManager.transcription)
+                dismiss()
+            } label: {
+                Label("Insert Transcript", systemImage: "doc.append")
+            }
+
+            if let analysis = speechManager.analysis {
+                Button {
+                    onComplete(analysis.summary)
+                    dismiss()
+                } label: {
+                    Label("Insert Summary", systemImage: "text.alignleft")
+                }
+
+                Button {
+                    let tasks = analysis.actionItems.map { "- [ ] \($0)" }.joined(separator: "\n")
+                    onComplete(tasks)
+                    dismiss()
+                } label: {
+                    Label("Insert Action Items", systemImage: "checkmark.circle")
+                }
+            }
+        } label: {
+            Image(systemName: "square.and.arrow.up")
+        }
+    }
+
+    private var processingOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.15).ignoresSafeArea()
+            VStack(spacing: 16) {
+                ProgressView()
+                    .scaleEffect(1.2)
+                Text("AI is thinking...")
+                    .font(.subheadline.weight(.medium))
+            }
+            .padding(24)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        }
+    }
+
+    // MARK: - Tabs (Original logic mostly preserved for standard tab)
 
     private var recordingTab: some View {
         VStack(spacing: 24) {
@@ -220,6 +372,32 @@ struct SpeechNotesView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 if let analysis = speechManager.analysis {
+                    // Smart Suggestions
+                    if !speechManager.suggestions.isEmpty {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                ForEach(speechManager.suggestions) { suggestion in
+                                    Button {
+                                        Task { await speechManager.applySuggestion(suggestion) }
+                                    } label: {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(suggestion.category)
+                                                .font(.caption2.bold())
+                                                .foregroundStyle(.accent)
+                                            Text(suggestion.text)
+                                                .font(.caption)
+                                                .lineLimit(1)
+                                        }
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+
                     if !analysis.topics.isEmpty {
                         SpeechTimelineView(
                             topics: analysis.topics,
@@ -233,10 +411,23 @@ struct SpeechNotesView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 12) {
-                        Label("Summary", systemImage: "text.alignleft")
-                            .font(.headline)
+                        HStack {
+                            Label("Summary", systemImage: "text.alignleft")
+                                .font(.headline)
+                            Spacer()
+                            Button {
+                                withAnimation {
+                                    dataDensity = dataDensity > 0.5 ? 0.3 : 0.8
+                                }
+                            } label: {
+                                Image(systemName: "line.3.horizontal.decrease.circle")
+                                    .foregroundStyle(dataDensity > 0.5 ? .accent : .secondary)
+                            }
+                        }
+
                         Text(analysis.summary)
                             .font(.body)
+                            .lineLimit(dataDensity < 0.5 ? 3 : nil)
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
@@ -261,20 +452,11 @@ struct SpeechNotesView: View {
                     .padding(.horizontal)
 
                     VStack(alignment: .leading, spacing: 12) {
-                        Label("Action Items", systemImage: "checkmark.circle")
+                        Label("Insights", systemImage: "lightbulb")
                             .font(.headline)
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(analysis.actionItems, id: \.self) { item in
-                                HStack(alignment: .top, spacing: 8) {
-                                    Image(systemName: "square")
-                                        .foregroundColor(.secondary)
-                                    Text(item)
-                                }
-                            }
+                        ForEach(analysis.insights) { insight in
+                            InsightView(insight: insight)
                         }
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
                     }
                     .padding(.horizontal)
                 } else {
@@ -328,8 +510,10 @@ struct SpeechNotesView: View {
                             .background(Color.accentColor.opacity(0.1), in: Circle())
                     }
 
-                    TextField("Ask about the recording...", text: $chatInput)
+                    TextField("Ask or use /command...", text: $chatInput)
                         .textFieldStyle(.roundedBorder)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
 
                     Button {
                         let text = chatInput
@@ -460,7 +644,11 @@ struct SpeechNotesView: View {
             audioFilename: url.lastPathComponent,
             transcriptSegments: speechManager.transcriptSegments,
             analysis: speechManager.analysis,
-            chatHistory: speechManager.chatHistory
+            chatHistory: speechManager.chatHistory,
+            tags: speechManager.tags,
+            versions: speechManager.versions,
+            pins: speechManager.pins,
+            executionHistory: speechManager.executionHistory
         )
 
         historyStore.saveRecording(recording)
@@ -472,6 +660,11 @@ struct SpeechNotesView: View {
         speechManager.transcriptSegments = recording.transcriptSegments
         speechManager.analysis = recording.analysis
         speechManager.chatHistory = recording.chatHistory
+        speechManager.tags = recording.tags
+        speechManager.versions = recording.versions
+        speechManager.pins = recording.pins
+        speechManager.executionHistory = recording.executionHistory
+        speechManager.suggestions = recording.analysis?.suggestions ?? []
 
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         speechManager.currentRecordingURL = documentsPath.appendingPathComponent(recording.audioFilename)
@@ -480,26 +673,160 @@ struct SpeechNotesView: View {
     }
 }
 
+struct HighlightCard: View {
+    let highlight: SpeechHighlight
+    var onTap: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                HStack(spacing: 4) {
+                    Image(systemName: typeIcon)
+                    Text(highlight.type)
+                }
+                .font(.caption.bold())
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color.accentColor.opacity(0.1), in: Capsule())
+
+                Spacer()
+
+                HStack(spacing: 4) {
+                    Image(systemName: "gauge.with.needle")
+                    Text("\(Int(highlight.confidence * 100))%")
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+                Text(formatTime(highlight.startTime))
+                    .font(.caption.monospacedDigit())
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 4))
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(highlight.title)
+                    .font(.headline)
+
+                Text(highlight.summary)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack(spacing: 12) {
+                Button(action: onTap) {
+                    Label("Replay", systemImage: "play.fill")
+                        .font(.caption.bold())
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+
+                Button {
+                    // Action: Expand
+                } label: {
+                    Image(systemName: "arrow.up.left.and.arrow.down.right")
+                        .font(.caption)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+
+                Spacer()
+
+                Button {
+                    // Action: Pin
+                } label: {
+                    Image(systemName: "pin")
+                        .font(.caption)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            }
+        }
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.accentColor.opacity(0.1), lineWidth: 1)
+        )
+    }
+
+    private var typeIcon: String {
+        switch highlight.type.lowercased() {
+        case "decision": return "gavel"
+        case "insight": return "lightbulb"
+        case "task": return "checkmark.circle"
+        default: return "sparkles"
+        }
+    }
+
+    private func formatTime(_ time: TimeInterval) -> String {
+        let minutes = Int(time) / 60
+        let seconds = Int(time) % 60
+        return String(format: "%d:%02d", minutes, seconds)
+    }
+}
+
+struct InsightView: View {
+    let insight: SpeechInsight
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: insightIcon)
+                .foregroundStyle(.accent)
+                .font(.title3)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(insight.text)
+                    .font(.body)
+                Text(insight.type)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var insightIcon: String {
+        switch insight.type.lowercased() {
+        case "sentiment": return "face.smiling"
+        case "intent": return "target"
+        default: return "lightbulb"
+        }
+    }
+}
+
 struct SpeechChatBubble: View {
     let message: ChatMessage
 
     var body: some View {
-        HStack {
-            if message.role == "user" { Spacer() }
+        VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 4) {
+            HStack {
+                if message.role == "user" { Spacer() }
 
-            Text(message.content)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(
-                    message.role == "user" ?
-                    Color.accentColor :
-                    Color(.secondarySystemBackground)
-                )
-                .foregroundColor(message.role == "user" ? .white : .primary)
-                .clipShape(RoundedRectangle(cornerRadius: 18))
-                .frame(maxWidth: 280, alignment: message.role == "user" ? .trailing : .leading)
+                VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 4) {
+                    if message.role == "user" {
+                        Text(message.content)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(Color.accentColor)
+                            .foregroundColor(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                    } else {
+                        SDKMarkdownView(text: message.content)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(Color(.secondarySystemBackground))
+                            .foregroundColor(.primary)
+                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                    }
+                }
+                .frame(maxWidth: 300, alignment: message.role == "user" ? .trailing : .leading)
 
-            if message.role != "user" { Spacer() }
+                if message.role != "user" { Spacer() }
+            }
         }
     }
 }
