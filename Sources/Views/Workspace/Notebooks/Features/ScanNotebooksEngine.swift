@@ -239,9 +239,14 @@ final class ScanNotebooksEngine: NSObject, ObservableObject {
         }
 
         DispatchQueue.global(qos: .utility).async { [weak self] in
-            let laplacianVariance = self?.computeLaplacianVariance(cgImage) ?? 100
+            let laplacianVariance = self.map { engine in
+                Task { @MainActor in
+                    engine.computeLaplacianVariance(cgImage)
+                }
+            }
             Task { @MainActor in
-                if laplacianVariance < 50 {
+                let variance = await laplacianVariance?.value ?? 100
+                if variance < 50 {
                     self?.qualityIssues.append(.blur)
                 }
             }
@@ -251,9 +256,14 @@ final class ScanNotebooksEngine: NSObject, ObservableObject {
         DispatchQueue.global(qos: .utility).async { [weak self] in
             let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
             try? handler.perform([brightnessRequest])
-            let avgBrightness = self?.estimateBrightness(cgImage) ?? 128
+            let avgBrightness = self.map { engine in
+                Task { @MainActor in
+                    engine.estimateBrightness(cgImage)
+                }
+            }
             Task { @MainActor in
-                if avgBrightness < 60 {
+                let brightness = await avgBrightness?.value ?? 128
+                if brightness < 60 {
                     self?.qualityIssues.append(.lowLight)
                 }
             }

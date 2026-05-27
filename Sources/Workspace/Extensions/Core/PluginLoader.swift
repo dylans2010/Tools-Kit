@@ -4,16 +4,21 @@ import Foundation
 final class PluginLoader {
     static let shared = PluginLoader()
 
-    private let pluginManager = SDKPluginManager.shared
+    private var pluginManager: SDKPluginManager {
+        get async {
+            await MainActor.run { SDKPluginManager.shared }
+        }
+    }
 
     private init() {}
 
     @MainActor
-    func loadAllPlugins() {
+    func loadAllPlugins() async {
         print("[PluginLoader] Initializing plugin ecosystem...")
         // SDKPluginManager already loads in its init
 
-        let plugins = pluginManager.plugins
+        let manager = await pluginManager
+        let plugins = manager.plugins
         for plugin in plugins where plugin.isEnabled {
             registerPlugin(plugin)
         }
