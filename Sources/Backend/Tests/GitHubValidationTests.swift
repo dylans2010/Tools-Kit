@@ -9,7 +9,21 @@ struct GitHubValidationTests {
         print("Testing GitHub Models (Manual Simulation)...")
         testModels()
 
+        print("Testing GitHub Auth Logic (Mock Simulation)...")
+        await testAuthLogic()
+
         print("GitHub Validation Tests Passed!")
+    }
+
+    private static func testAuthLogic() async {
+        // Test validateToken signature and Result handling
+        let result = await GitHubAuthManager.shared.validateToken(token: "mock_invalid_token")
+        switch result {
+        case .success:
+            fatalError("Auth logic should fail for mock_invalid_token")
+        case .failure(let error):
+            print("Successfully caught expected error: \(error.localizedDescription)")
+        }
     }
 
     private static func testEndpoints() {

@@ -10,28 +10,6 @@ private struct AIChatSettingsRouter: View {
     }
 }
 
-// MARK: - GitHubTokenStore
-
-private class GitHubTokenStore {
-    static let shared = GitHubTokenStore()
-    private let key = "github_pat_token"
-    private init() {}
-
-    func getToken() -> String? {
-        UserDefaults.standard.string(forKey: key)
-    }
-
-    func saveToken(_ token: String) {
-        UserDefaults.standard.set(token, forKey: key)
-    }
-
-    func validate(_ token: String) async throws {
-        guard !token.isEmpty else {
-            throw URLError(.userAuthenticationRequired)
-        }
-    }
-}
-
 struct WorkspaceNavItem: Identifiable, Codable, Equatable {
     let id: String
     let label: String
@@ -382,14 +360,8 @@ struct WorkspaceSettingsView: View {
 struct GitHubRouterView: View {
     @State private var isAuthenticated = false
     @State private var isLoading = true
-    @State private var token: String = ""
     @State private var showingAuth = false
-    @State private var authErrorMessage: String?
-    @State private var isSavingToken = false
-
-    private var isSaveDisabled: Bool {
-        isSavingToken || token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
+    @State private var isOAuthBusy = false
 
     var body: some View {
         Group {
@@ -398,17 +370,50 @@ struct GitHubRouterView: View {
             } else if isAuthenticated {
                 RepoListView()
             } else {
-                ContentUnavailableView {
-                    Label("GitHub Not Connected", systemImage: "terminal")
-                } description: {
-                    Text("Connect your GitHub account using a Personal Access Token to manage your repositories.")
-                }
-                .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button("Connect") {
+                VStack(spacing: 24) {
+                    ContentUnavailableView {
+                        Label("GitHub Integration", systemImage: "terminal")
+                    } description: {
+                        Text("Connect your GitHub account to manage repositories, track issues, and monitor CI/CD workflows directly from Tools Kit.")
+                    }
+                    .frame(maxHeight: .infinity)
+
+                    VStack(spacing: 14) {
+                        Button {
+                            signInWithOAuth()
+                        } label: {
+                            HStack {
+                                if isOAuthBusy {
+                                    ProgressView().tint(.white)
+                                } else {
+                                    Image(systemName: "person.crop.circle.badge.plus")
+                                    Text("Sign in with GitHub")
+                                }
+                            }
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.blue)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                        .disabled(isOAuthBusy)
+
+                        Button {
                             showingAuth = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "key.fill")
+                                Text("Use Personal Access Token")
+                            }
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.secondary.opacity(0.15))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                     }
+                    .padding(24)
                 }
             }
         }
@@ -417,61 +422,152 @@ struct GitHubRouterView: View {
             await refreshAuthState()
         }
         .sheet(isPresented: $showingAuth) {
-            NavigationStack {
-                Form {
-                    SecureField("Personal Access Token", text: $token)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-
-                    if let authErrorMessage {
-                        Text(authErrorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(.red)
-                    }
-                }
-                .navigationTitle("Connect GitHub")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") { showingAuth = false }
-                    }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Save") {
-                            saveToken()
-                        }
-                        .disabled(isSaveDisabled)
-                    }
-                }
+            GitHubConnectionView(isPresented: $showingAuth) {
+                Task { await refreshAuthState() }
             }
-            .presentationDetents([.medium])
         }
     }
 
     private func refreshAuthState() async {
-        let stored = GitHubTokenStore.shared.getToken()
+        let stored = GitHubAuthManager.shared.getToken()
         await MainActor.run {
             isAuthenticated = stored != nil
             isLoading = false
         }
     }
 
-    private func saveToken() {
-        isSavingToken = true
-        authErrorMessage = nil
-        let trimmed = token.trimmingCharacters(in: .whitespacesAndNewlines)
+    private func signInWithOAuth() {
+        isOAuthBusy = true
         Task {
             do {
-                try await GitHubTokenStore.shared.validate(trimmed)
-                GitHubTokenStore.shared.saveToken(trimmed)
-                await MainActor.run {
-                    isAuthenticated = true
-                    isSavingToken = false
-                    showingAuth = false
-                }
+                try await AccountAuthService.shared.signInWithOAuth(provider: "github")
+                await refreshAuthState()
             } catch {
-                await MainActor.run {
-                    authErrorMessage = error.localizedDescription
-                    isSavingToken = false
+                print("GitHub OAuth failed: \(error.localizedDescription)")
+            }
+            await MainActor.run { isOAuthBusy = false }
+        }
+    }
+}
+
+struct GitHubConnectionView: View {
+    @Binding var isPresented: Bool
+    var onCompletion: () -> Void
+
+    @State private var token: String = ""
+    @State private var isValidating = false
+    @State private var errorMessage: String?
+    @State private var validatedUser: GitHubAuthenticatedUser?
+    @State private var showSuccess = false
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Personal Access Token (Classic)")
+                            .font(.headline)
+                        Text("Generate a token in GitHub Settings > Developer settings > Personal access tokens.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+
+                        Text("Required Scopes:")
+                            .font(.caption.bold())
+                        Text("• repo (Full control of private repositories)\n• workflow (Update GitHub Action workflows)\n• read:user (Read user profile data)\n• gist (Create/Edit Gists)\n• notifications (Access notifications)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 4)
+
+                    SecureField("Enter Token", text: $token)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+
+                    if let errorMessage = errorMessage {
+                        Text(errorMessage)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
+                }
+
+                if let user = validatedUser {
+                    Section("Validated Account") {
+                        HStack(spacing: 12) {
+                            AsyncImage(url: URL(string: user.avatarUrl)) { image in
+                                image.resizable()
+                            } placeholder: {
+                                Circle().fill(.secondary)
+                            }
+                            .frame(width: 40, height: 40)
+                            .clipShape(Circle())
+
+                            VStack(alignment: .leading) {
+                                Text(user.name ?? user.login)
+                                    .font(.headline)
+                                Text("@\(user.login) • \(user.publicRepos) Repos")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+
+                Section {
+                    Button {
+                        validateToken()
+                    } label: {
+                        if isValidating {
+                            ProgressView().tint(.white)
+                        } else {
+                            Text(validatedUser == nil ? "Test Key" : "Verified - Save & Continue")
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(token.isEmpty || isValidating)
+
+                    if validatedUser != nil {
+                        Button("Try Different Token") {
+                            validatedUser = nil
+                            token = ""
+                        }
+                        .frame(maxWidth: .infinity)
+                        .foregroundStyle(.red)
+                    }
+                }
+                .listRowBackground(Color.clear)
+            }
+            .navigationTitle("Connect GitHub")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { isPresented = false }
+                }
+            }
+        }
+    }
+
+    private func validateToken() {
+        if let _ = validatedUser {
+            GitHubAuthManager.shared.saveToken(token)
+            onCompletion()
+            isPresented = false
+            return
+        }
+
+        isValidating = true
+        errorMessage = nil
+
+        Task {
+            let result = await GitHubAuthManager.shared.validateToken(token: token)
+            await MainActor.run {
+                isValidating = false
+                switch result {
+                case .success(let user):
+                    self.validatedUser = user
+                case .failure(let error):
+                    self.errorMessage = error.localizedDescription
                 }
             }
         }
