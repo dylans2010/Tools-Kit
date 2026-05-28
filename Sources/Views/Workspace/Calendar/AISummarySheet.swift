@@ -24,7 +24,7 @@ struct AISummarySheet: View {
         let normalizedTitle = trimmedTitle.isEmpty ? "Untitled Event" : trimmedTitle
         let normalizedLocation = location.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        var seeded = "Agenda for \(normalizedTitle) on \(formattedDate)."
+        var seeded = "Agenda For \(normalizedTitle) On \(formattedDate)."
         if !normalizedLocation.isEmpty {
             seeded += " Location: \(normalizedLocation)."
         }

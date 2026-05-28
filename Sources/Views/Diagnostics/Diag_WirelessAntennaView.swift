@@ -70,7 +70,7 @@ struct Diag_WirelessAntennaView: View {
 
         let monitor = NWPathMonitor()
         let path = monitor.currentPath
-        info.append(("Network Status", path.status == .satisfied ? "Connected" : "Not connected"))
+        info.append(("Network Status", path.status == .satisfied ? "Connected" : "Not Connected"))
 
         let wifiMonitor = NWPathMonitor(requiredInterfaceType: .wifi)
         info.append(("WiFi Interface", path.usesInterfaceType(.wifi) ? "Active" : "Inactive"))

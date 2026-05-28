@@ -75,7 +75,7 @@ struct NotebookReferenceManagerView: View {
             .listStyle(.insetGrouped)
         }
         .navigationTitle("Reference Manager")
-        .searchable(text: $searchText, prompt: "Search references...")
+        .searchable(text: $searchText, prompt: "Search References")
         .onAppear(perform: extractReferences)
     }
 

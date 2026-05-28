@@ -15,7 +15,7 @@ struct DiagnosticsHomeView: View {
                 toolsList
             }
             .listStyle(.insetGrouped)
-            .searchable(text: $viewModel.searchText, prompt: "Search \(viewModel.totalToolCount) diagnostic tools")
+            .searchable(text: $viewModel.searchText, prompt: "Search \(viewModel.totalToolCount) Tools")
             .navigationTitle("Diagnostics")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -24,7 +24,7 @@ struct DiagnosticsHomeView: View {
                             Button {
                                 showSupportAssist = true
                             } label: {
-                                Image(systemName: "sparkles.rectangle.stack")
+                                Image(systemName: "apple.intelligence")
                             }
                         }
                         NavigationLink {
@@ -413,7 +413,7 @@ struct DiagnosticsHomeView: View {
         case "white_point": Diag_DisplayWhitePointView()
         case "audio_phase": Diag_AudioPhaseView()
         default:
-            Text("Tool not found")
+            Text("Tool Not Found")
         }
     }
 }

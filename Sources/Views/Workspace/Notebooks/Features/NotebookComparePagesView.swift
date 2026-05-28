@@ -78,7 +78,7 @@ struct NotebookComparePagesView: View {
             VStack(alignment: .leading) {
                 Text(page.title)
                     .font(.headline)
-                Text("Last updated \(page.updatedAt, style: .date)")
+                Text("Last Updated \(page.updatedAt, style: .date)")
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }

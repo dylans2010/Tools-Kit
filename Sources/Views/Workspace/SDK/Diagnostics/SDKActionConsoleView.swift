@@ -47,7 +47,6 @@ struct SDKActionConsoleView: View {
         let result: String
         let status: ConsoleEntry.EntryStatus = .success
 
-        // RESTORED Logic
         switch cmd.lowercased() {
         case "system.status": result = "All services operational. Kernel v2.4.0 active."
         case "cache.flush": result = "L1/L2 caches purged. 240MB reclaimed."
@@ -101,7 +100,7 @@ private struct CommandInputBar: View {
     @Binding var input: String; let onExecute: () -> Void
     var body: some View {
         HStack {
-            TextField("Enter command...", text: $input).font(.system(.subheadline, design: .monospaced)).textInputAutocapitalization(.never).autocorrectionDisabled()
+            TextField("Enter Command", text: $input).font(.system(.subheadline, design: .monospaced)).textInputAutocapitalization(.never).autocorrectionDisabled()
             Button(action: onExecute) { Image(systemName: "arrow.up.circle.fill").font(.title2) }.disabled(input.isEmpty)
         }
         .padding(8).background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))

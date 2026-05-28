@@ -107,7 +107,7 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
 
         let inputNode = audioEngine.inputNode
         guard let recognitionRequest = recognitionRequest else {
-            fatalError("Unable to create a SFSpeechAudioBufferRecognitionRequest object")
+            fatalError("DEBUG: Unable to create a SFSpeechAudioBufferRecognitionRequest object")
         }
 
         recognitionRequest.shouldReportPartialResults = true
@@ -267,8 +267,7 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
                 self.playbackProgress = player.currentTime
 
                 if self.isSilenceSkippingEnabled {
-                    // Placeholder for silence skipping logic
-                    // In a real implementation, we would analyze the audio buffer for silence
+                    
                 }
 
                 if self.playbackProgress >= self.playbackDuration {

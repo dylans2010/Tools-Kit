@@ -37,7 +37,7 @@ struct SpeechHistoryView: View {
                 }
             }
             .navigationTitle("Recording History")
-            .searchable(text: $searchText, prompt: "Search recordings...")
+            .searchable(text: $searchText, prompt: "Search Recordings")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }

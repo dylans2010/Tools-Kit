@@ -10,10 +10,10 @@ struct DiagnosticReportsView: View {
 
     var body: some View {
         List {
-            Section("Auto-Logging") {
+            Section("Auto Logging") {
                 Toggle(isOn: $reportManager.isAutoLoggingEnabled) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Auto-Log Diagnostics")
+                        Text("Auto Log Diagnostics")
                             .font(.subheadline.weight(.medium))
                         Text(reportManager.isAutoLoggingEnabled
                             ? "All diagnostic results will be logged automatically"
@@ -37,10 +37,10 @@ struct DiagnosticReportsView: View {
             }
 
             if !reportManager.currentItems.isEmpty {
-                Section("Current Session (\(reportManager.currentItems.count) items)") {
+                Section("Current Session (\(reportManager.currentItems.count) Items)") {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("\(reportManager.currentItems.count) items recorded")
+                            Text("\(reportManager.currentItems.count) Items Recorded")
                                 .font(.subheadline.weight(.medium))
                             Text("Tap Save to create a report")
                                 .font(.caption)
@@ -98,10 +98,10 @@ struct DiagnosticReportsView: View {
                         Image(systemName: "doc.text.magnifyingglass")
                             .font(.title)
                             .foregroundStyle(.secondary)
-                        Text("No saved reports")
+                        Text("No Saved Reports")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        Text("Enable auto-logging and run diagnostics to create reports")
+                        Text("Enable auto logging and run diagnostics to create reports")
                             .font(.caption)
                             .foregroundStyle(.tertiary)
                             .multilineTextAlignment(.center)
@@ -187,7 +187,7 @@ struct DiagnosticReportsView: View {
         NavigationStack {
             Form {
                 Section("Report Title") {
-                    TextField("Enter a title", text: $reportTitle)
+                    TextField("Enter a Title", text: $reportTitle)
                 }
                 Section("Summary") {
                     let passed = reportManager.currentItems.filter { $0.status == .passed }.count
@@ -205,7 +205,7 @@ struct DiagnosticReportsView: View {
                     let categories = Set(reportManager.currentItems.map { $0.category })
                     ForEach(Array(categories).sorted(), id: \.self) { cat in
                         let count = reportManager.currentItems.filter { $0.category == cat }.count
-                        LabeledContent(cat) { Text("\(count) items").font(.caption) }
+                        LabeledContent(cat) { Text("\(count) Items").font(.caption) }
                     }
                 }
             }

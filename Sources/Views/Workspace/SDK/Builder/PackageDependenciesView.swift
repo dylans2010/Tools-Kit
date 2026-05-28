@@ -615,17 +615,17 @@ struct PackageDependenciesView: View {
                     Text(cycle.joined(separator: " → ")).font(.caption2.monospaced()).foregroundStyle(.red)
                 }
             } else {
-                Label("No circular dependencies", systemImage: "checkmark.circle").font(.caption).foregroundStyle(.green)
+                Label("No Circular Dependencies", systemImage: "checkmark.circle").font(.caption).foregroundStyle(.green)
             }
 
             let graph = registry.buildDependencyGraph()
             let orphans = graph.orphans()
             if !orphans.isEmpty {
-                Label("\(orphans.count) orphans detected", systemImage: "link.badge.plus")
+                Label("\(orphans.count) Orphans Detected", systemImage: "link.badge.plus")
                     .font(.caption).foregroundStyle(.orange)
             }
 
-            Button("Re-check") { cycleWarning = manager.checkCycles() }.font(.caption)
+            Button("Recheck") { cycleWarning = manager.checkCycles() }.font(.caption)
         }
     }
 
@@ -669,7 +669,6 @@ struct PackageDependenciesView: View {
     }
 
     private func refreshPackages() async {
-        // Real logic: trigger re-calculation of health scores and dependency order
         _ = manager.resolvedOrder()
         for pkg in registry.packages {
             _ = manager.verifyIntegrity(id: pkg.id)
@@ -754,7 +753,7 @@ struct PackageDependenciesView: View {
         Section("Dependency Resolution Order") {
             let resolved = manager.resolvedOrder()
             if resolved.isEmpty {
-                Text("No packages to resolve").foregroundStyle(.secondary).font(.caption)
+                Text("No Packages To Resolve").foregroundStyle(.secondary).font(.caption)
             } else {
                 ForEach(Array(resolved.enumerated()), id: \.element.id) { index, pkg in
                     HStack {
@@ -788,7 +787,7 @@ struct PackageDependenciesView: View {
             let graph = registry.buildDependencyGraph()
             let orphans = graph.orphans()
             if orphans.isEmpty {
-                Text("No orphaned packages").foregroundStyle(.secondary).font(.caption)
+                Text("No Orphaned Packages").foregroundStyle(.secondary).font(.caption)
             } else {
                 ForEach(orphans) { orphan in
                     HStack {
@@ -884,7 +883,7 @@ struct DependencyGraphVisualizerView: View {
             }
             .navigationTitle("Dependency Graph")
             .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $searchText, prompt: "Find node")
+            .searchable(text: $searchText, prompt: "Find Node")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
@@ -975,7 +974,7 @@ struct PackageDetailSheet: View {
             }
             Section("Exports") {
                 if package.exports.isEmpty {
-                    Text("No exports").foregroundStyle(.secondary)
+                    Text("No Exports").foregroundStyle(.secondary)
                 } else {
                     ForEach(package.exports, id: \.self) { exp in
                         Label(exp, systemImage: "arrow.right.square").font(.caption)
@@ -984,7 +983,7 @@ struct PackageDetailSheet: View {
             }
             Section("Dependencies") {
                 if package.dependencyIds.isEmpty {
-                    Text("No dependencies (leaf package)").foregroundStyle(.secondary)
+                    Text("No Dependencies (Leaf Package)").foregroundStyle(.secondary)
                 } else {
                     ForEach(package.dependencyIds, id: \.self) { depId in
                         Text(String(depId.uuidString.prefix(8)) + "...").font(.caption.monospaced())
@@ -1004,7 +1003,7 @@ struct PackageDetailSheet: View {
             Section("Impact Analysis") {
                 let impacts = manager.updateImpactAnalysis(packageId: package.id)
                 if impacts.isEmpty {
-                    Text("No downstream impacts").font(.caption2).foregroundStyle(.secondary)
+                    Text("No Downstream Impacts").font(.caption2).foregroundStyle(.secondary)
                 } else {
                     ForEach(impacts, id: \.self) { impact in
                         Text(impact).font(.system(size: 8, design: .monospaced))
@@ -1017,7 +1016,7 @@ struct PackageDetailSheet: View {
 
                 let findings = package.vulnerabilityHistory + manager.performSecurityScan(for: package.id)
                 if findings.isEmpty {
-                    Label("No issues detected", systemImage: "checkmark.shield.fill").foregroundStyle(.green).font(.caption)
+                    Label("No Issues Detected", systemImage: "checkmark.shield.fill").foregroundStyle(.green).font(.caption)
                 } else {
                     ForEach(findings) { finding in
                         VStack(alignment: .leading, spacing: 4) {

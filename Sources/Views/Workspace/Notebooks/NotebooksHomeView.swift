@@ -67,7 +67,7 @@ struct NotebooksHomeView: View {
                     Button {
                         showingAISheet = true
                     } label: {
-                        Image(systemName: "sparkles")
+                        Image(systemName: "sparkle")
                             .frame(width: 36, height: 36)
                     }
                     .buttonStyle(.bordered)
@@ -259,7 +259,7 @@ struct NotebooksHomeView: View {
         Task {
             do {
                 let context = manager.notebooks.map {
-                    "\($0.name) | folders: \($0.folders.count) | pages: \($0.folders.flatMap(\.pages).count) | updated: \($0.updatedAt)"
+                    "\($0.name) | Folders: \($0.folders.count) | Pages: \($0.folders.flatMap(\.pages).count) | Updated: \($0.updatedAt)"
                 }.joined(separator: "\n")
                 let insights = try await manager.generateNoteInsights(noteContent: prompt, notebookContext: context)
                 await MainActor.run {

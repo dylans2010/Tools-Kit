@@ -51,7 +51,7 @@ struct NotebookAddCommentsView: View {
                 Divider()
 
                 HStack(spacing: 12) {
-                    TextField("Add a comment...", text: $commentText, axis: .vertical)
+                    TextField("Add Comment", text: $commentText, axis: .vertical)
                         .padding(8)
                         .background(Color(.systemGray6))
                         .cornerRadius(8)
@@ -80,8 +80,6 @@ struct NotebookAddCommentsView: View {
     }
 
     private func loadComments() {
-        // In a real app, this would be fetched from NotebooksManager or a dedicated service.
-        // For now, we simulate persistence via UserDefaults per page.
         if let data = UserDefaults.standard.data(forKey: "comments_\(pageID.uuidString)"),
            let decoded = try? JSONDecoder().decode([NotebookComment].self, from: data) {
             comments = decoded
@@ -89,7 +87,7 @@ struct NotebookAddCommentsView: View {
     }
 
     private func postComment() {
-        let newComment = NotebookComment(author: "Local User", text: commentText, timestamp: Date())
+        let newComment = NotebookComment(author: "Me", text: commentText, timestamp: Date())
         comments.append(newComment)
         commentText = ""
 

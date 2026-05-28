@@ -25,7 +25,7 @@ struct SpeechPresetPromptsSheet: View {
             }
             .navigationTitle("AI Prompt Hub")
             .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $searchText, prompt: "Search 300+ prompts...")
+            .searchable(text: $searchText, prompt: "Search")
             .toolbar { promptsToolbarItems }
             .sheet(isPresented: $showingCustomBuilder) {
                 customBuilderView
@@ -126,14 +126,14 @@ struct SpeechPresetPromptsSheet: View {
         NavigationStack {
             Form {
                 Section("Prompt Details") {
-                    TextField("Title (e.g., Project Sync Summary)", text: $customTitle)
+                    TextField("Title", text: $customTitle)
                     TextField("Category", text: $customCategory)
                     TextEditor(text: $customPrompt)
                         .frame(minHeight: 100)
                         .overlay(
                             Group {
                                 if customPrompt.isEmpty {
-                                    Text("Enter your AI prompt here...")
+                                    Text("Enter Preset Prompt")
                                         .foregroundStyle(.placeholder)
                                         .padding(.leading, 4)
                                         .padding(.top, 8)
@@ -164,14 +164,11 @@ struct SpeechPresetPromptsSheet: View {
     }
 
     private func getRotatedPrompts(for categoryPrompts: [SpeechPresetPrompt]) -> [SpeechPresetPrompt] {
-        // Deterministic shuffle based on rotationToken
         let seededPrompts = categoryPrompts.sorted { $0.id.uuidString < $1.id.uuidString }
         if seededPrompts.count <= 5 {
             return seededPrompts
         }
 
-        // Simple rotation/shuffle simulation for the sake of 5-limit requirement
-        // In a real app, we might use the rotationToken to seed a random number generator
         return Array(seededPrompts.shuffled().prefix(5))
     }
 

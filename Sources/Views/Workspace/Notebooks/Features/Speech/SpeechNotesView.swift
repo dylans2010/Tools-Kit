@@ -295,7 +295,7 @@ struct SpeechNotesView: View {
             VStack(spacing: 16) {
                 ProgressView()
                     .scaleEffect(1.2)
-                Text("AI is thinking...")
+                Text("AI Is Thinking...")
                     .font(.subheadline.weight(.medium))
             }
             .padding(24)
@@ -320,12 +320,12 @@ struct SpeechNotesView: View {
                 Image(systemName: "mic.circle.fill")
                     .font(.system(size: 80))
                     .foregroundStyle(Color.accentColor)
-                Text("Ready to Record")
+                Text("Ready To Record")
                     .font(.headline)
             }
 
             ScrollView {
-                Text(speechManager.transcription.isEmpty ? "Transcription will appear here..." : speechManager.transcription)
+                Text(speechManager.transcription.isEmpty ? "Transcription will appear here" : speechManager.transcription)
                     .font(.body)
                     .multilineTextAlignment(.center)
                     .padding()
@@ -534,7 +534,7 @@ struct SpeechNotesView: View {
                         .background(Color.accentColor.opacity(0.1), in: Circle())
                 }
 
-                TextField("Ask or use /command...", text: $chatInput)
+                TextField("Ask Assist", text: $chatInput)
                     .textFieldStyle(.roundedBorder)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)

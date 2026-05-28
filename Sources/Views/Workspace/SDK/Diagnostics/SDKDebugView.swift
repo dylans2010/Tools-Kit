@@ -146,7 +146,7 @@ struct SDKDebugView: View {
             if !memorySnapshots.isEmpty {
                 let latest = memorySnapshots.last!
                 LabeledContent("Last Snapshot") {
-                    Text("\(latest.usedMB) MB used")
+                    Text("\(latest.usedMB) MB Used")
                         .font(.caption.monospacedDigit())
                 }
             }
@@ -180,7 +180,7 @@ struct SDKDebugView: View {
     private var networkSection: some View {
         Section {
             if networkRequests.isEmpty {
-                Text("No network activity captured").font(.caption).foregroundStyle(.secondary)
+                Text("No Network Activity Captured").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(networkRequests.prefix(5)) { req in
                     HStack {
@@ -209,7 +209,7 @@ struct SDKDebugView: View {
     private var watchExpressionsSection: some View {
         Section {
             if watchExpressions.isEmpty {
-                Text("No watch expressions").font(.caption).foregroundStyle(.secondary)
+                Text("No Watch Expressions").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(watchExpressions) { expr in
                     HStack {
@@ -243,7 +243,7 @@ struct SDKDebugView: View {
     private var breakpointsSection: some View {
         Section {
             if breakpoints.isEmpty {
-                Text("No breakpoints set").font(.caption).foregroundStyle(.secondary)
+                Text("No Breakpoints Set").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(breakpoints) { bp in
                     HStack {
@@ -257,7 +257,7 @@ struct SDKDebugView: View {
                             }
                         }
                         Spacer()
-                        Text("\(bp.hitCount) hits")
+                        Text("\(bp.hitCount) Hits")
                             .font(.caption2.monospacedDigit())
                             .foregroundStyle(.tertiary)
                     }
@@ -370,7 +370,7 @@ struct SDKDebugView: View {
         List {
             Section("Memory Snapshots") {
                 if memorySnapshots.isEmpty {
-                    Text("No snapshots taken").font(.caption).foregroundStyle(.secondary)
+                    Text("No Snapshots Taken").font(.caption).foregroundStyle(.secondary)
                 } else {
                     ForEach(memorySnapshots) { snapshot in
                         HStack {

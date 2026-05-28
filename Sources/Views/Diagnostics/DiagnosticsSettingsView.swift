@@ -74,7 +74,7 @@ public struct DiagnosticsSettingsView: View {
                 Button("Cancel", role: .cancel) {}
                 Button("Reset", role: .destructive) { resetAllSettings() }
             } message: {
-                Text("This will restore all Diagnostics settings to their defaults. This action cannot be undone.")
+                Text("This will restore all Diagnostics settings to their defaults. Do you want to proceed?")
             }
         }
     }

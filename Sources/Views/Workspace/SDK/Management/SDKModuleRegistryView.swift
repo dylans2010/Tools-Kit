@@ -30,7 +30,7 @@ struct SDKModuleRegistryView: View {
             if !registry.registrationLog.isEmpty { logSection }
         }
         .listStyle(.insetGrouped)
-        .searchable(text: $searchText, prompt: "Search modules")
+        .searchable(text: $searchText, prompt: "Search Modules")
         .navigationTitle("Module Registry")
         .sheet(isPresented: $showingAddModule) {
             NavigationStack { addModuleSheet }

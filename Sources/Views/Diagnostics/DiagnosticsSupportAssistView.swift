@@ -155,7 +155,7 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
             await MainActor.run {
                 lastSearchResults = searchResponse.results
                 lastSearchQuery = query
-                searchingStatus = "Analyzing results..."
+                searchingStatus = "Analyzing Results..."
             }
 
             let searchContext = ChatMessage(role: "system", content: "Search results for '\(query)':\n\(searchResponse.summary)")
@@ -444,7 +444,7 @@ struct DiagnosticsSupportAssistView: View {
 
     private var emptyStateView: some View {
         VStack(spacing: 12) {
-            Image(systemName: "sparkles")
+            Image(systemName: "app.background.dotted")
                 .font(.system(size: 60))
                 .symbolEffect(.variableColor.iterative)
                 .foregroundStyle(
@@ -456,7 +456,7 @@ struct DiagnosticsSupportAssistView: View {
                 )
                 .padding(.top, 40)
 
-            Text("Intelligent Diagnostics")
+            Text("Diagnostic Support Assist")
                 .font(.headline)
 
             Text("Ask me anything about your iOS device. Upload logs, crash reports, or photos of hardware issues for analysis.")
@@ -555,7 +555,7 @@ struct DiagnosticsSupportAssistView: View {
                 }
 
                 HStack {
-                    TextField("Describe the issue...", text: $viewModel.inputText, axis: .vertical)
+                    TextField("Describe The Issue", text: $viewModel.inputText, axis: .vertical)
                         .textFieldStyle(.plain)
                         .font(.body)
                         .padding(.horizontal, 12)

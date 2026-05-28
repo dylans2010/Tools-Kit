@@ -26,7 +26,7 @@ struct SDKConnectorBindingView: View {
             actionsSection
         }
         .listStyle(.insetGrouped)
-        .searchable(text: $searchText, prompt: "Search bindings")
+        .searchable(text: $searchText, prompt: "Search Bindings")
         .navigationTitle("Connector Bindings")
         .sheet(isPresented: $showingAddBinding) {
             NavigationStack { addBindingSheet }
@@ -165,7 +165,7 @@ struct SDKConnectorBindingView: View {
         Form {
             Section("Connector") {
                 Picker("Connector", selection: $selectedConnectorID) {
-                    Text("Select...").tag(nil as UUID?)
+                    Text("Select").tag(nil as UUID?)
                     ForEach(connectorManager.connectors, id: \.id) { connector in
                         Text(connector.name).tag(connector.id as UUID?)
                     }
@@ -173,7 +173,7 @@ struct SDKConnectorBindingView: View {
             }
             Section("Module") {
                 Picker("Module", selection: $selectedModuleIdentifier) {
-                    Text("Select...").tag("")
+                    Text("Select").tag("")
                     ForEach(moduleRegistry.modules) { mod in
                         Text(mod.displayName).tag(mod.identifier)
                     }

@@ -106,7 +106,7 @@ class WorkspaceNavConfig: ObservableObject {
         WorkspaceNavItem(id: "securitysetup", label: "Security Setup", icon: "shield.checkered", section: "System", isVisible: true),
         WorkspaceNavItem(id: "github", label: "GitHub", icon: "terminal", section: "System", isVisible: true),
 
-        WorkspaceNavItem(id: "mail", label: "Mail", icon: "envelope", section: "Settings", isVisible: true),
+        WorkspaceNavItem(id: "mail", label: "Mail", icon: "envelope", section: "Workspace", isVisible: true),
     ]
 }
 
@@ -349,7 +349,7 @@ struct WorkspaceSettingsView: View {
             }
 
             Section("About") {
-                LabeledContent("Version", value: "1.0.0")
+                LabeledContent("Version", value: "1.1.704")
                 LabeledContent("Build", value: "2026.5")
             }
         }

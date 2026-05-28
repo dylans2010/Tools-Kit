@@ -587,14 +587,14 @@ struct LibraryManageView: View {
             }
 
             if manager.registrySnapshots.isEmpty {
-                Text("No snapshots available").font(.caption2).foregroundStyle(.secondary)
+                Text("No Snapshots Available").font(.caption2).foregroundStyle(.secondary)
             } else {
                 ForEach(manager.registrySnapshots) { snapshot in
                     HStack {
                         VStack(alignment: .leading) {
-                            Text("Snapshot from \(snapshot.timestamp.formatted(date: .abbreviated, time: .shortened))")
+                            Text("Snapshot From \(snapshot.timestamp.formatted(date: .abbreviated, time: .shortened))")
                                 .font(.caption.bold())
-                            Text("\(snapshot.libraryCount) libraries").font(.system(size: 8))
+                            Text("\(snapshot.libraryCount) Libraries").font(.system(size: 8))
                         }
                         Spacer()
                         Button("Restore") { manager.rollbackToSnapshot(snapshot) }
@@ -866,7 +866,7 @@ struct LibraryManageView: View {
         Section("Capability Conflicts") {
             let conflicts = manager.detectConflicts()
             if conflicts.isEmpty {
-                Text("No conflicts detected").foregroundStyle(.secondary).font(.caption)
+                Text("No Conflicts Detected").foregroundStyle(.secondary).font(.caption)
             } else {
                 ForEach(conflicts) { conflict in
                     VStack(alignment: .leading, spacing: 4) {
@@ -883,7 +883,7 @@ struct LibraryManageView: View {
         Section("Pending Approvals (\(manager.pendingApprovals.filter { !$0.approved }.count))") {
             let pending = manager.pendingApprovals.filter { !$0.approved }
             if pending.isEmpty {
-                Text("No pending approvals").foregroundStyle(.secondary).font(.caption)
+                Text("No Pending Approvals").foregroundStyle(.secondary).font(.caption)
             } else {
                 ForEach(pending) { approval in
                     VStack(alignment: .leading, spacing: 4) {
@@ -902,7 +902,7 @@ struct LibraryManageView: View {
     private var invocationHistorySection: some View {
         Section("Invocation History") {
             if manager.invocationRecords.isEmpty {
-                Text("No invocations yet").foregroundStyle(.secondary).font(.caption)
+                Text("No Invocations Yet").foregroundStyle(.secondary).font(.caption)
             } else {
                 ForEach(manager.invocationRecords.suffix(10).reversed()) { record in
                     VStack(alignment: .leading, spacing: 2) {
@@ -955,9 +955,9 @@ struct TargetMigrationSheet: View {
 
     var body: some View {
         Form {
-            Section("Move \(selection.count) libraries to:") {
+            Section("Move \(selection.count) Libraries To:") {
                 Picker("Destination", selection: $selectedTarget) {
-                    Text("Select Target...").tag("")
+                    Text("Select Target").tag("")
                     ForEach(targets, id: \.self) { Text($0).tag($0) }
                 }
             }
@@ -1040,7 +1040,7 @@ struct LibrarySymbolBrowser: View {
                 }
                 Text("Type: \(symbol.type)").font(.system(size: 8, design: .monospaced)).foregroundStyle(.secondary)
                 if !symbol.conflicts.isEmpty {
-                    Text("Also defined in: \(symbol.conflicts.joined(separator: ", "))")
+                    Text("Also Defined In: \(symbol.conflicts.joined(separator: ", "))")
                         .font(.system(size: 8)).foregroundStyle(.orange)
                 }
             }
@@ -1281,7 +1281,7 @@ struct CapabilityMarketplaceView: View {
         }
         .navigationTitle("Marketplace")
         .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, prompt: "Search marketplace")
+        .searchable(text: $searchText, prompt: "Search Marketplace")
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Close") { dismiss() }
@@ -1378,7 +1378,7 @@ struct LibraryDetailSheet: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Hardening Features").font(.caption.bold())
                     if library.hardeningFeatures.isEmpty {
-                        Text("No data (run symbol browser to scan)").font(.caption2).foregroundStyle(.secondary)
+                        Text("No Data (run symbol browser to scan)").font(.caption2).foregroundStyle(.secondary)
                     } else {
                         ForEach(library.hardeningFeatures.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
                             HStack {
@@ -1399,7 +1399,7 @@ struct LibraryDetailSheet: View {
 
             Section("Capabilities") {
                 if library.capabilities.isEmpty {
-                    Text("No capabilities").foregroundStyle(.secondary)
+                    Text("No Capabilities").foregroundStyle(.secondary)
                 } else {
                     ForEach(library.capabilities, id: \.self) { cap in
                         Label(cap, systemImage: "gearshape").font(.caption)
@@ -1449,14 +1449,14 @@ struct LibraryDetailSheet: View {
                 VStack(alignment: .leading, spacing: 4) {
                     ProgressView(value: Double(usage), total: Double(quota))
                         .tint(usage >= quota ? .red : .purple)
-                    Text("\(usage) / \(quota) invocations used")
+                    Text("\(usage) / \(quota) Invocations Used")
                         .font(.caption2).foregroundStyle(.secondary)
                 }
             }
 
             Section("Constraints") {
                 if library.constraints.isEmpty {
-                    Text("No constraints").foregroundStyle(.secondary)
+                    Text("No Constraints").foregroundStyle(.secondary)
                 } else {
                     ForEach(library.constraints, id: \.self) { c in Text(c).font(.caption) }
                 }

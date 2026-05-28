@@ -176,7 +176,7 @@ struct NotebookDetailView: View {
                         Text(liveNotebook.name)
                             .font(.title2.weight(.bold))
                             .foregroundStyle(.white)
-                        Text("\(liveNotebook.folders.count) folders · \(totalPages) pages")
+                        Text("\(liveNotebook.folders.count) Folders · \(totalPages) Pages")
                             .font(.caption.weight(.medium))
                             .foregroundStyle(.white.opacity(0.8))
                     }
@@ -197,7 +197,7 @@ struct NotebookDetailView: View {
                         Button {
                             showingImagePlayground = true
                         } label: {
-                            Image(systemName: "sparkles")
+                            Image(systemName: "apple.intelligence")
                                 .font(.caption)
                         }
                         .buttonStyle(.borderedProminent)
@@ -234,7 +234,7 @@ struct NotebookDetailView: View {
                 Label("Notebook Tools", systemImage: "wrench.and.screwdriver")
                     .font(.headline)
                 Spacer()
-                Text("\(liveNotebook.folders.count) folders")
+                Text("\(liveNotebook.folders.count) Folders")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 8)
@@ -376,7 +376,7 @@ struct NotebookDetailView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Notebook AI")
+                    Text("Notebook Assist")
                         .font(.headline)
                     Text("Ask in natural language. AI will generate summaries, ideas, tags, and related note links.")
                         .font(.caption)

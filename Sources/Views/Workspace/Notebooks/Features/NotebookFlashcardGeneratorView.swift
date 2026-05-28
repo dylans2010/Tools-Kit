@@ -113,14 +113,14 @@ struct NotebookFlashcardGeneratorView: View {
             ZStack {
                 let card = flashcards[currentIndex]
                 VStack {
-                    Text("CARD \(currentIndex + 1) OF \(flashcards.count)")
+                    Text("Card \(currentIndex + 1) Of \(flashcards.count)")
                         .font(.caption2.bold())
                         .foregroundStyle(.secondary)
                         .padding(.top, 20)
 
                     Spacer()
 
-                    Text(showingAnswer ? "ANSWER" : "QUESTION")
+                    Text(showingAnswer ? "Answer" : "Question")
                         .font(.caption2.bold())
                         .foregroundStyle(showingAnswer ? .green : .blue)
                         .padding(.bottom, 10)

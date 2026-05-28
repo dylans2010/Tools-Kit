@@ -499,7 +499,7 @@ struct CitationFormatsView: View {
             Section {
                 HStack {
                     Image(systemName: "magnifyingglass").foregroundColor(.secondary)
-                    TextField("Search Citation Styles...", text: $viewModel.searchText)
+                    TextField("Search Citation Styles", text: $viewModel.searchText)
                         .textFieldStyle(.plain)
                     if !viewModel.searchText.isEmpty {
                         Button { viewModel.searchText = "" } label: {

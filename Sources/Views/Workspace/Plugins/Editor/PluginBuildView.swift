@@ -2225,12 +2225,12 @@ private struct BuildBackupSection: View {
             } else {
                 HStack {
                     Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-                    Text("No backups found").font(.caption).foregroundStyle(.secondary)
+                    Text("No Backups Found").font(.caption).foregroundStyle(.secondary)
                 }
             }
 
             Toggle(isOn: $autoBackup) {
-                Label("Auto-Backup", systemImage: "arrow.clockwise.icloud")
+                Label("Auto Backup", systemImage: "arrow.clockwise.icloud")
             }
 
             if autoBackup {

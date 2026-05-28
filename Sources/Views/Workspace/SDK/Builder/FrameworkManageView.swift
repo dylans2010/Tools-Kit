@@ -1006,7 +1006,7 @@ struct FrameworkManageView: View {
     private var executionHistorySection: some View {
         Section("Execution History") {
             if manager.executionRecords.isEmpty {
-                Text("No executions yet").foregroundStyle(.secondary).font(.caption)
+                Text("No Executions Yet").foregroundStyle(.secondary).font(.caption)
             } else {
                 ForEach(Array(manager.executionRecords.suffix(10).reversed())) { record in
                     VStack(alignment: .leading, spacing: 2) {
@@ -1119,10 +1119,10 @@ struct FrameworkDiagnosticsView: View {
                 if isScanning {
                     HStack {
                         ProgressView().controlSize(.small)
-                        Text("Scanning project...").foregroundStyle(.secondary)
+                        Text("Scanning Project...").foregroundStyle(.secondary)
                     }
                 } else if issues.isEmpty {
-                    Text("No issues detected").foregroundStyle(.green)
+                    Text("No Issues Detected").foregroundStyle(.green)
                 } else {
                     ForEach(issues) { issue in
                         VStack(alignment: .leading, spacing: 4) {
@@ -1666,7 +1666,7 @@ struct FrameworkDetailSheet: View {
             }
             Section("Package Dependencies") {
                 if framework.packageDependencies.isEmpty {
-                    Text("No package dependencies").foregroundStyle(.secondary)
+                    Text("No Package Dependencies").foregroundStyle(.secondary)
                 } else {
                     ForEach(framework.packageDependencies, id: \.self) { depId in
                         Text(String(depId.uuidString.prefix(8)) + "...").font(.caption.monospaced())
@@ -1676,7 +1676,7 @@ struct FrameworkDetailSheet: View {
 
             Section("Framework Dependencies") {
                 if framework.frameworkDependencies.isEmpty {
-                    Text("No framework dependencies").foregroundStyle(.secondary)
+                    Text("No Framework Dependencies").foregroundStyle(.secondary)
                 } else {
                     ForEach(framework.frameworkDependencies, id: \.self) { depId in
                         if let dep = FrameworkRegistry.shared.framework(by: depId) {
@@ -1693,7 +1693,7 @@ struct FrameworkDetailSheet: View {
                 }
             }
             Section("Dependency Binding") {
-                Button("Re-bind Dependencies") {
+                Button("Rebind Dependencies") {
                     _ = manager.bindDependencies(for: framework.id)
                 }
                 .font(.caption)
@@ -1739,7 +1739,7 @@ struct FrameworkDetailSheet: View {
                             .font(.caption2).italic().foregroundStyle(.orange)
                     }
                 } else {
-                    Text("No active issues detected").font(.caption2).foregroundStyle(.secondary)
+                    Text("No Active Issues Detected").font(.caption2).foregroundStyle(.secondary)
                 }
             }
 
