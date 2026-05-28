@@ -1,18 +1,25 @@
 import SwiftUI
 
 struct DocumentationEditorView: View {
-    @State private var sections: [DocSection] = [
-        DocSection(title: "Getting Started", pages: [
-            DocPage(id: UUID(), title: "Overview", content: "# Welcome to GitHub Pro", lastModified: Date(), version: "1.0.0", isDraft: false),
-            DocPage(id: UUID(), title: "Installation", content: "Steps to install...", lastModified: Date(), version: "1.0.0", isDraft: false)
-        ]),
-        DocSection(title: "API Reference", pages: [
-            DocPage(id: UUID(), title: "Authentication", content: "Auth details...", lastModified: Date(), version: "1.0.0", isDraft: true)
-        ])
-    ]
-
+    @State private var sections: [DocSection] = []
     @State private var selectedPageId: UUID?
     @State private var isRawMode = false
+    @State private var showingAddSection = false
+    @State private var newSectionTitle = ""
+
+    init() {
+        // Load from UserDefaults or start with defaults
+        if let data = UserDefaults.standard.data(forKey: "com.toolskit.developer.docs"),
+           let decoded = try? JSONDecoder().decode([DocSection].self, from: data) {
+            _sections = State(initialValue: decoded)
+        } else {
+            _sections = State(initialValue: [
+                DocSection(title: "Getting Started", pages: [
+                    DocPage(id: UUID(), title: "Overview", content: "# Welcome to your Project\n\nEdit this page to provide an overview.", lastModified: Date(), version: "1.0.0", isDraft: false)
+                ])
+            ])
+        }
+    }
 
     var body: some View {
         NavigationSplitView {
@@ -31,37 +38,63 @@ struct DocumentationEditorView: View {
                                 }
                             }
                         }
+
+                        Button {
+                            addPage(to: section)
+                        } label: {
+                            Label("Add Page", systemImage: "plus.circle")
+                                .font(.caption)
+                        }
                     }
                 }
             }
             .navigationTitle("Documentation")
             .toolbar {
-                Button { /* Add Section */ } label: { Image(systemName: "folder.badge.plus") }
+                Button { showingAddSection = true } label: { Image(systemName: "folder.badge.plus") }
             }
         } detail: {
-            if let pageId = selectedPageId {
-                editorView(for: pageId)
+            if let pageId = selectedPageId, let pageBinding = findPageBinding(for: pageId) {
+                editorView(for: pageBinding)
             } else {
                 Text("Select a page to edit").foregroundStyle(.secondary)
             }
         }
+        .alert("New Section", isPresented: $showingAddSection) {
+            TextField("Section Title", text: $newSectionTitle)
+            Button("Cancel", role: .cancel) { newSectionTitle = "" }
+            Button("Add") {
+                if !newSectionTitle.isEmpty {
+                    sections.append(DocSection(title: newSectionTitle, pages: []))
+                    newSectionTitle = ""
+                    saveDocs()
+                }
+            }
+        }
     }
 
-    private func editorView(for pageId: UUID) -> some View {
+    private func editorView(for page: Binding<DocPage>) -> some View {
         VStack(spacing: 0) {
-            toolbar
+            toolbar(for: page)
 
             if isRawMode {
-                TextEditor(text: .constant("# Content"))
+                TextEditor(text: page.content)
                     .font(.system(.body, design: .monospaced))
                     .padding()
+                    .onChange(of: page.content.wrappedValue) { _, _ in saveDocs() }
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Rich Editor Placeholder").font(.title).bold()
-                        Text("This is where the rich content editor with Markdown support would render.").foregroundStyle(.secondary)
+                        TextField("Page Title", text: page.title)
+                            .font(.title).bold()
+                            .onChange(of: page.title.wrappedValue) { _, _ in saveDocs() }
 
-                        codeBlockSample
+                        Text("Markdown Preview").font(.caption).foregroundStyle(.secondary)
+
+                        Text(page.content.wrappedValue)
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.secondary.opacity(0.05))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     .padding()
                 }
@@ -71,47 +104,61 @@ struct DocumentationEditorView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private var toolbar: some View {
+    private func toolbar(for page: Binding<DocPage>) -> some View {
         HStack {
             Picker("Mode", selection: $isRawMode) {
-                Text("Rich Text").tag(false)
+                Text("Editor").tag(false)
                 Text("Markdown").tag(true)
             }
             .pickerStyle(.segmented)
-            .frame(width: 200)
+            .frame(width: 150)
 
             Spacer()
 
-            Button("Preview") {}.buttonStyle(.bordered)
-            Button("Publish") {}.buttonStyle(.borderedProminent)
+            Toggle("Draft", isOn: page.isDraft)
+                .font(.caption)
+                .onChange(of: page.isDraft.wrappedValue) { _, _ in saveDocs() }
+
+            Button("Save") {
+                page.wrappedValue.lastModified = Date()
+                saveDocs()
+            }
+            .buttonStyle(.borderedProminent)
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
     }
 
-    private var codeBlockSample: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Text("Swift").font(.caption.bold())
-                Spacer()
-                Button { /* Copy */ } label: { Image(systemName: "doc.on.doc").font(.caption) }
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .background(Color.secondary.opacity(0.1))
-
-            Text("import ToolsKit\n\nlet client = GitHubClient()\nclient.authenticate()")
-                .font(.system(size: 12, design: .monospaced))
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.black.opacity(0.05))
+    private func addPage(to section: DocSection) {
+        if let index = sections.firstIndex(where: { $0.id == section.id }) {
+            let newPage = DocPage(id: UUID(), title: "Untitled Page", content: "", lastModified: Date(), version: "1.0.0", isDraft: true)
+            sections[index].pages.append(newPage)
+            selectedPageId = newPage.id
+            saveDocs()
         }
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func saveDocs() {
+        if let encoded = try? JSONEncoder().encode(sections) {
+            UserDefaults.standard.set(encoded, forKey: "com.toolskit.developer.docs")
+        }
+    }
+
+    private func findPageBinding(for id: UUID) -> Binding<DocPage>? {
+        for sectionIndex in sections.indices {
+            if let pageIndex = sections[sectionIndex].pages.firstIndex(where: { $0.id == id }) {
+                return Binding(
+                    get: { sections[sectionIndex].pages[pageIndex] },
+                    set: { sections[sectionIndex].pages[pageIndex] = $0 }
+                )
+            }
+        }
+        return nil
     }
 }
 
-struct DocSection: Identifiable {
-    let id = UUID()
+struct DocSection: Identifiable, Codable {
+    var id = UUID()
     var title: String
     var pages: [DocPage]
 }

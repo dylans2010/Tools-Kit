@@ -6,6 +6,7 @@ struct ConnectorsMainView: View {
     @State private var searchText = ""
     @State private var filterCategory: ConnectorCategory = .all
     @State private var showingConnectorBuilder = false
+    @State private var showingInstaller = false
 
     enum ConnectorCategory: String, CaseIterable {
         case all = "All"
@@ -150,10 +151,17 @@ struct ConnectorsMainView: View {
         .searchable(text: $searchText, prompt: "Search Connectors")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    showingConnectorBuilder = true
-                } label: {
-                    Label("Create New", systemImage: "plus.circle.fill")
+                HStack {
+                    Button {
+                        showingInstaller = true
+                    } label: {
+                        Image(systemName: "plus.app")
+                    }
+                    Button {
+                        showingConnectorBuilder = true
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                    }
                 }
             }
         }
@@ -161,6 +169,10 @@ struct ConnectorsMainView: View {
             NavigationStack {
                 ConnectorBuilderView()
             }
+        }
+        .sheet(isPresented: $showingInstaller) {
+            ProjectInstallerView()
+                .presentationDetents([.medium])
         }
         .navigationDestination(for: UUID.self) { id in
             if let connector = connectorManager.connectors.first(where: { $0.id == id }) {

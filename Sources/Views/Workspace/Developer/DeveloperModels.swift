@@ -17,9 +17,12 @@ public struct DeveloperProfile: Codable {
     public var pronouns: String
     public var avatarUrl: String?
     public var bio: String
+    public var experience: String
+    public var credits: String
     public var website: String
     public var github: String
     public var linkedin: String
+    public var socialLinks: [String: String]
     public var contactEmail: String
     public var supportEmail: String
     public var isPublic: Bool
@@ -35,9 +38,12 @@ public struct DeveloperProfile: Codable {
         username: String = "",
         pronouns: String = "",
         bio: String = "",
+        experience: String = "",
+        credits: String = "",
         website: String = "",
         github: String = "",
         linkedin: String = "",
+        socialLinks: [String: String] = [:],
         contactEmail: String = "",
         supportEmail: String = "",
         isPublic: Bool = false,
@@ -52,9 +58,12 @@ public struct DeveloperProfile: Codable {
         self.username = username
         self.pronouns = pronouns
         self.bio = bio
+        self.experience = experience
+        self.credits = credits
         self.website = website
         self.github = github
         self.linkedin = linkedin
+        self.socialLinks = socialLinks
         self.contactEmail = contactEmail
         self.supportEmail = supportEmail
         self.isPublic = isPublic
@@ -101,6 +110,9 @@ public struct DeveloperApp: Identifiable, Codable {
     public var status: AppStatus
     public var version: String
     public var description: String
+    public var aboutInfo: String
+    public var credits: String
+    public var socialLinks: [String: String]
     public var iconName: String
     public var bundleId: String
     public var installCount: Int
@@ -116,6 +128,9 @@ public struct DeveloperApp: Identifiable, Codable {
         status: AppStatus = .draft,
         version: String = "1.0.0",
         description: String = "",
+        aboutInfo: String = "",
+        credits: String = "",
+        socialLinks: [String: String] = [:],
         iconName: String = "app.dashed",
         bundleId: String = "",
         installCount: Int = 0,
@@ -130,6 +145,9 @@ public struct DeveloperApp: Identifiable, Codable {
         self.status = status
         self.version = version
         self.description = description
+        self.aboutInfo = aboutInfo
+        self.credits = credits
+        self.socialLinks = socialLinks
         self.iconName = iconName
         self.bundleId = bundleId
         self.installCount = installCount
@@ -137,6 +155,38 @@ public struct DeveloperApp: Identifiable, Codable {
         self.lastModified = lastModified
         self.pricingModel = pricingModel
         self.revenue = revenue
+    }
+}
+
+// MARK: - Project Export
+
+public struct TKProject: Codable {
+    public var metadata: ProjectMetadata
+    public var type: AppType
+    public var payload: Data // Encoded project configuration
+
+    public struct ProjectMetadata: Codable {
+        public var name: String
+        public var version: String
+        public var developerName: String
+        public var description: String
+        public var credits: String
+        public var socialLinks: [String: String]
+
+        public init(name: String, version: String, developerName: String, description: String, credits: String, socialLinks: [String: String]) {
+            self.name = name
+            self.version = version
+            self.developerName = developerName
+            self.description = description
+            self.credits = credits
+            self.socialLinks = socialLinks
+        }
+    }
+
+    public init(metadata: ProjectMetadata, type: AppType, payload: Data) {
+        self.metadata = metadata
+        self.type = type
+        self.payload = payload
     }
 }
 
@@ -193,8 +243,25 @@ public struct ScopeRequest: Identifiable, Codable {
 
 // MARK: - Auth Management
 
+public struct DeveloperKey: Identifiable, Codable {
+    public var id: UUID
+    public var key: String
+    public var name: String
+    public var tier: String
+    public var createdAt: Date
+    public var lastUsed: Date?
+
+    public init(id: UUID = UUID(), key: String, name: String, tier: String, createdAt: Date = Date(), lastUsed: Date? = nil) {
+        self.id = id
+        self.key = key
+        self.name = name
+        self.tier = tier
+        self.createdAt = createdAt
+        self.lastUsed = lastUsed
+    }
+}
+
 public enum AuthProviderType: String, Codable, CaseIterable {
-    case oauth2 = "OAuth 2.0"
     case apiKey = "API Key"
     case jwt = "JWT"
     case saml = "SAML"

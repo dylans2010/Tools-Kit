@@ -55,7 +55,7 @@ struct AppDetailView: View {
     private var overviewTab: some View {
         VStack(alignment: .leading, spacing: 16) {
             detailGroup(title: "App Information") {
-                detailRow(label: "Bundle ID", value: "com.jules.\(app.name.lowercased().replacingOccurrences(of: " ", with: "."))")
+                detailRow(label: "Bundle ID", value: app.bundleId.isEmpty ? "com.developer.\(app.name.lowercased().replacingOccurrences(of: " ", with: "."))" : app.bundleId)
                 detailRow(label: "Current Version", value: app.version)
                 detailRow(label: "Pricing", value: app.pricingModel)
                 detailRow(label: "Revenue", value: "$\(String(format: "%.2f", app.revenue))")

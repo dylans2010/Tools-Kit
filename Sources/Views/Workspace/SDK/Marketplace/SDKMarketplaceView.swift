@@ -4,6 +4,7 @@ struct SDKMarketplaceView: View {
     @State private var extensions: [SDKExtension] = []
     @State private var searchText = ""
     @State private var selectedCategory: ExtCategory?
+    @State private var showingInstaller = false
 
     fileprivate var filteredExtensions: [SDKExtension] {
         extensions.filter { ext in
@@ -80,6 +81,19 @@ struct SDKMarketplaceView: View {
         }
         .navigationTitle("Marketplace")
         .searchable(text: $searchText, prompt: "Search Extensions")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showingInstaller = true
+                } label: {
+                    Image(systemName: "plus.app")
+                }
+            }
+        }
+        .sheet(isPresented: $showingInstaller) {
+            ProjectInstallerView()
+                .presentationDetents([.medium])
+        }
         .task { loadExtensions() }
     }
 

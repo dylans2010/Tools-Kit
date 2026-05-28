@@ -1,13 +1,13 @@
 import SwiftUI
+import Core
 
 struct AuthServiceManagerView: View {
-    @State private var showingAddProvider = false
-
-    @State private var providers: [AuthProviderConfig] = [
-        AuthProviderConfig(id: UUID(), name: "Google OAuth", type: .oauth2, lastValidated: Date(), status: .healthy),
-        AuthProviderConfig(id: UUID(), name: "Main API Key", type: .apiKey, lastValidated: Date().addingTimeInterval(-86400), status: .warning),
-        AuthProviderConfig(id: UUID(), name: "Customer SSO", type: .saml, lastValidated: Date(), status: .healthy)
-    ]
+    @ObservedObject var store = DeveloperPersistentStore.shared
+    @State private var showingAddKey = false
+    @State private var newKeyName = ""
+    @State private var selectedTier: KeyTier = .dev
+    @State private var generatedKey: String?
+    @State private var showingKeyAlert = false
 
     var body: some View {
         ScrollView {
@@ -16,39 +16,57 @@ struct AuthServiceManagerView: View {
 
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
-                        Text("Connected Auth Providers").font(.headline)
+                        Text("Developer API Keys").font(.headline)
                         Spacer()
                         Button {
-                            showingAddProvider = true
+                            showingAddKey = true
                         } label: {
                             Image(systemName: "plus.circle.fill")
                         }
                     }
 
-                    ForEach(providers) { provider in
-                        providerCard(provider)
+                    if store.keys.isEmpty {
+                        Text("No API keys generated yet. Use keys to authenticate your apps and services.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color(uiColor: .secondarySystemGroupedBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    } else {
+                        ForEach(store.keys) { key in
+                            developerKeyCard(key)
+                        }
                     }
                 }
 
-                perAppAssignmentMatrix
                 credentialVaultSummary
             }
             .padding()
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Auth Services")
-        .sheet(isPresented: $showingAddProvider) {
-            Text("Add Provider UI")
+        .sheet(isPresented: $showingAddKey) {
+            addKeySheet
+        }
+        .alert("New Key Generated", isPresented: $showingKeyAlert) {
+            Button("Done") {
+                generatedKey = nil
+            }
+        } message: {
+            if let key = generatedKey {
+                Text("Please copy your new API key now. You won't be able to see it again.\n\n\(key)")
+            }
         }
     }
 
     private var tokenHealthPanel: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Token Health").font(.headline)
+            Text("Key Summary").font(.headline)
 
             HStack(spacing: 12) {
-                healthMetric(label: "Valid", value: "8", color: .green)
-                healthMetric(label: "Expiring", value: "2", color: .orange)
+                healthMetric(label: "Active", value: "\(store.keys.count)", color: .green)
+                healthMetric(label: "Expiring", value: "0", color: .orange)
                 healthMetric(label: "Revoked", value: "0", color: .secondary)
             }
         }
@@ -65,25 +83,44 @@ struct AuthServiceManagerView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func providerCard(_ config: AuthProviderConfig) -> some View {
+    private func developerKeyCard(_ key: DeveloperKey) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(config.name).font(.subheadline.bold())
-                    Text(config.type.rawValue).font(.caption2).foregroundStyle(.secondary)
+                    Text(key.name).font(.subheadline.bold())
+                    Text(key.tier).font(.system(size: 8, weight: .bold))
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(Color.blue.opacity(0.1), in: Capsule())
+                        .foregroundStyle(.blue)
                 }
                 Spacer()
-                statusBadge(config.status)
+                Button(role: .destructive) {
+                    revokeKey(key)
+                } label: {
+                    Text("Revoke").font(.caption.bold())
+                }
             }
 
             Divider()
 
             HStack {
-                Text("Last Validated: \(config.lastValidated.formatted(date: .abbreviated, time: .shortened))")
-                    .font(.system(size: 10))
-                    .foregroundStyle(.tertiary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Key ID: \(key.key.prefix(12))...")
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                    Text("Created: \(key.createdAt.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.tertiary)
+                }
                 Spacer()
-                Button("Rotate") {}.font(.caption.bold())
+                if let lastUsed = key.lastUsed {
+                    Text("Last used: \(lastUsed.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.system(size: 8))
+                        .foregroundStyle(.tertiary)
+                } else {
+                    Text("Never used").font(.system(size: 8)).foregroundStyle(.tertiary)
+                }
             }
         }
         .padding()
@@ -95,56 +132,78 @@ struct AuthServiceManagerView: View {
         )
     }
 
-    private func statusBadge(_ status: AuthProviderConfig.ConfigStatus) -> some View {
-        let color: Color = status == .healthy ? .green : (status == .warning ? .orange : .red)
-        return Text(status.rawValue.uppercased())
-            .font(.system(size: 8, weight: .bold))
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(color.opacity(0.1), in: Capsule())
-            .foregroundStyle(color)
-    }
+    private var addKeySheet: some View {
+        NavigationView {
+            Form {
+                Section("Key Details") {
+                    TextField("Key Name", text: $newKeyName)
+                    Picker("Tier", selection: $selectedTier) {
+                        ForEach(KeyTier.allCases, id: \.self) { tier in
+                            Text(tier.rawValue).tag(tier)
+                        }
+                    }
+                }
 
-    private var perAppAssignmentMatrix: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("App Assignment Matrix").font(.headline)
-
-            VStack(spacing: 0) {
-                assignmentRow(app: "GitHub Pro", provider: "Google OAuth")
-                Divider()
-                assignmentRow(app: "Mail AI Bot", provider: "Main API Key")
-                Divider()
-                assignmentRow(app: "Messenger", provider: "Customer SSO")
+                Section {
+                    Text("Generating a new key will follow our strict token pattern for secure authentication.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-    }
-
-    private func assignmentRow(app: String, provider: String) -> some View {
-        HStack {
-            Text(app).font(.subheadline)
-            Spacer()
-            HStack {
-                Text(provider).font(.caption).foregroundStyle(.secondary)
-                Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
+            .navigationTitle("Generate New Key")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showingAddKey = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Generate") {
+                        generateNewKey()
+                    }
+                    .disabled(newKeyName.isEmpty)
+                }
             }
         }
-        .padding()
     }
 
     private var credentialVaultSummary: some View {
         HStack {
             Image(systemName: "lock.shield.fill").foregroundStyle(.blue)
             VStack(alignment: .leading) {
-                Text("Credential Vault").font(.subheadline.bold())
-                Text("Securely storing 12 encrypted secrets.").font(.caption).foregroundStyle(.secondary)
+                Text("Security Notice").font(.subheadline.bold())
+                Text("API keys provide full developer access. Never share them.").font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
-            Button("Manage") {}.font(.caption.bold())
         }
         .padding()
         .background(Color.blue.opacity(0.05))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func generateNewKey() {
+        do {
+            let keyString = try DeveloperIDManager.shared.generateKey(tier: selectedTier)
+            let newKey = DeveloperKey(
+                key: keyString,
+                name: newKeyName,
+                tier: selectedTier.rawValue
+            )
+            var currentKeys = store.keys
+            currentKeys.append(newKey)
+            store.saveKeys(currentKeys)
+
+            generatedKey = keyString
+            newKeyName = ""
+            showingAddKey = false
+            showingKeyAlert = true
+        } catch {
+            print("Failed to generate key: \(error)")
+        }
+    }
+
+    private func revokeKey(_ key: DeveloperKey) {
+        var currentKeys = store.keys
+        currentKeys.removeAll { $0.id == key.id }
+        store.saveKeys(currentKeys)
     }
 }

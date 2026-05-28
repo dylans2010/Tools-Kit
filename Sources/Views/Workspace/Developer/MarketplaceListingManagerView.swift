@@ -1,22 +1,41 @@
 import SwiftUI
 
 struct MarketplaceListingManagerView: View {
-    @State private var listings: [DeveloperApp] = [
-        DeveloperApp(name: "GitHub Pro", type: .connector, status: .live, version: "2.1.0", installCount: 850),
-        DeveloperApp(name: "Metal Shaders", type: .sdkExtension, status: .live, version: "1.2.0", installCount: 340)
-    ]
+    @ObservedObject var store = DeveloperPersistentStore.shared
+    @State private var showingSubmissionSheet = false
 
     var body: some View {
         List {
             Section {
-                ForEach(listings) { listing in
-                    listingCard(listing)
+                if store.apps.isEmpty {
+                    Text("You don't have any apps in the Marketplace yet.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding()
+                } else {
+                    ForEach(store.apps) { listing in
+                        NavigationLink(destination: AppDetailView(app: listing)) {
+                            listingCard(listing)
+                        }
+                    }
                 }
             } header: {
                 Text("Your Live Listings")
             }
         }
         .navigationTitle("Marketplace Listings")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showingSubmissionSheet = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $showingSubmissionSheet) {
+            MarketplaceSubmissionView()
+        }
     }
 
     private func listingCard(_ listing: DeveloperApp) -> some View {
@@ -38,10 +57,18 @@ struct MarketplaceListingManagerView: View {
             }
 
             HStack(spacing: 8) {
-                actionButton(title: "Edit", icon: "pencil")
-                actionButton(title: "Version", icon: "arrow.up.circle")
-                actionButton(title: "Pause", icon: "pause")
-                actionButton(title: "Analytics", icon: "chart.bar")
+                actionButton(title: "Edit", icon: "pencil") {
+                    // Navigate to edit
+                }
+                actionButton(title: "Version", icon: "arrow.up.circle") {
+                    // Update version
+                }
+                actionButton(title: "Pause", icon: listing.status == .live ? "pause" : "play") {
+                    toggleStatus(listing)
+                }
+                actionButton(title: "Analytics", icon: "chart.bar") {
+                    // Navigate to analytics for this app
+                }
             }
 
             Divider()
@@ -50,15 +77,15 @@ struct MarketplaceListingManagerView: View {
                 Label("4.8 rating", systemImage: "star.fill")
                     .foregroundStyle(.yellow)
                 Spacer()
-                Text("Revenue: $1,240.00").font(.caption.bold())
+                Text("Revenue: $\(String(format: "%.2f", listing.revenue))").font(.caption.bold())
             }
             .font(.caption)
         }
         .padding(.vertical, 8)
     }
 
-    private func actionButton(title: String, icon: String) -> some View {
-        Button {} label: {
+    private func actionButton(title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
             VStack(spacing: 4) {
                 Image(systemName: icon)
                 Text(title).font(.system(size: 9))
@@ -69,5 +96,15 @@ struct MarketplaceListingManagerView: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
         }
         .buttonStyle(.plain)
+    }
+
+    private func toggleStatus(_ app: DeveloperApp) {
+        var updatedApp = app
+        updatedApp.status = (app.status == .live) ? .suspended : .live
+        var apps = store.apps
+        if let index = apps.firstIndex(where: { $0.id == app.id }) {
+            apps[index] = updatedApp
+            store.saveApps(apps)
+        }
     }
 }
