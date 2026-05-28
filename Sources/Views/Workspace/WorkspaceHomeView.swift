@@ -105,6 +105,7 @@ class WorkspaceNavConfig: ObservableObject {
         WorkspaceNavItem(id: "security", label: "Security", icon: "lock.shield", section: "System", isVisible: true),
         WorkspaceNavItem(id: "securitysetup", label: "Security Setup", icon: "shield.checkered", section: "System", isVisible: true),
         WorkspaceNavItem(id: "github", label: "GitHub", icon: "terminal", section: "System", isVisible: true),
+        WorkspaceNavItem(id: "developer", label: "Developer", icon: "hammer.fill", section: "System", isVisible: true),
 
         WorkspaceNavItem(id: "mail", label: "Mail", icon: "envelope", section: "Workspace", isVisible: true),
     ]
@@ -318,6 +319,8 @@ struct WorkspaceHomeView: View {
             NavigationLink { SecurityOnboardingView(authService: AuthService.shared) } label: { Label(item.label, systemImage: item.icon) }
         case "github":
             NavigationLink { GitHubRouterView() } label: { Label(item.label, systemImage: item.icon) }
+        case "developer":
+            NavigationLink { DeveloperHomeView() } label: { Label(item.label, systemImage: item.icon) }
         case "mail":
             if hasMailAccounts {
                 NavigationLink { UniversalInboxView() } label: { Label(item.label, systemImage: item.icon) }
