@@ -2064,6 +2064,10 @@
 		DA020000000000000000000B /* AppDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000000B /* AppDetailView.swift */; };
 		DA020000000000000000000C /* SubmissionWizardSteps.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000000C /* SubmissionWizardSteps.swift */; };
 		DA020000000000000000000D /* DocSectionEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000000D /* DocSectionEditor.swift */; };
+		DA020000000000000000000E /* DeveloperPersistentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000000E /* DeveloperPersistentStore.swift */; };
+		DA020000000000000000000F /* AppBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000000F /* AppBuilderView.swift */; };
+		DA0200000000000000000010 /* ProjectInstallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000010 /* ProjectInstallManager.swift */; };
+		DA0200000000000000000011 /* ProjectInstallerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000011 /* ProjectInstallerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -4108,6 +4112,10 @@
 		DA010000000000000000000B /* AppDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDetailView.swift; sourceTree = "<group>"; };
 		DA010000000000000000000C /* SubmissionWizardSteps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmissionWizardSteps.swift; sourceTree = "<group>"; };
 		DA010000000000000000000D /* DocSectionEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocSectionEditor.swift; sourceTree = "<group>"; };
+		DA010000000000000000000E /* DeveloperPersistentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperPersistentStore.swift; sourceTree = "<group>"; };
+		DA010000000000000000000F /* AppBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBuilderView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000010 /* ProjectInstallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectInstallManager.swift; sourceTree = "<group>"; };
+		DA0100000000000000000011 /* ProjectInstallerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectInstallerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -12312,6 +12320,10 @@
 				DA010000000000000000000B /* AppDetailView.swift */,
 				DA010000000000000000000C /* SubmissionWizardSteps.swift */,
 				DA010000000000000000000D /* DocSectionEditor.swift */,
+				DA010000000000000000000E /* DeveloperPersistentStore.swift */,
+				DA010000000000000000000F /* AppBuilderView.swift */,
+				DA0100000000000000000010 /* ProjectInstallManager.swift */,
+				DA0100000000000000000011 /* ProjectInstallerView.swift */,
 			);
 			path = Developer;
 			sourceTree = "<group>";
@@ -12496,6 +12508,10 @@
 				DA0200000000000000000002 /* AppManagementView.swift in Sources */,
 				DA0200000000000000000001 /* DeveloperProfileView.swift in Sources */,
 				DA0200000000000000000000 /* DeveloperHomeView.swift in Sources */,
+				DA020000000000000000000E /* DeveloperPersistentStore.swift in Sources */,
+				DA020000000000000000000F /* AppBuilderView.swift in Sources */,
+				DA0200000000000000000010 /* ProjectInstallManager.swift in Sources */,
+				DA0200000000000000000011 /* ProjectInstallerView.swift in Sources */,
 				92E13A73A39F4878870CCFF1 /* SDKResourceAuditView.swift in Sources */,
 				0603EBECCB2849248F4BD1D4 /* SDKGlobalSearchView.swift in Sources */,
 				6FCAA43DB3294F3586F66864 /* SDKDependencyVisualizerView.swift in Sources */,

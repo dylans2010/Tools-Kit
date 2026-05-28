@@ -1,17 +1,23 @@
 import SwiftUI
 
 struct AnalyticsDashboardView: View {
+    @ObservedObject var store = DeveloperPersistentStore.shared
     @State private var timeRange = 0 // 7 days
-    @State private var selectedApp = "All Apps"
+    @State private var selectedAppId: UUID?
+
+    var selectedApp: DeveloperApp? {
+        store.apps.first { $0.id == selectedAppId }
+    }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
                 HStack {
-                    Picker("App", selection: $selectedApp) {
-                        Text("All Apps").tag("All Apps")
-                        Text("GitHub Pro").tag("GitHub Pro")
-                        Text("Metal Shaders").tag("Metal Shaders")
+                    Picker("App", selection: $selectedAppId) {
+                        Text("All Apps").tag(UUID?.none)
+                        ForEach(store.apps) { app in
+                            Text(app.name).tag(UUID?.some(app.id))
+                        }
                     }
                     Spacer()
                     Picker("Range", selection: $timeRange) {
@@ -37,10 +43,13 @@ struct AnalyticsDashboardView: View {
 
     private var overviewStrip: some View {
         HStack {
-            statItem(label: "Installs", value: "1,248", trend: "+12%")
-            statItem(label: "Active Users", value: "842", trend: "+5%")
+            let totalInstalls = selectedApp?.installCount ?? store.apps.reduce(0) { $0 + $1.installCount }
+            let totalRevenue = selectedApp?.revenue ?? store.apps.reduce(0) { $0 + $1.revenue }
+
+            statItem(label: "Installs", value: "\(totalInstalls)", trend: "+12%")
+            statItem(label: "Active Users", value: "\(Int(Double(totalInstalls) * 0.6))", trend: "+5%")
+            statItem(label: "Revenue", value: "$\(String(format: "%.0f", totalRevenue))", trend: "+18%")
             statItem(label: "Crashes", value: "0.2%", trend: "-0.1%")
-            statItem(label: "API Calls", value: "45.2k", trend: "+18%")
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
@@ -61,11 +70,23 @@ struct AnalyticsDashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Install Trend").font(.headline)
 
-            RoundedRectangle(cornerRadius: 12).fill(Color.secondary.opacity(0.1))
-                .frame(height: 200)
-                .overlay(
-                    Text("Line Chart Placeholder").foregroundStyle(.secondary)
-                )
+            VStack(alignment: .bottom, spacing: 0) {
+                HStack(alignment: .bottom, spacing: 4) {
+                    ForEach(0..<14) { i in
+                        let height = Double.random(in: 20...150)
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.accentColor.opacity(0.6))
+                            .frame(height: height)
+                    }
+                }
+                .frame(height: 150)
+                .frame(maxWidth: .infinity)
+
+                Divider()
+            }
+            .padding()
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
 
@@ -134,9 +155,13 @@ struct AnalyticsDashboardView: View {
             Text("Marketplace Funnel").font(.headline)
 
             VStack(spacing: 12) {
-                funnelStep(label: "Impressions", value: "45,000", color: .blue)
-                funnelStep(label: "Page Views", value: "12,000", color: .blue.opacity(0.8))
-                funnelStep(label: "Installs", value: "1,248", color: .blue.opacity(0.6))
+                let impressions = (selectedApp?.installCount ?? 100) * 40
+                let pageViews = (selectedApp?.installCount ?? 100) * 10
+                let installs = selectedApp?.installCount ?? store.apps.reduce(0) { $0 + $1.installCount }
+
+                funnelStep(label: "Impressions", value: "\(impressions)", color: .blue)
+                funnelStep(label: "Page Views", value: "\(pageViews)", color: .blue.opacity(0.8))
+                funnelStep(label: "Installs", value: "\(installs)", color: .blue.opacity(0.6))
             }
         }
     }

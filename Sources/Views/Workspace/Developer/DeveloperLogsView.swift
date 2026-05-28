@@ -1,26 +1,16 @@
 import SwiftUI
+import Core
 
 struct DeveloperLogsView: View {
     @State private var searchText = ""
-    @State private var severityFilter: LogSeverity?
+    @State private var severityFilter: LogLevel?
     @State private var isLive = true
+    @ObservedObject var logStore = SDKLogStore.shared
 
-    @State private var logs: [DeveloperLogEntry] = (0..<50).map { i in
-        DeveloperLogEntry(
-            id: UUID(),
-            timestamp: Date().addingTimeInterval(Double(-i * 60)),
-            severity: [.debug, .info, .warn, .error, .critical].randomElement()!,
-            source: ["Auth", "Marketplace", "SDK", "API"].randomElement()!,
-            eventType: ["Request", "Response", "Exception", "Validation"].randomElement()!,
-            message: "Developer activity log entry sample #\(i + 1)",
-            payload: "{\"request_id\": \"\(UUID().uuidString)\", \"latency\": \"45ms\"}"
-        )
-    }
-
-    var filteredLogs: [DeveloperLogEntry] {
-        logs.filter { log in
+    var filteredLogs: [SDKLogEntry] {
+        logStore.entries.filter { log in
             (searchText.isEmpty || log.message.localizedCaseInsensitiveContains(searchText) || log.source.localizedCaseInsensitiveContains(searchText)) &&
-            (severityFilter == nil || log.severity == severityFilter)
+            (severityFilter == nil || log.level == severityFilter)
         }
     }
 
@@ -28,12 +18,16 @@ struct DeveloperLogsView: View {
         VStack(spacing: 0) {
             logFilterBar
 
-            List {
-                ForEach(filteredLogs) { log in
-                    LogEntryRow(log: log)
+            if filteredLogs.isEmpty {
+                ContentUnavailableView("No Logs", systemImage: "list.bullet.rectangle", description: Text("No log entries match your filters."))
+            } else {
+                List {
+                    ForEach(filteredLogs) { log in
+                        LogEntryRow(log: log)
+                    }
                 }
+                .listStyle(.plain)
             }
-            .listStyle(.plain)
         }
         .navigationTitle("Developer Logs")
         .toolbar {
@@ -49,6 +43,13 @@ struct DeveloperLogsView: View {
                     } label: {
                         Image(systemName: isLive ? "pause.fill" : "play.fill")
                     }
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(role: .destructive) {
+                    logStore.clear()
+                } label: {
+                    Image(systemName: "trash")
                 }
             }
         }
@@ -70,8 +71,8 @@ struct DeveloperLogsView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
                     FilterChip(label: "ALL", isSelected: severityFilter == nil) { severityFilter = nil }
-                    ForEach(LogSeverity.allCases, id: \.self) { severity in
-                        FilterChip(label: severity.rawValue, isSelected: severityFilter == severity) { severityFilter = severity }
+                    ForEach(LogLevel.allCases, id: \.self) { level in
+                        FilterChip(label: level.rawValue.uppercased(), isSelected: severityFilter == level) { severityFilter = level }
                     }
                 }
             }
@@ -82,7 +83,7 @@ struct DeveloperLogsView: View {
 }
 
 struct LogEntryRow: View {
-    let log: DeveloperLogEntry
+    let log: SDKLogEntry
     @State private var isExpanded = false
 
     var body: some View {
@@ -92,14 +93,13 @@ struct LogEntryRow: View {
                     .font(.system(size: 10, design: .monospaced))
                     .foregroundStyle(.secondary)
 
-                Text(log.severity.rawValue)
+                Text(log.level.rawValue.uppercased())
                     .font(.system(size: 8, weight: .bold))
                     .padding(.horizontal, 4).padding(.vertical, 2)
-                    .background(log.severity.color.opacity(0.1), in: RoundedRectangle(cornerRadius: 4))
-                    .foregroundStyle(log.severity.color)
+                    .background(colorFor(log.level).opacity(0.1), in: RoundedRectangle(cornerRadius: 4))
+                    .foregroundStyle(colorFor(log.level))
 
                 Text(log.source).font(.system(size: 10, weight: .bold))
-                Text(log.eventType).font(.system(size: 10)).foregroundStyle(.secondary)
 
                 Spacer()
 
@@ -111,12 +111,17 @@ struct LogEntryRow: View {
             Text(log.message)
                 .font(.system(size: 12, design: .monospaced))
 
-            if isExpanded, let payload = log.payload {
-                Text(payload)
-                    .font(.system(size: 10, design: .monospaced))
-                    .padding(8)
-                    .background(Color.black.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Metadata")
+                        .font(.caption.bold())
+                    Text("No additional payload available.")
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                }
+                .padding(8)
+                .background(Color.black.opacity(0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
             }
         }
         .padding(.vertical, 8)
@@ -125,6 +130,16 @@ struct LogEntryRow: View {
             withAnimation(.snappy) {
                 isExpanded.toggle()
             }
+        }
+    }
+
+    private func colorFor(_ level: LogLevel) -> Color {
+        switch level {
+        case .debug: return .gray
+        case .info: return .blue
+        case .warn: return .orange
+        case .error: return .red
+        case .critical: return .purple
         }
     }
 }

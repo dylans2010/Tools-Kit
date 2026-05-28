@@ -2,18 +2,7 @@ import SwiftUI
 import Core
 
 struct DeveloperHomeView: View {
-    @State private var profile = DeveloperProfile(
-        displayName: "Jules Engineer",
-        username: "jules_dev",
-        bio: "Full-stack developer building Tools-Kit integrations.",
-        tier: .verified
-    )
-
-    @State private var recentActivity: [DeveloperLogEntry] = [
-        DeveloperLogEntry(id: UUID(), timestamp: Date(), severity: .info, source: "Marketplace", eventType: "App Status", message: "Connector 'GitHub Pro' is now Live."),
-        DeveloperLogEntry(id: UUID(), timestamp: Date().addingTimeInterval(-3600), severity: .warn, source: "Auth", eventType: "Token Expiry", message: "API Key 'Production_Sync' expires in 48 hours."),
-        DeveloperLogEntry(id: UUID(), timestamp: Date().addingTimeInterval(-7200), severity: .info, source: "Scope", eventType: "Approval", message: "Scope 'Write:User' granted for App 'Messenger'."),
-    ]
+    @ObservedObject var store = DeveloperPersistentStore.shared
 
     var body: some View {
         ScrollView {
@@ -24,7 +13,6 @@ struct DeveloperHomeView: View {
                 healthStatusPanel
                 recentActivityFeed
                 noticesSection
-                trendingSection
             }
             .padding()
         }
@@ -37,24 +25,33 @@ struct DeveloperHomeView: View {
         HStack(spacing: 16) {
             ZStack {
                 Circle().fill(Color.accentColor.opacity(0.1))
-                Image(systemName: "person.crop.circle.fill")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .foregroundStyle(Color.accentColor)
+                if let avatarUrl = store.profile.avatarUrl, let url = URL(string: avatarUrl) {
+                    AsyncImage(url: url) { image in
+                        image.resizable()
+                    } placeholder: {
+                        ProgressView()
+                    }
+                    .clipShape(Circle())
+                } else {
+                    Image(systemName: "person.crop.circle.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundStyle(Color.accentColor)
+                }
             }
             .frame(width: 64, height: 64)
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text(profile.displayName)
+                    Text(store.profile.displayName.isEmpty ? "Complete your Profile" : store.profile.displayName)
                         .font(.title3.bold())
-                    if profile.tier == .verified || profile.tier == .enterprise {
+                    if store.profile.tier == .verified || store.profile.tier == .enterprise {
                         Image(systemName: "checkmark.seal.fill")
                             .foregroundStyle(.blue)
                             .font(.caption)
                     }
                 }
-                Text("@\(profile.username) • \(profile.tier.rawValue) Developer")
+                Text(store.profile.username.isEmpty ? "Unset Username" : "@\(store.profile.username) • \(store.profile.tier.rawValue) Developer")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -67,10 +64,10 @@ struct DeveloperHomeView: View {
 
     private var summaryStrip: some View {
         HStack(spacing: 12) {
-            summaryCard(label: "Apps", value: "12", icon: "square.grid.2x2")
-            summaryCard(label: "Installs", value: "1.2k", icon: "arrow.down.circle")
-            summaryCard(label: "Scopes", value: "3", icon: "lock.shield")
-            summaryCard(label: "Tickets", value: "0", icon: "lifepreserver")
+            summaryCard(label: "Apps", value: "\(store.apps.count)", icon: "square.grid.2x2")
+            summaryCard(label: "Installs", value: "\(store.apps.reduce(0) { $0 + $1.installCount })", icon: "arrow.down.circle")
+            summaryCard(label: "API Keys", value: "\(store.keys.count)", icon: "key.fill")
+            summaryCard(label: "Support", value: "0", icon: "lifepreserver")
         }
     }
 
@@ -97,11 +94,11 @@ struct DeveloperHomeView: View {
                 .font(.headline)
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                NavigationLink(destination: MarketplaceSubmissionView()) {
-                    quickActionCard(title: "Submit App", icon: "plus.app", color: .blue)
+                NavigationLink(destination: AppBuilderView()) {
+                    quickActionCard(title: "App Builder", icon: "hammer.fill", color: .blue)
                 }
-                NavigationLink(destination: ScopeManagementView()) {
-                    quickActionCard(title: "Request Scope", icon: "key.fill", color: .orange)
+                NavigationLink(destination: AppManagementView()) {
+                    quickActionCard(title: "Manage Apps", icon: "square.stack.3d.up", color: .orange)
                 }
                 NavigationLink(destination: DeveloperLogsView()) {
                     quickActionCard(title: "View Logs", icon: "list.bullet.rectangle", color: .purple)
@@ -138,19 +135,29 @@ struct DeveloperHomeView: View {
 
     private var healthStatusPanel: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("App Health & Status")
+            Text("Your Projects")
                 .font(.headline)
 
-            VStack(spacing: 1) {
-                appStatusRow(name: "GitHub Pro", type: "Connector", status: .live)
-                appStatusRow(name: "Mail AI Bot", type: "Plugin", status: .underReview)
-                appStatusRow(name: "Legacy Sync", type: "Service", status: .deprecated)
+            if store.apps.isEmpty {
+                Text("No projects yet. Start by building or submitting an app.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            } else {
+                VStack(spacing: 1) {
+                    ForEach(store.apps.prefix(3)) { app in
+                        appStatusRow(name: app.name, type: app.type.rawValue, status: app.status)
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.primary.opacity(0.05), lineWidth: 1)
+                )
             }
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.primary.opacity(0.05), lineWidth: 1)
-            )
         }
     }
 
@@ -179,17 +186,16 @@ struct DeveloperHomeView: View {
                 .font(.headline)
 
             VStack(alignment: .leading, spacing: 16) {
-                ForEach(recentActivity) { log in
-                    HStack(alignment: .top, spacing: 12) {
-                        Circle().fill(log.severity.color).frame(width: 8, height: 8).padding(.top, 5)
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text(log.eventType).font(.caption.bold())
-                                Spacer()
-                                Text(log.timestamp.formatted(.dateTime.hour().minute())).font(.caption2).foregroundStyle(.tertiary)
-                            }
-                            Text(log.message).font(.caption).foregroundStyle(.secondary)
-                        }
+                if store.keys.isEmpty && store.apps.isEmpty {
+                    Text("No recent activity recorded.").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    // In a real app, this would be fetched from a log service.
+                    // Here we show some contextual activity based on store state.
+                    if let lastKey = store.keys.last {
+                        activityRow(title: "Key Generated", detail: "API Key '\(lastKey.name)' was created.", date: lastKey.createdAt, color: .blue)
+                    }
+                    if let lastApp = store.apps.last {
+                        activityRow(title: "App Created", detail: "Project '\(lastApp.name)' was added.", date: lastApp.createdAt, color: .green)
                     }
                 }
             }
@@ -199,46 +205,36 @@ struct DeveloperHomeView: View {
         }
     }
 
+    private func activityRow(title: String, detail: String, date: Date, color: Color) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Circle().fill(color).frame(width: 8, height: 8).padding(.top, 5)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(title).font(.caption.bold())
+                    Spacer()
+                    Text(date.formatted(.dateTime.hour().minute())).font(.caption2).foregroundStyle(.tertiary)
+                }
+                Text(detail).font(.caption).foregroundStyle(.secondary)
+            }
+        }
+    }
+
     private var noticesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Notices & Alerts")
-                .font(.headline)
-
-            HStack(spacing: 12) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.orange)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Identity Verification Required").font(.subheadline.weight(.semibold))
-                    Text("Complete verification to unlock High-risk scopes.").font(.caption).foregroundStyle(.secondary)
+            if store.profile.displayName.isEmpty {
+                HStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Profile Incomplete").font(.subheadline.weight(.semibold))
+                        Text("Finish setting up your profile to enable all features.").font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer()
                 }
-                Spacer()
+                .padding()
+                .background(Color.orange.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .padding()
-            .background(Color.orange.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-    }
-
-    private var trendingSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Trending in Developer Tools")
-                .font(.headline)
-
-            VStack(alignment: .leading, spacing: 12) {
-                trendItem(title: "SDK v2.4 Release Notes", subtitle: "New Metal-accelerated UI primitives.")
-                Divider()
-                trendItem(title: "Security Best Practices", subtitle: "Managing OAuth tokens in shared environments.")
-            }
-            .padding()
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-    }
-
-    private func trendItem(title: String, subtitle: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title).font(.subheadline.weight(.medium))
-            Text(subtitle).font(.caption).foregroundStyle(.secondary)
         }
     }
 }

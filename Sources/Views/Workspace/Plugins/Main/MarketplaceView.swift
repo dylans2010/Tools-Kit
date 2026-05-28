@@ -22,6 +22,7 @@ struct MarketplaceView: View {
     @State private var showingReportSheet = false
     @State private var reportTargetPlugin: SDKPlugin?
     @State private var showingComparisonSheet = false
+    @State private var showingInstaller = false
     @State private var comparisonPlugins: [SDKPlugin] = []
     @State private var viewMode: MarketplaceViewMode = .list
     @State private var showFeaturedBanner = true
@@ -181,6 +182,10 @@ struct MarketplaceView: View {
                     Button { showingComparisonSheet = true } label: {
                         Label("Compare Plugins", systemImage: "rectangle.on.rectangle.angled")
                     }
+                    Divider()
+                    Button { showingInstaller = true } label: {
+                        Label("Install .tkproj", systemImage: "plus.app")
+                    }
                 } label: {
                     Image(systemName: "ellipsis.circle")
                 }
@@ -227,6 +232,10 @@ struct MarketplaceView: View {
             }
             .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showingInstaller) {
+            ProjectInstallerView()
+                .presentationDetents([.medium])
         }
     }
 
