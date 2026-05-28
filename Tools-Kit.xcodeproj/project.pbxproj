@@ -12295,12 +12295,6 @@
 			path = ZombieSiege;
 			sourceTree = "<group>";
 		};
-			isa = PBXGroup;
-			children = (
-			);
-			path = Developer;
-			sourceTree = "<group>";
-		};
 		DA0000000000000000000001 /* Developer */ = {
 			isa = PBXGroup;
 			children = (
