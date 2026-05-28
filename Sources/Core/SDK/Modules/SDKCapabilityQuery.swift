@@ -16,7 +16,7 @@ public final class SDKCapabilityQuery {
 
     public func activeCapabilities() -> Set<SDKModuleCapability> {
         let active = SDKModuleRegistry.shared.modules.filter { $0.isEnabled }
-        return Set(active.flatMap(\.capabilities))
+        return Set(active.flatMap { $0.capabilities })
     }
 
     public func capabilityMap() -> [SDKModuleCapability: [String]] {

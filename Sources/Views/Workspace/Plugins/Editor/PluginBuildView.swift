@@ -1461,15 +1461,21 @@ struct PluginDocumentationView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("Plugin Development Guide").font(.title.bold())
-                    DocSection(title: "Overview", text: "Plugins are event-driven modules that react to workspace activity. Start by defining an immutable identifier 'com.toolskit.<name>' and selecting relevant capabilities.")
-                    DocSection(title: "Capabilities", text: "Capabilities define what system services your plugin can access. High-risk scopes require an API Key and Privacy Note justification.")
+                    DocSection(title: "Overview", pages: [
+                        DocPage(id: UUID(), title: "Overview", content: "Plugins are event-driven modules that react to workspace activity. Start by defining an immutable identifier 'com.toolskit.<name>' and selecting relevant capabilities.", lastModified: Date(), version: "1.0.0", isDraft: false)
+                    ])
+                    DocSection(title: "Capabilities", pages: [
+                        DocPage(id: UUID(), title: "Capabilities", content: "Capabilities define what system services your plugin can access. High-risk scopes require an API Key and Privacy Note justification.", lastModified: Date(), version: "1.0.0", isDraft: false)
+                    ])
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Execution Logic").font(.headline)
                         Text("Plugins execute JavaScript code in a secure sandbox:").foregroundStyle(.secondary)
                         Text("await ctx.ai.summarize(text)\nawait ctx.notes.updateNote(id, content)")
                             .font(.system(.caption, design: .monospaced)).padding().background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
                     }
-                    DocSection(title: "Debugging", text: "Use the Test Console to simulate events and view execution logs. The Dev Console provides real-time error tracking.")
+                    DocSection(title: "Debugging", pages: [
+                        DocPage(id: UUID(), title: "Debugging", content: "Use the Test Console to simulate events and view execution logs. The Dev Console provides real-time error tracking.", lastModified: Date(), version: "1.0.0", isDraft: false)
+                    ])
                 }
                 .padding()
             }

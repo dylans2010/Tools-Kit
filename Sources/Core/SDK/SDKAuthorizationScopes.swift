@@ -11,11 +11,9 @@ public extension SDKModuleCapability {
     var requiredScopes: [String] {
         switch self {
         case .storage:
-            return ["workspace.files.read"]
+            return ["workspace.files.read", "workspace.files.write"]
         case .networking:
             return ["external.api.unrestricted"]
-        case .storage:
-            return ["workspace.files.write"]
         case .rendering:
             return ["workspace.files.read"]
         case .automation:

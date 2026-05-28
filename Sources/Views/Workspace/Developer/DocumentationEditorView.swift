@@ -157,8 +157,17 @@ struct DocumentationEditorView: View {
     }
 }
 
-struct DocSection: Identifiable, Codable {
+struct DocSection: Identifiable, Codable, View {
     var id = UUID()
     var title: String
     var pages: [DocPage]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).font(.headline)
+            ForEach(pages) { page in
+                Text(page.content).foregroundStyle(.secondary)
+            }
+        }
+    }
 }
