@@ -32,14 +32,14 @@ struct SDKCacheInspectorView: View {
     }
 
     private var statsSection: some View {
-        Section("Cache Statistics") {
+        Section(header: Text("Cache Statistics")) {
             LabeledContent("Entries", value: "\(cacheManager.entryCount)")
             LabeledContent("Total Size", value: ByteCountFormatter.string(fromByteCount: Int64(cacheManager.totalSizeBytes), countStyle: .memory))
         }
     }
 
     private var performanceSection: some View {
-        Section("Performance") {
+        Section(header: Text("Performance")) {
             LabeledContent("Hits", value: "\(cacheManager.hitCount)")
             LabeledContent("Misses", value: "\(cacheManager.missCount)")
             LabeledContent("Hit Rate", value: String(format: "%.1f%%", cacheManager.hitRate * 100))
@@ -62,7 +62,7 @@ struct SDKCacheInspectorView: View {
     }
 
     private var entriesSection: some View {
-        Section("Entries (\(filteredEntries.count))") {
+        Section(header: Text("Entries (\(filteredEntries.count))")) {
             if filteredEntries.isEmpty {
                 ContentUnavailableView(
                     "No Cache Entries",
@@ -116,7 +116,7 @@ struct SDKCacheInspectorView: View {
     }
 
     private var actionsSection: some View {
-        Section("Actions") {
+        Section(header: Text("Actions")) {
             Button {
                 showingClearConfirmation = true
             } label: {

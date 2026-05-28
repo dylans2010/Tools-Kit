@@ -19,14 +19,14 @@ struct SDKPipelineOptimizerView: View {
 
     var body: some View {
         List {
-            Section("Performance Tuning") {
+            Section(header: Text("Performance Tuning")) {
                 VStack(alignment: .leading) {
                     Text("Optimization Aggression: \(Int(optimizationLevel * 100))%")
                     Slider(value: $optimizationLevel)
                 }
             }
 
-            Section("Optimization Directives") {
+            Section(header: Text("Optimization Directives")) {
                 ForEach(availableDirectives, id: \.self) { directive in
                     Toggle(directive, isOn: Binding(
                         get: { selectedDirectives.contains(directive) },
@@ -48,7 +48,7 @@ struct SDKPipelineOptimizerView: View {
                 .disabled(selectedDirectives.isEmpty || projectManager.currentProject == nil)
             }
 
-            Section("Active Pipeline") {
+            Section(header: Text("Active Pipeline")) {
                 if let project = projectManager.currentProject {
                     LabeledContent("Project", value: project.name)
                     LabeledContent("Directives", value: "\(selectedDirectives.count) active")

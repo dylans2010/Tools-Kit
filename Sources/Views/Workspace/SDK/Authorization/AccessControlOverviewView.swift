@@ -10,12 +10,12 @@ struct AccessControlOverviewView: View {
 
     var body: some View {
         List {
-            Section("Auth State") {
+            Section(header: Text("Auth State")) {
                 LabeledContent("State", value: authorizationManager.authState.rawValue)
                 LabeledContent("Active Scopes", value: "\(authorizationManager.currentScopes().count)")
             }
 
-            Section("Modules") {
+            Section(header: Text("Modules")) {
                 let modules = moduleRegistry.modules.filter { searchText.isEmpty || $0.identifier.localizedCaseInsensitiveContains(searchText) || $0.displayName.localizedCaseInsensitiveContains(searchText) }
                 if modules.isEmpty {
                     Text("No modules")
@@ -27,7 +27,7 @@ struct AccessControlOverviewView: View {
                 }
             }
 
-            Section("Plugins") {
+            Section(header: Text("Plugins")) {
                 let plugins = pluginManager.plugins.filter { searchText.isEmpty || $0.name.localizedCaseInsensitiveContains(searchText) }
                 if plugins.isEmpty {
                     Text("No plugins")
@@ -39,7 +39,7 @@ struct AccessControlOverviewView: View {
                 }
             }
 
-            Section("Connectors") {
+            Section(header: Text("Connectors")) {
                 let connectors = connectorManager.connectors.filter { searchText.isEmpty || $0.name.localizedCaseInsensitiveContains(searchText) }
                 if connectors.isEmpty {
                     Text("No connectors")

@@ -17,14 +17,14 @@ struct URLParserDevToolView: View {
 
     var body: some View {
         Form {
-            Section("Input URL") {
+            Section(header: Text("Input URL")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 80)
                     .font(.system(.caption, design: .monospaced))
             }
 
             if !viewModel.components.isEmpty {
-                Section("Components") {
+                Section(header: Text("Components")) {
                     ForEach(viewModel.components) { component in
                         HStack {
                             Text(component.key)

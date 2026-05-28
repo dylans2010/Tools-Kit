@@ -17,7 +17,7 @@ struct SDKResourceAuditView: View {
 
     var body: some View {
         List {
-            Section("Current Resource Utilization") {
+            Section(header: Text("Current Resource Utilization")) {
                 let metrics = telemetry.getMetrics()
                 HStack(spacing: 20) {
                     ResourceGauge(label: "Avg Latency", value: min(1.0, metrics.averageDurationMs / 1000), color: .blue, systemImage: "timer", unit: "ms", displayVal: "\(Int(metrics.averageDurationMs))")
@@ -26,7 +26,7 @@ struct SDKResourceAuditView: View {
                 .padding(.vertical)
             }
 
-            Section("Project Allocation Audit") {
+            Section(header: Text("Project Allocation Audit")) {
                 if let project = projectManager.currentProject {
                     LabeledContent("Active Project", value: project.name)
                     LabeledContent("Scopes Enabled", value: "\(project.enabledScopes.count)")
@@ -38,7 +38,7 @@ struct SDKResourceAuditView: View {
                 }
             }
 
-            Section("System Metrics (ProcessInfo)") {
+            Section(header: Text("System Metrics (ProcessInfo)")) {
                 LabeledContent("Physical Memory", value: "\(ProcessInfo.processInfo.physicalMemory / (1024 * 1024 * 1024)) GB")
                 LabeledContent("Processor Count", value: "\(ProcessInfo.processInfo.processorCount)")
                 LabeledContent("System Uptime", value: "\(Int(ProcessInfo.processInfo.systemUptime / 3600)) hours")

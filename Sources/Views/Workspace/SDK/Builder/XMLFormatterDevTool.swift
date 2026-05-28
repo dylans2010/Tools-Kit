@@ -17,13 +17,13 @@ struct XMLFormatterDevToolView: View {
 
     var body: some View {
         Form {
-            Section("Input XML") {
+            Section(header: Text("Input XML")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 150)
                     .font(.system(.caption, design: .monospaced))
             }
 
-            Section("Output") {
+            Section(header: Text("Output")) {
                 ScrollView {
                     Text(viewModel.output)
                         .font(.system(.caption2, design: .monospaced))

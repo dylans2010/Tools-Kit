@@ -36,7 +36,7 @@ struct SDKModuleInspectorView: View {
 
     var body: some View {
         List {
-            Section("Registered Modules") {
+            Section(header: Text("Registered Modules")) {
                 ForEach(registry.modules) { module in
                     HStack {
                         VStack(alignment: .leading) {
@@ -69,11 +69,11 @@ struct ModuleDetailView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("General") {
+                Section(header: Text("General")) {
                     LabeledContent("Version", value: module.version)
                 }
 
-                Section("Capabilities") {
+                Section(header: Text("Capabilities")) {
                     ForEach(module.capabilities, id: \.self) { cap in
                         Label(cap, systemImage: "checkmark.circle.fill")
                     }

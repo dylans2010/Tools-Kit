@@ -125,14 +125,14 @@ struct SDKDiagnosticsView: View {
 
     private func diagnosticExportSheet(_ snapshot: DiagnosticsSnapshot) -> some View {
         Form {
-            Section("Report Summary") {
+            Section(header: Text("Report Summary")) {
                 LabeledContent("Health Status", value: "\(snapshot.healthRows.filter { $0.indicator.tint == .green }.count)/\(snapshot.healthRows.count) healthy")
                 LabeledContent("Success Rate", value: snapshot.successRateText)
                 LabeledContent("Connectors", value: "\(snapshot.connectorRows.count)")
                 LabeledContent("Plugins", value: "\(snapshot.pluginRows.count)")
                 LabeledContent("Alerts", value: "\(diagnosticAlerts.count)")
             }
-            Section("Telemetry") {
+            Section(header: Text("Telemetry")) {
                 LabeledContent("Total Traces", value: "\(snapshot.telemetryMetrics.totalTraces)")
                 LabeledContent("Avg Latency", value: "\(Int(snapshot.telemetryMetrics.averageDurationMs))ms")
                 LabeledContent("Successes", value: "\(snapshot.telemetryMetrics.successCount)")
@@ -154,7 +154,7 @@ struct SDKDiagnosticsView: View {
 
     private var dependencyGraphSheet: some View {
         List {
-            Section("Connector Dependencies") {
+            Section(header: Text("Connector Dependencies")) {
                 ForEach(connectorManager.connectors, id: \.id) { connector in
                     HStack {
                         Image(systemName: "link").foregroundStyle(connector.isConnected ? .green : .secondary)
@@ -165,7 +165,7 @@ struct SDKDiagnosticsView: View {
                     }
                 }
             }
-            Section("Plugin Dependencies") {
+            Section(header: Text("Plugin Dependencies")) {
                 ForEach(pluginManager.plugins, id: \.id) { plugin in
                     HStack {
                         Image(systemName: "puzzlepiece").foregroundStyle(plugin.isEnabled ? .blue : .secondary)
@@ -183,7 +183,7 @@ struct SDKDiagnosticsView: View {
 
     private var resourceMonitorSheet: some View {
         List {
-            Section("System Resources") {
+            Section(header: Text("System Resources")) {
                 LabeledContent("Physical Memory", value: "\(ProcessInfo.processInfo.physicalMemory / 1024 / 1024 / 1024) GB")
                 LabeledContent("Active Processors", value: "\(ProcessInfo.processInfo.activeProcessorCount)")
                 LabeledContent("System Uptime") {
@@ -195,7 +195,7 @@ struct SDKDiagnosticsView: View {
                     Text(thermalLabel(state)).foregroundStyle(thermalColor(state))
                 }
             }
-            Section("Log Statistics") {
+            Section(header: Text("Log Statistics")) {
                 LabeledContent("Total Entries", value: "\(logStore.entries.count)")
                 LabeledContent("Errors", value: "\(logStore.entries.filter { $0.level == .error }.count)")
                 LabeledContent("Warnings", value: "\(logStore.entries.filter { $0.level == .warning }.count)")

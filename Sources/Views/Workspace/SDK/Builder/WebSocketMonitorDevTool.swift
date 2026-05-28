@@ -19,7 +19,7 @@ struct WebSocketMonitorView: View {
 
     var body: some View {
         Form {
-            Section("Connection") {
+            Section(header: Text("Connection")) {
                 HStack {
                     TextField("wss://echo.websocket.org", text: $viewModel.url)
                         .autocorrectionDisabled()
@@ -53,7 +53,7 @@ struct WebSocketMonitorView: View {
             }
 
             if viewModel.isConnected {
-                Section("Send Message") {
+                Section(header: Text("Send Message")) {
                     HStack {
                         TextField("Message content...", text: $messageToSend)
                         Button("Send") {

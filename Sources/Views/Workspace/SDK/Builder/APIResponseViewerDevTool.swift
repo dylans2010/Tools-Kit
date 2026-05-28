@@ -18,13 +18,13 @@ struct APIResponseViewerView: View {
 
     var body: some View {
         Form {
-            Section("Input Raw Data") {
+            Section(header: Text("Input Raw Data")) {
                 TextEditor(text: $viewModel.rawInput)
                     .frame(height: 150)
                     .font(.system(.caption, design: .monospaced))
             }
 
-            Section("Analysis & Formatting") {
+            Section(header: Text("Analysis & Formatting")) {
                 Picker("View Mode", selection: $viewMode) {
                     Text("Pretty").tag(APIViewMode.pretty)
                     Text("Raw").tag(APIViewMode.raw)
@@ -36,7 +36,7 @@ struct APIResponseViewerView: View {
                     .frame(minHeight: 250)
             }
 
-            Section("Metrics") {
+            Section(header: Text("Metrics")) {
                 LabeledContent("Data Size", value: viewModel.dataSize)
                 LabeledContent("Format Detected", value: viewModel.formatDetected)
             }

@@ -27,14 +27,14 @@ struct SDKTemplateGalleryView: View {
             }
 
             if !templateManager.favorites().isEmpty {
-                Section("Favorites") {
+                Section(header: Text("Favorites")) {
                     ForEach(templateManager.favorites()) { template in
                         templateRow(template)
                     }
                 }
             }
 
-            Section("All Templates (\(filteredTemplates.count))") {
+            Section(header: Text("All Templates (\(filteredTemplates.count))")) {
                 ForEach(filteredTemplates) { template in
                     templateRow(template)
                 }

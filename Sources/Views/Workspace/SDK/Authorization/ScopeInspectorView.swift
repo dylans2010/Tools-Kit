@@ -11,13 +11,13 @@ struct ScopeInspectorView: View {
 
     var body: some View {
         List {
-            Section("Overview") {
+            Section(header: Text("Overview")) {
                 LabeledContent("Active Scope Count", value: "\(authorizationManager.currentScopes().count)")
                 LabeledContent("Violations", value: "\(authorizationManager.securityViolations.count)")
                 Toggle("Show only blocked resources", isOn: $showOnlyBlocked)
             }
 
-            Section("Active Scopes") {
+            Section(header: Text("Active Scopes")) {
                 let activeScopes = authorizationManager.currentScopes()
                     .filter { query.isEmpty || $0.localizedCaseInsensitiveContains(query) }
                 if activeScopes.isEmpty {
@@ -31,12 +31,12 @@ struct ScopeInspectorView: View {
             }
 
             ForEach(authorizationManager.currentScopes().filter { query.isEmpty || $0.localizedCaseInsensitiveContains(query) }, id: \.self) { scope in
-                Section(scope) {
+                Section(header: Text(scope)) {
                     resourceRows(for: scope)
                 }
             }
 
-            Section("Recent Violations") {
+            Section(header: Text("Recent Violations")) {
                 if authorizationManager.securityViolations.isEmpty {
                     Text("No violations detected")
                         .foregroundStyle(.secondary)

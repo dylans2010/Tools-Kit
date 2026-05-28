@@ -99,8 +99,8 @@ struct EditEntryView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Key") { Text(entry.key) }
-                Section("Value") {
+                Section(header: Text("Key")) { Text(entry.key) }
+                Section(header: Text("Value")) {
                     TextEditor(text: $value)
                         .frame(height: 100)
                 }

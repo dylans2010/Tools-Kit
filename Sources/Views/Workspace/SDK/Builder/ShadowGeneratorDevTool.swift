@@ -17,7 +17,7 @@ struct ShadowGeneratorView: View {
 
     var body: some View {
         Form {
-            Section("Preview") {
+            Section(header: Text("Preview")) {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color(uiColor: .systemBackground))
                     .frame(width: 150, height: 100)
@@ -31,7 +31,7 @@ struct ShadowGeneratorView: View {
                     .frame(maxWidth: .infinity)
             }
 
-            Section("Parameters") {
+            Section(header: Text("Parameters")) {
                 Slider(value: $viewModel.radius, in: 0...50) { Text("Radius") }
                 Slider(value: $viewModel.offsetX, in: -50...50) { Text("X Offset") }
                 Slider(value: $viewModel.offsetY, in: -50...50) { Text("Y Offset") }
@@ -39,7 +39,7 @@ struct ShadowGeneratorView: View {
                 ColorPicker("Shadow Color", selection: $viewModel.shadowColor)
             }
 
-            Section("SwiftUI Code") {
+            Section(header: Text("SwiftUI Code")) {
                 Text(viewModel.codeSnippet)
                     .font(.system(.caption2, design: .monospaced))
                     .padding()

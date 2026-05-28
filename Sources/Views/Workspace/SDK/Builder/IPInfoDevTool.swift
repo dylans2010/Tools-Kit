@@ -17,7 +17,7 @@ struct IPInfoDevToolView: View {
 
     var body: some View {
         Form {
-            Section("Target IP") {
+            Section(header: Text("Target IP")) {
                 HStack {
                     TextField("8.8.8.8", text: $viewModel.ipAddress)
                         .autocorrectionDisabled()
@@ -33,14 +33,14 @@ struct IPInfoDevToolView: View {
             }
 
             if let info = viewModel.info {
-                Section("Geographical Data") {
+                Section(header: Text("Geographical Data")) {
                     LabeledContent("Country", value: info.country ?? "Unknown")
                     LabeledContent("Region", value: info.region ?? "Unknown")
                     LabeledContent("City", value: info.city ?? "Unknown")
                     LabeledContent("Coordinates", value: info.loc ?? "Unknown")
                 }
 
-                Section("Network Data") {
+                Section(header: Text("Network Data")) {
                     LabeledContent("Organization", value: info.org ?? "Unknown")
                     LabeledContent("Timezone", value: info.timezone ?? "Unknown")
                     LabeledContent("Postal Code", value: info.postal ?? "Unknown")

@@ -92,7 +92,7 @@ struct SDKDataInspectorView: View {
     // MARK: - Storage Overview
 
     private var storageOverviewSection: some View {
-        Section("Storage Overview") {
+        Section(header: Text("Storage Overview")) {
             LabeledContent("Initialization") {
                 Image(systemName: dataStore.isInitialized ? "checkmark.circle.fill" : "xmark.circle.fill")
                     .foregroundStyle(dataStore.isInitialized ? Color.green : Color.red)
@@ -121,7 +121,7 @@ struct SDKDataInspectorView: View {
     // MARK: - Storage Stats
 
     private var storageStatsSection: some View {
-        Section("Collection Stats") {
+        Section(header: Text("Collection Stats")) {
             let stats = dataStore.collectionStats()
             if stats.isEmpty {
                 Text("No collection data").font(.caption).foregroundStyle(.secondary)
@@ -152,7 +152,7 @@ struct SDKDataInspectorView: View {
     // MARK: - Collections Section
 
     private var collectionsSection: some View {
-        Section("Collections") {
+        Section(header: Text("Collections")) {
             let stats = dataStore.collectionStats()
             if stats.isEmpty {
                 Text("No collections found").font(.caption).foregroundStyle(.secondary)
@@ -196,7 +196,7 @@ struct SDKDataInspectorView: View {
     // MARK: - Collection Items
 
     private var collectionItemsSection: some View {
-        Section(selectedCollection ?? "") {
+        Section(header: Text(selectedCollection ?? "")) {
             if sortedFilteredItems.isEmpty {
                 ContentUnavailableView("No Records", systemImage: "doc.text.magnifyingglass", description: Text("No items found in this collection."))
             } else {
@@ -230,7 +230,7 @@ struct SDKDataInspectorView: View {
     // MARK: - Integrity Section
 
     private var integritySection: some View {
-        Section("Data Integrity") {
+        Section(header: Text("Data Integrity")) {
             HStack {
                 Image(systemName: dataIntegrityStatus.icon)
                     .foregroundStyle(dataIntegrityStatus.color)
@@ -249,7 +249,7 @@ struct SDKDataInspectorView: View {
     // MARK: - Query Section
 
     private var querySection: some View {
-        Section("Quick Query") {
+        Section(header: Text("Quick Query")) {
             TextField("Search all collections...", text: $customQuery)
                 .font(.caption.monospaced())
             Button("Search") {
@@ -267,7 +267,7 @@ struct SDKDataInspectorView: View {
     // MARK: - Actions
 
     private var actionsSection: some View {
-        Section("Actions") {
+        Section(header: Text("Actions")) {
             Button { showingExport = true } label: {
                 Label("Export All Data", systemImage: "square.and.arrow.up")
             }
@@ -281,13 +281,13 @@ struct SDKDataInspectorView: View {
 
     private var exportSheet: some View {
         Form {
-            Section("Export Summary") {
+            Section(header: Text("Export Summary")) {
                 LabeledContent("Collections", value: "\(dataStore.collectionStats().count)")
                 LabeledContent("Total Records", value: "\(dataStore.totalRecords)")
                 LabeledContent("Storage", value: formatBytes(storageUsageBytes))
             }
             if let selected = selectedCollection {
-                Section("Selected: \(selected)") {
+                Section(header: Text("Selected: \(selected)")) {
                     LabeledContent("Items", value: "\(inspectedItems.count)")
                 }
             }
@@ -309,7 +309,7 @@ struct SDKDataInspectorView: View {
         List {
             let stats = dataStore.collectionStats()
             ForEach(stats.sorted(by: { $0.key < $1.key }), id: \.key) { name, count in
-                Section(name) {
+                Section(header: Text(name)) {
                     LabeledContent("Records", value: "\(count)")
                     LabeledContent("Type", value: name)
                     LabeledContent("Estimated Size", value: formatBytes(count * 256))
@@ -322,7 +322,7 @@ struct SDKDataInspectorView: View {
 
     private var queryBuilderSheet: some View {
         Form {
-            Section("Query") {
+            Section(header: Text("Query")) {
                 Picker("Collection", selection: $selectedCollection) {
                     Text("All").tag(Optional<String>.none)
                     ForEach(dataStore.collectionStats().sorted(by: { $0.key < $1.key }), id: \.key) { name, _ in
@@ -344,7 +344,7 @@ struct SDKDataInspectorView: View {
                 .disabled(customQuery.isEmpty)
             }
             if !queryResults.isEmpty {
-                Section("Results (\(queryResults.count))") {
+                Section(header: Text("Results (\(queryResults.count))")) {
                     ForEach(queryResults) { item in
                         InspectedItemRow(item: item)
                     }
@@ -357,7 +357,7 @@ struct SDKDataInspectorView: View {
 
     private var importSheet: some View {
         Form {
-            Section("Import JSON") {
+            Section(header: Text("Import JSON")) {
                 TextEditor(text: $importJSON)
                     .font(.caption.monospaced())
                     .frame(minHeight: 150)
@@ -378,7 +378,7 @@ struct SDKDataInspectorView: View {
 
     private var integrityCheckSheet: some View {
         List {
-            Section("Results") {
+            Section(header: Text("Results")) {
                 HStack {
                     Image(systemName: dataIntegrityStatus.icon)
                         .font(.title2)
@@ -389,7 +389,7 @@ struct SDKDataInspectorView: View {
                     }
                 }
             }
-            Section("Details") {
+            Section(header: Text("Details")) {
                 LabeledContent("Collections Checked", value: "\(dataStore.collectionStats().count)")
                 LabeledContent("Records Validated", value: "\(dataStore.totalRecords)")
                 LabeledContent("Orphaned Records", value: "0")

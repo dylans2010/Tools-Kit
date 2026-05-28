@@ -17,13 +17,13 @@ struct NumberFormatterView: View {
 
     var body: some View {
         Form {
-            Section("Input Number") {
+            Section(header: Text("Input Number")) {
                 TextField("12345.67", text: $viewModel.input)
                     .keyboardType(.decimalPad)
                     .font(.system(.body, design: .monospaced))
             }
 
-            Section("Formatting Style") {
+            Section(header: Text("Formatting Style")) {
                 Picker("Style", selection: $viewModel.style) {
                     Text("Decimal").tag(NumberFormatter.Style.decimal)
                     Text("Currency").tag(NumberFormatter.Style.currency)
@@ -41,7 +41,7 @@ struct NumberFormatterView: View {
                 Toggle("Use Grouping Separator", isOn: $viewModel.useGrouping)
             }
 
-            Section("Formatted Output") {
+            Section(header: Text("Formatted Output")) {
                 Text(viewModel.formattedNumber)
                     .font(.title2.bold())
                     .textSelection(.enabled)
@@ -54,7 +54,7 @@ struct NumberFormatterView: View {
                 .buttonStyle(.bordered).controlSize(.small)
             }
 
-            Section("Base Conversions") {
+            Section(header: Text("Base Conversions")) {
                 if let intValue = Int(viewModel.input) {
                     LabeledContent("Binary", value: String(intValue, radix: 2))
                     LabeledContent("Octal", value: String(intValue, radix: 8))
@@ -66,7 +66,7 @@ struct NumberFormatterView: View {
                 }
             }
 
-            Section("Common Locales") {
+            Section(header: Text("Common Locales")) {
                 ForEach(viewModel.commonLocales, id: \.id) { locale in
                     HStack {
                         Text(locale.name)
@@ -79,7 +79,7 @@ struct NumberFormatterView: View {
                 }
             }
 
-            Section("Number Info") {
+            Section(header: Text("Number Info")) {
                 if let num = Double(viewModel.input) {
                     LabeledContent("Is Integer", value: num.truncatingRemainder(dividingBy: 1) == 0 ? "Yes" : "No")
                     LabeledContent("Is Negative", value: num < 0 ? "Yes" : "No")

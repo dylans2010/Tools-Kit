@@ -2068,6 +2068,29 @@
 		DA020000000000000000000F /* AppBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000000F /* AppBuilderView.swift */; };
 		DA0200000000000000000010 /* ProjectInstallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000010 /* ProjectInstallManager.swift */; };
 		DA0200000000000000000011 /* ProjectInstallerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000011 /* ProjectInstallerView.swift */; };
+		B604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift */; };
+		B5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift */; };
+		BEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift */; };
+		B7BE5B1DCB302A099B4D84B9 /* SDKEventSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BE5B1DCB302A099B4D84B9 /* SDKEventSystem.swift */; };
+		B8B0FA67DD2FD4432E4BE924 /* SDKExecutionBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B0FA67DD2FD4432E4BE924 /* SDKExecutionBridge.swift */; };
+		B60DC11F926823715114F20B /* SDKExecutionKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60DC11F926823715114F20B /* SDKExecutionKernel.swift */; };
+		BF76E4D4C0E57D36818BC550 /* SDKMutationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF76E4D4C0E57D36818BC550 /* SDKMutationEngine.swift */; };
+		B7829DE339D20D4884CD4803 /* SDKNoSandboxOverrideController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7829DE339D20D4884CD4803 /* SDKNoSandboxOverrideController.swift */; };
+		B8BFE41FC0CC8B0D854AF534 /* SDKPermissionGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BFE41FC0CC8B0D854AF534 /* SDKPermissionGate.swift */; };
+		BF5E789639B4550247684ED6 /* SDKPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5E789639B4550247684ED6 /* SDKPermissionManager.swift */; };
+		B3C9C0B5C4697BF1FF0C9E39 /* SDKRuntimeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3C9C0B5C4697BF1FF0C9E39 /* SDKRuntimeEngine.swift */; };
+		B6ACF19641DA31BFAB49F7F8 /* SDKSandboxController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6ACF19641DA31BFAB49F7F8 /* SDKSandboxController.swift */; };
+		BE9318A7734C38A02E76D027 /* SDKSandboxEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE9318A7734C38A02E76D027 /* SDKSandboxEngine.swift */; };
+		B668A9A7B29CCD52E240F1E4 /* SDKStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F668A9A7B29CCD52E240F1E4 /* SDKStateManager.swift */; };
+		B0C307F26C12E9137FA72745 /* SDKStateSynchronizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0C307F26C12E9137FA72745 /* SDKStateSynchronizer.swift */; };
+		B7261C571DAFE2F17B079F61 /* SDKSystemRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7261C571DAFE2F17B079F61 /* SDKSystemRouter.swift */; };
+		BB71CFBB75C01944C100C4FE /* SDKTelemetryEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB71CFBB75C01944C100C4FE /* SDKTelemetryEngine.swift */; };
+		B332C25E8ABA50E0DE9E18DE /* SDKWorkspaceBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F332C25E8ABA50E0DE9E18DE /* SDKWorkspaceBridge.swift */; };
+		B0B395BD51668AAEE73A6848 /* SDKWorkspaceGraphEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B395BD51668AAEE73A6848 /* SDKWorkspaceGraphEngine.swift */; };
+		B0DA9DA484F4B1324FD360C0 /* WorkspaceAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0DA9DA484F4B1324FD360C0 /* WorkspaceAPI.swift */; };
+		B48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift */; };
+		BBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift */; };
+		B4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -4116,6 +4139,29 @@
 		DA010000000000000000000F /* AppBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBuilderView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000010 /* ProjectInstallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectInstallManager.swift; sourceTree = "<group>"; };
 		DA0100000000000000000011 /* ProjectInstallerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectInstallerView.swift; sourceTree = "<group>"; };
+		F604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKActionDispatcher.swift; sourceTree = "<group>"; };
+		F5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDependencyResolver.swift; sourceTree = "<group>"; };
+		FEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKEventInjectionEngine.swift; sourceTree = "<group>"; };
+		F7BE5B1DCB302A099B4D84B9 /* SDKEventSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKEventSystem.swift; sourceTree = "<group>"; };
+		F8B0FA67DD2FD4432E4BE924 /* SDKExecutionBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKExecutionBridge.swift; sourceTree = "<group>"; };
+		F60DC11F926823715114F20B /* SDKExecutionKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKExecutionKernel.swift; sourceTree = "<group>"; };
+		FF76E4D4C0E57D36818BC550 /* SDKMutationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKMutationEngine.swift; sourceTree = "<group>"; };
+		F7829DE339D20D4884CD4803 /* SDKNoSandboxOverrideController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNoSandboxOverrideController.swift; sourceTree = "<group>"; };
+		F8BFE41FC0CC8B0D854AF534 /* SDKPermissionGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPermissionGate.swift; sourceTree = "<group>"; };
+		FF5E789639B4550247684ED6 /* SDKPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPermissionManager.swift; sourceTree = "<group>"; };
+		F3C9C0B5C4697BF1FF0C9E39 /* SDKRuntimeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKRuntimeEngine.swift; sourceTree = "<group>"; };
+		F6ACF19641DA31BFAB49F7F8 /* SDKSandboxController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKSandboxController.swift; sourceTree = "<group>"; };
+		FE9318A7734C38A02E76D027 /* SDKSandboxEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKSandboxEngine.swift; sourceTree = "<group>"; };
+		F668A9A7B29CCD52E240F1E4 /* SDKStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKStateManager.swift; sourceTree = "<group>"; };
+		F0C307F26C12E9137FA72745 /* SDKStateSynchronizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKStateSynchronizer.swift; sourceTree = "<group>"; };
+		F7261C571DAFE2F17B079F61 /* SDKSystemRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKSystemRouter.swift; sourceTree = "<group>"; };
+		FB71CFBB75C01944C100C4FE /* SDKTelemetryEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKTelemetryEngine.swift; sourceTree = "<group>"; };
+		F332C25E8ABA50E0DE9E18DE /* SDKWorkspaceBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKWorkspaceBridge.swift; sourceTree = "<group>"; };
+		F0B395BD51668AAEE73A6848 /* SDKWorkspaceGraphEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKWorkspaceGraphEngine.swift; sourceTree = "<group>"; };
+		F0DA9DA484F4B1324FD360C0 /* WorkspaceAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAPI.swift; sourceTree = "<group>"; };
+		F48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKCapabilityQuery.swift; sourceTree = "<group>"; };
+		FBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginSandbox.swift; sourceTree = "<group>"; };
+		F4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConflictResolver.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -7081,6 +7127,7 @@
 				3DA55F0F933FAA68626FF7D3 /* SDKNotificationDispatcher.swift */,
 				79E9EC74C78EF3E548EA53BD /* SDKMigrationManager.swift */,
 				EXP1G0000000000000000001 /* Modules */,
+				F4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift */,
 			);
 			path = SDK;
 			sourceTree = "<group>";
@@ -7171,6 +7218,26 @@
 		7CD45F7AF64649DBADB0741C /* Legacy */ = {
 			isa = PBXGroup;
 			children = (
+				F604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift */,
+				F5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift */,
+				FEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift */,
+				F7BE5B1DCB302A099B4D84B9 /* SDKEventSystem.swift */,
+				F8B0FA67DD2FD4432E4BE924 /* SDKExecutionBridge.swift */,
+				F60DC11F926823715114F20B /* SDKExecutionKernel.swift */,
+				FF76E4D4C0E57D36818BC550 /* SDKMutationEngine.swift */,
+				F7829DE339D20D4884CD4803 /* SDKNoSandboxOverrideController.swift */,
+				F8BFE41FC0CC8B0D854AF534 /* SDKPermissionGate.swift */,
+				FF5E789639B4550247684ED6 /* SDKPermissionManager.swift */,
+				F3C9C0B5C4697BF1FF0C9E39 /* SDKRuntimeEngine.swift */,
+				F6ACF19641DA31BFAB49F7F8 /* SDKSandboxController.swift */,
+				FE9318A7734C38A02E76D027 /* SDKSandboxEngine.swift */,
+				F668A9A7B29CCD52E240F1E4 /* SDKStateManager.swift */,
+				F0C307F26C12E9137FA72745 /* SDKStateSynchronizer.swift */,
+				F7261C571DAFE2F17B079F61 /* SDKSystemRouter.swift */,
+				FB71CFBB75C01944C100C4FE /* SDKTelemetryEngine.swift */,
+				F332C25E8ABA50E0DE9E18DE /* SDKWorkspaceBridge.swift */,
+				F0B395BD51668AAEE73A6848 /* SDKWorkspaceGraphEngine.swift */,
+				F0DA9DA484F4B1324FD360C0 /* WorkspaceAPI.swift */,
 			);
 			path = Legacy;
 			sourceTree = "<group>";
@@ -7774,6 +7841,7 @@
 				EXP100000000000000000001 /* SDKModuleRegistry.swift */,
 				EXP100000000000000000002 /* SDKDependencyGraph.swift */,
 				EXP100000000000000000003 /* SDKFeatureExposure.swift */,
+				F48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -7786,6 +7854,7 @@
 				7D3E7FC509497E5291566A29 /* SDKPluginProtocol.swift */,
 				14B7B365068269664F884E1A /* SDKPluginRegistry.swift */,
 				053415F80C21633DE63D27A4 /* AnalyticsPlugin.swift */,
+				FBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -14549,6 +14618,29 @@
 				DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */,
 				21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */,
 				NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */,
+				B604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift in Sources */,
+				B5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift in Sources */,
+				BEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift in Sources */,
+				B7BE5B1DCB302A099B4D84B9 /* SDKEventSystem.swift in Sources */,
+				B8B0FA67DD2FD4432E4BE924 /* SDKExecutionBridge.swift in Sources */,
+				B60DC11F926823715114F20B /* SDKExecutionKernel.swift in Sources */,
+				BF76E4D4C0E57D36818BC550 /* SDKMutationEngine.swift in Sources */,
+				B7829DE339D20D4884CD4803 /* SDKNoSandboxOverrideController.swift in Sources */,
+				B8BFE41FC0CC8B0D854AF534 /* SDKPermissionGate.swift in Sources */,
+				BF5E789639B4550247684ED6 /* SDKPermissionManager.swift in Sources */,
+				B3C9C0B5C4697BF1FF0C9E39 /* SDKRuntimeEngine.swift in Sources */,
+				B6ACF19641DA31BFAB49F7F8 /* SDKSandboxController.swift in Sources */,
+				BE9318A7734C38A02E76D027 /* SDKSandboxEngine.swift in Sources */,
+				B668A9A7B29CCD52E240F1E4 /* SDKStateManager.swift in Sources */,
+				B0C307F26C12E9137FA72745 /* SDKStateSynchronizer.swift in Sources */,
+				B7261C571DAFE2F17B079F61 /* SDKSystemRouter.swift in Sources */,
+				BB71CFBB75C01944C100C4FE /* SDKTelemetryEngine.swift in Sources */,
+				B332C25E8ABA50E0DE9E18DE /* SDKWorkspaceBridge.swift in Sources */,
+				B0B395BD51668AAEE73A6848 /* SDKWorkspaceGraphEngine.swift in Sources */,
+				B0DA9DA484F4B1324FD360C0 /* WorkspaceAPI.swift in Sources */,
+				B48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift in Sources */,
+				BBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift in Sources */,
+				B4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -17,13 +17,13 @@ struct YAMLParserView: View {
 
     var body: some View {
         Form {
-            Section("YAML Input") {
+            Section(header: Text("YAML Input")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 150)
                     .font(.system(.caption, design: .monospaced))
             }
 
-            Section("JSON Output") {
+            Section(header: Text("JSON Output")) {
                 ScrollView {
                     Text(viewModel.output)
                         .font(.system(.caption2, design: .monospaced))

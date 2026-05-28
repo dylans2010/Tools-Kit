@@ -18,7 +18,7 @@ struct SQLiteBrowserView: View {
 
     var body: some View {
         Form {
-            Section("Query Editor") {
+            Section(header: Text("Query Editor")) {
                 TextEditor(text: $query)
                     .frame(height: 100)
                     .font(.system(.caption, design: .monospaced))
@@ -29,7 +29,7 @@ struct SQLiteBrowserView: View {
             }
 
             if !viewModel.results.isEmpty {
-                Section("Results") {
+                Section(header: Text("Results")) {
                     ScrollView(.horizontal) {
                         VStack(alignment: .leading) {
                             ForEach(viewModel.results, id: \.self) { row in

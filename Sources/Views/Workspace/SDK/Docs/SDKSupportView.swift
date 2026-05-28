@@ -264,13 +264,13 @@ struct SDKSupportView: View {
     @ViewBuilder
     private func planDetailSheet(_ plan: GenerationPlan) -> some View {
         List {
-            Section("Overview") {
+            Section(header: Text("Overview")) {
                 LabeledContent("App Name", value: plan.appName)
                 Text(plan.description).font(.subheadline).foregroundStyle(.secondary)
                 LabeledContent("Complexity", value: plan.estimatedComplexity)
                 LabeledContent("Generated", value: plan.generatedAt.formatted(date: .abbreviated, time: .shortened))
             }
-            Section("Modules (\(plan.modules.count))") {
+            Section(header: Text("Modules (\(plan.modules.count))")) {
                 ForEach(plan.modules) { mod in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(mod.name).font(.subheadline.bold())
@@ -281,7 +281,7 @@ struct SDKSupportView: View {
                     .padding(.vertical, 2)
                 }
             }
-            Section("Connectors (\(plan.connectors.count))") {
+            Section(header: Text("Connectors (\(plan.connectors.count))")) {
                 ForEach(plan.connectors) { conn in
                     HStack {
                         VStack(alignment: .leading) {
@@ -293,7 +293,7 @@ struct SDKSupportView: View {
                     }
                 }
             }
-            Section("Plugins (\(plan.plugins.count))") {
+            Section(header: Text("Plugins (\(plan.plugins.count))")) {
                 ForEach(plan.plugins) { plugin in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(plugin.name).font(.subheadline.bold())
@@ -303,7 +303,7 @@ struct SDKSupportView: View {
                 }
             }
             if !plan.automationRules.isEmpty {
-                Section("Automation Rules") {
+                Section(header: Text("Automation Rules")) {
                     ForEach(plan.automationRules, id: \.self) { rule in
                         Text(rule).font(.caption)
                     }

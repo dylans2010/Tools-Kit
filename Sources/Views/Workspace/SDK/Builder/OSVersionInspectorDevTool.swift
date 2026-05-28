@@ -15,7 +15,7 @@ struct OSVersionInspectorDevTool: DevTool {
 struct OSVersionInspectorView: View {
     var body: some View {
         Form {
-            Section("Operating System") {
+            Section(header: Text("Operating System")) {
                 LabeledContent("Version", value: ProcessInfo.processInfo.operatingSystemVersionString)
                 LabeledContent("Major", value: "\(ProcessInfo.processInfo.operatingSystemVersion.majorVersion)")
                 LabeledContent("Minor", value: "\(ProcessInfo.processInfo.operatingSystemVersion.minorVersion)")

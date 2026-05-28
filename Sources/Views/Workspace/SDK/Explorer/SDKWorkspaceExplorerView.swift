@@ -76,7 +76,7 @@ struct SDKWorkspaceExplorerView: View {
 
     private var nodeListSection: some View {
         List {
-            Section("Entities (\(filteredNodes.count))") {
+            Section(header: Text("Entities (\(filteredNodes.count))")) {
                 ForEach(filteredNodes) { node in
                     Button {
                         selectedNode = node
@@ -97,7 +97,7 @@ struct SDKWorkspaceExplorerView: View {
                 }
             }
 
-            Section("Relationships (\(graph.edges.count))") {
+            Section(header: Text("Relationships (\(graph.edges.count))")) {
                 if graph.edges.isEmpty {
                     Text("No connections detected")
                         .font(.caption)

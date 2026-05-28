@@ -13,7 +13,7 @@ struct SDKCapabilitiesMatrixView: View {
 
     var body: some View {
         List {
-            Section("Runtime Status") {
+            Section(header: Text("Runtime Status")) {
                 LabeledContent("Active Features") {
                     Text("\(enabledCount) / \(SDKRuntimeWorkspaceState.capabilityCatalog.count)")
                         .font(.headline.monospaced())
@@ -21,7 +21,7 @@ struct SDKCapabilitiesMatrixView: View {
                 }
             }
 
-            Section("Capability Matrix") {
+            Section(header: Text("Capability Matrix")) {
                 ForEach(SDKRuntimeWorkspaceState.capabilityCatalog) { capability in
                     CapabilityRow(capability: capability,
                                  effectiveScopes: effectiveScopes,
@@ -32,7 +32,7 @@ struct SDKCapabilitiesMatrixView: View {
             }
 
             if !dependencyConflicts.isEmpty {
-                Section("Integrity Issues") {
+                Section(header: Text("Integrity Issues")) {
                     ForEach(dependencyConflicts, id: \.self) { message in
                         Label(message, systemImage: "exclamationmark.triangle")
                             .font(.caption)
@@ -128,7 +128,7 @@ private struct CapabilityDetail: View {
 
     var body: some View {
         List {
-            Section("About") {
+            Section(header: Text("About")) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(capability.description)
                         .font(.subheadline)
@@ -143,7 +143,7 @@ private struct CapabilityDetail: View {
                 .padding(.vertical, 4)
             }
 
-            Section("Required Scopes") {
+            Section(header: Text("Required Scopes")) {
                 ForEach(capability.requiredScopes, id: \.self) { scope in
                     LabeledContent {
                         Image(systemName: effectiveScopes.contains(scope) ? "checkmark.circle.fill" : "lock.fill")
@@ -154,7 +154,7 @@ private struct CapabilityDetail: View {
                 }
             }
 
-            Section("Runtime Usage") {
+            Section(header: Text("Runtime Usage")) {
                 LabeledContent("Active Dependencies", value: "\(state.dependencies.filter { $0.requiredScopes.contains { capability.requiredScopes.contains($0) } }.count)")
                 LabeledContent("Linked Libraries", value: "\(state.libraries.filter { $0.linkedScopes.contains { capability.requiredScopes.contains($0) } }.count)")
 

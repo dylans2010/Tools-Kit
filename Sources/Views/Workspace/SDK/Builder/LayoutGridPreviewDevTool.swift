@@ -37,13 +37,13 @@ struct LayoutGridPreviewView: View {
             .padding()
 
             Form {
-                Section("Grid Configuration") {
+                Section(header: Text("Grid Configuration")) {
                     Stepper("Columns: \(viewModel.columns)", value: $viewModel.columns, in: 1...12)
                     Slider(value: $viewModel.gutter, in: 0...40) { Text("Gutter") }
                     Slider(value: $viewModel.margin, in: 0...40) { Text("Margin") }
                 }
 
-                Section("SwiftUI Snippet") {
+                Section(header: Text("SwiftUI Snippet")) {
                     Text(viewModel.codeSnippet)
                         .font(.system(.caption2, design: .monospaced))
                         .padding()

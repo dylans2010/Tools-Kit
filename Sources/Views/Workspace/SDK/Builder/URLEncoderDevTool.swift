@@ -17,13 +17,13 @@ struct URLEncoderView: View {
 
     var body: some View {
         Form {
-            Section("Input") {
+            Section(header: Text("Input")) {
                 TextEditor(text: $viewModel.inputText)
                     .frame(height: 120)
                     .font(.system(.body, design: .monospaced))
             }
 
-            Section("Output") {
+            Section(header: Text("Output")) {
                 Text(viewModel.outputText)
                     .font(.system(.body, design: .monospaced))
                     .textSelection(.enabled)

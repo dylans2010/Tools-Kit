@@ -9,7 +9,7 @@ struct SDKDependencyManagerView: View {
 
     var body: some View {
         List {
-            Section("Execution Tree") {
+            Section(header: Text("Execution Tree")) {
                 if state.dependencies.isEmpty {
                     ContentUnavailableView("No Dependencies", systemImage: "point.3.connected.trianglepath.dotted", description: Text("Register nodes to build the execution graph."))
                 } else {
@@ -31,7 +31,7 @@ struct SDKDependencyManagerView: View {
                 }
             }
 
-            Section("Conflict Resolution") {
+            Section(header: Text("Conflict Resolution")) {
                 let conflicts = conflictResolver.conflicts(in: state.dependencies)
                 if conflicts.isEmpty {
                     Label("System Integrity Verified", systemImage: "checkmark.circle.fill").font(.caption).foregroundStyle(.green)

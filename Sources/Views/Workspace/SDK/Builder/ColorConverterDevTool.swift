@@ -17,7 +17,7 @@ struct ColorConverterView: View {
 
     var body: some View {
         Form {
-            Section("Color Selection") {
+            Section(header: Text("Color Selection")) {
                 ColorPicker("Choose Color", selection: $viewModel.selectedColor)
 
                 Rectangle()
@@ -30,7 +30,7 @@ struct ColorConverterView: View {
                     )
             }
 
-            Section("Hex Input") {
+            Section(header: Text("Hex Input")) {
                 HStack {
                     Text("#")
                         .font(.system(.body, design: .monospaced))
@@ -46,7 +46,7 @@ struct ColorConverterView: View {
                 }
             }
 
-            Section("Color Formats") {
+            Section(header: Text("Color Formats")) {
                 copyRow(label: "HEX", value: viewModel.hexValue)
                 copyRow(label: "RGB", value: viewModel.rgbValue)
                 copyRow(label: "HSL", value: viewModel.hslValue)
@@ -54,7 +54,7 @@ struct ColorConverterView: View {
                 copyRow(label: "HSB", value: viewModel.hsbValue)
             }
 
-            Section("RGB Sliders") {
+            Section(header: Text("RGB Sliders")) {
                 VStack(spacing: 8) {
                     HStack {
                         Text("R").font(.caption.bold()).foregroundStyle(.red).frame(width: 20)
@@ -82,7 +82,7 @@ struct ColorConverterView: View {
                 }
             }
 
-            Section("Code Snippets") {
+            Section(header: Text("Code Snippets")) {
                 VStack(alignment: .leading, spacing: 8) {
                     codeBlock(title: "SwiftUI", code: viewModel.swiftUISnippet)
                     codeBlock(title: "UIKit", code: viewModel.uiKitSnippet)
@@ -91,7 +91,7 @@ struct ColorConverterView: View {
                 }
             }
 
-            Section("Accessibility") {
+            Section(header: Text("Accessibility")) {
                 LabeledContent("Luminance", value: String(format: "%.3f", viewModel.luminance))
                 HStack {
                     Text("Contrast vs White")

@@ -24,7 +24,7 @@ struct BezierCurveVisualizerView: View {
                 .padding()
 
             Form {
-                Section("SwiftUI Code") {
+                Section(header: Text("SwiftUI Code")) {
                     Text(viewModel.codeSnippet)
                         .font(.system(.caption2, design: .monospaced))
                         .padding()

@@ -70,7 +70,7 @@ struct SDKAutomationView: View {
     // MARK: - Stats Section
 
     private var automationStatsSection: some View {
-        Section("Overview") {
+        Section(header: Text("Overview")) {
             HStack(spacing: 16) {
                 VStack(spacing: 2) {
                     Text("\(engine.rules.count)").font(.title3.bold()).foregroundStyle(.blue)
@@ -107,7 +107,7 @@ struct SDKAutomationView: View {
     // MARK: - Active Triggers Section
 
     private var activeTriggersSection: some View {
-        Section("Automation Rules") {
+        Section(header: Text("Automation Rules")) {
             if filteredRules.isEmpty {
                 ContentUnavailableView(
                     "No Automation Rules",
@@ -128,7 +128,7 @@ struct SDKAutomationView: View {
     // MARK: - Recent Runs
 
     private var recentRunsSection: some View {
-        Section("Recent Runs") {
+        Section(header: Text("Recent Runs")) {
             if runHistory.isEmpty {
                 Text("No runs recorded").font(.caption).foregroundStyle(.secondary)
             } else {
@@ -149,7 +149,7 @@ struct SDKAutomationView: View {
     // MARK: - Bulk Actions
 
     private var bulkActionsSection: some View {
-        Section("Bulk Actions") {
+        Section(header: Text("Bulk Actions")) {
             Button { executeAllEnabled() } label: {
                 Label("Run All Enabled Rules", systemImage: "play.fill")
             }
@@ -184,7 +184,7 @@ struct SDKAutomationView: View {
 
     private var exportRulesSheet: some View {
         Form {
-            Section("Export") {
+            Section(header: Text("Export")) {
                 LabeledContent("Rules", value: "\(engine.rules.count)")
                 LabeledContent("Enabled", value: "\(engine.rules.filter(\.isEnabled).count)")
             }
@@ -326,11 +326,11 @@ struct AddAutomationRuleView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Rule Identity") {
+                Section(header: Text("Rule Identity")) {
                     TextField("Name", text: $name)
                 }
 
-                Section("Trigger") {
+                Section(header: Text("Trigger")) {
                     Picker("Type", selection: $selectedTrigger) {
                         ForEach(TriggerType.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                     }

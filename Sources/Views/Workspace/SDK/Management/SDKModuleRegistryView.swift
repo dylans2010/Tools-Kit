@@ -156,13 +156,13 @@ struct SDKModuleRegistryView: View {
 
     private var addModuleSheet: some View {
         Form {
-            Section("Module Details") {
+            Section(header: Text("Module Details")) {
                 TextField("Identifier (e.g. com.app.module)", text: $newModIdentifier)
                     .font(.system(size: 13, design: .monospaced))
                 TextField("Display Name", text: $newModDisplayName)
                 TextField("Version", text: $newModVersion)
             }
-            Section("Capabilities") {
+            Section(header: Text("Capabilities")) {
                 ForEach(SDKModuleCapability.allCases, id: \.self) { cap in
                     Toggle(cap.rawValue, isOn: Binding(
                         get: { newModCapabilities.contains(cap) },
@@ -199,7 +199,7 @@ struct SDKModuleRegistryView: View {
     @ViewBuilder
     private func moduleDetailSheet(_ mod: SDKModuleDescriptor) -> some View {
         List {
-            Section("Details") {
+            Section(header: Text("Details")) {
                 LabeledContent("Identifier", value: mod.identifier)
                 LabeledContent("Display Name", value: mod.displayName)
                 LabeledContent("Version", value: "v\(mod.version)")
@@ -207,7 +207,7 @@ struct SDKModuleRegistryView: View {
                 LabeledContent("Priority", value: "\(mod.loadPriority)")
                 LabeledContent("Status", value: registry.activeModuleIDs.contains(mod.id) ? "Active" : "Inactive")
             }
-            Section("Capabilities") {
+            Section(header: Text("Capabilities")) {
                 ForEach(mod.capabilities.sorted(by: { $0.rawValue < $1.rawValue }), id: \.self) { cap in
                     Button { filterCapability = cap; selectedModule = nil } label: {
                         Label(cap.rawValue, systemImage: "cpu")
@@ -215,20 +215,20 @@ struct SDKModuleRegistryView: View {
                 }
             }
             if !mod.dependencies.isEmpty {
-                Section("Dependencies") {
+                Section(header: Text("Dependencies")) {
                     ForEach(mod.dependencies, id: \.self) { dep in
                         Text(dep).font(.caption.monospaced())
                     }
                 }
             }
             if !mod.exportedServices.isEmpty {
-                Section("Exported Services") {
+                Section(header: Text("Exported Services")) {
                     ForEach(mod.exportedServices, id: \.self) { svc in
                         Text(svc).font(.caption.monospaced())
                     }
                 }
             }
-            Section("Actions") {
+            Section(header: Text("Actions")) {
                 if registry.activeModuleIDs.contains(mod.id) {
                     Button("Deactivate") {
                         Task { await registry.deactivate(identifier: mod.identifier) }
@@ -262,12 +262,12 @@ struct SDKModuleRegistryView: View {
         let warnings = resolution.warnings
 
         return List {
-            Section("Resolution") {
+            Section(header: Text("Resolution")) {
                 LabeledContent("Clean", value: cleanText)
                 LabeledContent("Ordered Modules", value: countText)
             }
             if !conflicts.isEmpty {
-                Section("Conflicts") {
+                Section(header: Text("Conflicts")) {
                     ForEach(conflicts) { conflict in
                         Label {
                             VStack(alignment: .leading, spacing: 2) {
@@ -280,7 +280,7 @@ struct SDKModuleRegistryView: View {
                     }
                 }
             }
-            Section("Load Order") {
+            Section(header: Text("Load Order")) {
                 ForEach(Array(orderedModules.enumerated()), id: \.element.id) { index, mod in
                     HStack {
                         Text("\(index + 1)").font(.caption.monospaced()).foregroundStyle(.tertiary)
@@ -291,7 +291,7 @@ struct SDKModuleRegistryView: View {
                 }
             }
             if !warnings.isEmpty {
-                Section("Warnings") {
+                Section(header: Text("Warnings")) {
                     ForEach(warnings, id: \.self) { warning in
                         Text(warning).font(.caption).foregroundStyle(.orange)
                     }

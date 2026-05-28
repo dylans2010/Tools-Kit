@@ -12,7 +12,7 @@ public struct SDKPlugin: Identifiable, Codable, Hashable {
     public var automationHooks: [String]
 }
 
-public enum PluginPermission: String, Codable, CaseIterable {
+public enum PluginPermission: String, Codable, CaseIterable, Sendable {
     case readData, writeData, network, notifications, fileAccess
 
     public static var all: [PluginPermission] { allCases }

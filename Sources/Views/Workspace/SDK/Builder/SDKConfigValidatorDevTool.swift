@@ -36,7 +36,7 @@ struct SDKConfigValidatorView: View {
             lhs.key < rhs.key
         }
         List {
-            Section("Active Configurations") {
+            Section(header: Text("Active Configurations")) {
                 ForEach(sortedConfigurations) { entry in
                     HStack {
                         VStack(alignment: .leading) {
@@ -54,7 +54,7 @@ struct SDKConfigValidatorView: View {
                 }
             }
 
-            Section("Configuration Change Log") {
+            Section(header: Text("Configuration Change Log")) {
                 ForEach(config.changes.reversed(), id: \.self) { change in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(change.key).font(.caption.bold())

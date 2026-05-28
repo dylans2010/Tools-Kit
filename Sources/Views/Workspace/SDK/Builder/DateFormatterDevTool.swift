@@ -17,7 +17,7 @@ struct DateFormatterView: View {
 
     var body: some View {
         Form {
-            Section("Input Date") {
+            Section(header: Text("Input Date")) {
                 DatePicker("Select Date", selection: $viewModel.date)
                 HStack {
                     Button("Now") { viewModel.date = Date() }
@@ -28,7 +28,7 @@ struct DateFormatterView: View {
                 }
             }
 
-            Section("Epoch Converter") {
+            Section(header: Text("Epoch Converter")) {
                 HStack {
                     TextField("Unix timestamp", text: $viewModel.epochInput)
                         .keyboardType(.numberPad)
@@ -43,7 +43,7 @@ struct DateFormatterView: View {
                 }
             }
 
-            Section("Custom Format") {
+            Section(header: Text("Custom Format")) {
                 TextField("yyyy-MM-dd HH:mm:ss", text: $viewModel.formatString)
                     .font(.system(.caption, design: .monospaced))
                 Text(viewModel.customFormatted)
@@ -57,7 +57,7 @@ struct DateFormatterView: View {
                 .buttonStyle(.bordered).controlSize(.small)
             }
 
-            Section("Common Formats") {
+            Section(header: Text("Common Formats")) {
                 ForEach(viewModel.commonFormats, id: \.label) { item in
                     HStack {
                         Text(item.label)
@@ -78,7 +78,7 @@ struct DateFormatterView: View {
                 }
             }
 
-            Section("Timezone") {
+            Section(header: Text("Timezone")) {
                 Picker("Timezone", selection: $viewModel.selectedTimezone) {
                     ForEach(viewModel.timezones, id: \.self) { tz in
                         Text(tz).tag(tz)
@@ -88,7 +88,7 @@ struct DateFormatterView: View {
                     .font(.caption.monospaced())
             }
 
-            Section("Relative Time") {
+            Section(header: Text("Relative Time")) {
                 LabeledContent("Time Ago", value: viewModel.relativeTime)
                 LabeledContent("Days Since", value: "\(viewModel.daysSince)")
                 LabeledContent("Day of Year", value: "\(viewModel.dayOfYear)")

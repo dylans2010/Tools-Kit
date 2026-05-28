@@ -17,12 +17,12 @@ struct CacheViewerView: View {
 
     var body: some View {
         List {
-            Section("Cache Summary") {
+            Section(header: Text("Cache Summary")) {
                 LabeledContent("Total Cache Size", value: viewModel.totalCacheSize)
                 Button("Clear All Cache", role: .destructive) { viewModel.clearAll() }
             }
 
-            Section("Cache Buckets") {
+            Section(header: Text("Cache Buckets")) {
                 ForEach(viewModel.buckets) { bucket in
                     HStack {
                         VStack(alignment: .leading) {

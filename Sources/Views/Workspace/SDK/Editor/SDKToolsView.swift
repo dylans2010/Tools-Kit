@@ -9,14 +9,14 @@ struct SDKToolsView: View {
     var body: some View {
         List {
             ForEach(SDKToolCategory.allCases, id: \.self) { category in
-                Section(category.rawValue.capitalized) {
+                Section(header: Text(category.rawValue.capitalized)) {
                     ForEach(manager.tools(for: category)) { tool in
                         ToolRegistryRow(tool: tool) { selectedTool = tool }
                     }
                 }
             }
 
-            Section("Execution History") {
+            Section(header: Text("Execution History")) {
                 let history = SDKToolRuntime.shared.getHistory().prefix(10)
                 if history.isEmpty {
                     Text("No executions recorded").font(.caption).foregroundStyle(.secondary)
@@ -72,13 +72,13 @@ struct ToolRunner: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Input Parameters") {
+                Section(header: Text("Input Parameters")) {
                     ForEach(tool.inputSchema, id: \.key) { param in
                         TextField(param.key, text: binding(for: param.key), prompt: Text(param.required ? "Required" : "Optional"))
                     }
                 }
 
-                Section("Environment") {
+                Section(header: Text("Environment")) {
                     LabeledContent("Sandbox Mode") {
                         Text(runtime.isNoSandboxModeEnabled ? "Unrestricted" : "Sandboxed")
                             .foregroundStyle(runtime.isNoSandboxModeEnabled ? Color.red : Color.green).bold()
@@ -95,7 +95,7 @@ struct ToolRunner: View {
                 }
 
                 if let res = result {
-                    Section("Output") {
+                    Section(header: Text("Output")) {
                         if res.success {
                             ForEach(Array(res.output.keys.sorted()), id: \.self) { key in
                                 LabeledContent(key) { Text("\(String(describing: res.output[key] ?? ""))").font(.caption.monospaced()) }

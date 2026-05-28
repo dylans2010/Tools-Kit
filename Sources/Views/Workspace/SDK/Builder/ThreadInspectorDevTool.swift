@@ -17,7 +17,7 @@ struct ThreadInspectorView: View {
 
     var body: some View {
         List {
-            Section("Active Threads") {
+            Section(header: Text("Active Threads")) {
                 ForEach(viewModel.threads) { thread in
                     HStack {
                         VStack(alignment: .leading) {

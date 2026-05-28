@@ -538,7 +538,7 @@ struct PackageDependenciesView: View {
     }
 
     private var registrySelectionSection: some View {
-        Section("Registry Source") {
+        Section(header: Text("Registry Source")) {
             Picker("Registry", selection: $registry.activeRegistry) {
                 ForEach(RegistryType.allCases) { type in
                     Text(type.rawValue.capitalized).tag(type)
@@ -571,7 +571,7 @@ struct PackageDependenciesView: View {
     }
 
     private var overallHealthSection: some View {
-        Section("Overall Health") {
+        Section(header: Text("Overall Health")) {
             let order = manager.resolvedOrder()
             let graph = registry.buildDependencyGraph()
             let scores = order.map { DependencyHealthEngine.analyze(package: $0, graph: graph).score }
@@ -607,7 +607,7 @@ struct PackageDependenciesView: View {
     }
 
     private var cycleSection: some View {
-        Section("Dependency Health") {
+        Section(header: Text("Dependency Health")) {
             if let cycle = cycleWarning {
                 VStack(alignment: .leading, spacing: 4) {
                     Label("Circular Dependency Detected", systemImage: "exclamationmark.triangle.fill")
@@ -630,7 +630,7 @@ struct PackageDependenciesView: View {
     }
 
     private var filterSection: some View {
-        Section("Filters") {
+        Section(header: Text("Filters")) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     filterChip(title: "All Layers", layer: nil)
@@ -676,7 +676,7 @@ struct PackageDependenciesView: View {
     }
 
     private var bulkActionsSection: some View {
-        Section("Actions") {
+        Section(header: Text("Actions")) {
             Button {
                 showingVisualGraph = true
             } label: {
@@ -711,7 +711,7 @@ struct PackageDependenciesView: View {
     }
 
     private var packageListSection: some View {
-        Section("Installed Packages (\(filteredPackages.count))") {
+        Section(header: Text("Installed Packages (\(filteredPackages.count))")) {
             if filteredPackages.isEmpty {
                 ContentUnavailableView("No Packages", systemImage: "shippingbox", description: Text("Install a package to get started."))
             } else {
@@ -750,7 +750,7 @@ struct PackageDependenciesView: View {
     }
 
     private var graphSection: some View {
-        Section("Dependency Resolution Order") {
+        Section(header: Text("Dependency Resolution Order")) {
             let resolved = manager.resolvedOrder()
             if resolved.isEmpty {
                 Text("No Packages To Resolve").foregroundStyle(.secondary).font(.caption)
@@ -768,7 +768,7 @@ struct PackageDependenciesView: View {
     }
 
     private var integritySection: some View {
-        Section("Integrity Verification") {
+        Section(header: Text("Integrity Verification")) {
             let total = registry.packages.count
             let verified = registry.packages.filter { PackageIntegrityEngine.verify(package: $0) }.count
             let tampered = total - verified
@@ -783,7 +783,7 @@ struct PackageDependenciesView: View {
     }
 
     private var orphanSection: some View {
-        Section("Orphan Detection") {
+        Section(header: Text("Orphan Detection")) {
             let graph = registry.buildDependencyGraph()
             let orphans = graph.orphans()
             if orphans.isEmpty {
@@ -817,7 +817,7 @@ struct PackageInstallSheet: View {
 
     var body: some View {
         Form {
-            Section("Package Info") {
+            Section(header: Text("Package Info")) {
                 TextField("Name", text: $name)
                 TextField("Version (semver)", text: $version)
                 Picker("Layer", selection: $layer) {
@@ -966,13 +966,13 @@ struct PackageDetailSheet: View {
 
     var body: some View {
         List {
-            Section("Details") {
+            Section(header: Text("Details")) {
                 LabeledContent("Name", value: package.name)
                 LabeledContent("Version", value: package.version)
                 LabeledContent("Layer", value: package.layer.rawValue.capitalized)
                 LabeledContent("ID", value: String(package.id.uuidString.prefix(8)) + "...")
             }
-            Section("Exports") {
+            Section(header: Text("Exports")) {
                 if package.exports.isEmpty {
                     Text("No Exports").foregroundStyle(.secondary)
                 } else {
@@ -981,7 +981,7 @@ struct PackageDetailSheet: View {
                     }
                 }
             }
-            Section("Dependencies") {
+            Section(header: Text("Dependencies")) {
                 if package.dependencyIds.isEmpty {
                     Text("No Dependencies (Leaf Package)").foregroundStyle(.secondary)
                 } else {
@@ -992,7 +992,7 @@ struct PackageDetailSheet: View {
             }
             healthDetailSection(for: package)
 
-            Section("Package.swift Fragment") {
+            Section(header: Text("Package.swift Fragment")) {
                 Text(generateManifestFragment(for: package))
                     .font(.system(size: 8, design: .monospaced))
                     .padding(8)
@@ -1000,7 +1000,7 @@ struct PackageDetailSheet: View {
                     .cornerRadius(4)
             }
 
-            Section("Impact Analysis") {
+            Section(header: Text("Impact Analysis")) {
                 let impacts = manager.updateImpactAnalysis(packageId: package.id)
                 if impacts.isEmpty {
                     Text("No Downstream Impacts").font(.caption2).foregroundStyle(.secondary)
@@ -1011,7 +1011,7 @@ struct PackageDetailSheet: View {
                 }
             }
 
-            Section("Security Audit") {
+            Section(header: Text("Security Audit")) {
                 Button("Run Vulnerability Scan") { manager.simulateVulnerabilityScan() }
 
                 let findings = package.vulnerabilityHistory + manager.performSecurityScan(for: package.id)
@@ -1032,7 +1032,7 @@ struct PackageDetailSheet: View {
                 }
             }
 
-            Section("Integrity") {
+            Section(header: Text("Integrity")) {
                 LabeledContent("Hash", value: String(package.integrityHash.prefix(16)) + "...")
                 LabeledContent("Verified") {
                     Text(manager.verifyIntegrity(id: package.id) ? "Pass" : "Fail")
@@ -1058,7 +1058,7 @@ struct PackageDetailSheet: View {
 
     private func healthDetailSection(for package: PackageDescriptor) -> some View {
         let health = DependencyHealthEngine.analyze(package: package, graph: registry.buildDependencyGraph())
-        return Section("Dependency Health") {
+        return Section(header: Text("Dependency Health")) {
             LabeledContent("Score", value: "\(health.score)%")
 
             if !health.issues.isEmpty {

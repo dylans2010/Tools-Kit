@@ -6,14 +6,14 @@ struct SDKCapabilityMatrixView: View {
 
     var body: some View {
         List {
-            Section("Global Capability Overview") {
+            Section(header: Text("Global Capability Overview")) {
                 Text("This matrix shows all available SDK capabilities and their status across your current project.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
             if let project = projectManager.currentProject {
-                Section("Project: \(project.name)") {
+                Section(header: Text("Project: \(project.name)")) {
                     ForEach(SDKScope.allCases.filter {
                         searchText.isEmpty || $0.displayName.localizedCaseInsensitiveContains(searchText)
                     }) { scope in

@@ -271,7 +271,7 @@ private struct SimpleDevToolView: View {
 
     var body: some View {
         Form {
-            Section("Input") {
+            Section(header: Text("Input")) {
                 TextEditor(text: $input)
                     .font(.system(.body, design: .monospaced))
                     .frame(minHeight: 80)
@@ -300,7 +300,7 @@ private struct SimpleDevToolView: View {
             .listRowBackground(Color.clear)
 
             if !output.isEmpty {
-                Section("Output") {
+                Section(header: Text("Output")) {
                     Text(output)
                         .font(.system(.body, design: .monospaced))
                         .textSelection(.enabled)

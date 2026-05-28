@@ -581,7 +581,7 @@ struct LibraryManageView: View {
     }
 
     private var registrySnapshotSection: some View {
-        Section("Registry Snapshots") {
+        Section(header: Text("Registry Snapshots")) {
             Button { manager.createSnapshot() } label: {
                 Label("Create New Snapshot", systemImage: "camera.shutter.button")
             }
@@ -621,7 +621,7 @@ struct LibraryManageView: View {
     }
 
     private var resourceMonitorSection: some View {
-        Section("Simulation & Resources") {
+        Section(header: Text("Simulation & Resources")) {
             Toggle("Dry Run Mode", isOn: $manager.dryRunEnabled)
                 .font(.subheadline)
 
@@ -658,7 +658,7 @@ struct LibraryManageView: View {
     }
 
     private var templatesSection: some View {
-        Section("Invocation Templates") {
+        Section(header: Text("Invocation Templates")) {
             if manager.invocationTemplates.isEmpty {
                 Text("No templates defined").foregroundStyle(.secondary).font(.caption)
             } else {
@@ -683,7 +683,7 @@ struct LibraryManageView: View {
     }
 
     private var workflowsSection: some View {
-        Section("Composite Workflows") {
+        Section(header: Text("Composite Workflows")) {
             if manager.compositeWorkflows.isEmpty {
                 Text("No workflows created").foregroundStyle(.secondary).font(.caption)
             } else {
@@ -712,7 +712,7 @@ struct LibraryManageView: View {
     }
 
     private var filterSection: some View {
-        Section("Filters & Categories") {
+        Section(header: Text("Filters & Categories")) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     Menu {
@@ -749,7 +749,7 @@ struct LibraryManageView: View {
     }
 
     private var libraryListSection: some View {
-        Section("Installed Libraries (\(filteredLibraries.count))") {
+        Section(header: Text("Installed Libraries (\(filteredLibraries.count))")) {
             if filteredLibraries.isEmpty {
                 ContentUnavailableView("No Libraries", systemImage: "books.vertical", description: Text("Install a library to get started."))
             } else {
@@ -788,7 +788,7 @@ struct LibraryManageView: View {
     }
 
     private var usageIntelligenceSection: some View {
-        Section("Usage Intelligence") {
+        Section(header: Text("Usage Intelligence")) {
             let totalCalls = manager.invocationRecords.count
             let totalSuccess = manager.usageMetrics.values.map(\.successCount).reduce(0, +)
             let totalFailures = manager.usageMetrics.values.map(\.failureCount).reduce(0, +)
@@ -826,7 +826,7 @@ struct LibraryManageView: View {
 
     private var sortMenu: some View {
         Menu {
-            Section("Batch Flags") {
+            Section(header: Text("Batch Flags")) {
                 Button { copyBatchLinkerFlags() } label: { Label("Copy -l Flags", systemImage: "doc.on.doc") }
             }
             Picker("Sort By", selection: $sortOption) {
@@ -856,14 +856,14 @@ struct LibraryManageView: View {
     }
 
     private var pipelineStateSection: some View {
-        Section("Execution Pipeline") {
+        Section(header: Text("Execution Pipeline")) {
             LabeledContent("State", value: manager.invocationState.rawValue)
             LabeledContent("Total Invocations", value: "\(manager.invocationRecords.count)")
         }
     }
 
     private var conflictsSection: some View {
-        Section("Capability Conflicts") {
+        Section(header: Text("Capability Conflicts")) {
             let conflicts = manager.detectConflicts()
             if conflicts.isEmpty {
                 Text("No Conflicts Detected").foregroundStyle(.secondary).font(.caption)
@@ -900,7 +900,7 @@ struct LibraryManageView: View {
     }
 
     private var invocationHistorySection: some View {
-        Section("Invocation History") {
+        Section(header: Text("Invocation History")) {
             if manager.invocationRecords.isEmpty {
                 Text("No Invocations Yet").foregroundStyle(.secondary).font(.caption)
             } else {
@@ -955,7 +955,7 @@ struct TargetMigrationSheet: View {
 
     var body: some View {
         Form {
-            Section("Move \(selection.count) Libraries To:") {
+            Section(header: Text("Move \(selection.count) Libraries To:")) {
                 Picker("Destination", selection: $selectedTarget) {
                     Text("Select Target").tag("")
                     ForEach(targets, id: \.self) { Text($0).tag($0) }
@@ -1217,7 +1217,7 @@ struct LibraryInstallSheet: View {
 
     var body: some View {
         Form {
-            Section("Library Info") {
+            Section(header: Text("Library Info")) {
                 TextField("Name", text: $name)
                 TextField("Version (semver)", text: $version)
                 Picker("Channel", selection: $channel) {
@@ -1226,14 +1226,14 @@ struct LibraryInstallSheet: View {
                     }
                 }
             }
-            Section("Capabilities") {
+            Section(header: Text("Capabilities")) {
                 ForEach(LibraryCapability.allCases) { cap in
                     Toggle(isOn: Binding(get: { selectedCaps.contains(cap) }, set: { if $0 { selectedCaps.insert(cap) } else { selectedCaps.remove(cap) } })) {
                         Label(cap.displayName, systemImage: cap.icon).font(.caption)
                     }
                 }
             }
-            Section("Required Scopes") {
+            Section(header: Text("Required Scopes")) {
                 ForEach(SDKScope.allCases) { scope in
                     Toggle(scope.displayName, isOn: Binding(get: { selectedScopes.contains(scope) }, set: { if $0 { selectedScopes.insert(scope) } else { selectedScopes.remove(scope) } })).font(.caption)
                 }
@@ -1352,7 +1352,7 @@ struct LibraryDetailSheet: View {
 
     var body: some View {
         List {
-            Section("Details") {
+            Section(header: Text("Details")) {
                 LabeledContent("Name", value: library.name)
                 LabeledContent("Path", value: library.path)
                 LabeledContent("Type", value: library.type.rawValue.capitalized)
@@ -1360,21 +1360,21 @@ struct LibraryDetailSheet: View {
                 LabeledContent("ID", value: String(library.id.uuidString.prefix(8)) + "...")
             }
 
-            Section("Target Membership") {
+            Section(header: Text("Target Membership")) {
                 NavigationLink("Manage Targets (\(library.targetCount))") {
                     TargetMembershipView(library: library)
                 }
             }
 
-            Section("Linker Flags") {
+            Section(header: Text("Linker Flags")) {
                 LinkerFlagManager(library: library)
             }
-            Section("Resource Limits") {
+            Section(header: Text("Resource Limits")) {
                 ForEach(library.resourceLimits.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
                     LabeledContent(key, value: String(format: "%.2f", value))
                 }
             }
-            Section("Security & Analysis") {
+            Section(header: Text("Security & Analysis")) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Hardening Features").font(.caption.bold())
                     if library.hardeningFeatures.isEmpty {
@@ -1397,7 +1397,7 @@ struct LibraryDetailSheet: View {
                     .foregroundStyle(radius > 5 ? .red : .primary)
             }
 
-            Section("Capabilities") {
+            Section(header: Text("Capabilities")) {
                 if library.capabilities.isEmpty {
                     Text("No Capabilities").foregroundStyle(.secondary)
                 } else {
@@ -1407,7 +1407,7 @@ struct LibraryDetailSheet: View {
                 }
                 Button("Browse Symbols & Scan Hardening") { showSymbolBrowser = true }.font(.caption)
             }
-            Section("Scopes & Health") {
+            Section(header: Text("Scopes & Health")) {
                 ForEach(library.requiredScopes, id: \.rawValue) { scope in
                     Label(scope.displayName, systemImage: "lock").font(.caption)
                 }
@@ -1437,7 +1437,7 @@ struct LibraryDetailSheet: View {
                         .foregroundStyle(healthStatus.contains("Missing") ? .red : .green)
                 }
             }
-            Section("Usage Quota") {
+            Section(header: Text("Usage Quota")) {
                 let usage = manager.quotaUsage[library.id] ?? 0
                 let quota = manager.quotas[library.id] ?? 100
 
@@ -1454,14 +1454,14 @@ struct LibraryDetailSheet: View {
                 }
             }
 
-            Section("Constraints") {
+            Section(header: Text("Constraints")) {
                 if library.constraints.isEmpty {
                     Text("No Constraints").foregroundStyle(.secondary)
                 } else {
                     ForEach(library.constraints, id: \.self) { c in Text(c).font(.caption) }
                 }
             }
-            Section("Invoke") {
+            Section(header: Text("Invoke")) {
                 TextField("Capability", text: $invokeCapability)
                 TextField("Input (key=value,key=value)", text: $invokeInput)
                 Button("Invoke") {

@@ -17,7 +17,7 @@ struct JWTDecoderDevToolView: View {
 
     var body: some View {
         Form {
-            Section("Input JWT") {
+            Section(header: Text("Input JWT")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 100)
                     .font(.system(.caption2, design: .monospaced))
@@ -51,7 +51,7 @@ struct JWTDecoderDevToolView: View {
                     Text("Validation")
                 }
 
-                Section("Header") {
+                Section(header: Text("Header")) {
                     ScrollView {
                         Text(viewModel.header)
                             .font(.system(.caption2, design: .monospaced))
@@ -71,7 +71,7 @@ struct JWTDecoderDevToolView: View {
                     }
                 }
 
-                Section("Payload") {
+                Section(header: Text("Payload")) {
                     ScrollView {
                         Text(viewModel.payload)
                             .font(.system(.caption2, design: .monospaced))
@@ -84,7 +84,7 @@ struct JWTDecoderDevToolView: View {
                     .frame(height: 200)
                 }
 
-                Section("Claims Analysis") {
+                Section(header: Text("Claims Analysis")) {
                     if let sub = viewModel.subject {
                         LabeledContent("Subject (sub)", value: sub)
                     }
@@ -113,7 +113,7 @@ struct JWTDecoderDevToolView: View {
                     }
                 }
 
-                Section("Signature") {
+                Section(header: Text("Signature")) {
                     Text(viewModel.signature)
                         .font(.system(.caption2, design: .monospaced))
                         .foregroundStyle(.secondary)

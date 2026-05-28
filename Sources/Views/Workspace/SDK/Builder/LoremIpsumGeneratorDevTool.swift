@@ -17,7 +17,7 @@ struct LoremIpsumGeneratorView: View {
 
     var body: some View {
         Form {
-            Section("Configuration") {
+            Section(header: Text("Configuration")) {
                 Picker("Type", selection: $viewModel.generationType) {
                     Text("Paragraphs").tag(LoremType.paragraphs)
                     Text("Sentences").tag(LoremType.sentences)
@@ -43,7 +43,7 @@ struct LoremIpsumGeneratorView: View {
                 .buttonStyle(.borderedProminent)
             }
 
-            Section("Result") {
+            Section(header: Text("Result")) {
                 TextEditor(text: .constant(viewModel.output))
                     .frame(height: 200)
                     .font(.system(.body))
@@ -66,7 +66,7 @@ struct LoremIpsumGeneratorView: View {
                 }
             }
 
-            Section("Statistics") {
+            Section(header: Text("Statistics")) {
                 LabeledContent("Characters", value: "\(viewModel.output.count)")
                 LabeledContent("Words", value: "\(viewModel.output.split(separator: " ").count)")
                 LabeledContent("Paragraphs", value: "\(viewModel.output.components(separatedBy: "\n\n").count)")

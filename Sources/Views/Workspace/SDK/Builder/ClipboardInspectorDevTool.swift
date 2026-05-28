@@ -17,14 +17,14 @@ struct ClipboardInspectorView: View {
 
     var body: some View {
         List {
-            Section("Current Clipboard") {
+            Section(header: Text("Current Clipboard")) {
                 Text(viewModel.currentContent)
                     .font(.subheadline)
                     .foregroundStyle(Color.accentColor)
                     .textSelection(.enabled)
             }
 
-            Section("History") {
+            Section(header: Text("History")) {
                 ForEach(viewModel.history) { item in
                     VStack(alignment: .leading) {
                         Text(item.title).font(.caption.bold())

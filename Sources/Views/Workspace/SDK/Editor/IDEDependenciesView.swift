@@ -15,7 +15,7 @@ struct IDEDependenciesView: View {
 
     var body: some View {
         List {
-            Section("Resolution") {
+            Section(header: Text("Resolution")) {
                 LabeledContent("State", value: resolutionState.rawValue)
                 LabeledContent("Nodes", value: "\(state.dependencies.count)")
                 Button {
@@ -25,7 +25,7 @@ struct IDEDependenciesView: View {
                 }
             }
 
-            Section("Dependency Operations") {
+            Section(header: Text("Dependency Operations")) {
                 Button { installDependency() } label: {
                     Label("Install Node", systemImage: "plus")
                 }
@@ -41,7 +41,7 @@ struct IDEDependenciesView: View {
 
             let conflicts = conflictResolver.conflicts(in: state.dependencies)
             if !conflicts.isEmpty {
-                Section("Conflict Alerts") {
+                Section(header: Text("Conflict Alerts")) {
                     ForEach(conflicts, id: \.self) { conflict in
                         VStack(alignment: .leading, spacing: 2) {
                             Text(conflict).font(.subheadline)
@@ -53,7 +53,7 @@ struct IDEDependenciesView: View {
                 }
             }
 
-            Section("Dependency Graph") {
+            Section(header: Text("Dependency Graph")) {
                 if state.dependencies.isEmpty {
                     ContentUnavailableView(
                         "No Dependencies",
@@ -75,7 +75,7 @@ struct IDEDependenciesView: View {
             }
 
             if let selected = state.dependencies.first(where: { $0.id == selectedNodeID }) {
-                Section("Selected Node") {
+                Section(header: Text("Selected Node")) {
                     LabeledContent("Name", value: selected.name)
                     LabeledContent("Kind", value: selected.kind.rawValue)
                     LabeledContent("Version", value: "v\(selected.version)")

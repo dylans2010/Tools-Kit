@@ -17,7 +17,7 @@ struct GradientBuilderView: View {
 
     var body: some View {
         Form {
-            Section("Gradient Preview") {
+            Section(header: Text("Gradient Preview")) {
                 LinearGradient(
                     gradient: Gradient(colors: viewModel.colors),
                     startPoint: .topLeading,
@@ -27,7 +27,7 @@ struct GradientBuilderView: View {
                 .cornerRadius(12)
             }
 
-            Section("Colors") {
+            Section(header: Text("Colors")) {
                 ForEach($viewModel.colors, id: \.self) { $color in
                     ColorPicker("Color", selection: $color)
                 }
@@ -38,7 +38,7 @@ struct GradientBuilderView: View {
                 }
             }
 
-            Section("SwiftUI Code") {
+            Section(header: Text("SwiftUI Code")) {
                 Text(viewModel.codeSnippet)
                     .font(.system(.caption2, design: .monospaced))
                     .padding()

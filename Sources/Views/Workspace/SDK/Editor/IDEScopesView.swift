@@ -17,7 +17,7 @@ struct IDEScopesView: View {
 
     var body: some View {
         List {
-            Section("Security Profile") {
+            Section(header: Text("Security Profile")) {
                 LabeledContent("Active Grants") {
                     Text("\(enabledScopes.count)").monospaced().bold().foregroundStyle(Color.accentColor)
                 }
@@ -29,7 +29,7 @@ struct IDEScopesView: View {
             }
 
             if !scopeDiagnostics.isEmpty {
-                Section("Validation Issues") {
+                Section(header: Text("Validation Issues")) {
                     ForEach(scopeDiagnostics) { diagnostic in
                         Label {
                             VStack(alignment: .leading, spacing: 2) {
@@ -51,7 +51,7 @@ struct IDEScopesView: View {
             }
 
             ForEach(categories, id: \.0) { category, items in
-                Section(category.uppercased()) {
+                Section(header: Text(category.uppercased())) {
                     ForEach(items) { item in
                         ScopeItemRow(item: item, projectManager: projectManager, state: state)
                     }
@@ -64,7 +64,7 @@ struct IDEScopesView: View {
         .sheet(isPresented: $showingReview) {
             NavigationStack {
                 List {
-                    Section("Aggregated Grants") {
+                    Section(header: Text("Aggregated Grants")) {
                         ForEach(enabledScopes.sorted(), id: \.self) { scope in
                             Text(scope).font(.system(.caption, design: .monospaced))
                         }

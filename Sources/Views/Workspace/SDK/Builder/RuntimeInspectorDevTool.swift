@@ -21,7 +21,7 @@ struct RuntimeInspectorView: View {
 
     private var objectsList: some View {
         List {
-            Section("Live Objects") {
+            Section(header: Text("Live Objects")) {
                 ForEach(viewModel.objects) { object in
                     objectRow(for: object)
                 }

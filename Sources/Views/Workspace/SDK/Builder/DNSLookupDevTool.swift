@@ -18,7 +18,7 @@ struct DNSLookupDevToolView: View {
 
     var body: some View {
         Form {
-            Section("Target") {
+            Section(header: Text("Target")) {
                 HStack {
                     TextField("google.com", text: $viewModel.hostname)
                         .autocorrectionDisabled()
@@ -44,7 +44,7 @@ struct DNSLookupDevToolView: View {
             }
 
             if !viewModel.results.isEmpty {
-                Section("Results") {
+                Section(header: Text("Results")) {
                     ForEach(viewModel.results, id: \.self) { result in
                         Text(result)
                             .font(.system(.caption, design: .monospaced))

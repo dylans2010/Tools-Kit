@@ -24,11 +24,11 @@ struct SDKRuntimeStateView: View {
 
     var body: some View {
         Form {
-            Section("Global Status") {
+            Section(header: Text("Global Status")) {
                 LabeledContent("Initialized", value: sdk.isInitialized ? "Yes" : "No")
             }
 
-            Section("Subsystem Health") {
+            Section(header: Text("Subsystem Health")) {
                 HStack {
                     Text("Policy Engine")
                     Spacer()

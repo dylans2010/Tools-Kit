@@ -17,7 +17,7 @@ struct TaskAutomationView: View {
 
     var body: some View {
         List {
-            Section("Active Workflows") {
+            Section(header: Text("Active Workflows")) {
                 ForEach($viewModel.workflows) { $wf in
                     HStack {
                         Image(systemName: wf.icon)
@@ -32,7 +32,7 @@ struct TaskAutomationView: View {
                 }
             }
 
-            Section("Quick Actions") {
+            Section(header: Text("Quick Actions")) {
                 Button("Trigger Health Check") { }
                 Button("Trigger Cache Purge") { }
             }

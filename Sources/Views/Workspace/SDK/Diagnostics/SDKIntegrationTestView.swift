@@ -17,7 +17,7 @@ struct SDKIntegrationTestView: View {
 
     var body: some View {
         List {
-            Section("Test Configuration") {
+            Section(header: Text("Test Configuration")) {
                 Picker("Execution Scenario", selection: $selectedScenario) {
                     ForEach(0..<scenarios.count, id: \.self) { index in
                         Text(scenarios[index]).tag(index)
@@ -41,7 +41,7 @@ struct SDKIntegrationTestView: View {
                 .disabled(testStatus == .running)
             }
 
-            Section("Execution Output") {
+            Section(header: Text("Execution Output")) {
                 switch testStatus {
                 case .idle:
                     Text("Awaiting execution trigger...").font(.caption).foregroundStyle(.secondary)
@@ -58,7 +58,7 @@ struct SDKIntegrationTestView: View {
                 }
             }
 
-            Section("Environment Parameters") {
+            Section(header: Text("Environment Parameters")) {
                 Toggle("Enforce Scope Validation", isOn: $enableScopeValidation)
 
                 Toggle(isOn: $runtime.isNoSandboxModeEnabled) {

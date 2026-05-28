@@ -17,12 +17,12 @@ struct UUIDBulkGeneratorView: View {
 
     var body: some View {
         Form {
-            Section("Quantity") {
+            Section(header: Text("Quantity")) {
                 Stepper("Count: \(viewModel.count)", value: $viewModel.count, in: 1...1000)
                 Button("Generate Batch") { viewModel.generateBatch() }
             }
 
-            Section("Batch Output") {
+            Section(header: Text("Batch Output")) {
                 TextEditor(text: .constant(viewModel.output))
                     .frame(height: 200)
                     .font(.system(.caption, design: .monospaced))

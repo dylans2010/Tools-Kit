@@ -35,12 +35,12 @@ struct MemoryMonitorView: View {
             .padding()
 
             Form {
-                Section("Usage") {
+                Section(header: Text("Usage")) {
                     LabeledContent("Current", value: viewModel.currentMemory)
                     LabeledContent("Peak", value: viewModel.peakMemory)
                 }
 
-                Section("System") {
+                Section(header: Text("System")) {
                     LabeledContent("Physical Memory", value: viewModel.totalMemory)
                 }
             }

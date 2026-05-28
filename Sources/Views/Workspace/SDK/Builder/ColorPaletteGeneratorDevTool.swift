@@ -17,11 +17,11 @@ struct ColorPaletteGeneratorView: View {
 
     var body: some View {
         Form {
-            Section("Base Color") {
+            Section(header: Text("Base Color")) {
                 ColorPicker("Primary", selection: $viewModel.baseColor)
             }
 
-            Section("Scheme Type") {
+            Section(header: Text("Scheme Type")) {
                 Picker("Harmony", selection: $viewModel.type) {
                     Text("Monochromatic").tag(PaletteType.monochromatic)
                     Text("Analogous").tag(PaletteType.analogous)
@@ -30,7 +30,7 @@ struct ColorPaletteGeneratorView: View {
                 .pickerStyle(.segmented)
             }
 
-            Section("Generated Palette") {
+            Section(header: Text("Generated Palette")) {
                 HStack(spacing: 4) {
                     ForEach(viewModel.palette, id: \.self) { color in
                         Rectangle()

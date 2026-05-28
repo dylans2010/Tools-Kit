@@ -55,7 +55,7 @@ struct SDKEventStreamView: View {
                 }.pickerStyle(.menu)
             }
 
-            Section("Event Log") {
+            Section(header: Text("Event Log")) {
                 if filteredEvents.isEmpty {
                     ContentUnavailableView("No Events", systemImage: "antenna.radiowaves.left.and.right", description: Text("Real-time kernel events will appear here."))
                 } else {

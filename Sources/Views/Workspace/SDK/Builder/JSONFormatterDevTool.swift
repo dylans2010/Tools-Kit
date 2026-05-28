@@ -17,7 +17,7 @@ struct JSONFormatterDevToolView: View {
 
     var body: some View {
         Form {
-            Section("Input") {
+            Section(header: Text("Input")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 150)
                     .font(.system(.caption, design: .monospaced))
@@ -44,7 +44,7 @@ struct JSONFormatterDevToolView: View {
                 }
             }
 
-            Section("Options") {
+            Section(header: Text("Options")) {
                 Picker("Format", selection: $viewModel.formatType) {
                     Text("Prettify").tag(JSONFormatType.prettify)
                     Text("Minify").tag(JSONFormatType.minify)
@@ -58,7 +58,7 @@ struct JSONFormatterDevToolView: View {
                 Toggle("Escape Unicode", isOn: $viewModel.escapeUnicode)
             }
 
-            Section("Validation") {
+            Section(header: Text("Validation")) {
                 HStack {
                     Image(systemName: viewModel.isValid ? "checkmark.circle.fill" : "xmark.circle.fill")
                         .foregroundStyle(viewModel.isValid ? .green : .red)
@@ -79,7 +79,7 @@ struct JSONFormatterDevToolView: View {
                 }
             }
 
-            Section("JSON Path Query") {
+            Section(header: Text("JSON Path Query")) {
                 HStack {
                     TextField("e.g. users[0].name", text: $viewModel.jsonPath)
                         .font(.system(.caption, design: .monospaced))
@@ -97,7 +97,7 @@ struct JSONFormatterDevToolView: View {
                 }
             }
 
-            Section("Output") {
+            Section(header: Text("Output")) {
                 ScrollView {
                     Text(viewModel.output)
                         .font(.system(.caption2, design: .monospaced))
@@ -133,7 +133,7 @@ struct JSONFormatterDevToolView: View {
                 }
             }
 
-            Section("Statistics") {
+            Section(header: Text("Statistics")) {
                 LabeledContent("Size", value: "\(viewModel.input.utf8.count) bytes")
                 LabeledContent("Keys", value: "\(viewModel.keyCount)")
                 LabeledContent("Arrays", value: "\(viewModel.arrayCount)")

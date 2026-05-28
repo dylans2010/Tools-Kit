@@ -17,13 +17,13 @@ struct DeviceInfoDevToolView: View {
 
     var body: some View {
         Form {
-            Section("Hardware") {
+            Section(header: Text("Hardware")) {
                 LabeledContent("Model", value: viewModel.model)
                 LabeledContent("Processor", value: "\(ProcessInfo.processInfo.processorCount) Cores")
                 LabeledContent("Physical Memory", value: viewModel.memory)
             }
 
-            Section("Software") {
+            Section(header: Text("Software")) {
                 LabeledContent("System Name", value: UIDevice.current.systemName)
                 LabeledContent("System Version", value: UIDevice.current.systemVersion)
                 LabeledContent("Language", value: Locale.current.language.languageCode?.identifier ?? "Unknown")

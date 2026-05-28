@@ -17,12 +17,12 @@ struct HTMLEntityEncoderView: View {
 
     var body: some View {
         Form {
-            Section("Plain Text") {
+            Section(header: Text("Plain Text")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 120)
             }
 
-            Section("HTML Entities") {
+            Section(header: Text("HTML Entities")) {
                 Text(viewModel.output)
                     .font(.system(.body, design: .monospaced))
                     .textSelection(.enabled)
@@ -47,7 +47,7 @@ struct HTMLEntityEncoderView: View {
                 }
             }
 
-            Section("Options") {
+            Section(header: Text("Options")) {
                 Toggle("Encode All Non-ASCII", isOn: $viewModel.encodeNonASCII)
             }
         }

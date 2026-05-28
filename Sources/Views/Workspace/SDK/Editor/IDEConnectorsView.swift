@@ -8,13 +8,13 @@ struct IDEConnectorsView: View {
 
     var body: some View {
         List {
-            Section("Integration Summary") {
+            Section(header: Text("Integration Summary")) {
                 LabeledContent("Registered", value: "\(connectorManager.connectors.count)")
                 LabeledContent("Connected", value: "\(connectorManager.connectors.filter { $0.status == .connected }.count)")
                 LabeledContent("Dependency Links", value: "\(connectorLinkedDependencyCount)")
             }
 
-            Section("Connector Registry") {
+            Section(header: Text("Connector Registry")) {
                 if connectorManager.connectors.isEmpty {
                     ContentUnavailableView(
                         "No Connectors",
@@ -36,7 +36,7 @@ struct IDEConnectorsView: View {
             }
 
             if let selectedConnector = connectorManager.connectors.first(where: { $0.id == selectedConnectorID }) {
-                Section("Selection") {
+                Section(header: Text("Selection")) {
                     LabeledContent("Name", value: selectedConnector.name)
                     LabeledContent("Type", value: selectedConnector.type.rawValue.capitalized)
                     LabeledContent("Status", value: selectedConnector.status.rawValue.capitalized)

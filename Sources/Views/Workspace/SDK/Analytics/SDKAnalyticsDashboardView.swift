@@ -13,7 +13,7 @@ struct SDKAnalyticsDashboardView: View {
 
     var body: some View {
         List {
-            Section("Session Metrics") {
+            Section(header: Text("Session Metrics")) {
                 HStack(spacing: 12) {
                     metricCard(title: "Total", value: "\(analytics.sessionMetrics.totalEvents)", color: .blue)
                     metricCard(title: "Errors", value: "\(analytics.sessionMetrics.errorCount)", color: .red)
@@ -21,7 +21,7 @@ struct SDKAnalyticsDashboardView: View {
                 }
             }
 
-            Section("Categories") {
+            Section(header: Text("Categories")) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         categoryChip(nil, label: "All (\(analytics.events.count))")
@@ -32,7 +32,7 @@ struct SDKAnalyticsDashboardView: View {
                 }
             }
 
-            Section("Events (\(displayedEvents.count))") {
+            Section(header: Text("Events (\(displayedEvents.count))")) {
                 if displayedEvents.isEmpty {
                     ContentUnavailableView("No Events", systemImage: "chart.bar.xaxis", description: Text("Analytics events will appear here once tracking starts."))
                 } else {
@@ -66,7 +66,7 @@ struct SDKAnalyticsDashboardView: View {
                 }
             }
 
-            Section("Controls") {
+            Section(header: Text("Controls")) {
                 HStack {
                     Button(analytics.isTracking ? "Stop Tracking" : "Start Tracking") {
                         if analytics.isTracking { analytics.stopTracking() } else { analytics.startTracking() }

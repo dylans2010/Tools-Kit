@@ -17,7 +17,7 @@ struct TypographyScaleView: View {
 
     var body: some View {
         Form {
-            Section("Configuration") {
+            Section(header: Text("Configuration")) {
                 TextField("Base Size (pt)", text: $viewModel.baseSize)
                     .keyboardType(.numberPad)
 
@@ -29,7 +29,7 @@ struct TypographyScaleView: View {
                 }
             }
 
-            Section("Scale Preview") {
+            Section(header: Text("Scale Preview")) {
                 ForEach(viewModel.scaleItems) { item in
                     HStack(alignment: .bottom) {
                         VStack(alignment: .leading) {

@@ -413,7 +413,7 @@ struct SDKAPIExplorerView: View {
 
     private var curlExportSheet: some View {
         Form {
-            Section("cURL Command") {
+            Section(header: Text("cURL Command")) {
                 Text(curlCommand)
                     .font(.caption.monospaced())
                     .textSelection(.enabled)

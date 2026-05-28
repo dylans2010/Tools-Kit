@@ -17,13 +17,13 @@ struct JSONValidatorView: View {
 
     var body: some View {
         Form {
-            Section("Input JSON") {
+            Section(header: Text("Input JSON")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 200)
                     .font(.system(.caption, design: .monospaced))
             }
 
-            Section("Status") {
+            Section(header: Text("Status")) {
                 HStack {
                     Text(viewModel.isValid ? "Valid JSON" : "Invalid JSON")
                         .font(.caption2.bold())
@@ -41,7 +41,7 @@ struct JSONValidatorView: View {
             }
 
             if viewModel.isValid {
-                Section("Metadata") {
+                Section(header: Text("Metadata")) {
                     LabeledContent("Type", value: viewModel.rootType)
                     LabeledContent("Key Count", value: "\(viewModel.keyCount)")
                 }

@@ -23,7 +23,7 @@ struct SDKHealthDashboardView: View {
     }
 
     private var overallStatusSection: some View {
-        Section("Overall Status") {
+        Section(header: Text("Overall Status")) {
             HStack {
                 statusIcon(for: healthMonitor.overallStatus)
                 VStack(alignment: .leading, spacing: 2) {
@@ -44,7 +44,7 @@ struct SDKHealthDashboardView: View {
     }
 
     private var componentsSection: some View {
-        Section("Components") {
+        Section(header: Text("Components")) {
             if healthMonitor.componentStatuses.isEmpty {
                 ContentUnavailableView(
                     "No Health Data",
@@ -80,7 +80,7 @@ struct SDKHealthDashboardView: View {
     }
 
     private var actionsSection: some View {
-        Section("Actions") {
+        Section(header: Text("Actions")) {
             Button {
                 Task { await refresh() }
             } label: {
@@ -104,7 +104,7 @@ struct SDKHealthDashboardView: View {
     }
 
     private func reportSection(_ report: SDKHealthReport) -> some View {
-        Section("Last Report") {
+        Section(header: Text("Last Report")) {
             LabeledContent("Timestamp", value: report.timestamp.formatted(date: .abbreviated, time: .standard))
             LabeledContent("Duration", value: String(format: "%.0fms", report.checkDuration * 1000))
             LabeledContent("Components", value: "\(report.components.count)")

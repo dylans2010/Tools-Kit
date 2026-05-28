@@ -17,7 +17,7 @@ struct CSVParserView: View {
 
     var body: some View {
         Form {
-            Section("Input CSV") {
+            Section(header: Text("Input CSV")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 100)
                     .font(.system(.caption, design: .monospaced))
@@ -35,7 +35,7 @@ struct CSVParserView: View {
                 }
             }
 
-            Section("Configuration") {
+            Section(header: Text("Configuration")) {
                 HStack {
                     Text("Delimiter")
                         .font(.caption)
@@ -50,7 +50,7 @@ struct CSVParserView: View {
                 Toggle("Has Header Row", isOn: $viewModel.hasHeader)
             }
 
-            Section("Statistics") {
+            Section(header: Text("Statistics")) {
                 HStack(spacing: 16) {
                     VStack {
                         Text("\(viewModel.rowCount)").font(.title3.bold())
@@ -71,7 +71,7 @@ struct CSVParserView: View {
             }
 
             if viewModel.hasHeader && !viewModel.headers.isEmpty {
-                Section("Filter") {
+                Section(header: Text("Filter")) {
                     Picker("Column", selection: $viewModel.filterColumn) {
                         Text("All").tag(-1)
                         ForEach(Array(viewModel.headers.enumerated()), id: \.offset) { idx, header in
@@ -83,7 +83,7 @@ struct CSVParserView: View {
                         .textInputAutocapitalization(.never)
                 }
 
-                Section("Sort") {
+                Section(header: Text("Sort")) {
                     HStack {
                         Picker("Sort by", selection: $viewModel.sortColumn) {
                             Text("None").tag(-1)
@@ -99,7 +99,7 @@ struct CSVParserView: View {
             }
 
             if !viewModel.displayRows.isEmpty {
-                Section("Data Table (\(viewModel.displayRows.count) rows)") {
+                Section(header: Text("Data Table (\(viewModel.displayRows.count) rows)")) {
                     ScrollView(.horizontal) {
                         VStack(alignment: .leading, spacing: 0) {
                             if viewModel.hasHeader && !viewModel.headers.isEmpty {
@@ -130,7 +130,7 @@ struct CSVParserView: View {
                 }
             }
 
-            Section("Export") {
+            Section(header: Text("Export")) {
                 HStack {
                     Button {
                         UIPasteboard.general.string = viewModel.toJSON()

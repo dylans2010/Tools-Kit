@@ -17,16 +17,16 @@ struct ColorMixerView: View {
 
     var body: some View {
         Form {
-            Section("Base Colors") {
+            Section(header: Text("Base Colors")) {
                 ColorPicker("Color A", selection: $viewModel.colorA)
                 ColorPicker("Color B", selection: $viewModel.colorB)
             }
 
-            Section("Ratio: \(Int(viewModel.ratio * 100))%") {
+            Section(header: Text("Ratio: \(Int(viewModel.ratio * 100))%")) {
                 Slider(value: $viewModel.ratio)
             }
 
-            Section("Result") {
+            Section(header: Text("Result")) {
                 HStack(spacing: 12) {
                     Rectangle()
                         .fill(viewModel.mixedColor)

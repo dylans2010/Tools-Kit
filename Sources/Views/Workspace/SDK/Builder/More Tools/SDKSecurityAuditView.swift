@@ -22,7 +22,7 @@ struct SDKSecurityAuditView: View {
     }
 
     private var controlsSection: some View {
-        Section("Security Controls") {
+        Section(header: Text("Security Controls")) {
             Button(action: refreshAudit) {
                 HStack {
                     Label("Refresh Audit Logs", systemImage: "arrow.clockwise.shield")
@@ -35,7 +35,7 @@ struct SDKSecurityAuditView: View {
     }
 
     private var logsSection: some View {
-        Section("Audit Logs") {
+        Section(header: Text("Audit Logs")) {
             if filteredEvents.isEmpty {
                 ContentUnavailableView("No Events Found", systemImage: "checkmark.shield", description: Text("No security or privacy events have been recorded yet."))
             } else {

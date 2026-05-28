@@ -17,13 +17,13 @@ struct Base64DecoderView: View {
 
     var body: some View {
         Form {
-            Section("Input Base64") {
+            Section(header: Text("Input Base64")) {
                 TextEditor(text: $viewModel.inputText)
                     .frame(height: 120)
                     .font(.system(.body, design: .monospaced))
             }
 
-            Section("Output") {
+            Section(header: Text("Output")) {
                 if viewModel.isError {
                     Text(viewModel.outputText)
                         .foregroundStyle(.red)
