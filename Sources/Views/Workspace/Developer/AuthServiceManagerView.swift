@@ -1,5 +1,4 @@
 import SwiftUI
-import Core
 
 struct AuthServiceManagerView: View {
     @ObservedObject var store = DeveloperPersistentStore.shared

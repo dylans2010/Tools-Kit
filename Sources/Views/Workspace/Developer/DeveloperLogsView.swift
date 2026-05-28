@@ -1,5 +1,4 @@
 import SwiftUI
-import Core
 
 struct DeveloperLogsView: View {
     @State private var searchText = ""
