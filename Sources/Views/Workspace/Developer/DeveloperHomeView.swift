@@ -1,5 +1,4 @@
 import SwiftUI
-import Core
 
 struct DeveloperHomeView: View {
     @ObservedObject var store = DeveloperPersistentStore.shared
