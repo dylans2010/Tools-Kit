@@ -17,7 +17,7 @@ struct AppStateInspectorView: View {
 
     var body: some View {
         Form {
-            Section("Current State") {
+            Section(header: Text("Current State")) {
                 HStack {
                     Text(viewModel.currentState)
                         .font(.caption2.bold())
@@ -32,7 +32,7 @@ struct AppStateInspectorView: View {
                 }
             }
 
-            Section("Lifecycle History") {
+            Section(header: Text("Lifecycle History")) {
                 ForEach(viewModel.history) { item in
                     HStack {
                         Text(item.title).font(.subheadline)

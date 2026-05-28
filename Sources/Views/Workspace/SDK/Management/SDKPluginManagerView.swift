@@ -25,7 +25,7 @@ struct SDKPluginManagerView: View {
                 Text("System Status")
             }
 
-            Section("Registry") {
+            Section(header: Text("Registry")) {
                 if filteredApps.isEmpty {
                     ContentUnavailableView("No Extensions Found", systemImage: "puzzlepiece.extension", description: Text("Register an app to extend workspace capabilities."))
                 } else {
@@ -111,13 +111,13 @@ private struct AddPluginAppSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("App Details") {
+                Section(header: Text("App Details")) {
                     TextField("Name", text: $name)
                     TextField("Version", text: $version)
                     TextField("Author", text: $author)
                     TextField("Description", text: $description, axis: .vertical).lineLimit(3)
                 }
-                Section("Permissions") {
+                Section(header: Text("Permissions")) {
                     TextField("e.g. read, write, network", text: $permissions).font(.caption.monospaced())
                 }
                 Section {

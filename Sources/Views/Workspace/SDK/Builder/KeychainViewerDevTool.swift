@@ -17,7 +17,7 @@ struct KeychainViewerView: View {
 
     var body: some View {
         List {
-            Section("Keychain Items") {
+            Section(header: Text("Keychain Items")) {
                 if viewModel.items.isEmpty {
                     Text("No items found").foregroundStyle(.secondary)
                 } else {
@@ -31,7 +31,7 @@ struct KeychainViewerView: View {
                 }
             }
 
-            Section("Add Entry") {
+            Section(header: Text("Add Entry")) {
                 TextField("Service", text: $viewModel.newService)
                 TextField("Account", text: $viewModel.newAccount)
                 SecureField("Value", text: $viewModel.newValue)

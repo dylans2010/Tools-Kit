@@ -31,7 +31,7 @@ struct SDKMetricsDashboardView: View {
     }
 
     private var overviewSection: some View {
-        Section("Overview") {
+        Section(header: Text("Overview")) {
             LabeledContent("Total Points Recorded", value: "\(metricsCollector.totalPointsRecorded)")
             LabeledContent("Counters", value: "\(snapshot.counters.count)")
             LabeledContent("Gauges", value: "\(snapshot.gauges.count)")
@@ -41,7 +41,7 @@ struct SDKMetricsDashboardView: View {
     }
 
     private var countersSection: some View {
-        Section("Counters") {
+        Section(header: Text("Counters")) {
             if snapshot.counters.isEmpty {
                 Text("No counters recorded")
                     .font(.caption)
@@ -64,7 +64,7 @@ struct SDKMetricsDashboardView: View {
     }
 
     private var gaugesSection: some View {
-        Section("Gauges") {
+        Section(header: Text("Gauges")) {
             if snapshot.gauges.isEmpty {
                 Text("No gauges recorded")
                     .font(.caption)
@@ -87,7 +87,7 @@ struct SDKMetricsDashboardView: View {
     }
 
     private var timingsSection: some View {
-        Section("Timings") {
+        Section(header: Text("Timings")) {
             if snapshot.timings.isEmpty {
                 Text("No timings recorded")
                     .font(.caption)
@@ -153,7 +153,7 @@ struct SDKMetricsDashboardView: View {
     }
 
     private var recentActivitySection: some View {
-        Section("Recent Activity") {
+        Section(header: Text("Recent Activity")) {
             Picker("Filter", selection: $filterKind) {
                 Text("All").tag(Optional<SDKMetricPoint.MetricKind>.none)
                 Text("Counter").tag(Optional(SDKMetricPoint.MetricKind.counter))
@@ -182,7 +182,7 @@ struct SDKMetricsDashboardView: View {
     }
 
     private var actionsSection: some View {
-        Section("Actions") {
+        Section(header: Text("Actions")) {
             Button(role: .destructive) {
                 metricsCollector.reset()
             } label: {

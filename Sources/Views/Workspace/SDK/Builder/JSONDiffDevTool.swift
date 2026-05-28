@@ -34,7 +34,7 @@ struct JSONDiffView: View {
             .padding(.horizontal)
 
             Form {
-                Section("Differences") {
+                Section(header: Text("Differences")) {
                     if viewModel.diffResults.isEmpty {
                         Text("No differences found").foregroundStyle(.secondary)
                     } else {

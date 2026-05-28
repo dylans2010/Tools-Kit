@@ -17,7 +17,7 @@ struct UUIDGeneratorDevToolView: View {
 
     var body: some View {
         Form {
-            Section("Generated UUID") {
+            Section(header: Text("Generated UUID")) {
                 Text(viewModel.currentUUID)
                     .font(.system(.headline, design: .monospaced))
                     .textSelection(.enabled)
@@ -41,7 +41,7 @@ struct UUIDGeneratorDevToolView: View {
                 }
             }
 
-            Section("Format Options") {
+            Section(header: Text("Format Options")) {
                 Toggle("Uppercase", isOn: $viewModel.isUppercase)
                 Toggle("Include Hyphens", isOn: $viewModel.includeHyphens)
                 Picker("Prefix", selection: $viewModel.prefix) {
@@ -52,7 +52,7 @@ struct UUIDGeneratorDevToolView: View {
                 }
             }
 
-            Section("Batch Generate") {
+            Section(header: Text("Batch Generate")) {
                 Stepper("Count: \(viewModel.batchCount)", value: $viewModel.batchCount, in: 1...100)
 
                 Button {
@@ -83,7 +83,7 @@ struct UUIDGeneratorDevToolView: View {
                 }
             }
 
-            Section("UUID Validator") {
+            Section(header: Text("UUID Validator")) {
                 TextField("Paste UUID to validate", text: $viewModel.validateInput)
                     .font(.system(.caption, design: .monospaced))
                     .textInputAutocapitalization(.never)

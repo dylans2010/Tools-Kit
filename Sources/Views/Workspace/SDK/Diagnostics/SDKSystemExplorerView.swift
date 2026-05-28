@@ -23,7 +23,7 @@ struct SDKSystemExplorerView: View {
                 }
             }
 
-            Section("Interface Explorer") {
+            Section(header: Text("Interface Explorer")) {
                 ExplorerLink(title: "Notes API", module: "Notes", icon: "note.text")
                 ExplorerLink(title: "Tasks API", module: "checkmark.circle", icon: "checkmark.circle")
                 ExplorerLink(title: "Mail API", module: "Mail", icon: "envelope")
@@ -34,13 +34,13 @@ struct SDKSystemExplorerView: View {
                 ExplorerLink(title: "Persona API", module: "Persona", icon: "brain")
             }
 
-            Section("Deep Data Access") {
+            Section(header: Text("Deep Data Access")) {
                 NavigationLink { EntityExplorerView() } label: { Label("Active Entities", systemImage: "cylinder.fill") }
                 NavigationLink { SDKWorkspaceExplorerView() } label: { Label("Workspace Graph", systemImage: "circle.grid.cross") }
                 NavigationLink { SDKEventStreamView() } label: { Label("Event Stream", systemImage: "bolt.fill") }
             }
 
-            Section("SDK Internals") {
+            Section(header: Text("SDK Internals")) {
                 let metrics = SDKTelemetryEngine.shared.getMetrics()
                 LabeledContent("Total Traces", value: "\(metrics.totalTraces)")
                 LabeledContent("Active Sync Channels", value: "\(SDKRealtimeSync.shared.activeChannels.count)")
@@ -72,10 +72,10 @@ struct APIExplorerDetail: View {
     let module: String
     var body: some View {
         List {
-            Section("Exposed Methods") {
+            Section(header: Text("Exposed Methods")) {
                 ForEach(methods, id: \.self) { Text($0).font(.caption.monospaced()) }
             }
-            Section("Live Stats") {
+            Section(header: Text("Live Stats")) {
                 LabeledContent("Object Count") {
                     Text("\(count)").monospaced().bold().foregroundStyle(Color.accentColor)
                 }
@@ -105,7 +105,7 @@ struct APIExplorerDetail: View {
 struct EntityExplorerView: View {
     var body: some View {
         List {
-            Section("Notes") {
+            Section(header: Text("Notes")) {
                 ForEach(WorkspaceAPI.shared.notes.listNotes()) { note in
                     VStack(alignment: .leading, spacing: 2) {
                         Text(note.title).font(.subheadline.bold())
@@ -113,13 +113,13 @@ struct EntityExplorerView: View {
                     }
                 }
             }
-            Section("Tasks") {
+            Section(header: Text("Tasks")) {
                 ForEach(WorkspaceAPI.shared.tasks.listTasks()) { task in
                     Label(task.title, systemImage: task.completed ? "checkmark.circle.fill" : "circle")
                         .foregroundStyle(task.completed ? Color.green : Color.secondary)
                 }
             }
-            Section("Snapshots") {
+            Section(header: Text("Snapshots")) {
                 ForEach(WorkspaceAPI.shared.timeTravel.listSnapshots()) { snap in
                     LabeledContent(snap.message, value: snap.timestamp.formatted(date: .abbreviated, time: .omitted))
                         .font(.caption)

@@ -31,7 +31,7 @@ struct SDKBuildStatView: View {
                 .padding(.vertical, 4)
             }
 
-            Section("Build Metrics") {
+            Section(header: Text("Build Metrics")) {
                 let metrics = telemetry.getMetrics()
 
                 MetricRow(name: "Total Trace Executions", value: "\(metrics.totalTraces)", icon: "waveform.path.ecg")
@@ -40,7 +40,7 @@ struct SDKBuildStatView: View {
                 MetricRow(name: "Active Operations", value: "\(metrics.activeTraces)", icon: "bolt.fill")
             }
 
-            Section("System Status") {
+            Section(header: Text("System Status")) {
                 let warnings = logStore.entries.filter { $0.level == .warning }.count
                 let errors = logStore.entries.filter { $0.level == .error }.count
 
@@ -49,7 +49,7 @@ struct SDKBuildStatView: View {
                 MetricRow(name: "Binary Size", value: binarySize, icon: "doc.zipper")
             }
 
-            Section("Project Context") {
+            Section(header: Text("Project Context")) {
                 if let project = projectManager.currentProject {
                     LabeledContent("Project Name", value: project.name)
                     LabeledContent("Version", value: "\(project.version)")

@@ -17,19 +17,19 @@ struct ASCIIHexConverterView: View {
 
     var body: some View {
         Form {
-            Section("Text (ASCII/UTF-8)") {
+            Section(header: Text("Text (ASCII/UTF-8)")) {
                 TextEditor(text: $viewModel.textInput)
                     .frame(height: 100)
                     .font(.system(.body, design: .monospaced))
             }
 
-            Section("Hexadecimal") {
+            Section(header: Text("Hexadecimal")) {
                 TextEditor(text: $viewModel.hexInput)
                     .frame(height: 100)
                     .font(.system(.body, design: .monospaced))
             }
 
-            Section("Configuration") {
+            Section(header: Text("Configuration")) {
                 Toggle("Add Spaces", isOn: $viewModel.addSpaces)
                 Toggle("Uppercase Hex", isOn: $viewModel.isUppercase)
             }

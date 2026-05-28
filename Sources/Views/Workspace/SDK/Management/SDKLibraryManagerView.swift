@@ -7,7 +7,7 @@ struct SDKLibraryManagerView: View {
 
     var body: some View {
         List {
-            Section("Module Registry") {
+            Section(header: Text("Module Registry")) {
                 if state.libraries.isEmpty {
                     ContentUnavailableView("No Libraries", systemImage: "books.vertical", description: Text("Register SDK modules to manage shared business logic."))
                 } else {
@@ -29,7 +29,7 @@ struct SDKLibraryManagerView: View {
                 }
             }
 
-            Section("Lifecycle Analysis") {
+            Section(header: Text("Lifecycle Analysis")) {
                 if let first = state.libraries.first {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
@@ -101,11 +101,11 @@ private struct SDKLibraryEditorSheet: View {
     let onSave: (SDKLibraryDefinition) -> Void
     var body: some View {
         Form {
-            Section("Details") {
+            Section(header: Text("Details")) {
                 TextField("Name", text: $library.name)
                 TextField("Version", text: $library.version)
             }
-            Section("Bindings") {
+            Section(header: Text("Bindings")) {
                 TextField("Scopes (comma-separated)", text: Binding(
                     get: { library.linkedScopes.joined(separator: ", ") },
                     set: { library.linkedScopes = $0.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty } }

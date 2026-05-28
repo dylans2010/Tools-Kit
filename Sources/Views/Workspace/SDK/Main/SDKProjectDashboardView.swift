@@ -19,7 +19,7 @@ struct SDKProjectDashboardView: View {
                         Text("Overview")
                     }
 
-                    Section("Control Hub") {
+                    Section(header: Text("Control Hub")) {
                         HubLink(route: .build, title: "Build & Export", subtitle: buildSubtitle, icon: "hammer", color: .blue)
                         HubLink(route: .ideWorkspace, title: "IDE Workspace", subtitle: "Multi-panel runtime editor", icon: "square.split.2x2", color: .indigo)
                         HubLink(route: .connectors, title: "Connectors", subtitle: "\(connectorManager.connectors.count) active modules", icon: "link", color: .green)
@@ -28,7 +28,7 @@ struct SDKProjectDashboardView: View {
                         HubLink(route: .appBuilder, title: "App Builder", subtitle: "Visual integration", icon: "wand.and.stars", color: .indigo)
                     }
 
-                    Section("System") {
+                    Section(header: Text("System")) {
                         HubLink(route: .logs, title: "System Logs", subtitle: "\(logStore.entries.count) stored events", icon: "terminal", color: .primary)
                         HubLink(route: .diagnostics, title: "Diagnostics", subtitle: "Real-time health", icon: "heart.text.square", color: .red)
                     }

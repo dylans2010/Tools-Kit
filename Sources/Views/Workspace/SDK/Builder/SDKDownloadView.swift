@@ -38,7 +38,7 @@ struct SDKDownloadView: View {
             }
 
             if let error = errorMessage {
-                Section("Error") {
+                Section(header: Text("Error")) {
                     Label(error, systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.red)
                         .font(.caption)
@@ -196,7 +196,7 @@ struct SDKDownloadView: View {
 
     private var exportConfigSheet: some View {
         Form {
-            Section("Include in Bundle") {
+            Section(header: Text("Include in Bundle")) {
                 Toggle("SDK Modules", isOn: $exportModules)
                 Toggle("Plugins", isOn: $exportPlugins)
                 Toggle("Connectors", isOn: $exportConnectors)
@@ -204,7 +204,7 @@ struct SDKDownloadView: View {
             }
 
             if let version = selectedVersion {
-                Section("Selected Version") {
+                Section(header: Text("Selected Version")) {
                     LabeledContent("Version", value: "v\(version.version)")
                     LabeledContent("Size", value: version.size)
                 }
@@ -224,11 +224,11 @@ struct SDKDownloadView: View {
 
     private var installGuideContent: some View {
         List {
-            Section("Step 1: Download") {
+            Section(header: Text("Step 1: Download")) {
                 Text("Select an SDK version and download the .zip bundle containing all SDK modules, plugins, connectors, and runtime definitions.")
                     .font(.subheadline).foregroundStyle(.secondary)
             }
-            Section("Step 2: Extract") {
+            Section(header: Text("Step 2: Extract")) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Unzip the bundle into your Xcode project directory:")
                         .font(.subheadline).foregroundStyle(.secondary)
@@ -238,11 +238,11 @@ struct SDKDownloadView: View {
                         .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 6))
                 }
             }
-            Section("Step 3: Integrate") {
+            Section(header: Text("Step 3: Integrate")) {
                 Text("Add the extracted SDK directory as a Swift Package or embed the framework directly into your Xcode project target.")
                     .font(.subheadline).foregroundStyle(.secondary)
             }
-            Section("Step 4: Initialize") {
+            Section(header: Text("Step 4: Initialize")) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Boot the SDK at app launch:")
                         .font(.subheadline).foregroundStyle(.secondary)

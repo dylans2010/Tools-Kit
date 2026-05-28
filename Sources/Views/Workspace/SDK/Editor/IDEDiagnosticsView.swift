@@ -7,7 +7,7 @@ struct IDEDiagnosticsView: View {
 
     var body: some View {
         List {
-            Section("Status Monitoring") {
+            Section(header: Text("Status Monitoring")) {
                 LabeledContent("Active Issues") {
                     Text("\(state.diagnostics.count)")
                         .monospaced().bold()
@@ -23,7 +23,7 @@ struct IDEDiagnosticsView: View {
                 }
             }
 
-            Section("Runtime Reports") {
+            Section(header: Text("Runtime Reports")) {
                 if state.diagnostics.isEmpty {
                     ContentUnavailableView(
                         "All Systems Go",

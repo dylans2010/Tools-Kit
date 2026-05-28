@@ -6,14 +6,14 @@ struct IDECapabilitiesView: View {
 
     var body: some View {
         List {
-            Section("Capability Summary") {
+            Section(header: Text("Capability Summary")) {
                 let scopes = state.effectiveScopes(for: projectManager.currentProject)
                 let enabled = SDKRuntimeWorkspaceState.capabilityCatalog.filter { Set($0.requiredScopes).isSubset(of: scopes) }
                 LabeledContent("Enabled", value: "\(enabled.count)")
                 LabeledContent("Total", value: "\(SDKRuntimeWorkspaceState.capabilityCatalog.count)")
             }
 
-            Section("Capabilities") {
+            Section(header: Text("Capabilities")) {
                 ForEach(SDKRuntimeWorkspaceState.capabilityCatalog) { capability in
                     CapabilityRow(
                         capability: capability,

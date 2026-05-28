@@ -18,7 +18,7 @@ struct ScriptRunnerView: View {
 
     var body: some View {
         Form {
-            Section("Script Editor") {
+            Section(header: Text("Script Editor")) {
                 TextEditor(text: $script)
                     .frame(height: 200)
                     .font(.system(.caption, design: .monospaced))
@@ -29,7 +29,7 @@ struct ScriptRunnerView: View {
                 .disabled(viewModel.isRunning)
             }
 
-            Section("Output / Console") {
+            Section(header: Text("Output / Console")) {
                 ScrollView {
                     Text(viewModel.output)
                         .font(.system(.caption2, design: .monospaced))

@@ -15,7 +15,7 @@ struct IDELibrariesView: View {
 
     var body: some View {
         List {
-            Section("Package Resolution") {
+            Section(header: Text("Package Resolution")) {
                 LabeledContent("State", value: resolutionState.rawValue)
                 LabeledContent("Libraries", value: "\(state.libraries.count)")
                 LabeledContent("Exports", value: "\(state.libraries.reduce(0) { $0 + $1.exportedFunctions.count })")
@@ -26,7 +26,7 @@ struct IDELibrariesView: View {
                 }
             }
 
-            Section("Library Operations") {
+            Section(header: Text("Library Operations")) {
                 Button {
                     editingLibrary = nil
                     showingEditor = true
@@ -41,7 +41,7 @@ struct IDELibrariesView: View {
                 .disabled(state.libraries.isEmpty)
             }
 
-            Section("Installed Libraries") {
+            Section(header: Text("Installed Libraries")) {
                 if state.libraries.isEmpty {
                     ContentUnavailableView(
                         "No Libraries",
@@ -164,17 +164,17 @@ struct LibraryEditorSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Identity") {
+                Section(header: Text("Identity")) {
                     TextField("Library Name", text: $name)
                     TextField("Version", text: $version)
                 }
 
-                Section("Dependencies") {
+                Section(header: Text("Dependencies")) {
                     TextField("Comma-separated module names", text: $dependencies)
                         .font(.caption)
                 }
 
-                Section("Scopes") {
+                Section(header: Text("Scopes")) {
                     ForEach(SDKRuntimeWorkspaceState.scopeCatalog) { scope in
                         Toggle(scope.key, isOn: Binding(
                             get: { selectedScopes.contains(scope.key) },
@@ -184,7 +184,7 @@ struct LibraryEditorSheet: View {
                     }
                 }
 
-                Section("Exports") {
+                Section(header: Text("Exports")) {
                     ForEach($functions) { (fn: Binding<SDKLibraryFunctionExport>) in
                         TextField("Function Signature", text: fn.name)
                             .font(.caption.monospaced())

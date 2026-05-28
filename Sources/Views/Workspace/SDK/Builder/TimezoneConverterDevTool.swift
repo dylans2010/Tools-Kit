@@ -18,7 +18,7 @@ struct TimezoneConverterDevToolView: View {
 
     var body: some View {
         Form {
-            Section("Base Time") {
+            Section(header: Text("Base Time")) {
                 DatePicker("Date & Time", selection: $viewModel.baseDate)
                 HStack {
                     Button("Now") { viewModel.baseDate = Date() }
@@ -30,7 +30,7 @@ struct TimezoneConverterDevToolView: View {
                 }
             }
 
-            Section("World Clock") {
+            Section(header: Text("World Clock")) {
                 ForEach(viewModel.targetTimezones, id: \.self) { tzName in
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
@@ -61,7 +61,7 @@ struct TimezoneConverterDevToolView: View {
                 .onDelete { viewModel.targetTimezones.remove(atOffsets: $0) }
             }
 
-            Section("Add Timezone") {
+            Section(header: Text("Add Timezone")) {
                 TextField("Search timezones...", text: $searchText)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
@@ -87,7 +87,7 @@ struct TimezoneConverterDevToolView: View {
                 }
             }
 
-            Section("Quick Add") {
+            Section(header: Text("Quick Add")) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
                         ForEach(viewModel.popularTimezones, id: \.self) { tz in
@@ -103,7 +103,7 @@ struct TimezoneConverterDevToolView: View {
                 }
             }
 
-            Section("Time Differences") {
+            Section(header: Text("Time Differences")) {
                 ForEach(viewModel.targetTimezones, id: \.self) { tzName in
                     HStack {
                         Text(viewModel.cityName(tzName)).font(.caption)

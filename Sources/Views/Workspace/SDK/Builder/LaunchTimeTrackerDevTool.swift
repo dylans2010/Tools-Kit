@@ -17,13 +17,13 @@ struct LaunchTimeTrackerView: View {
 
     var body: some View {
         Form {
-            Section("Metrics") {
+            Section(header: Text("Metrics")) {
                 LabeledContent("Process Start", value: viewModel.processStartTime)
                 LabeledContent("Main Initialized", value: viewModel.mainInitTime)
                 LabeledContent("First Frame", value: viewModel.firstFrameTime)
             }
 
-            Section("Analysis") {
+            Section(header: Text("Analysis")) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Total Launch Time").font(.headline)
                     Text(viewModel.totalTime)

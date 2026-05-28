@@ -18,7 +18,7 @@ struct EncryptionToolView: View {
 
     var body: some View {
         Form {
-            Section("Key Configuration") {
+            Section(header: Text("Key Configuration")) {
                 Picker("Key Source", selection: $viewModel.keySource) {
                     Text("Password").tag(EncryptKeySource.password)
                     Text("Base64 Key").tag(EncryptKeySource.base64)
@@ -47,7 +47,7 @@ struct EncryptionToolView: View {
                 }
             }
 
-            Section("Encryption") {
+            Section(header: Text("Encryption")) {
                 Picker("Algorithm", selection: $viewModel.algorithm) {
                     Text("AES-GCM").tag(EncryptAlgorithm.aesGCM)
                     Text("ChaChaPoly").tag(EncryptAlgorithm.chaChaPoly)
@@ -55,7 +55,7 @@ struct EncryptionToolView: View {
                 .pickerStyle(.segmented)
             }
 
-            Section("Input") {
+            Section(header: Text("Input")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 100)
                     .font(.system(.caption, design: .monospaced))
@@ -69,7 +69,7 @@ struct EncryptionToolView: View {
                 }
             }
 
-            Section("Actions") {
+            Section(header: Text("Actions")) {
                 HStack(spacing: 12) {
                     Button {
                         viewModel.encrypt()
@@ -87,7 +87,7 @@ struct EncryptionToolView: View {
                 }
             }
 
-            Section("Output") {
+            Section(header: Text("Output")) {
                 if !viewModel.output.isEmpty {
                     Text(viewModel.output)
                         .font(.system(.caption2, design: .monospaced))
@@ -116,7 +116,7 @@ struct EncryptionToolView: View {
                 }
             }
 
-            Section("Key Info") {
+            Section(header: Text("Key Info")) {
                 if !viewModel.activeKeyBase64.isEmpty {
                     LabeledContent("Active Key (Base64)") {
                         Text(viewModel.activeKeyBase64)

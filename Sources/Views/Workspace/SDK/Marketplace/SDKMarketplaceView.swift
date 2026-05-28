@@ -16,7 +16,7 @@ struct SDKMarketplaceView: View {
 
     var body: some View {
         List {
-            Section("Featured") {
+            Section(header: Text("Featured")) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ForEach(extensions.filter(\.isFeatured).prefix(3)) { ext in
@@ -38,7 +38,7 @@ struct SDKMarketplaceView: View {
                 }
             }
 
-            Section("Extensions (\(filteredExtensions.count))") {
+            Section(header: Text("Extensions (\(filteredExtensions.count))")) {
                 ForEach(filteredExtensions) { ext in
                     HStack(spacing: 12) {
                         Image(systemName: ext.icon)

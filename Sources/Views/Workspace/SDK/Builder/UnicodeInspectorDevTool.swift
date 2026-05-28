@@ -17,12 +17,12 @@ struct UnicodeInspectorView: View {
 
     var body: some View {
         Form {
-            Section("Input Text") {
+            Section(header: Text("Input Text")) {
                 TextField("Enter characters...", text: $viewModel.input)
             }
 
             if !viewModel.characters.isEmpty {
-                Section("Analysis") {
+                Section(header: Text("Analysis")) {
                     ForEach(viewModel.characters) { item in
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {

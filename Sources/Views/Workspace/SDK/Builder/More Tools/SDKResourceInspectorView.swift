@@ -46,7 +46,7 @@ struct SDKResourceInspectorView: View {
                 .padding(.vertical, 4)
             }
 
-            Section("Assets") {
+            Section(header: Text("Assets")) {
                 if assets.isEmpty && !isScanning {
                     Text("No assets found in managed directories").font(.caption).foregroundStyle(.secondary)
                 } else {
@@ -56,7 +56,7 @@ struct SDKResourceInspectorView: View {
                 }
             }
 
-            Section("Components") {
+            Section(header: Text("Components")) {
                 if modules.isEmpty && !isScanning {
                     Text("No components found").font(.caption).foregroundStyle(.secondary)
                 } else {
@@ -66,7 +66,7 @@ struct SDKResourceInspectorView: View {
                 }
             }
 
-            Section("Maintenance") {
+            Section(header: Text("Maintenance")) {
                 Button(role: .destructive) {
                     showingPruneConfirmation = true
                 } label: {

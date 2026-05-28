@@ -17,13 +17,13 @@ struct QueryStringParserView: View {
 
     var body: some View {
         Form {
-            Section("Input URL / Query String") {
+            Section(header: Text("Input URL / Query String")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 100)
                     .font(.system(.caption, design: .monospaced))
             }
 
-            Section("Parameters") {
+            Section(header: Text("Parameters")) {
                 if viewModel.parameters.isEmpty {
                     Text("No parameters detected").foregroundStyle(.secondary)
                 } else {
@@ -44,7 +44,7 @@ struct QueryStringParserView: View {
                 }
             }
 
-            Section("Generated Output") {
+            Section(header: Text("Generated Output")) {
                 Text(viewModel.output)
                     .font(.system(.caption2, design: .monospaced))
                     .padding(8)

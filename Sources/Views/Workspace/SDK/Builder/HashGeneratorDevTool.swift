@@ -18,7 +18,7 @@ struct HashGeneratorDevToolView: View {
 
     var body: some View {
         Form {
-            Section("Input Content") {
+            Section(header: Text("Input Content")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 100)
                 HStack {
@@ -31,7 +31,7 @@ struct HashGeneratorDevToolView: View {
                 }
             }
 
-            Section("Encoding") {
+            Section(header: Text("Encoding")) {
                 Picker("Input Encoding", selection: $viewModel.encoding) {
                     Text("UTF-8").tag(HashEncoding.utf8)
                     Text("ASCII").tag(HashEncoding.ascii)
@@ -46,7 +46,7 @@ struct HashGeneratorDevToolView: View {
                 }
             }
 
-            Section("Hash Results") {
+            Section(header: Text("Hash Results")) {
                 VStack(alignment: .leading, spacing: 12) {
                     hashRow(title: "SHA-256", value: viewModel.sha256)
                     hashRow(title: "SHA-384", value: viewModel.sha384)
@@ -55,14 +55,14 @@ struct HashGeneratorDevToolView: View {
                 }
             }
 
-            Section("HMAC") {
+            Section(header: Text("HMAC")) {
                 SecureField("HMAC Key", text: $viewModel.hmacKey)
                 if !viewModel.hmacKey.isEmpty {
                     hashRow(title: "HMAC-SHA256", value: viewModel.hmacSha256)
                 }
             }
 
-            Section("Hash Comparison") {
+            Section(header: Text("Hash Comparison")) {
                 TextField("Paste hash to compare", text: $viewModel.compareHash)
                     .font(.system(.caption, design: .monospaced))
                     .textInputAutocapitalization(.never)
@@ -77,7 +77,7 @@ struct HashGeneratorDevToolView: View {
                 }
             }
 
-            Section("Statistics") {
+            Section(header: Text("Statistics")) {
                 LabeledContent("Input length", value: "\(viewModel.input.count) chars")
                 LabeledContent("Byte count", value: "\(viewModel.input.data(using: .utf8)?.count ?? 0) bytes")
             }

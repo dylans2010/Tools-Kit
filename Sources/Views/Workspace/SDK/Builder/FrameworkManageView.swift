@@ -737,21 +737,21 @@ struct FrameworkManageView: View {
 
     private var batchActionsMenu: some View {
         Menu {
-            Section("Export") {
+            Section(header: Text("Export")) {
                 Button { batchExport() } label: {
                     Label("Export as .zip", systemImage: "archivebox")
                 }
             }
-            Section("Link Type") {
+            Section(header: Text("Link Type")) {
                 Button("Set Required") { batchUpdateLinkType(.required) }
                 Button("Set Optional") { batchUpdateLinkType(.optional) }
             }
-            Section("Embed Mode") {
+            Section(header: Text("Embed Mode")) {
                 Button("Embed & Sign") { batchUpdateEmbedMode(.embedAndSign) }
                 Button("Embed Without Signing") { batchUpdateEmbedMode(.embedWithoutSigning) }
                 Button("Do Not Embed") { batchUpdateEmbedMode(.doNotEmbed) }
             }
-            Section("Status") {
+            Section(header: Text("Status")) {
                 Button("Enable All") { batchUpdateEnabled(true) }
                 Button("Disable All") { batchUpdateEnabled(false) }
             }
@@ -824,7 +824,7 @@ struct FrameworkManageView: View {
 
     private var sortMenu: some View {
         Menu {
-            Section("Sort") {
+            Section(header: Text("Sort")) {
                 Picker("Primary Sort", selection: $primarySort) {
                     ForEach(SortOption.allCases, id: \.self) { option in
                         Text(option.rawValue).tag(option)
@@ -842,7 +842,7 @@ struct FrameworkManageView: View {
                 }
             }
 
-            Section("Presets") {
+            Section(header: Text("Presets")) {
                 if presets.isEmpty {
                     Text("No saved presets").font(.caption).foregroundStyle(.secondary)
                 } else {
@@ -925,7 +925,7 @@ struct FrameworkManageView: View {
     }
 
     private var frameworkListSection: some View {
-        Section("Installed Frameworks (\(filteredFrameworks.count))") {
+        Section(header: Text("Installed Frameworks (\(filteredFrameworks.count))")) {
             if filteredFrameworks.isEmpty {
                 ContentUnavailableView("No Frameworks", systemImage: "cpu", description: Text("Upload or create a framework."))
             } else {
@@ -972,7 +972,7 @@ struct FrameworkManageView: View {
     }
 
     private var executionStateSection: some View {
-        Section("Execution Pipeline") {
+        Section(header: Text("Execution Pipeline")) {
             LabeledContent("State", value: manager.executionState.rawValue)
             LabeledContent("Total Executions", value: "\(manager.executionRecords.count)")
             LabeledContent("Active Bindings", value: "\(manager.activeBindings.count)")
@@ -980,7 +980,7 @@ struct FrameworkManageView: View {
     }
 
     private var liveMonitoringSection: some View {
-        Section("Live Monitoring") {
+        Section(header: Text("Live Monitoring")) {
             let runningCount = registry.frameworks.filter { $0.lifecycleState == .running }.count
             HStack {
                 Circle().fill(runningCount > 0 ? .green : .secondary).frame(width: 8, height: 8)
@@ -995,7 +995,7 @@ struct FrameworkManageView: View {
     }
 
     private var sandboxSection: some View {
-        Section("Sandbox Constraints") {
+        Section(header: Text("Sandbox Constraints")) {
             LabeledContent("Max Time", value: "\(manager.sandboxConfig.maxExecutionTimeMs)ms")
             LabeledContent("Max Memory", value: "\(manager.sandboxConfig.maxMemoryBytes / (1024*1024))MB")
             LabeledContent("Filesystem", value: manager.sandboxConfig.allowFileSystem ? "Allowed" : "Blocked")
@@ -1004,7 +1004,7 @@ struct FrameworkManageView: View {
     }
 
     private var executionHistorySection: some View {
-        Section("Execution History") {
+        Section(header: Text("Execution History")) {
             if manager.executionRecords.isEmpty {
                 Text("No Executions Yet").foregroundStyle(.secondary).font(.caption)
             } else {
@@ -1047,7 +1047,7 @@ struct FrameworkInfoPlistView: View {
     private func renderNode(key: String, value: AnyHashable) -> some View {
         if let dict = value as? [String: AnyHashable] {
             AnyView(
-                Section(key) {
+                Section(header: Text(key)) {
                     ForEach(dict.keys.sorted(), id: \.self) { subkey in
                         renderNode(key: subkey, value: dict[subkey]!)
                     }
@@ -1055,7 +1055,7 @@ struct FrameworkInfoPlistView: View {
             )
         } else if let array = value as? [AnyHashable] {
             AnyView(
-                Section(key) {
+                Section(header: Text(key)) {
                     ForEach(Array(array.enumerated()), id: \.offset) { index, subvalue in
                         renderNode(key: "[\(index)]", value: subvalue)
                     }
@@ -1115,7 +1115,7 @@ struct FrameworkDiagnosticsView: View {
                 .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
             }
 
-            Section("Issues (\(issues.count))") {
+            Section(header: Text("Issues (\(issues.count))")) {
                 if isScanning {
                     HStack {
                         ProgressView().controlSize(.small)
@@ -1427,7 +1427,7 @@ struct FrameworkInstallSheet: View {
 
     var body: some View {
         Form {
-            Section("Templates") {
+            Section(header: Text("Templates")) {
                 Picker("Select Template", selection: $selectedTemplate) {
                     Text("Custom").tag(nil as UUID?)
                     ForEach(FrameworkManager.templates) { template in
@@ -1443,7 +1443,7 @@ struct FrameworkInstallSheet: View {
                 }
             }
 
-            Section("Framework Info") {
+            Section(header: Text("Framework Info")) {
                 TextField("Name", text: $name)
                 TextField("Entry Points (comma-separated)", text: $entryPointsText)
                 Picker("Language", selection: $language) {
@@ -1574,7 +1574,7 @@ struct FrameworkDetailSheet: View {
 
     var body: some View {
         List {
-            Section("Details") {
+            Section(header: Text("Details")) {
                 LabeledContent("Name", value: framework.name)
                 LabeledContent("Path", value: framework.path)
                 LabeledContent("Type", value: framework.type.rawValue.capitalized)
@@ -1584,7 +1584,7 @@ struct FrameworkDetailSheet: View {
                 LabeledContent("Enabled", value: framework.isEnabled ? "Yes" : "No")
             }
 
-            Section("Code Signature") {
+            Section(header: Text("Code Signature")) {
                 LabeledContent("Team ID", value: teamID)
                 if !entitlements.isEmpty {
                     NavigationLink("Entitlements (\(entitlements.count))") {
@@ -1595,7 +1595,7 @@ struct FrameworkDetailSheet: View {
             }
 
             if !infoPlist.isEmpty {
-                Section("Metadata") {
+                Section(header: Text("Metadata")) {
                     NavigationLink("Info.plist Viewer") {
                         FrameworkInfoPlistView(data: infoPlist)
                     }
@@ -1603,14 +1603,14 @@ struct FrameworkDetailSheet: View {
             }
 
             if !linkerDependencies.isEmpty {
-                Section("Linker Dependencies") {
+                Section(header: Text("Linker Dependencies")) {
                     ForEach(linkerDependencies, id: \.self) { dep in
                         Text(dep).font(.caption2.monospaced())
                     }
                 }
             }
 
-            Section("Binary Info") {
+            Section(header: Text("Binary Info")) {
                 LabeledContent("Size", value: ByteCountFormatter.string(fromByteCount: framework.size, countStyle: .file))
                 LabeledContent("Last Modified", value: framework.lastModified.formatted())
                 LabeledContent("Min OS", value: minOSVersion)
@@ -1639,7 +1639,7 @@ struct FrameworkDetailSheet: View {
                     }
                 }
             }
-            Section("Sandbox Profile") {
+            Section(header: Text("Sandbox Profile")) {
                 Picker("Profile", selection: Binding(
                     get: { framework.sandboxProfile },
                     set: { manager.setSandboxProfile(id: framework.id, profile: $0) }
@@ -1659,12 +1659,12 @@ struct FrameworkDetailSheet: View {
                 }
                 .font(.caption2).foregroundStyle(.secondary)
             }
-            Section("Entry Points") {
+            Section(header: Text("Entry Points")) {
                 ForEach(framework.entryPoints, id: \.self) { ep in
                     Label(ep, systemImage: "arrow.right.circle").font(.caption)
                 }
             }
-            Section("Package Dependencies") {
+            Section(header: Text("Package Dependencies")) {
                 if framework.packageDependencies.isEmpty {
                     Text("No Package Dependencies").foregroundStyle(.secondary)
                 } else {
@@ -1674,7 +1674,7 @@ struct FrameworkDetailSheet: View {
                 }
             }
 
-            Section("Framework Dependencies") {
+            Section(header: Text("Framework Dependencies")) {
                 if framework.frameworkDependencies.isEmpty {
                     Text("No Framework Dependencies").foregroundStyle(.secondary)
                 } else {
@@ -1687,12 +1687,12 @@ struct FrameworkDetailSheet: View {
                     }
                 }
             }
-            Section("Scopes") {
+            Section(header: Text("Scopes")) {
                 ForEach(framework.requiredScopes, id: \.rawValue) { scope in
                     Label(scope.displayName, systemImage: "lock").font(.caption)
                 }
             }
-            Section("Dependency Binding") {
+            Section(header: Text("Dependency Binding")) {
                 Button("Rebind Dependencies") {
                     _ = manager.bindDependencies(for: framework.id)
                 }
@@ -1708,7 +1708,7 @@ struct FrameworkDetailSheet: View {
                 }
             }
 
-            Section("Live Logs") {
+            Section(header: Text("Live Logs")) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 4) {
                         ForEach(framework.logs) { log in
@@ -1728,7 +1728,7 @@ struct FrameworkDetailSheet: View {
                 .frame(height: 100)
             }
 
-            Section("Error Intelligence") {
+            Section(header: Text("Error Intelligence")) {
                 if let analysis = manager.analyzeError(manager.executionRecords.last { $0.frameworkId == framework.id }?.output ?? "") {
                     VStack(alignment: .leading, spacing: 4) {
                         Label(analysis.errorCode, systemImage: "bolt.shield")
@@ -1743,7 +1743,7 @@ struct FrameworkDetailSheet: View {
                 }
             }
 
-            Section("Resource Consumption History (Last 5)") {
+            Section(header: Text("Resource Consumption History (Last 5)")) {
                 let records = manager.executionRecords.filter { $0.frameworkId == framework.id }.suffix(5).reversed()
                 if records.isEmpty {
                     Text("No resource data available").font(.caption2).foregroundStyle(.secondary)
@@ -1766,7 +1766,7 @@ struct FrameworkDetailSheet: View {
                 }
             }
 
-            Section("Management") {
+            Section(header: Text("Management")) {
                 Button { manager.hotReload(id: framework.id) } label: {
                     Label("Hot-Reload from Filesystem", systemImage: "arrow.clockwise")
                 }
@@ -1778,7 +1778,7 @@ struct FrameworkDetailSheet: View {
                 }
             }
 
-            Section("Execution Controls") {
+            Section(header: Text("Execution Controls")) {
                 HStack {
                     Label("Health Status", systemImage: manager.preExecuteHealthCheck(id: framework.id) ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
                         .foregroundStyle(manager.preExecuteHealthCheck(id: framework.id) ? .green : .red)
@@ -2024,7 +2024,7 @@ struct FrameworkEnvVarEditor: View {
 
     var body: some View {
         List {
-            Section("Current Variables") {
+            Section(header: Text("Current Variables")) {
                 ForEach(envVars) { varItem in
                     HStack {
                         Text(varItem.key).font(.caption.bold())
@@ -2039,7 +2039,7 @@ struct FrameworkEnvVarEditor: View {
                 }
             }
 
-            Section("Add New") {
+            Section(header: Text("Add New")) {
                 TextField("Key", text: $newKey)
                 TextField("Value", text: $newValue)
                 Button("Add") {

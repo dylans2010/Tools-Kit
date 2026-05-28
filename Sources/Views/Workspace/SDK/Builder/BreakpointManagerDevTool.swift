@@ -17,7 +17,7 @@ struct BreakpointManagerView: View {
 
     var body: some View {
         List {
-            Section("Active Breakpoints") {
+            Section(header: Text("Active Breakpoints")) {
                 if viewModel.breakpoints.isEmpty {
                     Text("No breakpoints defined").foregroundStyle(.secondary)
                 } else {

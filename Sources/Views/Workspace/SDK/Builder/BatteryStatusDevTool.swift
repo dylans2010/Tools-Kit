@@ -38,7 +38,7 @@ struct BatteryStatusView: View {
                 .padding()
 
                 Form {
-                    Section("Power Details") {
+                    Section(header: Text("Power Details")) {
                         LabeledContent("Charging State", value: viewModel.state)
                         LabeledContent("Level", value: String(format: "%.0f%%", viewModel.level * 100))
                     }

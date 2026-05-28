@@ -17,13 +17,13 @@ struct Base64EncoderView: View {
 
     var body: some View {
         Form {
-            Section("Input") {
+            Section(header: Text("Input")) {
                 TextEditor(text: $viewModel.inputText)
                     .frame(height: 120)
                     .font(.system(.body, design: .monospaced))
             }
 
-            Section("Configuration") {
+            Section(header: Text("Configuration")) {
                 Toggle("URL Safe Encoding", isOn: $viewModel.isURLSafe)
                 Picker("Encoding", selection: $viewModel.encoding) {
                     Text("UTF-8").tag(String.Encoding.utf8)
@@ -32,7 +32,7 @@ struct Base64EncoderView: View {
                 }
             }
 
-            Section("Output") {
+            Section(header: Text("Output")) {
                 Text(viewModel.outputText)
                     .font(.system(.body, design: .monospaced))
                     .textSelection(.enabled)

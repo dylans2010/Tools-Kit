@@ -368,7 +368,7 @@ struct SDKDebugView: View {
 
     private var memoryProfileSheet: some View {
         List {
-            Section("Memory Snapshots") {
+            Section(header: Text("Memory Snapshots")) {
                 if memorySnapshots.isEmpty {
                     Text("No Snapshots Taken").font(.caption).foregroundStyle(.secondary)
                 } else {
@@ -401,7 +401,7 @@ struct SDKDebugView: View {
 
     private var threadInspectorSheet: some View {
         List {
-            Section("Active Threads") {
+            Section(header: Text("Active Threads")) {
                 let threadCount = ProcessInfo.processInfo.activeProcessorCount
                 ForEach(0..<threadCount, id: \.self) { i in
                     HStack {
@@ -417,7 +417,7 @@ struct SDKDebugView: View {
                     }
                 }
             }
-            Section("Thread Safety") {
+            Section(header: Text("Thread Safety")) {
                 LabeledContent("Main Thread Checker", value: "Enabled")
                 LabeledContent("Data Race Detection", value: "Active")
                 LabeledContent("Deadlock Monitor", value: "Watching")
@@ -429,7 +429,7 @@ struct SDKDebugView: View {
 
     private var networkLogSheet: some View {
         List {
-            Section("Network Requests (\(networkRequests.count))") {
+            Section(header: Text("Network Requests (\(networkRequests.count))")) {
                 if networkRequests.isEmpty {
                     ContentUnavailableView("No Network Activity", systemImage: "network.slash", description: Text("Network requests will appear here."))
                 } else {
@@ -464,18 +464,18 @@ struct SDKDebugView: View {
 
     private var environmentDumpSheet: some View {
         List {
-            Section("Process Info") {
+            Section(header: Text("Process Info")) {
                 LabeledContent("Process ID", value: "\(ProcessInfo.processInfo.processIdentifier)")
                 LabeledContent("Process Name", value: ProcessInfo.processInfo.processName)
                 LabeledContent("Host Name", value: ProcessInfo.processInfo.hostName)
                 LabeledContent("OS Version", value: ProcessInfo.processInfo.operatingSystemVersionString)
             }
-            Section("Hardware") {
+            Section(header: Text("Hardware")) {
                 LabeledContent("Physical Memory", value: "\(ProcessInfo.processInfo.physicalMemory / 1024 / 1024) MB")
                 LabeledContent("Processors", value: "\(ProcessInfo.processInfo.processorCount)")
                 LabeledContent("Active Processors", value: "\(ProcessInfo.processInfo.activeProcessorCount)")
             }
-            Section("Locale") {
+            Section(header: Text("Locale")) {
                 LabeledContent("Language", value: Locale.current.language.languageCode?.identifier ?? "N/A")
                 LabeledContent("Region", value: Locale.current.region?.identifier ?? "N/A")
                 LabeledContent("Calendar", value: Calendar.current.identifier.debugDescription)
@@ -488,7 +488,7 @@ struct SDKDebugView: View {
 
     private var crashAnalysisSheet: some View {
         List {
-            Section("Crash Reports") {
+            Section(header: Text("Crash Reports")) {
                 let crashes = logStore.entries.filter { $0.level == .error }
                 if crashes.isEmpty {
                     ContentUnavailableView("No Crashes", systemImage: "checkmark.shield", description: Text("No crash reports available."))
@@ -507,7 +507,7 @@ struct SDKDebugView: View {
                     }
                 }
             }
-            Section("Analysis") {
+            Section(header: Text("Analysis")) {
                 let errorCount = logStore.entries.filter { $0.level == .error }.count
                 LabeledContent("Total Errors", value: "\(errorCount)")
                 let uniqueSources = Set(logStore.entries.filter { $0.level == .error }.compactMap(\.source))

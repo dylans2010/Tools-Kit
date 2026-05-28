@@ -202,18 +202,18 @@ struct CustomAppSDKView: View {
     @ViewBuilder
     private func appValidationDetailSheet(_ app: CustomAppSDKView.ImportedSDKApp) -> some View {
         List {
-            Section("App Details") {
+            Section(header: Text("App Details")) {
                 LabeledContent("Name", value: app.name)
                 LabeledContent("Version", value: "v\(app.version)")
                 LabeledContent("SDK Compatibility", value: app.sdkCompatibility)
                 LabeledContent("Status", value: app.status.rawValue.capitalized)
             }
-            Section("Contents") {
+            Section(header: Text("Contents")) {
                 LabeledContent("Modules", value: "\(app.moduleCount)")
                 LabeledContent("Plugins", value: "\(app.pluginCount)")
                 LabeledContent("Connectors", value: "\(app.connectorCount)")
             }
-            Section("Actions") {
+            Section(header: Text("Actions")) {
                 Button(action: { validateApp(app) }) {
                     Label(isValidating ? "Validating..." : "Validate Structure", systemImage: "checkmark.shield")
                 }

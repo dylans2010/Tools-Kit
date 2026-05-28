@@ -17,7 +17,7 @@ struct EnergyImpactMonitorView: View {
 
     var body: some View {
         Form {
-            Section("Impact Score") {
+            Section(header: Text("Impact Score")) {
                 HStack {
                     Text("\(Int(viewModel.impactScore))")
                         .font(.system(size: 40, weight: .bold))
@@ -31,7 +31,7 @@ struct EnergyImpactMonitorView: View {
                 }
             }
 
-            Section("Contributors") {
+            Section(header: Text("Contributors")) {
                 LabeledContent("CPU Intensity", value: viewModel.cpuIntensity)
                 LabeledContent("Network Activity", value: viewModel.networkActivity)
                 LabeledContent("Location Updates", value: viewModel.locationActive ? "Active" : "Idle")

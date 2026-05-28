@@ -41,7 +41,7 @@ struct FPSMonitorView: View {
             }
 
             Form {
-                Section("Statistics") {
+                Section(header: Text("Statistics")) {
                     LabeledContent("Min FPS", value: "\(Int(viewModel.minFPS))")
                     LabeledContent("Max FPS", value: "\(Int(viewModel.maxFPS))")
                 }

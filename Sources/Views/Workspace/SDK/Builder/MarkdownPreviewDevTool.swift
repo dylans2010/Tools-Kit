@@ -40,7 +40,7 @@ struct MarkdownPreviewDevToolView: View {
             Divider()
 
             Form {
-                Section("Templates") {
+                Section(header: Text("Templates")) {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             ForEach(MarkdownPreviewViewModel.templates, id: \.name) { template in
@@ -54,7 +54,7 @@ struct MarkdownPreviewDevToolView: View {
                     }
                 }
 
-                Section("Quick Insert") {
+                Section(header: Text("Quick Insert")) {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             Button("H1") { viewModel.insert("# ") }
@@ -76,7 +76,7 @@ struct MarkdownPreviewDevToolView: View {
                     }
                 }
 
-                Section("Statistics") {
+                Section(header: Text("Statistics")) {
                     HStack {
                         LabeledContent("Characters", value: "\(viewModel.input.count)")
                         Spacer()

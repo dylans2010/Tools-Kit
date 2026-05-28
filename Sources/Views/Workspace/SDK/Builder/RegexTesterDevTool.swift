@@ -17,7 +17,7 @@ struct RegexTesterDevToolView: View {
 
     var body: some View {
         Form {
-            Section("Regex Pattern") {
+            Section(header: Text("Regex Pattern")) {
                 TextField("^([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$", text: $viewModel.pattern)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
@@ -32,7 +32,7 @@ struct RegexTesterDevToolView: View {
                 .toggleStyle(.button)
             }
 
-            Section("Input Text") {
+            Section(header: Text("Input Text")) {
                 TextEditor(text: $viewModel.inputText)
                     .frame(height: 100)
                     .font(.system(.body, design: .monospaced))
@@ -51,7 +51,7 @@ struct RegexTesterDevToolView: View {
                 }
             }
 
-            Section("Matches (\(viewModel.matches.count))") {
+            Section(header: Text("Matches (\(viewModel.matches.count))")) {
                 if !viewModel.isValid {
                     Label("Invalid Regex Pattern", systemImage: "xmark.circle")
                         .foregroundStyle(.red)
@@ -93,7 +93,7 @@ struct RegexTesterDevToolView: View {
                 }
             }
 
-            Section("Replace") {
+            Section(header: Text("Replace")) {
                 TextField("Replacement string", text: $viewModel.replacement)
                     .font(.system(.caption, design: .monospaced))
                     .textInputAutocapitalization(.never)
@@ -106,7 +106,7 @@ struct RegexTesterDevToolView: View {
                 }
             }
 
-            Section("Common Patterns") {
+            Section(header: Text("Common Patterns")) {
                 ForEach(RegexTesterViewModel.commonPatterns, id: \.name) { pattern in
                     Button {
                         viewModel.pattern = pattern.regex

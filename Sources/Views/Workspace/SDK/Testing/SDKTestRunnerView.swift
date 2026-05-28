@@ -6,7 +6,7 @@ struct SDKTestRunnerView: View {
 
     var body: some View {
         List {
-            Section("Controls") {
+            Section(header: Text("Controls")) {
                 HStack {
                     Button {
                         Task { await runAll() }
@@ -30,7 +30,7 @@ struct SDKTestRunnerView: View {
                 }
             }
 
-            Section("Test Suites (\(harness.testSuites.count))") {
+            Section(header: Text("Test Suites (\(harness.testSuites.count))")) {
                 if harness.testSuites.isEmpty {
                     ContentUnavailableView("No Test Suites", systemImage: "testtube.2", description: Text("Register test suites to get started."))
                 } else {
@@ -57,7 +57,7 @@ struct SDKTestRunnerView: View {
             }
 
             if let result = harness.lastRunResult {
-                Section("Last Run") {
+                Section(header: Text("Last Run")) {
                     HStack(spacing: 16) {
                         resultCard(title: "Passed", value: "\(result.passedCount)", color: .green)
                         resultCard(title: "Failed", value: "\(result.failedCount)", color: .red)
@@ -67,7 +67,7 @@ struct SDKTestRunnerView: View {
                     LabeledContent("All Passed", value: result.allPassed ? "Yes" : "No")
                 }
 
-                Section("Results") {
+                Section(header: Text("Results")) {
                     ForEach(result.caseResults) { caseResult in
                         HStack {
                             Image(systemName: caseResult.status == .passed ? "checkmark.circle.fill" : "xmark.circle.fill")
@@ -95,7 +95,7 @@ struct SDKTestRunnerView: View {
             }
 
             if !harness.runHistory.isEmpty {
-                Section("History (\(harness.runHistory.count) Runs)") {
+                Section(header: Text("History (\(harness.runHistory.count) Runs)")) {
                     ForEach(harness.runHistory) { run in
                         HStack {
                             Image(systemName: run.allPassed ? "checkmark.circle" : "xmark.circle")

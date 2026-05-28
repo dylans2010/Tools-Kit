@@ -49,7 +49,7 @@ struct HTTPRequestTesterView: View {
 
     private var requestTab: some View {
         Form {
-            Section("Endpoint") {
+            Section(header: Text("Endpoint")) {
                 HStack {
                     Picker("Method", selection: $viewModel.method) {
                         ForEach(["GET", "POST", "PUT", "PATCH", "DELETE"], id: \.self) { method in
@@ -64,7 +64,7 @@ struct HTTPRequestTesterView: View {
                 }
             }
 
-            Section("Body") {
+            Section(header: Text("Body")) {
                 TextEditor(text: $viewModel.body)
                     .frame(height: 150)
                     .font(.system(.caption, design: .monospaced))
@@ -125,7 +125,7 @@ struct HTTPRequestTesterView: View {
         VStack {
             if let response = viewModel.lastResponse {
                 List {
-                    Section("Status") {
+                    Section(header: Text("Status")) {
                         HStack {
                             Text("\(response.statusCode)")
                                 .font(.caption2.bold())
@@ -141,13 +141,13 @@ struct HTTPRequestTesterView: View {
                         }
                     }
 
-                    Section("Response Headers") {
+                    Section(header: Text("Response Headers")) {
                         ForEach(response.headers.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
                             LabeledContent(key, value: value)
                         }
                     }
 
-                    Section("Body") {
+                    Section(header: Text("Body")) {
                         ScrollView {
                             Text(response.body)
                                 .font(.system(.caption2, design: .monospaced))

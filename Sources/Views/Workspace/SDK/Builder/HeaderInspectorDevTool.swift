@@ -18,7 +18,7 @@ struct HeaderInspectorView: View {
 
     var body: some View {
         Form {
-            Section("Input Raw Headers") {
+            Section(header: Text("Input Raw Headers")) {
                 TextEditor(text: $rawHeaders)
                     .frame(height: 150)
                     .font(.system(.caption, design: .monospaced))
@@ -30,7 +30,7 @@ struct HeaderInspectorView: View {
             }
 
             if !viewModel.headers.isEmpty {
-                Section("Analysis") {
+                Section(header: Text("Analysis")) {
                     ForEach(viewModel.analysisResults) { result in
                         HStack {
                             Image(systemName: result.isPositive ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
@@ -43,7 +43,7 @@ struct HeaderInspectorView: View {
                     }
                 }
 
-                Section("Parsed Headers") {
+                Section(header: Text("Parsed Headers")) {
                     ForEach(viewModel.headers.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
                         VStack(alignment: .leading) {
                             Text(key).font(.caption.bold()).foregroundStyle(Color.accentColor)

@@ -35,7 +35,7 @@ struct SDKFeatureFlagView: View {
     }
 
     private var summarySection: some View {
-        Section("Summary") {
+        Section(header: Text("Summary")) {
             let allFlags = flagService.allFlags
             LabeledContent("Total Flags", value: "\(allFlags.count)")
             LabeledContent("Enabled", value: "\(allFlags.filter(\.isEnabled).count)")
@@ -45,7 +45,7 @@ struct SDKFeatureFlagView: View {
     }
 
     private var filterSection: some View {
-        Section("Filter") {
+        Section(header: Text("Filter")) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     FilterChip(title: "All", isSelected: selectedCategory == nil, action: {
@@ -64,7 +64,7 @@ struct SDKFeatureFlagView: View {
     }
 
     private var flagsSection: some View {
-        Section("Flags (\(filteredFlags.count))") {
+        Section(header: Text("Flags (\(filteredFlags.count))")) {
             if filteredFlags.isEmpty {
                 ContentUnavailableView(
                     "No Flags",
@@ -82,7 +82,7 @@ struct SDKFeatureFlagView: View {
     }
 
     private var actionsSection: some View {
-        Section("Actions") {
+        Section(header: Text("Actions")) {
             Button(role: .destructive) {
                 flagService.resetToDefaults()
             } label: {

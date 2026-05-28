@@ -17,7 +17,7 @@ struct TextCaseConverterView: View {
 
     var body: some View {
         Form {
-            Section("Input") {
+            Section(header: Text("Input")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 80)
                 HStack {
@@ -34,7 +34,7 @@ struct TextCaseConverterView: View {
                 }
             }
 
-            Section("Case Conversions") {
+            Section(header: Text("Case Conversions")) {
                 VStack(alignment: .leading, spacing: 10) {
                     caseRow(title: "UPPERCASE", value: viewModel.input.uppercased())
                     caseRow(title: "lowercase", value: viewModel.input.lowercased())
@@ -51,14 +51,14 @@ struct TextCaseConverterView: View {
                 }
             }
 
-            Section("Statistics") {
+            Section(header: Text("Statistics")) {
                 LabeledContent("Characters", value: "\(viewModel.input.count)")
                 LabeledContent("Words", value: "\(viewModel.wordCount)")
                 LabeledContent("Lines", value: "\(viewModel.lineCount)")
                 LabeledContent("Unique chars", value: "\(Set(viewModel.input).count)")
             }
 
-            Section("Text Operations") {
+            Section(header: Text("Text Operations")) {
                 HStack(spacing: 8) {
                     Button("Reverse") { viewModel.input = String(viewModel.input.reversed()) }
                         .buttonStyle(.bordered).controlSize(.small)

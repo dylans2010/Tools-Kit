@@ -17,12 +17,12 @@ struct ContrastCheckerView: View {
 
     var body: some View {
         Form {
-            Section("Colors") {
+            Section(header: Text("Colors")) {
                 ColorPicker("Background", selection: $viewModel.backgroundColor)
                 ColorPicker("Foreground (Text)", selection: $viewModel.foregroundColor)
             }
 
-            Section("Preview") {
+            Section(header: Text("Preview")) {
                 Text("Sample Text")
                     .font(.title.bold())
                     .foregroundStyle(viewModel.foregroundColor)
@@ -32,7 +32,7 @@ struct ContrastCheckerView: View {
                     .cornerRadius(8)
             }
 
-            Section("WCAG Results") {
+            Section(header: Text("WCAG Results")) {
                 HStack {
                     Text("Ratio: \(String(format: "%.2f", viewModel.contrastRatio)):1")
                         .font(.headline)

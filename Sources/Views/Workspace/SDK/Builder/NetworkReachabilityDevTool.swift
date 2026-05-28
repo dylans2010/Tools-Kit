@@ -18,7 +18,7 @@ struct NetworkReachabilityView: View {
 
     var body: some View {
         Form {
-            Section("Status") {
+            Section(header: Text("Status")) {
                 HStack {
                     Text(viewModel.status.description)
                         .font(.caption2.bold())
@@ -40,14 +40,14 @@ struct NetworkReachabilityView: View {
                 LabeledContent("Interface Type", value: viewModel.interfaceType)
             }
 
-            Section("Capabilities") {
+            Section(header: Text("Capabilities")) {
                 Toggle("DNS Required", isOn: .constant(true)).disabled(true)
                 Toggle("IPv4 Supported", isOn: .constant(viewModel.supportsIPv4)).disabled(true)
                 Toggle("IPv6 Supported", isOn: .constant(viewModel.supportsIPv6)).disabled(true)
                 Toggle("VPN Active", isOn: .constant(viewModel.isVPNActive)).disabled(true)
             }
 
-            Section("Active Interfaces") {
+            Section(header: Text("Active Interfaces")) {
                 ForEach(viewModel.interfaces, id: \.self) { interface in
                     Label(interface, systemImage: interfaceIcon(for: interface))
                 }

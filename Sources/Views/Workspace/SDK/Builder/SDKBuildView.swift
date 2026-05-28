@@ -260,7 +260,7 @@ struct SDKBuildView: View {
     @ViewBuilder
     private var buildResultSection: some View {
         if let url = exportedURL {
-            Section("Build Result") {
+            Section(header: Text("Build Result")) {
                 Label("Build Successful", systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
                 HStack {
@@ -276,7 +276,7 @@ struct SDKBuildView: View {
         }
 
         if let error = errorMessage {
-            Section("Pipeline Failure") {
+            Section(header: Text("Pipeline Failure")) {
                 Label(error, systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(.red)
             }
@@ -497,7 +497,7 @@ struct SDKBuildView: View {
 
     private var metadataSheet: some View {
         Form {
-            Section("Project Info") {
+            Section(header: Text("Project Info")) {
                 TextField("Project Name", text: $metadataName)
                 TextField("Description", text: $metadataDescription, axis: .vertical)
                     .lineLimit(3...5)
@@ -507,8 +507,8 @@ struct SDKBuildView: View {
                     }
                 }
             }
-            Section("Access Scopes") { scopeSelector }
-            Section("Assignments") { connectorAndToolAssignment }
+            Section(header: Text("Access Scopes")) { scopeSelector }
+            Section(header: Text("Assignments")) { connectorAndToolAssignment }
         }
         .navigationTitle("Project Metadata")
         .navigationBarTitleDisplayMode(.inline)

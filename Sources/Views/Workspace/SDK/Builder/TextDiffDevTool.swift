@@ -42,7 +42,7 @@ struct TextDiffView: View {
             .padding(.horizontal)
 
             Form {
-                Section("Options") {
+                Section(header: Text("Options")) {
                     Picker("Diff Mode", selection: $viewModel.diffMode) {
                         Text("Line").tag(DiffMode.line)
                         Text("Word").tag(DiffMode.word)
@@ -53,7 +53,7 @@ struct TextDiffView: View {
                     Toggle("Ignore case", isOn: $viewModel.ignoreCase)
                 }
 
-                Section("Statistics") {
+                Section(header: Text("Statistics")) {
                     HStack(spacing: 16) {
                         VStack {
                             Text("\(viewModel.additions)").font(.title3.bold()).foregroundStyle(.green)
@@ -76,7 +76,7 @@ struct TextDiffView: View {
                     LabeledContent("Similarity", value: String(format: "%.1f%%", viewModel.similarity))
                 }
 
-                Section("Diff Result") {
+                Section(header: Text("Diff Result")) {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
                             ForEach(viewModel.diffLines) { (line: TextDiffView.DiffLine) in

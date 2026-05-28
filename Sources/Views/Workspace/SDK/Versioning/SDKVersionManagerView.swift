@@ -5,7 +5,7 @@ struct SDKVersionManagerView: View {
 
     var body: some View {
         List {
-            Section("Current Version") {
+            Section(header: Text("Current Version")) {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("SDK \(versionManager.versionString)")
@@ -21,7 +21,7 @@ struct SDKVersionManagerView: View {
                 }
             }
 
-            Section("Compatibility") {
+            Section(header: Text("Compatibility")) {
                 ForEach(Array(versionManager.compatibilityMatrix.keys.sorted()), id: \.self) { component in
                     let result = versionManager.checkComponentCompatibility(component)
                     HStack {
@@ -37,7 +37,7 @@ struct SDKVersionManagerView: View {
                 }
             }
 
-            Section("Changelog") {
+            Section(header: Text("Changelog")) {
                 ForEach(versionManager.changelog) { entry in
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
@@ -67,7 +67,7 @@ struct SDKVersionManagerView: View {
             }
 
             if !versionManager.activeDeprecations().isEmpty {
-                Section("Deprecations") {
+                Section(header: Text("Deprecations")) {
                     ForEach(versionManager.activeDeprecations()) { notice in
                         VStack(alignment: .leading, spacing: 4) {
                             Text(notice.api)

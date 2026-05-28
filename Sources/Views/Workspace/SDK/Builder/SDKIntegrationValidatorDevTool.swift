@@ -36,7 +36,7 @@ struct SDKIntegrationValidatorView: View {
 
     var body: some View {
         List {
-            Section("Validation Results") {
+            Section(header: Text("Validation Results")) {
                 ForEach(viewModel.results) { (result: SDKIntegrationValidatorView.ValidationResult) in
                     HStack {
                         Image(systemName: result.isPassed ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")

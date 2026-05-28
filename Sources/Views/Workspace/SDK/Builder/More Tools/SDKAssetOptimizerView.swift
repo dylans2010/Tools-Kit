@@ -11,7 +11,7 @@ struct SDKAssetOptimizerView: View {
 
     var body: some View {
         List {
-            Section("Optimization Targets") {
+            Section(header: Text("Optimization Targets")) {
                 Text("Select components to optimize and clear to reduce the SDK's footprint during development.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -30,7 +30,7 @@ struct SDKAssetOptimizerView: View {
                 }
             }
 
-            Section("Action") {
+            Section(header: Text("Action")) {
                 Button(action: runOptimizer) {
                     Label("Run Asset Optimizer", systemImage: "wand.and.stars")
                 }
@@ -38,14 +38,14 @@ struct SDKAssetOptimizerView: View {
             }
 
             if let results = optimizationResults {
-                Section("Results") {
+                Section(header: Text("Results")) {
                     Label(results, systemImage: "checkmark.circle.fill")
                         .font(.subheadline)
                         .foregroundStyle(.green)
                 }
             }
 
-            Section("Status") {
+            Section(header: Text("Status")) {
                 LabeledContent("Cache Status", value: dataEngine.isInitialized ? "Active" : "Invalid")
                 if let project = projectManager.currentProject {
                     LabeledContent("Project", value: project.name)

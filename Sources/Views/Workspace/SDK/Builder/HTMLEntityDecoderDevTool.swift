@@ -17,12 +17,12 @@ struct HTMLEntityDecoderView: View {
 
     var body: some View {
         Form {
-            Section("HTML Entities") {
+            Section(header: Text("HTML Entities")) {
                 TextEditor(text: $viewModel.input)
                     .frame(height: 120)
             }
 
-            Section("Plain Text") {
+            Section(header: Text("Plain Text")) {
                 Text(viewModel.output)
                     .font(.system(.body, design: .monospaced))
                     .textSelection(.enabled)

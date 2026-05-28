@@ -35,13 +35,13 @@ struct CPUMonitorView: View {
             .padding()
 
             Form {
-                Section("Live Metrics") {
+                Section(header: Text("Live Metrics")) {
                     LabeledContent("Current Usage", value: String(format: "%.1f%%", viewModel.currentUsage))
                     LabeledContent("Peak Usage", value: String(format: "%.1f%%", viewModel.peakUsage))
                     LabeledContent("Cores Detected", value: "\(ProcessInfo.processInfo.processorCount)")
                 }
 
-                Section("System State") {
+                Section(header: Text("System State")) {
                     LabeledContent("Low Power Mode", value: ProcessInfo.processInfo.isLowPowerModeEnabled ? "On" : "Off")
                     LabeledContent("Thermal State", value: viewModel.thermalState)
                 }
