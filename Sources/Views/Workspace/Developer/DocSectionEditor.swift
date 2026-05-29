@@ -1,41 +1,23 @@
 import SwiftUI
 
 struct DocSectionEditor: View {
-    @Binding var section: DocumentationSection
-    var onAddPage: () -> Void
+    @ObservedObject var docService = DocumentationService.shared
+    @State private var sectionType: DocumentationSectionType = .guide
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            TextField("Section Title", text: $section.title)
-                .font(.headline)
-                .textFieldStyle(.roundedBorder)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Pages").font(.subheadline.bold())
-
-                ForEach(section.pages) { page in
+        List {
+            Section("Document Sections") {
+                ForEach(DocumentationSectionType.allCases, id: \.self) { type in
                     HStack {
-                        Image(systemName: "doc.text").foregroundStyle(.secondary)
-                        Text(page.title)
+                        Text(type.rawValue)
                         Spacer()
-                        Image(systemName: "line.3.horizontal").foregroundStyle(.tertiary)
+                        Text("\(docService.pages.filter { $0.sectionType == type }.count) pages")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
-                    .padding()
-                    .background(Color.secondary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
-
-                Button {
-                    onAddPage()
-                } label: {
-                    Label("Add Page", systemImage: "plus.circle")
-                        .font(.subheadline)
-                }
-                .padding(.top, 4)
             }
         }
-        .padding()
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .navigationTitle("Section Manager")
     }
 }

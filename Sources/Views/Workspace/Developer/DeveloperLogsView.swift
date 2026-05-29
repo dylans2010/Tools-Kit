@@ -1,144 +1,107 @@
 import SwiftUI
 
 struct DeveloperLogsView: View {
+    @ObservedObject var logService = DeveloperLogService.shared
     @State private var searchText = ""
-    @State private var severityFilter: LogLevel?
-    @State private var isLive = true
-    @ObservedObject var logStore = SDKLogStore.shared
+    @State private var selectedSeverity: LogSeverity?
+    @State private var selectedCategory: LogCategory?
 
-    var filteredLogs: [SDKLogEntry] {
-        logStore.entries.filter { log in
-            (searchText.isEmpty || log.message.localizedCaseInsensitiveContains(searchText) || (log.source?.localizedCaseInsensitiveContains(searchText) ?? false)) &&
-            (severityFilter == nil || log.level == severityFilter)
+    var filteredLogs: [LogEntry] {
+        logService.logEntries.filter { entry in
+            (searchText.isEmpty || entry.message.localizedCaseInsensitiveContains(searchText) || entry.payload.localizedCaseInsensitiveContains(searchText)) &&
+            (selectedSeverity == nil || entry.severity == selectedSeverity) &&
+            (selectedCategory == nil || entry.category == selectedCategory)
         }
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            logFilterBar
-
-            if filteredLogs.isEmpty {
-                ContentUnavailableView("No Logs", systemImage: "list.bullet.rectangle", description: Text("No log entries match your filters."))
-            } else {
-                List {
-                    ForEach(filteredLogs) { log in
-                        DeveloperLogEntryRow(log: log)
+        List {
+            Section {
+                HStack {
+                    Picker("Severity", selection: $selectedSeverity) {
+                        Text("All").tag(Optional<LogSeverity>.none)
+                        ForEach(LogSeverity.allCases, id: \.self) { severity in
+                            Text(severity.rawValue).tag(Optional(severity))
+                        }
+                    }
+                    Divider()
+                    Picker("Category", selection: $selectedCategory) {
+                        Text("All").tag(Optional<LogCategory>.none)
+                        ForEach(LogCategory.allCases, id: \.self) { category in
+                            Text(category.rawValue).tag(Optional(category))
+                        }
                     }
                 }
-                .listStyle(.plain)
+            }
+
+            Section {
+                if filteredLogs.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "list.bullet.rectangle.portrait")
+                            .font(.system(size: 48))
+                            .foregroundStyle(.secondary)
+                        Text("No logs matching the current filters were found.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                } else {
+                    ForEach(filteredLogs) { entry in
+                        logRow(entry)
+                    }
+                }
             }
         }
+        .searchable(text: $searchText, prompt: "Search message or payload")
         .navigationTitle("Developer Logs")
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                HStack {
-                    if isLive {
-                        Text("LIVE").font(.system(size: 8, weight: .bold)).foregroundStyle(.red)
-                            .padding(.horizontal, 4).padding(.vertical, 2)
-                            .background(.red.opacity(0.1), in: Capsule())
-                    }
-                    Button {
-                        isLive.toggle()
-                    } label: {
-                        Image(systemName: isLive ? "pause.fill" : "play.fill")
-                    }
-                }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(role: .destructive) {
-                    logStore.clear()
+            ToolbarItem(placement: .secondaryAction) {
+                Button {
+                    Task { try? await logService.exportLogs(format: "json", filters: [:]) }
                 } label: {
-                    Image(systemName: "trash")
+                    Label("Export", systemImage: "square.and.arrow.up")
                 }
             }
         }
     }
 
-    private var logFilterBar: some View {
-        VStack(spacing: 8) {
+    private func logRow(_ entry: LogEntry) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-                TextField("Filter logs...", text: $searchText)
-                if !searchText.isEmpty {
-                    Button { searchText = "" } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary) }
-                }
+                Text(entry.severity.rawValue)
+                    .font(.caption2.bold())
+                    .padding(.horizontal, 6).padding(.vertical, 2)
+                    .background(severityColor(entry.severity).opacity(0.1), in: RoundedRectangle(cornerRadius: 4))
+                    .foregroundStyle(severityColor(entry.severity))
+
+                Text(entry.category.rawValue).font(.caption2.bold()).foregroundStyle(.secondary)
+                Spacer()
+                Text(entry.timestamp.formatted(date: .omitted, time: .shortened)).font(.system(size: 8, design: .monospaced)).foregroundStyle(.tertiary)
             }
-            .padding(8)
-            .background(Color.secondary.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack {
-                    FilterChip(title: "ALL", isSelected: severityFilter == nil, action: { severityFilter = nil })
-                    ForEach(LogLevel.allCases, id: \.self) { level in
-                        FilterChip(title: level.rawValue.uppercased(), isSelected: severityFilter == level, action: { severityFilter = level })
-                    }
-                }
-            }
-        }
-        .padding()
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-    }
-}
+            Text(entry.message).font(.subheadline)
 
-struct DeveloperLogEntryRow: View {
-    let log: SDKLogEntry
-    @State private var isExpanded = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top) {
-                Text(log.timestamp.formatted(.dateTime.hour().minute().second()))
+            if !entry.payload.isEmpty {
+                Text(entry.payload)
                     .font(.system(size: 10, design: .monospaced))
                     .foregroundStyle(.secondary)
-
-                Text(log.level.rawValue.uppercased())
-                    .font(.system(size: 8, weight: .bold))
-                    .padding(.horizontal, 4).padding(.vertical, 2)
-                    .background(colorFor(log.level).opacity(0.1), in: RoundedRectangle(cornerRadius: 4))
-                    .foregroundStyle(colorFor(log.level))
-
-                Text(log.source ?? "System").font(.system(size: 10, weight: .bold))
-
-                Spacer()
-
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 10))
-                    .rotationEffect(.degrees(isExpanded ? 180 : 0))
-            }
-
-            Text(log.message)
-                .font(.system(size: 12, design: .monospaced))
-
-            if isExpanded {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Metadata")
-                        .font(.caption.bold())
-                    Text("No additional payload available.")
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundStyle(.secondary)
-                }
-                .padding(8)
-                .background(Color.black.opacity(0.05))
-                .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .lineLimit(2)
+                    .padding(4)
+                    .background(Color.secondary.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
             }
         }
-        .padding(.vertical, 8)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            withAnimation(.snappy) {
-                isExpanded.toggle()
-            }
-        }
+        .padding(.vertical, 4)
     }
 
-    private func colorFor(_ level: LogLevel) -> Color {
-        switch level {
+    private func severityColor(_ severity: LogSeverity) -> Color {
+        switch severity {
         case .debug: return .gray
         case .info: return .blue
         case .warning: return .orange
         case .error: return .red
+        case .critical: return .purple
         }
     }
 }
-

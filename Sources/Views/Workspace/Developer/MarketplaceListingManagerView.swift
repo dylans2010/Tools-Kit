@@ -1,110 +1,63 @@
 import SwiftUI
 
 struct MarketplaceListingManagerView: View {
-    @ObservedObject var store = DeveloperPersistentStore.shared
-    @State private var showingSubmissionSheet = false
+    @ObservedObject var marketplaceService = MarketplaceService.shared
+    @ObservedObject var appService = DeveloperAppService.shared
 
     var body: some View {
         List {
             Section {
-                if store.apps.isEmpty {
-                    Text("You don't have any apps in the Marketplace yet.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding()
+                if marketplaceService.submissions.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "storefront")
+                            .font(.system(size: 48))
+                            .foregroundStyle(.secondary)
+                        Text("No active listings. Submit your app to the Marketplace to reach more users.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
                 } else {
-                    ForEach(store.apps) { listing in
-                        NavigationLink(destination: AppDetailView(app: listing)) {
-                            listingCard(listing)
-                        }
+                    ForEach(marketplaceService.submissions) { submission in
+                        listingRow(submission)
                     }
                 }
             } header: {
-                Text("Your Live Listings")
+                Text("Your Listings")
             }
         }
-        .navigationTitle("Marketplace Listings")
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showingSubmissionSheet = true
-                } label: {
-                    Image(systemName: "plus")
-                }
-            }
-        }
-        .sheet(isPresented: $showingSubmissionSheet) {
-            MarketplaceSubmissionView()
-        }
+        .navigationTitle("Marketplace Manager")
     }
 
-    private func listingCard(_ listing: DeveloperApp) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 12) {
-                RoundedRectangle(cornerRadius: 12).fill(Color.secondary.opacity(0.1))
-                    .frame(width: 48, height: 48)
-                    .overlay(Image(systemName: listing.iconName).foregroundStyle(.secondary))
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(listing.name).font(.headline)
-                    Text("v\(listing.version) • \(listing.status.rawValue)").font(.caption).foregroundStyle(.secondary)
-                }
-                Spacer()
-                VStack(alignment: .trailing) {
-                    Text("\(listing.installCount)").font(.subheadline.bold())
-                    Text("Installs").font(.system(size: 8)).foregroundStyle(.secondary)
-                }
+    private func listingRow(_ submission: MarketplaceSubmission) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(submission.metadata.title).font(.subheadline.bold())
+                Text("v\(submission.technicalDetails.version)").font(.caption2).foregroundStyle(.secondary)
             }
-
-            HStack(spacing: 8) {
-                actionButton(title: "Edit", icon: "pencil") {
-                    // Navigate to edit
-                }
-                actionButton(title: "Version", icon: "arrow.up.circle") {
-                    // Update version
-                }
-                actionButton(title: "Pause", icon: listing.status == .live ? "pause" : "play") {
-                    toggleStatus(listing)
-                }
-                actionButton(title: "Analytics", icon: "chart.bar") {
-                    // Navigate to analytics for this app
-                }
-            }
-
-            Divider()
-
-            HStack {
-                Label("4.8 rating", systemImage: "star.fill")
-                    .foregroundStyle(.yellow)
-                Spacer()
-                Text("Revenue: $\(String(format: "%.2f", listing.revenue))").font(.caption.bold())
-            }
-            .font(.caption)
+            Spacer()
+            statusBadge(submission.status)
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 4)
     }
 
-    private func actionButton(title: String, icon: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack(spacing: 4) {
-                Image(systemName: icon)
-                Text(title).font(.system(size: 9))
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
-            .background(Color.secondary.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-        }
-        .buttonStyle(.plain)
+    private func statusBadge(_ status: SubmissionStatus) -> some View {
+        Text(status.rawValue).font(.caption2.bold())
+            .padding(.horizontal, 8).padding(.vertical, 4)
+            .background(statusColor(status).opacity(0.1), in: Capsule())
+            .foregroundStyle(statusColor(status))
     }
 
-    private func toggleStatus(_ app: DeveloperApp) {
-        var updatedApp = app
-        updatedApp.status = (app.status == .live) ? .suspended : .live
-        var apps = store.apps
-        if let index = apps.firstIndex(where: { $0.id == app.id }) {
-            apps[index] = updatedApp
-            store.saveApps(apps)
+    private func statusColor(_ status: SubmissionStatus) -> Color {
+        switch status {
+        case .draft: return .gray
+        case .pendingReview, .underReview: return .orange
+        case .live: return .green
+        case .paused: return .blue
+        case .rejected: return .red
+        case .deprecated: return .secondary
         }
     }
 }

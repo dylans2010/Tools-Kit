@@ -1,88 +1,57 @@
 import SwiftUI
 
 struct AuthServiceManagerView: View {
-    @ObservedObject var store = DeveloperPersistentStore.shared
+    @ObservedObject var keyService = APIKeyService.shared
+    @ObservedObject var webhookService = WebhookService.shared
     @State private var showingAddKey = false
     @State private var newKeyName = ""
-    @State private var selectedTier: KeyTier = .dev
+    @State private var selectedKeyType: APIKeyType = .developerAPI
+    @State private var selectedEnvironment: KeyEnvironment = .live
     @State private var generatedKey: String?
     @State private var showingKeyAlert = false
 
-    @State private var selectedTab = 0
-
     var body: some View {
-        VStack(spacing: 0) {
-            Picker("Auth Category", selection: $selectedTab) {
-                Text("Keys").tag(0)
-                Text("Webhooks").tag(1)
-                Text("OAuth").tag(2)
-                Text("Environment").tag(3)
-            }
-            .pickerStyle(.segmented)
-            .padding()
+        ScrollView {
+            VStack(spacing: 24) {
+                tokenHealthPanel
 
-            ScrollView {
-                VStack(spacing: 24) {
-                    if selectedTab == 0 {
-                        keysView
-                    } else if selectedTab == 1 {
-                        webhooksSection
-                    } else if selectedTab == 2 {
-                        oauthSection
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("API Keys").font(.headline)
+                        Spacer()
+                        Button { showingAddKey = true } label: {
+                            Image(systemName: "plus.circle.fill")
+                        }
+                    }
+
+                    if keyService.keys.isEmpty {
+                        emptyStateCard(text: "No API keys yet — create one to authenticate your integrations.")
                     } else {
-                        environmentSection
+                        ForEach(keyService.keys) { key in
+                            developerKeyCard(key)
+                        }
                     }
                 }
-                .padding()
+
+                webhooksSection
+                environmentSection
+                credentialVaultSummary
             }
+            .padding()
         }
         .background(Color(uiColor: .systemGroupedBackground))
-        .navigationTitle("Auth Services")
+        .navigationTitle("Auth & Webhooks")
         .sheet(isPresented: $showingAddKey) {
             addKeySheet
         }
-        .alert("New Key Generated", isPresented: $showingKeyAlert) {
-            Button("Done") {
+        .alert("Key Generated", isPresented: $showingKeyAlert) {
+            Button("I have saved this key", role: .cancel) {
                 generatedKey = nil
             }
         } message: {
             if let key = generatedKey {
-                Text("Please copy your new API key now. You won't be able to see it again.\n\n\(key)")
+                Text("Your new API key is:\n\n\(key)\n\nCopy it now. It will not be shown again.")
             }
-        }
-    }
-
-    private var keysView: some View {
-        VStack(spacing: 24) {
-            tokenHealthPanel
-
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text("Developer API Keys").font(.headline)
-                    Spacer()
-                    Button {
-                        showingAddKey = true
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                    }
-                }
-
-                if store.keys.isEmpty {
-                    Text("No API keys generated yet. Use keys to authenticate your apps and services.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color(uiColor: .secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                } else {
-                    ForEach(store.keys) { key in
-                        developerKeyCard(key)
-                    }
-                }
-            }
-
-            credentialVaultSummary
         }
     }
 
@@ -96,44 +65,19 @@ struct AuthServiceManagerView: View {
                 }
             }
 
-            if store.webhooks.isEmpty {
-                placeholderCard(text: "No webhooks configured. Receive real-time event notifications at your service endpoints.")
+            if webhookService.endpoints.isEmpty {
+                emptyStateCard(text: "No webhooks configured. Receive real-time event notifications at your service endpoints.")
             } else {
-                ForEach(store.webhooks) { webhook in
+                ForEach(webhookService.endpoints) { webhook in
                     HStack {
                         VStack(alignment: .leading) {
                             Text(webhook.url).font(.subheadline.bold()).lineLimit(1)
-                            Text("\(webhook.events.count) events").font(.caption).foregroundStyle(.secondary)
+                            Text("\(webhook.subscribedEvents.count) events").font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()
                         Toggle("", isOn: .constant(webhook.isActive)).labelsHidden()
                     }
                     .padding()
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-            }
-        }
-    }
-
-    private var oauthSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("OAuth 2.0 Clients").font(.headline)
-                Spacer()
-                Button {} label: { Image(systemName: "plus.circle.fill") }
-            }
-
-            if store.oauthClients.isEmpty {
-                placeholderCard(text: "Register OAuth clients to allow users to securely authorize your apps.")
-            } else {
-                ForEach(store.oauthClients) { client in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(client.name).font(.subheadline.bold())
-                        Text("ID: \(client.clientID)").font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color(uiColor: .secondarySystemGroupedBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
@@ -151,27 +95,13 @@ struct AuthServiceManagerView: View {
                 }
             }
 
-            ForEach(store.sandboxes) { sandbox in
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(sandbox.name).font(.subheadline.bold())
-                        Text(sandbox.apiBaseURL).font(.caption).foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    if sandbox.isActive {
-                        Text("Active").font(.caption2.bold()).foregroundStyle(.green)
-                            .padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(Color.green.opacity(0.1), in: Capsule())
-                    }
-                }
-                .padding()
-                .background(Color(uiColor: .secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
+            Text("Manage your live and test environments to isolate data.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 
-    private func placeholderCard(text: String) -> some View {
+    private func emptyStateCard(text: String) -> some View {
         Text(text)
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -186,9 +116,9 @@ struct AuthServiceManagerView: View {
             Text("Key Summary").font(.headline)
 
             HStack(spacing: 12) {
-                healthMetric(label: "Active", value: "\(store.keys.count)", color: .green)
+                healthMetric(label: "Active", value: "\(keyService.keys.filter { !$0.isRevoked }.count)", color: .green)
                 healthMetric(label: "Expiring", value: "0", color: .orange)
-                healthMetric(label: "Revoked", value: "0", color: .secondary)
+                healthMetric(label: "Revoked", value: "\(keyService.keys.filter { $0.isRevoked }.count)", color: .secondary)
             }
         }
         .padding()
@@ -204,22 +134,26 @@ struct AuthServiceManagerView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func developerKeyCard(_ key: DeveloperKey) -> some View {
+    private func developerKeyCard(_ key: APIKey) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(key.name).font(.subheadline.bold())
-                    Text(key.tier).font(.system(size: 8, weight: .bold))
+                    Text(key.label).font(.subheadline.bold())
+                    Text(key.type.rawValue).font(.system(size: 8, weight: .bold))
                         .padding(.horizontal, 4)
                         .padding(.vertical, 2)
                         .background(Color.blue.opacity(0.1), in: Capsule())
                         .foregroundStyle(.blue)
                 }
                 Spacer()
-                Button(role: .destructive) {
-                    revokeKey(key)
-                } label: {
-                    Text("Revoke").font(.caption.bold())
+                if !key.isRevoked {
+                    Button(role: .destructive) {
+                        Task { try? await keyService.revokeKey(id: key.id, reason: .noLongerNeeded) }
+                    } label: {
+                        Text("Revoke").font(.caption.bold())
+                    }
+                } else {
+                    Text("Revoked").font(.caption2.bold()).foregroundStyle(.red)
                 }
             }
 
@@ -227,7 +161,7 @@ struct AuthServiceManagerView: View {
 
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Key ID: \(key.key.prefix(12))...")
+                    Text("Key ID: \(key.maskedValue)")
                         .font(.system(size: 10, design: .monospaced))
                         .foregroundStyle(.secondary)
                     Text("Created: \(key.createdAt.formatted(date: .abbreviated, time: .shortened))")
@@ -235,7 +169,7 @@ struct AuthServiceManagerView: View {
                         .foregroundStyle(.tertiary)
                 }
                 Spacer()
-                if let lastUsed = key.lastUsed {
+                if let lastUsed = key.lastUsedAt {
                     Text("Last used: \(lastUsed.formatted(date: .abbreviated, time: .shortened))")
                         .font(.system(size: 8))
                         .foregroundStyle(.tertiary)
@@ -254,13 +188,18 @@ struct AuthServiceManagerView: View {
     }
 
     private var addKeySheet: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section("Key Details") {
-                    TextField("Key Name", text: $newKeyName)
-                    Picker("Tier", selection: $selectedTier) {
-                        ForEach(KeyTier.allCases, id: \.self) { tier in
-                            Text(tier.rawValue).tag(tier)
+                    TextField("Key Label", text: $newKeyName)
+                    Picker("Type", selection: $selectedKeyType) {
+                        ForEach(APIKeyType.allCases, id: \.self) { type in
+                            Text(type.rawValue).tag(type)
+                        }
+                    }
+                    Picker("Environment", selection: $selectedEnvironment) {
+                        ForEach(KeyEnvironment.allCases, id: \.self) { env in
+                            Text(env.rawValue).tag(env)
                         }
                     }
                 }
@@ -279,7 +218,15 @@ struct AuthServiceManagerView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Generate") {
-                        generateNewKey()
+                        Task {
+                            let key = try? await keyService.createKey(label: newKeyName, type: selectedKeyType, environment: selectedEnvironment)
+                            await MainActor.run {
+                                generatedKey = key
+                                newKeyName = ""
+                                showingAddKey = false
+                                showingKeyAlert = true
+                            }
+                        }
                     }
                     .disabled(newKeyName.isEmpty)
                 }
@@ -299,32 +246,5 @@ struct AuthServiceManagerView: View {
         .padding()
         .background(Color.blue.opacity(0.05))
         .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-
-    private func generateNewKey() {
-        do {
-            let keyString = try DeveloperIDManager.shared.generateKey(tier: selectedTier)
-            let newKey = DeveloperKey(
-                key: keyString,
-                name: newKeyName,
-                tier: selectedTier.rawValue
-            )
-            var currentKeys = store.keys
-            currentKeys.append(newKey)
-            store.saveKeys(currentKeys)
-
-            generatedKey = keyString
-            newKeyName = ""
-            showingAddKey = false
-            showingKeyAlert = true
-        } catch {
-            print("Failed to generate key: \(error)")
-        }
-    }
-
-    private func revokeKey(_ key: DeveloperKey) {
-        var currentKeys = store.keys
-        currentKeys.removeAll { $0.id == key.id }
-        store.saveKeys(currentKeys)
     }
 }

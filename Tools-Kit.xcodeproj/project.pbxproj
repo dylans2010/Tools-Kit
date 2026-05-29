@@ -2082,6 +2082,62 @@
 		DA020000000000000000001A /* DeveloperStorageUsageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000001A /* DeveloperStorageUsageView.swift */; };
 		DA020000000000000000001B /* DeveloperIntegrationGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000001B /* DeveloperIntegrationGalleryView.swift */; };
 		DA020000000000000000001C /* DeveloperSupportTicketView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000001C /* DeveloperSupportTicketView.swift */; };
+		DA020000000000000000001D /* AppVersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000001D /* AppVersionHistoryView.swift */; };
+		DA020000000000000000001E /* AppCollaboratorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000001E /* AppCollaboratorsView.swift */; };
+		DA020000000000000000001F /* AppEnvironmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000001F /* AppEnvironmentsView.swift */; };
+		DA0200000000000000000020 /* AppBundleValidatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000020 /* AppBundleValidatorView.swift */; };
+		DA0200000000000000000021 /* OrganizationManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000021 /* OrganizationManagementView.swift */; };
+		DA0200000000000000000022 /* TeamManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000022 /* TeamManagementView.swift */; };
+		DA0200000000000000000023 /* DeveloperVerificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000023 /* DeveloperVerificationView.swift */; };
+		DA0200000000000000000024 /* DeveloperAccountActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000024 /* DeveloperAccountActivityView.swift */; };
+		DA0200000000000000000025 /* TransferOwnershipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000025 /* TransferOwnershipView.swift */; };
+		DA0200000000000000000026 /* ScopeDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000026 /* ScopeDetailSheet.swift */; };
+		DA0200000000000000000027 /* ScopeRequestFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000027 /* ScopeRequestFormView.swift */; };
+		DA0200000000000000000028 /* ScopeAuditLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000028 /* ScopeAuditLogView.swift */; };
+		DA0200000000000000000029 /* ScopeTemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000029 /* ScopeTemplatesView.swift */; };
+		DA020000000000000000002A /* WebhookDeliveryLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000002A /* WebhookDeliveryLogView.swift */; };
+		DA020000000000000000002B /* WebhookTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000002B /* WebhookTestView.swift */; };
+		DA020000000000000000002C /* LogAlertRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000002C /* LogAlertRulesView.swift */; };
+		DA020000000000000000002D /* LogDrainConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000002D /* LogDrainConfigView.swift */; };
+		DA020000000000000000002E /* ErrorGroupingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000002E /* ErrorGroupingView.swift */; };
+		DA020000000000000000002F /* MarketplaceDraftListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000002F /* MarketplaceDraftListView.swift */; };
+		DA0200000000000000000030 /* MarketplaceReviewFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000030 /* MarketplaceReviewFeedbackView.swift */; };
+		DA0200000000000000000031 /* DocumentationAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000031 /* DocumentationAnalyticsView.swift */; };
+		DA0200000000000000000032 /* DocumentationLocalizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000032 /* DocumentationLocalizationView.swift */; };
+		DA0200000000000000000033 /* PrivacyManifestEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000033 /* PrivacyManifestEditorView.swift */; };
+		DA0200000000000000000034 /* ComplianceChecklistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000034 /* ComplianceChecklistView.swift */; };
+		DA0200000000000000000035 /* DataHandlingPolicyBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000035 /* DataHandlingPolicyBuilderView.swift */; };
+		DA0200000000000000000036 /* CLITokenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000036 /* CLITokenView.swift */; };
+		DA0200000000000000000037 /* SandboxEnvironmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000037 /* SandboxEnvironmentView.swift */; };
+		DA0200000000000000000038 /* SDKVersionManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000038 /* SDKVersionManagerView.swift */; };
+		DA0200000000000000000039 /* CustomEventManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000039 /* CustomEventManagerView.swift */; };
+		DA020000000000000000003A /* FunnelBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000003A /* FunnelBuilderView.swift */; };
+		DA020000000000000000003B /* APIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000003B /* APIKey.swift */; };
+		DA020000000000000000003C /* AnalyticsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000003C /* AnalyticsModels.swift */; };
+		DA020000000000000000003D /* DataHandlingPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000003D /* DataHandlingPolicy.swift */; };
+		DA020000000000000000003E /* DeveloperActivityEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000003E /* DeveloperActivityEvent.swift */; };
+		DA020000000000000000003F /* DeveloperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000003F /* DeveloperApp.swift */; };
+		DA0200000000000000000040 /* DeveloperOrganization.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000040 /* DeveloperOrganization.swift */; };
+		DA0200000000000000000041 /* DeveloperProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000041 /* DeveloperProfile.swift */; };
+		DA0200000000000000000042 /* DeveloperScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000042 /* DeveloperScope.swift */; };
+		DA0200000000000000000043 /* DocumentationPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000043 /* DocumentationPage.swift */; };
+		DA0200000000000000000044 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000044 /* LogEntry.swift */; };
+		DA0200000000000000000045 /* MarketplaceSubmission.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000045 /* MarketplaceSubmission.swift */; };
+		DA0200000000000000000046 /* PrivacyManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000046 /* PrivacyManifest.swift */; };
+		DA0200000000000000000047 /* ScopeRequirement.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000047 /* ScopeRequirement.swift */; };
+		DA0200000000000000000048 /* WebhookEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000048 /* WebhookEndpoint.swift */; };
+		DA0200000000000000000049 /* APIKeyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000049 /* APIKeyService.swift */; };
+		DA020000000000000000004A /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000004A /* AnalyticsService.swift */; };
+		DA020000000000000000004B /* DeveloperActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000004B /* DeveloperActivityService.swift */; };
+		DA020000000000000000004C /* DeveloperAppService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000004C /* DeveloperAppService.swift */; };
+		DA020000000000000000004D /* DeveloperLogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000004D /* DeveloperLogService.swift */; };
+		DA020000000000000000004E /* DeveloperProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000004E /* DeveloperProfileService.swift */; };
+		DA020000000000000000004F /* DeveloperScopeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000004F /* DeveloperScopeService.swift */; };
+		DA0200000000000000000050 /* DocumentationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000050 /* DocumentationService.swift */; };
+		DA0200000000000000000051 /* MarketplaceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000051 /* MarketplaceService.swift */; };
+		DA0200000000000000000052 /* OrganizationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000052 /* OrganizationService.swift */; };
+		DA0200000000000000000053 /* WebhookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000053 /* WebhookService.swift */; };
+		DA0200000000000000000054 /* WebhookManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000054 /* WebhookManagerView.swift */; };
 		B604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift */; };
 		B5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift */; };
 		BEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift */; };
@@ -4167,6 +4223,62 @@
 		DA010000000000000000001A /* DeveloperStorageUsageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperStorageUsageView.swift; sourceTree = "<group>"; };
 		DA010000000000000000001B /* DeveloperIntegrationGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperIntegrationGalleryView.swift; sourceTree = "<group>"; };
 		DA010000000000000000001C /* DeveloperSupportTicketView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSupportTicketView.swift; sourceTree = "<group>"; };
+		DA010000000000000000001D /* AppVersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionHistoryView.swift; sourceTree = "<group>"; };
+		DA010000000000000000001E /* AppCollaboratorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCollaboratorsView.swift; sourceTree = "<group>"; };
+		DA010000000000000000001F /* AppEnvironmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironmentsView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000020 /* AppBundleValidatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBundleValidatorView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000021 /* OrganizationManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizationManagementView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000022 /* TeamManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamManagementView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000023 /* DeveloperVerificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperVerificationView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000024 /* DeveloperAccountActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperAccountActivityView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000025 /* TransferOwnershipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferOwnershipView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000026 /* ScopeDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeDetailSheet.swift; sourceTree = "<group>"; };
+		DA0100000000000000000027 /* ScopeRequestFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeRequestFormView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000028 /* ScopeAuditLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeAuditLogView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000029 /* ScopeTemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeTemplatesView.swift; sourceTree = "<group>"; };
+		DA010000000000000000002A /* WebhookDeliveryLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookDeliveryLogView.swift; sourceTree = "<group>"; };
+		DA010000000000000000002B /* WebhookTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookTestView.swift; sourceTree = "<group>"; };
+		DA010000000000000000002C /* LogAlertRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogAlertRulesView.swift; sourceTree = "<group>"; };
+		DA010000000000000000002D /* LogDrainConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDrainConfigView.swift; sourceTree = "<group>"; };
+		DA010000000000000000002E /* ErrorGroupingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorGroupingView.swift; sourceTree = "<group>"; };
+		DA010000000000000000002F /* MarketplaceDraftListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceDraftListView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000030 /* MarketplaceReviewFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceReviewFeedbackView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000031 /* DocumentationAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentationAnalyticsView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000032 /* DocumentationLocalizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentationLocalizationView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000033 /* PrivacyManifestEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyManifestEditorView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000034 /* ComplianceChecklistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplianceChecklistView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000035 /* DataHandlingPolicyBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataHandlingPolicyBuilderView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000036 /* CLITokenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLITokenView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000037 /* SandboxEnvironmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SandboxEnvironmentView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000038 /* SDKVersionManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKVersionManagerView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000039 /* CustomEventManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomEventManagerView.swift; sourceTree = "<group>"; };
+		DA010000000000000000003A /* FunnelBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunnelBuilderView.swift; sourceTree = "<group>"; };
+		DA010000000000000000003B /* APIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKey.swift; sourceTree = "<group>"; };
+		DA010000000000000000003C /* AnalyticsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsModels.swift; sourceTree = "<group>"; };
+		DA010000000000000000003D /* DataHandlingPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataHandlingPolicy.swift; sourceTree = "<group>"; };
+		DA010000000000000000003E /* DeveloperActivityEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperActivityEvent.swift; sourceTree = "<group>"; };
+		DA010000000000000000003F /* DeveloperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperApp.swift; sourceTree = "<group>"; };
+		DA0100000000000000000040 /* DeveloperOrganization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperOrganization.swift; sourceTree = "<group>"; };
+		DA0100000000000000000041 /* DeveloperProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperProfile.swift; sourceTree = "<group>"; };
+		DA0100000000000000000042 /* DeveloperScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperScope.swift; sourceTree = "<group>"; };
+		DA0100000000000000000043 /* DocumentationPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentationPage.swift; sourceTree = "<group>"; };
+		DA0100000000000000000044 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
+		DA0100000000000000000045 /* MarketplaceSubmission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceSubmission.swift; sourceTree = "<group>"; };
+		DA0100000000000000000046 /* PrivacyManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyManifest.swift; sourceTree = "<group>"; };
+		DA0100000000000000000047 /* ScopeRequirement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeRequirement.swift; sourceTree = "<group>"; };
+		DA0100000000000000000048 /* WebhookEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookEndpoint.swift; sourceTree = "<group>"; };
+		DA0100000000000000000049 /* APIKeyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKeyService.swift; sourceTree = "<group>"; };
+		DA010000000000000000004A /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		DA010000000000000000004B /* DeveloperActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperActivityService.swift; sourceTree = "<group>"; };
+		DA010000000000000000004C /* DeveloperAppService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperAppService.swift; sourceTree = "<group>"; };
+		DA010000000000000000004D /* DeveloperLogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperLogService.swift; sourceTree = "<group>"; };
+		DA010000000000000000004E /* DeveloperProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperProfileService.swift; sourceTree = "<group>"; };
+		DA010000000000000000004F /* DeveloperScopeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperScopeService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000050 /* DocumentationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentationService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000051 /* MarketplaceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000052 /* OrganizationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizationService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000053 /* WebhookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000054 /* WebhookManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookManagerView.swift; sourceTree = "<group>"; };
 		F604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKActionDispatcher.swift; sourceTree = "<group>"; };
 		F5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDependencyResolver.swift; sourceTree = "<group>"; };
 		FEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKEventInjectionEngine.swift; sourceTree = "<group>"; };
@@ -12406,6 +12518,8 @@
 		DA0000000000000000000001 /* Developer */ = {
 			isa = PBXGroup;
 			children = (
+				DA0000000000000000000002 /* Models */,
+				DA0000000000000000000003 /* Services */,
 				DA0100000000000000000000 /* DeveloperHomeView.swift */,
 				DA0100000000000000000001 /* DeveloperProfileView.swift */,
 				DA0100000000000000000002 /* AppManagementView.swift */,
@@ -12435,7 +12549,78 @@
 				DA010000000000000000001A /* DeveloperStorageUsageView.swift */,
 				DA010000000000000000001B /* DeveloperIntegrationGalleryView.swift */,
 				DA010000000000000000001C /* DeveloperSupportTicketView.swift */,
+				DA010000000000000000001D /* AppVersionHistoryView.swift */,
+				DA010000000000000000001E /* AppCollaboratorsView.swift */,
+				DA010000000000000000001F /* AppEnvironmentsView.swift */,
+				DA0100000000000000000020 /* AppBundleValidatorView.swift */,
+				DA0100000000000000000021 /* OrganizationManagementView.swift */,
+				DA0100000000000000000022 /* TeamManagementView.swift */,
+				DA0100000000000000000023 /* DeveloperVerificationView.swift */,
+				DA0100000000000000000024 /* DeveloperAccountActivityView.swift */,
+				DA0100000000000000000025 /* TransferOwnershipView.swift */,
+				DA0100000000000000000026 /* ScopeDetailSheet.swift */,
+				DA0100000000000000000027 /* ScopeRequestFormView.swift */,
+				DA0100000000000000000028 /* ScopeAuditLogView.swift */,
+				DA0100000000000000000029 /* ScopeTemplatesView.swift */,
+				DA010000000000000000002A /* WebhookDeliveryLogView.swift */,
+				DA010000000000000000002B /* WebhookTestView.swift */,
+				DA010000000000000000002C /* LogAlertRulesView.swift */,
+				DA010000000000000000002D /* LogDrainConfigView.swift */,
+				DA010000000000000000002E /* ErrorGroupingView.swift */,
+				DA010000000000000000002F /* MarketplaceDraftListView.swift */,
+				DA0100000000000000000030 /* MarketplaceReviewFeedbackView.swift */,
+				DA0100000000000000000031 /* DocumentationAnalyticsView.swift */,
+				DA0100000000000000000032 /* DocumentationLocalizationView.swift */,
+				DA0100000000000000000033 /* PrivacyManifestEditorView.swift */,
+				DA0100000000000000000034 /* ComplianceChecklistView.swift */,
+				DA0100000000000000000035 /* DataHandlingPolicyBuilderView.swift */,
+				DA0100000000000000000036 /* CLITokenView.swift */,
+				DA0100000000000000000037 /* SandboxEnvironmentView.swift */,
+				DA0100000000000000000038 /* SDKVersionManagerView.swift */,
+				DA0100000000000000000039 /* CustomEventManagerView.swift */,
+				DA010000000000000000003A /* FunnelBuilderView.swift */,
+				DA0100000000000000000054 /* WebhookManagerView.swift */,
 			);
+		};
+		DA0000000000000000000002 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				DA010000000000000000003B /* APIKey.swift */,
+				DA010000000000000000003C /* AnalyticsModels.swift */,
+				DA010000000000000000003D /* DataHandlingPolicy.swift */,
+				DA010000000000000000003E /* DeveloperActivityEvent.swift */,
+				DA010000000000000000003F /* DeveloperApp.swift */,
+				DA0100000000000000000040 /* DeveloperOrganization.swift */,
+				DA0100000000000000000041 /* DeveloperProfile.swift */,
+				DA0100000000000000000042 /* DeveloperScope.swift */,
+				DA0100000000000000000043 /* DocumentationPage.swift */,
+				DA0100000000000000000044 /* LogEntry.swift */,
+				DA0100000000000000000045 /* MarketplaceSubmission.swift */,
+				DA0100000000000000000046 /* PrivacyManifest.swift */,
+				DA0100000000000000000047 /* ScopeRequirement.swift */,
+				DA0100000000000000000048 /* WebhookEndpoint.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		DA0000000000000000000003 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				DA0100000000000000000049 /* APIKeyService.swift */,
+				DA010000000000000000004A /* AnalyticsService.swift */,
+				DA010000000000000000004B /* DeveloperActivityService.swift */,
+				DA010000000000000000004C /* DeveloperAppService.swift */,
+				DA010000000000000000004D /* DeveloperLogService.swift */,
+				DA010000000000000000004E /* DeveloperProfileService.swift */,
+				DA010000000000000000004F /* DeveloperScopeService.swift */,
+				DA0100000000000000000050 /* DocumentationService.swift */,
+				DA0100000000000000000051 /* MarketplaceService.swift */,
+				DA0100000000000000000052 /* OrganizationService.swift */,
+				DA0100000000000000000053 /* WebhookService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 			path = Developer;
 			sourceTree = "<group>";
 		};
@@ -12637,6 +12822,62 @@
 				DA020000000000000000001A /* DeveloperStorageUsageView.swift in Sources */,
 				DA020000000000000000001B /* DeveloperIntegrationGalleryView.swift in Sources */,
 				DA020000000000000000001C /* DeveloperSupportTicketView.swift in Sources */,
+				DA020000000000000000001D /* AppVersionHistoryView.swift in Sources */,
+				DA020000000000000000001E /* AppCollaboratorsView.swift in Sources */,
+				DA020000000000000000001F /* AppEnvironmentsView.swift in Sources */,
+				DA0200000000000000000020 /* AppBundleValidatorView.swift in Sources */,
+				DA0200000000000000000021 /* OrganizationManagementView.swift in Sources */,
+				DA0200000000000000000022 /* TeamManagementView.swift in Sources */,
+				DA0200000000000000000023 /* DeveloperVerificationView.swift in Sources */,
+				DA0200000000000000000024 /* DeveloperAccountActivityView.swift in Sources */,
+				DA0200000000000000000025 /* TransferOwnershipView.swift in Sources */,
+				DA0200000000000000000026 /* ScopeDetailSheet.swift in Sources */,
+				DA0200000000000000000027 /* ScopeRequestFormView.swift in Sources */,
+				DA0200000000000000000028 /* ScopeAuditLogView.swift in Sources */,
+				DA0200000000000000000029 /* ScopeTemplatesView.swift in Sources */,
+				DA020000000000000000002A /* WebhookDeliveryLogView.swift in Sources */,
+				DA020000000000000000002B /* WebhookTestView.swift in Sources */,
+				DA020000000000000000002C /* LogAlertRulesView.swift in Sources */,
+				DA020000000000000000002D /* LogDrainConfigView.swift in Sources */,
+				DA020000000000000000002E /* ErrorGroupingView.swift in Sources */,
+				DA020000000000000000002F /* MarketplaceDraftListView.swift in Sources */,
+				DA0200000000000000000030 /* MarketplaceReviewFeedbackView.swift in Sources */,
+				DA0200000000000000000031 /* DocumentationAnalyticsView.swift in Sources */,
+				DA0200000000000000000032 /* DocumentationLocalizationView.swift in Sources */,
+				DA0200000000000000000033 /* PrivacyManifestEditorView.swift in Sources */,
+				DA0200000000000000000034 /* ComplianceChecklistView.swift in Sources */,
+				DA0200000000000000000035 /* DataHandlingPolicyBuilderView.swift in Sources */,
+				DA0200000000000000000036 /* CLITokenView.swift in Sources */,
+				DA0200000000000000000037 /* SandboxEnvironmentView.swift in Sources */,
+				DA0200000000000000000038 /* SDKVersionManagerView.swift in Sources */,
+				DA0200000000000000000039 /* CustomEventManagerView.swift in Sources */,
+				DA020000000000000000003A /* FunnelBuilderView.swift in Sources */,
+				DA020000000000000000003B /* APIKey.swift in Sources */,
+				DA020000000000000000003C /* AnalyticsModels.swift in Sources */,
+				DA020000000000000000003D /* DataHandlingPolicy.swift in Sources */,
+				DA020000000000000000003E /* DeveloperActivityEvent.swift in Sources */,
+				DA020000000000000000003F /* DeveloperApp.swift in Sources */,
+				DA0200000000000000000040 /* DeveloperOrganization.swift in Sources */,
+				DA0200000000000000000041 /* DeveloperProfile.swift in Sources */,
+				DA0200000000000000000042 /* DeveloperScope.swift in Sources */,
+				DA0200000000000000000043 /* DocumentationPage.swift in Sources */,
+				DA0200000000000000000044 /* LogEntry.swift in Sources */,
+				DA0200000000000000000045 /* MarketplaceSubmission.swift in Sources */,
+				DA0200000000000000000046 /* PrivacyManifest.swift in Sources */,
+				DA0200000000000000000047 /* ScopeRequirement.swift in Sources */,
+				DA0200000000000000000048 /* WebhookEndpoint.swift in Sources */,
+				DA0200000000000000000049 /* APIKeyService.swift in Sources */,
+				DA020000000000000000004A /* AnalyticsService.swift in Sources */,
+				DA020000000000000000004B /* DeveloperActivityService.swift in Sources */,
+				DA020000000000000000004C /* DeveloperAppService.swift in Sources */,
+				DA020000000000000000004D /* DeveloperLogService.swift in Sources */,
+				DA020000000000000000004E /* DeveloperProfileService.swift in Sources */,
+				DA020000000000000000004F /* DeveloperScopeService.swift in Sources */,
+				DA0200000000000000000050 /* DocumentationService.swift in Sources */,
+				DA0200000000000000000051 /* MarketplaceService.swift in Sources */,
+				DA0200000000000000000052 /* OrganizationService.swift in Sources */,
+				DA0200000000000000000053 /* WebhookService.swift in Sources */,
+				DA0200000000000000000054 /* WebhookManagerView.swift in Sources */,
 				92E13A73A39F4878870CCFF1 /* SDKResourceAuditView.swift in Sources */,
 				0603EBECCB2849248F4BD1D4 /* SDKGlobalSearchView.swift in Sources */,
 				6FCAA43DB3294F3586F66864 /* SDKDependencyVisualizerView.swift in Sources */,

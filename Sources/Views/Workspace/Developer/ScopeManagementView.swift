@@ -1,18 +1,8 @@
 import SwiftUI
 
 struct ScopeManagementView: View {
+    @ObservedObject var scopeService = DeveloperScopeService.shared
     @State private var selectedTab = 0
-    @State private var searchText = ""
-
-    let availableScopes: [DeveloperScope] = [
-        DeveloperScope(id: "read:user", name: "Read User Profile", description: "Access basic user information like name and avatar.", riskLevel: .low, category: "User Identity"),
-        DeveloperScope(id: "write:user", name: "Write User Profile", description: "Modify user profile information.", riskLevel: .medium, category: "User Identity"),
-        DeveloperScope(id: "read:data", name: "Read Workspace Data", description: "Access files, notes, and tasks in the workspace.", riskLevel: .medium, category: "Read Data"),
-        DeveloperScope(id: "write:data", name: "Write Workspace Data", description: "Create or modify files and notes.", riskLevel: .high, category: "Write Data"),
-        DeveloperScope(id: "sys:admin", name: "System Admin", description: "Full access to system configurations and internal APIs.", riskLevel: .critical, category: "System-Level", requiredTier: .enterprise)
-    ]
-
-    @State private var pendingRequests: [ScopeRequest] = []
     @State private var justifications: [String: String] = [:]
 
     var body: some View {
@@ -40,36 +30,43 @@ struct ScopeManagementView: View {
     private var myGrantedScopesList: some View {
         List {
             Section("Currently Granted") {
-                ForEach(availableScopes.prefix(2)) { scope in
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(scope.id).font(.caption.monospaced()).bold()
-                            Spacer()
-                            Text("Granted").font(.caption2).foregroundStyle(.green)
+                if scopeService.grantedScopes.isEmpty {
+                    Text("No scopes granted yet.").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(scopeService.grantedScopes) { grant in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(grant.scopeIdentifier).font(.caption.monospaced()).bold()
+                                Spacer()
+                                Text("Granted").font(.caption2).foregroundStyle(.green)
+                            }
+                            Text(grant.grantDate.formatted(date: .abbreviated, time: .omitted)).font(.caption2).foregroundStyle(.secondary)
                         }
-                        Text(scope.name).font(.subheadline)
-                        Text(scope.description).font(.caption).foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 4)
-                    .swipeActions {
-                        Button(role: .destructive) {
-                            // Revoke
-                        } label: {
-                            Label("Revoke", systemImage: "xmark.circle")
+                        .padding(.vertical, 4)
+                        .swipeActions {
+                            Button(role: .destructive) {
+                                Task { try? await scopeService.revokeScope(id: grant.id) }
+                            } label: {
+                                Label("Revoke", systemImage: "xmark.circle")
+                            }
                         }
                     }
                 }
             }
 
             Section("Pending Requests") {
-                ForEach(pendingRequests) { request in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(request.scopeId).font(.caption.monospaced())
-                            Text(request.justification).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                if scopeService.pendingRequests.isEmpty {
+                    Text("No pending requests.").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(scopeService.pendingRequests) { request in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(request.scopeIdentifier).font(.caption.monospaced())
+                                Text(request.justification).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                            }
+                            Spacer()
+                            Text(request.status.rawValue).font(.caption2).foregroundStyle(.orange)
                         }
-                        Spacer()
-                        Text(request.status.rawValue).font(.caption2).foregroundStyle(.orange)
                     }
                 }
             }
@@ -83,8 +80,15 @@ struct ScopeManagementView: View {
                     .font(.headline)
                     .padding(.horizontal)
 
-                ForEach(availableScopes) { scope in
-                    scopeCard(scope)
+                if scopeService.catalog.isEmpty {
+                    Text("The scope catalog is currently empty.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding()
+                } else {
+                    ForEach(scopeService.catalog) { scope in
+                        scopeCard(scope)
+                    }
                 }
             }
             .padding(.vertical)
@@ -94,11 +98,11 @@ struct ScopeManagementView: View {
     private func scopeCard(_ scope: DeveloperScope) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(scope.category).font(.caption2.bold()).foregroundStyle(.secondary)
+                Text(scope.category.rawValue).font(.caption2.bold()).foregroundStyle(.secondary)
                 Spacer()
-                Text(scope.riskLevel.rawValue).font(.caption2.bold()).foregroundStyle(scope.riskLevel.color)
+                Text(scope.riskLevel.rawValue).font(.caption2.bold()).foregroundStyle(riskColor(scope.riskLevel))
                     .padding(.horizontal, 6).padding(.vertical, 2)
-                    .background(scope.riskLevel.color.opacity(0.1), in: Capsule())
+                    .background(riskColor(scope.riskLevel).opacity(0.1), in: Capsule())
             }
 
             VStack(alignment: .leading, spacing: 4) {
@@ -124,14 +128,11 @@ struct ScopeManagementView: View {
 
             Button {
                 let request = ScopeRequest(
-                    id: UUID(),
-                    appId: UUID(), // Should be selected app
-                    scopeId: scope.id,
-                    justification: justifications[scope.id] ?? "N/A",
-                    status: .pending,
-                    requestedAt: Date()
+                    appId: UUID(), // Should be selected app in real use
+                    scopeIdentifier: scope.id,
+                    justification: justifications[scope.id] ?? ""
                 )
-                pendingRequests.append(request)
+                Task { try? await scopeService.submitRequest(request) }
             } label: {
                 Text("Request Scope")
                     .font(.subheadline.bold())
@@ -148,19 +149,28 @@ struct ScopeManagementView: View {
         .padding(.horizontal)
     }
 
+    private func riskColor(_ risk: ScopeRiskLevel) -> Color {
+        switch risk {
+        case .low: return .green
+        case .medium: return .blue
+        case .high: return .orange
+        case .critical: return .red
+        }
+    }
+
     private var scopeAuditLogView: some View {
         List {
-            ForEach(0..<10) { i in
-                HStack(alignment: .top, spacing: 12) {
-                    VStack {
-                        Circle().fill(i % 3 == 0 ? .green : (i % 5 == 0 ? .red : .blue)).frame(width: 8, height: 8)
-                        Rectangle().fill(.secondary.opacity(0.2)).frame(width: 1)
-                    }
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(i % 3 == 0 ? "Scope Granted" : (i % 5 == 0 ? "Request Rejected" : "Scope Requested"))
-                            .font(.subheadline.bold())
-                        Text("scope:read:data • App: GitHub Pro").font(.caption2).foregroundStyle(.secondary)
-                        Text(Date().addingTimeInterval(Double(-i * 3600)).formatted()).font(.system(size: 8)).foregroundStyle(.tertiary)
+            if scopeService.auditLog.isEmpty {
+                Text("No audit log entries found.").font(.caption).foregroundStyle(.secondary)
+            } else {
+                ForEach(scopeService.auditLog) { event in
+                    HStack(alignment: .top, spacing: 12) {
+                        Circle().fill(.blue).frame(width: 8, height: 8).padding(.top, 4)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(event.eventType).font(.subheadline.bold())
+                            Text("scope:\(event.scopeIdentifier)").font(.caption2).foregroundStyle(.secondary)
+                            Text(event.timestamp.formatted()).font(.system(size: 8)).foregroundStyle(.tertiary)
+                        }
                     }
                 }
             }

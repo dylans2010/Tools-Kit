@@ -1,47 +1,30 @@
 import SwiftUI
 
 struct DeveloperBetaTestingView: View {
+    @ObservedObject var appService = DeveloperAppService.shared
+    @State private var selectedAppID: UUID?
+
     var body: some View {
         List {
-            Section("Internal Testing") {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("Core Team").font(.subheadline.bold())
-                        Text("12 Testers").font(.caption).foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Text("Active").font(.caption2.bold()).foregroundStyle(.green)
-                }
-            }
-
-            Section("External Beta") {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("Public Beta Group").font(.subheadline.bold())
-                        Text("450/1000 Testers").font(.caption).foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Text("Active").font(.caption2.bold()).foregroundStyle(.green)
-                }
-            }
-
-            Section("Feedback") {
-                ForEach(0..<3) { i in
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text("User \(i+123)").font(.caption.bold())
-                            Spacer()
-                            Text("v1.2.0 (45)").font(.system(size: 8)).foregroundStyle(.tertiary)
-                        }
-                        Text("This is some dummy feedback from a beta tester regarding a crash in the latest build.").font(.caption).foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 4)
-                }
-            }
-
             Section {
-                Button("Invite Testers") {}
-                Button("Create New Testing Group") {}
+                Picker("App", selection: $selectedAppID) {
+                    Text("Select an App").tag(Optional<UUID>.none)
+                    ForEach(appService.apps) { app in
+                        Text(app.name).tag(Optional(app.id))
+                    }
+                }
+            }
+
+            Section("Beta Groups") {
+                if selectedAppID != nil {
+                    Text("No beta groups configured. Create a group to start testing your app.").font(.caption).foregroundStyle(.secondary)
+
+                    Button("Create Beta Group") {
+                        // Awaiting backend integration
+                    }
+                } else {
+                    Text("Select an app to manage beta testing.").font(.caption).foregroundStyle(.secondary)
+                }
             }
         }
         .navigationTitle("Beta Testing")

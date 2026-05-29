@@ -1,22 +1,28 @@
 import SwiftUI
 
 struct DeveloperWebhookManagerView: View {
-    @ObservedObject var store = DeveloperPersistentStore.shared
+    @ObservedObject var webhookService = WebhookService.shared
     @State private var showingAddWebhook = false
     @State private var newWebhookURL = ""
-    @State private var selectedEvents: Set<String> = []
-
-    let availableEvents = ["app.installed", "app.updated", "user.authorized", "payment.succeeded", "log.error"]
+    @State private var selectedEvents: Set<WebhookEventType> = []
 
     var body: some View {
         List {
             Section {
-                if store.webhooks.isEmpty {
-                    Text("No webhooks configured. Add one to receive real-time updates.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                if webhookService.endpoints.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "antenna.radiowaves.left.and.right")
+                            .font(.system(size: 48))
+                            .foregroundStyle(.secondary)
+                        Text("No webhooks configured. Add one to receive real-time updates at your endpoint.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
                 } else {
-                    ForEach(store.webhooks) { webhook in
+                    ForEach(webhookService.endpoints) { webhook in
                         webhookRow(webhook)
                     }
                     .onDelete(perform: deleteWebhook)
@@ -27,53 +33,59 @@ struct DeveloperWebhookManagerView: View {
         }
         .navigationTitle("Webhooks")
         .toolbar {
-            Button { showingAddWebhook = true } label: { Image(systemName: "plus") }
+            ToolbarItem(placement: .primaryAction) {
+                Button { showingAddWebhook = true } label: { Image(systemName: "plus") }
+            }
         }
         .sheet(isPresented: $showingAddWebhook) {
-            NavigationStack {
-                Form {
-                    Section("Endpoint URL") {
-                        TextField("https://api.yourservice.com/webhook", text: $newWebhookURL)
-                            .autocapitalization(.none)
-                            .disableAutocorrection(true)
-                    }
-
-                    Section("Events") {
-                        ForEach(availableEvents, id: \.self) { event in
-                            Toggle(event, isOn: binding(for: event))
-                        }
-                    }
-                }
-                .navigationTitle("Add Webhook")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") { showingAddWebhook = false }
-                    }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Add") { addWebhook() }
-                            .disabled(newWebhookURL.isEmpty || selectedEvents.isEmpty)
-                    }
-                }
-            }
+            addWebhookSheet
         }
     }
 
-    private func webhookRow(_ webhook: DeveloperWebhook) -> some View {
+    private func webhookRow(_ webhook: WebhookEndpoint) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(webhook.url).font(.subheadline.bold()).lineLimit(1)
                 Spacer()
                 Circle().fill(webhook.isActive ? .green : .gray).frame(width: 8, height: 8)
             }
-            Text("\(webhook.events.joined(separator: ", "))")
+            Text("\(webhook.subscribedEvents.map { $0.rawValue }.joined(separator: ", "))")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
         .padding(.vertical, 4)
     }
 
-    private func binding(for event: String) -> Binding<Bool> {
+    private var addWebhookSheet: some View {
+        NavigationStack {
+            Form {
+                Section("Endpoint URL") {
+                    TextField("https://api.yourservice.com/webhook", text: $newWebhookURL)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                }
+
+                Section("Events") {
+                    ForEach(WebhookEventType.allCases, id: \.self) { event in
+                        Toggle(event.rawValue, isOn: binding(for: event))
+                    }
+                }
+            }
+            .navigationTitle("Add Webhook")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showingAddWebhook = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Add") { addWebhook() }
+                        .disabled(newWebhookURL.isEmpty || selectedEvents.isEmpty)
+                }
+            }
+        }
+    }
+
+    private func binding(for event: WebhookEventType) -> Binding<Bool> {
         Binding(
             get: { selectedEvents.contains(event) },
             set: { isSelected in
@@ -87,18 +99,20 @@ struct DeveloperWebhookManagerView: View {
     }
 
     private func addWebhook() {
-        let webhook = DeveloperWebhook(url: newWebhookURL, events: Array(selectedEvents), secret: UUID().uuidString)
-        var current = store.webhooks
-        current.append(webhook)
-        store.saveWebhooks(current)
-        showingAddWebhook = false
-        newWebhookURL = ""
-        selectedEvents = []
+        Task {
+            try? await webhookService.createEndpoint(url: newWebhookURL, events: Array(selectedEvents))
+            await MainActor.run {
+                showingAddWebhook = false
+                newWebhookURL = ""
+                selectedEvents = []
+            }
+        }
     }
 
     private func deleteWebhook(at offsets: IndexSet) {
-        var current = store.webhooks
-        current.remove(atOffsets: offsets)
-        store.saveWebhooks(current)
+        for index in offsets {
+            let webhook = webhookService.endpoints[index]
+            Task { try? await webhookService.deleteEndpoint(id: webhook.id) }
+        }
     }
 }

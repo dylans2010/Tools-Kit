@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct DeveloperProfileView: View {
-    @ObservedObject var store = DeveloperPersistentStore.shared
+    @ObservedObject var profileService = DeveloperProfileService.shared
+    @ObservedObject var keyService = APIKeyService.shared
     @State private var profile: DeveloperProfile
-    @State private var showingImagePicker = false
     @State private var showingSaveAlert = false
 
     init() {
-        _profile = State(initialValue: DeveloperPersistentStore.shared.profile)
+        _profile = State(initialValue: DeveloperProfileService.shared.profile)
     }
 
     var body: some View {
@@ -16,7 +16,7 @@ struct DeveloperProfileView: View {
                 HStack(spacing: 16) {
                     ZStack {
                         Circle().fill(Color.accentColor.opacity(0.1))
-                        if let avatarUrl = profile.avatarUrl, let url = URL(string: avatarUrl) {
+                        if !profile.avatarUrl.isEmpty, let url = URL(string: profile.avatarUrl) {
                             AsyncImage(url: url) { image in
                                 image.resizable()
                             } placeholder: {
@@ -33,7 +33,7 @@ struct DeveloperProfileView: View {
                     .frame(width: 80, height: 80)
 
                     Button("Update Avatar") {
-                        showingImagePicker = true
+                        // Awaiting backend integration for image picking
                     }
                 }
                 .padding(.vertical, 8)
@@ -73,7 +73,7 @@ struct DeveloperProfileView: View {
                 }
 
                 verificationStep(label: "Email Verification", status: !profile.contactEmail.isEmpty)
-                verificationStep(label: "Developer Key Generated", status: !store.keys.isEmpty)
+                verificationStep(label: "Developer Key Generated", status: !keyService.keys.isEmpty)
                 verificationStep(label: "Identity Verified", status: profile.tier == .verified || profile.tier == .enterprise)
             }
 
@@ -96,8 +96,12 @@ struct DeveloperProfileView: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
-                    store.saveProfile(profile)
-                    showingSaveAlert = true
+                    Task {
+                        try? await profileService.saveProfile(profile)
+                        await MainActor.run {
+                            showingSaveAlert = true
+                        }
+                    }
                 }
             }
         }

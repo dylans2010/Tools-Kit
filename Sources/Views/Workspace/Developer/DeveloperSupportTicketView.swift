@@ -2,11 +2,22 @@ import SwiftUI
 
 struct DeveloperSupportTicketView: View {
     @State private var showingNewTicket = false
+    @State private var subject = ""
+    @State private var message = ""
 
     var body: some View {
         List {
             Section("Your Tickets") {
-                Text("You have no active support tickets.").font(.caption).foregroundStyle(.secondary)
+                VStack(spacing: 12) {
+                    Image(systemName: "lifepreserver")
+                        .font(.system(size: 48))
+                        .foregroundStyle(.secondary)
+                    Text("You have no active support tickets.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
             }
 
             Section("Common Topics") {
@@ -18,32 +29,47 @@ struct DeveloperSupportTicketView: View {
         }
         .navigationTitle("Support")
         .toolbar {
-            Button("New Ticket") { showingNewTicket = true }
+            ToolbarItem(placement: .primaryAction) {
+                Button("New Ticket") { showingNewTicket = true }
+            }
         }
         .sheet(isPresented: $showingNewTicket) {
-            NavigationStack {
-                Form {
-                    Section("What do you need help with?") {
-                        TextField("Subject", text: .constant(""))
-                        Picker("Topic", selection: .constant(0)) {
-                            Text("Technical").tag(0)
-                            Text("Billing").tag(1)
-                            Text("Feedback").tag(2)
-                        }
-                        TextEditor(text: .constant("")).frame(height: 150)
+            newTicketSheet
+        }
+    }
+
+    private var newTicketSheet: some View {
+        NavigationStack {
+            Form {
+                Section("What do you need help with?") {
+                    TextField("Subject", text: $subject)
+                    Picker("Topic", selection: .constant(0)) {
+                        Text("Technical").tag(0)
+                        Text("Billing").tag(1)
+                        Text("Feedback").tag(2)
+                    }
+                    VStack(alignment: .leading) {
+                        Text("Message").font(.caption).foregroundStyle(.secondary)
+                        TextEditor(text: $message).frame(height: 150)
                     }
                 }
-                .navigationTitle("New Ticket")
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingNewTicket = false } }
-                    ToolbarItem(placement: .confirmationAction) { Button("Submit") { showingNewTicket = false } }
+            }
+            .navigationTitle("New Ticket")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingNewTicket = false } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Submit") {
+                        // Awaiting backend integration
+                        showingNewTicket = false
+                    }
+                    .disabled(subject.isEmpty || message.isEmpty)
                 }
             }
         }
     }
 
     private func topicLink(_ title: String) -> some View {
-        NavigationLink(destination: Text(title)) {
+        NavigationLink(destination: Text(title).navigationTitle(title)) {
             Text(title)
         }
     }

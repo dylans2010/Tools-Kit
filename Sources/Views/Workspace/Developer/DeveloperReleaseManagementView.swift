@@ -1,76 +1,102 @@
 import SwiftUI
 
 struct DeveloperReleaseManagementView: View {
-    @ObservedObject var store = DeveloperPersistentStore.shared
+    @ObservedObject var appService = DeveloperAppService.shared
     @State private var showingAddRelease = false
     @State private var version = ""
     @State private var build = ""
     @State private var notes = ""
+    @State private var selectedAppID: UUID?
+
+    var selectedApp: DeveloperApp? {
+        appService.apps.first { $0.id == selectedAppID }
+    }
 
     var body: some View {
         List {
+            Section {
+                Picker("App", selection: $selectedAppID) {
+                    Text("Select an App").tag(Optional<UUID>.none)
+                    ForEach(appService.apps) { app in
+                        Text(app.name).tag(Optional(app.id))
+                    }
+                }
+            }
+
             Section("Active Releases") {
-                if store.releases.isEmpty {
-                    Text("No releases yet. Start by uploading a build.").font(.caption).foregroundStyle(.secondary)
-                } else {
-                    ForEach(store.releases) { release in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text("v\(release.version) (\(release.buildNumber))").font(.subheadline.bold())
-                                Text(release.releaseNotes).font(.caption).lineLimit(1).foregroundStyle(.secondary)
+                if let app = selectedApp {
+                    if app.versions.isEmpty {
+                        Text("No releases yet. Start by uploading a build.").font(.caption).foregroundStyle(.secondary)
+                    } else {
+                        ForEach(app.versions) { release in
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text("v\(release.version) (\(release.buildNumber))").font(.subheadline.bold())
+                                    Text(release.releaseNotes).font(.caption).lineLimit(1).foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Text(release.status).font(.caption2.bold())
+                                    .padding(.horizontal, 8).padding(.vertical, 4)
+                                    .background(Color.blue.opacity(0.1), in: Capsule())
+                                    .foregroundStyle(.blue)
                             }
-                            Spacer()
-                            statusBadge(release.status)
                         }
                     }
-                    .onDelete(perform: deleteRelease)
+                } else {
+                    Text("Select an app to view release history.").font(.caption).foregroundStyle(.secondary)
                 }
             }
         }
         .navigationTitle("Release Management")
         .toolbar {
-            Button { showingAddRelease = true } label: { Image(systemName: "plus") }
+            ToolbarItem(placement: .primaryAction) {
+                Button { showingAddRelease = true } label: { Image(systemName: "plus") }
+                    .disabled(selectedAppID == nil)
+            }
         }
         .sheet(isPresented: $showingAddRelease) {
-            NavigationStack {
-                Form {
-                    TextField("Version", text: $version)
+            addReleaseSheet
+        }
+    }
+
+    private var addReleaseSheet: some View {
+        NavigationStack {
+            Form {
+                Section("New Version Details") {
+                    TextField("Version (e.g. 1.0.1)", text: $version)
                     TextField("Build Number", text: $build)
-                    TextEditor(text: $notes).frame(height: 100)
-                }
-                .navigationTitle("New Release")
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddRelease = false } }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Create") { addRelease() }
-                            .disabled(version.isEmpty || build.isEmpty)
+                    VStack(alignment: .leading) {
+                        Text("Release Notes").font(.caption).foregroundStyle(.secondary)
+                        TextEditor(text: $notes).frame(height: 150)
                     }
+                }
+            }
+            .navigationTitle("New Release")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddRelease = false } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Create") { addRelease() }
+                        .disabled(version.isEmpty || build.isEmpty)
                 }
             }
         }
     }
 
-    private func statusBadge(_ status: ReleaseStatus) -> some View {
-        Text(status.rawValue).font(.caption2.bold())
-            .padding(.horizontal, 8).padding(.vertical, 4)
-            .background(Color.blue.opacity(0.1), in: Capsule())
-            .foregroundStyle(.blue)
-    }
-
     private func addRelease() {
-        let release = AppRelease(version: version, buildNumber: build, status: .preparing, releaseNotes: notes)
-        var current = store.releases
-        current.insert(release, at: 0)
-        store.saveReleases(current)
-        showingAddRelease = false
-        version = ""
-        build = ""
-        notes = ""
-    }
+        guard let appID = selectedAppID else { return }
+        let release = AppVersion(version: version, buildNumber: build, releaseNotes: notes, status: "Draft")
 
-    private func deleteRelease(at offsets: IndexSet) {
-        var current = store.releases
-        current.remove(atOffsets: offsets)
-        store.saveReleases(current)
+        Task {
+            if var app = appService.apps.first(where: { $0.id == appID }) {
+                app.versions.insert(release, at: 0)
+                try? await appService.updateApp(app)
+            }
+            await MainActor.run {
+                showingAddRelease = false
+                version = ""
+                build = ""
+                notes = ""
+            }
+        }
     }
 }

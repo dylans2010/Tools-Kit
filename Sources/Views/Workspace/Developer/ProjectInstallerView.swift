@@ -1,6 +1,16 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+public class ProjectInstallManager: ObservableObject {
+    public static let shared = ProjectInstallManager()
+
+    private init() {}
+
+    public func install(from url: URL) throws {
+        // Awaiting backend integration for project installation logic
+    }
+}
+
 struct ProjectInstallerView: View {
     @Environment(\.dismiss) var dismiss
     @State private var showingFilePicker = false
@@ -9,70 +19,48 @@ struct ProjectInstallerView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            header
-
             if success {
                 successView
             } else {
-                installView
-            }
-        }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(uiColor: .systemGroupedBackground))
-    }
+                VStack(spacing: 16) {
+                    Image(systemName: "square.and.arrow.down.fill")
+                        .font(.system(size: 64))
+                        .foregroundStyle(.accent)
 
-    private var header: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "square.and.arrow.down.fill")
-                .font(.system(size: 48))
-                .foregroundStyle(.blue)
-            Text("Project Installer")
-                .font(.title2.bold())
-            Text("Install .tkproj files instantly without authentication.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding(.top)
-    }
+                    Text("Install Project")
+                        .font(.title2.bold())
 
-    private var installView: some View {
-        VStack(spacing: 20) {
-            Button {
-                showingFilePicker = true
-            } label: {
-                VStack(spacing: 12) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title)
-                    Text("Select .tkproj file")
-                        .font(.headline)
+                    Text("Select a .tkproj file to import an existing project into your workspace.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+
+                    Button {
+                        showingFilePicker = true
+                    } label: {
+                        Label("Select Project File", systemImage: "doc.badge.plus")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.accentColor)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .padding(.top, 8)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 40)
-                .background(Color(uiColor: .secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [6]))
-                        .foregroundStyle(.secondary.opacity(0.3))
-                )
             }
-            .buttonStyle(.plain)
 
             if let error = error {
                 Text(error)
                     .font(.caption)
                     .foregroundStyle(.red)
+                    .padding()
+                    .background(Color.red.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-
-            Spacer()
-
-            Button("Cancel") {
-                dismiss()
-            }
-            .foregroundStyle(.secondary)
         }
+        .padding()
+        .navigationTitle("Installer")
         .sheet(isPresented: $showingFilePicker) {
             FileImporterView(
                 allowedContentTypes: [UTType(filenameExtension: "tkproj") ?? .data],
