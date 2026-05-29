@@ -26,7 +26,7 @@ struct DeveloperBetaTestingView: View {
                 if let appID = selectedAppID {
                     if betaGroups.isEmpty {
                         VStack(spacing: 12) {
-                            EmptyStateView(text: "No active beta groups found for this project.", icon: "person.3.sequence.fill")
+                            EmptyStateView(icon: "person.3.sequence.fill", title: "No Beta Groups", message: "No active beta groups found for this project.")
 
                             Button {
                                 showingCreateGroup = true

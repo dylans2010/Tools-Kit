@@ -69,7 +69,7 @@ struct MarketplaceSubmissionView: View {
     private var metadataStep: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                SectionHeader(title: "App Listing Metadata")
+                SectionHeader(title: "App Listing Metadata", subtitle: nil, icon: nil)
 
                 VStack(alignment: .leading, spacing: 12) {
                     submissionField(label: "Listing Title", text: $draft.metadata.title, placeholder: "e.g. My Productivity Tool")
@@ -91,7 +91,7 @@ struct MarketplaceSubmissionView: View {
     private var assetsStep: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                SectionHeader(title: "Visual Assets")
+                SectionHeader(title: "Visual Assets", subtitle: nil, icon: nil)
 
                 submissionField(label: "Icon URL (512x512 PNG)", text: $draft.assets.iconURL, placeholder: "https://example.com/icon.png")
 
@@ -113,7 +113,7 @@ struct MarketplaceSubmissionView: View {
     private var technicalStep: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                SectionHeader(title: "Technical Configuration")
+                SectionHeader(title: "Technical Configuration", subtitle: nil, icon: nil)
 
                 HStack(spacing: 16) {
                     submissionField(label: "Version", text: $draft.technicalDetails.version, placeholder: "1.0.0")
@@ -137,7 +137,7 @@ struct MarketplaceSubmissionView: View {
     private var supportStep: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                SectionHeader(title: "Support & Compliance")
+                SectionHeader(title: "Support & Compliance", subtitle: nil, icon: nil)
 
                 submissionField(label: "Support Email", text: $draft.supportConfig.supportEmail, placeholder: "support@example.com")
                 submissionField(label: "Support Website", text: $draft.supportConfig.supportURL, placeholder: "https://example.com/support")
@@ -156,7 +156,7 @@ struct MarketplaceSubmissionView: View {
     private var reviewStep: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                SectionHeader(title: "Review & Submit")
+                SectionHeader(title: "Review & Submit", subtitle: nil, icon: nil)
 
                 VStack(spacing: 12) {
                     reviewRow(label: "App Title", value: draft.metadata.title)

@@ -125,7 +125,7 @@ struct AppDetailView: View {
 
     private func overviewTab(_ app: DeveloperApp) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "Project Information")
+            SectionHeader(title: "Project Information", subtitle: nil, icon: nil)
 
             VStack(spacing: 12) {
                 infoRow(label: "Description", value: app.description)
@@ -135,7 +135,7 @@ struct AppDetailView: View {
                 infoRow(label: "Created", value: app.createdAt.formatted(date: .abbreviated, time: .omitted))
             }
 
-            SectionHeader(title: "Platform Targets")
+            SectionHeader(title: "Platform Targets", subtitle: nil, icon: nil)
             FlowLayout(spacing: 8) {
                 ForEach(app.platformTargets, id: \.self) { target in
                     Text(target.rawValue)
@@ -151,7 +151,7 @@ struct AppDetailView: View {
     private func versionsTab(_ app: DeveloperApp) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                SectionHeader(title: "Version History")
+                SectionHeader(title: "Version History", subtitle: nil, icon: nil)
                 Spacer()
                 Button {
                     // Logic to add version
@@ -162,7 +162,7 @@ struct AppDetailView: View {
             }
 
             if app.versions.isEmpty {
-                EmptyStateView(text: "No versions released yet.", icon: "shippingbox")
+                EmptyStateView(icon: "shippingbox", title: "No Versions", message: "No versions released yet.")
             } else {
                 ForEach(app.versions.sorted(by: { $0.createdAt > $1.createdAt })) { version in
                     VStack(alignment: .leading, spacing: 8) {
@@ -190,10 +190,10 @@ struct AppDetailView: View {
 
     private func scopesTab(_ app: DeveloperApp) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "Granted Permissions")
+            SectionHeader(title: "Granted Permissions", subtitle: nil, icon: nil)
 
             if app.grantedScopes.isEmpty {
-                EmptyStateView(text: "No permissions granted yet.", icon: "shield.slash")
+                EmptyStateView(icon: "shield.slash", title: "No Permissions", message: "No permissions granted yet.")
             } else {
                 ForEach(app.grantedScopes, id: \.self) { scopeID in
                     if let scope = scopeService.fetchScope(identifier: scopeID) {
@@ -227,12 +227,12 @@ struct AppDetailView: View {
 
     private func authTab(_ app: DeveloperApp) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "Assigned API Keys")
+            SectionHeader(title: "Assigned API Keys", subtitle: nil, icon: nil)
 
             let assignedKeys = keyService.keys.filter { $0.appID == app.id }
 
             if assignedKeys.isEmpty {
-                EmptyStateView(text: "No API keys assigned to this project.", icon: "key.slash")
+                EmptyStateView(icon: "key.slash", title: "No API Keys", message: "No API keys assigned to this project.")
             } else {
                 ForEach(assignedKeys) { key in
                     HStack {
@@ -268,7 +268,7 @@ struct AppDetailView: View {
 
     private func moreTab(_ app: DeveloperApp) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            SectionHeader(title: "Collaborators")
+            SectionHeader(title: "Collaborators", subtitle: nil, icon: nil)
             if app.collaborators.isEmpty {
                 Text("You are the sole owner of this project.").font(.caption).foregroundStyle(.secondary)
             } else {
@@ -279,7 +279,7 @@ struct AppDetailView: View {
                             Text(collab.email).font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Text(collab.role).font(.caption2.bold()).foregroundStyle(.accentColor)
+                        Text(collab.role).font(.caption2.bold()).foregroundColor(.accentColor)
                     }
                     .padding()
                     .background(Color(uiColor: .secondarySystemGroupedBackground))
@@ -289,7 +289,7 @@ struct AppDetailView: View {
 
             Divider()
 
-            SectionHeader(title: "Danger Zone")
+            SectionHeader(title: "Danger Zone", subtitle: nil, icon: nil)
             VStack(spacing: 12) {
                 Button(role: .destructive) {
                     // Transfer ownership
@@ -363,28 +363,6 @@ struct AppDetailView: View {
     }
 }
 
-// Helper components that might be in Sources/Components or need to be defined if not found
-struct SectionHeader: View {
-    let title: String
-    var body: some View {
-        Text(title).font(.headline).padding(.bottom, 4)
-    }
-}
-
-struct EmptyStateView: View {
-    let text: String
-    let icon: String
-    var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon).font(.largeTitle).foregroundStyle(.secondary)
-            Text(text).font(.subheadline).foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color.secondary.opacity(0.05))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-}
 
 struct FlowLayout: View {
     let spacing: CGFloat

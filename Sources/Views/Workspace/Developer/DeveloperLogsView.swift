@@ -56,7 +56,7 @@ struct DeveloperLogsView: View {
         }
         .sheet(isPresented: $showingExportSheet) {
             if let url = exportURL {
-                ActivityView(activityItems: [url])
+                LogActivityView(activityItems: [url])
             }
         }
         .refreshable {
@@ -129,7 +129,7 @@ struct DeveloperLogsView: View {
                         .background(Color.secondary.opacity(0.05))
                         .clipShape(RoundedRectangle(cornerRadius: 4))
                 } label: {
-                    Text("View Details").font(.caption2).foregroundStyle(.accentColor)
+                    Text("View Details").font(.caption2).foregroundColor(.accentColor)
                 }
             }
 
@@ -165,7 +165,7 @@ struct DeveloperLogsView: View {
     }
 }
 
-struct ActivityView: UIViewControllerRepresentable {
+struct LogActivityView: UIViewControllerRepresentable {
     let activityItems: [Any]
     let applicationActivities: [UIActivity]? = nil
 

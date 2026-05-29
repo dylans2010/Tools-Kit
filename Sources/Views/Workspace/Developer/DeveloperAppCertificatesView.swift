@@ -25,7 +25,7 @@ struct DeveloperAppCertificatesView: View {
                 if let appID = selectedAppID {
                     if appCertificates.isEmpty {
                         VStack(spacing: 12) {
-                            EmptyStateView(text: "No active signing certificates found.", icon: "doc.badge.gearshape")
+                            EmptyStateView(icon: "doc.badge.gearshape", title: "No Certificates", message: "No active signing certificates found.")
 
                             Button {
                                 showingRequestDialog = true
