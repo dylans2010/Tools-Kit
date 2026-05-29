@@ -15,7 +15,7 @@ struct ProjectInstallerView: View {
                 VStack(spacing: 16) {
                     Image(systemName: "square.and.arrow.down.fill")
                         .font(.system(size: 64))
-                        .foregroundStyle(.accentColor)
+                        .foregroundStyle(Color.accentColor)
 
                     Text("Install Project")
                         .font(.title2.bold())
