@@ -61,7 +61,7 @@ struct AppManagementView: View {
         HStack {
             Image(systemName: app.iconName)
                 .font(.title2)
-                .foregroundStyle(.accent)
+                .foregroundStyle(.accentColor)
                 .frame(width: 40)
 
             VStack(alignment: .leading, spacing: 2) {

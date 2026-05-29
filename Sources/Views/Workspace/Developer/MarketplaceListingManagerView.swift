@@ -54,8 +54,9 @@ struct MarketplaceListingManagerView: View {
         switch status {
         case .draft: return .gray
         case .pendingReview, .underReview: return .orange
+        case .approved: return .blue
         case .live: return .green
-        case .paused: return .blue
+        case .paused: return .cyan
         case .rejected: return .red
         case .deprecated: return .secondary
         }

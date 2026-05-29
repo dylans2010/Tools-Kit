@@ -1,5 +1,14 @@
 import SwiftUI
 
+struct DocPage: Identifiable {
+    var id: UUID
+    var title: String
+    var content: String
+    var lastModified: Date
+    var version: String
+    var isDraft: Bool
+}
+
 struct PluginBuildView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var manager = SDKPluginManager.shared

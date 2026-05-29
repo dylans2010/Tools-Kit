@@ -27,20 +27,23 @@ struct DocumentationEditorView: View {
 
             // Editor
             Group {
-                if let _ = selectedPageID, var p = page {
+                if page != nil {
                     VStack(spacing: 0) {
-                        TextField("Page Title", text: $p.title)
-                            .font(.title2.bold())
-                            .padding()
+                        TextField("Page Title", text: Binding(
+                            get: { page?.title ?? "" },
+                            set: { page?.title = $0 }
+                        ))
+                        .font(.title2.bold())
+                        .padding()
 
                         Divider()
 
-                        TextEditor(text: $p.content)
-                            .font(.system(.body, design: .monospaced))
-                            .padding()
-                    }
-                    .onChange(of: p) { newValue in
-                        page = newValue
+                        TextEditor(text: Binding(
+                            get: { page?.content ?? "" },
+                            set: { page?.content = $0 }
+                        ))
+                        .font(.system(.body, design: .monospaced))
+                        .padding()
                     }
                 } else {
                     VStack(spacing: 12) {
