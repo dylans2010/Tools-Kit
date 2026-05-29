@@ -7,7 +7,7 @@ struct AnalyticsSummary {
     var insights: [String]
 }
 
-final class AnalyticsService {
+final class WorkoutsAnalyticsService {
     func buildSummary(progress: [ProgressModel], performances: [WorkoutPerformanceModel]) -> AnalyticsSummary {
         let recentProgress = Array(progress.suffix(30))
         let recentPerformance = Array(performances.suffix(30))
