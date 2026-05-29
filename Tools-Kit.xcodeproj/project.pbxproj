@@ -14846,6 +14846,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.dylans2010.ToolsKit;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -14867,6 +14868,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.dylans2010.ToolsKit.messages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -14927,6 +14929,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.dylans2010.ToolsKit.keyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

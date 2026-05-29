@@ -771,7 +771,6 @@ class AIService {
 struct DynamicAIModelRouting {
     private let provider: any AIProvider
     private let apiKey: String
-    private let modelCatalog = AIModelCatalog.shared
 
     init(provider: any AIProvider, apiKey: String) {
         self.provider = provider
@@ -781,13 +780,13 @@ struct DynamicAIModelRouting {
     /// Executes the AI request across available free models until success or exhaustion.
     func execute(messages: [ChatMessage], attachments: [ChatAttachment] = []) async throws -> String {
         // 1. Ensure models are loaded for OpenRouter
-        if await MainActor.run { modelCatalog.models(for: "openrouter").isEmpty } {
-            await modelCatalog.loadModels(for: "openrouter")
+        if await MainActor.run { AIModelCatalog.shared.models(for: "openrouter").isEmpty } {
+            await AIModelCatalog.shared.loadModels(for: "openrouter")
         }
 
         // 2. Fetch and prioritize "free" models
         let freeModels = await MainActor.run {
-            modelCatalog.models(for: "openrouter")
+            AIModelCatalog.shared.models(for: "openrouter")
                 .filter { $0.id.lowercased().contains("free") }
                 .sorted { m1, m2 in
                     // Prioritize newer/larger models if known, otherwise alphabetic

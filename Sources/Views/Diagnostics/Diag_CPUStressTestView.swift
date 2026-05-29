@@ -130,8 +130,9 @@ struct Diag_CPUStressTestView: View {
             }
 
             let elapsed = Date().timeIntervalSince(startTime)
+            let opsValue = ops
             await MainActor.run {
-                computationsPerSecond = Double(ops) / elapsed
+                computationsPerSecond = Double(opsValue) / elapsed
                 progress = 1.0
                 stopTest()
             }

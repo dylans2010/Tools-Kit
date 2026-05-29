@@ -393,8 +393,9 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
     }
 
     @MainActor
-    public func setScope(_ key: String, enabled: Bool, for projectManager: SDKProjectManager = .shared) {
-        guard var project = projectManager.currentProject else { return }
+    public func setScope(_ key: String, enabled: Bool, for projectManager: SDKProjectManager? = nil) {
+        let pm = projectManager ?? SDKProjectManager.shared
+        guard var project = pm.currentProject else { return }
         if enabled {
             grantScope(key, to: &project)
         } else {
@@ -454,7 +455,8 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
     @MainActor
     public func recalculateDiagnostics() {
         var next: [SDKRuntimeDiagnostic] = []
-        let project = SDKProjectManager.shared.currentProject
+        let pm = SDKProjectManager.shared
+        let project = pm.currentProject
         let scopes = effectiveScopes(for: project)
 
         if scopes.isEmpty {
@@ -534,11 +536,12 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
 
     public func executeGuarded<T>(_ operationName: String, _ block: @escaping () async throws -> T) async -> T? {
         do {
-            runtimeFailureMessage = nil
+            await MainActor.run { runtimeFailureMessage = nil }
             return try await block()
         } catch {
-            runtimeFailureMessage = "\(operationName) failed: \(error.localizedDescription)"
-            SDKLogStore.shared.log(runtimeFailureMessage ?? "Operation failed", source: "SDKRuntimeWorkspaceState", level: .error)
+            let msg = "\(operationName) failed: \(error.localizedDescription)"
+            await MainActor.run { runtimeFailureMessage = msg }
+            SDKLogStore.shared.log(msg, source: "SDKRuntimeWorkspaceState", level: .error)
             return nil
         }
     }
