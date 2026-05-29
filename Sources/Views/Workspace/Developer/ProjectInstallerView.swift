@@ -1,16 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-public class ProjectInstallManager: ObservableObject {
-    public static let shared = ProjectInstallManager()
-
-    private init() {}
-
-    public func install(from url: URL) throws {
-        // Awaiting backend integration for project installation logic
-    }
-}
-
 struct ProjectInstallerView: View {
     @Environment(\.dismiss) var dismiss
     @State private var showingFilePicker = false
@@ -25,7 +15,7 @@ struct ProjectInstallerView: View {
                 VStack(spacing: 16) {
                     Image(systemName: "square.and.arrow.down.fill")
                         .font(.system(size: 64))
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(.accentColor)
 
                     Text("Install Project")
                         .font(.title2.bold())

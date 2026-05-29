@@ -1,4 +1,17 @@
 import Foundation
+import SwiftUI
+
+public enum TeamRole: String, Codable, CaseIterable {
+    case owner, admin, developer, viewer
+    public var color: Color {
+        switch self {
+            case .owner: return .purple
+            case .admin: return .blue
+            case .developer: return .green
+            case .viewer: return .gray
+        }
+    }
+}
 
 public enum OrgRole: String, Codable, CaseIterable {
     case owner = "Owner"
@@ -30,9 +43,9 @@ public struct TeamMember: Identifiable, Codable, Hashable {
     public var accountID: UUID
     public var name: String
     public var email: String
-    public var role: String // e.g. "Developer", "Viewer"
+    public var role: TeamRole
 
-    public init(id: UUID = UUID(), accountID: UUID, name: String, email: String, role: String) {
+    public init(id: UUID = UUID(), accountID: UUID, name: String, email: String, role: TeamRole) {
         self.id = id
         self.accountID = accountID
         self.name = name

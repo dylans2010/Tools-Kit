@@ -1,5 +1,9 @@
 import SwiftUI
 
+extension URL: Identifiable {
+    public var id: String { absoluteString }
+}
+
 class SDKAppBuilderViewModel: ObservableObject {
     @Published var name: String = ""
     @Published var description: String = ""
