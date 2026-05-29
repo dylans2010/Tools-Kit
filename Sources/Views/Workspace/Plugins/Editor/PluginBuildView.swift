@@ -1461,10 +1461,10 @@ struct PluginDocumentationView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("Plugin Development Guide").font(.title.bold())
-                    DocSection(title: "Overview", pages: [
+                    PluginBuildDocSection(title: "Overview", pages: [
                         DocPage(id: UUID(), title: "Overview", content: "Plugins are event-driven modules that react to workspace activity. Start by defining an immutable identifier 'com.toolskit.<name>' and selecting relevant capabilities.", lastModified: Date(), version: "1.0.0", isDraft: false)
                     ])
-                    DocSection(title: "Capabilities", pages: [
+                    PluginBuildDocSection(title: "Capabilities", pages: [
                         DocPage(id: UUID(), title: "Capabilities", content: "Capabilities define what system services your plugin can access. High-risk scopes require an API Key and Privacy Note justification.", lastModified: Date(), version: "1.0.0", isDraft: false)
                     ])
                     VStack(alignment: .leading, spacing: 8) {
@@ -1473,7 +1473,7 @@ struct PluginDocumentationView: View {
                         Text("await ctx.ai.summarize(text)\nawait ctx.notes.updateNote(id, content)")
                             .font(.system(.caption, design: .monospaced)).padding().background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
                     }
-                    DocSection(title: "Debugging", pages: [
+                    PluginBuildDocSection(title: "Debugging", pages: [
                         DocPage(id: UUID(), title: "Debugging", content: "Use the Test Console to simulate events and view execution logs. The Dev Console provides real-time error tracking.", lastModified: Date(), version: "1.0.0", isDraft: false)
                     ])
                 }
@@ -1486,13 +1486,15 @@ struct PluginDocumentationView: View {
     }
 }
 
-private struct DocSection: View {
+private struct PluginBuildDocSection: View {
     let title: String
-    let text: String
+    let pages: [DocPage]
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title).font(.headline)
-            Text(text).foregroundStyle(.secondary)
+            ForEach(pages) { page in
+                Text(page.content).foregroundStyle(.secondary)
+            }
         }
     }
 }

@@ -42,10 +42,10 @@ struct ConnectorVersioningView: View {
         List {
             Section {
                 HStack(spacing: 0) {
-                    DetailMetricPill(label: "Version", value: "v\(connector.version)", color: .blue)
-                    DetailMetricPill(label: "History", value: "\(versionHistory.count)", color: .purple)
-                    DetailMetricPill(label: "Status", value: deploymentStatus.rawValue, color: deploymentStatus == .deployed ? .sdkSuccess : .orange)
-                    DetailMetricPill(label: "Branch", value: selectedBranch, color: .teal)
+                    SDKStatPill(label: "Version", value: "v\(connector.version)", color: .blue)
+                    SDKStatPill(label: "History", value: "\(versionHistory.count)", color: .purple)
+                    SDKStatPill(label: "Status", value: deploymentStatus.rawValue, color: deploymentStatus == .deployed ? .sdkSuccess : .orange)
+                    SDKStatPill(label: "Branch", value: selectedBranch, color: .teal)
                 }
                 .padding(.vertical, 8)
             }
@@ -318,10 +318,6 @@ private struct DiffItem: View {
     var body: some View { HStack { Text(label).font(.caption); Spacer(); Text(value).font(.caption2.monospaced()).foregroundStyle(.secondary) } }
 }
 
-private struct DetailMetricPill: View {
-    let label: String; let value: String; let color: Color
-    var body: some View { VStack(spacing: 4) { Text(value).font(.headline).foregroundStyle(color); Text(label).font(.caption2.bold()).foregroundStyle(.secondary) }.frame(maxWidth: .infinity) }
-}
 
 // MARK: - Version Models
 

@@ -225,7 +225,7 @@ private struct InternalLogsView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 6) {
                         ForEach(logger.entries) { entry in
-                            LogEntryRow(entry: entry)
+                            FallbackFetchLogEntryRow(entry: entry)
                                 .id(entry.id)
                         }
                     }
@@ -242,7 +242,7 @@ private struct InternalLogsView: View {
     }
 }
 
-private struct LogEntryRow: View {
+private struct FallbackFetchLogEntryRow: View {
     let entry: LogEntry
 
     var body: some View {

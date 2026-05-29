@@ -40,59 +40,19 @@ struct ConnectorSecurityView: View {
 
     var body: some View {
         Form {
-            if let conn = connector {
-                Section {
-                    HStack(spacing: 0) {
-                        DetailMetricPill(label: "Auth", value: conn.authConfig.type.rawValue.capitalized, color: conn.authConfig.type == .none ? .red : .sdkSuccess)
-                        DetailMetricPill(label: "Rate Limit", value: "\(rateLimit)/m", color: .blue)
-                        DetailMetricPill(label: "Scopes", value: "\(requestedScopes.count)", color: .purple)
-                        DetailMetricPill(label: "Score", value: "\(securityScore)", color: securityScore >= 80 ? .green : securityScore >= 50 ? .orange : .red)
-                    }.padding(.vertical, 8)
-                }.listRowBackground(Color.clear).listRowInsets(EdgeInsets())
-            }
-
+            headerSection
             AccessControlSection(tls: $enforceTLS, publicAccess: $allowPublicAccess, rateLimit: $rateLimit)
-
             IPWhitelistSection(enabled: $enableIPWhitelist, ips: $whitelistedIPs, newIP: $newIPAddress)
-
-            Section("Token Policy") {
-                Stepper("\(tokenExpiryHours) Hours", value: $tokenExpiryHours, in: 1...720).font(.subheadline)
-                Toggle("Auto-Refresh", isOn: $autoRefreshTokens)
-            }
-
+            tokenPolicySection
             certPinningSection
-
             mtlsSection
-
             requestSigningSection
-
             CORSConfigSection(enabled: $enableCORS, origins: $allowedOrigins, newOrigin: $newOrigin)
-
-            Section("Webhook Integrity") {
-                Toggle("Sign Payloads", isOn: $enableWebhookSignatures)
-                if enableWebhookSignatures {
-                    HStack { SecureField("Signing Secret", text: $webhookSecret).font(.caption.monospaced()); Button { webhookSecret = (0..<32).map { _ in String("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".randomElement()!) }.joined() } label: { Image(systemName: "arrow.clockwise") } }
-                }
-            }
-
+            webhookIntegritySection
             ScopeManagementSection(scopes: $requestedScopes, newScope: $newScopeText)
-
             auditSection
-
-            Section("Compliance") {
-                ComplianceRow(label: "Data Residency", value: "Local")
-                ComplianceRow(label: "Encryption", value: "AES-256")
-                ComplianceRow(label: "Audit Logs", value: enableAuditLogging ? "Enabled" : "Disabled", color: enableAuditLogging ? .sdkSuccess : .red)
-                ComplianceRow(label: "mTLS", value: enableMTLS ? "Active" : "Inactive", color: enableMTLS ? .sdkSuccess : .secondary)
-                ComplianceRow(label: "Cert Pinning", value: enableCertPinning ? "Active" : "Inactive", color: enableCertPinning ? .sdkSuccess : .secondary)
-                ComplianceRow(label: "Request Signing", value: enableRequestSigning ? signingAlgorithm.rawValue : "Disabled", color: enableRequestSigning ? .sdkSuccess : .secondary)
-            }
-
-            Section {
-                Button("Apply Security Policy") { applyPolicy(); showingSaveAlert = true }.frame(maxWidth: .infinity).bold().buttonStyle(.borderedProminent)
-                Button("Run Security Scan") { runSecurityScan(); showingSecurityScan = true }.frame(maxWidth: .infinity)
-                Button("Reset Defaults", role: .destructive) { showingResetAlert = true }.frame(maxWidth: .infinity)
-            }.listRowBackground(Color.clear)
+            complianceSection
+            actionsSection
         }
         .navigationTitle("Security").navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -124,9 +84,84 @@ struct ConnectorSecurityView: View {
         }
     }
 
+    // MARK: - Sections
+
+    @ViewBuilder private var headerSection: some View {
+        if let conn = connector {
+            Section {
+                HStack(spacing: 0) {
+                    SDKStatPill(label: "Auth", value: conn.authConfig.type.rawValue.capitalized, color: conn.authConfig.type == .none ? .red : .sdkSuccess)
+                    SDKStatPill(label: "Rate Limit", value: "\(rateLimit)/m", color: .blue)
+                    SDKStatPill(label: "Scopes", value: "\(requestedScopes.count)", color: .purple)
+                    SDKStatPill(label: "Score", value: "\(securityScore)", color: securityScore >= 80 ? .green : securityScore >= 50 ? .orange : .red)
+                }.padding(.vertical, 8)
+            }
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets())
+        }
+    }
+
+    @ViewBuilder private var tokenPolicySection: some View {
+        Section("Token Policy") {
+            Stepper("\(tokenExpiryHours) Hours", value: $tokenExpiryHours, in: 1...720).font(.subheadline)
+            Toggle("Auto-Refresh", isOn: $autoRefreshTokens)
+        }
+    }
+
+    @ViewBuilder private var webhookIntegritySection: some View {
+        Section("Webhook Integrity") {
+            Toggle("Sign Payloads", isOn: $enableWebhookSignatures)
+            if enableWebhookSignatures {
+                HStack {
+                    SecureField("Signing Secret", text: $webhookSecret).font(.caption.monospaced())
+                    Button {
+                        webhookSecret = (0..<32).map { _ in
+                            String("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".randomElement()!)
+                        }.joined()
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder private var complianceSection: some View {
+        Section("Compliance") {
+            ComplianceRow(label: "Data Residency", value: "Local")
+            ComplianceRow(label: "Encryption", value: "AES-256")
+            ComplianceRow(label: "Audit Logs", value: enableAuditLogging ? "Enabled" : "Disabled", color: enableAuditLogging ? .sdkSuccess : .red)
+            ComplianceRow(label: "mTLS", value: enableMTLS ? "Active" : "Inactive", color: enableMTLS ? .sdkSuccess : .secondary)
+            ComplianceRow(label: "Cert Pinning", value: enableCertPinning ? "Active" : "Inactive", color: enableCertPinning ? .sdkSuccess : .secondary)
+            ComplianceRow(label: "Request Signing", value: enableRequestSigning ? signingAlgorithm.rawValue : "Disabled", color: enableRequestSigning ? .sdkSuccess : .secondary)
+        }
+    }
+
+    @ViewBuilder private var actionsSection: some View {
+        Section {
+            Button("Apply Security Policy") {
+                applyPolicy()
+                showingSaveAlert = true
+            }
+            .frame(maxWidth: .infinity).bold().buttonStyle(.borderedProminent)
+
+            Button("Run Security Scan") {
+                runSecurityScan()
+                showingSecurityScan = true
+            }
+            .frame(maxWidth: .infinity)
+
+            Button("Reset Defaults", role: .destructive) {
+                showingResetAlert = true
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .listRowBackground(Color.clear)
+    }
+
     // MARK: - Certificate Pinning
 
-    private var certPinningSection: some View {
+    @ViewBuilder private var certPinningSection: some View {
         Section("Certificate Pinning") {
             Toggle("Enable Certificate Pinning", isOn: $enableCertPinning)
             if enableCertPinning {
@@ -153,7 +188,7 @@ struct ConnectorSecurityView: View {
 
     // MARK: - mTLS
 
-    private var mtlsSection: some View {
+    @ViewBuilder private var mtlsSection: some View {
         Section("Mutual TLS") {
             Toggle("Enable mTLS", isOn: $enableMTLS)
             if enableMTLS {
@@ -166,7 +201,7 @@ struct ConnectorSecurityView: View {
 
     // MARK: - Request Signing
 
-    private var requestSigningSection: some View {
+    @ViewBuilder private var requestSigningSection: some View {
         Section("Request Signing") {
             Toggle("Enable Request Signing", isOn: $enableRequestSigning)
             if enableRequestSigning {
@@ -186,7 +221,7 @@ struct ConnectorSecurityView: View {
 
     // MARK: - Audit Section
 
-    private var auditSection: some View {
+    @ViewBuilder private var auditSection: some View {
         Section("Audit Logging") {
             Toggle("Enable Audit Logging", isOn: $enableAuditLogging)
             if !auditEntries.isEmpty {
@@ -378,10 +413,6 @@ private struct ComplianceRow: View {
     var body: some View { HStack { Text(label).font(.subheadline); Spacer(); Text(value).font(.caption).foregroundStyle(color) } }
 }
 
-private struct DetailMetricPill: View {
-    let label: String; let value: String; let color: Color
-    var body: some View { VStack(spacing: 4) { Text(value).font(.headline).foregroundStyle(color); Text(label).font(.caption2.bold()).foregroundStyle(.secondary) }.frame(maxWidth: .infinity) }
-}
 
 // MARK: - Security Models
 
