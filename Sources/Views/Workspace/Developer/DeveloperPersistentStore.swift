@@ -86,6 +86,11 @@ public class DeveloperPersistentStore: ObservableObject {
         self.apps = newApps
     }
 
+    public func addApp(_ app: DeveloperApp) {
+        self.apps.append(app)
+        save(self.apps, key: appsKey)
+    }
+
     public func saveKeys(_ newKeys: [APIKey]) {
         save(newKeys, key: keysKey)
         self.keys = newKeys

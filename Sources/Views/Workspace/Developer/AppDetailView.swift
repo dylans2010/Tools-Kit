@@ -136,13 +136,11 @@ struct AppDetailView: View {
             }
 
             SectionHeader(title: "Platform Targets", subtitle: nil, icon: nil)
-            FlowLayout(spacing: 8) {
-                ForEach(app.platformTargets, id: \.self) { target in
-                    Text(target.rawValue)
-                        .font(.caption.bold())
-                        .padding(.horizontal, 10).padding(.vertical, 5)
-                        .background(Color.secondary.opacity(0.1), in: Capsule())
-                }
+            FlowLayout(app.platformTargets, spacing: 8) { target in
+                Text(target.rawValue)
+                    .font(.caption.bold())
+                    .padding(.horizontal, 10).padding(.vertical, 5)
+                    .background(Color.secondary.opacity(0.1), in: Capsule())
             }
         }
         .padding()
@@ -364,27 +362,3 @@ struct AppDetailView: View {
 }
 
 
-struct FlowLayout: View {
-    let spacing: CGFloat
-    let content: [AnyView]
-
-    init<Data: Collection, ID: Hashable, V: View>(
-        _ data: Data,
-        id: KeyPath<Data.Element, ID>,
-        spacing: CGFloat = 8,
-        @ViewBuilder content: @escaping (Data.Element) -> V
-    ) {
-        self.spacing = spacing
-        self.content = data.map { AnyView(content($0)) }
-    }
-
-    // Simplified FlowLayout for implementation
-    var body: some View {
-        HStack(spacing: spacing) {
-            ForEach(0..<content.count, id: \.self) { index in
-                content[index]
-            }
-            Spacer()
-        }
-    }
-}
