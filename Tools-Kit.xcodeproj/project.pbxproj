@@ -12581,6 +12581,8 @@
 				DA010000000000000000003A /* FunnelBuilderView.swift */,
 				DA0100000000000000000054 /* WebhookManagerView.swift */,
 			);
+			path = Developer;
+			sourceTree = "<group>";
 		};
 		DA0000000000000000000002 /* Models */ = {
 			isa = PBXGroup;
@@ -12619,9 +12621,6 @@
 				DA0100000000000000000053 /* WebhookService.swift */,
 			);
 			path = Services;
-			sourceTree = "<group>";
-		};
-			path = Developer;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
