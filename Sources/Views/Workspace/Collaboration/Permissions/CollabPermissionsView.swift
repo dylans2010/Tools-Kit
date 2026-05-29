@@ -14,9 +14,10 @@ struct CollabPermissionsView: View {
         List {
             Section("Team Overview") {
                 HStack(spacing: 16) {
-                    roleCard(role: .admin, count: members.count(where: { $0.role == .admin }))
-                    roleCard(role: .editor, count: members.count(where: { $0.role == .editor }))
-                    roleCard(role: .viewer, count: members.count(where: { $0.role == .viewer }))
+                    roleCard(role: .owner, count: members.filter({ $0.role == .owner }).count)
+                    roleCard(role: .admin, count: members.filter({ $0.role == .admin }).count)
+                    roleCard(role: .developer, count: members.filter({ $0.role == .developer }).count)
+                    roleCard(role: .viewer, count: members.filter({ $0.role == .viewer }).count)
                 }
             }
 
@@ -35,7 +36,7 @@ struct CollabPermissionsView: View {
                         }
                         Spacer()
                         Menu {
-                            ForEach(MemberRole.allCases, id: \.self) { role in
+                            ForEach(TeamRole.allCases, id: \.self) { role in
                                 Button {
                                     updateRole(memberID: member.id, to: role)
                                 } label: {
@@ -66,12 +67,20 @@ struct CollabPermissionsView: View {
 
             Section("Permissions Matrix") {
                 VStack(alignment: .leading, spacing: 8) {
-                    permissionRow("View workspace", admin: true, editor: true, viewer: true)
-                    permissionRow("Edit content", admin: true, editor: true, viewer: false)
-                    permissionRow("Manage plugins", admin: true, editor: true, viewer: false)
-                    permissionRow("Manage members", admin: true, editor: false, viewer: false)
-                    permissionRow("Delete workspace", admin: true, editor: false, viewer: false)
-                    permissionRow("Manage billing", admin: true, editor: false, viewer: false)
+                    HStack {
+                        Text("Permission").font(.caption.bold()).frame(maxWidth: .infinity, alignment: .leading)
+                        Text("Own").font(.caption.bold()).frame(width: 40)
+                        Text("Adm").font(.caption.bold()).frame(width: 40)
+                        Text("Dev").font(.caption.bold()).frame(width: 40)
+                        Text("View").font(.caption.bold()).frame(width: 40)
+                    }
+                    Divider()
+                    permissionRow("View workspace", owner: true, admin: true, developer: true, viewer: true)
+                    permissionRow("Edit content", owner: true, admin: true, developer: true, viewer: false)
+                    permissionRow("Manage plugins", owner: true, admin: true, developer: true, viewer: false)
+                    permissionRow("Manage members", owner: true, admin: true, developer: false, viewer: false)
+                    permissionRow("Delete workspace", owner: true, admin: true, developer: false, viewer: false)
+                    permissionRow("Manage billing", owner: true, admin: true, developer: false, viewer: false)
                 }
             }
         }
@@ -87,7 +96,7 @@ struct CollabPermissionsView: View {
         .task { loadMembers() }
     }
 
-    private func roleCard(role: MemberRole, count: Int) -> some View {
+    private func roleCard(role: TeamRole, count: Int) -> some View {
         VStack(spacing: 4) {
             Text("\(count)").font(.title2.bold()).foregroundStyle(role.color)
             Text(role.rawValue.capitalized + "s").font(.caption2).foregroundStyle(.secondary)
@@ -95,16 +104,17 @@ struct CollabPermissionsView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func permissionRow(_ permission: String, admin: Bool, editor: Bool, viewer: Bool) -> some View {
+    private func permissionRow(_ permission: String, owner: Bool, admin: Bool, developer: Bool, viewer: Bool) -> some View {
         HStack {
             Text(permission).font(.caption).frame(maxWidth: .infinity, alignment: .leading)
-            Image(systemName: admin ? "checkmark.circle.fill" : "xmark.circle").foregroundStyle(admin ? .green : .red).frame(width: 50)
-            Image(systemName: editor ? "checkmark.circle.fill" : "xmark.circle").foregroundStyle(editor ? .green : .red).frame(width: 50)
-            Image(systemName: viewer ? "checkmark.circle.fill" : "xmark.circle").foregroundStyle(viewer ? .green : .red).frame(width: 50)
+            Image(systemName: owner ? "checkmark.circle.fill" : "xmark.circle").foregroundStyle(owner ? .green : .red).frame(width: 40)
+            Image(systemName: admin ? "checkmark.circle.fill" : "xmark.circle").foregroundStyle(admin ? .green : .red).frame(width: 40)
+            Image(systemName: developer ? "checkmark.circle.fill" : "xmark.circle").foregroundStyle(developer ? .green : .red).frame(width: 40)
+            Image(systemName: viewer ? "checkmark.circle.fill" : "xmark.circle").foregroundStyle(viewer ? .green : .red).frame(width: 40)
         }
     }
 
-    private func updateRole(memberID: UUID, to role: MemberRole) {
+    private func updateRole(memberID: UUID, to role: TeamRole) {
         if let index = members.firstIndex(where: { $0.id == memberID }) {
             members[index].role = role
         }
@@ -112,24 +122,5 @@ struct CollabPermissionsView: View {
 
     private func loadMembers() {
         // Team members are managed by the workspace owner; start empty until members are added.
-    }
-}
-
-private struct TeamMember: Identifiable {
-    let id = UUID()
-    let name: String
-    let email: String
-    var role: MemberRole
-}
-
-private enum MemberRole: String, CaseIterable {
-    case admin, editor, viewer
-
-    var color: Color {
-        switch self {
-        case .admin: return .red
-        case .editor: return .blue
-        case .viewer: return .green
-        }
     }
 }

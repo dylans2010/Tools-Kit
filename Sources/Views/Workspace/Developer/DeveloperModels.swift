@@ -402,6 +402,15 @@ public enum TeamRole: String, Codable, CaseIterable {
     case admin = "Admin"
     case developer = "Developer"
     case viewer = "Viewer"
+
+    public var color: Color {
+        switch self {
+        case .owner: return .purple
+        case .admin: return .red
+        case .developer: return .blue
+        case .viewer: return .green
+        }
+    }
 }
 
 public struct TeamMember: Identifiable, Codable, Hashable {
