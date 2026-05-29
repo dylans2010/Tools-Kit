@@ -8,7 +8,7 @@ struct DeveloperLogsView: View {
 
     var filteredLogs: [SDKLogEntry] {
         logStore.entries.filter { log in
-            (searchText.isEmpty || log.message.localizedCaseInsensitiveContains(searchText) || log.source.localizedCaseInsensitiveContains(searchText)) &&
+            (searchText.isEmpty || log.message.localizedCaseInsensitiveContains(searchText) || (log.source?.localizedCaseInsensitiveContains(searchText) ?? false)) &&
             (severityFilter == nil || log.level == severityFilter)
         }
     }
@@ -69,9 +69,9 @@ struct DeveloperLogsView: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    FilterChip(label: "ALL", isSelected: severityFilter == nil) { severityFilter = nil }
+                    FilterChip(title: "ALL", isSelected: severityFilter == nil, action: { severityFilter = nil })
                     ForEach(LogLevel.allCases, id: \.self) { level in
-                        FilterChip(label: level.rawValue.uppercased(), isSelected: severityFilter == level) { severityFilter = level }
+                        FilterChip(title: level.rawValue.uppercased(), isSelected: severityFilter == level, action: { severityFilter = level })
                     }
                 }
             }
@@ -98,7 +98,7 @@ struct DeveloperLogEntryRow: View {
                     .background(colorFor(log.level).opacity(0.1), in: RoundedRectangle(cornerRadius: 4))
                     .foregroundStyle(colorFor(log.level))
 
-                Text(log.source).font(.system(size: 10, weight: .bold))
+                Text(log.source ?? "System").font(.system(size: 10, weight: .bold))
 
                 Spacer()
 
@@ -136,28 +136,9 @@ struct DeveloperLogEntryRow: View {
         switch level {
         case .debug: return .gray
         case .info: return .blue
-        case .warn: return .orange
+        case .warning: return .orange
         case .error: return .red
-        case .critical: return .purple
         }
     }
 }
 
-struct FilterChip: View {
-    let label: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(label)
-                .font(.system(size: 10, weight: .bold))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.1))
-                .foregroundStyle(isSelected ? .white : .primary)
-                .clipShape(Capsule())
-        }
-        .buttonStyle(.plain)
-    }
-}
