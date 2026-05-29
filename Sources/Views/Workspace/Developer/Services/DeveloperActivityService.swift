@@ -32,8 +32,9 @@ public class DeveloperActivityService: ObservableObject {
 
         store.saveActivities(currentActivities)
 
+        let updatedActivities = currentActivities
         await MainActor.run {
-            self.activities = currentActivities
+            self.activities = updatedActivities
         }
     }
 
