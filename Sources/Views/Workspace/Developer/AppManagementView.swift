@@ -7,7 +7,7 @@ struct AppManagementView: View {
 
     var filteredApps: [DeveloperApp] {
         appService.apps.filter { app in
-            (searchText.isEmpty || app.name.localizedCaseInsensitiveContains(searchText)) &&
+            (searchText.isEmpty || app.name.localizedCaseInsensitiveContains(searchText) || app.bundleId.localizedCaseInsensitiveContains(searchText)) &&
             (selectedType == nil || app.type == selectedType)
         }
     }
@@ -25,16 +25,30 @@ struct AppManagementView: View {
 
             Section {
                 if filteredApps.isEmpty {
-                    VStack(spacing: 12) {
+                    VStack(spacing: 16) {
                         Image(systemName: "square.stack.3d.up.slash")
                             .font(.system(size: 48))
                             .foregroundStyle(.secondary)
-                        Text("No apps found. Register your first app to get started.")
+                        Text(searchText.isEmpty ? "No apps registered." : "No apps match your search.")
+                            .font(.headline)
+                        Text("Register your app to manage its lifecycle, versions, and scopes.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
+
+                        if searchText.isEmpty {
+                            NavigationLink(destination: AppBuilderView()) {
+                                Text("Register First App")
+                                    .fontWeight(.bold)
+                                    .padding(.horizontal, 24)
+                                    .padding(.vertical, 12)
+                                    .background(Color.accentColor)
+                                    .foregroundStyle(.white)
+                                    .clipShape(Capsule())
+                            }
+                        }
                     }
-                    .padding()
+                    .padding(.vertical, 40)
                     .frame(maxWidth: .infinity)
                 } else {
                     ForEach(filteredApps) { app in
@@ -46,7 +60,7 @@ struct AppManagementView: View {
                 }
             }
         }
-        .searchable(text: $searchText, prompt: "Search apps")
+        .searchable(text: $searchText, prompt: "Search apps by name or bundle ID")
         .navigationTitle("App Management")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -55,27 +69,37 @@ struct AppManagementView: View {
                 }
             }
         }
+        .refreshable {
+            appService.loadApps()
+        }
     }
 
     private func appRow(_ app: DeveloperApp) -> some View {
-        HStack {
+        HStack(spacing: 12) {
             Image(systemName: app.iconName)
                 .font(.title2)
                 .foregroundStyle(Color.accentColor)
-                .frame(width: 40)
+                .frame(width: 44, height: 44)
+                .background(Color.accentColor.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(app.name).font(.subheadline.bold())
                 Text("\(app.type.rawValue) • \(app.version)").font(.caption2).foregroundStyle(.secondary)
             }
             Spacer()
-            statusBadge(app.status)
+            VStack(alignment: .trailing, spacing: 4) {
+                statusBadge(app.status)
+                if app.installCount > 0 {
+                    Text("\(app.installCount) installs").font(.system(size: 8)).foregroundStyle(.tertiary)
+                }
+            }
         }
         .padding(.vertical, 4)
     }
 
     private func statusBadge(_ status: DeveloperAppStatus) -> some View {
-        Text(status.rawValue).font(.caption2.bold())
+        Text(status.rawValue).font(.system(size: 10, weight: .bold))
             .padding(.horizontal, 8).padding(.vertical, 4)
             .background(statusColor(status).opacity(0.1), in: Capsule())
             .foregroundStyle(statusColor(status))

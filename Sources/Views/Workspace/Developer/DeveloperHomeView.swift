@@ -5,6 +5,7 @@ struct DeveloperHomeView: View {
     @ObservedObject var appService = DeveloperAppService.shared
     @ObservedObject var activityService = DeveloperActivityService.shared
     @ObservedObject var keyService = APIKeyService.shared
+    @ObservedObject var scopeService = DeveloperScopeService.shared
 
     var body: some View {
         ScrollView {
@@ -21,6 +22,11 @@ struct DeveloperHomeView: View {
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Developer Portal")
         .navigationBarTitleDisplayMode(.inline)
+        .refreshable {
+            appService.loadApps()
+            keyService.loadKeys()
+            activityService.loadActivities()
+        }
     }
 
     private var headerSection: some View {
@@ -68,8 +74,8 @@ struct DeveloperHomeView: View {
         HStack(spacing: 12) {
             summaryCard(label: "Apps", value: "\(appService.apps.count)", icon: "square.grid.2x2")
             summaryCard(label: "Installs", value: "\(appService.apps.reduce(0) { $0 + $1.installCount })", icon: "arrow.down.circle")
-            summaryCard(label: "API Keys", value: "\(keyService.keys.count)", icon: "key.fill")
-            summaryCard(label: "Support", value: "0", icon: "lifepreserver")
+            summaryCard(label: "Pending Scopes", value: "\(scopeService.pendingRequests.count)", icon: "shield.lefthalf.filled")
+            summaryCard(label: "API Keys", value: "\(keyService.keys.filter { !$0.isRevoked }.count)", icon: "key.fill")
         }
     }
 
@@ -92,12 +98,8 @@ struct DeveloperHomeView: View {
 
     private var quickActionsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Developer Views")
+            Text("Developer Workspace")
                 .font(.headline)
-
-            Text("Access every primary developer workspace view from one place.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 NavigationLink(destination: AppBuilderView()) {
@@ -115,15 +117,6 @@ struct DeveloperHomeView: View {
                 NavigationLink(destination: DocumentationEditorView()) {
                     quickActionCard(title: "Docs Editor", icon: "book.and.wrench", color: .cyan)
                 }
-                NavigationLink(destination: OrganizationManagementView()) {
-                    quickActionCard(title: "Organizations", icon: "building.2.fill", color: .gray)
-                }
-                NavigationLink(destination: DeveloperTeamManagerView()) {
-                    quickActionCard(title: "Team", icon: "person.2.fill", color: .indigo)
-                }
-                NavigationLink(destination: DeveloperReleaseManagementView()) {
-                    quickActionCard(title: "Releases", icon: "shippingbox.fill", color: .brown)
-                }
                 NavigationLink(destination: MarketplaceListingManagerView()) {
                     quickActionCard(title: "Marketplace", icon: "storefront.fill", color: .teal)
                 }
@@ -132,21 +125,6 @@ struct DeveloperHomeView: View {
                 }
                 NavigationLink(destination: AnalyticsDashboardView()) {
                     quickActionCard(title: "Analytics", icon: "chart.xyaxis.line", color: .pink)
-                }
-                NavigationLink(destination: DeveloperSecurityAuditView()) {
-                    quickActionCard(title: "Security", icon: "shield.checkered", color: .red)
-                }
-                NavigationLink(destination: DeveloperVerificationView()) {
-                    quickActionCard(title: "Verification", icon: "checkmark.seal.fill", color: .blue)
-                }
-                NavigationLink(destination: DeveloperAccountActivityView()) {
-                    quickActionCard(title: "Activity", icon: "clock.arrow.circlepath", color: .orange)
-                }
-                NavigationLink(destination: ProjectInstallerView()) {
-                    quickActionCard(title: "Installer", icon: "square.and.arrow.down.fill", color: .brown)
-                }
-                NavigationLink(destination: DeveloperProfileView()) {
-                    quickActionCard(title: "Profile", icon: "person.text.rectangle", color: .green)
                 }
             }
         }
@@ -171,17 +149,21 @@ struct DeveloperHomeView: View {
 
     private var healthStatusPanel: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Your Projects")
+            Text("Project Health")
                 .font(.headline)
 
             if appService.apps.isEmpty {
-                Text("No projects yet. Start by building or submitting an app.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                VStack(spacing: 8) {
+                    Text("No projects yet.").font(.subheadline.bold())
+                    Text("Register an app to start tracking status.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             } else {
                 VStack(spacing: 1) {
                     ForEach(appService.apps.prefix(3)) { app in
@@ -234,10 +216,14 @@ struct DeveloperHomeView: View {
 
             VStack(alignment: .leading, spacing: 16) {
                 if activityService.activities.isEmpty {
-                    Text("No recent activity recorded.").font(.caption).foregroundStyle(.secondary)
+                    Text("No activity records found.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical)
                 } else {
                     ForEach(activityService.activities.prefix(5)) { activity in
-                        activityRow(title: activity.eventType.rawValue, detail: activity.description, date: activity.timestamp, color: .blue)
+                        activityRow(title: activity.eventType.rawValue, detail: activity.description, date: activity.timestamp)
                     }
                 }
             }
@@ -247,14 +233,14 @@ struct DeveloperHomeView: View {
         }
     }
 
-    private func activityRow(title: String, detail: String, date: Date, color: Color) -> some View {
+    private func activityRow(title: String, detail: String, date: Date) -> some View {
         HStack(alignment: .top, spacing: 12) {
-            Circle().fill(color).frame(width: 8, height: 8).padding(.top, 5)
+            Circle().fill(Color.accentColor).frame(width: 8, height: 8).padding(.top, 5)
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text(title).font(.caption.bold())
                     Spacer()
-                    Text(date.formatted(.dateTime.hour().minute())).font(.caption2).foregroundStyle(.tertiary)
+                    Text(date.formatted(.relative(presentation: .numeric))).font(.caption2).foregroundStyle(.tertiary)
                 }
                 Text(detail).font(.caption).foregroundStyle(.secondary)
             }
@@ -272,6 +258,9 @@ struct DeveloperHomeView: View {
                         Text("Finish setting up your profile to enable all features.").font(.caption).foregroundStyle(.secondary)
                     }
                     Spacer()
+                    NavigationLink(destination: DeveloperProfileView()) {
+                        Text("Finish").font(.caption.bold())
+                    }
                 }
                 .padding()
                 .background(Color.orange.opacity(0.1))

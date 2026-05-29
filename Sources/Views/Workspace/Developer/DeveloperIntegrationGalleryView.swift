@@ -34,10 +34,14 @@ struct DeveloperIntegrationGalleryView: View {
                 .foregroundStyle(color)
             Text(name)
                 .font(.headline)
-            Button("Configure") {
-                // Awaiting backend integration
+
+            NavigationLink(destination: AuthServiceManagerView()) {
+                Text("Configure")
+                    .font(.subheadline.bold())
+                    .padding(.horizontal, 16).padding(.vertical, 8)
+                    .background(Color.accentColor.opacity(0.1))
+                    .clipShape(Capsule())
             }
-            .buttonStyle(.bordered)
         }
         .padding()
         .frame(maxWidth: .infinity)

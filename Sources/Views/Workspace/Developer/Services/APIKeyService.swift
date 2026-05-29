@@ -2,6 +2,7 @@ import Foundation
 
 public class APIKeyService: ObservableObject {
     public static let shared = APIKeyService()
+    private let store = DeveloperPersistentStore.shared
 
     @Published public var keys: [APIKey] = []
 
@@ -10,7 +11,7 @@ public class APIKeyService: ObservableObject {
     }
 
     public func loadKeys() {
-        // Awaiting backend integration
+        self.keys = store.keys
     }
 
     public func createKey(
@@ -19,14 +20,18 @@ public class APIKeyService: ObservableObject {
         environment: KeyEnvironment,
         scopeIdentifiers: [String] = [],
         appID: UUID? = nil,
-        ttl: TimeInterval? = nil
+        expiresAt: Date? = nil
     ) async throws -> String {
         let payload = generateSecureRandomPayload()
-        let prefix = type == .cli ? "tkcli_" : "tk_"
-        let envSuffix = environment == .test ? "_test" : ""
-        let fullKey = "\(prefix)\(payload)\(envSuffix)"
+        let prefix = type == .cli ? "tkcli" : "tk"
+        let envString = environment == .test ? "test" : "live"
 
-        let masked = "\(prefix)\(payload.prefix(4))••••••••\(payload.suffix(4))\(envSuffix)"
+        // Pattern: {prefix}_{environment}_{base62payload}_{checksum}
+        let payloadWithEnv = "\(prefix)_\(envString)_\(payload)"
+        let checksum = computeChecksum(for: payloadWithEnv)
+        let fullKey = "\(payloadWithEnv)_\(checksum)"
+
+        let masked = "\(prefix)_\(envString)_\(payload.prefix(4))••••••••\(payload.suffix(4))_\(checksum)"
 
         let newKey = APIKey(
             maskedValue: masked,
@@ -35,38 +40,95 @@ public class APIKeyService: ObservableObject {
             environment: environment,
             appID: appID,
             scopeIdentifiers: scopeIdentifiers,
-            expiresAt: ttl != nil ? Date().addingTimeInterval(ttl!) : nil
+            expiresAt: expiresAt
         )
 
-        keys.append(newKey)
-        // Awaiting backend integration
+        var currentKeys = store.keys
+        currentKeys.insert(newKey, at: 0)
+        store.saveKeys(currentKeys)
+
+        await MainActor.run {
+            self.keys = currentKeys
+        }
+
+        await DeveloperActivityService.shared.logEvent(
+            eventType: .keyGenerated,
+            appID: appID,
+            recordID: newKey.id
+        )
 
         return fullKey
     }
 
-    public func revokeKey(id: UUID, reason: DeveloperKeyRevocationReason) async throws {
-        if let index = keys.firstIndex(where: { $0.id == id }) {
-            keys[index].isRevoked = true
-            keys[index].revokedAt = Date()
-            keys[index].revokedReason = reason
+    public func revokeKey(id: UUID, reason: DeveloperKeyRevocationReason, description: String = "") async throws {
+        var currentKeys = store.keys
+        if let index = currentKeys.firstIndex(where: { $0.id == id }) {
+            currentKeys[index].isRevoked = true
+            currentKeys[index].revokedAt = Date()
+            currentKeys[index].revokedReason = reason
+            currentKeys[index].notes = description
+
+            store.saveKeys(currentKeys)
+
+            await MainActor.run {
+                self.keys = currentKeys
+            }
+
+            await DeveloperActivityService.shared.logEvent(
+                eventType: .keyRevoked,
+                appID: currentKeys[index].appID,
+                recordID: id
+            )
         }
-        // Awaiting backend integration
     }
 
     public func rotateKey(id: UUID) async throws -> String {
-        guard let oldKey = keys.first(where: { $0.id == id }) else {
+        guard let oldKey = store.keys.first(where: { $0.id == id }) else {
             throw NSError(domain: "APIKeyService", code: 404, userInfo: [NSLocalizedDescriptionKey: "Key not found"])
         }
 
         try await revokeKey(id: id, reason: .rotated)
 
-        return try await createKey(
+        let newKeyString = try await createKey(
             label: oldKey.label,
             type: oldKey.type,
             environment: oldKey.environment,
             scopeIdentifiers: oldKey.scopeIdentifiers,
-            appID: oldKey.appID
+            appID: oldKey.appID,
+            expiresAt: oldKey.expiresAt
         )
+
+        if let newKeyRecordIndex = store.keys.firstIndex(where: { $0.label == oldKey.label && !$0.isRevoked }) {
+            var updatedKeys = store.keys
+            let rotationRecord = KeyRotationRecord(previousKeyMasked: oldKey.maskedValue)
+            updatedKeys[newKeyRecordIndex].rotationHistory.append(rotationRecord)
+            store.saveKeys(updatedKeys)
+            await MainActor.run {
+                self.keys = updatedKeys
+            }
+        }
+
+        await DeveloperActivityService.shared.logEvent(
+            eventType: .keyRotated,
+            appID: oldKey.appID,
+            recordID: oldKey.id
+        )
+
+        return newKeyString
+    }
+
+    public func updateKeyMetadata(id: UUID, label: String, notes: String, ipAllowlist: [String]) async throws {
+        var currentKeys = store.keys
+        if let index = currentKeys.firstIndex(where: { $0.id == id }) {
+            currentKeys[index].label = label
+            currentKeys[index].notes = notes
+            currentKeys[index].ipAllowlist = ipAllowlist
+
+            store.saveKeys(currentKeys)
+            await MainActor.run {
+                self.keys = currentKeys
+            }
+        }
     }
 
     public func bulkRevoke(ids: [UUID], reason: DeveloperKeyRevocationReason) async throws {
@@ -78,5 +140,12 @@ public class APIKeyService: ObservableObject {
     private func generateSecureRandomPayload() -> String {
         let alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return String((0..<32).map { _ in alphabet.randomElement()! })
+    }
+
+    private func computeChecksum(for input: String) -> String {
+        // Deterministic checksum from preceding segments
+        let hash = input.hash
+        let checksumBase62 = String(abs(hash), radix: 36)
+        return String(checksumBase62.suffix(6))
     }
 }

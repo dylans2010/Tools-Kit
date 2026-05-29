@@ -3,119 +3,170 @@ import SwiftUI
 struct AnalyticsDashboardView: View {
     @ObservedObject var appService = DeveloperAppService.shared
     @ObservedObject var analyticsService = AnalyticsService.shared
-    @State private var timeRange = 0 // 7 days
-    @State private var selectedAppId: UUID?
+    @State private var selectedAppID: UUID?
+    @State private var selectedTimeRange: TimeRange = .last7Days
+    @State private var isLoading = false
+    @State private var errorSummary: [String: Int] = [:]
+    @State private var apiUsageCount: Int = 0
 
-    var selectedApp: DeveloperApp? {
-        appService.apps.first { $0.id == selectedAppId }
+    enum TimeRange: String, CaseIterable {
+        case last24Hours = "Last 24 Hours"
+        case last7Days = "Last 7 Days"
+        case last30Days = "Last 30 Days"
+        case last90Days = "Last 90 Days"
     }
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                HStack {
-                    Picker("App", selection: $selectedAppId) {
-                        Text("All Apps").tag(UUID?.none)
-                        ForEach(appService.apps) { app in
-                            Text(app.name).tag(Optional(app.id))
-                        }
-                    }
-                    Spacer()
-                    Picker("Range", selection: $timeRange) {
-                        Text("7D").tag(0)
-                        Text("30D").tag(1)
-                        Text("90D").tag(2)
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 150)
-                }
+            VStack(spacing: 20) {
+                filterHeader
 
-                overviewStrip
-                installTrendChart
-                apiUsageSection
-                marketplaceFunnel
+                if isLoading {
+                    ProgressView().padding(100)
+                } else {
+                    mainMetricsGrid
+                    errorSummarySection
+                    apiUsageSection
+                }
             }
             .padding()
         }
-        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Analytics")
+        .background(Color(uiColor: .systemGroupedBackground))
+        .onAppear(perform: refreshData)
+        .onChange(of: selectedAppID) { _ in refreshData() }
+        .onChange(of: selectedTimeRange) { _ in refreshData() }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    Task { try? await analyticsService.exportMetrics(appID: selectedAppID, from: Date().addingTimeInterval(-7*24*3600), to: Date(), format: "json") }
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                }
+            }
+        }
     }
 
-    private var overviewStrip: some View {
-        HStack {
-            let totalInstalls = selectedApp?.installCount ?? appService.apps.reduce(0) { $0 + $1.installCount }
-            let totalRevenue = selectedApp?.revenue ?? appService.apps.reduce(0) { $0 + $1.revenue }
+    private var filterHeader: some View {
+        VStack(spacing: 12) {
+            Picker("Project", selection: $selectedAppID) {
+                Text("All Projects").tag(Optional<UUID>.none)
+                ForEach(appService.apps) { app in
+                    Text(app.name).tag(Optional(app.id))
+                }
+            }
+            .pickerStyle(.menu)
+            .frame(maxWidth: .infinity)
+            .padding(8)
+            .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
 
-            statItem(label: "Installs", value: "\(totalInstalls)", trend: "")
-            statItem(label: "Active Users", value: "0", trend: "")
-            statItem(label: "Revenue", value: "$\(String(format: "%.2f", totalRevenue))", trend: "")
-            statItem(label: "Crashes", value: "0.0%", trend: "")
+            Picker("Range", selection: $selectedTimeRange) {
+                ForEach(TimeRange.allCases, id: \.self) { range in
+                    Text(range.rawValue).tag(range)
+                }
+            }
+            .pickerStyle(.segmented)
+        }
+    }
+
+    private var mainMetricsGrid: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            metricCard(label: "Total Installs", value: "\(totalInstalls)", icon: "arrow.down.circle", color: .blue)
+            metricCard(label: "API Requests", value: "\(apiUsageCount)", icon: "bolt.fill", color: .orange)
+            metricCard(label: "Active Keys", value: "\(activeKeysCount)", icon: "key.fill", color: .green)
+            metricCard(label: "Error Events", value: "\(errorCount)", icon: "exclamationmark.triangle.fill", color: .red)
+        }
+    }
+
+    private var totalInstalls: Int {
+        appService.apps.filter { selectedAppID == nil || $0.id == selectedAppID }.reduce(0) { $0 + $1.installCount }
+    }
+
+    private var activeKeysCount: Int {
+        APIKeyService.shared.keys.filter { (selectedAppID == nil || $0.appID == selectedAppID) && !$0.isRevoked }.count
+    }
+
+    private var errorCount: Int {
+        errorSummary.values.reduce(0, +)
+    }
+
+    private func metricCard(label: String, value: String, icon: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: icon).foregroundStyle(color)
+                Spacer()
+            }
+            Text(value).font(.title2.bold())
+            Text(label).font(.caption).foregroundStyle(.secondary)
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
-    private func statItem(label: String, value: String, trend: String) -> some View {
-        VStack(spacing: 4) {
-            Text(value).font(.headline)
-            Text(label).font(.system(size: 8)).foregroundStyle(.secondary)
-            if !trend.isEmpty {
-                Text(trend).font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary)
-            }
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private var installTrendChart: some View {
+    private var errorSummarySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Install Trend").font(.headline)
+            SectionHeader(title: "Top Errors")
 
-            VStack(alignment: .center) {
-                Text("No data available").font(.caption).foregroundStyle(.secondary)
+            if errorSummary.isEmpty {
+                EmptyStateView(text: "No errors reported for this period.", icon: "checkmark.shield")
+            } else {
+                VStack(spacing: 1) {
+                    ForEach(errorSummary.sorted(by: { $0.value > $1.value }).prefix(5), id: \.key) { error, count in
+                        HStack {
+                            Text(error).font(.caption).lineLimit(1)
+                            Spacer()
+                            Text("\(count)").font(.caption.bold()).foregroundStyle(.red)
+                        }
+                        .padding()
+                        .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .frame(height: 150)
-            .frame(maxWidth: .infinity)
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
 
     private var apiUsageSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("API Usage & Latency").font(.headline)
+            SectionHeader(title: "API Usage")
 
-            VStack(spacing: 0) {
-                Text("No API calls recorded for the selected period.").font(.caption).foregroundStyle(.secondary).padding()
-            }
-            .frame(maxWidth: .infinity)
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-    }
-
-    private var marketplaceFunnel: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Marketplace Funnel").font(.headline)
-
-            VStack(spacing: 12) {
-                let installs = selectedApp?.installCount ?? appService.apps.reduce(0) { $0 + $1.installCount }
-                funnelStep(label: "Impressions", value: "0", color: .blue)
-                funnelStep(label: "Page Views", value: "0", color: .blue.opacity(0.8))
-                funnelStep(label: "Installs", value: "\(installs)", color: .blue.opacity(0.6))
+            if apiUsageCount == 0 {
+                EmptyStateView(text: "No API usage recorded.", icon: "bolt.slash")
+            } else {
+                Text("Total of \(apiUsageCount) API calls recorded in the selected period.")
+                    .font(.subheadline)
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
     }
 
-    private func funnelStep(label: String, value: String, color: Color) -> some View {
-        HStack {
-            Text(label).font(.caption).bold()
-            Spacer()
-            Text(value).font(.caption.bold())
+    private func refreshData() {
+        isLoading = true
+        Task {
+            let from = dateFromRange(selectedTimeRange)
+            let to = Date()
+
+            let usage = try? await analyticsService.fetchAPIUsage(appID: selectedAppID, from: from, to: to)
+            let errors = try? await analyticsService.fetchErrorSummary(appID: selectedAppID, from: from, to: to)
+
+            await MainActor.run {
+                apiUsageCount = usage?.count ?? 0
+                errorSummary = errors ?? [:]
+                isLoading = false
+            }
         }
-        .padding()
-        .background(color.opacity(0.1))
-        .overlay(Rectangle().stroke(color, lineWidth: 1))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func dateFromRange(_ range: TimeRange) -> Date {
+        switch range {
+        case .last24Hours: return Date().addingTimeInterval(-24 * 3600)
+        case .last7Days: return Date().addingTimeInterval(-7 * 24 * 3600)
+        case .last30Days: return Date().addingTimeInterval(-30 * 24 * 3600)
+        case .last90Days: return Date().addingTimeInterval(-90 * 24 * 3600)
+        }
     }
 }

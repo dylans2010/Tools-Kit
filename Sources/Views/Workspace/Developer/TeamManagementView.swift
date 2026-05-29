@@ -1,65 +1,84 @@
 import SwiftUI
 
 struct TeamManagementView: View {
-    let orgID: UUID
     @ObservedObject var orgService = OrganizationService.shared
-    @State private var showingCreate = false
-    @State private var newTeamName = ""
-
-    var org: DeveloperOrganization? {
-        orgService.organizations.first { $0.id == orgID }
-    }
+    @State private var showingAddMember = false
+    @State private var memberEmail = ""
+    @State private var selectedRole: OrgRole = .member
 
     var body: some View {
         List {
-            if let org = org {
-                Section("Teams") {
-                    if org.teams.isEmpty {
-                        Text("No teams created in this organization.").foregroundStyle(.secondary)
-                    } else {
-                        ForEach(org.teams) { team in
-                            VStack(alignment: .leading) {
-                                Text(team.name).font(.headline)
-                                Text("\(team.members.count) members").font(.caption).foregroundStyle(.secondary)
+            if orgService.organizations.isEmpty {
+                EmptyStateView(text: "No organizations found.", icon: "building.2")
+            } else {
+                ForEach(orgService.organizations) { org in
+                    Section(org.name) {
+                        ForEach(org.members) { member in
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text(member.name).font(.subheadline.bold())
+                                    Text(member.email).font(.caption).foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Text(member.role.rawValue).font(.caption2.bold())
+                                    .padding(.horizontal, 8).padding(.vertical, 4)
+                                    .background(Color.accentColor.opacity(0.1), in: Capsule())
                             }
+                        }
+                        .onDelete { offsets in
+                            for index in offsets {
+                                let member = org.members[index]
+                                Task { try? await orgService.removeMember(orgID: org.id, memberID: member.id) }
+                            }
+                        }
+
+                        Button {
+                            showingAddMember = true
+                            // In real app, would set targetOrgID
+                        } label: {
+                            Label("Invite Member", systemImage: "person.badge.plus")
                         }
                     }
                 }
             }
         }
         .navigationTitle("Team Management")
-        .toolbar {
-            Button { showingCreate = true } label: { Image(systemName: "plus") }
-        }
-        .sheet(isPresented: $showingCreate) {
-            createTeamSheet
+        .sheet(isPresented: $showingAddMember) {
+            inviteMemberSheet
         }
     }
 
-    private var createTeamSheet: some View {
+    private var inviteMemberSheet: some View {
         NavigationStack {
             Form {
-                TextField("Team Name", text: $newTeamName)
-            }
-            .navigationTitle("Create Team")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingCreate = false } }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Create") {
-                        createTeam()
+                TextField("Email Address", text: $memberEmail)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
+                Picker("Role", selection: $selectedRole) {
+                    ForEach(OrgRole.allCases, id: \.self) { role in
+                        Text(role.rawValue).tag(role)
                     }
-                    .disabled(newTeamName.isEmpty)
                 }
             }
-        }
-    }
-
-    private func createTeam() {
-        Task {
-            try? await orgService.createTeam(orgID: orgID, name: newTeamName)
-            await MainActor.run {
-                showingCreate = false
-                newTeamName = ""
+            .navigationTitle("Invite to Organization")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showingAddMember = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Send Invite") {
+                        if let firstOrg = orgService.organizations.first {
+                            Task {
+                                try? await orgService.addMember(orgID: firstOrg.id, email: memberEmail, role: selectedRole)
+                                await MainActor.run {
+                                    memberEmail = ""
+                                    showingAddMember = false
+                                }
+                            }
+                        }
+                    }
+                    .disabled(memberEmail.isEmpty)
+                }
             }
         }
     }

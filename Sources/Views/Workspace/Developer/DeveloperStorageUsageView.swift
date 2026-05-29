@@ -2,7 +2,9 @@ import SwiftUI
 
 struct DeveloperStorageUsageView: View {
     @ObservedObject var appService = DeveloperAppService.shared
+    @ObservedObject var logService = DeveloperLogService.shared
     @State private var selectedAppID: UUID?
+    @State private var showingClearConfirmation = false
 
     var body: some View {
         ScrollView {
@@ -24,11 +26,11 @@ struct DeveloperStorageUsageView: View {
                     Text("Storage Usage").font(.headline)
                     HStack {
                         VStack(alignment: .leading) {
-                            Text("0.0 GB / 5.0 GB").font(.title3.bold())
-                            ProgressView(value: 0.0).tint(.blue)
+                            Text("\(currentUsageGB, specifier: "%.2f") GB / 5.0 GB").font(.title3.bold())
+                            ProgressView(value: currentUsageGB, total: 5.0).tint(.blue)
                         }
                         Spacer()
-                        Text("0%").font(.headline).foregroundStyle(.secondary)
+                        Text("\(Int(currentUsageGB / 5.0 * 100))%").font(.headline).foregroundStyle(.secondary)
                     }
                 }
                 .padding()
@@ -39,7 +41,7 @@ struct DeveloperStorageUsageView: View {
                     Text("Usage by Category").font(.headline)
                     usageRow(label: "Database", value: "0 MB", icon: "cylinder.split.1x2.fill", color: .blue)
                     usageRow(label: "Assets", value: "0 MB", icon: "photo.on.rectangle.angled", color: .green)
-                    usageRow(label: "Logs", value: "0 MB", icon: "list.bullet.rectangle", color: .purple)
+                    usageRow(label: "Logs", value: "\(logUsageMB, specifier: "%.1f") MB", icon: "list.bullet.rectangle", color: .purple)
                 }
                 .padding()
                 .background(Color(uiColor: .secondarySystemGroupedBackground))
@@ -47,7 +49,7 @@ struct DeveloperStorageUsageView: View {
 
                 Section {
                     Button(role: .destructive) {
-                        // Awaiting backend integration
+                        showingClearConfirmation = true
                     } label: {
                         Label("Clear Cached Data", systemImage: "trash")
                             .frame(maxWidth: .infinity)
@@ -61,6 +63,24 @@ struct DeveloperStorageUsageView: View {
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Storage Usage")
+        .confirmationDialog("Clear Cached Data?", isPresented: $showingClearConfirmation, titleVisibility: .visible) {
+            Button("Clear All Logs", role: .destructive) {
+                Task {
+                    // Logic to clear logs
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will permanently delete local logs and cached app data. This action cannot be undone.")
+        }
+    }
+
+    private var currentUsageGB: Double {
+        logUsageMB / 1024.0
+    }
+
+    private var logUsageMB: Double {
+        Double(logService.logEntries.count) * 0.01 // Estimated 10KB per log
     }
 
     private func usageRow(label: String, value: String, icon: String, color: Color) -> some View {

@@ -14,7 +14,7 @@ public enum SdkLanguage: String, Codable, CaseIterable {
     case rust = "Rust"
 }
 
-public struct CodeSample: Identifiable, Codable, Hashable {
+public struct Snippet: Identifiable, Codable, Hashable {
     public var id: UUID
     public var title: String
     public var language: SdkLanguage
