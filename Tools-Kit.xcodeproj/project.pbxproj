@@ -2109,7 +2109,6 @@
 		DA0200000000000000000035 /* DataHandlingPolicyBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000035 /* DataHandlingPolicyBuilderView.swift */; };
 		DA0200000000000000000036 /* CLITokenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000036 /* CLITokenView.swift */; };
 		DA0200000000000000000037 /* SandboxEnvironmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000037 /* SandboxEnvironmentView.swift */; };
-		DA0200000000000000000038 /* SDKVersionManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000038 /* SDKVersionManagerView.swift */; };
 		DA0200000000000000000039 /* CustomEventManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000039 /* CustomEventManagerView.swift */; };
 		DA020000000000000000003A /* FunnelBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000003A /* FunnelBuilderView.swift */; };
 		DA020000000000000000003B /* APIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000003B /* APIKey.swift */; };
@@ -4250,7 +4249,6 @@
 		DA0100000000000000000035 /* DataHandlingPolicyBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataHandlingPolicyBuilderView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000036 /* CLITokenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLITokenView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000037 /* SandboxEnvironmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SandboxEnvironmentView.swift; sourceTree = "<group>"; };
-		DA0100000000000000000038 /* SDKVersionManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKVersionManagerView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000039 /* CustomEventManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomEventManagerView.swift; sourceTree = "<group>"; };
 		DA010000000000000000003A /* FunnelBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunnelBuilderView.swift; sourceTree = "<group>"; };
 		DA010000000000000000003B /* APIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKey.swift; sourceTree = "<group>"; };
@@ -12576,7 +12574,6 @@
 				DA0100000000000000000035 /* DataHandlingPolicyBuilderView.swift */,
 				DA0100000000000000000036 /* CLITokenView.swift */,
 				DA0100000000000000000037 /* SandboxEnvironmentView.swift */,
-				DA0100000000000000000038 /* SDKVersionManagerView.swift */,
 				DA0100000000000000000039 /* CustomEventManagerView.swift */,
 				DA010000000000000000003A /* FunnelBuilderView.swift */,
 				DA0100000000000000000054 /* WebhookManagerView.swift */,
@@ -12848,7 +12845,6 @@
 				DA0200000000000000000035 /* DataHandlingPolicyBuilderView.swift in Sources */,
 				DA0200000000000000000036 /* CLITokenView.swift in Sources */,
 				DA0200000000000000000037 /* SandboxEnvironmentView.swift in Sources */,
-				DA0200000000000000000038 /* SDKVersionManagerView.swift in Sources */,
 				DA0200000000000000000039 /* CustomEventManagerView.swift in Sources */,
 				DA020000000000000000003A /* FunnelBuilderView.swift in Sources */,
 				DA020000000000000000003B /* APIKey.swift in Sources */,
