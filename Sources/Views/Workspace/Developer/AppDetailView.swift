@@ -51,7 +51,7 @@ struct AppDetailView: View {
         HStack(spacing: 16) {
             Image(systemName: app.iconName)
                 .font(.system(size: 60))
-                .foregroundStyle(.accentColor)
+                .foregroundStyle(Color.accentColor)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(app.name).font(.title2.bold())
