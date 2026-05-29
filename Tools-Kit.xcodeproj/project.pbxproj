@@ -2071,6 +2071,17 @@
 		DA020000000000000000000F /* AppBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000000F /* AppBuilderView.swift */; };
 		DA0200000000000000000010 /* ProjectInstallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000010 /* ProjectInstallManager.swift */; };
 		DA0200000000000000000011 /* ProjectInstallerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000011 /* ProjectInstallerView.swift */; };
+		DA0200000000000000000012 /* DeveloperWebhookManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000012 /* DeveloperWebhookManagerView.swift */; };
+		DA0200000000000000000013 /* DeveloperTeamManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000013 /* DeveloperTeamManagerView.swift */; };
+		DA0200000000000000000014 /* DeveloperAppCertificatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000014 /* DeveloperAppCertificatesView.swift */; };
+		DA0200000000000000000015 /* DeveloperSandboxEnvironmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000015 /* DeveloperSandboxEnvironmentView.swift */; };
+		DA0200000000000000000016 /* DeveloperReleaseManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000016 /* DeveloperReleaseManagementView.swift */; };
+		DA0200000000000000000017 /* DeveloperMonetizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000017 /* DeveloperMonetizationView.swift */; };
+		DA0200000000000000000018 /* DeveloperBetaTestingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000018 /* DeveloperBetaTestingView.swift */; };
+		DA0200000000000000000019 /* DeveloperSecurityAuditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000019 /* DeveloperSecurityAuditView.swift */; };
+		DA020000000000000000001A /* DeveloperStorageUsageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000001A /* DeveloperStorageUsageView.swift */; };
+		DA020000000000000000001B /* DeveloperIntegrationGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000001B /* DeveloperIntegrationGalleryView.swift */; };
+		DA020000000000000000001C /* DeveloperSupportTicketView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000001C /* DeveloperSupportTicketView.swift */; };
 		B604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift */; };
 		B5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift */; };
 		BEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift */; };
@@ -4145,6 +4156,17 @@
 		DA010000000000000000000F /* AppBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBuilderView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000010 /* ProjectInstallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectInstallManager.swift; sourceTree = "<group>"; };
 		DA0100000000000000000011 /* ProjectInstallerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectInstallerView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000012 /* DeveloperWebhookManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperWebhookManagerView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000013 /* DeveloperTeamManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperTeamManagerView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000014 /* DeveloperAppCertificatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperAppCertificatesView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000015 /* DeveloperSandboxEnvironmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSandboxEnvironmentView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000016 /* DeveloperReleaseManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperReleaseManagementView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000017 /* DeveloperMonetizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperMonetizationView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000018 /* DeveloperBetaTestingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperBetaTestingView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000019 /* DeveloperSecurityAuditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSecurityAuditView.swift; sourceTree = "<group>"; };
+		DA010000000000000000001A /* DeveloperStorageUsageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperStorageUsageView.swift; sourceTree = "<group>"; };
+		DA010000000000000000001B /* DeveloperIntegrationGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperIntegrationGalleryView.swift; sourceTree = "<group>"; };
+		DA010000000000000000001C /* DeveloperSupportTicketView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSupportTicketView.swift; sourceTree = "<group>"; };
 		F604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKActionDispatcher.swift; sourceTree = "<group>"; };
 		F5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDependencyResolver.swift; sourceTree = "<group>"; };
 		FEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKEventInjectionEngine.swift; sourceTree = "<group>"; };
@@ -12402,6 +12424,17 @@
 				DA010000000000000000000F /* AppBuilderView.swift */,
 				DA0100000000000000000010 /* ProjectInstallManager.swift */,
 				DA0100000000000000000011 /* ProjectInstallerView.swift */,
+				DA0100000000000000000012 /* DeveloperWebhookManagerView.swift */,
+				DA0100000000000000000013 /* DeveloperTeamManagerView.swift */,
+				DA0100000000000000000014 /* DeveloperAppCertificatesView.swift */,
+				DA0100000000000000000015 /* DeveloperSandboxEnvironmentView.swift */,
+				DA0100000000000000000016 /* DeveloperReleaseManagementView.swift */,
+				DA0100000000000000000017 /* DeveloperMonetizationView.swift */,
+				DA0100000000000000000018 /* DeveloperBetaTestingView.swift */,
+				DA0100000000000000000019 /* DeveloperSecurityAuditView.swift */,
+				DA010000000000000000001A /* DeveloperStorageUsageView.swift */,
+				DA010000000000000000001B /* DeveloperIntegrationGalleryView.swift */,
+				DA010000000000000000001C /* DeveloperSupportTicketView.swift */,
 			);
 			path = Developer;
 			sourceTree = "<group>";
@@ -12593,6 +12626,17 @@
 				DA020000000000000000000F /* AppBuilderView.swift in Sources */,
 				DA0200000000000000000010 /* ProjectInstallManager.swift in Sources */,
 				DA0200000000000000000011 /* ProjectInstallerView.swift in Sources */,
+				DA0200000000000000000012 /* DeveloperWebhookManagerView.swift in Sources */,
+				DA0200000000000000000013 /* DeveloperTeamManagerView.swift in Sources */,
+				DA0200000000000000000014 /* DeveloperAppCertificatesView.swift in Sources */,
+				DA0200000000000000000015 /* DeveloperSandboxEnvironmentView.swift in Sources */,
+				DA0200000000000000000016 /* DeveloperReleaseManagementView.swift in Sources */,
+				DA0200000000000000000017 /* DeveloperMonetizationView.swift in Sources */,
+				DA0200000000000000000018 /* DeveloperBetaTestingView.swift in Sources */,
+				DA0200000000000000000019 /* DeveloperSecurityAuditView.swift in Sources */,
+				DA020000000000000000001A /* DeveloperStorageUsageView.swift in Sources */,
+				DA020000000000000000001B /* DeveloperIntegrationGalleryView.swift in Sources */,
+				DA020000000000000000001C /* DeveloperSupportTicketView.swift in Sources */,
 				92E13A73A39F4878870CCFF1 /* SDKResourceAuditView.swift in Sources */,
 				0603EBECCB2849248F4BD1D4 /* SDKGlobalSearchView.swift in Sources */,
 				6FCAA43DB3294F3586F66864 /* SDKDependencyVisualizerView.swift in Sources */,

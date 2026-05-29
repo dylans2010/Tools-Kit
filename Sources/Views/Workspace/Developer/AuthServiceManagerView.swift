@@ -8,40 +8,33 @@ struct AuthServiceManagerView: View {
     @State private var generatedKey: String?
     @State private var showingKeyAlert = false
 
+    @State private var selectedTab = 0
+
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                tokenHealthPanel
+        VStack(spacing: 0) {
+            Picker("Auth Category", selection: $selectedTab) {
+                Text("Keys").tag(0)
+                Text("Webhooks").tag(1)
+                Text("OAuth").tag(2)
+                Text("Environment").tag(3)
+            }
+            .pickerStyle(.segmented)
+            .padding()
 
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Text("Developer API Keys").font(.headline)
-                        Spacer()
-                        Button {
-                            showingAddKey = true
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                        }
-                    }
-
-                    if store.keys.isEmpty {
-                        Text("No API keys generated yet. Use keys to authenticate your apps and services.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color(uiColor: .secondarySystemGroupedBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+            ScrollView {
+                VStack(spacing: 24) {
+                    if selectedTab == 0 {
+                        keysView
+                    } else if selectedTab == 1 {
+                        webhooksSection
+                    } else if selectedTab == 2 {
+                        oauthSection
                     } else {
-                        ForEach(store.keys) { key in
-                            developerKeyCard(key)
-                        }
+                        environmentSection
                     }
                 }
-
-                credentialVaultSummary
+                .padding()
             }
-            .padding()
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Auth Services")
@@ -57,6 +50,135 @@ struct AuthServiceManagerView: View {
                 Text("Please copy your new API key now. You won't be able to see it again.\n\n\(key)")
             }
         }
+    }
+
+    private var keysView: some View {
+        VStack(spacing: 24) {
+            tokenHealthPanel
+
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("Developer API Keys").font(.headline)
+                    Spacer()
+                    Button {
+                        showingAddKey = true
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                    }
+                }
+
+                if store.keys.isEmpty {
+                    Text("No API keys generated yet. Use keys to authenticate your apps and services.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(uiColor: .secondarySystemGroupedBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                } else {
+                    ForEach(store.keys) { key in
+                        developerKeyCard(key)
+                    }
+                }
+            }
+
+            credentialVaultSummary
+        }
+    }
+
+    private var webhooksSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Webhooks").font(.headline)
+                Spacer()
+                NavigationLink(destination: DeveloperWebhookManagerView()) {
+                    Image(systemName: "plus.circle.fill")
+                }
+            }
+
+            if store.webhooks.isEmpty {
+                placeholderCard(text: "No webhooks configured. Receive real-time event notifications at your service endpoints.")
+            } else {
+                ForEach(store.webhooks) { webhook in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(webhook.url).font(.subheadline.bold()).lineLimit(1)
+                            Text("\(webhook.events.count) events").font(.caption).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: .constant(webhook.isActive)).labelsHidden()
+                    }
+                    .padding()
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+    }
+
+    private var oauthSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("OAuth 2.0 Clients").font(.headline)
+                Spacer()
+                Button {} label: { Image(systemName: "plus.circle.fill") }
+            }
+
+            if store.oauthClients.isEmpty {
+                placeholderCard(text: "Register OAuth clients to allow users to securely authorize your apps.")
+            } else {
+                ForEach(store.oauthClients) { client in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(client.name).font(.subheadline.bold())
+                        Text("ID: \(client.clientID)").font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+    }
+
+    private var environmentSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Service Environments").font(.headline)
+                Spacer()
+                NavigationLink(destination: DeveloperSandboxEnvironmentView()) {
+                    Image(systemName: "plus.circle.fill")
+                }
+            }
+
+            ForEach(store.sandboxes) { sandbox in
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text(sandbox.name).font(.subheadline.bold())
+                        Text(sandbox.apiBaseURL).font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    if sandbox.isActive {
+                        Text("Active").font(.caption2.bold()).foregroundStyle(.green)
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(Color.green.opacity(0.1), in: Capsule())
+                    }
+                }
+                .padding()
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+        }
+    }
+
+    private func placeholderCard(text: String) -> some View {
+        Text(text)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private var tokenHealthPanel: some View {

@@ -52,6 +52,8 @@ struct AppDetailView: View {
         .background(Color(uiColor: .secondarySystemGroupedBackground))
     }
 
+    @Environment(\.dismiss) var dismiss
+
     private var overviewTab: some View {
         VStack(alignment: .leading, spacing: 16) {
             detailGroup(title: "App Information") {
@@ -68,7 +70,10 @@ struct AppDetailView: View {
             }
 
             Section {
-                Button(role: .destructive) {} label: {
+                Button(role: .destructive) {
+                    DeveloperPersistentStore.shared.deleteApp(id: app.id)
+                    dismiss()
+                } label: {
                     Label("Delete App", systemImage: "trash")
                 }
             } header: {

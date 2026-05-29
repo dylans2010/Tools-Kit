@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DocSectionEditor: View {
     @Binding var section: DocumentationSection
+    var onAddPage: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -25,7 +26,7 @@ struct DocSectionEditor: View {
                 }
 
                 Button {
-                    // Add Page
+                    onAddPage()
                 } label: {
                     Label("Add Page", systemImage: "plus.circle")
                         .font(.subheadline)

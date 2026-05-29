@@ -7,12 +7,11 @@ struct AppBuilderView: View {
     @State private var projectDescription = ""
     @State private var projectType: AppType = .app
     @State private var projectVersion = "1.0.0"
+    @State private var bundleId = ""
     @State private var aboutInfo = ""
     @State private var credits = ""
     @State private var socialLinks: [String: String] = [:]
     @State private var selectedScopes: Set<String> = []
-    @State private var isExporting = false
-    @State private var exportedURL: URL?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -29,11 +28,8 @@ struct AppBuilderView: View {
 
             footer
         }
-        .navigationTitle("App Builder")
+        .navigationTitle("Register Existing App")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(item: $exportedURL) { url in
-            AppBuilderShareSheet(activityItems: [url])
-        }
     }
 
     private var stepIndicator: some View {
@@ -50,9 +46,12 @@ struct AppBuilderView: View {
     private var identityStep: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("Project Identity").font(.headline)
-                TextField("Project Name", text: $projectName)
+                Text("App Identity").font(.headline)
+                TextField("App Name", text: $projectName)
                     .textFieldStyle(.roundedBorder)
+                TextField("Bundle Identifier", text: $bundleId)
+                    .textFieldStyle(.roundedBorder)
+                    .autocapitalization(.none)
                 TextField("Version", text: $projectVersion)
                     .textFieldStyle(.roundedBorder)
                 VStack(alignment: .leading) {
@@ -110,10 +109,11 @@ struct AppBuilderView: View {
     private var reviewStep: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("Review Configuration").font(.headline)
+                Text("Review Registration").font(.headline)
 
                 VStack(alignment: .leading, spacing: 12) {
                     summaryRow(label: "Name", value: projectName)
+                    summaryRow(label: "Bundle ID", value: bundleId)
                     summaryRow(label: "Type", value: projectType.rawValue)
                     summaryRow(label: "Version", value: projectVersion)
                     summaryRow(label: "Scopes", value: "\(selectedScopes.count) selected")
@@ -122,28 +122,15 @@ struct AppBuilderView: View {
                 .background(Color.secondary.opacity(0.05))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
-                Button(action: buildAndInstall) {
-                    Label("Build & Install Locally", systemImage: "hammer.fill")
+                Button(action: registerApp) {
+                    Label("Complete Registration", systemImage: "checkmark.seal.fill")
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.accentColor)
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .disabled(projectName.isEmpty)
-
-                Button(action: exportProject) {
-                    if isExporting {
-                        ProgressView().progressViewStyle(.circular)
-                    } else {
-                        Label("Export as .tkproj", systemImage: "square.and.arrow.up")
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.secondary.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .disabled(projectName.isEmpty || isExporting)
+                .disabled(projectName.isEmpty || bundleId.isEmpty)
             }
             .padding()
         }
@@ -186,50 +173,20 @@ struct AppBuilderView: View {
         )
     }
 
-    private func buildAndInstall() {
+    private func registerApp() {
         let newApp = DeveloperApp(
             name: projectName,
             type: projectType,
-            status: .live,
+            status: .draft,
             version: projectVersion,
             description: projectDescription,
             aboutInfo: aboutInfo,
             credits: credits,
-            socialLinks: socialLinks
+            socialLinks: socialLinks,
+            bundleId: bundleId
         )
         DeveloperPersistentStore.shared.addApp(newApp)
         dismiss()
-    }
-
-    private func exportProject() {
-        isExporting = true
-        Task {
-            let metadata = TKProject.ProjectMetadata(
-                name: projectName,
-                version: projectVersion,
-                developerName: DeveloperPersistentStore.shared.profile.displayName,
-                description: projectDescription,
-                credits: credits,
-                socialLinks: socialLinks
-            )
-
-            // Mock payload for now, in a real app this would be the actual project data
-            let payloadObject: [String: Any] = ["type": projectType.rawValue, "scopes": Array(selectedScopes)]
-            let payload = try? JSONSerialization.data(withJSONObject: payloadObject)
-            let project = TKProject(metadata: metadata, type: projectType, payload: payload ?? Data())
-
-            if let projectData = try? JSONEncoder().encode(project) {
-                let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("\(projectName).tkproj")
-                try? projectData.write(to: tempURL)
-
-                await MainActor.run {
-                    self.exportedURL = tempURL
-                    isExporting = false
-                }
-            } else {
-                await MainActor.run { isExporting = false }
-            }
-        }
     }
 }
 

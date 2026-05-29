@@ -325,11 +325,141 @@ public struct AppAnalytics: Codable {
 
 // MARK: - Documentation
 
-public struct DocPage: Identifiable, Codable {
+public struct DocPage: Identifiable, Codable, Hashable {
     public var id: UUID
     public var title: String
     public var content: String
     public var lastModified: Date
     public var version: String
     public var isDraft: Bool
+
+    public init(id: UUID = UUID(), title: String, content: String, lastModified: Date = Date(), version: String = "1.0.0", isDraft: Bool = false) {
+        self.id = id
+        self.title = title
+        self.content = content
+        self.lastModified = lastModified
+        self.version = version
+        self.isDraft = isDraft
+    }
+}
+
+public struct DocumentationSection: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var title: String
+    public var pages: [DocPage]
+
+    public init(id: UUID = UUID(), title: String, pages: [DocPage] = []) {
+        self.id = id
+        self.title = title
+        self.pages = pages
+    }
+}
+
+// MARK: - Webhooks
+
+public struct DeveloperWebhook: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var url: String
+    public var events: [String]
+    public var isActive: Bool
+    public var secret: String
+    public var createdAt: Date
+
+    public init(id: UUID = UUID(), url: String, events: [String], isActive: Bool = true, secret: String, createdAt: Date = Date()) {
+        self.id = id
+        self.url = url
+        self.events = events
+        self.isActive = isActive
+        self.secret = secret
+        self.createdAt = createdAt
+    }
+}
+
+// MARK: - OAuth Clients
+
+public struct OAuthClient: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var name: String
+    public var clientID: String
+    public var clientSecret: String
+    public var redirectURIs: [String]
+    public var allowedScopes: [String]
+
+    public init(id: UUID = UUID(), name: String, clientID: String, clientSecret: String, redirectURIs: [String], allowedScopes: [String]) {
+        self.id = id
+        self.name = name
+        self.clientID = clientID
+        self.clientSecret = clientSecret
+        self.redirectURIs = redirectURIs
+        self.allowedScopes = allowedScopes
+    }
+}
+
+// MARK: - Teams
+
+public enum TeamRole: String, Codable, CaseIterable {
+    case owner = "Owner"
+    case admin = "Admin"
+    case developer = "Developer"
+    case viewer = "Viewer"
+}
+
+public struct TeamMember: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var name: String
+    public var email: String
+    public var role: TeamRole
+    public var joinedAt: Date
+
+    public init(id: UUID = UUID(), name: String, email: String, role: TeamRole, joinedAt: Date = Date()) {
+        self.id = id
+        self.name = name
+        self.email = email
+        self.role = role
+        self.joinedAt = joinedAt
+    }
+}
+
+// MARK: - Sandbox
+
+public struct SandboxEnvironment: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var name: String
+    public var apiBaseURL: String
+    public var isActive: Bool
+
+    public init(id: UUID = UUID(), name: String, apiBaseURL: String, isActive: Bool = false) {
+        self.id = id
+        self.name = name
+        self.apiBaseURL = apiBaseURL
+        self.isActive = isActive
+    }
+}
+
+// MARK: - Release Management
+
+public enum ReleaseStatus: String, Codable, CaseIterable {
+    case preparing = "Preparing"
+    case testing = "Testing"
+    case phased = "Phased Rollout"
+    case released = "Released"
+    case rejected = "Rejected"
+}
+
+public struct AppRelease: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var version: String
+    public var buildNumber: String
+    public var status: ReleaseStatus
+    public var releaseNotes: String
+    public var createdAt: Date
+
+    public init(id: UUID = UUID(), version: String, buildNumber: String, status: ReleaseStatus, releaseNotes: String, createdAt: Date = Date()) {
+        self.id = id
+        self.version = version
+        self.buildNumber = buildNumber
+        self.status = status
+        self.releaseNotes = releaseNotes
+        self.createdAt = createdAt
+    }
 }

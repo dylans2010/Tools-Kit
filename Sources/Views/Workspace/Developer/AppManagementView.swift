@@ -1,21 +1,14 @@
 import SwiftUI
 
 struct AppManagementView: View {
+    @ObservedObject var store = DeveloperPersistentStore.shared
     @State private var searchText = ""
     @State private var statusFilter: AppStatus?
     @State private var typeFilter: AppType?
     @State private var showingCreateSheet = false
 
-    @State private var apps: [DeveloperApp] = [
-        DeveloperApp(name: "GitHub Pro", type: .connector, status: .live, version: "2.1.0", installCount: 850, revenue: 420.0),
-        DeveloperApp(name: "Mail AI Bot", type: .plugin, status: .underReview, version: "1.0.4", installCount: 0),
-        DeveloperApp(name: "Internal Metrics", type: .service, status: .draft, version: "0.1.0"),
-        DeveloperApp(name: "Legacy Sync", type: .service, status: .deprecated, version: "0.5.0", installCount: 120),
-        DeveloperApp(name: "Metal Shaders", type: .sdkExtension, status: .live, version: "1.2.0", installCount: 340)
-    ]
-
     var filteredApps: [DeveloperApp] {
-        apps.filter { app in
+        store.apps.filter { app in
             (searchText.isEmpty || app.name.localizedCaseInsensitiveContains(searchText)) &&
             (statusFilter == nil || app.status == statusFilter) &&
             (typeFilter == nil || app.type == typeFilter)
