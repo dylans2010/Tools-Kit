@@ -70,7 +70,7 @@ struct AnalyticsDashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Install Trend").font(.headline)
 
-            VStack(alignment: .bottom, spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .bottom, spacing: 4) {
                     ForEach(0..<14) { i in
                         let height = Double.random(in: 20...150)
