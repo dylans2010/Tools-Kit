@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct DocumentationEditorView: View {
-    @State private var sections: [DocSection] = []
+    @State private var sections: [DocumentationSection] = []
     @State private var selectedPageId: UUID?
     @State private var isRawMode = false
     @State private var showingAddSection = false
@@ -10,11 +10,11 @@ struct DocumentationEditorView: View {
     init() {
         // Load from UserDefaults or start with defaults
         if let data = UserDefaults.standard.data(forKey: "com.toolskit.developer.docs"),
-           let decoded = try? JSONDecoder().decode([DocSection].self, from: data) {
+           let decoded = try? JSONDecoder().decode([DocumentationSection].self, from: data) {
             _sections = State(initialValue: decoded)
         } else {
             _sections = State(initialValue: [
-                DocSection(title: "Getting Started", pages: [
+                DocumentationSection(title: "Getting Started", pages: [
                     DocPage(id: UUID(), title: "Overview", content: "# Welcome to your Project\n\nEdit this page to provide an overview.", lastModified: Date(), version: "1.0.0", isDraft: false)
                 ])
             ])
@@ -64,7 +64,7 @@ struct DocumentationEditorView: View {
             Button("Cancel", role: .cancel) { newSectionTitle = "" }
             Button("Add") {
                 if !newSectionTitle.isEmpty {
-                    sections.append(DocSection(title: newSectionTitle, pages: []))
+                    sections.append(DocumentationSection(title: newSectionTitle, pages: []))
                     newSectionTitle = ""
                     saveDocs()
                 }
@@ -129,7 +129,7 @@ struct DocumentationEditorView: View {
         .background(Color(uiColor: .secondarySystemGroupedBackground))
     }
 
-    private func addPage(to section: DocSection) {
+    private func addPage(to section: DocumentationSection) {
         if let index = sections.firstIndex(where: { $0.id == section.id }) {
             let newPage = DocPage(id: UUID(), title: "Untitled Page", content: "", lastModified: Date(), version: "1.0.0", isDraft: true)
             sections[index].pages.append(newPage)
@@ -157,7 +157,7 @@ struct DocumentationEditorView: View {
     }
 }
 
-struct DocSection: Identifiable, Codable, View {
+struct DocumentationSection: Identifiable, Codable, View {
     var id = UUID()
     var title: String
     var pages: [DocPage]

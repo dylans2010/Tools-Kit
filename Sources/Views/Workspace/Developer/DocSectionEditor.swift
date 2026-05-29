@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct DocSectionEditor: View {
-    @Binding var section: DocSection
+    @Binding var section: DocumentationSection
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {

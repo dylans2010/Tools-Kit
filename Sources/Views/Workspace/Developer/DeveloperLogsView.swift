@@ -22,7 +22,7 @@ struct DeveloperLogsView: View {
             } else {
                 List {
                     ForEach(filteredLogs) { log in
-                        LogEntryRow(log: log)
+                        DeveloperLogEntryRow(log: log)
                     }
                 }
                 .listStyle(.plain)
@@ -81,7 +81,7 @@ struct DeveloperLogsView: View {
     }
 }
 
-struct LogEntryRow: View {
+struct DeveloperLogEntryRow: View {
     let log: SDKLogEntry
     @State private var isExpanded = false
 

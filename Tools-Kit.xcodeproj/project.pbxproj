@@ -524,6 +524,8 @@
 		AS0200000000000000000002 /* SlideCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000002 /* SlideCanvasView.swift */; };
 		AS0200000000000000000003 /* WhiteboardsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000003 /* WhiteboardsHomeView.swift */; };
 		AS0200000000000000000004 /* WhiteboardCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000004 /* WhiteboardCanvasView.swift */; };
+		AS020000000000000000000039 /* DrawingToolCustomizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000000039 /* DrawingToolCustomizer.swift */; };
+		AS020000000000000000000040 /* ElementToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000000040 /* ElementToolbar.swift */; };
 		AS0200000000000000000005 /* WhiteboardNodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000005 /* WhiteboardNodeView.swift */; };
 		AS0200000000000000000006 /* WhiteboardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000006 /* WhiteboardModels.swift */; };
 		AS0200000000000000000007 /* WhiteboardAIEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000007 /* WhiteboardAIEngine.swift */; };
@@ -1632,6 +1634,7 @@
 		C0B0B0B0B0B0B0B0B0B0B002 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
 		C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
 		C0B0B0B0B0B0B0B0B0B0B003 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
+		PL020000000000000000000038 /* SDKUIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000038 /* SDKUIComponents.swift */; };
 		A00200000000000000000201 /* CustomGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000201 /* CustomGlow.swift */; };
 		A00200000000000000000202 /* HeroGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000202 /* HeroGlow.swift */; };
 		A00200000000000000000203 /* LiveTuningGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000203 /* LiveTuningGlow.swift */; };
@@ -2905,6 +2908,8 @@
 		AS0100000000000000000002 /* SlideCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideCanvasView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000003 /* WhiteboardsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardsHomeView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000004 /* WhiteboardCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardCanvasView.swift; sourceTree = "<group>"; };
+		AS010000000000000000000039 /* DrawingToolCustomizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingToolCustomizer.swift; sourceTree = "<group>"; };
+		AS010000000000000000000040 /* ElementToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElementToolbar.swift; sourceTree = "<group>"; };
 		AS0100000000000000000005 /* WhiteboardNodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardNodeView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000006 /* WhiteboardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardModels.swift; sourceTree = "<group>"; };
 		AS0100000000000000000007 /* WhiteboardAIEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardAIEngine.swift; sourceTree = "<group>"; };
@@ -3703,6 +3708,7 @@
 		SK010005 /* DraftSkillsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Tools/AIChat/Skills/DraftSkillsView.swift"; sourceTree = "<group>"; };
 		SK010006 /* SkillPickerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/SkillPickerModifier.swift"; sourceTree = "<group>"; };
 		C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
+		PL010000000000000000000038 /* SDKUIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKUIComponents.swift; sourceTree = "<group>"; };
 		A00100000000000000000201 /* CustomGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/CustomGlow.swift"; sourceTree = "<group>"; };
 		A00100000000000000000202 /* HeroGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/HeroGlow.swift"; sourceTree = "<group>"; };
 		A00100000000000000000203 /* LiveTuningGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/LiveTuningGlow.swift"; sourceTree = "<group>"; };
@@ -5256,6 +5262,8 @@
 				AS0100000000000000000005 /* WhiteboardNodeView.swift */,
 				AS0100000000000000000006 /* WhiteboardModels.swift */,
 				AS0100000000000000000007 /* WhiteboardAIEngine.swift */,
+				AS010000000000000000000039 /* DrawingToolCustomizer.swift */,
+				AS010000000000000000000040 /* ElementToolbar.swift */,
 				AS0100000000000000000008 /* WhiteboardGraphProcessor.swift */,
 				FX0100000000000000000005 /* WhiteboardViewTools.swift */,
 			);
@@ -5753,6 +5761,7 @@
 				WS010000000000000000000B /* ToolHeaderView.swift */,
 				WS010000000000000000000C /* CardView.swift */,
 				WS010000000000000000000D /* EmptyStateView.swift */,
+				PL010000000000000000000038 /* SDKUIComponents.swift */,
 				C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */,
 				US010000000000000000000A /* UnsplashImagesView.swift */,
 			);
@@ -12563,9 +12572,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AS020000000000000000000039 /* DrawingToolCustomizer.swift in Sources */,
+				AS020000000000000000000040 /* ElementToolbar.swift in Sources */,
 				DA020000000000000000000D /* DocSectionEditor.swift in Sources */,
 				DA020000000000000000000C /* SubmissionWizardSteps.swift in Sources */,
 				DA020000000000000000000B /* AppDetailView.swift in Sources */,
+				PL020000000000000000000038 /* SDKUIComponents.swift in Sources */,
 				DA020000000000000000000A /* DeveloperModels.swift in Sources */,
 				DA0200000000000000000009 /* AnalyticsDashboardView.swift in Sources */,
 				DA0200000000000000000008 /* DocumentationEditorView.swift in Sources */,
