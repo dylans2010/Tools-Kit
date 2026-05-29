@@ -89,8 +89,12 @@ struct DeveloperHomeView: View {
 
     private var quickActionsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Quick Actions")
+            Text("Developer Views")
                 .font(.headline)
+
+            Text("Access every primary developer workspace view from one place.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 NavigationLink(destination: AppBuilderView()) {
@@ -98,6 +102,12 @@ struct DeveloperHomeView: View {
                 }
                 NavigationLink(destination: AppManagementView()) {
                     quickActionCard(title: "Manage Apps", icon: "square.stack.3d.up", color: .orange)
+                }
+                NavigationLink(destination: AppDetailView(app: previewApp)) {
+                    quickActionCard(title: "App Detail", icon: "app.badge", color: .indigo)
+                }
+                NavigationLink(destination: AuthServiceManagerView()) {
+                    quickActionCard(title: "Auth Services", icon: "key.fill", color: .mint)
                 }
                 NavigationLink(destination: DeveloperLogsView()) {
                     quickActionCard(title: "View Logs", icon: "list.bullet.rectangle", color: .purple)
@@ -108,11 +118,34 @@ struct DeveloperHomeView: View {
                 NavigationLink(destination: DocumentationEditorView()) {
                     quickActionCard(title: "Docs Editor", icon: "book.and.wrench", color: .cyan)
                 }
+                NavigationLink(destination: MarketplaceListingManagerView()) {
+                    quickActionCard(title: "Marketplace", icon: "storefront.fill", color: .teal)
+                }
+                NavigationLink(destination: MarketplaceSubmissionView()) {
+                    quickActionCard(title: "Submit Listing", icon: "paperplane.fill", color: .red)
+                }
+                NavigationLink(destination: ProjectInstallerView()) {
+                    quickActionCard(title: "Project Installer", icon: "square.and.arrow.down.fill", color: .brown)
+                }
+                NavigationLink(destination: ScopeManagementView()) {
+                    quickActionCard(title: "Scopes", icon: "checkmark.shield.fill", color: .yellow)
+                }
                 NavigationLink(destination: AnalyticsDashboardView()) {
                     quickActionCard(title: "Analytics", icon: "chart.xyaxis.line", color: .pink)
                 }
             }
         }
+    }
+
+    private var previewApp: DeveloperApp {
+        store.apps.first ?? DeveloperApp(
+            name: "Sample Developer App",
+            type: .app,
+            status: .draft,
+            description: "Preview app details before creating your first project.",
+            iconName: "app.badge",
+            bundleId: "com.toolskit.sample"
+        )
     }
 
     private func quickActionCard(title: String, icon: String, color: Color) -> some View {

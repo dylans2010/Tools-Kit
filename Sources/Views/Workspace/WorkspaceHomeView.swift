@@ -32,7 +32,8 @@ class WorkspaceNavConfig: ObservableObject {
         if let data = UserDefaults.standard.data(forKey: storageKey),
            let saved = try? JSONDecoder().decode([WorkspaceNavItem].self, from: data),
            !saved.isEmpty {
-            items = saved
+            items = Self.mergedWithDefaultItems(saved)
+            save()
         } else {
             items = Self.defaultItems
         }
@@ -75,6 +76,12 @@ class WorkspaceNavConfig: ObservableObject {
             if !seen.contains(item.section) { seen.append(item.section) }
         }
         return seen
+    }
+
+    private static func mergedWithDefaultItems(_ savedItems: [WorkspaceNavItem]) -> [WorkspaceNavItem] {
+        let savedIDs = Set(savedItems.map(\.id))
+        let missingDefaultItems = defaultItems.filter { !savedIDs.contains($0.id) }
+        return savedItems + missingDefaultItems
     }
 
     static let defaultItems: [WorkspaceNavItem] = [
