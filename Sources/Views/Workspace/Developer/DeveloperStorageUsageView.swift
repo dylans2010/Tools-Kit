@@ -70,7 +70,7 @@ struct DeveloperStorageUsageView: View {
             Text("Usage by Category").font(.headline)
             usageRow(label: "Database", value: "0 MB", icon: "cylinder.split.1x2.fill", color: .blue)
             usageRow(label: "Assets", value: "0 MB", icon: "photo.on.rectangle.angled", color: .green)
-            usageRow(label: "Logs", value: "\(logUsageMB, specifier: "%.1f") MB", icon: "list.bullet.rectangle", color: .purple)
+            usageRow(label: "Logs", value: "\(String(format: "%.1f", logUsageMB)) MB", icon: "list.bullet.rectangle", color: .purple)
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
