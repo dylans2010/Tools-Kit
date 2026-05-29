@@ -2,104 +2,166 @@ import SwiftUI
 
 struct DocumentationEditorView: View {
     @ObservedObject var docService = DocumentationService.shared
+    @ObservedObject var appService = DeveloperAppService.shared
+    @State private var selectedAppID: UUID?
     @State private var selectedPageID: UUID?
-    @State private var page: DocumentationPage?
-    @State private var isSaving = false
+    @State private var showingAddPage = false
+    @State private var newPageTitle = ""
+    @State private var showSaveIndicator = false
+
+    var filteredPages: [DocumentationPage] {
+        docService.pages.filter { $0.appID == selectedAppID }
+            .sorted { $0.order < $1.order }
+    }
+
+    var selectedPage: DocumentationPage? {
+        docService.pages.first { $0.id == selectedPageID }
+    }
 
     var body: some View {
-        HStack(spacing: 0) {
-            // Page List
-            List(selection: $selectedPageID) {
-                Section("Your Documentation") {
-                    if docService.pages.isEmpty {
-                        Text("No pages yet.").font(.caption).foregroundStyle(.secondary)
-                    } else {
-                        ForEach(docService.pages) { p in
-                            Text(p.title).tag(p.id)
+        NavigationSplitView {
+            VStack {
+                Picker("Project", selection: $selectedAppID) {
+                    Text("Select Project").tag(Optional<UUID>.none)
+                    ForEach(appService.apps) { app in
+                        Text(app.name).tag(Optional(app.id))
+                    }
+                }
+                .padding()
+
+                List(selection: $selectedPageID) {
+                    ForEach(filteredPages) { page in
+                        NavigationLink(value: page.id) {
+                            HStack {
+                                Image(systemName: page.isPublished ? "doc.plaintext.fill" : "doc.plaintext")
+                                    .foregroundStyle(page.isPublished ? .green : .secondary)
+                                Text(page.title)
+                                    .font(.subheadline)
+                            }
+                        }
+                    }
+                    .onDelete(perform: deletePages)
+                }
+
+                if selectedAppID != nil {
+                    Button { showingAddPage = true } label: {
+                        Label("Add Page", systemImage: "plus.circle.fill")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    }
+                    .buttonStyle(.bordered)
+                    .padding()
+                }
+            }
+            .navigationTitle("Docs")
+            .toolbar {
+                if showSaveIndicator {
+                    ToolbarItem(placement: .status) {
+                        Text("Saved").font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+            }
+        } detail: {
+            if let page = selectedPage {
+                editorView(page)
+            } else {
+                EmptyStateView(text: "Select a page to edit or create a new one.", icon: "doc.text.magnifyingglass")
+            }
+        }
+        .sheet(isPresented: $showingAddPage) {
+            addPageSheet
+        }
+    }
+
+    private func editorView(_ page: DocumentationPage) -> some View {
+        VStack(spacing: 0) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(page.title).font(.title2.bold())
+                    Text("Slug: \(page.slug)").font(.caption).monospaced().foregroundStyle(.tertiary)
+                }
+                Spacer()
+                Button(page.isPublished ? "Unpublish" : "Publish") {
+                    Task {
+                        if page.isPublished {
+                            try? await docService.unpublishPage(id: page.id)
+                        } else {
+                            try? await docService.publishPage(id: page.id)
                         }
                     }
                 }
+                .buttonStyle(.bordered)
+                .tint(page.isPublished ? .red : .green)
             }
-            .listStyle(.sidebar)
-            .frame(width: 250)
+            .padding()
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
 
-            Divider()
-
-            // Editor
-            Group {
-                if page != nil {
-                    VStack(spacing: 0) {
-                        TextField("Page Title", text: Binding(
-                            get: { page?.title ?? "" },
-                            set: { page?.title = $0 }
-                        ))
-                        .font(.title2.bold())
-                        .padding()
-
-                        Divider()
-
-                        TextEditor(text: Binding(
-                            get: { page?.content ?? "" },
-                            set: { page?.content = $0 }
-                        ))
-                        .font(.system(.body, design: .monospaced))
-                        .padding()
+            TextEditor(text: Binding(
+                get: { page.content },
+                set: { newContent in
+                    var updated = page
+                    updated.content = newContent
+                    Task {
+                        try? await docService.savePage(updated)
+                        await MainActor.run {
+                            withAnimation { showSaveIndicator = true }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation { showSaveIndicator = false }
+                            }
+                        }
                     }
-                } else {
-                    VStack(spacing: 12) {
-                        Image(systemName: "book.and.wrench")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.secondary)
-                        Text("Select a page to edit or create a new one.")
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            ))
+            .font(.system(.body, design: .monospaced))
+            .padding()
+
+            HStack {
+                Text("Last updated: \(page.updatedAt.formatted())")
+                    .font(.caption2).foregroundStyle(.tertiary)
+                Spacer()
+                if let publishedAt = page.publishedAt {
+                    Text("Published: \(publishedAt.formatted())")
+                        .font(.caption2).foregroundStyle(.green)
                 }
             }
-        }
-        .navigationTitle("Documentation Editor")
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    createNewPage()
-                } label: {
-                    Image(systemName: "plus")
-                }
-            }
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Save") {
-                    saveCurrentPage()
-                }
-                .disabled(page == nil)
-            }
-        }
-        .onChange(of: selectedPageID) { newID in
-            if let id = newID {
-                page = docService.pages.first { $0.id == id }
-            }
+            .padding()
+            .background(Color(uiColor: .systemGroupedBackground))
         }
     }
 
-    private func createNewPage() {
-        Task {
-            let newPage = try? await docService.createPage(appID: UUID(), title: "New Page")
-            await MainActor.run {
-                if let p = newPage {
-                    selectedPageID = p.id
-                    page = p
+    private var addPageSheet: some View {
+        NavigationStack {
+            Form {
+                TextField("Page Title", text: $newPageTitle)
+            }
+            .navigationTitle("New Page")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showingAddPage = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Create") {
+                        if let appID = selectedAppID {
+                            Task {
+                                let newPage = try? await docService.createPage(appID: appID, title: newPageTitle)
+                                await MainActor.run {
+                                    selectedPageID = newPage?.id
+                                    newPageTitle = ""
+                                    showingAddPage = false
+                                }
+                            }
+                        }
+                    }
+                    .disabled(newPageTitle.isEmpty)
                 }
             }
         }
     }
 
-    private func saveCurrentPage() {
-        guard let p = page else { return }
-        isSaving = true
-        Task {
-            try? await docService.savePage(p)
-            await MainActor.run {
-                isSaving = false
-            }
+    private func deletePages(at offsets: IndexSet) {
+        for index in offsets {
+            let page = filteredPages[index]
+            Task { try? await docService.deletePage(id: page.id) }
         }
     }
 }

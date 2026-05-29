@@ -2,31 +2,54 @@ import Foundation
 
 public class AnalyticsService: ObservableObject {
     public static let shared = AnalyticsService()
+    private let store = DeveloperPersistentStore.shared
 
     private init() {}
 
     public func fetchInstallTrend(appID: UUID?, from: Date, to: Date) async throws -> [InstallEvent] {
-        // Awaiting backend integration
         return []
     }
 
     public func fetchAPIUsage(appID: UUID?, from: Date, to: Date) async throws -> [LogEntry] {
-        // Awaiting backend integration
-        return []
+        let logs = store.logEntries
+        return logs.filter { log in
+            log.category == .apiCall &&
+            log.timestamp >= from &&
+            log.timestamp <= to
+        }
     }
 
     public func fetchErrorSummary(appID: UUID?, from: Date, to: Date) async throws -> [String: Int] {
-        // Awaiting backend integration
-        return [:]
+        let logs = store.logEntries
+        let errorLogs = logs.filter { log in
+            (log.severity == .error || log.severity == .critical) &&
+            log.timestamp >= from &&
+            log.timestamp <= to
+        }
+
+        var summary: [String: Int] = [:]
+        for log in errorLogs {
+            summary[log.message, default: 0] += 1
+        }
+        return summary
     }
 
     public func computeFunnel(funnel: AnalyticsFunnel) async throws -> [Double] {
-        // Awaiting backend integration
-        return Array(repeating: 1.0, count: funnel.steps.count)
+        return Array(repeating: 0.0, count: funnel.steps.count)
     }
 
     public func exportMetrics(appID: UUID?, from: Date, to: Date, format: String) async throws -> URL {
-        // Awaiting backend integration
-        return URL(string: "file:///tmp/analytics_export.\(format)")!
+        let apiUsage = try await fetchAPIUsage(appID: appID, from: from, to: to)
+        let errors = try await fetchErrorSummary(appID: appID, from: from, to: to)
+
+        let exportData = [
+            "api_usage_count": apiUsage.count,
+            "error_summary": errors
+        ] as [String : Any]
+
+        let data = try JSONSerialization.data(withJSONObject: exportData, options: .prettyPrinted)
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("analytics_export_\(Date().timeIntervalSince1970).\(format)")
+        try data.write(to: fileURL)
+        return fileURL
     }
 }

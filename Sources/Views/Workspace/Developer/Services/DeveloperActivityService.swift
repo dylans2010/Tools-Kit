@@ -2,6 +2,7 @@ import Foundation
 
 public class DeveloperActivityService: ObservableObject {
     public static let shared = DeveloperActivityService()
+    private let store = DeveloperPersistentStore.shared
 
     @Published public var activities: [DeveloperActivityEvent] = []
 
@@ -10,22 +11,40 @@ public class DeveloperActivityService: ObservableObject {
     }
 
     public func loadActivities() {
-        // Awaiting backend integration
+        self.activities = store.activities
     }
 
     public func logEvent(eventType: DeveloperActivityEventType, appID: UUID? = nil, appName: String? = nil, recordID: UUID? = nil) async {
         let event = DeveloperActivityEvent(
             eventType: eventType,
             sourceAppID: appID,
-            sourceAppName: appName,
+            sourceAppName: appName ?? store.apps.first(where: { $0.id == appID })?.name,
             relatedRecordID: recordID
         )
-        activities.insert(event, at: 0)
-        // Awaiting backend integration
+
+        var currentActivities = store.activities
+        currentActivities.insert(event, at: 0)
+
+        // Cap activity log
+        if currentActivities.count > 500 {
+            currentActivities.removeLast()
+        }
+
+        store.saveActivities(currentActivities)
+
+        await MainActor.run {
+            self.activities = currentActivities
+        }
     }
 
     public func fetchRecentActivities(limit: Int = 10) async -> [DeveloperActivityEvent] {
-        // Awaiting backend integration
         return Array(activities.prefix(limit))
+    }
+
+    public func clearActivities() async {
+        store.saveActivities([])
+        await MainActor.run {
+            self.activities = []
+        }
     }
 }

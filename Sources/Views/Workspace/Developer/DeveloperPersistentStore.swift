@@ -11,9 +11,17 @@ public class DeveloperPersistentStore: ObservableObject {
     @Published public var teamMembers: [OrgMember]
     @Published public var organizations: [DeveloperOrganization]
     @Published public var submissions: [MarketplaceSubmission]
+    @Published public var drafts: [MarketplaceSubmissionDraft]
     @Published public var releases: [AppVersion]
     @Published public var logEntries: [LogEntry]
     @Published public var activities: [DeveloperActivityEvent]
+    @Published public var grantedScopes: [GrantedScope]
+    @Published public var scopeRequests: [ScopeRequest]
+    @Published public var scopeAuditLogs: [ScopeAuditEvent]
+    @Published public var documentationPages: [DocumentationPage]
+    @Published public var certificates: [DeveloperCertificate]
+    @Published public var betaGroups: [BetaGroup]
+    @Published public var supportTickets: [SupportTicket]
 
     private let profileKey = "dev_portal_profile"
     private let appsKey = "dev_portal_apps"
@@ -22,172 +30,189 @@ public class DeveloperPersistentStore: ObservableObject {
     private let teamMembersKey = "dev_portal_team"
     private let organizationsKey = "dev_portal_orgs"
     private let submissionsKey = "dev_portal_submissions"
+    private let draftsKey = "dev_portal_drafts"
     private let releasesKey = "dev_portal_releases"
     private let logsKey = "dev_portal_logs"
     private let activitiesKey = "dev_portal_activities"
+    private let grantedScopesKey = "dev_portal_granted_scopes"
+    private let scopeRequestsKey = "dev_portal_scope_requests"
+    private let scopeAuditLogsKey = "dev_portal_scope_audit_logs"
+    private let documentationKey = "dev_portal_documentation"
+    private let certificatesKey = "dev_portal_certificates"
+    private let betaGroupsKey = "dev_portal_beta_groups"
+    private let supportTicketsKey = "dev_portal_support_tickets"
 
     private init() {
-        // Initialize with real persisted data or empty defaults
+        self.profile = Self.load(DeveloperProfile.self, key: profileKey) ?? DeveloperProfile()
+        self.apps = Self.load([DeveloperApp].self, key: appsKey) ?? []
+        self.keys = Self.load([APIKey].self, key: keysKey) ?? []
+        self.webhooks = Self.load([WebhookEndpoint].self, key: webhooksKey) ?? []
+        self.teamMembers = Self.load([OrgMember].self, key: teamMembersKey) ?? []
+        self.organizations = Self.load([DeveloperOrganization].self, key: organizationsKey) ?? []
+        self.submissions = Self.load([MarketplaceSubmission].self, key: submissionsKey) ?? []
+        self.drafts = Self.load([MarketplaceSubmissionDraft].self, key: draftsKey) ?? []
+        self.releases = Self.load([AppVersion].self, key: releasesKey) ?? []
+        self.logEntries = Self.load([LogEntry].self, key: logsKey) ?? []
+        self.activities = Self.load([DeveloperActivityEvent].self, key: activitiesKey) ?? []
+        self.grantedScopes = Self.load([GrantedScope].self, key: grantedScopesKey) ?? []
+        self.scopeRequests = Self.load([ScopeRequest].self, key: scopeRequestsKey) ?? []
+        self.scopeAuditLogs = Self.load([ScopeAuditEvent].self, key: scopeAuditLogsKey) ?? []
+        self.documentationPages = Self.load([DocumentationPage].self, key: documentationKey) ?? []
+        self.certificates = Self.load([DeveloperCertificate].self, key: certificatesKey) ?? []
+        self.betaGroups = Self.load([BetaGroup].self, key: betaGroupsKey) ?? []
+        self.supportTickets = Self.load([SupportTicket].self, key: supportTicketsKey) ?? []
+    }
 
-        // Load Profile
-        if let data = UserDefaults.standard.data(forKey: profileKey),
-           let decoded = try? JSONDecoder().decode(DeveloperProfile.self, from: data) {
-            self.profile = decoded
-        } else {
-            self.profile = DeveloperProfile()
+    private static func load<T: Decodable>(_ type: T.Type, key: String) -> T? {
+        if let data = UserDefaults.standard.data(forKey: key) {
+            return try? JSONDecoder().decode(T.self, from: data)
         }
+        return nil
+    }
 
-        // Load Apps
-        if let data = UserDefaults.standard.data(forKey: appsKey),
-           let decoded = try? JSONDecoder().decode([DeveloperApp].self, from: data) {
-            self.apps = decoded
-        } else {
-            self.apps = []
-        }
-
-        // Load Keys
-        if let data = UserDefaults.standard.data(forKey: keysKey),
-           let decoded = try? JSONDecoder().decode([APIKey].self, from: data) {
-            self.keys = decoded
-        } else {
-            self.keys = []
-        }
-
-        // Load Webhooks
-        if let data = UserDefaults.standard.data(forKey: webhooksKey),
-           let decoded = try? JSONDecoder().decode([WebhookEndpoint].self, from: data) {
-            self.webhooks = decoded
-        } else {
-            self.webhooks = []
-        }
-
-        // Load Team
-        if let data = UserDefaults.standard.data(forKey: teamMembersKey),
-           let decoded = try? JSONDecoder().decode([OrgMember].self, from: data) {
-            self.teamMembers = decoded
-        } else {
-            self.teamMembers = []
-        }
-
-        // Load Organizations
-        if let data = UserDefaults.standard.data(forKey: organizationsKey),
-           let decoded = try? JSONDecoder().decode([DeveloperOrganization].self, from: data) {
-            self.organizations = decoded
-        } else {
-            self.organizations = []
-        }
-
-        // Load Submissions
-        if let data = UserDefaults.standard.data(forKey: submissionsKey),
-           let decoded = try? JSONDecoder().decode([MarketplaceSubmission].self, from: data) {
-            self.submissions = decoded
-        } else {
-            self.submissions = []
-        }
-
-        // Load Releases
-        if let data = UserDefaults.standard.data(forKey: releasesKey),
-           let decoded = try? JSONDecoder().decode([AppVersion].self, from: data) {
-            self.releases = decoded
-        } else {
-            self.releases = []
-        }
-
-        // Load Logs
-        if let data = UserDefaults.standard.data(forKey: logsKey),
-           let decoded = try? JSONDecoder().decode([LogEntry].self, from: data) {
-            self.logEntries = decoded
-        } else {
-            self.logEntries = []
-        }
-
-        // Load Activities
-        if let data = UserDefaults.standard.data(forKey: activitiesKey),
-           let decoded = try? JSONDecoder().decode([DeveloperActivityEvent].self, from: data) {
-            self.activities = decoded
-        } else {
-            self.activities = []
+    private func save<T: Encodable>(_ object: T, key: String) {
+        if let encoded = try? JSONEncoder().encode(object) {
+            UserDefaults.standard.set(encoded, forKey: key)
         }
     }
 
     public func saveProfile(_ newProfile: DeveloperProfile) {
-        if let encoded = try? JSONEncoder().encode(newProfile) {
-            UserDefaults.standard.set(encoded, forKey: profileKey)
-            self.profile = newProfile
-        }
+        save(newProfile, key: profileKey)
+        self.profile = newProfile
     }
 
     public func saveApps(_ newApps: [DeveloperApp]) {
-        if let encoded = try? JSONEncoder().encode(newApps) {
-            UserDefaults.standard.set(encoded, forKey: appsKey)
-            self.apps = newApps
-        }
+        save(newApps, key: appsKey)
+        self.apps = newApps
     }
 
     public func saveKeys(_ newKeys: [APIKey]) {
-        if let encoded = try? JSONEncoder().encode(newKeys) {
-            UserDefaults.standard.set(encoded, forKey: keysKey)
-            self.keys = newKeys
-        }
+        save(newKeys, key: keysKey)
+        self.keys = newKeys
     }
 
     public func saveWebhooks(_ newWebhooks: [WebhookEndpoint]) {
-        if let encoded = try? JSONEncoder().encode(newWebhooks) {
-            UserDefaults.standard.set(encoded, forKey: webhooksKey)
-            self.webhooks = newWebhooks
-        }
+        save(newWebhooks, key: webhooksKey)
+        self.webhooks = newWebhooks
     }
 
     public func saveTeamMembers(_ newMembers: [OrgMember]) {
-        if let encoded = try? JSONEncoder().encode(newMembers) {
-            UserDefaults.standard.set(encoded, forKey: teamMembersKey)
-            self.teamMembers = newMembers
-        }
+        save(newMembers, key: teamMembersKey)
+        self.teamMembers = newMembers
     }
 
     public func saveOrganizations(_ newOrgs: [DeveloperOrganization]) {
-        if let encoded = try? JSONEncoder().encode(newOrgs) {
-            UserDefaults.standard.set(encoded, forKey: organizationsKey)
-            self.organizations = newOrgs
-        }
+        save(newOrgs, key: organizationsKey)
+        self.organizations = newOrgs
     }
 
     public func saveSubmissions(_ newSubmissions: [MarketplaceSubmission]) {
-        if let encoded = try? JSONEncoder().encode(newSubmissions) {
-            UserDefaults.standard.set(encoded, forKey: submissionsKey)
-            self.submissions = newSubmissions
-        }
+        save(newSubmissions, key: submissionsKey)
+        self.submissions = newSubmissions
+    }
+
+    public func saveDrafts(_ newDrafts: [MarketplaceSubmissionDraft]) {
+        save(newDrafts, key: draftsKey)
+        self.drafts = newDrafts
     }
 
     public func saveReleases(_ newReleases: [AppVersion]) {
-        if let encoded = try? JSONEncoder().encode(newReleases) {
-            UserDefaults.standard.set(encoded, forKey: releasesKey)
-            self.releases = newReleases
-        }
+        save(newReleases, key: releasesKey)
+        self.releases = newReleases
     }
 
     public func saveLogs(_ newLogs: [LogEntry]) {
-        if let encoded = try? JSONEncoder().encode(newLogs) {
-            UserDefaults.standard.set(encoded, forKey: logsKey)
-            self.logEntries = newLogs
-        }
+        save(newLogs, key: logsKey)
+        self.logEntries = newLogs
     }
 
     public func saveActivities(_ newActivities: [DeveloperActivityEvent]) {
-        if let encoded = try? JSONEncoder().encode(newActivities) {
-            UserDefaults.standard.set(encoded, forKey: activitiesKey)
-            self.activities = newActivities
-        }
+        save(newActivities, key: activitiesKey)
+        self.activities = newActivities
     }
 
-    public func addApp(_ app: DeveloperApp) {
-        var currentApps = apps
-        currentApps.append(app)
-        saveApps(currentApps)
+    public func saveGrantedScopes(_ newScopes: [GrantedScope]) {
+        save(newScopes, key: grantedScopesKey)
+        self.grantedScopes = newScopes
     }
 
-    public func deleteApp(id: UUID) {
-        let currentApps = apps.filter { $0.id != id }
-        saveApps(currentApps)
+    public func saveScopeRequests(_ newRequests: [ScopeRequest]) {
+        save(newRequests, key: scopeRequestsKey)
+        self.scopeRequests = newRequests
+    }
+
+    public func saveScopeAuditLogs(_ newLogs: [ScopeAuditEvent]) {
+        save(newLogs, key: scopeAuditLogsKey)
+        self.scopeAuditLogs = newLogs
+    }
+
+    public func saveDocumentationPages(_ newPages: [DocumentationPage]) {
+        save(newPages, key: documentationKey)
+        self.documentationPages = newPages
+    }
+
+    public func saveCertificates(_ newCertificates: [DeveloperCertificate]) {
+        save(newCertificates, key: certificatesKey)
+        self.certificates = newCertificates
+    }
+
+    public func saveBetaGroups(_ newGroups: [BetaGroup]) {
+        save(newGroups, key: betaGroupsKey)
+        self.betaGroups = newGroups
+    }
+
+    public func saveSupportTickets(_ newTickets: [SupportTicket]) {
+        save(newTickets, key: supportTicketsKey)
+        self.supportTickets = newTickets
+    }
+}
+
+public struct DeveloperCertificate: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var appID: UUID
+    public var name: String
+    public var type: String
+    public var createdAt: Date
+    public var expiresAt: Date
+
+    public init(id: UUID = UUID(), appID: UUID, name: String, type: String, createdAt: Date = Date(), expiresAt: Date = Date().addingTimeInterval(365*24*3600)) {
+        self.id = id
+        self.appID = appID
+        self.name = name
+        self.type = type
+        self.createdAt = createdAt
+        self.expiresAt = expiresAt
+    }
+}
+
+public struct BetaGroup: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var appID: UUID
+    public var name: String
+    public var testerEmails: [String]
+
+    public init(id: UUID = UUID(), appID: UUID, name: String, testerEmails: [String] = []) {
+        self.id = id
+        self.appID = appID
+        self.name = name
+        self.testerEmails = testerEmails
+    }
+}
+
+public struct SupportTicket: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var subject: String
+    public var topic: String
+    public var message: String
+    public var status: String
+    public var createdAt: Date
+
+    public init(id: UUID = UUID(), subject: String, topic: String, message: String, status: String = "Open", createdAt: Date = Date()) {
+        self.id = id
+        self.subject = subject
+        self.topic = topic
+        self.message = message
+        self.status = status
+        self.createdAt = createdAt
     }
 }

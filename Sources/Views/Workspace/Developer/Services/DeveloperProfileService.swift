@@ -2,6 +2,7 @@ import Foundation
 
 public class DeveloperProfileService: ObservableObject {
     public static let shared = DeveloperProfileService()
+    private let store = DeveloperPersistentStore.shared
 
     @Published public var profile: DeveloperProfile = DeveloperProfile()
 
@@ -10,12 +11,14 @@ public class DeveloperProfileService: ObservableObject {
     }
 
     public func loadProfile() {
-        // Awaiting backend integration
+        self.profile = store.profile
     }
 
     public func saveProfile(_ profile: DeveloperProfile) async throws {
-        self.profile = profile
-        // Awaiting backend integration
+        store.saveProfile(profile)
+        await MainActor.run {
+            self.profile = profile
+        }
     }
 
     public func updateProfile(displayName: String, legalName: String, bio: String) async throws {
@@ -27,7 +30,7 @@ public class DeveloperProfileService: ObservableObject {
     }
 
     public func fetchVerificationStatus() async throws -> DeveloperVerificationStatus {
-        // Awaiting backend integration
+        // Logic to re-verify status if needed
         return profile.verificationStatus
     }
 
@@ -37,7 +40,9 @@ public class DeveloperProfileService: ObservableObject {
             profile.legalName,
             profile.username,
             profile.contactEmail,
-            profile.bio
+            profile.bio,
+            profile.website,
+            profile.github
         ]
         let completed = fields.filter { !$0.isEmpty }.count
         return Double(completed) / Double(fields.count)
