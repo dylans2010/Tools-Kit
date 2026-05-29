@@ -138,7 +138,7 @@ final class AccountAuthService: ObservableObject {
         defer { isBusy = false }
 
         do {
-            try await AppwriteService.account.deleteSession(sessionId: "current")
+            _ = try await AppwriteService.account.deleteSession(sessionId: "current")
         } catch {
             lastErrorMessage = error.localizedDescription
             throw error

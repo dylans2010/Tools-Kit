@@ -3,7 +3,7 @@ import Foundation
 struct SudokuGenerator {
     static func generate(difficulty: Int) -> (puzzle: [[Int]], solution: [[Int]]) {
         var grid = Array(repeating: Array(repeating: 0, count: 9), count: 9)
-        fillGrid(&grid)
+        _ = fillGrid(&grid)
         let solution = grid
         let cellsToRemove: Int
         switch difficulty {

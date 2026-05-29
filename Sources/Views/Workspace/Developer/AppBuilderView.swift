@@ -203,7 +203,7 @@ struct AppBuilderView: View {
 
     private func exportProject() {
         isExporting = true
-        Task {
+        Task<Void, Never> {
             let metadata = TKProject.ProjectMetadata(
                 name: projectName,
                 version: projectVersion,
@@ -303,6 +303,6 @@ struct AppBuilderShareSheet: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
-extension URL: Identifiable {
+@retroactive extension URL: Identifiable {
     public var id: String { absoluteString }
 }
