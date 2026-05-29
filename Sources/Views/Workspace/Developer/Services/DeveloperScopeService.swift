@@ -51,9 +51,11 @@ public class DeveloperScopeService: ObservableObject {
         currentAudit.insert(event, at: 0)
         store.saveScopeAuditLogs(currentAudit)
 
+        let updatedPendingRequests = currentRequests.filter { $0.status == .pending }
+        let updatedAuditLog = currentAudit
         await MainActor.run {
-            self.pendingRequests = currentRequests.filter { $0.status == .pending }
-            self.auditLog = currentAudit
+            self.pendingRequests = updatedPendingRequests
+            self.auditLog = updatedAuditLog
         }
 
         await DeveloperActivityService.shared.logEvent(
@@ -69,8 +71,9 @@ public class DeveloperScopeService: ObservableObject {
             currentRequests[index].status = .cancelled
             store.saveScopeRequests(currentRequests)
 
+            let updatedPendingRequests = currentRequests.filter { $0.status == .pending }
             await MainActor.run {
-                self.pendingRequests = currentRequests.filter { $0.status == .pending }
+                self.pendingRequests = updatedPendingRequests
             }
         }
     }
@@ -88,9 +91,11 @@ public class DeveloperScopeService: ObservableObject {
             currentAudit.insert(event, at: 0)
             store.saveScopeAuditLogs(currentAudit)
 
+            let updatedGrantedScopes = currentGranted
+            let updatedAuditLog = currentAudit
             await MainActor.run {
-                self.grantedScopes = currentGranted
-                self.auditLog = currentAudit
+                self.grantedScopes = updatedGrantedScopes
+                self.auditLog = updatedAuditLog
             }
         }
     }
@@ -117,10 +122,13 @@ public class DeveloperScopeService: ObservableObject {
             currentAudit.insert(event, at: 0)
             store.saveScopeAuditLogs(currentAudit)
 
+            let updatedPendingRequests = currentRequests.filter { $0.status == .pending }
+            let updatedGrantedScopes = currentGranted
+            let updatedAuditLog = currentAudit
             await MainActor.run {
-                self.pendingRequests = currentRequests.filter { $0.status == .pending }
-                self.grantedScopes = currentGranted
-                self.auditLog = currentAudit
+                self.pendingRequests = updatedPendingRequests
+                self.grantedScopes = updatedGrantedScopes
+                self.auditLog = updatedAuditLog
             }
 
             await DeveloperActivityService.shared.logEvent(

@@ -49,8 +49,9 @@ public class DeveloperLogService: ObservableObject {
 
         store.saveLogs(currentLogs)
 
+        let updatedLogEntries = currentLogs
         await MainActor.run {
-            self.logEntries = currentLogs
+            self.logEntries = updatedLogEntries
         }
     }
 

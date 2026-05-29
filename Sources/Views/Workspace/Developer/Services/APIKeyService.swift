@@ -47,8 +47,9 @@ public class APIKeyService: ObservableObject {
         currentKeys.insert(newKey, at: 0)
         store.saveKeys(currentKeys)
 
+        let updatedKeys = currentKeys
         await MainActor.run {
-            self.keys = currentKeys
+            self.keys = updatedKeys
         }
 
         await DeveloperActivityService.shared.logEvent(
@@ -70,8 +71,9 @@ public class APIKeyService: ObservableObject {
 
             store.saveKeys(currentKeys)
 
+            let updatedKeys = currentKeys
             await MainActor.run {
-                self.keys = currentKeys
+                self.keys = updatedKeys
             }
 
             await DeveloperActivityService.shared.logEvent(
@@ -103,8 +105,9 @@ public class APIKeyService: ObservableObject {
             let rotationRecord = KeyRotationRecord(previousKeyMasked: oldKey.maskedValue)
             updatedKeys[newKeyRecordIndex].rotationHistory.append(rotationRecord)
             store.saveKeys(updatedKeys)
+            let refreshedKeys = updatedKeys
             await MainActor.run {
-                self.keys = updatedKeys
+                self.keys = refreshedKeys
             }
         }
 
@@ -125,8 +128,9 @@ public class APIKeyService: ObservableObject {
             currentKeys[index].ipAllowlist = ipAllowlist
 
             store.saveKeys(currentKeys)
+            let updatedKeys = currentKeys
             await MainActor.run {
-                self.keys = currentKeys
+                self.keys = updatedKeys
             }
         }
     }

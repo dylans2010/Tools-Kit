@@ -19,14 +19,15 @@ public class DeveloperAppService: ObservableObject {
         currentApps.append(app)
         store.saveApps(currentApps)
 
+        let updatedApps = currentApps
         await MainActor.run {
-            self.apps = currentApps
+            self.apps = updatedApps
         }
 
         await DeveloperActivityService.shared.logEvent(
             eventType: .appCreated,
             appID: app.id,
-            sourceAppName: app.name
+            appName: app.name
         )
     }
 
@@ -38,14 +39,15 @@ public class DeveloperAppService: ObservableObject {
 
             store.saveApps(currentApps)
 
+            let updatedApps = currentApps
             await MainActor.run {
-                self.apps = currentApps
+                self.apps = updatedApps
             }
 
             await DeveloperActivityService.shared.logEvent(
                 eventType: .appUpdated,
                 appID: app.id,
-                sourceAppName: app.name
+                appName: app.name
             )
         }
     }
@@ -57,14 +59,15 @@ public class DeveloperAppService: ObservableObject {
             currentApps.remove(at: index)
             store.saveApps(currentApps)
 
+            let updatedApps = currentApps
             await MainActor.run {
-                self.apps = currentApps
+                self.apps = updatedApps
             }
 
             await DeveloperActivityService.shared.logEvent(
                 eventType: .appDeleted,
                 appID: id,
-                sourceAppName: appName
+                appName: appName
             )
         }
     }
@@ -80,8 +83,9 @@ public class DeveloperAppService: ObservableObject {
 
             store.saveApps(currentApps)
 
+            let updatedApps = currentApps
             await MainActor.run {
-                self.apps = currentApps
+                self.apps = updatedApps
             }
         }
     }
@@ -92,8 +96,9 @@ public class DeveloperAppService: ObservableObject {
             currentApps[index].collaborators.append(collaborator)
             store.saveApps(currentApps)
 
+            let updatedApps = currentApps
             await MainActor.run {
-                self.apps = currentApps
+                self.apps = updatedApps
             }
         }
     }
@@ -104,8 +109,9 @@ public class DeveloperAppService: ObservableObject {
             currentApps[index].collaborators.removeAll { $0.id == collaboratorID }
             store.saveApps(currentApps)
 
+            let updatedApps = currentApps
             await MainActor.run {
-                self.apps = currentApps
+                self.apps = updatedApps
             }
         }
     }
@@ -122,8 +128,9 @@ public class DeveloperAppService: ObservableObject {
             currentApps[index].version = version.version
             store.saveApps(currentApps)
 
+            let updatedApps = currentApps
             await MainActor.run {
-                self.apps = currentApps
+                self.apps = updatedApps
             }
         }
     }

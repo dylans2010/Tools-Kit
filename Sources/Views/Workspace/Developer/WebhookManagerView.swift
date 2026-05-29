@@ -10,7 +10,7 @@ struct WebhookManagerView: View {
         List {
             Section("Endpoints") {
                 if webhookService.endpoints.isEmpty {
-                    EmptyStateView(text: "No webhook endpoints configured.", icon: "antenna.radiowaves.left.and.right")
+                    EmptyStateView(icon: "antenna.radiowaves.left.and.right", title: "No webhook endpoints configured.", message: "Add an endpoint to receive signed webhook delivery events.")
                 } else {
                     ForEach(webhookService.endpoints) { endpoint in
                         NavigationLink(destination: WebhookDetailView(endpointID: endpoint.id)) {

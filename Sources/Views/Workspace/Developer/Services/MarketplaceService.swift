@@ -33,8 +33,9 @@ public class MarketplaceService: ObservableObject {
 
         store.saveDrafts(currentDrafts)
 
+        let updatedDrafts = currentDrafts
         await MainActor.run {
-            self.drafts = currentDrafts
+            self.drafts = updatedDrafts
         }
     }
 
@@ -42,8 +43,9 @@ public class MarketplaceService: ObservableObject {
         var currentDrafts = store.drafts
         currentDrafts.removeAll { $0.id == id }
         store.saveDrafts(currentDrafts)
+        let updatedDrafts = currentDrafts
         await MainActor.run {
-            self.drafts = currentDrafts
+            self.drafts = updatedDrafts
         }
     }
 
@@ -67,14 +69,15 @@ public class MarketplaceService: ObservableObject {
         // Remove draft upon successful submission
         try await deleteDraft(id: draft.id)
 
+        let updatedSubmissions = currentSubmissions
         await MainActor.run {
-            self.submissions = currentSubmissions
+            self.submissions = updatedSubmissions
         }
 
         await DeveloperActivityService.shared.logEvent(
             eventType: .submissionCompleted,
             appID: draft.appID,
-            sourceAppName: draft.metadata.title
+            appName: draft.metadata.title
         )
     }
 
@@ -93,8 +96,9 @@ public class MarketplaceService: ObservableObject {
         }
 
         store.saveSubmissions(currentSubmissions)
+        let updatedSubmissions = currentSubmissions
         await MainActor.run {
-            self.submissions = currentSubmissions
+            self.submissions = updatedSubmissions
         }
     }
 
@@ -107,8 +111,9 @@ public class MarketplaceService: ObservableObject {
 
             store.saveSubmissions(currentSubmissions)
 
+            let updatedSubmissions = currentSubmissions
             await MainActor.run {
-                self.submissions = currentSubmissions
+                self.submissions = updatedSubmissions
             }
 
             // Also update the linked DeveloperApp status if it transitions to Live

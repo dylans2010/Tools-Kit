@@ -20,8 +20,9 @@ public class OrganizationService: ObservableObject {
         currentOrgs.append(org)
         store.saveOrganizations(currentOrgs)
 
+        let updatedOrganizations = currentOrgs
         await MainActor.run {
-            self.organizations = currentOrgs
+            self.organizations = updatedOrganizations
         }
     }
 
@@ -30,8 +31,9 @@ public class OrganizationService: ObservableObject {
         if let index = currentOrgs.firstIndex(where: { $0.id == org.id }) {
             currentOrgs[index] = org
             store.saveOrganizations(currentOrgs)
+            let updatedOrganizations = currentOrgs
             await MainActor.run {
-                self.organizations = currentOrgs
+                self.organizations = updatedOrganizations
             }
         }
     }
@@ -42,8 +44,9 @@ public class OrganizationService: ObservableObject {
             let member = OrgMember(accountID: UUID(), name: email.components(separatedBy: "@").first ?? "User", email: email, role: role)
             currentOrgs[index].members.append(member)
             store.saveOrganizations(currentOrgs)
+            let updatedOrganizations = currentOrgs
             await MainActor.run {
-                self.organizations = currentOrgs
+                self.organizations = updatedOrganizations
             }
         }
     }
@@ -53,8 +56,9 @@ public class OrganizationService: ObservableObject {
         if let index = currentOrgs.firstIndex(where: { $0.id == orgID }) {
             currentOrgs[index].members.removeAll { $0.id == memberID }
             store.saveOrganizations(currentOrgs)
+            let updatedOrganizations = currentOrgs
             await MainActor.run {
-                self.organizations = currentOrgs
+                self.organizations = updatedOrganizations
             }
         }
     }
@@ -65,8 +69,9 @@ public class OrganizationService: ObservableObject {
             let team = DeveloperTeam(name: name, organizationID: orgID)
             currentOrgs[index].teams.append(team)
             store.saveOrganizations(currentOrgs)
+            let updatedOrganizations = currentOrgs
             await MainActor.run {
-                self.organizations = currentOrgs
+                self.organizations = updatedOrganizations
             }
         }
     }

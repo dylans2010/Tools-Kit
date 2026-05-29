@@ -20,8 +20,9 @@ public class WebhookService: ObservableObject {
         currentEndpoints.append(endpoint)
         store.saveWebhooks(currentEndpoints)
 
+        let updatedEndpoints = currentEndpoints
         await MainActor.run {
-            self.endpoints = currentEndpoints
+            self.endpoints = updatedEndpoints
         }
     }
 
@@ -30,8 +31,9 @@ public class WebhookService: ObservableObject {
         if let index = currentEndpoints.firstIndex(where: { $0.id == endpoint.id }) {
             currentEndpoints[index] = endpoint
             store.saveWebhooks(currentEndpoints)
+            let updatedEndpoints = currentEndpoints
             await MainActor.run {
-                self.endpoints = currentEndpoints
+                self.endpoints = updatedEndpoints
             }
         }
     }
@@ -40,8 +42,9 @@ public class WebhookService: ObservableObject {
         var currentEndpoints = store.webhooks
         currentEndpoints.removeAll { $0.id == id }
         store.saveWebhooks(currentEndpoints)
+        let updatedEndpoints = currentEndpoints
         await MainActor.run {
-            self.endpoints = currentEndpoints
+            self.endpoints = updatedEndpoints
         }
     }
 

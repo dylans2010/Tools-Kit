@@ -27,8 +27,9 @@ public class DocumentationService: ObservableObject {
 
         store.saveDocumentationPages(currentPages)
 
+        let updatedPages = currentPages
         await MainActor.run {
-            self.pages = currentPages
+            self.pages = updatedPages
         }
     }
 
@@ -52,8 +53,9 @@ public class DocumentationService: ObservableObject {
             currentPages[index].updatedAt = Date()
 
             store.saveDocumentationPages(currentPages)
+            let updatedPages = currentPages
             await MainActor.run {
-                self.pages = currentPages
+                self.pages = updatedPages
             }
         }
     }
@@ -65,8 +67,9 @@ public class DocumentationService: ObservableObject {
             currentPages[index].updatedAt = Date()
 
             store.saveDocumentationPages(currentPages)
+            let updatedPages = currentPages
             await MainActor.run {
-                self.pages = currentPages
+                self.pages = updatedPages
             }
         }
     }
@@ -75,8 +78,9 @@ public class DocumentationService: ObservableObject {
         var currentPages = store.documentationPages
         currentPages.removeAll { $0.id == id }
         store.saveDocumentationPages(currentPages)
+        let updatedPages = currentPages
         await MainActor.run {
-            self.pages = currentPages
+            self.pages = updatedPages
         }
     }
 
@@ -88,8 +92,9 @@ public class DocumentationService: ObservableObject {
             }
         }
         store.saveDocumentationPages(currentPages)
+        let updatedPages = currentPages
         await MainActor.run {
-            self.pages = currentPages
+            self.pages = updatedPages
         }
     }
 
