@@ -351,6 +351,7 @@
 		FA12000000000000000000A0 /* PersonaChatExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11000000000000000000A0 /* PersonaChatExporter.swift */; };
 		FC0200000000000000000001 /* FilterChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0100000000000000000001 /* FilterChip.swift */; };
 		FI0200000000000000000001 /* FileImporterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FI0100000000000000000001 /* FileImporterView.swift */; };
+		FL0200000000000000000001 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FL0100000000000000000001 /* FlowLayout.swift */; };
 		8229B675224E4601A7B980CD /* MailAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF38182EF444218AFF7D2D3 /* MailAIService.swift */; };
 		B1B2C3D4E5F60718293A001F /* MailAIToolsSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A001F /* MailAIToolsSystem.swift */; };
 		BC63F5FE32D0419AB791F193 /* iCloudMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */; };
@@ -2486,6 +2487,7 @@
 		FA11000000000000000000A0 /* PersonaChatExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaChatExporter.swift; sourceTree = "<group>"; };
 		FC0100000000000000000001 /* FilterChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterChip.swift; sourceTree = "<group>"; };
 		FI0100000000000000000001 /* FileImporterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileImporterView.swift; sourceTree = "<group>"; };
+		FL0100000000000000000001 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		TH0100000000000000000001 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		IW0100000000000000000001 /* WorkspaceColorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceColorManager.swift; sourceTree = "<group>"; };
 		IW0100000000000000000002 /* WorkspaceSurfaceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSurfaceCard.swift; sourceTree = "<group>"; };
@@ -5889,6 +5891,7 @@
 				D3614DB596A94EBEA3646F6A /* ToolCard.swift */,
 				FC0100000000000000000001 /* FilterChip.swift */,
 				FI0100000000000000000001 /* FileImporterView.swift */,
+				FL0100000000000000000001 /* FlowLayout.swift */,
 				TH0100000000000000000001 /* Theme.swift */,
 				WS010000000000000000000B /* ToolHeaderView.swift */,
 				WS010000000000000000000C /* CardView.swift */,
@@ -14465,6 +14468,7 @@
 				US020000000000000000000A /* UnsplashImagesView.swift in Sources */,
 				FC0200000000000000000001 /* FilterChip.swift in Sources */,
 				FI0200000000000000000001 /* FileImporterView.swift in Sources */,
+				FL0200000000000000000001 /* FlowLayout.swift in Sources */,
 				WS020000000000000000000E /* Article.swift in Sources */,
 				WS020000000000000000000F /* ArticleCollection.swift in Sources */,
 				WS0200000000000000000010 /* Spreadsheet.swift in Sources */,
