@@ -1,7 +1,10 @@
 import SwiftUI
 
 struct DeveloperHomeView: View {
-    @ObservedObject var store = DeveloperPersistentStore.shared
+    @ObservedObject var profileService = DeveloperProfileService.shared
+    @ObservedObject var appService = DeveloperAppService.shared
+    @ObservedObject var activityService = DeveloperActivityService.shared
+    @ObservedObject var keyService = APIKeyService.shared
 
     var body: some View {
         ScrollView {
@@ -24,7 +27,7 @@ struct DeveloperHomeView: View {
         HStack(spacing: 16) {
             ZStack {
                 Circle().fill(Color.accentColor.opacity(0.1))
-                if let avatarUrl = store.profile.avatarUrl, let url = URL(string: avatarUrl) {
+                if !profileService.profile.avatarUrl.isEmpty, let url = URL(string: profileService.profile.avatarUrl) {
                     AsyncImage(url: url) { image in
                         image.resizable()
                     } placeholder: {
@@ -42,15 +45,15 @@ struct DeveloperHomeView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text(store.profile.displayName.isEmpty ? "Complete your Profile" : store.profile.displayName)
+                    Text(profileService.profile.displayName.isEmpty ? "Complete your Profile" : profileService.profile.displayName)
                         .font(.title3.bold())
-                    if store.profile.tier == .verified || store.profile.tier == .enterprise {
+                    if profileService.profile.tier == .verified || profileService.profile.tier == .enterprise {
                         Image(systemName: "checkmark.seal.fill")
                             .foregroundStyle(.blue)
                             .font(.caption)
                     }
                 }
-                Text(store.profile.username.isEmpty ? "Unset Username" : "@\(store.profile.username) • \(store.profile.tier.rawValue) Developer")
+                Text(profileService.profile.username.isEmpty ? "Unset Username" : "@\(profileService.profile.username) • \(profileService.profile.tier.rawValue) Developer")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -63,9 +66,9 @@ struct DeveloperHomeView: View {
 
     private var summaryStrip: some View {
         HStack(spacing: 12) {
-            summaryCard(label: "Apps", value: "\(store.apps.count)", icon: "square.grid.2x2")
-            summaryCard(label: "Installs", value: "\(store.apps.reduce(0) { $0 + $1.installCount })", icon: "arrow.down.circle")
-            summaryCard(label: "API Keys", value: "\(store.keys.count)", icon: "key.fill")
+            summaryCard(label: "Apps", value: "\(appService.apps.count)", icon: "square.grid.2x2")
+            summaryCard(label: "Installs", value: "\(appService.apps.reduce(0) { $0 + $1.installCount })", icon: "arrow.down.circle")
+            summaryCard(label: "API Keys", value: "\(keyService.keys.count)", icon: "key.fill")
             summaryCard(label: "Support", value: "0", icon: "lifepreserver")
         }
     }
@@ -106,8 +109,14 @@ struct DeveloperHomeView: View {
                 NavigationLink(destination: AuthServiceManagerView()) {
                     quickActionCard(title: "Auth & Webhooks", icon: "key.fill", color: .mint)
                 }
+                NavigationLink(destination: ScopeManagementView()) {
+                    quickActionCard(title: "Permissions", icon: "shield.fill", color: .red)
+                }
                 NavigationLink(destination: DocumentationEditorView()) {
                     quickActionCard(title: "Docs Editor", icon: "book.and.wrench", color: .cyan)
+                }
+                NavigationLink(destination: OrganizationManagementView()) {
+                    quickActionCard(title: "Organizations", icon: "building.2.fill", color: .gray)
                 }
                 NavigationLink(destination: DeveloperTeamManagerView()) {
                     quickActionCard(title: "Team", icon: "person.2.fill", color: .indigo)
@@ -127,23 +136,11 @@ struct DeveloperHomeView: View {
                 NavigationLink(destination: DeveloperSecurityAuditView()) {
                     quickActionCard(title: "Security", icon: "shield.checkered", color: .red)
                 }
-                NavigationLink(destination: DeveloperAppCertificatesView()) {
-                    quickActionCard(title: "Certificates", icon: "medal.fill", color: .yellow)
+                NavigationLink(destination: DeveloperVerificationView()) {
+                    quickActionCard(title: "Verification", icon: "checkmark.seal.fill", color: .blue)
                 }
-                NavigationLink(destination: DeveloperMonetizationView()) {
-                    quickActionCard(title: "Monetization", icon: "dollarsign.circle.fill", color: .green)
-                }
-                NavigationLink(destination: DeveloperBetaTestingView()) {
-                    quickActionCard(title: "Beta Testing", icon: "testtube.2", color: .orange)
-                }
-                NavigationLink(destination: DeveloperIntegrationGalleryView()) {
-                    quickActionCard(title: "Integrations", icon: "puzzlepiece.fill", color: .blue)
-                }
-                NavigationLink(destination: DeveloperStorageUsageView()) {
-                    quickActionCard(title: "Storage", icon: "cylinder.split.1x2.fill", color: .gray)
-                }
-                NavigationLink(destination: DeveloperSupportTicketView()) {
-                    quickActionCard(title: "Support", icon: "lifepreserver.fill", color: .red)
+                NavigationLink(destination: DeveloperAccountActivityView()) {
+                    quickActionCard(title: "Activity", icon: "clock.arrow.circlepath", color: .orange)
                 }
                 NavigationLink(destination: ProjectInstallerView()) {
                     quickActionCard(title: "Installer", icon: "square.and.arrow.down.fill", color: .brown)
@@ -153,17 +150,6 @@ struct DeveloperHomeView: View {
                 }
             }
         }
-    }
-
-    private var previewApp: DeveloperApp {
-        store.apps.first ?? DeveloperApp(
-            name: "Sample Developer App",
-            type: .app,
-            status: .draft,
-            description: "Preview app details before creating your first project.",
-            iconName: "app.badge",
-            bundleId: "com.toolskit.sample"
-        )
     }
 
     private func quickActionCard(title: String, icon: String, color: Color) -> some View {
@@ -188,7 +174,7 @@ struct DeveloperHomeView: View {
             Text("Your Projects")
                 .font(.headline)
 
-            if store.apps.isEmpty {
+            if appService.apps.isEmpty {
                 Text("No projects yet. Start by building or submitting an app.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -198,7 +184,7 @@ struct DeveloperHomeView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             } else {
                 VStack(spacing: 1) {
-                    ForEach(store.apps.prefix(3)) { app in
+                    ForEach(appService.apps.prefix(3)) { app in
                         appStatusRow(name: app.name, type: app.type.rawValue, status: app.status)
                     }
                 }
@@ -211,7 +197,7 @@ struct DeveloperHomeView: View {
         }
     }
 
-    private func appStatusRow(name: String, type: String, status: AppStatus) -> some View {
+    private func appStatusRow(name: String, type: String, status: DeveloperAppStatus) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(name).font(.subheadline.weight(.semibold))
@@ -219,15 +205,26 @@ struct DeveloperHomeView: View {
             }
             Spacer()
             HStack(spacing: 6) {
-                Circle().fill(status.color).frame(width: 8, height: 8)
+                Circle().fill(statusColor(status)).frame(width: 8, height: 8)
                 Text(status.rawValue).font(.caption).foregroundStyle(.secondary)
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(status.color.opacity(0.1), in: Capsule())
+            .background(statusColor(status).opacity(0.1), in: Capsule())
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
+    }
+
+    private func statusColor(_ status: DeveloperAppStatus) -> Color {
+        switch status {
+        case .draft: return .gray
+        case .underReview: return .orange
+        case .live: return .green
+        case .suspended: return .red
+        case .deprecated: return .secondary
+        case .archived: return .black
+        }
     }
 
     private var recentActivityFeed: some View {
@@ -236,16 +233,11 @@ struct DeveloperHomeView: View {
                 .font(.headline)
 
             VStack(alignment: .leading, spacing: 16) {
-                if store.keys.isEmpty && store.apps.isEmpty {
+                if activityService.activities.isEmpty {
                     Text("No recent activity recorded.").font(.caption).foregroundStyle(.secondary)
                 } else {
-                    // In a real app, this would be fetched from a log service.
-                    // Here we show some contextual activity based on store state.
-                    if let lastKey = store.keys.last {
-                        activityRow(title: "Key Generated", detail: "API Key '\(lastKey.name)' was created.", date: lastKey.createdAt, color: .blue)
-                    }
-                    if let lastApp = store.apps.last {
-                        activityRow(title: "App Created", detail: "Project '\(lastApp.name)' was added.", date: lastApp.createdAt, color: .green)
+                    ForEach(activityService.activities.prefix(5)) { activity in
+                        activityRow(title: activity.eventType.rawValue, detail: activity.description, date: activity.timestamp, color: .blue)
                     }
                 }
             }
@@ -271,7 +263,7 @@ struct DeveloperHomeView: View {
 
     private var noticesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if store.profile.displayName.isEmpty {
+            if profileService.profile.displayName.isEmpty {
                 HStack(spacing: 12) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)

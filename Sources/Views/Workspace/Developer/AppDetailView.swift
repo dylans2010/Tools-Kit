@@ -1,50 +1,67 @@
 import SwiftUI
 
 struct AppDetailView: View {
-    let app: DeveloperApp
+    let appID: UUID
+    @ObservedObject var appService = DeveloperAppService.shared
     @State private var selectedTab = 0
 
+    var app: DeveloperApp? {
+        appService.apps.first { $0.id == appID }
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            header
+        Group {
+            if let app = app {
+                ScrollView {
+                    VStack(spacing: 20) {
+                        appHeader(app)
 
-            Picker("Tab", selection: $selectedTab) {
-                Text("Overview").tag(0)
-                Text("History").tag(1)
-                Text("Scopes").tag(2)
-                Text("Auth").tag(3)
-            }
-            .pickerStyle(.segmented)
-            .padding()
+                        Picker("Details", selection: $selectedTab) {
+                            Text("Overview").tag(0)
+                            Text("Versions").tag(1)
+                            Text("Scopes").tag(2)
+                            Text("Auth").tag(3)
+                        }
+                        .pickerStyle(.segmented)
+                        .padding(.horizontal)
 
-            ScrollView {
-                VStack(spacing: 20) {
-                    if selectedTab == 0 {
-                        overviewTab
-                    } else if selectedTab == 1 {
-                        versionHistoryTab
-                    } else if selectedTab == 2 {
-                        scopesTab
-                    } else {
-                        authConfigTab
+                        switch selectedTab {
+                        case 0:
+                            overviewTab(app)
+                        case 1:
+                            versionsTab(app)
+                        case 2:
+                            scopesTab(app)
+                        case 3:
+                            authTab(app)
+                        default:
+                            Color.clear
+                        }
                     }
                 }
-                .padding()
+            } else {
+                Text("App not found").foregroundStyle(.secondary)
             }
         }
-        .navigationTitle(app.name)
+        .navigationTitle("App Details")
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private var header: some View {
+    private func appHeader(_ app: DeveloperApp) -> some View {
         HStack(spacing: 16) {
-            RoundedRectangle(cornerRadius: 12).fill(Color.secondary.opacity(0.1))
-                .frame(width: 64, height: 64)
-                .overlay(Image(systemName: app.iconName).font(.title).foregroundStyle(.secondary))
+            Image(systemName: app.iconName)
+                .font(.system(size: 60))
+                .foregroundStyle(.accent)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(app.name).font(.title3.bold())
-                Text("\(app.type.rawValue) • \(app.status.rawValue)").font(.subheadline).foregroundStyle(.secondary)
+                Text(app.name).font(.title2.bold())
+                Text(app.bundleId).font(.caption).foregroundStyle(.secondary)
+                HStack {
+                    Text(app.type.rawValue).font(.caption2.bold())
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(Color.accentColor.opacity(0.1), in: Capsule())
+                    statusBadge(app.status)
+                }
             }
             Spacer()
         }
@@ -52,114 +69,100 @@ struct AppDetailView: View {
         .background(Color(uiColor: .secondarySystemGroupedBackground))
     }
 
-    @Environment(\.dismiss) var dismiss
+    private func statusBadge(_ status: DeveloperAppStatus) -> some View {
+        Text(status.rawValue).font(.caption2.bold())
+            .padding(.horizontal, 8).padding(.vertical, 4)
+            .background(statusColor(status).opacity(0.1), in: Capsule())
+            .foregroundStyle(statusColor(status))
+    }
 
-    private var overviewTab: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            detailGroup(title: "App Information") {
-                detailRow(label: "Bundle ID", value: app.bundleId.isEmpty ? "com.developer.\(app.name.lowercased().replacingOccurrences(of: " ", with: "."))" : app.bundleId)
-                detailRow(label: "Current Version", value: app.version)
-                detailRow(label: "Pricing", value: app.pricingModel)
-                detailRow(label: "Revenue", value: "$\(String(format: "%.2f", app.revenue))")
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Description").font(.headline)
-                Text(app.description.isEmpty ? "No description provided." : app.description)
-                    .font(.subheadline).foregroundStyle(.secondary)
-            }
-
-            Section {
-                Button(role: .destructive) {
-                    DeveloperPersistentStore.shared.deleteApp(id: app.id)
-                    dismiss()
-                } label: {
-                    Label("Delete App", systemImage: "trash")
-                }
-            } header: {
-                Text("Danger Zone").font(.headline).foregroundStyle(.red)
-            }
+    private func statusColor(_ status: DeveloperAppStatus) -> Color {
+        switch status {
+        case .draft: return .gray
+        case .underReview: return .orange
+        case .live: return .green
+        case .suspended: return .red
+        case .deprecated: return .secondary
+        case .archived: return .black
         }
     }
 
-    private var versionHistoryTab: some View {
-        VStack(spacing: 0) {
-            ForEach(0..<3) { i in
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("v1.\(3-i).0").font(.subheadline.bold())
-                        Text("Released \(Date().addingTimeInterval(Double(-i * 86400 * 7)).formatted(date: .abbreviated, time: .omitted))")
-                            .font(.caption).foregroundStyle(.secondary)
+    private func overviewTab(_ app: DeveloperApp) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            infoSection(title: "Description", content: app.description)
+            infoSection(title: "Version", content: app.version)
+            infoSection(title: "Installs", content: "\(app.installCount)")
+            infoSection(title: "Monetization", content: app.monetizationModel.rawValue)
+        }
+        .padding()
+    }
+
+    private func versionsTab(_ app: DeveloperApp) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if app.versions.isEmpty {
+                Text("No version history available.").font(.caption).foregroundStyle(.secondary)
+            } else {
+                ForEach(app.versions) { version in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("v\(version.version) (\(version.buildNumber))").font(.subheadline.bold())
+                            Text(version.createdAt.formatted(date: .abbreviated, time: .omitted)).font(.caption2).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Text(version.status).font(.caption2)
                     }
-                    Spacer()
-                    Text(i == 0 ? "Active" : "Archived")
-                        .font(.caption2.bold())
-                        .padding(.horizontal, 6).padding(.vertical, 2)
-                        .background(i == 0 ? Color.green.opacity(0.1) : Color.secondary.opacity(0.1))
-                        .foregroundStyle(i == 0 ? .green : .secondary)
-                        .clipShape(Capsule())
+                    .padding()
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .padding()
-                if i < 2 { Divider() }
             }
         }
+        .padding()
+    }
+
+    private func scopesTab(_ app: DeveloperApp) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Granted Scopes").font(.headline)
+            if app.grantedScopes.isEmpty {
+                Text("No scopes granted to this app.").font(.caption).foregroundStyle(.secondary)
+            } else {
+                ForEach(app.grantedScopes, id: \.self) { scope in
+                    Text(scope).font(.caption.monospaced())
+                        .padding(8)
+                        .background(Color.secondary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+            }
+        }
+        .padding()
+    }
+
+    private func authTab(_ app: DeveloperApp) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Assigned API Keys").font(.headline)
+            Text("API Keys are managed in the Auth & Webhooks section.").font(.caption).foregroundStyle(.secondary)
+
+            NavigationLink(destination: AuthServiceManagerView()) {
+                Text("Manage API Keys")
+                    .font(.subheadline.bold())
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.accentColor)
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+        }
+        .padding()
+    }
+
+    private func infoSection(title: String, content: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title).font(.caption.bold()).foregroundStyle(.secondary)
+            Text(content.isEmpty ? "Not provided" : content).font(.subheadline)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-
-    private var scopesTab: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Currently Granted Scopes", systemImage: "lock.shield")
-                .font(.headline)
-
-            ForEach(["read:user", "read:data"], id: \.self) { scope in
-                HStack {
-                    Text(scope).font(.caption.monospaced())
-                    Spacer()
-                    Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
-                }
-                .padding()
-                .background(Color.secondary.opacity(0.05))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-            }
-        }
-    }
-
-    private var authConfigTab: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Authentication Setup").font(.headline)
-
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("Primary Auth").font(.subheadline.bold())
-                    Text("Google OAuth 2.0").font(.caption).foregroundStyle(.secondary)
-                }
-                Spacer()
-                Button("Configure") {}.font(.caption.bold())
-            }
-            .padding()
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-    }
-
-    private func detailGroup<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(.headline)
-            VStack(spacing: 0) {
-                content()
-            }
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-    }
-
-    private func detailRow(label: String, value: String) -> some View {
-        HStack {
-            Text(label).font(.subheadline).foregroundStyle(.secondary)
-            Spacer()
-            Text(value).font(.subheadline.bold())
-        }
-        .padding()
     }
 }

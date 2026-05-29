@@ -2,234 +2,181 @@ import SwiftUI
 
 struct MarketplaceSubmissionView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var currentStep = 1
+    @ObservedObject var marketplaceService = MarketplaceService.shared
+    @State private var currentStep = 0
+    @State private var draft: MarketplaceSubmissionDraft
+    @State private var isSubmitting = false
 
-    // Step 1: Type Selection
-    @State private var selectedType: AppType = .app
-
-    // Step 2: Basic Metadata
-    @State private var appName = ""
-    @State private var subtitle = ""
-    @State private var description = ""
-
-    // Step 3: Media
-    @State private var screenshotsCount = 0
-
-    // Step 4: Technical
-    @State private var versionNumber = "1.0.0"
-
-    // Step 5: Scopes
-    @State private var selectedScopes: Set<String> = []
+    init(appID: UUID) {
+        _draft = State(initialValue: MarketplaceSubmissionDraft(appID: appID))
+    }
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             stepIndicator
 
-                ScrollView {
-                    VStack(spacing: 24) {
-                        if currentStep == 1 {
-                            typeSelectionStep
-                        } else if currentStep == 2 {
-                            basicMetadataStep
-                        } else if currentStep == 3 {
-                            mediaAssetsStep
-                        } else if currentStep == 4 {
-                            technicalDetailsStep
-                        } else if currentStep == 5 {
-                            scopeDeclarationStep
-                        } else if currentStep == 6 {
-                            pricingLicensingStep
-                        } else if currentStep == 7 {
-                            dataHandlingStep
-                        } else {
-                            reviewSubmitStep
-                        }
-                    }
-                    .padding()
-                }
+            TabView(selection: $currentStep) {
+                metadataStep.tag(0)
+                assetsStep.tag(1)
+                technicalStep.tag(2)
+                supportStep.tag(3)
+                reviewStep.tag(4)
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
 
-                footer
-            }
-        .navigationTitle("New Submission")
+            footer
+        }
+        .navigationTitle("Marketplace Submission")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button("Cancel") { dismiss() }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Save Draft") { /* Save */ }
-                    .font(.subheadline)
+        .disabled(isSubmitting)
+        .overlay {
+            if isSubmitting {
+                ProgressView("Submitting...")
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
     }
 
     private var stepIndicator: some View {
-        HStack(spacing: 4) {
-            ForEach(1...8, id: \.self) { step in
-                Rectangle()
-                    .fill(step <= currentStep ? Color.accentColor : Color.secondary.opacity(0.2))
-                    .frame(height: 4)
+        HStack(spacing: 8) {
+            ForEach(0..<5) { index in
+                Circle()
+                    .fill(index <= currentStep ? Color.accentColor : Color.secondary.opacity(0.3))
+                    .frame(width: 8, height: 8)
             }
         }
-        .padding(.horizontal)
+        .padding()
     }
 
-    private var typeSelectionStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("What are you building?").font(.headline)
-            ForEach(AppType.allCases, id: \.self) { type in
-                Button { selectedType = type } label: {
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(type.rawValue).font(.subheadline.bold())
-                            Text("Brief description of what a \(type.rawValue) is.").font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        if selectedType == type {
-                            Image(systemName: "checkmark.circle.fill").foregroundStyle(.blue)
-                        }
-                    }
-                    .padding()
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(selectedType == type ? Color.blue : Color.clear, lineWidth: 2))
+    private var metadataStep: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("App Listing Metadata").font(.headline)
+
+                SubmissionWizardSteps.TechnicalField(label: "Listing Title", text: $draft.metadata.title)
+                SubmissionWizardSteps.TechnicalField(label: "Subtitle", text: $draft.metadata.subtitle)
+
+                VStack(alignment: .leading) {
+                    Text("Description").font(.caption.bold()).foregroundStyle(.secondary)
+                    TextEditor(text: $draft.metadata.description)
+                        .frame(height: 150)
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.2)))
                 }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    private var basicMetadataStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Basic Information").font(.headline)
-            TextField("App Name", text: $appName).textFieldStyle(.roundedBorder)
-            TextField("Subtitle", text: $subtitle).textFieldStyle(.roundedBorder)
-            TextEditor(text: $description)
-                .frame(height: 150)
-                .padding(4)
-                .background(Color(uiColor: .secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.2)))
-        }
-    }
-
-    private var mediaAssetsStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Media Assets").font(.headline)
-
-            HStack {
-                VStack {
-                    RoundedRectangle(cornerRadius: 12).fill(Color.secondary.opacity(0.1))
-                        .aspectRatio(1, contentMode: .fit)
-                        .overlay(Image(systemName: "plus").foregroundStyle(.secondary))
-                    Text("App Icon").font(.caption2)
-                }
-                .frame(width: 80)
-                Spacer()
-            }
-
-            Text("Screenshots (Min 3)").font(.subheadline.bold())
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack {
-                    ForEach(0..<3) { _ in
-                        RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.1))
-                            .frame(width: 120, height: 200)
-                            .overlay(Image(systemName: "photo").foregroundStyle(.secondary))
-                    }
-                }
-            }
-        }
-    }
-
-    private var technicalDetailsStep: some View {
-        Form {
-            TextField("Version Number", text: $versionNumber)
-            TextField("Min SDK Version", text: .constant("2.0.0"))
-            Toggle("Supports Desktop", isOn: .constant(true))
-            Toggle("Supports Mobile", isOn: .constant(true))
-        }
-        .frame(height: 250)
-    }
-
-    private var scopeDeclarationStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Declare Scopes").font(.headline)
-            Text("Identify all permissions your app requires.").font(.caption).foregroundStyle(.secondary)
-
-            ForEach(["read:user", "read:data", "write:data"], id: \.self) { scope in
-                Toggle(scope, isOn: .constant(false))
-            }
-        }
-    }
-
-    private var pricingLicensingStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Pricing & Licensing").font(.headline)
-            Picker("Model", selection: .constant(0)) {
-                Text("Free").tag(0)
-                Text("Paid").tag(1)
-                Text("Freemium").tag(2)
-            }
-            .pickerStyle(.segmented)
-
-            TextField("License URL", text: .constant(""))
-                .textFieldStyle(.roundedBorder)
-        }
-    }
-
-    private var dataHandlingStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Data Handling").font(.headline)
-            Toggle("Does this app collect user data?", isOn: .constant(true))
-            Toggle("Is data shared with 3rd parties?", isOn: .constant(false))
-            TextField("Privacy Policy URL", text: .constant(""))
-                .textFieldStyle(.roundedBorder)
-        }
-    }
-
-    private var reviewSubmitStep: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Review Submission").font(.headline)
-
-            VStack(alignment: .leading, spacing: 12) {
-                summaryRow(label: "Name", value: appName)
-                summaryRow(label: "Type", value: selectedType.rawValue)
-                summaryRow(label: "Version", value: versionNumber)
             }
             .padding()
-            .background(Color.secondary.opacity(0.05))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-
-            Label("I certify that all information provided is accurate and complies with platform policies.", systemImage: "checkmark.square")
-                .font(.caption)
         }
+    }
+
+    private var assetsStep: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("App Assets").font(.headline)
+                SubmissionWizardSteps.TechnicalField(label: "Icon URL", text: $draft.assets.iconURL)
+                Text("Icon must be 512x512px PNG.").font(.caption).foregroundStyle(.secondary)
+            }
+            .padding()
+        }
+    }
+
+    private var technicalStep: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Technical Details").font(.headline)
+                SubmissionWizardSteps.TechnicalField(label: "Version", text: $draft.technicalDetails.version)
+                SubmissionWizardSteps.TechnicalField(label: "Build Number", text: $draft.technicalDetails.buildNumber)
+
+                VStack(alignment: .leading) {
+                    Text("Release Notes").font(.caption.bold()).foregroundStyle(.secondary)
+                    TextEditor(text: $draft.technicalDetails.releaseNotes)
+                        .frame(height: 100)
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.2)))
+                }
+            }
+            .padding()
+        }
+    }
+
+    private var supportStep: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Support & Privacy").font(.headline)
+                SubmissionWizardSteps.TechnicalField(label: "Support Email", text: $draft.supportConfig.supportEmail)
+                SubmissionWizardSteps.TechnicalField(label: "Privacy Policy URL", text: $draft.supportConfig.privacyPolicyURL)
+            }
+            .padding()
+        }
+    }
+
+    private var reviewStep: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Review & Submit").font(.headline)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    summaryRow(label: "Title", value: draft.metadata.title)
+                    summaryRow(label: "Version", value: draft.technicalDetails.version)
+                    summaryRow(label: "Support", value: draft.supportConfig.supportEmail)
+                }
+                .padding()
+                .background(Color.secondary.opacity(0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                Button {
+                    submit()
+                } label: {
+                    Text("Submit for Review")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.accentColor)
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .disabled(!isDraftComplete)
+            }
+            .padding()
+        }
+    }
+
+    private var footer: some View {
+        HStack {
+            if currentStep > 0 {
+                Button("Back") { currentStep -= 1 }
+                    .buttonStyle(.bordered)
+            }
+            Spacer()
+            if currentStep < 4 {
+                Button("Next") { currentStep += 1 }
+                    .buttonStyle(.borderedProminent)
+            }
+        }
+        .padding()
+    }
+
+    private var isDraftComplete: Bool {
+        !draft.metadata.title.isEmpty &&
+        !draft.technicalDetails.version.isEmpty &&
+        !draft.supportConfig.privacyPolicyURL.isEmpty
     }
 
     private func summaryRow(label: String, value: String) -> some View {
         HStack {
             Text(label).foregroundStyle(.secondary)
             Spacer()
-            Text(value).bold()
+            Text(value.isEmpty ? "Missing" : value).bold().foregroundStyle(value.isEmpty ? .red : .primary)
         }
-        .font(.subheadline)
     }
 
-    private var footer: some View {
-        HStack {
-            if currentStep > 1 {
-                Button("Back") { currentStep -= 1 }
-                    .buttonStyle(.bordered)
+    private func submit() {
+        isSubmitting = true
+        Task {
+            try? await marketplaceService.submitApp(draft: draft)
+            await MainActor.run {
+                isSubmitting = false
+                dismiss()
             }
-            Spacer()
-            Button(currentStep == 8 ? "Submit for Review" : "Next") {
-                if currentStep < 8 {
-                    currentStep += 1
-                } else {
-                    dismiss()
-                }
-            }
-            .buttonStyle(.borderedProminent)
         }
-        .padding()
     }
 }

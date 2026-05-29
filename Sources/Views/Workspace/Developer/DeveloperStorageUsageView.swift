@@ -1,18 +1,34 @@
 import SwiftUI
 
 struct DeveloperStorageUsageView: View {
+    @ObservedObject var appService = DeveloperAppService.shared
+    @State private var selectedAppID: UUID?
+
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
+                Section {
+                    Picker("App", selection: $selectedAppID) {
+                        Text("All Apps").tag(Optional<UUID>.none)
+                        ForEach(appService.apps) { app in
+                            Text(app.name).tag(Optional(app.id))
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .padding()
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Total Storage").font(.headline)
+                    Text("Storage Usage").font(.headline)
                     HStack {
                         VStack(alignment: .leading) {
-                            Text("1.2 GB / 5.0 GB").font(.title3.bold())
-                            ProgressView(value: 0.24).tint(.blue)
+                            Text("0.0 GB / 5.0 GB").font(.title3.bold())
+                            ProgressView(value: 0.0).tint(.blue)
                         }
                         Spacer()
-                        Text("24%").font(.headline).foregroundStyle(.secondary)
+                        Text("0%").font(.headline).foregroundStyle(.secondary)
                     }
                 }
                 .padding()
@@ -21,9 +37,9 @@ struct DeveloperStorageUsageView: View {
 
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Usage by Category").font(.headline)
-                    usageRow(label: "Database", value: "450 MB", icon: "cylinder.split.1x2.fill", color: .blue)
-                    usageRow(label: "Assets", value: "680 MB", icon: "photo.on.rectangle.angled", color: .green)
-                    usageRow(label: "Logs", value: "90 MB", icon: "list.bullet.rectangle", color: .purple)
+                    usageRow(label: "Database", value: "0 MB", icon: "cylinder.split.1x2.fill", color: .blue)
+                    usageRow(label: "Assets", value: "0 MB", icon: "photo.on.rectangle.angled", color: .green)
+                    usageRow(label: "Logs", value: "0 MB", icon: "list.bullet.rectangle", color: .purple)
                 }
                 .padding()
                 .background(Color(uiColor: .secondarySystemGroupedBackground))
@@ -31,9 +47,13 @@ struct DeveloperStorageUsageView: View {
 
                 Section {
                     Button(role: .destructive) {
-                        // Clear logs
+                        // Awaiting backend integration
                     } label: {
-                        Label("Clear Cached Logs", systemImage: "trash")
+                        Label("Clear Cached Data", systemImage: "trash")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.red.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                 }
             }

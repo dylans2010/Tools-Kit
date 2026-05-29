@@ -1,30 +1,34 @@
 import Foundation
 import Combine
 
-public final class DeveloperPersistentStore: ObservableObject {
+public class DeveloperPersistentStore: ObservableObject {
     public static let shared = DeveloperPersistentStore()
-
-    private let profileKey = "com.toolskit.developer.profile"
-    private let appsKey = "com.toolskit.developer.apps"
-    private let keysKey = "com.toolskit.developer.keys"
-    private let docsKey = "com.toolskit.developer.docs"
-    private let webhooksKey = "com.toolskit.developer.webhooks"
-    private let oauthClientsKey = "com.toolskit.developer.oauth"
-    private let teamMembersKey = "com.toolskit.developer.team"
-    private let sandboxesKey = "com.toolskit.developer.sandboxes"
-    private let releasesKey = "com.toolskit.developer.releases"
 
     @Published public var profile: DeveloperProfile
     @Published public var apps: [DeveloperApp]
-    @Published public var keys: [DeveloperKey]
-    @Published public var docSections: [DocumentationSection]
-    @Published public var webhooks: [DeveloperWebhook]
-    @Published public var oauthClients: [OAuthClient]
-    @Published public var teamMembers: [TeamMember]
-    @Published public var sandboxes: [SandboxEnvironment]
-    @Published public var releases: [AppRelease]
+    @Published public var keys: [APIKey]
+    @Published public var webhooks: [WebhookEndpoint]
+    @Published public var teamMembers: [OrgMember]
+    @Published public var organizations: [DeveloperOrganization]
+    @Published public var submissions: [MarketplaceSubmission]
+    @Published public var releases: [AppVersion]
+    @Published public var logEntries: [LogEntry]
+    @Published public var activities: [DeveloperActivityEvent]
+
+    private let profileKey = "dev_portal_profile"
+    private let appsKey = "dev_portal_apps"
+    private let keysKey = "dev_portal_keys"
+    private let webhooksKey = "dev_portal_webhooks"
+    private let teamMembersKey = "dev_portal_team"
+    private let organizationsKey = "dev_portal_orgs"
+    private let submissionsKey = "dev_portal_submissions"
+    private let releasesKey = "dev_portal_releases"
+    private let logsKey = "dev_portal_logs"
+    private let activitiesKey = "dev_portal_activities"
 
     private init() {
+        // Initialize with real persisted data or empty defaults
+
         // Load Profile
         if let data = UserDefaults.standard.data(forKey: profileKey),
            let decoded = try? JSONDecoder().decode(DeveloperProfile.self, from: data) {
@@ -43,65 +47,66 @@ public final class DeveloperPersistentStore: ObservableObject {
 
         // Load Keys
         if let data = UserDefaults.standard.data(forKey: keysKey),
-           let decoded = try? JSONDecoder().decode([DeveloperKey].self, from: data) {
+           let decoded = try? JSONDecoder().decode([APIKey].self, from: data) {
             self.keys = decoded
         } else {
             self.keys = []
         }
 
-        // Load Docs
-        if let data = UserDefaults.standard.data(forKey: docsKey),
-           let decoded = try? JSONDecoder().decode([DocumentationSection].self, from: data) {
-            self.docSections = decoded
-        } else {
-            self.docSections = [
-                DocumentationSection(title: "Getting Started", pages: [
-                    DocPage(title: "Overview", content: "# Project Overview\nWelcome to your developer documentation.")
-                ])
-            ]
-        }
-
         // Load Webhooks
         if let data = UserDefaults.standard.data(forKey: webhooksKey),
-           let decoded = try? JSONDecoder().decode([DeveloperWebhook].self, from: data) {
+           let decoded = try? JSONDecoder().decode([WebhookEndpoint].self, from: data) {
             self.webhooks = decoded
         } else {
             self.webhooks = []
         }
 
-        // Load OAuth
-        if let data = UserDefaults.standard.data(forKey: oauthClientsKey),
-           let decoded = try? JSONDecoder().decode([OAuthClient].self, from: data) {
-            self.oauthClients = decoded
-        } else {
-            self.oauthClients = []
-        }
-
         // Load Team
         if let data = UserDefaults.standard.data(forKey: teamMembersKey),
-           let decoded = try? JSONDecoder().decode([TeamMember].self, from: data) {
+           let decoded = try? JSONDecoder().decode([OrgMember].self, from: data) {
             self.teamMembers = decoded
         } else {
             self.teamMembers = []
         }
 
-        // Load Sandboxes
-        if let data = UserDefaults.standard.data(forKey: sandboxesKey),
-           let decoded = try? JSONDecoder().decode([SandboxEnvironment].self, from: data) {
-            self.sandboxes = decoded
+        // Load Organizations
+        if let data = UserDefaults.standard.data(forKey: organizationsKey),
+           let decoded = try? JSONDecoder().decode([DeveloperOrganization].self, from: data) {
+            self.organizations = decoded
         } else {
-            self.sandboxes = [
-                SandboxEnvironment(name: "Development", apiBaseURL: "https://dev-api.toolskit.io", isActive: true),
-                SandboxEnvironment(name: "Staging", apiBaseURL: "https://staging-api.toolskit.io")
-            ]
+            self.organizations = []
+        }
+
+        // Load Submissions
+        if let data = UserDefaults.standard.data(forKey: submissionsKey),
+           let decoded = try? JSONDecoder().decode([MarketplaceSubmission].self, from: data) {
+            self.submissions = decoded
+        } else {
+            self.submissions = []
         }
 
         // Load Releases
         if let data = UserDefaults.standard.data(forKey: releasesKey),
-           let decoded = try? JSONDecoder().decode([AppRelease].self, from: data) {
+           let decoded = try? JSONDecoder().decode([AppVersion].self, from: data) {
             self.releases = decoded
         } else {
             self.releases = []
+        }
+
+        // Load Logs
+        if let data = UserDefaults.standard.data(forKey: logsKey),
+           let decoded = try? JSONDecoder().decode([LogEntry].self, from: data) {
+            self.logEntries = decoded
+        } else {
+            self.logEntries = []
+        }
+
+        // Load Activities
+        if let data = UserDefaults.standard.data(forKey: activitiesKey),
+           let decoded = try? JSONDecoder().decode([DeveloperActivityEvent].self, from: data) {
+            self.activities = decoded
+        } else {
+            self.activities = []
         }
     }
 
@@ -119,52 +124,59 @@ public final class DeveloperPersistentStore: ObservableObject {
         }
     }
 
-    public func saveKeys(_ newKeys: [DeveloperKey]) {
+    public func saveKeys(_ newKeys: [APIKey]) {
         if let encoded = try? JSONEncoder().encode(newKeys) {
             UserDefaults.standard.set(encoded, forKey: keysKey)
             self.keys = newKeys
         }
     }
 
-    public func saveDocSections(_ newSections: [DocumentationSection]) {
-        if let encoded = try? JSONEncoder().encode(newSections) {
-            UserDefaults.standard.set(encoded, forKey: docsKey)
-            self.docSections = newSections
-        }
-    }
-
-    public func saveWebhooks(_ newWebhooks: [DeveloperWebhook]) {
+    public func saveWebhooks(_ newWebhooks: [WebhookEndpoint]) {
         if let encoded = try? JSONEncoder().encode(newWebhooks) {
             UserDefaults.standard.set(encoded, forKey: webhooksKey)
             self.webhooks = newWebhooks
         }
     }
 
-    public func saveOAuthClients(_ newClients: [OAuthClient]) {
-        if let encoded = try? JSONEncoder().encode(newClients) {
-            UserDefaults.standard.set(encoded, forKey: oauthClientsKey)
-            self.oauthClients = newClients
-        }
-    }
-
-    public func saveTeamMembers(_ newMembers: [TeamMember]) {
+    public func saveTeamMembers(_ newMembers: [OrgMember]) {
         if let encoded = try? JSONEncoder().encode(newMembers) {
             UserDefaults.standard.set(encoded, forKey: teamMembersKey)
             self.teamMembers = newMembers
         }
     }
 
-    public func saveSandboxes(_ newSandboxes: [SandboxEnvironment]) {
-        if let encoded = try? JSONEncoder().encode(newSandboxes) {
-            UserDefaults.standard.set(encoded, forKey: sandboxesKey)
-            self.sandboxes = newSandboxes
+    public func saveOrganizations(_ newOrgs: [DeveloperOrganization]) {
+        if let encoded = try? JSONEncoder().encode(newOrgs) {
+            UserDefaults.standard.set(encoded, forKey: organizationsKey)
+            self.organizations = newOrgs
         }
     }
 
-    public func saveReleases(_ newReleases: [AppRelease]) {
+    public func saveSubmissions(_ newSubmissions: [MarketplaceSubmission]) {
+        if let encoded = try? JSONEncoder().encode(newSubmissions) {
+            UserDefaults.standard.set(encoded, forKey: submissionsKey)
+            self.submissions = newSubmissions
+        }
+    }
+
+    public func saveReleases(_ newReleases: [AppVersion]) {
         if let encoded = try? JSONEncoder().encode(newReleases) {
             UserDefaults.standard.set(encoded, forKey: releasesKey)
             self.releases = newReleases
+        }
+    }
+
+    public func saveLogs(_ newLogs: [LogEntry]) {
+        if let encoded = try? JSONEncoder().encode(newLogs) {
+            UserDefaults.standard.set(encoded, forKey: logsKey)
+            self.logEntries = newLogs
+        }
+    }
+
+    public func saveActivities(_ newActivities: [DeveloperActivityEvent]) {
+        if let encoded = try? JSONEncoder().encode(newActivities) {
+            UserDefaults.standard.set(encoded, forKey: activitiesKey)
+            self.activities = newActivities
         }
     }
 

@@ -2,10 +2,11 @@ import SwiftUI
 
 struct AppBuilderView: View {
     @Environment(\.dismiss) var dismiss
+    @ObservedObject var appService = DeveloperAppService.shared
     @State private var currentStep = 0
     @State private var projectName = ""
     @State private var projectDescription = ""
-    @State private var projectType: AppType = .app
+    @State private var projectType: DeveloperAppType = .app
     @State private var projectVersion = "1.0.0"
     @State private var bundleId = ""
     @State private var aboutInfo = ""
@@ -69,7 +70,7 @@ struct AppBuilderView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Select Project Type").font(.headline)
-                ForEach(AppType.allCases, id: \.self) { type in
+                ForEach(DeveloperAppType.allCases, id: \.self) { type in
                     Button { projectType = type } label: {
                         HStack {
                             Text(type.rawValue).font(.subheadline.bold())
@@ -183,10 +184,15 @@ struct AppBuilderView: View {
             aboutInfo: aboutInfo,
             credits: credits,
             socialLinks: socialLinks,
-            bundleId: bundleId
+            bundleId: bundleId,
+            grantedScopes: Array(selectedScopes)
         )
-        DeveloperPersistentStore.shared.addApp(newApp)
-        dismiss()
+        Task {
+            try? await appService.createApp(newApp)
+            await MainActor.run {
+                dismiss()
+            }
+        }
     }
 }
 
@@ -251,16 +257,4 @@ struct AboutProjectView: View {
         }
         .padding()
     }
-}
-
-struct AppBuilderShareSheet: UIViewControllerRepresentable {
-    let activityItems: [Any]
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-    }
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
-}
-
-extension URL: Identifiable {
-    public var id: String { absoluteString }
 }

@@ -1,36 +1,47 @@
 import SwiftUI
 
 struct DeveloperIntegrationGalleryView: View {
-    let integrations = [
-        ("GitHub", "Connect your repositories for automated builds."),
-        ("Slack", "Get notifications for app events in your channels."),
-        ("App Store Connect", "Sync app metadata and manage submissions."),
-        ("Google Play Console", "Manage Android app listings and releases."),
-        ("Jira", "Link crash reports to your development tickets.")
-    ]
-
     var body: some View {
-        List {
-            Section("Available Integrations") {
-                ForEach(integrations, id: \.0) { integration in
-                    HStack(spacing: 12) {
-                        RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.1))
-                            .frame(width: 40, height: 40)
-                            .overlay(Image(systemName: "puzzlepiece.fill").foregroundStyle(.secondary))
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(integration.0).font(.subheadline.bold())
-                            Text(integration.1).font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Button("Connect") {}
-                            .font(.caption.bold())
-                            .buttonStyle(.bordered)
-                    }
-                    .padding(.vertical, 4)
+        ScrollView {
+            VStack(spacing: 24) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Ready-to-use Integrations")
+                        .font(.headline)
+                    Text("Connect your apps with popular services using our verified connectors.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                    integrationCard(name: "GitHub", icon: "p.circle.fill", color: .black)
+                    integrationCard(name: "Slack", icon: "s.circle.fill", color: .purple)
+                    integrationCard(name: "Discord", icon: "d.circle.fill", color: .indigo)
+                    integrationCard(name: "AWS", icon: "a.circle.fill", color: .orange)
+                }
+                .padding(.horizontal)
             }
         }
-        .navigationTitle("Integrations")
+        .background(Color(uiColor: .systemGroupedBackground))
+        .navigationTitle("Integration Gallery")
+    }
+
+    private func integrationCard(name: String, icon: String, color: Color) -> some View {
+        VStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 40))
+                .foregroundStyle(color)
+            Text(name)
+                .font(.headline)
+            Button("Configure") {
+                // Awaiting backend integration
+            }
+            .buttonStyle(.bordered)
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }

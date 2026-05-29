@@ -1,12 +1,13 @@
 import SwiftUI
 
 struct AnalyticsDashboardView: View {
-    @ObservedObject var store = DeveloperPersistentStore.shared
+    @ObservedObject var appService = DeveloperAppService.shared
+    @ObservedObject var analyticsService = AnalyticsService.shared
     @State private var timeRange = 0 // 7 days
     @State private var selectedAppId: UUID?
 
     var selectedApp: DeveloperApp? {
-        store.apps.first { $0.id == selectedAppId }
+        appService.apps.first { $0.id == selectedAppId }
     }
 
     var body: some View {
@@ -15,8 +16,8 @@ struct AnalyticsDashboardView: View {
                 HStack {
                     Picker("App", selection: $selectedAppId) {
                         Text("All Apps").tag(UUID?.none)
-                        ForEach(store.apps) { app in
-                            Text(app.name).tag(UUID?.some(app.id))
+                        ForEach(appService.apps) { app in
+                            Text(app.name).tag(Optional(app.id))
                         }
                     }
                     Spacer()
@@ -31,7 +32,6 @@ struct AnalyticsDashboardView: View {
 
                 overviewStrip
                 installTrendChart
-                geographicDistribution
                 apiUsageSection
                 marketplaceFunnel
             }
@@ -43,13 +43,13 @@ struct AnalyticsDashboardView: View {
 
     private var overviewStrip: some View {
         HStack {
-            let totalInstalls = selectedApp?.installCount ?? store.apps.reduce(0) { $0 + $1.installCount }
-            let totalRevenue = selectedApp?.revenue ?? store.apps.reduce(0) { $0 + $1.revenue }
+            let totalInstalls = selectedApp?.installCount ?? appService.apps.reduce(0) { $0 + $1.installCount }
+            let totalRevenue = selectedApp?.revenue ?? appService.apps.reduce(0) { $0 + $1.revenue }
 
-            statItem(label: "Installs", value: "\(totalInstalls)", trend: "+12%")
-            statItem(label: "Active Users", value: "\(Int(Double(totalInstalls) * 0.6))", trend: "+5%")
-            statItem(label: "Revenue", value: "$\(String(format: "%.0f", totalRevenue))", trend: "+18%")
-            statItem(label: "Crashes", value: "0.2%", trend: "-0.1%")
+            statItem(label: "Installs", value: "\(totalInstalls)", trend: "")
+            statItem(label: "Active Users", value: "0", trend: "")
+            statItem(label: "Revenue", value: "$\(String(format: "%.2f", totalRevenue))", trend: "")
+            statItem(label: "Crashes", value: "0.0%", trend: "")
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
@@ -60,8 +60,9 @@ struct AnalyticsDashboardView: View {
         VStack(spacing: 4) {
             Text(value).font(.headline)
             Text(label).font(.system(size: 8)).foregroundStyle(.secondary)
-            Text(trend).font(.system(size: 8, weight: .bold))
-                .foregroundStyle(trend.contains("+") ? .green : .red)
+            if !trend.isEmpty {
+                Text(trend).font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary)
+            }
         }
         .frame(maxWidth: .infinity)
     }
@@ -70,51 +71,13 @@ struct AnalyticsDashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Install Trend").font(.headline)
 
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(alignment: .bottom, spacing: 4) {
-                    ForEach(0..<14) { i in
-                        let height = Double.random(in: 20...150)
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.accentColor.opacity(0.6))
-                            .frame(height: height)
-                    }
-                }
-                .frame(height: 150)
-                .frame(maxWidth: .infinity)
-
-                Divider()
+            VStack(alignment: .center) {
+                Text("No data available").font(.caption).foregroundStyle(.secondary)
             }
-            .padding()
+            .frame(height: 150)
+            .frame(maxWidth: .infinity)
             .background(Color(uiColor: .secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-    }
-
-    private var geographicDistribution: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Geographic Distribution").font(.headline)
-
-            VStack(spacing: 8) {
-                geoRow(country: "United States", value: "45%", progress: 0.45)
-                geoRow(country: "United Kingdom", value: "12%", progress: 0.12)
-                geoRow(country: "Germany", value: "8%", progress: 0.08)
-                geoRow(country: "Japan", value: "5%", progress: 0.05)
-            }
-            .padding()
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-    }
-
-    private func geoRow(country: String, value: String, progress: Double) -> some View {
-        VStack(spacing: 4) {
-            HStack {
-                Text(country).font(.caption)
-                Spacer()
-                Text(value).font(.caption.bold())
-            }
-            ProgressView(value: progress)
-                .tint(.blue)
         }
     }
 
@@ -123,31 +86,12 @@ struct AnalyticsDashboardView: View {
             Text("API Usage & Latency").font(.headline)
 
             VStack(spacing: 0) {
-                apiRow(endpoint: "/v1/sync", calls: "12.4k", latency: "120ms", error: "0.1%")
-                Divider()
-                apiRow(endpoint: "/v1/auth", calls: "2.1k", latency: "240ms", error: "0.5%")
-                Divider()
-                apiRow(endpoint: "/v1/search", calls: "8.5k", latency: "450ms", error: "1.2%")
+                Text("No API calls recorded for the selected period.").font(.caption).foregroundStyle(.secondary).padding()
             }
+            .frame(maxWidth: .infinity)
             .background(Color(uiColor: .secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-    }
-
-    private func apiRow(endpoint: String, calls: String, latency: String, error: String) -> some View {
-        HStack {
-            Text(endpoint).font(.caption.monospaced()).bold()
-            Spacer()
-            VStack(alignment: .trailing) {
-                Text(calls).font(.caption)
-                HStack(spacing: 8) {
-                    Text(latency).foregroundStyle(.secondary)
-                    Text(error).foregroundStyle(.red)
-                }
-                .font(.system(size: 8))
-            }
-        }
-        .padding()
     }
 
     private var marketplaceFunnel: some View {
@@ -155,12 +99,9 @@ struct AnalyticsDashboardView: View {
             Text("Marketplace Funnel").font(.headline)
 
             VStack(spacing: 12) {
-                let impressions = (selectedApp?.installCount ?? 100) * 40
-                let pageViews = (selectedApp?.installCount ?? 100) * 10
-                let installs = selectedApp?.installCount ?? store.apps.reduce(0) { $0 + $1.installCount }
-
-                funnelStep(label: "Impressions", value: "\(impressions)", color: .blue)
-                funnelStep(label: "Page Views", value: "\(pageViews)", color: .blue.opacity(0.8))
+                let installs = selectedApp?.installCount ?? appService.apps.reduce(0) { $0 + $1.installCount }
+                funnelStep(label: "Impressions", value: "0", color: .blue)
+                funnelStep(label: "Page Views", value: "0", color: .blue.opacity(0.8))
                 funnelStep(label: "Installs", value: "\(installs)", color: .blue.opacity(0.6))
             }
         }

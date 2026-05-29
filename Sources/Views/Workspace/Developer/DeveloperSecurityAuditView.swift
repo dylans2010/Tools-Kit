@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct DeveloperSecurityAuditView: View {
+    @ObservedObject var logService = DeveloperLogService.shared
+    @ObservedObject var keyService = APIKeyService.shared
+
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
@@ -8,7 +11,7 @@ struct DeveloperSecurityAuditView: View {
                     Text("Security Health").font(.headline)
                     HStack(spacing: 12) {
                         securityMetric(label: "Vulnerabilities", value: "0", color: .green)
-                        securityMetric(label: "Warnings", value: "2", color: .orange)
+                        securityMetric(label: "Warnings", value: "\(keyService.keys.filter { !$0.isRevoked && $0.lastUsedAt == nil }.count)", color: .orange)
                         securityMetric(label: "Critical", value: "0", color: .red)
                     }
                 }
@@ -17,26 +20,33 @@ struct DeveloperSecurityAuditView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Audit Log").font(.headline)
-                    ForEach(0..<5) { i in
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text(i % 2 == 0 ? "Key Access" : "Scope Change").font(.subheadline.bold())
-                                Spacer()
-                                Text(Date().addingTimeInterval(Double(-i * 3600)).formatted()).font(.system(size: 8)).foregroundStyle(.tertiary)
+                    Text("Security Audit Log").font(.headline)
+                    let securityLogs = logService.logEntries.filter { $0.category == .authentication }
+                    if securityLogs.isEmpty {
+                        Text("No security events recorded.").font(.caption).foregroundStyle(.secondary)
+                    } else {
+                        ForEach(securityLogs.prefix(5)) { entry in
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack {
+                                    Text(entry.message).font(.subheadline.bold())
+                                    Spacer()
+                                    Text(entry.timestamp.formatted()).font(.system(size: 8)).foregroundStyle(.tertiary)
+                                }
+                                Text("Source: \(entry.source.component)").font(.caption).foregroundStyle(.secondary)
                             }
-                            Text("A developer key was used to access the '/user' endpoint from IP 192.168.1.1").font(.caption).foregroundStyle(.secondary)
+                            .padding()
+                            .background(Color(uiColor: .secondarySystemGroupedBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
-                        .padding()
-                        .background(Color(uiColor: .secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Recommendations").font(.headline)
-                    recommendationCard(title: "Rotate API Keys", detail: "Your primary API key hasn't been rotated in 90 days.")
-                    recommendationCard(title: "Reduce Scopes", detail: "Your app 'GitHub Pro' has 'write:user' scope but hasn't used it recently.")
+                    if keyService.keys.contains(where: { !$0.isRevoked && $0.createdAt.timeIntervalSinceNow < -90*24*3600 }) {
+                        recommendationCard(title: "Rotate API Keys", detail: "One or more API keys haven't been rotated in over 90 days.")
+                    }
+                    recommendationCard(title: "Review Scopes", detail: "Ensure your apps only have the minimum necessary permissions.")
                 }
             }
             .padding()
