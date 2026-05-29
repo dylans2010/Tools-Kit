@@ -12,9 +12,8 @@ struct ScopeManagementView: View {
         DeveloperScope(id: "sys:admin", name: "System Admin", description: "Full access to system configurations and internal APIs.", riskLevel: .critical, category: "System-Level", requiredTier: .enterprise)
     ]
 
-    @State private var pendingRequests: [ScopeRequest] = [
-        ScopeRequest(id: UUID(), appId: UUID(), scopeId: "write:data", justification: "Required for bidirectional sync feature.", status: .pending, requestedAt: Date())
-    ]
+    @State private var pendingRequests: [ScopeRequest] = []
+    @State private var justifications: [String: String] = [:]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -111,9 +110,12 @@ struct ScopeManagementView: View {
             if scope.riskLevel == .high || scope.riskLevel == .critical {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Justification Required").font(.caption.bold())
-                    TextField("How will you use this data?", text: .constant(""))
-                        .textFieldStyle(.roundedBorder)
-                        .font(.caption)
+                    TextField("How will you use this data?", text: Binding(
+                        get: { justifications[scope.id] ?? "" },
+                        set: { justifications[scope.id] = $0 }
+                    ))
+                    .textFieldStyle(.roundedBorder)
+                    .font(.caption)
                 }
                 .padding()
                 .background(Color.secondary.opacity(0.05))
@@ -121,7 +123,15 @@ struct ScopeManagementView: View {
             }
 
             Button {
-                // Request
+                let request = ScopeRequest(
+                    id: UUID(),
+                    appId: UUID(), // Should be selected app
+                    scopeId: scope.id,
+                    justification: justifications[scope.id] ?? "N/A",
+                    status: .pending,
+                    requestedAt: Date()
+                )
+                pendingRequests.append(request)
             } label: {
                 Text("Request Scope")
                     .font(.subheadline.bold())

@@ -98,40 +98,58 @@ struct DeveloperHomeView: View {
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 NavigationLink(destination: AppBuilderView()) {
-                    quickActionCard(title: "App Builder", icon: "hammer.fill", color: .blue)
+                    quickActionCard(title: "Register App", icon: "plus.app.fill", color: .blue)
                 }
                 NavigationLink(destination: AppManagementView()) {
                     quickActionCard(title: "Manage Apps", icon: "square.stack.3d.up", color: .orange)
                 }
-                NavigationLink(destination: AppDetailView(app: previewApp)) {
-                    quickActionCard(title: "App Detail", icon: "app.badge", color: .indigo)
-                }
                 NavigationLink(destination: AuthServiceManagerView()) {
-                    quickActionCard(title: "Auth Services", icon: "key.fill", color: .mint)
-                }
-                NavigationLink(destination: DeveloperLogsView()) {
-                    quickActionCard(title: "View Logs", icon: "list.bullet.rectangle", color: .purple)
-                }
-                NavigationLink(destination: DeveloperProfileView()) {
-                    quickActionCard(title: "Edit Profile", icon: "person.text.rectangle", color: .green)
+                    quickActionCard(title: "Auth & Webhooks", icon: "key.fill", color: .mint)
                 }
                 NavigationLink(destination: DocumentationEditorView()) {
                     quickActionCard(title: "Docs Editor", icon: "book.and.wrench", color: .cyan)
                 }
+                NavigationLink(destination: DeveloperTeamManagerView()) {
+                    quickActionCard(title: "Team", icon: "person.2.fill", color: .indigo)
+                }
+                NavigationLink(destination: DeveloperReleaseManagementView()) {
+                    quickActionCard(title: "Releases", icon: "shippingbox.fill", color: .brown)
+                }
                 NavigationLink(destination: MarketplaceListingManagerView()) {
                     quickActionCard(title: "Marketplace", icon: "storefront.fill", color: .teal)
                 }
-                NavigationLink(destination: MarketplaceSubmissionView()) {
-                    quickActionCard(title: "Submit Listing", icon: "paperplane.fill", color: .red)
-                }
-                NavigationLink(destination: ProjectInstallerView()) {
-                    quickActionCard(title: "Project Installer", icon: "square.and.arrow.down.fill", color: .brown)
-                }
-                NavigationLink(destination: ScopeManagementView()) {
-                    quickActionCard(title: "Scopes", icon: "checkmark.shield.fill", color: .yellow)
+                NavigationLink(destination: DeveloperLogsView()) {
+                    quickActionCard(title: "View Logs", icon: "list.bullet.rectangle", color: .purple)
                 }
                 NavigationLink(destination: AnalyticsDashboardView()) {
                     quickActionCard(title: "Analytics", icon: "chart.xyaxis.line", color: .pink)
+                }
+                NavigationLink(destination: DeveloperSecurityAuditView()) {
+                    quickActionCard(title: "Security", icon: "shield.checkered", color: .red)
+                }
+                NavigationLink(destination: DeveloperAppCertificatesView()) {
+                    quickActionCard(title: "Certificates", icon: "medal.fill", color: .yellow)
+                }
+                NavigationLink(destination: DeveloperMonetizationView()) {
+                    quickActionCard(title: "Monetization", icon: "dollarsign.circle.fill", color: .green)
+                }
+                NavigationLink(destination: DeveloperBetaTestingView()) {
+                    quickActionCard(title: "Beta Testing", icon: "testtube.2", color: .orange)
+                }
+                NavigationLink(destination: DeveloperIntegrationGalleryView()) {
+                    quickActionCard(title: "Integrations", icon: "puzzlepiece.fill", color: .blue)
+                }
+                NavigationLink(destination: DeveloperStorageUsageView()) {
+                    quickActionCard(title: "Storage", icon: "cylinder.split.1x2.fill", color: .gray)
+                }
+                NavigationLink(destination: DeveloperSupportTicketView()) {
+                    quickActionCard(title: "Support", icon: "lifepreserver.fill", color: .red)
+                }
+                NavigationLink(destination: ProjectInstallerView()) {
+                    quickActionCard(title: "Installer", icon: "square.and.arrow.down.fill", color: .brown)
+                }
+                NavigationLink(destination: DeveloperProfileView()) {
+                    quickActionCard(title: "Profile", icon: "person.text.rectangle", color: .green)
                 }
             }
         }

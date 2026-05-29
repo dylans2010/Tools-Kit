@@ -1,32 +1,19 @@
 import SwiftUI
 
 struct DocumentationEditorView: View {
-    @State private var sections: [DocumentationSection] = []
+    @ObservedObject var store = DeveloperPersistentStore.shared
     @State private var selectedPageId: UUID?
     @State private var isRawMode = false
     @State private var showingAddSection = false
     @State private var newSectionTitle = ""
 
-    init() {
-        // Load from UserDefaults or start with defaults
-        if let data = UserDefaults.standard.data(forKey: "com.toolskit.developer.docs"),
-           let decoded = try? JSONDecoder().decode([DocumentationSection].self, from: data) {
-            _sections = State(initialValue: decoded)
-        } else {
-            _sections = State(initialValue: [
-                DocumentationSection(title: "Getting Started", pages: [
-                    DocPage(id: UUID(), title: "Overview", content: "# Welcome to your Project\n\nEdit this page to provide an overview.", lastModified: Date(), version: "1.0.0", isDraft: false)
-                ])
-            ])
-        }
-    }
-
     var body: some View {
         NavigationSplitView {
             List(selection: $selectedPageId) {
-                ForEach($sections) { $section in
-                    Section(section.title) {
-                        ForEach($section.pages) { $page in
+                ForEach(store.docSections.indices, id: \.self) { sectionIndex in
+                    Section(header: Text(store.docSections[sectionIndex].title)) {
+                        ForEach(store.docSections[sectionIndex].pages.indices, id: \.self) { pageIndex in
+                            let page = store.docSections[sectionIndex].pages[pageIndex]
                             NavigationLink(value: page.id) {
                                 HStack {
                                     Text(page.title)
@@ -40,7 +27,7 @@ struct DocumentationEditorView: View {
                         }
 
                         Button {
-                            addPage(to: section)
+                            addPage(to: store.docSections[sectionIndex])
                         } label: {
                             Label("Add Page", systemImage: "plus.circle")
                                 .font(.caption)
@@ -64,9 +51,10 @@ struct DocumentationEditorView: View {
             Button("Cancel", role: .cancel) { newSectionTitle = "" }
             Button("Add") {
                 if !newSectionTitle.isEmpty {
-                    sections.append(DocumentationSection(title: newSectionTitle, pages: []))
+                    var currentSections = store.docSections
+                    currentSections.append(DocumentationSection(title: newSectionTitle, pages: []))
+                    store.saveDocSections(currentSections)
                     newSectionTitle = ""
-                    saveDocs()
                 }
             }
         }
@@ -80,13 +68,13 @@ struct DocumentationEditorView: View {
                 TextEditor(text: page.content)
                     .font(.system(.body, design: .monospaced))
                     .padding()
-                    .onChange(of: page.content.wrappedValue) { _, _ in saveDocs() }
+                    .onChange(of: page.content.wrappedValue) { _, _ in store.saveDocSections(store.docSections) }
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         TextField("Page Title", text: page.title)
                             .font(.title).bold()
-                            .onChange(of: page.title.wrappedValue) { _, _ in saveDocs() }
+                            .onChange(of: page.title.wrappedValue) { _, _ in store.saveDocSections(store.docSections) }
 
                         Text("Markdown Preview").font(.caption).foregroundStyle(.secondary)
 
@@ -117,11 +105,11 @@ struct DocumentationEditorView: View {
 
             Toggle("Draft", isOn: page.isDraft)
                 .font(.caption)
-                .onChange(of: page.isDraft.wrappedValue) { _, _ in saveDocs() }
+                .onChange(of: page.isDraft.wrappedValue) { _, _ in store.saveDocSections(store.docSections) }
 
             Button("Save") {
                 page.wrappedValue.lastModified = Date()
-                saveDocs()
+                store.saveDocSections(store.docSections)
             }
             .buttonStyle(.borderedProminent)
         }
@@ -130,44 +118,28 @@ struct DocumentationEditorView: View {
     }
 
     private func addPage(to section: DocumentationSection) {
-        if let index = sections.firstIndex(where: { $0.id == section.id }) {
+        if let index = store.docSections.firstIndex(where: { $0.id == section.id }) {
+            var currentSections = store.docSections
             let newPage = DocPage(id: UUID(), title: "Untitled Page", content: "", lastModified: Date(), version: "1.0.0", isDraft: true)
-            sections[index].pages.append(newPage)
+            currentSections[index].pages.append(newPage)
+            store.saveDocSections(currentSections)
             selectedPageId = newPage.id
-            saveDocs()
-        }
-    }
-
-    private func saveDocs() {
-        if let encoded = try? JSONEncoder().encode(sections) {
-            UserDefaults.standard.set(encoded, forKey: "com.toolskit.developer.docs")
         }
     }
 
     private func findPageBinding(for id: UUID) -> Binding<DocPage>? {
-        for sectionIndex in sections.indices {
-            if let pageIndex = sections[sectionIndex].pages.firstIndex(where: { $0.id == id }) {
+        for sectionIndex in store.docSections.indices {
+            if let pageIndex = store.docSections[sectionIndex].pages.firstIndex(where: { $0.id == id }) {
                 return Binding(
-                    get: { sections[sectionIndex].pages[pageIndex] },
-                    set: { sections[sectionIndex].pages[pageIndex] = $0 }
+                    get: { store.docSections[sectionIndex].pages[pageIndex] },
+                    set: {
+                        var currentSections = store.docSections
+                        currentSections[sectionIndex].pages[pageIndex] = $0
+                        store.saveDocSections(currentSections)
+                    }
                 )
             }
         }
         return nil
-    }
-}
-
-struct DocumentationSection: Identifiable, Codable, View {
-    var id = UUID()
-    var title: String
-    var pages: [DocPage]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(.headline)
-            ForEach(pages) { page in
-                Text(page.content).foregroundStyle(.secondary)
-            }
-        }
     }
 }

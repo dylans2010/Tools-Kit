@@ -3,7 +3,7 @@ import UniformTypeIdentifiers
 
 struct ProjectInstallerView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var isImporting = false
+    @State private var showingFilePicker = false
     @State private var error: String?
     @State private var success = false
 
@@ -40,7 +40,7 @@ struct ProjectInstallerView: View {
     private var installView: some View {
         VStack(spacing: 20) {
             Button {
-                isImporting = true
+                showingFilePicker = true
             } label: {
                 VStack(spacing: 12) {
                     Image(systemName: "plus.circle.fill")
@@ -73,13 +73,12 @@ struct ProjectInstallerView: View {
             }
             .foregroundStyle(.secondary)
         }
-        .fileImporter(
-            isPresented: $isImporting,
-            allowedContentTypes: [UTType(filenameExtension: "tkproj") ?? .data],
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
+        .sheet(isPresented: $showingFilePicker) {
+            FileImporterView(
+                allowedContentTypes: [UTType(filenameExtension: "tkproj") ?? .data],
+                allowsMultipleSelection: false
+            ) { urls in
+                showingFilePicker = false
                 if let url = urls.first {
                     guard url.startAccessingSecurityScopedResource() else {
                         self.error = "Failed to access the selected file."
@@ -94,8 +93,6 @@ struct ProjectInstallerView: View {
                         self.error = "Failed to install project: \(error.localizedDescription)"
                     }
                 }
-            case .failure(let error):
-                self.error = error.localizedDescription
             }
         }
     }
