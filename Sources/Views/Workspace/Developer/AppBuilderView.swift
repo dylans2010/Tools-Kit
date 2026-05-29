@@ -214,7 +214,8 @@ struct AppBuilderView: View {
             )
 
             // Mock payload for now, in a real app this would be the actual project data
-            let payload = try? JSONEncoder().encode(["type": projectType.rawValue, "scopes": Array(selectedScopes)])
+            let payloadObject: [String: Any] = ["type": projectType.rawValue, "scopes": Array(selectedScopes)]
+            let payload = try? JSONSerialization.data(withJSONObject: payloadObject)
             let project = TKProject(metadata: metadata, type: projectType, payload: payload ?? Data())
 
             if let projectData = try? JSONEncoder().encode(project) {
