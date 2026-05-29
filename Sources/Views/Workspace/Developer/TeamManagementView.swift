@@ -9,7 +9,7 @@ struct TeamManagementView: View {
     var body: some View {
         List {
             if orgService.organizations.isEmpty {
-                EmptyStateView(text: "No organizations found.", icon: "building.2")
+                EmptyStateView(icon: "building.2", title: "No Organizations", message: "No organizations found.")
             } else {
                 ForEach(orgService.organizations) { org in
                     Section(org.name) {

@@ -10,7 +10,7 @@ struct MarketplaceListingManagerView: View {
         List {
             Section("Live & Pending Listings") {
                 if marketplaceService.submissions.isEmpty {
-                    EmptyStateView(text: "No active or pending listings.", icon: "storefront")
+                    EmptyStateView(icon: "storefront", title: "No Listings", message: "No active or pending listings.")
                 } else {
                     ForEach(marketplaceService.submissions) { submission in
                         listingRow(submission)

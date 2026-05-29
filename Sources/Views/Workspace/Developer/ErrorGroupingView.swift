@@ -14,7 +14,7 @@ struct ErrorGroupingView: View {
     var body: some View {
         List {
             if groupedErrors.isEmpty {
-                EmptyStateView(text: "No critical errors reported.", icon: "checkmark.circle")
+                EmptyStateView(icon: "checkmark.circle", title: "No Errors", message: "No critical errors reported.")
             } else {
                 ForEach(groupedErrors, id: \.message) { group in
                     VStack(alignment: .leading, spacing: 8) {

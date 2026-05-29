@@ -106,10 +106,10 @@ struct AnalyticsDashboardView: View {
 
     private var errorSummarySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionHeader(title: "Top Errors")
+            SectionHeader(title: "Top Errors", subtitle: nil, icon: nil)
 
             if errorSummary.isEmpty {
-                EmptyStateView(text: "No errors reported for this period.", icon: "checkmark.shield")
+                EmptyStateView(icon: "checkmark.shield", title: "No Errors", message: "No errors reported for this period.")
             } else {
                 VStack(spacing: 1) {
                     ForEach(errorSummary.sorted(by: { $0.value > $1.value }).prefix(5), id: \.key) { error, count in
@@ -129,10 +129,10 @@ struct AnalyticsDashboardView: View {
 
     private var apiUsageSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionHeader(title: "API Usage")
+            SectionHeader(title: "API Usage", subtitle: nil, icon: nil)
 
             if apiUsageCount == 0 {
-                EmptyStateView(text: "No API usage recorded.", icon: "bolt.slash")
+                EmptyStateView(icon: "bolt.slash", title: "No API Usage", message: "No API usage recorded.")
             } else {
                 Text("Total of \(apiUsageCount) API calls recorded in the selected period.")
                     .font(.subheadline)

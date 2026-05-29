@@ -65,7 +65,7 @@ struct DocumentationEditorView: View {
             if let page = selectedPage {
                 editorView(page)
             } else {
-                EmptyStateView(text: "Select a page to edit or create a new one.", icon: "doc.text.magnifyingglass")
+                EmptyStateView(icon: "doc.text.magnifyingglass", title: "No Page Selected", message: "Select a page to edit or create a new one.")
             }
         }
         .sheet(isPresented: $showingAddPage) {

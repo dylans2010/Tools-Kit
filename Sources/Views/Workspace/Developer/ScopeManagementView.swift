@@ -33,7 +33,7 @@ struct ScopeManagementView: View {
         List {
             Section("Active Permissions") {
                 if scopeService.grantedScopes.isEmpty {
-                    EmptyStateView(text: "No permissions granted yet.", icon: "shield.slash")
+                    EmptyStateView(icon: "shield.slash", title: "No Permissions", message: "No permissions granted yet.")
                 } else {
                     ForEach(scopeService.grantedScopes) { grant in
                         VStack(alignment: .leading, spacing: 4) {
@@ -110,7 +110,7 @@ struct ScopeManagementView: View {
                 }
                 .padding(.horizontal)
 
-                SectionHeader(title: "Available Scopes")
+                SectionHeader(title: "Available Scopes", subtitle: nil, icon: nil)
                     .padding(.horizontal)
 
                 ForEach(scopeService.catalog) { scope in
@@ -200,7 +200,7 @@ struct ScopeManagementView: View {
     private var scopeAuditLogView: some View {
         List {
             if scopeService.auditLog.isEmpty {
-                EmptyStateView(text: "No audit events found.", icon: "list.bullet.indent")
+                EmptyStateView(icon: "list.bullet.indent", title: "No Audit Events", message: "No audit events found.")
             } else {
                 ForEach(scopeService.auditLog) { event in
                     HStack(alignment: .top, spacing: 12) {
