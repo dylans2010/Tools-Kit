@@ -401,7 +401,7 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
         } else {
             project.enabledScopes.removeAll { $0 == key }
         }
-        projectManager.updateProject(project)
+        pm.updateProject(project)
         syncSDKGraphFromProject(project)
         recalculateDiagnostics()
     }
