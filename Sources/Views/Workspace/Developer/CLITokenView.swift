@@ -80,7 +80,8 @@ struct CLITokenView: View {
 
     private func generate() {
         Task {
-            let token = try? await keyService.createKey(label: tokenLabel, type: .cli, environment: .live, ttl: selectedTTL)
+            let expiry = Date().addingTimeInterval(selectedTTL)
+            let token = try? await keyService.createKey(label: tokenLabel, type: .cli, environment: .live, expiresAt: expiry)
             await MainActor.run {
                 generatedToken = token
                 tokenLabel = ""
