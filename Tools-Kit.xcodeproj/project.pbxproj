@@ -726,7 +726,7 @@
 		WK0200000000000000000021 /* WorkoutCoachService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000021 /* WorkoutCoachService.swift */; };
 		WK0200000000000000000022 /* RecoveryScoreModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000022 /* RecoveryScoreModel.swift */; };
 		WK0200000000000000000023 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000023 /* AnalyticsView.swift */; };
-		WK0200000000000000000024 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000024 /* AnalyticsService.swift */; };
+		WK0200000000000000000024 /* WorkoutsAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000024 /* WorkoutsAnalyticsService.swift */; };
 		WK0200000000000000000025 /* MealPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000025 /* MealPlanView.swift */; };
 		WK0200000000000000000026 /* GroceryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000026 /* GroceryListView.swift */; };
 		WK0200000000000000000027 /* MealPlanningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000027 /* MealPlanningService.swift */; };
@@ -3176,7 +3176,7 @@
 		WK0100000000000000000021 /* WorkoutCoachService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutCoachService.swift; sourceTree = "<group>"; };
 		WK0100000000000000000022 /* RecoveryScoreModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryScoreModel.swift; sourceTree = "<group>"; };
 		WK0100000000000000000023 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
-		WK0100000000000000000024 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		WK0100000000000000000024 /* WorkoutsAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutsAnalyticsService.swift; sourceTree = "<group>"; };
 		WK0100000000000000000025 /* MealPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPlanView.swift; sourceTree = "<group>"; };
 		WK0100000000000000000026 /* GroceryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryListView.swift; sourceTree = "<group>"; };
 		WK0100000000000000000027 /* MealPlanningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPlanningService.swift; sourceTree = "<group>"; };
@@ -6779,7 +6779,7 @@
 			isa = PBXGroup;
 			children = (
 				WK0100000000000000000023 /* AnalyticsView.swift */,
-				WK0100000000000000000024 /* AnalyticsService.swift */,
+				WK0100000000000000000024 /* WorkoutsAnalyticsService.swift */,
 			);
 			path = Analytics;
 			sourceTree = "<group>";
@@ -14626,7 +14626,7 @@
 				WK0200000000000000000021 /* WorkoutCoachService.swift in Sources */,
 				WK0200000000000000000022 /* RecoveryScoreModel.swift in Sources */,
 				WK0200000000000000000023 /* AnalyticsView.swift in Sources */,
-				WK0200000000000000000024 /* AnalyticsService.swift in Sources */,
+				WK0200000000000000000024 /* WorkoutsAnalyticsService.swift in Sources */,
 				WK0200000000000000000025 /* MealPlanView.swift in Sources */,
 				WK0200000000000000000026 /* GroceryListView.swift in Sources */,
 				WK0200000000000000000027 /* MealPlanningService.swift in Sources */,

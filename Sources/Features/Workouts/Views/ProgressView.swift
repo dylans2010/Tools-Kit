@@ -3,7 +3,7 @@ import Charts
 
 struct WorkoutProgressDashboardView: View {
     @StateObject private var manager = WorkoutsManager.shared
-    private let analyticsService = AnalyticsService()
+    private let analyticsService = WorkoutsAnalyticsService()
 
     var body: some View {
         let summary = analyticsService.buildSummary(progress: manager.progress, performances: manager.performance)
