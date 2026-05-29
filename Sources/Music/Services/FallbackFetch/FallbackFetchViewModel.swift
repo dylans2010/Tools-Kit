@@ -32,7 +32,7 @@ enum PipelineStage: String {
     case system   = "SYSTEM"
 }
 
-struct LogEntry: Identifiable {
+struct FetchLogEntry: Identifiable {
     let id: UUID = UUID()
     let timestamp: Date
     let level: FetchLogLevel
@@ -52,7 +52,7 @@ final class LogManager: ObservableObject {
     static let shared = LogManager()
     private init() {}
 
-    @Published private(set) var entries: [LogEntry] = []
+    @Published private(set) var entries: [FetchLogEntry] = []
     var debugMode: Bool = true
 
     func log(
@@ -63,7 +63,7 @@ final class LogManager: ObservableObject {
     ) {
         guard level != .debug || debugMode else { return }
 
-        let entry = LogEntry(
+        let entry = FetchLogEntry(
             timestamp: Date(),
             level: level,
             stage: stage,

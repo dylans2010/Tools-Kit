@@ -243,7 +243,7 @@ private struct InternalLogsView: View {
 }
 
 private struct FallbackFetchLogEntryRow: View {
-    let entry: LogEntry
+    let entry: FetchLogEntry
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
