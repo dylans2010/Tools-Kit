@@ -1,5 +1,9 @@
 import Foundation
 
+/**
+ SYSTEM DOMAIN: Network, Configuration
+ RESPONSIBILITY: Manages API keys, rotation, and revocation for application authentication.
+ */
 public class APIKeyService: ObservableObject {
     public static let shared = APIKeyService()
     private let store = DeveloperPersistentStore.shared

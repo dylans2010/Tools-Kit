@@ -1,5 +1,9 @@
 import Foundation
 
+/**
+ SYSTEM DOMAIN: Configuration, Lifecycle
+ RESPONSIBILITY: Manages developer organizations, teams, and member roles.
+ */
 public class OrganizationService: ObservableObject {
     public static let shared = OrganizationService()
     private let store = DeveloperPersistentStore.shared
@@ -44,6 +48,12 @@ public class OrganizationService: ObservableObject {
             let member = OrgMember(accountID: UUID(), name: email.components(separatedBy: "@").first ?? "User", email: email, role: role)
             currentOrgs[index].members.append(member)
             store.saveOrganizations(currentOrgs)
+
+            // Sync with teamMembers collection
+            var currentMembers = store.teamMembers
+            currentMembers.append(member)
+            store.saveTeamMembers(currentMembers)
+
             let updatedOrganizations = currentOrgs
             await MainActor.run {
                 self.organizations = updatedOrganizations
@@ -56,9 +66,37 @@ public class OrganizationService: ObservableObject {
         if let index = currentOrgs.firstIndex(where: { $0.id == orgID }) {
             currentOrgs[index].members.removeAll { $0.id == memberID }
             store.saveOrganizations(currentOrgs)
+
+            // Sync with teamMembers collection
+            var currentMembers = store.teamMembers
+            currentMembers.removeAll { $0.id == memberID }
+            store.saveTeamMembers(currentMembers)
+
             let updatedOrganizations = currentOrgs
             await MainActor.run {
                 self.organizations = updatedOrganizations
+            }
+        }
+    }
+
+    public func updateMemberRole(orgID: UUID, memberID: UUID, newRole: OrgRole) async throws {
+        var currentOrgs = store.organizations
+        if let index = currentOrgs.firstIndex(where: { $0.id == orgID }) {
+            if let memberIndex = currentOrgs[index].members.firstIndex(where: { $0.id == memberID }) {
+                currentOrgs[index].members[memberIndex].role = newRole
+                store.saveOrganizations(currentOrgs)
+
+                // Sync with teamMembers collection
+                var currentMembers = store.teamMembers
+                if let idx = currentMembers.firstIndex(where: { $0.id == memberID }) {
+                    currentMembers[idx].role = newRole
+                    store.saveTeamMembers(currentMembers)
+                }
+
+                let updatedOrganizations = currentOrgs
+                await MainActor.run {
+                    self.organizations = updatedOrganizations
+                }
             }
         }
     }

@@ -67,15 +67,25 @@ struct AppBundleValidatorView: View {
         isValidating = true
         results = []
 
-        // Simulate validation logic
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            results = [
+        Task {
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+
+            let bundleIdRegex = "^[a-zA-Z0-9.-]+$"
+            let isBundleIdValid = app.bundleId.range(of: bundleIdRegex, options: .regularExpression) != nil
+
+            let validationResults = [
                 ValidationResult(name: "Icon Asset", passed: !app.iconName.isEmpty, message: app.iconName.isEmpty ? "Missing app icon." : "Icon asset found."),
-                ValidationResult(name: "Bundle Identifier", passed: !app.bundleId.isEmpty, message: app.bundleId.isEmpty ? "Missing bundle identifier." : "Valid bundle identifier."),
-                ValidationResult(name: "Description", passed: app.description.count > 10, message: app.description.count <= 10 ? "Description too short." : "Description is sufficient."),
-                ValidationResult(name: "Granted Scopes", passed: !app.grantedScopes.isEmpty, message: app.grantedScopes.isEmpty ? "No permissions declared." : "Permissions configured.")
+                ValidationResult(name: "Bundle Identifier", passed: isBundleIdValid && !app.bundleId.isEmpty, message: app.bundleId.isEmpty ? "Missing bundle identifier." : (isBundleIdValid ? "Valid bundle identifier format." : "Invalid characters in bundle ID.")),
+                ValidationResult(name: "Description", passed: app.description.count > 10, message: app.description.count <= 10 ? "Description too short (min 10 chars)." : "Description is sufficient."),
+                ValidationResult(name: "Granted Scopes", passed: !app.grantedScopes.isEmpty, message: app.grantedScopes.isEmpty ? "No permissions declared." : "\(app.grantedScopes.count) permissions configured."),
+                ValidationResult(name: "Version Format", passed: app.version.split(separator: ".").count >= 2, message: "Current version: \(app.version)"),
+                ValidationResult(name: "Platform Targets", passed: !app.platformTargets.isEmpty, message: app.platformTargets.isEmpty ? "No platforms selected." : "Targeting \(app.platformTargets.count) platforms.")
             ]
-            isValidating = false
+
+            await MainActor.run {
+                results = validationResults
+                isValidating = false
+            }
         }
     }
 }

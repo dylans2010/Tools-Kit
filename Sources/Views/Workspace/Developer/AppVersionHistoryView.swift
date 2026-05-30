@@ -40,13 +40,20 @@ struct AppVersionHistoryView: View {
                                 Text("\(Int(version.rolloutPercentage * 100))% Rollout").font(.caption2).foregroundStyle(.secondary)
                             }
 
-                            if version.status != "Current" {
-                                Button("Rollback to this version") {
-                                    // Rollback logic
+                            if app.currentVersion != version.id {
+                                Button("Set as Current Version") {
+                                    Task {
+                                        try? await appService.setCurrentVersion(appID: app.id, versionID: version.id)
+                                    }
                                 }
                                 .font(.caption.bold())
                                 .buttonStyle(.bordered)
-                                .tint(.red)
+                                .tint(.blue)
+                            } else {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                                    Text("Current Version").font(.caption.bold()).foregroundStyle(.green)
+                                }
                             }
                         }
                         .padding(.vertical, 8)

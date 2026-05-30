@@ -132,6 +132,28 @@ struct WebhookDetailView: View {
                         Text(status).font(.caption).foregroundStyle(.secondary)
                     }
                 }
+
+                Section("Recent Deliveries") {
+                    if webhookService.deliveries.isEmpty {
+                        Text("No recent delivery attempts.").font(.caption).foregroundStyle(.secondary)
+                    } else {
+                        ForEach(webhookService.deliveries) { delivery in
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text(delivery.eventType.rawValue).font(.caption.bold())
+                                    Text(delivery.timestamp.formatted()).font(.system(size: 8)).foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Text("\(delivery.statusCode)")
+                                    .font(.caption.monospaced())
+                                    .padding(.horizontal, 6).padding(.vertical, 2)
+                                    .background(delivery.statusCode == 200 ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
+                                    .foregroundStyle(delivery.statusCode == 200 ? .green : .red)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+                }
             }
             .navigationTitle("Webhook Details")
         }

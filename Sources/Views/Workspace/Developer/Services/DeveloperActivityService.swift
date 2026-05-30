@@ -1,5 +1,9 @@
 import Foundation
 
+/**
+ SYSTEM DOMAIN: Observability
+ RESPONSIBILITY: Tracks and logs administrative and development activity within the portal.
+ */
 public class DeveloperActivityService: ObservableObject {
     public static let shared = DeveloperActivityService()
     private let store = DeveloperPersistentStore.shared

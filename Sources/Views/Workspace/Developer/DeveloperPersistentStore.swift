@@ -14,6 +14,8 @@ public class DeveloperPersistentStore: ObservableObject {
     @Published public var drafts: [MarketplaceSubmissionDraft]
     @Published public var releases: [AppVersion]
     @Published public var logEntries: [LogEntry]
+    @Published public var logAlertRules: [LogAlertRule]
+    @Published public var logDrains: [LogDrain]
     @Published public var activities: [DeveloperActivityEvent]
     @Published public var grantedScopes: [GrantedScope]
     @Published public var scopeRequests: [ScopeRequest]
@@ -22,6 +24,8 @@ public class DeveloperPersistentStore: ObservableObject {
     @Published public var certificates: [DeveloperCertificate]
     @Published public var betaGroups: [BetaGroup]
     @Published public var supportTickets: [SupportTicket]
+    @Published public var dataHandlingPolicies: [DataHandlingPolicy]
+    @Published public var webhookDeliveries: [WebhookDelivery]
 
     private let profileKey = "dev_portal_profile"
     private let appsKey = "dev_portal_apps"
@@ -33,6 +37,8 @@ public class DeveloperPersistentStore: ObservableObject {
     private let draftsKey = "dev_portal_drafts"
     private let releasesKey = "dev_portal_releases"
     private let logsKey = "dev_portal_logs"
+    private let logAlertRulesKey = "dev_portal_log_alert_rules"
+    private let logDrainsKey = "dev_portal_log_drains"
     private let activitiesKey = "dev_portal_activities"
     private let grantedScopesKey = "dev_portal_granted_scopes"
     private let scopeRequestsKey = "dev_portal_scope_requests"
@@ -41,6 +47,8 @@ public class DeveloperPersistentStore: ObservableObject {
     private let certificatesKey = "dev_portal_certificates"
     private let betaGroupsKey = "dev_portal_beta_groups"
     private let supportTicketsKey = "dev_portal_support_tickets"
+    private let dataPoliciesKey = "dev_portal_data_policies"
+    private let webhookDeliveriesKey = "dev_portal_webhook_deliveries"
 
     private init() {
         self.profile = Self.load(DeveloperProfile.self, key: profileKey) ?? DeveloperProfile()
@@ -53,6 +61,8 @@ public class DeveloperPersistentStore: ObservableObject {
         self.drafts = Self.load([MarketplaceSubmissionDraft].self, key: draftsKey) ?? []
         self.releases = Self.load([AppVersion].self, key: releasesKey) ?? []
         self.logEntries = Self.load([LogEntry].self, key: logsKey) ?? []
+        self.logAlertRules = Self.load([LogAlertRule].self, key: logAlertRulesKey) ?? []
+        self.logDrains = Self.load([LogDrain].self, key: logDrainsKey) ?? []
         self.activities = Self.load([DeveloperActivityEvent].self, key: activitiesKey) ?? []
         self.grantedScopes = Self.load([GrantedScope].self, key: grantedScopesKey) ?? []
         self.scopeRequests = Self.load([ScopeRequest].self, key: scopeRequestsKey) ?? []
@@ -61,6 +71,8 @@ public class DeveloperPersistentStore: ObservableObject {
         self.certificates = Self.load([DeveloperCertificate].self, key: certificatesKey) ?? []
         self.betaGroups = Self.load([BetaGroup].self, key: betaGroupsKey) ?? []
         self.supportTickets = Self.load([SupportTicket].self, key: supportTicketsKey) ?? []
+        self.dataHandlingPolicies = Self.load([DataHandlingPolicy].self, key: dataPoliciesKey) ?? []
+        self.webhookDeliveries = Self.load([WebhookDelivery].self, key: webhookDeliveriesKey) ?? []
     }
 
     private static func load<T: Decodable>(_ type: T.Type, key: String) -> T? {
@@ -131,6 +143,16 @@ public class DeveloperPersistentStore: ObservableObject {
         self.logEntries = newLogs
     }
 
+    public func saveLogAlertRules(_ newRules: [LogAlertRule]) {
+        save(newRules, key: logAlertRulesKey)
+        self.logAlertRules = newRules
+    }
+
+    public func saveLogDrains(_ newDrains: [LogDrain]) {
+        save(newDrains, key: logDrainsKey)
+        self.logDrains = newDrains
+    }
+
     public func saveActivities(_ newActivities: [DeveloperActivityEvent]) {
         save(newActivities, key: activitiesKey)
         self.activities = newActivities
@@ -169,6 +191,16 @@ public class DeveloperPersistentStore: ObservableObject {
     public func saveSupportTickets(_ newTickets: [SupportTicket]) {
         save(newTickets, key: supportTicketsKey)
         self.supportTickets = newTickets
+    }
+
+    public func saveDataHandlingPolicies(_ newPolicies: [DataHandlingPolicy]) {
+        save(newPolicies, key: dataPoliciesKey)
+        self.dataHandlingPolicies = newPolicies
+    }
+
+    public func saveWebhookDeliveries(_ newDeliveries: [WebhookDelivery]) {
+        save(newDeliveries, key: webhookDeliveriesKey)
+        self.webhookDeliveries = newDeliveries
     }
 }
 

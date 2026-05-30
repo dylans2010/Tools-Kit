@@ -2072,7 +2072,6 @@
 		DA020000000000000000000F /* AppBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000000F /* AppBuilderView.swift */; };
 		DA0200000000000000000010 /* ProjectInstallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000010 /* ProjectInstallManager.swift */; };
 		DA0200000000000000000011 /* ProjectInstallerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000011 /* ProjectInstallerView.swift */; };
-		DA0200000000000000000012 /* DeveloperWebhookManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000012 /* DeveloperWebhookManagerView.swift */; };
 		DA0200000000000000000013 /* DeveloperTeamManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000013 /* DeveloperTeamManagerView.swift */; };
 		DA0200000000000000000014 /* DeveloperAppCertificatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000014 /* DeveloperAppCertificatesView.swift */; };
 		DA0200000000000000000015 /* DeveloperSandboxEnvironmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000015 /* DeveloperSandboxEnvironmentView.swift */; };
@@ -2101,7 +2100,6 @@
 		DA020000000000000000002C /* LogAlertRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000002C /* LogAlertRulesView.swift */; };
 		DA020000000000000000002D /* LogDrainConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000002D /* LogDrainConfigView.swift */; };
 		DA020000000000000000002E /* ErrorGroupingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000002E /* ErrorGroupingView.swift */; };
-		DA020000000000000000002F /* MarketplaceDraftListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000002F /* MarketplaceDraftListView.swift */; };
 		DA0200000000000000000030 /* MarketplaceReviewFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000030 /* MarketplaceReviewFeedbackView.swift */; };
 		DA0200000000000000000031 /* DocumentationAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000031 /* DocumentationAnalyticsView.swift */; };
 		DA0200000000000000000032 /* DocumentationLocalizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000032 /* DocumentationLocalizationView.swift */; };
@@ -4213,7 +4211,6 @@
 		DA010000000000000000000F /* AppBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBuilderView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000010 /* ProjectInstallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectInstallManager.swift; sourceTree = "<group>"; };
 		DA0100000000000000000011 /* ProjectInstallerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectInstallerView.swift; sourceTree = "<group>"; };
-		DA0100000000000000000012 /* DeveloperWebhookManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperWebhookManagerView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000013 /* DeveloperTeamManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperTeamManagerView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000014 /* DeveloperAppCertificatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperAppCertificatesView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000015 /* DeveloperSandboxEnvironmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSandboxEnvironmentView.swift; sourceTree = "<group>"; };
@@ -4242,7 +4239,6 @@
 		DA010000000000000000002C /* LogAlertRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogAlertRulesView.swift; sourceTree = "<group>"; };
 		DA010000000000000000002D /* LogDrainConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDrainConfigView.swift; sourceTree = "<group>"; };
 		DA010000000000000000002E /* ErrorGroupingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorGroupingView.swift; sourceTree = "<group>"; };
-		DA010000000000000000002F /* MarketplaceDraftListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceDraftListView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000030 /* MarketplaceReviewFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceReviewFeedbackView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000031 /* DocumentationAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentationAnalyticsView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000032 /* DocumentationLocalizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentationLocalizationView.swift; sourceTree = "<group>"; };
@@ -12539,7 +12535,6 @@
 				DA010000000000000000000F /* AppBuilderView.swift */,
 				DA0100000000000000000010 /* ProjectInstallManager.swift */,
 				DA0100000000000000000011 /* ProjectInstallerView.swift */,
-				DA0100000000000000000012 /* DeveloperWebhookManagerView.swift */,
 				DA0100000000000000000013 /* DeveloperTeamManagerView.swift */,
 				DA0100000000000000000014 /* DeveloperAppCertificatesView.swift */,
 				DA0100000000000000000015 /* DeveloperSandboxEnvironmentView.swift */,
@@ -12568,7 +12563,6 @@
 				DA010000000000000000002C /* LogAlertRulesView.swift */,
 				DA010000000000000000002D /* LogDrainConfigView.swift */,
 				DA010000000000000000002E /* ErrorGroupingView.swift */,
-				DA010000000000000000002F /* MarketplaceDraftListView.swift */,
 				DA0100000000000000000030 /* MarketplaceReviewFeedbackView.swift */,
 				DA0100000000000000000031 /* DocumentationAnalyticsView.swift */,
 				DA0100000000000000000032 /* DocumentationLocalizationView.swift */,
@@ -12810,7 +12804,6 @@
 				DA020000000000000000000F /* AppBuilderView.swift in Sources */,
 				DA0200000000000000000010 /* ProjectInstallManager.swift in Sources */,
 				DA0200000000000000000011 /* ProjectInstallerView.swift in Sources */,
-				DA0200000000000000000012 /* DeveloperWebhookManagerView.swift in Sources */,
 				DA0200000000000000000013 /* DeveloperTeamManagerView.swift in Sources */,
 				DA0200000000000000000014 /* DeveloperAppCertificatesView.swift in Sources */,
 				DA0200000000000000000015 /* DeveloperSandboxEnvironmentView.swift in Sources */,
@@ -12839,7 +12832,6 @@
 				DA020000000000000000002C /* LogAlertRulesView.swift in Sources */,
 				DA020000000000000000002D /* LogDrainConfigView.swift in Sources */,
 				DA020000000000000000002E /* ErrorGroupingView.swift in Sources */,
-				DA020000000000000000002F /* MarketplaceDraftListView.swift in Sources */,
 				DA0200000000000000000030 /* MarketplaceReviewFeedbackView.swift in Sources */,
 				DA0200000000000000000031 /* DocumentationAnalyticsView.swift in Sources */,
 				DA0200000000000000000032 /* DocumentationLocalizationView.swift in Sources */,

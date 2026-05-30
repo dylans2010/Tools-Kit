@@ -1,5 +1,9 @@
 import Foundation
 
+/**
+ SYSTEM DOMAIN: Observability
+ RESPONSIBILITY: Centralized logging service for tracking system events, errors, and alert rules.
+ */
 public class DeveloperLogService: ObservableObject {
     public static let shared = DeveloperLogService()
     private let store = DeveloperPersistentStore.shared
@@ -19,14 +23,11 @@ public class DeveloperLogService: ObservableObject {
     }
 
     public func loadAlertRules() {
-        // We could add alertRules to the store if needed, let's use a separate key or extend store
-        // For now using the store for logEntries and providing a way to persist others if required.
-        // Assuming we extended store in step 1 if needed.
-        // self.alertRules = store.load([LogAlertRule].self, key: "alert_rules") ?? []
+        self.alertRules = store.logAlertRules
     }
 
     public func loadLogDrains() {
-        // self.logDrains = store.load([LogDrain].self, key: "log_drains") ?? []
+        self.logDrains = store.logDrains
     }
 
     public func writeLog(severity: LogSeverity, category: LogCategory, message: String, payload: String = "", appID: UUID? = nil) async {
@@ -114,30 +115,46 @@ public class DeveloperLogService: ObservableObject {
     }
 
     public func saveAlertRule(_ rule: LogAlertRule) async throws {
-        if let index = alertRules.firstIndex(where: { $0.id == rule.id }) {
-            alertRules[index] = rule
+        var currentRules = store.logAlertRules
+        if let index = currentRules.firstIndex(where: { $0.id == rule.id }) {
+            currentRules[index] = rule
         } else {
-            alertRules.append(rule)
+            currentRules.append(rule)
         }
-        // Persist
+        store.saveLogAlertRules(currentRules)
+        await MainActor.run {
+            self.alertRules = currentRules
+        }
     }
 
     public func deleteAlertRule(id: UUID) async throws {
-        alertRules.removeAll { $0.id == id }
-        // Persist
+        var currentRules = store.logAlertRules
+        currentRules.removeAll { $0.id == id }
+        store.saveLogAlertRules(currentRules)
+        await MainActor.run {
+            self.alertRules = currentRules
+        }
     }
 
     public func saveLogDrain(_ drain: LogDrain) async throws {
-        if let index = logDrains.firstIndex(where: { $0.id == drain.id }) {
-            logDrains[index] = drain
+        var currentDrains = store.logDrains
+        if let index = currentDrains.firstIndex(where: { $0.id == drain.id }) {
+            currentDrains[index] = drain
         } else {
-            logDrains.append(drain)
+            currentDrains.append(drain)
         }
-        // Persist
+        store.saveLogDrains(currentDrains)
+        await MainActor.run {
+            self.logDrains = currentDrains
+        }
     }
 
     public func deleteLogDrain(id: UUID) async throws {
-        logDrains.removeAll { $0.id == id }
-        // Persist
+        var currentDrains = store.logDrains
+        currentDrains.removeAll { $0.id == id }
+        store.saveLogDrains(currentDrains)
+        await MainActor.run {
+            self.logDrains = currentDrains
+        }
     }
 }

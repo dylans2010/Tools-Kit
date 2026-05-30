@@ -1,5 +1,9 @@
 import SwiftUI
 
+/**
+ SYSTEM DOMAIN: Configuration, Lifecycle, Observability, Data, Network
+ RESPONSIBILITY: Detailed management interface for a specific application project.
+ */
 struct AppDetailView: View {
     let appID: UUID
     @ObservedObject var appService = DeveloperAppService.shared
@@ -266,22 +270,24 @@ struct AppDetailView: View {
 
     private func moreTab(_ app: DeveloperApp) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            SectionHeader(title: "Collaborators", subtitle: nil, icon: nil)
-            if app.collaborators.isEmpty {
-                Text("You are the sole owner of this project.").font(.caption).foregroundStyle(.secondary)
-            } else {
-                ForEach(app.collaborators) { collab in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(collab.name).font(.subheadline.bold())
-                            Text(collab.email).font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Text(collab.role).font(.caption2.bold()).foregroundColor(.accentColor)
+            SectionHeader(title: "Management Tools", subtitle: nil, icon: nil)
+
+            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 12) {
+                GridRow {
+                    NavigationLink(destination: AppBundleValidatorView(appID: app.id)) {
+                        toolCard(title: "Validator", icon: "checkmark.seal", color: .green)
                     }
-                    .padding()
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    NavigationLink(destination: AppCollaboratorsView(appID: app.id)) {
+                        toolCard(title: "Collaborators", icon: "person.2", color: .blue)
+                    }
+                }
+                GridRow {
+                    NavigationLink(destination: DeveloperSandboxEnvironmentView()) {
+                        toolCard(title: "Environments", icon: "network", color: .orange)
+                    }
+                    NavigationLink(destination: DataHandlingPolicyBuilderView(appID: app.id)) {
+                        toolCard(title: "Data Policy", icon: "hand.raised", color: .purple)
+                    }
                 }
             }
 
@@ -309,6 +315,18 @@ struct AppDetailView: View {
             }
         }
         .padding()
+    }
+
+    private func toolCard(title: String, icon: String, color: Color) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon).font(.headline).foregroundStyle(color)
+            Text(title).font(.caption.bold())
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05)))
     }
 
     private func infoRow(label: String, value: String) -> some View {

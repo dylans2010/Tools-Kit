@@ -35,6 +35,13 @@ struct DeveloperSandboxEnvironmentView: View {
                                 }
                                 Spacer()
                             }
+                            .swipeActions {
+                                Button(role: .destructive) {
+                                    deleteEnvironment(env.id)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
                         }
                     }
                 } else {
@@ -85,6 +92,16 @@ struct DeveloperSandboxEnvironmentView: View {
                 showingAddSandbox = false
                 newName = ""
                 newURL = ""
+            }
+        }
+    }
+
+    private func deleteEnvironment(_ id: UUID) {
+        guard let appID = selectedAppID else { return }
+        Task {
+            if var app = appService.apps.first(where: { $0.id == appID }) {
+                app.environments.removeAll { $0.id == id }
+                try? await appService.updateApp(app)
             }
         }
     }

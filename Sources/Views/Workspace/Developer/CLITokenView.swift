@@ -34,6 +34,13 @@ struct CLITokenView: View {
                                 Text("Expires: \(expiry.formatted())").font(.caption2).foregroundStyle(.tertiary)
                             }
                         }
+                        .swipeActions {
+                            Button(role: .destructive) {
+                                Task { try? await keyService.revokeKey(id: token.id, reason: .noLongerNeeded) }
+                            } label: {
+                                Label("Revoke", systemImage: "xmark.circle")
+                            }
+                        }
                     }
                 }
             }

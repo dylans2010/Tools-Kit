@@ -68,12 +68,24 @@ struct AppCollaboratorsView: View {
     }
 
     private func invite() {
-        // Invite logic using appService.addCollaborator
-        showingInvite = false
-        inviteEmail = ""
+        guard let appID = appID else { return }
+        let collaborator = AppCollaborator(accountID: UUID(), name: inviteEmail.components(separatedBy: "@").first ?? "User", email: inviteEmail, role: selectedRole)
+        Task {
+            try? await appService.addCollaborator(appID: appID, collaborator: collaborator)
+            await MainActor.run {
+                showingInvite = false
+                inviteEmail = ""
+            }
+        }
     }
 
     private func removeCollaborator(at offsets: IndexSet) {
-        // Remove logic using appService.removeCollaborator
+        guard let app = app else { return }
+        for index in offsets {
+            let collaboratorID = app.collaborators[index].id
+            Task {
+                try? await appService.removeCollaborator(appID: app.id, collaboratorID: collaboratorID)
+            }
+        }
     }
 }

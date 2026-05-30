@@ -37,9 +37,17 @@ struct DeveloperTeamManagerView: View {
                                     Text(member.email).font(.caption).foregroundStyle(.secondary)
                                 }
                                 Spacer()
-                                Text(member.role.rawValue).font(.caption2.bold())
-                                    .padding(.horizontal, 8).padding(.vertical, 4)
-                                    .background(Color.accentColor.opacity(0.1), in: Capsule())
+                                Menu {
+                                    ForEach(OrgRole.allCases, id: \.self) { role in
+                                        Button(role.rawValue) {
+                                            Task { try? await orgService.updateMemberRole(orgID: org.id, memberID: member.id, newRole: role) }
+                                        }
+                                    }
+                                } label: {
+                                    Text(member.role.rawValue).font(.caption2.bold())
+                                        .padding(.horizontal, 8).padding(.vertical, 4)
+                                        .background(Color.accentColor.opacity(0.1), in: Capsule())
+                                }
                             }
                         }
                         .onDelete(perform: deleteMember)

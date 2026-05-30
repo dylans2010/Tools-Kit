@@ -20,9 +20,8 @@ struct DeveloperStorageUsageView: View {
         .navigationTitle("Storage Usage")
         .confirmationDialog("Clear Cached Data?", isPresented: $showingClearConfirmation, titleVisibility: .visible) {
             Button("Clear All Logs", role: .destructive) {
-                Task {
-                    // Logic to clear logs
-                }
+                DeveloperPersistentStore.shared.saveLogs([])
+                logService.loadLogEntries()
             }
             Button("Cancel", role: .cancel) {}
         } message: {
@@ -83,7 +82,7 @@ struct DeveloperStorageUsageView: View {
             Button(role: .destructive) {
                 showingClearConfirmation = true
             } label: {
-                Label("Clear Cached Data", systemImage: "trash")
+                Label("Clear All Logs", systemImage: "trash")
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.red.opacity(0.1))

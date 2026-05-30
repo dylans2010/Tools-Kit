@@ -10,9 +10,9 @@ struct DeveloperSecurityAuditView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Security Health").font(.headline)
                     HStack(spacing: 12) {
-                        securityMetric(label: "Vulnerabilities", value: "0", color: .green)
-                        securityMetric(label: "Warnings", value: "\(keyService.keys.filter { !$0.isRevoked && $0.lastUsedAt == nil }.count)", color: .orange)
-                        securityMetric(label: "Critical", value: "0", color: .red)
+                        securityMetric(label: "Broad Scopes", value: "\(appService.apps.filter { $0.grantedScopes.count > 5 }.count)", color: .orange)
+                        securityMetric(label: "Old Keys", value: "\(keyService.keys.filter { !$0.isRevoked && $0.createdAt.timeIntervalSinceNow < -90*24*3600 }.count)", color: .red)
+                        securityMetric(label: "Unused Keys", value: "\(keyService.keys.filter { !$0.isRevoked && $0.lastUsedAt == nil && $0.createdAt.timeIntervalSinceNow < -7*24*3600 }.count)", color: .blue)
                     }
                 }
                 .padding()

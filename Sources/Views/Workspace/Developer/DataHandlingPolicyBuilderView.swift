@@ -1,7 +1,15 @@
 import SwiftUI
 
 struct DataHandlingPolicyBuilderView: View {
-    @State private var policy = DataHandlingPolicy(appID: UUID())
+    let appID: UUID
+    @ObservedObject var store = DeveloperPersistentStore.shared
+    @State private var policy: DataHandlingPolicy
+
+    init(appID: UUID) {
+        self.appID = appID
+        let existing = DeveloperPersistentStore.shared.dataHandlingPolicies.first(where: { $0.appID == appID })
+        _policy = State(initialValue: existing ?? DataHandlingPolicy(appID: appID))
+    }
 
     var body: some View {
         Form {
@@ -23,7 +31,14 @@ struct DataHandlingPolicyBuilderView: View {
 
             Section {
                 Button("Save Policy") {
-                    // Save logic
+                    var current = store.dataHandlingPolicies
+                    if let index = current.firstIndex(where: { $0.appID == appID }) {
+                        current[index] = policy
+                        current[index].updatedAt = Date()
+                    } else {
+                        current.append(policy)
+                    }
+                    store.saveDataHandlingPolicies(current)
                 }
                 .frame(maxWidth: .infinity)
             }

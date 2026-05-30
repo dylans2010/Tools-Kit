@@ -1,5 +1,9 @@
 import SwiftUI
 
+/**
+ SYSTEM DOMAIN: Configuration, Runtime, Data, Network, Observability, Lifecycle
+ RESPONSIBILITY: Primary control dashboard for the ToolsKit Developer Portal.
+ */
 struct DeveloperHomeView: View {
     @ObservedObject var profileService = DeveloperProfileService.shared
     @ObservedObject var appService = DeveloperAppService.shared
@@ -125,6 +129,18 @@ struct DeveloperHomeView: View {
                 }
                 NavigationLink(destination: AnalyticsDashboardView()) {
                     quickActionCard(title: "Analytics", icon: "chart.xyaxis.line", color: .pink)
+                }
+                NavigationLink(destination: OrganizationManagementView()) {
+                    quickActionCard(title: "Organizations", icon: "building.2.fill", color: .indigo)
+                }
+                NavigationLink(destination: DeveloperSecurityAuditView()) {
+                    quickActionCard(title: "Security Audit", icon: "lock.shield.fill", color: .red)
+                }
+                NavigationLink(destination: DeveloperStorageUsageView()) {
+                    quickActionCard(title: "Storage Usage", icon: "internaldrive.fill", color: .gray)
+                }
+                NavigationLink(destination: DeveloperSupportTicketView()) {
+                    quickActionCard(title: "Help & Support", icon: "lifepreserver.fill", color: .blue)
                 }
             }
         }
