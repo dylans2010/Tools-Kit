@@ -23,10 +23,10 @@ struct AppDetailView: View {
 
                         Picker("Details", selection: $selectedTab) {
                             Text("Overview").tag(0)
-                            Text("Versions").tag(1)
-                            Text("Scopes").tag(2)
-                            Text("Auth").tag(3)
-                            Text("More").tag(4)
+                            Text("Technical").tag(1)
+                            Text("Auth").tag(2)
+                            Text("Management").tag(3)
+                            Text("Admin").tag(4)
                         }
                         .pickerStyle(.segmented)
                         .padding(.horizontal)
@@ -36,13 +36,13 @@ struct AppDetailView: View {
                             case 0:
                                 overviewTab(app)
                             case 1:
-                                versionsTab(app)
+                                technicalTab(app)
                             case 2:
-                                scopesTab(app)
-                            case 3:
                                 authTab(app)
+                            case 3:
+                                managementTab(app)
                             case 4:
-                                moreTab(app)
+                                adminTab(app)
                             default:
                                 Color.clear
                             }
@@ -116,8 +116,8 @@ struct AppDetailView: View {
         switch status {
         case .draft: return .gray
         case .underReview: return .orange
-        case .live: return .green
-        case .suspended: return .red
+        case .live: return .sdkSuccess
+        case .suspended: return .sdkError
         case .deprecated: return .secondary
         case .archived: return .black
         }
@@ -146,78 +146,24 @@ struct AppDetailView: View {
         .padding()
     }
 
-    private func versionsTab(_ app: DeveloperApp) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                SectionHeader(title: "Version History", subtitle: nil, icon: nil)
-                Spacer()
-                Button {
-                    // Logic to add version
-                } label: {
-                    Label("New Version", systemImage: "plus")
-                        .font(.caption.bold())
-                }
+    private func technicalTab(_ app: DeveloperApp) -> some View {
+        VStack(alignment: .leading, spacing: 20) {
+            SectionHeader(title: "Technical Tools", subtitle: nil, icon: nil)
+
+            NavigationLink(destination: AppBundleValidatorView(appID: app.id)) {
+                toolRow(title: "Bundle Validator", icon: "checkmark.seal", color: .blue)
             }
-
-            if app.versions.isEmpty {
-                EmptyStateView(icon: "shippingbox", title: "No Versions", message: "No versions released yet.")
-            } else {
-                ForEach(app.versions.sorted(by: { $0.createdAt > $1.createdAt })) { version in
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("v\(version.version)").font(.subheadline.bold())
-                            Text("(\(version.buildNumber))").font(.caption).foregroundStyle(.secondary)
-                            Spacer()
-                            Text(version.status).font(.caption2.bold())
-                                .padding(.horizontal, 6).padding(.vertical, 2)
-                                .background(Color.blue.opacity(0.1), in: Capsule())
-                        }
-                        if !version.releaseNotes.isEmpty {
-                            Text(version.releaseNotes).font(.caption).foregroundStyle(.secondary).lineLimit(2)
-                        }
-                        Text(version.createdAt.formatted(date: .abbreviated, time: .shortened)).font(.system(size: 8)).foregroundStyle(.tertiary)
-                    }
-                    .padding()
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
+            NavigationLink(destination: AppVersionHistoryView(appID: app.id)) {
+                toolRow(title: "Version History", icon: "clock.arrow.circlepath", color: .orange)
             }
-        }
-        .padding()
-    }
-
-    private func scopesTab(_ app: DeveloperApp) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "Granted Permissions", subtitle: nil, icon: nil)
-
-            if app.grantedScopes.isEmpty {
-                EmptyStateView(icon: "shield.slash", title: "No Permissions", message: "No permissions granted yet.")
-            } else {
-                ForEach(app.grantedScopes, id: \.self) { scopeID in
-                    if let scope = scopeService.fetchScope(identifier: scopeID) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(scope.name).font(.subheadline.bold())
-                                Text(scope.id).font(.caption2.monospaced()).foregroundStyle(.tertiary)
-                            }
-                            Spacer()
-                            Image(systemName: "checkmark.shield.fill").foregroundStyle(.green)
-                        }
-                        .padding()
-                        .background(Color(uiColor: .secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                    }
-                }
+            NavigationLink(destination: PrivacyManifestEditorView(appID: app.id)) {
+                toolRow(title: "Privacy Manifest", icon: "hand.raised.fill", color: .red)
             }
-
-            NavigationLink(destination: ScopeManagementView()) {
-                Label("Request More Scopes", systemImage: "shield.fill")
-                    .font(.subheadline.bold())
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor.opacity(0.1))
-                    .foregroundStyle(Color.accentColor)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            NavigationLink(destination: DataHandlingPolicyBuilderView(appID: app.id)) {
+                toolRow(title: "Data Policy Builder", icon: "doc.text.fill", color: .purple)
+            }
+            NavigationLink(destination: AppEnvironmentsView(appID: app.id)) {
+                toolRow(title: "Environments", icon: "server.rack", color: .mint)
             }
         }
         .padding()
@@ -225,7 +171,7 @@ struct AppDetailView: View {
 
     private func authTab(_ app: DeveloperApp) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "Assigned API Keys", subtitle: nil, icon: nil)
+            SectionHeader(title: "Permissions & Keys", subtitle: nil, icon: nil)
 
             let assignedKeys = keyService.keys.filter { $0.appID == app.id }
 
@@ -241,8 +187,8 @@ struct AppDetailView: View {
                         Spacer()
                         Text(key.environment.rawValue).font(.system(size: 8, weight: .bold))
                             .padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(key.environment == .live ? Color.green.opacity(0.1) : Color.orange.opacity(0.1))
-                            .foregroundStyle(key.environment == .live ? .green : .orange)
+                            .background(key.environment == .live ? Color.sdkSuccess.opacity(0.1) : Color.sdkWarning.opacity(0.1))
+                            .foregroundStyle(key.environment == .live ? .sdkSuccess : .sdkWarning)
                             .clipShape(Capsule())
                     }
                     .padding()
@@ -251,42 +197,35 @@ struct AppDetailView: View {
                 }
             }
 
-            NavigationLink(destination: AuthServiceManagerView()) {
-                Label("Manage All Keys", systemImage: "key.fill")
+            NavigationLink(destination: ScopeManagementView()) {
+                Label("Manage Scopes", systemImage: "shield.fill")
                     .font(.subheadline.bold())
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.accentColor)
-                    .foregroundStyle(.white)
+                    .background(Color.accentColor.opacity(0.1))
+                    .foregroundStyle(Color.accentColor)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
         .padding()
     }
 
-    private func moreTab(_ app: DeveloperApp) -> some View {
+    private func managementTab(_ app: DeveloperApp) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            SectionHeader(title: "Collaborators", subtitle: nil, icon: nil)
-            if app.collaborators.isEmpty {
-                Text("You are the sole owner of this project.").font(.caption).foregroundStyle(.secondary)
-            } else {
-                ForEach(app.collaborators) { collab in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(collab.name).font(.subheadline.bold())
-                            Text(collab.email).font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Text(collab.role).font(.caption2.bold()).foregroundColor(.accentColor)
-                    }
-                    .padding()
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
+            SectionHeader(title: "App Operations", subtitle: nil, icon: nil)
+
+            NavigationLink(destination: AppCollaboratorsView(appID: app.id)) {
+                toolRow(title: "Collaborators", icon: "person.2.fill", color: .blue)
             }
+            NavigationLink(destination: MarketplaceSubmissionView(appID: app.id)) {
+                toolRow(title: "Marketplace Listing", icon: "storefront.fill", color: .teal)
+            }
+        }
+        .padding()
+    }
 
-            Divider()
-
+    private func adminTab(_ app: DeveloperApp) -> some View {
+        VStack(alignment: .leading, spacing: 20) {
             SectionHeader(title: "Danger Zone", subtitle: nil, icon: nil)
             VStack(spacing: 12) {
                 Button(role: .destructive) {
@@ -309,6 +248,18 @@ struct AppDetailView: View {
             }
         }
         .padding()
+    }
+
+    private func toolRow(title: String, icon: String, color: Color) -> some View {
+        HStack {
+            Image(systemName: icon).foregroundStyle(color).frame(width: 24)
+            Text(title).font(.subheadline)
+            Spacer()
+            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private func infoRow(label: String, value: String) -> some View {
@@ -360,5 +311,3 @@ struct AppDetailView: View {
         }
     }
 }
-
-

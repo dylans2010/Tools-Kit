@@ -137,10 +137,12 @@ struct DeveloperProfileView: View {
             ZStack {
                 Circle().fill(Color.accentColor.opacity(0.1))
                 if !profile.avatarUrl.isEmpty, let url = URL(string: profile.avatarUrl) {
-                    AsyncImage(url: url) { image in
-                        image.resizable()
-                    } placeholder: {
-                        ProgressView()
+                    AsyncImage(url: url) { phase in
+                        if let image = phase.image {
+                            image.resizable()
+                        } else {
+                            ProgressView()
+                        }
                     }
                     .clipShape(Circle())
                 } else {

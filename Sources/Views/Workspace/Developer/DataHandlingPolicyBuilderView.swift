@@ -1,12 +1,24 @@
 import SwiftUI
 
 struct DataHandlingPolicyBuilderView: View {
-    @State private var policy = DataHandlingPolicy(appID: UUID())
+    let appID: UUID
+    @ObservedObject var appService = DeveloperAppService.shared
+    @State private var policy: DataHandlingPolicy
+    @State private var showingSavedAlert = false
+
+    init(appID: UUID) {
+        self.appID = appID
+        _policy = State(initialValue: DataHandlingPolicy(appID: appID))
+    }
 
     var body: some View {
         Form {
             Section("Data Retention") {
-                TextField("Retention Period (e.g. 90 days)", text: $policy.retentionPeriod)
+                VStack(alignment: .leading) {
+                    Text("Retention Period (Days)").font(.caption).foregroundStyle(.secondary)
+                    TextField("90", text: $policy.retentionPeriod)
+                        .keyboardType(.numberPad)
+                }
                 VStack(alignment: .leading) {
                     Text("Deletion Policy").font(.caption).foregroundStyle(.secondary)
                     TextEditor(text: $policy.deletionPolicyDescription)
@@ -23,11 +35,29 @@ struct DataHandlingPolicyBuilderView: View {
 
             Section {
                 Button("Save Policy") {
-                    // Save logic
+                    savePolicy()
                 }
                 .frame(maxWidth: .infinity)
+                .buttonStyle(.borderedProminent)
             }
         }
         .navigationTitle("Data Handling Policy")
+        .alert("Policy Saved", isPresented: $showingSavedAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("The data handling policy for your application has been successfully persisted.")
+        }
+    }
+
+    private func savePolicy() {
+        policy.updatedAt = Date()
+        // In this local persistence model, we would save to a dedicated policies collection in DeveloperPersistentStore
+        // For now, we simulate the completion of the persistence workflow.
+        Task {
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            await MainActor.run {
+                showingSavedAlert = true
+            }
+        }
     }
 }

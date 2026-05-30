@@ -26,15 +26,11 @@ struct AppManagementView: View {
             Section {
                 if filteredApps.isEmpty {
                     VStack(spacing: 16) {
-                        Image(systemName: "square.stack.3d.up.slash")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.secondary)
-                        Text(searchText.isEmpty ? "No apps registered." : "No apps match your search.")
-                            .font(.headline)
-                        Text("Register your app to manage its lifecycle, versions, and scopes.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
+                        EmptyStateView(
+                            icon: "square.stack.3d.up.slash",
+                            title: searchText.isEmpty ? "No apps registered" : "No matches found",
+                            message: "Register your app to manage its lifecycle, versions, and scopes."
+                        )
 
                         if searchText.isEmpty {
                             NavigationLink(destination: AppBuilderView()) {
@@ -109,8 +105,8 @@ struct AppManagementView: View {
         switch status {
         case .draft: return .gray
         case .underReview: return .orange
-        case .live: return .green
-        case .suspended: return .red
+        case .live: return .sdkSuccess
+        case .suspended: return .sdkError
         case .deprecated: return .secondary
         case .archived: return .black
         }
