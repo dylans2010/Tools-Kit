@@ -52,9 +52,9 @@ struct TransferOwnershipView: View {
     }
 
     private func transfer() {
-        guard let appID = selectedAppID, let recipientID = UUID(uuidString: recipientAccountIDString) else { return }
+        guard let appID = selectedAppID else { return }
         Task {
-            try? await appService.transferOwnership(appID: appID, toAccountID: recipientID)
+            try? await appService.transferOwnership(appID: appID, toEmail: recipientAccountIDString)
         }
     }
 }
