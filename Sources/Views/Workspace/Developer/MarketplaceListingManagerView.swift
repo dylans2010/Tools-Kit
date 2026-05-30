@@ -36,8 +36,12 @@ struct MarketplaceListingManagerView: View {
         .navigationTitle("Marketplace Manager")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button {
-                    // Logic to show app selector for new submission
+                Menu {
+                    ForEach(appService.apps) { app in
+                        NavigationLink(destination: MarketplaceSubmissionView(appID: app.id)) {
+                            Text(app.name)
+                        }
+                    }
                 } label: {
                     Image(systemName: "plus")
                 }

@@ -10,9 +10,9 @@ struct DeveloperSecurityAuditView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Security Health").font(.headline)
                     HStack(spacing: 12) {
-                        securityMetric(label: "Vulnerabilities", value: "0", color: .green)
-                        securityMetric(label: "Warnings", value: "\(keyService.keys.filter { !$0.isRevoked && $0.lastUsedAt == nil }.count)", color: .orange)
-                        securityMetric(label: "Critical", value: "0", color: .red)
+                        securityMetric(label: "Vulnerabilities", value: "\(vulnerabilityCount)", color: vulnerabilityCount == 0 ? .green : .red)
+                        securityMetric(label: "Warnings", value: "\(keyService.keys.filter { !$0.isRevoked && ($0.lastUsedAt == nil || $0.createdAt.timeIntervalSinceNow < -90*24*3600) }.count)", color: .orange)
+                        securityMetric(label: "Critical", value: "\(criticalCount)", color: .red)
                     }
                 }
                 .padding()
@@ -53,6 +53,14 @@ struct DeveloperSecurityAuditView: View {
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Security Audit")
+    }
+
+    private var vulnerabilityCount: Int {
+        logService.logEntries.filter { $0.category == .authentication && $0.severity == .error }.count
+    }
+
+    private var criticalCount: Int {
+        logService.logEntries.filter { $0.severity == .critical }.count
     }
 
     private func securityMetric(label: String, value: String, color: Color) -> some View {

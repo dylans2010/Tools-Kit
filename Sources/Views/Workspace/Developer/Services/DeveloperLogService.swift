@@ -19,14 +19,11 @@ public class DeveloperLogService: ObservableObject {
     }
 
     public func loadAlertRules() {
-        // We could add alertRules to the store if needed, let's use a separate key or extend store
-        // For now using the store for logEntries and providing a way to persist others if required.
-        // Assuming we extended store in step 1 if needed.
-        // self.alertRules = store.load([LogAlertRule].self, key: "alert_rules") ?? []
+        self.alertRules = store.alertRules
     }
 
     public func loadLogDrains() {
-        // self.logDrains = store.load([LogDrain].self, key: "log_drains") ?? []
+        self.logDrains = store.logDrains
     }
 
     public func writeLog(severity: LogSeverity, category: LogCategory, message: String, payload: String = "", appID: UUID? = nil) async {
@@ -114,30 +111,46 @@ public class DeveloperLogService: ObservableObject {
     }
 
     public func saveAlertRule(_ rule: LogAlertRule) async throws {
-        if let index = alertRules.firstIndex(where: { $0.id == rule.id }) {
-            alertRules[index] = rule
+        var current = store.alertRules
+        if let index = current.firstIndex(where: { $0.id == rule.id }) {
+            current[index] = rule
         } else {
-            alertRules.append(rule)
+            current.append(rule)
         }
-        // Persist
+        store.saveAlertRules(current)
+        await MainActor.run {
+            self.alertRules = current
+        }
     }
 
     public func deleteAlertRule(id: UUID) async throws {
-        alertRules.removeAll { $0.id == id }
-        // Persist
+        var current = store.alertRules
+        current.removeAll { $0.id == id }
+        store.saveAlertRules(current)
+        await MainActor.run {
+            self.alertRules = current
+        }
     }
 
     public func saveLogDrain(_ drain: LogDrain) async throws {
-        if let index = logDrains.firstIndex(where: { $0.id == drain.id }) {
-            logDrains[index] = drain
+        var current = store.logDrains
+        if let index = current.firstIndex(where: { $0.id == drain.id }) {
+            current[index] = drain
         } else {
-            logDrains.append(drain)
+            current.append(drain)
         }
-        // Persist
+        store.saveLogDrains(current)
+        await MainActor.run {
+            self.logDrains = current
+        }
     }
 
     public func deleteLogDrain(id: UUID) async throws {
-        logDrains.removeAll { $0.id == id }
-        // Persist
+        var current = store.logDrains
+        current.removeAll { $0.id == id }
+        store.saveLogDrains(current)
+        await MainActor.run {
+            self.logDrains = current
+        }
     }
 }

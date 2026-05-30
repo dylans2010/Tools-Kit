@@ -6,6 +6,7 @@ struct DeveloperSupportTicketView: View {
     @State private var subject = ""
     @State private var message = ""
     @State private var selectedTopic = "Technical Integration"
+    @State private var selectedTicketID: UUID?
 
     var body: some View {
         List {
@@ -26,15 +27,19 @@ struct DeveloperSupportTicketView: View {
                     .frame(maxWidth: .infinity)
                 } else {
                     ForEach(store.supportTickets) { ticket in
-                        VStack(alignment: .leading) {
-                            HStack {
-                                Text(ticket.subject).font(.subheadline.bold())
-                                Spacer()
-                                Text(ticket.status).font(.caption2.bold())
-                                    .padding(.horizontal, 6).padding(.vertical, 2)
-                                    .background(Color.blue.opacity(0.1), in: Capsule())
+                        Button {
+                            selectedTicketID = ticket.id
+                        } label: {
+                            VStack(alignment: .leading) {
+                                HStack {
+                                    Text(ticket.subject).font(.subheadline.bold())
+                                    Spacer()
+                                    Text(ticket.status).font(.caption2.bold())
+                                        .padding(.horizontal, 6).padding(.vertical, 2)
+                                        .background(Color.blue.opacity(0.1), in: Capsule())
+                                }
+                                Text(ticket.createdAt.formatted()).font(.caption2).foregroundStyle(.secondary)
                             }
-                            Text(ticket.createdAt.formatted()).font(.caption2).foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -55,6 +60,53 @@ struct DeveloperSupportTicketView: View {
         }
         .sheet(isPresented: $showingNewTicket) {
             newTicketSheet
+        }
+        .sheet(item: Binding(get: { selectedTicketID.map { IdentifiableUUID(id: $0) } }, set: { selectedTicketID = $0?.id })) { item in
+            ticketDetailSheet(id: item.id)
+        }
+    }
+
+    private func ticketDetailSheet(id: UUID) -> some View {
+        let ticket = store.supportTickets.first { $0.id == id }
+        return NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(ticket?.subject ?? "").font(.title3.bold())
+                        Text(ticket?.topic ?? "").font(.caption).foregroundStyle(.secondary)
+                    }
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Conversation History").font(.headline)
+                        VStack(alignment: .leading, spacing: 12) {
+                            messageBubble(text: ticket?.message ?? "", isUser: true, date: ticket?.createdAt ?? Date())
+                            messageBubble(text: "Thank you for contacting support. Our team will review your request and get back to you shortly.", isUser: false, date: Date())
+                        }
+                    }
+                }
+                .padding()
+            }
+            .navigationTitle("Ticket Details")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Close") { selectedTicketID = nil } }
+            }
+        }
+    }
+
+    private func messageBubble(text: String, isUser: Bool, date: Date) -> some View {
+        HStack {
+            if isUser { Spacer() }
+            VStack(alignment: isUser ? .trailing : .leading, spacing: 4) {
+                Text(text)
+                    .font(.subheadline)
+                    .padding()
+                    .background(isUser ? Color.accentColor : Color.secondary.opacity(0.1))
+                    .foregroundStyle(isUser ? .white : .primary)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                Text(date.formatted()).font(.system(size: 8)).foregroundStyle(.tertiary)
+            }
+            if !isUser { Spacer() }
         }
     }
 

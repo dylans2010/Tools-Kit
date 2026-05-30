@@ -7,7 +7,11 @@ public class AnalyticsService: ObservableObject {
     private init() {}
 
     public func fetchInstallTrend(appID: UUID?, from: Date, to: Date) async throws -> [InstallEvent] {
-        return []
+        return store.installEvents.filter { event in
+            (appID == nil || event.appID == appID) &&
+            event.timestamp >= from &&
+            event.timestamp <= to
+        }
     }
 
     public func fetchAPIUsage(appID: UUID?, from: Date, to: Date) async throws -> [LogEntry] {
@@ -35,7 +39,19 @@ public class AnalyticsService: ObservableObject {
     }
 
     public func computeFunnel(funnel: AnalyticsFunnel) async throws -> [Double] {
-        return Array(repeating: 0.0, count: funnel.steps.count)
+        let events = store.customEventDefinitions
+        var counts: [Int] = []
+
+        for step in funnel.steps {
+            let count = events.filter { $0.eventName == step.eventName }.count
+            counts.append(count)
+        }
+
+        guard let firstCount = counts.first, firstCount > 0 else {
+            return Array(repeating: 0.0, count: funnel.steps.count)
+        }
+
+        return counts.map { Double($0) / Double(firstCount) }
     }
 
     public func exportMetrics(appID: UUID?, from: Date, to: Date, format: String) async throws -> URL {

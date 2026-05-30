@@ -6,6 +6,9 @@ struct DeveloperBetaTestingView: View {
     @State private var selectedAppID: UUID?
     @State private var showingCreateGroup = false
     @State private var groupName = ""
+    @State private var showingAddTester = false
+    @State private var testerEmail = ""
+    @State private var selectedGroupID: UUID?
 
     var betaGroups: [BetaGroup] {
         store.betaGroups.filter { $0.appID == selectedAppID }
@@ -41,8 +44,28 @@ struct DeveloperBetaTestingView: View {
                     } else {
                         ForEach(betaGroups) { group in
                             VStack(alignment: .leading) {
-                                Text(group.name).font(.subheadline.bold())
-                                Text("\(group.testerEmails.count) testers").font(.caption).foregroundStyle(.secondary)
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        Text(group.name).font(.subheadline.bold())
+                                        Text("\(group.testerEmails.count) testers").font(.caption).foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    Button {
+                                        selectedGroupID = group.id
+                                        showingAddTester = true
+                                    } label: {
+                                        Image(systemName: "person.badge.plus")
+                                    }
+                                }
+
+                                if !group.testerEmails.isEmpty {
+                                    DisclosureGroup("Testers") {
+                                        ForEach(group.testerEmails, id: \.self) { email in
+                                            Text(email).font(.caption)
+                                        }
+                                    }
+                                    .font(.caption)
+                                }
                             }
                         }
                         .onDelete(perform: deleteGroups)
@@ -63,6 +86,38 @@ struct DeveloperBetaTestingView: View {
         .navigationTitle("Beta Testing")
         .sheet(isPresented: $showingCreateGroup) {
             createGroupSheet
+        }
+        .sheet(isPresented: $showingAddTester) {
+            addTesterSheet
+        }
+    }
+
+    private var addTesterSheet: some View {
+        NavigationStack {
+            Form {
+                TextField("Tester Email", text: $testerEmail)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
+            }
+            .navigationTitle("Invite Tester")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddTester = false } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Invite") { addTester() }
+                        .disabled(!testerEmail.contains("@"))
+                }
+            }
+        }
+    }
+
+    private func addTester() {
+        guard let groupID = selectedGroupID else { return }
+        var current = store.betaGroups
+        if let index = current.firstIndex(where: { $0.id == groupID }) {
+            current[index].testerEmails.append(testerEmail)
+            store.saveBetaGroups(current)
+            testerEmail = ""
+            showingAddTester = false
         }
     }
 

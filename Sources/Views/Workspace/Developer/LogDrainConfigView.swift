@@ -5,6 +5,7 @@ struct LogDrainConfigView: View {
     @State private var showingAdd = false
     @State private var newName = ""
     @State private var newURL = ""
+    @State private var selectedFormat: String = "JSON"
 
     var body: some View {
         List {
@@ -25,6 +26,51 @@ struct LogDrainConfigView: View {
         .navigationTitle("Log Drains")
         .toolbar {
             Button { showingAdd = true } label: { Image(systemName: "plus") }
+        }
+        .sheet(isPresented: $showingAdd) {
+            addDrainSheet
+        }
+    }
+
+    private var addDrainSheet: some View {
+        NavigationStack {
+            Form {
+                Section("Drain Details") {
+                    TextField("Name", text: $newName)
+                    TextField("Target URL", text: $newURL)
+                        .keyboardType(.URL)
+                        .autocapitalization(.none)
+                }
+                Section("Configuration") {
+                    Picker("Format", selection: $selectedFormat) {
+                        Text("JSON").tag("JSON")
+                        Text("Syslog").tag("Syslog")
+                        Text("Plain Text").tag("Plain Text")
+                    }
+                }
+            }
+            .navigationTitle("New Log Drain")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAdd = false } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Create") {
+                        saveDrain()
+                    }
+                    .disabled(newName.isEmpty || newURL.isEmpty)
+                }
+            }
+        }
+    }
+
+    private func saveDrain() {
+        let drain = LogDrain(name: newName, targetURL: newURL)
+        Task {
+            try? await logService.saveLogDrain(drain)
+            await MainActor.run {
+                showingAdd = false
+                newName = ""
+                newURL = ""
+            }
         }
     }
 

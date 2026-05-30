@@ -34,10 +34,14 @@ struct DeveloperHomeView: View {
             ZStack {
                 Circle().fill(Color.accentColor.opacity(0.1))
                 if !profileService.profile.avatarUrl.isEmpty, let url = URL(string: profileService.profile.avatarUrl) {
-                    AsyncImage(url: url) { image in
-                        image.resizable()
-                    } placeholder: {
-                        ProgressView()
+                    AsyncImage(url: url) { phase in
+                        if let image = phase.image {
+                            image.resizable()
+                        } else {
+                            Image(systemName: "person.circle.fill")
+                                .resizable()
+                                .foregroundStyle(.secondary)
+                        }
                     }
                     .clipShape(Circle())
                 } else {
@@ -127,7 +131,78 @@ struct DeveloperHomeView: View {
                     quickActionCard(title: "Analytics", icon: "chart.xyaxis.line", color: .pink)
                 }
             }
+
+            Text("Platform Tools")
+                .font(.headline)
+                .padding(.top, 8)
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                NavigationLink(destination: DeveloperSecurityAuditView()) {
+                    platformToolCard(title: "Security", icon: "shield.lefthalf.filled", color: .blue)
+                }
+                NavigationLink(destination: OrganizationManagementView()) {
+                    platformToolCard(title: "Orgs", icon: "building.2", color: .orange)
+                }
+                NavigationLink(destination: DeveloperBetaTestingView()) {
+                    platformToolCard(title: "Beta", icon: "testtube.2", color: .purple)
+                }
+                NavigationLink(destination: DeveloperSupportTicketView()) {
+                    platformToolCard(title: "Support", icon: "lifepreserver", color: .green)
+                }
+                NavigationLink(destination: ComplianceChecklistView()) {
+                    platformToolCard(title: "Legal", icon: "doc.text.shield", color: .red)
+                }
+                NavigationLink(destination: DeveloperStorageUsageView()) {
+                    platformToolCard(title: "Storage", icon: "cylinder.split.1x2", color: .cyan)
+                }
+                NavigationLink(destination: PrivacyManifestEditorView()) {
+                    platformToolCard(title: "Privacy", icon: "hand.raised.fill", color: .indigo)
+                }
+                NavigationLink(destination: DeveloperVerificationView()) {
+                    platformToolCard(title: "Verify", icon: "checkmark.seal", color: .yellow)
+                }
+                NavigationLink(destination: DeveloperAccountActivityView()) {
+                    platformToolCard(title: "Account", icon: "person.badge.key", color: .gray)
+                }
+            }
+
+            Text("Advanced Monitoring")
+                .font(.headline)
+                .padding(.top, 8)
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                NavigationLink(destination: LogAlertRulesView()) {
+                    quickActionCard(title: "Log Alerts", icon: "bell.badge.fill", color: .red)
+                }
+                NavigationLink(destination: LogDrainConfigView()) {
+                    quickActionCard(title: "Log Drains", icon: "arrow.up.right.square", color: .blue)
+                }
+                NavigationLink(destination: CustomEventManagerView()) {
+                    quickActionCard(title: "Custom Events", icon: "sparkles", color: .orange)
+                }
+                NavigationLink(destination: FunnelBuilderView()) {
+                    quickActionCard(title: "Funnels", icon: "filter", color: .purple)
+                }
+            }
         }
+    }
+
+    private func platformToolCard(title: String, icon: String, color: Color) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.headline)
+                .foregroundStyle(color)
+            Text(title)
+                .font(.caption2.weight(.medium))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.primary.opacity(0.05), lineWidth: 1)
+        )
     }
 
     private func quickActionCard(title: String, icon: String, color: Color) -> some View {

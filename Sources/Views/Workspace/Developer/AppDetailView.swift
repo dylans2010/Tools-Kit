@@ -151,9 +151,7 @@ struct AppDetailView: View {
             HStack {
                 SectionHeader(title: "Version History", subtitle: nil, icon: nil)
                 Spacer()
-                Button {
-                    // Logic to add version
-                } label: {
+                NavigationLink(destination: DeveloperReleaseManagementView()) {
                     Label("New Version", systemImage: "plus")
                         .font(.caption.bold())
                 }
@@ -289,9 +287,7 @@ struct AppDetailView: View {
 
             SectionHeader(title: "Danger Zone", subtitle: nil, icon: nil)
             VStack(spacing: 12) {
-                Button(role: .destructive) {
-                    // Transfer ownership
-                } label: {
+                NavigationLink(destination: TransferOwnershipView()) {
                     Label("Transfer Ownership", systemImage: "person.2.badge.key")
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }

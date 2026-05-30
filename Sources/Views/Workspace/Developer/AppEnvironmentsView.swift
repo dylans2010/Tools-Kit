@@ -4,6 +4,9 @@ struct AppEnvironmentsView: View {
     let appID: UUID
     @ObservedObject var appService = DeveloperAppService.shared
     @ObservedObject var keyService = APIKeyService.shared
+    @State private var showingAdd = false
+    @State private var newName = ""
+    @State private var newURL = "https://api.example.com"
 
     var app: DeveloperApp? {
         appService.apps.first { $0.id == appID }
@@ -41,5 +44,44 @@ struct AppEnvironmentsView: View {
             }
         }
         .navigationTitle("Environments")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { showingAdd = true } label: { Image(systemName: "plus") }
+                    .disabled(app == nil)
+            }
+        }
+        .sheet(isPresented: $showingAdd) {
+            addEnvSheet
+        }
+    }
+
+    private var addEnvSheet: some View {
+        NavigationStack {
+            Form {
+                TextField("Environment Name", text: $newName)
+                TextField("Base URL", text: $newURL)
+            }
+            .navigationTitle("New Environment")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAdd = false } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Add") { addEnv() }
+                        .disabled(newName.isEmpty)
+                }
+            }
+        }
+    }
+
+    private func addEnv() {
+        guard var app = app else { return }
+        let env = AppEnvironment(name: newName, apiBaseURL: newURL)
+        app.environments.append(env)
+        Task {
+            try? await appService.updateApp(app)
+            await MainActor.run {
+                showingAdd = false
+                newName = ""
+            }
+        }
     }
 }

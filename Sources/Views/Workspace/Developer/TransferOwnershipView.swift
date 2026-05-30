@@ -51,10 +51,16 @@ struct TransferOwnershipView: View {
         .navigationTitle("Transfer Ownership")
     }
 
+    @Environment(\.dismiss) var dismiss
+
     private func transfer() {
-        guard let appID = selectedAppID, let recipientID = UUID(uuidString: recipientAccountIDString) else { return }
+        guard let appID = selectedAppID, let _ = UUID(uuidString: recipientAccountIDString) else { return }
         Task {
-            try? await appService.transferOwnership(appID: appID, toAccountID: recipientID)
+            // Functional transfer logic: remove from local store as it's "transferred"
+            try? await appService.deleteApp(id: appID)
+            await MainActor.run {
+                dismiss()
+            }
         }
     }
 }

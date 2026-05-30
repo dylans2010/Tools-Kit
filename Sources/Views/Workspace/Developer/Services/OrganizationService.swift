@@ -75,4 +75,14 @@ public class OrganizationService: ObservableObject {
             }
         }
     }
+
+    public func deleteOrganization(id: UUID) async throws {
+        var currentOrgs = store.organizations
+        currentOrgs.removeAll { $0.id == id }
+        store.saveOrganizations(currentOrgs)
+        let updatedOrganizations = currentOrgs
+        await MainActor.run {
+            self.organizations = updatedOrganizations
+        }
+    }
 }

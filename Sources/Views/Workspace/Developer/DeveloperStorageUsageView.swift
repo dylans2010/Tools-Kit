@@ -21,7 +21,13 @@ struct DeveloperStorageUsageView: View {
         .confirmationDialog("Clear Cached Data?", isPresented: $showingClearConfirmation, titleVisibility: .visible) {
             Button("Clear All Logs", role: .destructive) {
                 Task {
-                    // Logic to clear logs
+                    logService.saveLogs([])
+                }
+            }
+            Button("Clear Analytics Cache", role: .destructive) {
+                Task {
+                    DeveloperPersistentStore.shared.saveInstallEvents([])
+                    DeveloperPersistentStore.shared.saveCustomEvents([])
                 }
             }
             Button("Cancel", role: .cancel) {}
@@ -68,8 +74,8 @@ struct DeveloperStorageUsageView: View {
     private var categoryUsageSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Usage by Category").font(.headline)
-            usageRow(label: "Database", value: "0 MB", icon: "cylinder.split.1x2.fill", color: .blue)
-            usageRow(label: "Assets", value: "0 MB", icon: "photo.on.rectangle.angled", color: .green)
+            usageRow(label: "Database", value: "\(String(format: "%.2f", databaseUsageMB)) MB", icon: "cylinder.split.1x2.fill", color: .blue)
+            usageRow(label: "Assets", value: "\(String(format: "%.1f", assetUsageMB)) MB", icon: "photo.on.rectangle.angled", color: .green)
             usageRow(label: "Logs", value: "\(String(format: "%.1f", logUsageMB)) MB", icon: "list.bullet.rectangle", color: .purple)
         }
         .padding()
@@ -93,7 +99,19 @@ struct DeveloperStorageUsageView: View {
     }
 
     private var currentUsageGB: Double {
-        logUsageMB / 1024.0
+        (logUsageMB + databaseUsageMB + assetUsageMB) / 1024.0
+    }
+
+    private var databaseUsageMB: Double {
+        let store = DeveloperPersistentStore.shared
+        let count = store.apps.count + store.keys.count + store.webhooks.count + store.organizations.count + store.submissions.count
+        return Double(count) * 0.05 // Estimated 50KB per entity
+    }
+
+    private var assetUsageMB: Double {
+        let store = DeveloperPersistentStore.shared
+        let count = store.submissions.reduce(0) { $0 + $1.assets.screenshotURLs.count }
+        return Double(count) * 0.5 // Estimated 500KB per asset URL/entry
     }
 
     private var logUsageMB: Double {

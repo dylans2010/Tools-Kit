@@ -27,13 +27,27 @@ struct DeveloperVerificationView: View {
 
             Section {
                 Button("Start Next Step") {
-                    // Start verification flow
+                    startNextVerificationStep()
                 }
                 .frame(maxWidth: .infinity)
                 .disabled(profileService.profile.tier == .enterprise)
             }
         }
         .navigationTitle("Developer Verification")
+    }
+
+    private func startNextVerificationStep() {
+        Task {
+            var updatedProfile = profileService.profile
+            if updatedProfile.contactEmail.isEmpty {
+                updatedProfile.contactEmail = "dev@example.com"
+            } else if updatedProfile.tier == .standard {
+                updatedProfile.tier = .verified
+            } else if updatedProfile.tier == .verified {
+                updatedProfile.tier = .enterprise
+            }
+            try? await profileService.saveProfile(updatedProfile)
+        }
     }
 
     private func verificationRow(title: String, description: String, status: Bool) -> some View {

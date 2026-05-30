@@ -53,11 +53,27 @@ public class WebhookService: ObservableObject {
             return (404, "Endpoint not found")
         }
 
-        // Return 200 OK as the delivery simulation result
-        return (200, "OK")
+        let statusCode = 200
+        let responseBody = "OK"
+
+        let delivery = WebhookDelivery(
+            endpointID: endpointID,
+            eventID: UUID(),
+            eventType: endpoint.subscribedEvents.first ?? .appUpdated,
+            payload: "{\"test\": true}",
+            statusCode: statusCode,
+            responseBody: responseBody,
+            duration: 0.1
+        )
+
+        var current = store.webhookDeliveries
+        current.insert(delivery, at: 0)
+        store.saveWebhookDeliveries(current)
+
+        return (statusCode, responseBody)
     }
 
     public func fetchDeliveryLog(endpointID: UUID) async throws -> [WebhookDelivery] {
-        return []
+        return store.webhookDeliveries.filter { $0.endpointID == endpointID }
     }
 }

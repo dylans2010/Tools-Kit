@@ -67,15 +67,24 @@ struct AppBundleValidatorView: View {
         isValidating = true
         results = []
 
-        // Simulate validation logic
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            results = [
-                ValidationResult(name: "Icon Asset", passed: !app.iconName.isEmpty, message: app.iconName.isEmpty ? "Missing app icon." : "Icon asset found."),
-                ValidationResult(name: "Bundle Identifier", passed: !app.bundleId.isEmpty, message: app.bundleId.isEmpty ? "Missing bundle identifier." : "Valid bundle identifier."),
-                ValidationResult(name: "Description", passed: app.description.count > 10, message: app.description.count <= 10 ? "Description too short." : "Description is sufficient."),
-                ValidationResult(name: "Granted Scopes", passed: !app.grantedScopes.isEmpty, message: app.grantedScopes.isEmpty ? "No permissions declared." : "Permissions configured.")
-            ]
-            isValidating = false
+        Task {
+            // Real validation logic
+            let iconPassed = !app.iconName.isEmpty
+            let bundlePassed = app.bundleId.contains(".") && app.bundleId.count > 5
+            let descPassed = app.description.count >= 20
+            let versionPassed = app.version.split(separator: ".").count >= 2
+            let scopePassed = !app.grantedScopes.isEmpty
+
+            await MainActor.run {
+                results = [
+                    ValidationResult(name: "Icon Asset", passed: iconPassed, message: iconPassed ? "Icon asset found." : "Missing app icon."),
+                    ValidationResult(name: "Bundle Identifier", passed: bundlePassed, message: bundlePassed ? "Valid bundle identifier." : "Invalid or missing bundle identifier."),
+                    ValidationResult(name: "Description", passed: descPassed, message: descPassed ? "Description is sufficient." : "Description too short (min 20 chars)."),
+                    ValidationResult(name: "Version String", passed: versionPassed, message: versionPassed ? "Valid semantic version." : "Invalid version format."),
+                    ValidationResult(name: "Granted Scopes", passed: scopePassed, message: scopePassed ? "Permissions configured." : "No permissions declared.")
+                ]
+                isValidating = false
+            }
         }
     }
 }

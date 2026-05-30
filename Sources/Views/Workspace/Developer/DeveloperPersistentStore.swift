@@ -22,6 +22,13 @@ public class DeveloperPersistentStore: ObservableObject {
     @Published public var certificates: [DeveloperCertificate]
     @Published public var betaGroups: [BetaGroup]
     @Published public var supportTickets: [SupportTicket]
+    @Published public var alertRules: [LogAlertRule]
+    @Published public var logDrains: [LogDrain]
+    @Published public var customEventDefinitions: [CustomEventRecord]
+    @Published public var webhookDeliveries: [WebhookDelivery]
+    @Published public var accountActivities: [AccountActivityEvent]
+    @Published public var funnels: [AnalyticsFunnel]
+    @Published public var installEvents: [InstallEvent]
 
     private let profileKey = "dev_portal_profile"
     private let appsKey = "dev_portal_apps"
@@ -41,6 +48,13 @@ public class DeveloperPersistentStore: ObservableObject {
     private let certificatesKey = "dev_portal_certificates"
     private let betaGroupsKey = "dev_portal_beta_groups"
     private let supportTicketsKey = "dev_portal_support_tickets"
+    private let alertRulesKey = "dev_portal_alert_rules"
+    private let logDrainsKey = "dev_portal_log_drains"
+    private let customEventsKey = "dev_portal_custom_events"
+    private let webhookDeliveriesKey = "dev_portal_webhook_deliveries"
+    private let accountActivitiesKey = "dev_portal_account_activities"
+    private let funnelsKey = "dev_portal_funnels"
+    private let installEventsKey = "dev_portal_install_events"
 
     private init() {
         self.profile = Self.load(DeveloperProfile.self, key: profileKey) ?? DeveloperProfile()
@@ -61,6 +75,13 @@ public class DeveloperPersistentStore: ObservableObject {
         self.certificates = Self.load([DeveloperCertificate].self, key: certificatesKey) ?? []
         self.betaGroups = Self.load([BetaGroup].self, key: betaGroupsKey) ?? []
         self.supportTickets = Self.load([SupportTicket].self, key: supportTicketsKey) ?? []
+        self.alertRules = Self.load([LogAlertRule].self, key: alertRulesKey) ?? []
+        self.logDrains = Self.load([LogDrain].self, key: logDrainsKey) ?? []
+        self.customEventDefinitions = Self.load([CustomEventRecord].self, key: customEventsKey) ?? []
+        self.webhookDeliveries = Self.load([WebhookDelivery].self, key: webhookDeliveriesKey) ?? []
+        self.accountActivities = Self.load([AccountActivityEvent].self, key: accountActivitiesKey) ?? []
+        self.funnels = Self.load([AnalyticsFunnel].self, key: funnelsKey) ?? []
+        self.installEvents = Self.load([InstallEvent].self, key: installEventsKey) ?? []
     }
 
     private static func load<T: Decodable>(_ type: T.Type, key: String) -> T? {
@@ -169,6 +190,41 @@ public class DeveloperPersistentStore: ObservableObject {
     public func saveSupportTickets(_ newTickets: [SupportTicket]) {
         save(newTickets, key: supportTicketsKey)
         self.supportTickets = newTickets
+    }
+
+    public func saveAlertRules(_ newRules: [LogAlertRule]) {
+        save(newRules, key: alertRulesKey)
+        self.alertRules = newRules
+    }
+
+    public func saveLogDrains(_ newDrains: [LogDrain]) {
+        save(newDrains, key: logDrainsKey)
+        self.logDrains = newDrains
+    }
+
+    public func saveCustomEvents(_ newEvents: [CustomEventRecord]) {
+        save(newEvents, key: customEventsKey)
+        self.customEventDefinitions = newEvents
+    }
+
+    public func saveWebhookDeliveries(_ newDeliveries: [WebhookDelivery]) {
+        save(newDeliveries, key: webhookDeliveriesKey)
+        self.webhookDeliveries = newDeliveries
+    }
+
+    public func saveAccountActivities(_ newActivities: [AccountActivityEvent]) {
+        save(newActivities, key: accountActivitiesKey)
+        self.accountActivities = newActivities
+    }
+
+    public func saveFunnels(_ newFunnels: [AnalyticsFunnel]) {
+        save(newFunnels, key: funnelsKey)
+        self.funnels = newFunnels
+    }
+
+    public func saveInstallEvents(_ newEvents: [InstallEvent]) {
+        save(newEvents, key: installEventsKey)
+        self.installEvents = newEvents
     }
 }
 

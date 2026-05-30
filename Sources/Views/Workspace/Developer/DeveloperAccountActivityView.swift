@@ -1,15 +1,15 @@
 import SwiftUI
 
 struct DeveloperAccountActivityView: View {
-    @State private var activities: [AccountActivityEvent] = []
+    @ObservedObject var store = DeveloperPersistentStore.shared
 
     var body: some View {
         List {
             Section("Recent Login & Security Activity") {
-                if activities.isEmpty {
+                if store.accountActivities.isEmpty {
                     Text("No recent account activity recorded.").foregroundStyle(.secondary)
                 } else {
-                    ForEach(activities) { event in
+                    ForEach(store.accountActivities) { event in
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
                                 Text(event.eventType).font(.subheadline.bold())
@@ -24,8 +24,5 @@ struct DeveloperAccountActivityView: View {
             }
         }
         .navigationTitle("Account Activity")
-        .onAppear {
-            // Load activities from profile service
-        }
     }
 }
