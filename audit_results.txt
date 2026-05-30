@@ -1,0 +1,20 @@
+Sources/Views/Workspace/Developer/Models/DeveloperApp.swift:40:    public var status: String // e.g. "Draft", "Released"
+Sources/Views/Workspace/Developer/Models/DeveloperApp.swift:59:    public var role: String // e.g. "Owner", "Developer"
+Sources/Views/Workspace/Developer/Models/DeveloperScope.swift:18:    public var id: String // e.g. "read:user"
+Sources/Views/Workspace/Developer/Models/DeveloperScope.swift:97:    public var eventType: String // e.g. "Grant", "Revoke"
+Sources/Views/Workspace/Developer/DataHandlingPolicyBuilderView.swift:9:                TextField("Retention Period (e.g. 90 days)", text: $policy.retentionPeriod)
+Sources/Views/Workspace/Developer/DeveloperReleaseManagementView.swift:66:                    TextField("Version (e.g. 1.0.1)", text: $version)
+Sources/Views/Workspace/Developer/AppBuilderView.swift:242:                    TextField("Platform (e.g. X, GitHub)", text: $newPlatform)
+Sources/Views/Workspace/Developer/DeveloperProfileView.swift:142:                    } placeholder: {
+Sources/Views/Workspace/Developer/DeveloperHomeView.swift:39:                    } placeholder: {
+Sources/Views/Workspace/Developer/MarketplaceSubmissionView.swift:75:                    submissionField(label: "Listing Title", text: $draft.metadata.title, placeholder: "e.g. My Productivity Tool")
+Sources/Views/Workspace/Developer/MarketplaceSubmissionView.swift:76:                    submissionField(label: "Subtitle", text: $draft.metadata.subtitle, placeholder: "Brief summary of what your app does")
+Sources/Views/Workspace/Developer/MarketplaceSubmissionView.swift:96:                submissionField(label: "Icon URL (512x512 PNG)", text: $draft.assets.iconURL, placeholder: "https://example.com/icon.png")
+Sources/Views/Workspace/Developer/MarketplaceSubmissionView.swift:119:                    submissionField(label: "Version", text: $draft.technicalDetails.version, placeholder: "1.0.0")
+Sources/Views/Workspace/Developer/MarketplaceSubmissionView.swift:120:                    submissionField(label: "Build", text: $draft.technicalDetails.buildNumber, placeholder: "100")
+Sources/Views/Workspace/Developer/MarketplaceSubmissionView.swift:123:                submissionField(label: "Minimum OS Version", text: $draft.technicalDetails.minOSVersion, placeholder: "macOS 13.0")
+Sources/Views/Workspace/Developer/MarketplaceSubmissionView.swift:142:                submissionField(label: "Support Email", text: $draft.supportConfig.supportEmail, placeholder: "support@example.com")
+Sources/Views/Workspace/Developer/MarketplaceSubmissionView.swift:143:                submissionField(label: "Support Website", text: $draft.supportConfig.supportURL, placeholder: "https://example.com/support")
+Sources/Views/Workspace/Developer/MarketplaceSubmissionView.swift:144:                submissionField(label: "Privacy Policy URL", text: $draft.supportConfig.privacyPolicyURL, placeholder: "https://example.com/privacy")
+Sources/Views/Workspace/Developer/MarketplaceSubmissionView.swift:219:    private func submissionField(label: String, text: Binding<String>, placeholder: String) -> some View {
+Sources/Views/Workspace/Developer/MarketplaceSubmissionView.swift:222:            TextField(placeholder, text: text)

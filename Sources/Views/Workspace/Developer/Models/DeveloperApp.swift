@@ -37,7 +37,7 @@ public struct AppVersion: Codable, Identifiable, Hashable {
     public var buildNumber: String
     public var releaseNotes: String
     public var createdAt: Date
-    public var status: String // e.g. "Draft", "Released"
+    public var status: String // Lifecycle status (Draft, Released, etc.)
     public var rolloutPercentage: Double
 
     public init(id: UUID = UUID(), version: String, buildNumber: String, releaseNotes: String = "", createdAt: Date = Date(), status: String = "Draft", rolloutPercentage: Double = 0.0) {
@@ -56,7 +56,7 @@ public struct AppCollaborator: Codable, Identifiable, Hashable {
     public var accountID: UUID
     public var name: String
     public var email: String
-    public var role: String // e.g. "Owner", "Developer"
+    public var role: String // Access level (Owner, Developer, etc.)
 
     public init(id: UUID = UUID(), accountID: UUID, name: String, email: String, role: String) {
         self.id = id

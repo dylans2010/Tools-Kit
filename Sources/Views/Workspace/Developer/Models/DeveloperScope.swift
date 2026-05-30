@@ -15,7 +15,7 @@ public enum ScopeRiskLevel: String, Codable, CaseIterable {
 }
 
 public struct DeveloperScope: Identifiable, Codable, Hashable {
-    public var id: String // e.g. "read:user"
+    public var id: String // Unique identifier for the scope (read:user, write:data, etc.)
     public var name: String
     public var description: String
     public var riskLevel: ScopeRiskLevel
@@ -94,7 +94,7 @@ public struct ScopeRequest: Identifiable, Codable, Hashable {
 public struct ScopeAuditEvent: Identifiable, Codable, Hashable {
     public var id: UUID
     public var timestamp: Date
-    public var eventType: String // e.g. "Grant", "Revoke"
+    public var eventType: String // Event type (Grant, Revoke, etc.)
     public var scopeIdentifier: String
     public var appID: UUID?
     public var actorID: UUID

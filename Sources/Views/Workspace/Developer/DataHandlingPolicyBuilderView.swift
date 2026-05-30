@@ -6,7 +6,7 @@ struct DataHandlingPolicyBuilderView: View {
     var body: some View {
         Form {
             Section("Data Retention") {
-                TextField("Retention Period (e.g. 90 days)", text: $policy.retentionPeriod)
+                TextField("Retention Period", text: $policy.retentionPeriod)
                 VStack(alignment: .leading) {
                     Text("Deletion Policy").font(.caption).foregroundStyle(.secondary)
                     TextEditor(text: $policy.deletionPolicyDescription)

@@ -22,6 +22,10 @@ public class DeveloperPersistentStore: ObservableObject {
     @Published public var certificates: [DeveloperCertificate]
     @Published public var betaGroups: [BetaGroup]
     @Published public var supportTickets: [SupportTicket]
+    @Published public var distributions: [BuildDistribution]
+    @Published public var featureFlags: [FeatureFlag]
+    @Published public var networkRequests: [NetworkRequest]
+    @Published public var systemMetrics: [SystemMetric]
 
     private let profileKey = "dev_portal_profile"
     private let appsKey = "dev_portal_apps"
@@ -41,6 +45,10 @@ public class DeveloperPersistentStore: ObservableObject {
     private let certificatesKey = "dev_portal_certificates"
     private let betaGroupsKey = "dev_portal_beta_groups"
     private let supportTicketsKey = "dev_portal_support_tickets"
+    private let distributionsKey = "dev_portal_distributions"
+    private let featureFlagsKey = "dev_portal_feature_flags"
+    private let networkRequestsKey = "dev_portal_network_requests"
+    private let systemMetricsKey = "dev_portal_system_metrics"
 
     private init() {
         self.profile = Self.load(DeveloperProfile.self, key: profileKey) ?? DeveloperProfile()
@@ -61,6 +69,10 @@ public class DeveloperPersistentStore: ObservableObject {
         self.certificates = Self.load([DeveloperCertificate].self, key: certificatesKey) ?? []
         self.betaGroups = Self.load([BetaGroup].self, key: betaGroupsKey) ?? []
         self.supportTickets = Self.load([SupportTicket].self, key: supportTicketsKey) ?? []
+        self.distributions = Self.load([BuildDistribution].self, key: distributionsKey) ?? []
+        self.featureFlags = Self.load([FeatureFlag].self, key: featureFlagsKey) ?? []
+        self.networkRequests = Self.load([NetworkRequest].self, key: networkRequestsKey) ?? []
+        self.systemMetrics = Self.load([SystemMetric].self, key: systemMetricsKey) ?? []
     }
 
     private static func load<T: Decodable>(_ type: T.Type, key: String) -> T? {
@@ -169,6 +181,26 @@ public class DeveloperPersistentStore: ObservableObject {
     public func saveSupportTickets(_ newTickets: [SupportTicket]) {
         save(newTickets, key: supportTicketsKey)
         self.supportTickets = newTickets
+    }
+
+    public func saveDistributions(_ newDistributions: [BuildDistribution]) {
+        save(newDistributions, key: distributionsKey)
+        self.distributions = newDistributions
+    }
+
+    public func saveFeatureFlags(_ newFlags: [FeatureFlag]) {
+        save(newFlags, key: featureFlagsKey)
+        self.featureFlags = newFlags
+    }
+
+    public func saveNetworkRequests(_ newRequests: [NetworkRequest]) {
+        save(newRequests, key: networkRequestsKey)
+        self.networkRequests = newRequests
+    }
+
+    public func saveSystemMetrics(_ newMetrics: [SystemMetric]) {
+        save(newMetrics, key: systemMetricsKey)
+        self.systemMetrics = newMetrics
     }
 }
 

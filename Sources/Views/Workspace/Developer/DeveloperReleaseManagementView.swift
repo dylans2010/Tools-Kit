@@ -63,7 +63,7 @@ struct DeveloperReleaseManagementView: View {
         NavigationStack {
             Form {
                 Section("New Version Details") {
-                    TextField("Version (e.g. 1.0.1)", text: $version)
+                    TextField("Version Number", text: $version)
                     TextField("Build Number", text: $build)
                     VStack(alignment: .leading) {
                         Text("Release Notes").font(.caption).foregroundStyle(.secondary)

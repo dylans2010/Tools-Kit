@@ -34,10 +34,12 @@ struct DeveloperHomeView: View {
             ZStack {
                 Circle().fill(Color.accentColor.opacity(0.1))
                 if !profileService.profile.avatarUrl.isEmpty, let url = URL(string: profileService.profile.avatarUrl) {
-                    AsyncImage(url: url) { image in
-                        image.resizable()
-                    } placeholder: {
-                        ProgressView()
+                    AsyncImage(url: url) { phase in
+                        if let image = phase.image {
+                            image.resizable()
+                        } else {
+                            ProgressView()
+                        }
                     }
                     .clipShape(Circle())
                 } else {
@@ -97,35 +99,98 @@ struct DeveloperHomeView: View {
     }
 
     private var quickActionsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Developer Workspace")
-                .font(.headline)
-
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+        VStack(alignment: .leading, spacing: 24) {
+            domainSection(title: "Applications", icon: "square.grid.2x2.fill", color: .blue) {
                 NavigationLink(destination: AppBuilderView()) {
                     quickActionCard(title: "Register App", icon: "plus.app.fill", color: .blue)
                 }
                 NavigationLink(destination: AppManagementView()) {
                     quickActionCard(title: "Manage Apps", icon: "square.stack.3d.up", color: .orange)
                 }
-                NavigationLink(destination: AuthServiceManagerView()) {
-                    quickActionCard(title: "Auth & Webhooks", icon: "key.fill", color: .mint)
+            }
+
+            domainSection(title: "Builds & Testing", icon: "hammer.fill", color: .orange) {
+                NavigationLink(destination: DeveloperReleaseManagementView()) {
+                    quickActionCard(title: "Releases", icon: "shippingbox.fill", color: .orange)
                 }
-                NavigationLink(destination: ScopeManagementView()) {
-                    quickActionCard(title: "Permissions", icon: "shield.fill", color: .red)
+                NavigationLink(destination: DeveloperBetaTestingView()) {
+                    quickActionCard(title: "Beta Testing", icon: "person.3.sequence.fill", color: .indigo)
                 }
-                NavigationLink(destination: DocumentationEditorView()) {
-                    quickActionCard(title: "Docs Editor", icon: "book.and.wrench", color: .cyan)
+            }
+
+            domainSection(title: "Distribution & Marketplace", icon: "cart.fill", color: .green) {
+                NavigationLink(destination: BuildDistributionView()) {
+                    quickActionCard(title: "Distribution", icon: "paperplane.fill", color: .green)
                 }
                 NavigationLink(destination: MarketplaceListingManagerView()) {
                     quickActionCard(title: "Marketplace", icon: "storefront.fill", color: .teal)
                 }
+            }
+
+            domainSection(title: "Configuration", icon: "gearshape.2.fill", color: .purple) {
+                NavigationLink(destination: FeatureFlagView()) {
+                    quickActionCard(title: "Feature Flags", icon: "flag.fill", color: .purple)
+                }
+                NavigationLink(destination: AppEnvironmentsView()) {
+                    quickActionCard(title: "Environments", icon: "network", color: .blue)
+                }
+            }
+
+            domainSection(title: "Auth & Access", icon: "lock.shield.fill", color: .red) {
+                NavigationLink(destination: AuthServiceManagerView()) {
+                    quickActionCard(title: "API Keys", icon: "key.fill", color: .mint)
+                }
+                NavigationLink(destination: ScopeManagementView()) {
+                    quickActionCard(title: "Permissions", icon: "shield.fill", color: .red)
+                }
+            }
+
+            domainSection(title: "Observability", icon: "eye.fill", color: .pink) {
                 NavigationLink(destination: DeveloperLogsView()) {
-                    quickActionCard(title: "View Logs", icon: "list.bullet.rectangle", color: .purple)
+                    quickActionCard(title: "Logs", icon: "list.bullet.rectangle", color: .purple)
                 }
                 NavigationLink(destination: AnalyticsDashboardView()) {
                     quickActionCard(title: "Analytics", icon: "chart.xyaxis.line", color: .pink)
                 }
+                NavigationLink(destination: APIStateMonitorView()) {
+                    quickActionCard(title: "API Status", icon: "waveform.path.ecg", color: .red)
+                }
+                NavigationLink(destination: DocumentationEditorView()) {
+                    quickActionCard(title: "Docs", icon: "book.and.wrench", color: .cyan)
+                }
+            }
+
+            domainSection(title: "Data & Network", icon: "server.rack", color: .cyan) {
+                NavigationLink(destination: DatabaseInspectorView()) {
+                    quickActionCard(title: "Database", icon: "tray.full.fill", color: .cyan)
+                }
+                NavigationLink(destination: NetworkInspectorView()) {
+                    quickActionCard(title: "Network", icon: "wifi", color: .blue)
+                }
+                NavigationLink(destination: CacheManagerView()) {
+                    quickActionCard(title: "Cache", icon: "archivebox", color: .orange)
+                }
+            }
+
+            domainSection(title: "System Health", icon: "heart.text.square.fill", color: .red) {
+                NavigationLink(destination: ResourceMonitorView()) {
+                    quickActionCard(title: "Resources", icon: "cpu", color: .red)
+                }
+                NavigationLink(destination: BackgroundTaskTrackerView()) {
+                    quickActionCard(title: "Background", icon: "clock.arrow.2.circlepath", color: .orange)
+                }
+            }
+        }
+    }
+
+    private func domainSection<Content: View>(title: String, icon: String, color: Color, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: icon).foregroundStyle(color)
+                Text(title).font(.headline)
+            }
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                content()
             }
         }
     }

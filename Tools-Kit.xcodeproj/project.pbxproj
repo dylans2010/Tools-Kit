@@ -2138,6 +2138,17 @@
 		DA0200000000000000000052 /* OrganizationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000052 /* OrganizationService.swift */; };
 		DA0200000000000000000053 /* WebhookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000053 /* WebhookService.swift */; };
 		DA0200000000000000000054 /* WebhookManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000054 /* WebhookManagerView.swift */; };
+		DA0200000000000000000100 /* PlatformModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000100 /* PlatformModels.swift */; };
+		DA0200000000000000000101 /* BuildDistributionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000101 /* BuildDistributionService.swift */; };
+		DA0200000000000000000102 /* DatabaseManagementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000102 /* DatabaseManagementService.swift */; };
+		DA0200000000000000000103 /* FeatureFlagService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000103 /* FeatureFlagService.swift */; };
+		DA0200000000000000000104 /* NetworkMonitoringService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000104 /* NetworkMonitoringService.swift */; };
+		DA0200000000000000000105 /* SystemHealthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000105 /* SystemHealthService.swift */; };
+		DA0200000000000000000106 /* BuildDistributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000106 /* BuildDistributionView.swift */; };
+		DA0200000000000000000107 /* DeveloperDataSystemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000107 /* DeveloperDataSystemsView.swift */; };
+		DA0200000000000000000108 /* DeveloperNetworkSystemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000108 /* DeveloperNetworkSystemsView.swift */; };
+		DA0200000000000000000109 /* DeveloperHealthSystemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000109 /* DeveloperHealthSystemsView.swift */; };
+		DA020000000000000000010A /* FeatureFlagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000010A /* FeatureFlagView.swift */; };
 		B604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift */; };
 		B5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift */; };
 		BEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift */; };
@@ -4279,6 +4290,17 @@
 		DA0100000000000000000052 /* OrganizationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizationService.swift; sourceTree = "<group>"; };
 		DA0100000000000000000053 /* WebhookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookService.swift; sourceTree = "<group>"; };
 		DA0100000000000000000054 /* WebhookManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookManagerView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000100 /* PlatformModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformModels.swift; sourceTree = "<group>"; };
+		DA0100000000000000000101 /* BuildDistributionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildDistributionService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000102 /* DatabaseManagementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManagementService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000103 /* FeatureFlagService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlagService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000104 /* NetworkMonitoringService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitoringService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000105 /* SystemHealthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemHealthService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000106 /* BuildDistributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildDistributionView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000107 /* DeveloperDataSystemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperDataSystemsView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000108 /* DeveloperNetworkSystemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperNetworkSystemsView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000109 /* DeveloperHealthSystemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperHealthSystemsView.swift; sourceTree = "<group>"; };
+		DA010000000000000000010A /* FeatureFlagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlagView.swift; sourceTree = "<group>"; };
 		F604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKActionDispatcher.swift; sourceTree = "<group>"; };
 		F5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDependencyResolver.swift; sourceTree = "<group>"; };
 		FEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKEventInjectionEngine.swift; sourceTree = "<group>"; };
@@ -12580,6 +12602,11 @@
 				DA0100000000000000000039 /* CustomEventManagerView.swift */,
 				DA010000000000000000003A /* FunnelBuilderView.swift */,
 				DA0100000000000000000054 /* WebhookManagerView.swift */,
+				DA0100000000000000000106 /* BuildDistributionView.swift */,
+				DA0100000000000000000107 /* DeveloperDataSystemsView.swift */,
+				DA0100000000000000000108 /* DeveloperNetworkSystemsView.swift */,
+				DA0100000000000000000109 /* DeveloperHealthSystemsView.swift */,
+				DA010000000000000000010A /* FeatureFlagView.swift */,
 			);
 			path = Developer;
 			sourceTree = "<group>";
@@ -12601,6 +12628,7 @@
 				DA0100000000000000000046 /* PrivacyManifest.swift */,
 				DA0100000000000000000047 /* ScopeRequirement.swift */,
 				DA0100000000000000000048 /* WebhookEndpoint.swift */,
+				DA0100000000000000000100 /* PlatformModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -12619,6 +12647,11 @@
 				DA0100000000000000000051 /* MarketplaceService.swift */,
 				DA0100000000000000000052 /* OrganizationService.swift */,
 				DA0100000000000000000053 /* WebhookService.swift */,
+				DA0100000000000000000101 /* BuildDistributionService.swift */,
+				DA0100000000000000000102 /* DatabaseManagementService.swift */,
+				DA0100000000000000000103 /* FeatureFlagService.swift */,
+				DA0100000000000000000104 /* NetworkMonitoringService.swift */,
+				DA0100000000000000000105 /* SystemHealthService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -12815,6 +12848,17 @@
 				DA0200000000000000000014 /* DeveloperAppCertificatesView.swift in Sources */,
 				DA0200000000000000000015 /* DeveloperSandboxEnvironmentView.swift in Sources */,
 				DA0200000000000000000016 /* DeveloperReleaseManagementView.swift in Sources */,
+				DA0200000000000000000100 /* PlatformModels.swift in Sources */,
+				DA0200000000000000000101 /* BuildDistributionService.swift in Sources */,
+				DA0200000000000000000102 /* DatabaseManagementService.swift in Sources */,
+				DA0200000000000000000103 /* FeatureFlagService.swift in Sources */,
+				DA0200000000000000000104 /* NetworkMonitoringService.swift in Sources */,
+				DA0200000000000000000105 /* SystemHealthService.swift in Sources */,
+				DA0200000000000000000106 /* BuildDistributionView.swift in Sources */,
+				DA0200000000000000000107 /* DeveloperDataSystemsView.swift in Sources */,
+				DA0200000000000000000108 /* DeveloperNetworkSystemsView.swift in Sources */,
+				DA0200000000000000000109 /* DeveloperHealthSystemsView.swift in Sources */,
+				DA020000000000000000010A /* FeatureFlagView.swift in Sources */,
 				DA0200000000000000000017 /* DeveloperMonetizationView.swift in Sources */,
 				DA0200000000000000000018 /* DeveloperBetaTestingView.swift in Sources */,
 				DA0200000000000000000019 /* DeveloperSecurityAuditView.swift in Sources */,
