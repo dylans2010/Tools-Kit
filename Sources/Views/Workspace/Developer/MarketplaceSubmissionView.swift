@@ -72,8 +72,8 @@ struct MarketplaceSubmissionView: View {
                 SectionHeader(title: "App Listing Metadata", subtitle: nil, icon: nil)
 
                 VStack(alignment: .leading, spacing: 12) {
-                    submissionField(label: "Listing Title", text: $draft.metadata.title, placeholder: "e.g. My Productivity Tool")
-                    submissionField(label: "Subtitle", text: $draft.metadata.subtitle, placeholder: "Brief summary of what your app does")
+                    submissionField(label: "Listing Title", text: $draft.metadata.title, hint: "e.g. My Productivity Tool")
+                    submissionField(label: "Subtitle", text: $draft.metadata.subtitle, hint: "Brief summary of what your app does")
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Long Description").font(.caption.bold()).foregroundStyle(.secondary)
@@ -93,7 +93,7 @@ struct MarketplaceSubmissionView: View {
             VStack(alignment: .leading, spacing: 20) {
                 SectionHeader(title: "Visual Assets", subtitle: nil, icon: nil)
 
-                submissionField(label: "Icon URL (512x512 PNG)", text: $draft.assets.iconURL, placeholder: "https://example.com/icon.png")
+                submissionField(label: "Icon URL (512x512 PNG)", text: $draft.assets.iconURL, hint: "https://example.com/icon.png")
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Screenshots (URLs, one per line)").font(.caption.bold()).foregroundStyle(.secondary)
@@ -116,11 +116,11 @@ struct MarketplaceSubmissionView: View {
                 SectionHeader(title: "Technical Configuration", subtitle: nil, icon: nil)
 
                 HStack(spacing: 16) {
-                    submissionField(label: "Version", text: $draft.technicalDetails.version, placeholder: "1.0.0")
-                    submissionField(label: "Build", text: $draft.technicalDetails.buildNumber, placeholder: "100")
+                    submissionField(label: "Version", text: $draft.technicalDetails.version, hint: "1.0.0")
+                    submissionField(label: "Build", text: $draft.technicalDetails.buildNumber, hint: "100")
                 }
 
-                submissionField(label: "Minimum OS Version", text: $draft.technicalDetails.minOSVersion, placeholder: "macOS 13.0")
+                submissionField(label: "Minimum OS Version", text: $draft.technicalDetails.minOSVersion, hint: "macOS 13.0")
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Release Notes").font(.caption.bold()).foregroundStyle(.secondary)
@@ -139,9 +139,9 @@ struct MarketplaceSubmissionView: View {
             VStack(alignment: .leading, spacing: 20) {
                 SectionHeader(title: "Support & Compliance", subtitle: nil, icon: nil)
 
-                submissionField(label: "Support Email", text: $draft.supportConfig.supportEmail, placeholder: "support@example.com")
-                submissionField(label: "Support Website", text: $draft.supportConfig.supportURL, placeholder: "https://example.com/support")
-                submissionField(label: "Privacy Policy URL", text: $draft.supportConfig.privacyPolicyURL, placeholder: "https://example.com/privacy")
+                submissionField(label: "Support Email", text: $draft.supportConfig.supportEmail, hint: "support@example.com")
+                submissionField(label: "Support Website", text: $draft.supportConfig.supportURL, hint: "https://example.com/support")
+                submissionField(label: "Privacy Policy URL", text: $draft.supportConfig.privacyPolicyURL, hint: "https://example.com/privacy")
 
                 Divider()
 
@@ -216,10 +216,10 @@ struct MarketplaceSubmissionView: View {
         .background(Color(uiColor: .systemBackground))
     }
 
-    private func submissionField(label: String, text: Binding<String>, placeholder: String) -> some View {
+    private func submissionField(label: String, text: Binding<String>, hint: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label).font(.caption.bold()).foregroundStyle(.secondary)
-            TextField(placeholder, text: text)
+            TextField(hint, text: text)
                 .textFieldStyle(.roundedBorder)
         }
     }

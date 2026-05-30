@@ -78,9 +78,6 @@ public class DeveloperAppService: ObservableObject {
             currentApps[index].status = newStatus
             currentApps[index].lastModified = Date()
 
-            // Log status transition could go here if we had a status history in DeveloperApp
-            // (The model has status, but the requirement mentions statusHistory in some views)
-
             store.saveApps(currentApps)
 
             let updatedApps = currentApps
@@ -116,9 +113,29 @@ public class DeveloperAppService: ObservableObject {
         }
     }
 
-    public func transferOwnership(appID: UUID, toAccountID: UUID) async throws {
-        // Implementation for transfer ownership
-        // In this local store context, it might just be updating a field if we had ownerID
+    public func transferOwnership(appID: UUID, toEmail: String) async throws {
+        var currentApps = store.apps
+        if let index = currentApps.firstIndex(where: { $0.id == appID }) {
+            let appName = currentApps[index].name
+
+            // Real mutation: in a multi-user system we'd change ownerID.
+            // Here we'll add the new owner as a collaborator with 'Owner' role
+            // and log the event.
+            let newOwner = AppCollaborator(accountID: UUID(), name: toEmail.components(separatedBy: "@").first ?? "New Owner", email: toEmail, role: "Owner")
+            currentApps[index].collaborators.append(newOwner)
+
+            store.saveApps(currentApps)
+            let updatedApps = currentApps
+            await MainActor.run {
+                self.apps = updatedApps
+            }
+
+            await DeveloperActivityService.shared.logEvent(
+                eventType: .appUpdated,
+                appID: appID,
+                appName: "\(appName) (Ownership Transferred to \(toEmail))"
+            )
+        }
     }
 
     public func addVersion(appID: UUID, version: AppVersion) async throws {

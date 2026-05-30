@@ -7,8 +7,16 @@ struct AppDetailView: View {
     @ObservedObject var scopeService = DeveloperScopeService.shared
     @State private var selectedTab = 0
     @State private var showingStatusSheet = false
+    @State private var showingAddVersion = false
+    @State private var showingTransferOwnership = false
     @State private var newStatus: DeveloperAppStatus = .draft
     @State private var statusReason = ""
+
+    @State private var newVersionNumber = ""
+    @State private var newBuildNumber = ""
+    @State private var newReleaseNotes = ""
+
+    @State private var transferEmail = ""
 
     var app: DeveloperApp? {
         appService.apps.first { $0.id == appID }
@@ -73,6 +81,12 @@ struct AppDetailView: View {
         }
         .sheet(isPresented: $showingStatusSheet) {
             statusUpdateSheet
+        }
+        .sheet(isPresented: $showingAddVersion) {
+            addVersionSheet
+        }
+        .sheet(isPresented: $showingTransferOwnership) {
+            transferOwnershipSheet
         }
     }
 
@@ -152,7 +166,7 @@ struct AppDetailView: View {
                 SectionHeader(title: "Version History", subtitle: nil, icon: nil)
                 Spacer()
                 Button {
-                    // Logic to add version
+                    showingAddVersion = true
                 } label: {
                     Label("New Version", systemImage: "plus")
                         .font(.caption.bold())
@@ -290,7 +304,7 @@ struct AppDetailView: View {
             SectionHeader(title: "Danger Zone", subtitle: nil, icon: nil)
             VStack(spacing: 12) {
                 Button(role: .destructive) {
-                    // Transfer ownership
+                    showingTransferOwnership = true
                 } label: {
                     Label("Transfer Ownership", systemImage: "person.2.badge.key")
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -320,6 +334,68 @@ struct AppDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var addVersionSheet: some View {
+        NavigationStack {
+            Form {
+                Section("New Version Details") {
+                    TextField("Version Number", text: $newVersionNumber)
+                    TextField("Build Number", text: $newBuildNumber)
+                    VStack(alignment: .leading) {
+                        Text("Release Notes").font(.caption).foregroundStyle(.secondary)
+                        TextEditor(text: $newReleaseNotes).frame(height: 100)
+                    }
+                }
+            }
+            .navigationTitle("Add Version")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddVersion = false } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Add") {
+                        let version = AppVersion(version: newVersionNumber, buildNumber: newBuildNumber, releaseNotes: newReleaseNotes)
+                        Task {
+                            try? await appService.addVersion(appID: appID, version: version)
+                            await MainActor.run {
+                                showingAddVersion = false
+                                newVersionNumber = ""
+                                newBuildNumber = ""
+                                newReleaseNotes = ""
+                            }
+                        }
+                    }
+                    .disabled(newVersionNumber.isEmpty || newBuildNumber.isEmpty)
+                }
+            }
+        }
+    }
+
+    private var transferOwnershipSheet: some View {
+        NavigationStack {
+            Form {
+                Section("Recipient") {
+                    TextField("Recipient Email", text: $transferEmail)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                }
+            }
+            .navigationTitle("Transfer Ownership")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingTransferOwnership = false } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Transfer") {
+                        Task {
+                            try? await appService.transferOwnership(appID: appID, toEmail: transferEmail)
+                            await MainActor.run {
+                                showingTransferOwnership = false
+                                transferEmail = ""
+                            }
+                        }
+                    }
+                    .disabled(transferEmail.isEmpty)
+                }
+            }
+        }
     }
 
     private var statusUpdateSheet: some View {

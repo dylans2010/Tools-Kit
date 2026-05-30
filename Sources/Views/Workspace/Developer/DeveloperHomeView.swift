@@ -12,21 +12,60 @@ struct DeveloperHomeView: View {
             VStack(spacing: 24) {
                 headerSection
                 summaryStrip
-                quickActionsSection
+
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Management Domains").font(.headline)
+
+                    domainSection(title: "Applications", icon: "app.window.checkerboard", color: .blue, systems: [
+                        SystemLink(title: "App Manager", destination: AnyView(AppManagementView()), icon: "square.stack.3d.up"),
+                        SystemLink(title: "Builds & Releases", destination: AnyView(DeveloperReleaseManagementView()), icon: "shippingbox.fill"),
+                        SystemLink(title: "Marketplace", destination: AnyView(MarketplaceListingManagerView()), icon: "storefront.fill"),
+                        SystemLink(title: "App Builder", destination: AnyView(AppBuilderView()), icon: "plus.app.fill")
+                    ])
+
+                    domainSection(title: "Pipeline & Distribution", icon: "arrow.triangle.pull", color: .orange, systems: [
+                        SystemLink(title: "CI/CD Pipelines", destination: AnyView(DeveloperDeploymentPipelineView()), icon: "hammer.fill"),
+                        SystemLink(title: "Beta Testing", destination: AnyView(DeveloperBetaTestingView()), icon: "person.3.sequence.fill"),
+                        SystemLink(title: "Certificates", destination: AnyView(DeveloperAppCertificatesView()), icon: "doc.badge.gearshape")
+                    ])
+
+                    domainSection(title: "Observability", icon: "eye.fill", color: .purple, systems: [
+                        SystemLink(title: "System Logs", destination: AnyView(DeveloperLogsView()), icon: "list.bullet.rectangle"),
+                        SystemLink(title: "Analytics", destination: AnyView(AnalyticsDashboardView()), icon: "chart.xyaxis.line"),
+                        SystemLink(title: "Performance (APM)", destination: AnyView(DeveloperPerformanceMonitorView()), icon: "gauge.with.needle"),
+                        SystemLink(title: "Crash Reports", destination: AnyView(DeveloperCrashReportView()), icon: "heart.text.square")
+                    ])
+
+                    domainSection(title: "Security & Configuration", icon: "shield.fill", color: .red, systems: [
+                        SystemLink(title: "Auth & Webhooks", destination: AnyView(AuthServiceManagerView()), icon: "key.fill"),
+                        SystemLink(title: "Permissions", destination: AnyView(ScopeManagementView()), icon: "shield.lefthalf.filled"),
+                        SystemLink(title: "Secrets Manager", destination: AnyView(DeveloperSecretsManagerView()), icon: "lock.rectangle"),
+                        SystemLink(title: "Feature Flags", destination: AnyView(DeveloperFeatureFlagView()), icon: "flag.fill"),
+                        SystemLink(title: "Remote Config", destination: AnyView(DeveloperRemoteConfigView()), icon: "gearshape.2")
+                    ])
+
+                    domainSection(title: "Data & System Health", icon: "server.rack", color: .green, systems: [
+                        SystemLink(title: "Database Manager", destination: AnyView(DeveloperDatabaseManagerView()), icon: "tablecells"),
+                        SystemLink(title: "Incident Manager", destination: AnyView(DeveloperIncidentManagerView()), icon: "exclamationmark.triangle.fill"),
+                        SystemLink(title: "Infra Status", destination: AnyView(DeveloperInfrastructureStatusView()), icon: "waveform.path.ecg"),
+                        SystemLink(title: "Network Traffic", destination: AnyView(DeveloperNetworkTrafficView()), icon: "wifi.router")
+                    ])
+
+                    domainSection(title: "Global Operations", icon: "globe", color: .cyan, systems: [
+                        SystemLink(title: "Localization", destination: AnyView(DeveloperLocalizationManagerView()), icon: "character.book.closed.fill"),
+                        SystemLink(title: "Docs Editor", destination: AnyView(DocumentationEditorView()), icon: "book.and.wrench"),
+                        SystemLink(title: "Team Manager", destination: AnyView(DeveloperTeamManagerView()), icon: "person.2.fill")
+                    ])
+                }
+
                 healthStatusPanel
                 recentActivityFeed
-                noticesSection
             }
             .padding()
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Developer Portal")
         .navigationBarTitleDisplayMode(.inline)
-        .refreshable {
-            appService.loadApps()
-            keyService.loadKeys()
-            activityService.loadActivities()
-        }
     }
 
     private var headerSection: some View {
@@ -34,10 +73,17 @@ struct DeveloperHomeView: View {
             ZStack {
                 Circle().fill(Color.accentColor.opacity(0.1))
                 if !profileService.profile.avatarUrl.isEmpty, let url = URL(string: profileService.profile.avatarUrl) {
-                    AsyncImage(url: url) { image in
-                        image.resizable()
-                    } placeholder: {
-                        ProgressView()
+                    AsyncImage(url: url) { phase in
+                        if let image = phase.image {
+                            image.resizable()
+                        } else if phase.error != nil {
+                            Image(systemName: "person.crop.circle.badge.exclamationmark")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .foregroundStyle(.red)
+                        } else {
+                            ProgressView()
+                        }
                     }
                     .clipShape(Circle())
                 } else {
@@ -53,13 +99,8 @@ struct DeveloperHomeView: View {
                 HStack {
                     Text(profileService.profile.displayName.isEmpty ? "Complete your Profile" : profileService.profile.displayName)
                         .font(.title3.bold())
-                    if profileService.profile.tier == .verified || profileService.profile.tier == .enterprise {
-                        Image(systemName: "checkmark.seal.fill")
-                            .foregroundStyle(.blue)
-                            .font(.caption)
-                    }
                 }
-                Text(profileService.profile.username.isEmpty ? "Unset Username" : "@\(profileService.profile.username) • \(profileService.profile.tier.rawValue) Developer")
+                Text("@\(profileService.profile.username) • \(profileService.profile.tier.rawValue) Developer")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -74,21 +115,15 @@ struct DeveloperHomeView: View {
         HStack(spacing: 12) {
             summaryCard(label: "Apps", value: "\(appService.apps.count)", icon: "square.grid.2x2")
             summaryCard(label: "Installs", value: "\(appService.apps.reduce(0) { $0 + $1.installCount })", icon: "arrow.down.circle")
-            summaryCard(label: "Pending Scopes", value: "\(scopeService.pendingRequests.count)", icon: "shield.lefthalf.filled")
             summaryCard(label: "API Keys", value: "\(keyService.keys.filter { !$0.isRevoked }.count)", icon: "key.fill")
         }
     }
 
     private func summaryCard(label: String, value: String, icon: String) -> some View {
         VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.headline)
-            Text(label)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+            Image(systemName: icon).font(.subheadline).foregroundStyle(.secondary)
+            Text(value).font(.headline)
+            Text(label).font(.caption2).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
@@ -96,134 +131,71 @@ struct DeveloperHomeView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
-    private var quickActionsSection: some View {
+    private func domainSection(title: String, icon: String, color: Color, systems: [SystemLink]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Developer Workspace")
-                .font(.headline)
+            HStack {
+                Image(systemName: icon).foregroundStyle(color)
+                Text(title).font(.subheadline.bold())
+            }
 
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                NavigationLink(destination: AppBuilderView()) {
-                    quickActionCard(title: "Register App", icon: "plus.app.fill", color: .blue)
-                }
-                NavigationLink(destination: AppManagementView()) {
-                    quickActionCard(title: "Manage Apps", icon: "square.stack.3d.up", color: .orange)
-                }
-                NavigationLink(destination: AuthServiceManagerView()) {
-                    quickActionCard(title: "Auth & Webhooks", icon: "key.fill", color: .mint)
-                }
-                NavigationLink(destination: ScopeManagementView()) {
-                    quickActionCard(title: "Permissions", icon: "shield.fill", color: .red)
-                }
-                NavigationLink(destination: DocumentationEditorView()) {
-                    quickActionCard(title: "Docs Editor", icon: "book.and.wrench", color: .cyan)
-                }
-                NavigationLink(destination: MarketplaceListingManagerView()) {
-                    quickActionCard(title: "Marketplace", icon: "storefront.fill", color: .teal)
-                }
-                NavigationLink(destination: DeveloperLogsView()) {
-                    quickActionCard(title: "View Logs", icon: "list.bullet.rectangle", color: .purple)
-                }
-                NavigationLink(destination: AnalyticsDashboardView()) {
-                    quickActionCard(title: "Analytics", icon: "chart.xyaxis.line", color: .pink)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                ForEach(systems) { system in
+                    NavigationLink(destination: system.destination) {
+                        HStack {
+                            Image(systemName: system.icon).font(.caption).foregroundStyle(color)
+                            Text(system.title).font(.caption.weight(.medium))
+                            Spacer()
+                        }
+                        .padding(10)
+                        .background(Color(uiColor: .secondarySystemGroupedBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
-    }
-
-    private func quickActionCard(title: String, icon: String, color: Color) -> some View {
-        HStack {
-            Image(systemName: icon)
-                .foregroundStyle(color)
-            Text(title)
-                .font(.subheadline.weight(.medium))
-            Spacer()
-        }
         .padding()
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .background(color.opacity(0.03))
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.primary.opacity(0.05), lineWidth: 1)
-        )
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(color.opacity(0.1), lineWidth: 1))
     }
 
     private var healthStatusPanel: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Project Health")
-                .font(.headline)
-
+            Text("Project Health").font(.headline)
             if appService.apps.isEmpty {
-                VStack(spacing: 8) {
-                    Text("No projects yet.").font(.subheadline.bold())
-                    Text("Register an app to start tracking status.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color(uiColor: .secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                Text("No active projects.").font(.caption).foregroundStyle(.secondary)
             } else {
-                VStack(spacing: 1) {
-                    ForEach(appService.apps.prefix(3)) { app in
-                        appStatusRow(name: app.name, type: app.type.rawValue, status: app.status)
+                ForEach(appService.apps.prefix(3)) { app in
+                    HStack {
+                        Text(app.name).font(.subheadline.bold())
+                        Spacer()
+                        Circle().fill(app.status == .live ? .green : .orange).frame(width: 8, height: 8)
+                        Text(app.status.rawValue).font(.caption).foregroundStyle(.secondary)
                     }
+                    .padding()
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.primary.opacity(0.05), lineWidth: 1)
-                )
             }
-        }
-    }
-
-    private func appStatusRow(name: String, type: String, status: DeveloperAppStatus) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(name).font(.subheadline.weight(.semibold))
-                Text(type).font(.caption2).foregroundStyle(.secondary)
-            }
-            Spacer()
-            HStack(spacing: 6) {
-                Circle().fill(statusColor(status)).frame(width: 8, height: 8)
-                Text(status.rawValue).font(.caption).foregroundStyle(.secondary)
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(statusColor(status).opacity(0.1), in: Capsule())
-        }
-        .padding()
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-    }
-
-    private func statusColor(_ status: DeveloperAppStatus) -> Color {
-        switch status {
-        case .draft: return .gray
-        case .underReview: return .orange
-        case .live: return .green
-        case .suspended: return .red
-        case .deprecated: return .secondary
-        case .archived: return .black
         }
     }
 
     private var recentActivityFeed: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Recent Activity")
-                .font(.headline)
-
-            VStack(alignment: .leading, spacing: 16) {
+            Text("Recent Activity").font(.headline)
+            VStack(alignment: .leading, spacing: 12) {
                 if activityService.activities.isEmpty {
-                    Text("No activity records found.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical)
+                    Text("No recent activity.").font(.caption).foregroundStyle(.secondary)
                 } else {
                     ForEach(activityService.activities.prefix(5)) { activity in
-                        activityRow(title: activity.eventType.rawValue, detail: activity.description, date: activity.timestamp)
+                        HStack(alignment: .top) {
+                            Circle().fill(Color.accentColor).frame(width: 6, height: 6).padding(.top, 6)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(activity.eventType.rawValue).font(.caption.bold())
+                                Text(activity.description).font(.caption2).foregroundStyle(.secondary)
+                            }
+                        }
                     }
                 }
             }
@@ -232,40 +204,11 @@ struct DeveloperHomeView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
+}
 
-    private func activityRow(title: String, detail: String, date: Date) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Circle().fill(Color.accentColor).frame(width: 8, height: 8).padding(.top, 5)
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text(title).font(.caption.bold())
-                    Spacer()
-                    Text(date.formatted(.relative(presentation: .numeric))).font(.caption2).foregroundStyle(.tertiary)
-                }
-                Text(detail).font(.caption).foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    private var noticesSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            if profileService.profile.displayName.isEmpty {
-                HStack(spacing: 12) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Profile Incomplete").font(.subheadline.weight(.semibold))
-                        Text("Finish setting up your profile to enable all features.").font(.caption).foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    NavigationLink(destination: DeveloperProfileView()) {
-                        Text("Finish").font(.caption.bold())
-                    }
-                }
-                .padding()
-                .background(Color.orange.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-        }
-    }
+struct SystemLink: Identifiable {
+    let id = UUID()
+    let title: String
+    let destination: AnyView
+    let icon: String
 }
