@@ -12,7 +12,9 @@ struct AppVersionHistoryView: View {
         List {
             if let app = app {
                 if app.versions.isEmpty {
-                    Text("No version history found.").foregroundStyle(.secondary)
+                    Section {
+                        EmptyStateView(icon: "clock.arrow.circlepath", title: "No History", message: "No previous versions found for this project.")
+                    }
                 } else {
                     ForEach(app.versions) { version in
                         VStack(alignment: .leading, spacing: 8) {
@@ -42,7 +44,7 @@ struct AppVersionHistoryView: View {
 
                             if version.status != "Current" {
                                 Button("Rollback to this version") {
-                                    // Rollback logic
+                                    rollback(to: version)
                                 }
                                 .font(.caption.bold())
                                 .buttonStyle(.bordered)
@@ -55,5 +57,14 @@ struct AppVersionHistoryView: View {
             }
         }
         .navigationTitle("Version History")
+    }
+
+    private func rollback(to version: AppVersion) {
+        guard var updatedApp = app else { return }
+        updatedApp.version = version.version
+        // Additional logic for updating status of versions
+        Task {
+            try? await appService.updateApp(updatedApp)
+        }
     }
 }

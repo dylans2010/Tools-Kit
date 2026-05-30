@@ -239,7 +239,7 @@ struct AboutProjectView: View {
                 }
 
                 HStack {
-                    TextField("Platform (e.g. X, GitHub)", text: $newPlatform)
+                    TextField("Platform (X, GitHub, etc.)", text: $newPlatform)
                         .textFieldStyle(.roundedBorder)
                     TextField("Handle/Link", text: $newHandle)
                         .textFieldStyle(.roundedBorder)

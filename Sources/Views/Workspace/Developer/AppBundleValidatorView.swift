@@ -41,7 +41,7 @@ struct AppBundleValidatorView: View {
                             ForEach(results) { result in
                                 HStack {
                                     Image(systemName: result.passed ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                        .foregroundStyle(result.passed ? .green : .red)
+                                        .foregroundStyle(result.passed ? .sdkSuccess : .sdkError)
                                     VStack(alignment: .leading) {
                                         Text(result.name).font(.subheadline.bold())
                                         Text(result.message).font(.caption).foregroundStyle(.secondary)
@@ -67,15 +67,21 @@ struct AppBundleValidatorView: View {
         isValidating = true
         results = []
 
-        // Simulate validation logic
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            results = [
-                ValidationResult(name: "Icon Asset", passed: !app.iconName.isEmpty, message: app.iconName.isEmpty ? "Missing app icon." : "Icon asset found."),
-                ValidationResult(name: "Bundle Identifier", passed: !app.bundleId.isEmpty, message: app.bundleId.isEmpty ? "Missing bundle identifier." : "Valid bundle identifier."),
-                ValidationResult(name: "Description", passed: app.description.count > 10, message: app.description.count <= 10 ? "Description too short." : "Description is sufficient."),
-                ValidationResult(name: "Granted Scopes", passed: !app.grantedScopes.isEmpty, message: app.grantedScopes.isEmpty ? "No permissions declared." : "Permissions configured.")
-            ]
-            isValidating = false
+        // In a real application, this would perform actual file system and manifest analysis.
+        // For this management suite, we perform logical consistency checks against the persistent state.
+        Task {
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+
+            await MainActor.run {
+                results = [
+                    ValidationResult(name: "Icon Asset", passed: !app.iconName.isEmpty, message: app.iconName.isEmpty ? "Missing app icon." : "Icon asset found: \(app.iconName)"),
+                    ValidationResult(name: "Bundle Identifier", passed: app.bundleId.contains("."), message: app.bundleId.contains(".") ? "Valid bundle identifier format." : "Invalid bundle identifier format."),
+                    ValidationResult(name: "Version String", passed: !app.version.isEmpty, message: "Current version: \(app.version)"),
+                    ValidationResult(name: "Description", passed: app.description.count > 10, message: app.description.count <= 10 ? "Description too short." : "Description is sufficient."),
+                    ValidationResult(name: "Granted Scopes", passed: !app.grantedScopes.isEmpty, message: app.grantedScopes.isEmpty ? "No permissions declared." : "\(app.grantedScopes.count) permissions configured.")
+                ]
+                isValidating = false
+            }
         }
     }
 }

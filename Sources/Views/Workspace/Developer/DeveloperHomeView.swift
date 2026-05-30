@@ -13,6 +13,8 @@ struct DeveloperHomeView: View {
                 headerSection
                 summaryStrip
                 quickActionsSection
+                monitoringSection
+                lifecycleSection
                 healthStatusPanel
                 recentActivityFeed
                 noticesSection
@@ -34,10 +36,12 @@ struct DeveloperHomeView: View {
             ZStack {
                 Circle().fill(Color.accentColor.opacity(0.1))
                 if !profileService.profile.avatarUrl.isEmpty, let url = URL(string: profileService.profile.avatarUrl) {
-                    AsyncImage(url: url) { image in
-                        image.resizable()
-                    } placeholder: {
-                        ProgressView()
+                    AsyncImage(url: url) { phase in
+                        if let image = phase.image {
+                            image.resizable()
+                        } else {
+                            ProgressView()
+                        }
                     }
                     .clipShape(Circle())
                 } else {
@@ -98,8 +102,7 @@ struct DeveloperHomeView: View {
 
     private var quickActionsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Developer Workspace")
-                .font(.headline)
+            SectionHeader(title: "App Workspace", subtitle: "Core Registration & Security", icon: "briefcase.fill")
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 NavigationLink(destination: AppBuilderView()) {
@@ -109,22 +112,70 @@ struct DeveloperHomeView: View {
                     quickActionCard(title: "Manage Apps", icon: "square.stack.3d.up", color: .orange)
                 }
                 NavigationLink(destination: AuthServiceManagerView()) {
-                    quickActionCard(title: "Auth & Webhooks", icon: "key.fill", color: .mint)
+                    quickActionCard(title: "Auth & Keys", icon: "key.fill", color: .mint)
                 }
                 NavigationLink(destination: ScopeManagementView()) {
                     quickActionCard(title: "Permissions", icon: "shield.fill", color: .red)
                 }
-                NavigationLink(destination: DocumentationEditorView()) {
-                    quickActionCard(title: "Docs Editor", icon: "book.and.wrench", color: .cyan)
+                NavigationLink(destination: CLITokenView()) {
+                    quickActionCard(title: "CLI Tokens", icon: "terminal.fill", color: .secondary)
                 }
-                NavigationLink(destination: MarketplaceListingManagerView()) {
-                    quickActionCard(title: "Marketplace", icon: "storefront.fill", color: .teal)
+                NavigationLink(destination: DeveloperAppCertificatesView()) {
+                    quickActionCard(title: "Certificates", icon: "doc.badge.gearshape.fill", color: .purple)
                 }
+            }
+        }
+    }
+
+    private var monitoringSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeader(title: "Monitoring", subtitle: "Observability & Security Audit", icon: "eye.fill")
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 NavigationLink(destination: DeveloperLogsView()) {
-                    quickActionCard(title: "View Logs", icon: "list.bullet.rectangle", color: .purple)
+                    quickActionCard(title: "System Logs", icon: "list.bullet.rectangle", color: .purple)
                 }
                 NavigationLink(destination: AnalyticsDashboardView()) {
                     quickActionCard(title: "Analytics", icon: "chart.xyaxis.line", color: .pink)
+                }
+                NavigationLink(destination: DeveloperSecurityAuditView()) {
+                    quickActionCard(title: "Security Audit", icon: "lock.shield.fill", color: .red)
+                }
+                NavigationLink(destination: ErrorGroupingView()) {
+                    quickActionCard(title: "Error Groups", icon: "exclamationmark.octagon.fill", color: .orange)
+                }
+                NavigationLink(destination: LogAlertRulesView()) {
+                    quickActionCard(title: "Alert Rules", icon: "bell.badge.fill", color: .yellow)
+                }
+                NavigationLink(destination: WebhookManagerView()) {
+                    quickActionCard(title: "Webhooks", icon: "antenna.radiowaves.left.and.right", color: .blue)
+                }
+            }
+        }
+    }
+
+    private var lifecycleSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeader(title: "Lifecycle", subtitle: "Release & Distribution", icon: "shippingbox.fill")
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                NavigationLink(destination: MarketplaceListingManagerView()) {
+                    quickActionCard(title: "Marketplace", icon: "storefront.fill", color: .teal)
+                }
+                NavigationLink(destination: DeveloperReleaseManagementView()) {
+                    quickActionCard(title: "Releases", icon: "arrow.up.doc.fill", color: .blue)
+                }
+                NavigationLink(destination: DeveloperBetaTestingView()) {
+                    quickActionCard(title: "Beta Testing", icon: "testtube.2", color: .orange)
+                }
+                NavigationLink(destination: DeveloperMonetizationView()) {
+                    quickActionCard(title: "Monetization", icon: "dollarsign.circle.fill", color: .green)
+                }
+                NavigationLink(destination: DocumentationEditorView()) {
+                    quickActionCard(title: "Docs Editor", icon: "book.and.wrench.fill", color: .cyan)
+                }
+                NavigationLink(destination: TeamManagementView()) {
+                    quickActionCard(title: "Team", icon: "person.2.fill", color: .indigo)
                 }
             }
         }
@@ -202,8 +253,8 @@ struct DeveloperHomeView: View {
         switch status {
         case .draft: return .gray
         case .underReview: return .orange
-        case .live: return .green
-        case .suspended: return .red
+        case .live: return .sdkSuccess
+        case .suspended: return .sdkError
         case .deprecated: return .secondary
         case .archived: return .black
         }
@@ -264,6 +315,17 @@ struct DeveloperHomeView: View {
                 }
                 .padding()
                 .background(Color.orange.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            NavigationLink(destination: DeveloperSupportTicketView()) {
+                HStack {
+                    Label("Need Help? Contact Support", systemImage: "questionmark.circle.fill")
+                    Spacer()
+                    Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
+                }
+                .padding()
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }

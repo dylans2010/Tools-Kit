@@ -5,6 +5,7 @@ struct AppCollaboratorsView: View {
     @ObservedObject var appService = DeveloperAppService.shared
     @State private var showingInvite = false
     @State private var inviteEmail = ""
+    @State private var inviteName = ""
     @State private var selectedRole = "Developer"
 
     var app: DeveloperApp? {
@@ -47,11 +48,16 @@ struct AppCollaboratorsView: View {
     private var inviteSheet: some View {
         NavigationStack {
             Form {
-                TextField("Collaborator Email", text: $inviteEmail)
-                Picker("Role", selection: $selectedRole) {
-                    Text("Admin").tag("Admin")
-                    Text("Developer").tag("Developer")
-                    Text("Viewer").tag("Viewer")
+                Section("Invitation Details") {
+                    TextField("Name", text: $inviteName)
+                    TextField("Collaborator Email", text: $inviteEmail)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                    Picker("Role", selection: $selectedRole) {
+                        Text("Admin").tag("Admin")
+                        Text("Developer").tag("Developer")
+                        Text("Viewer").tag("Viewer")
+                    }
                 }
             }
             .navigationTitle("Invite Collaborator")
@@ -61,19 +67,31 @@ struct AppCollaboratorsView: View {
                     Button("Invite") {
                         invite()
                     }
-                    .disabled(inviteEmail.isEmpty)
+                    .disabled(inviteEmail.isEmpty || inviteName.isEmpty)
                 }
             }
         }
     }
 
     private func invite() {
-        // Invite logic using appService.addCollaborator
-        showingInvite = false
-        inviteEmail = ""
+        let collab = AppCollaborator(accountID: UUID(), name: inviteName, email: inviteEmail, role: selectedRole)
+        Task {
+            try? await appService.addCollaborator(appID: appID, collaborator: collab)
+            await MainActor.run {
+                showingInvite = false
+                inviteEmail = ""
+                inviteName = ""
+            }
+        }
     }
 
     private func removeCollaborator(at offsets: IndexSet) {
-        // Remove logic using appService.removeCollaborator
+        guard let app = app else { return }
+        for index in offsets {
+            let collab = app.collaborators[index]
+            Task {
+                try? await appService.removeCollaborator(appID: appID, collaboratorID: collab.id)
+            }
+        }
     }
 }
