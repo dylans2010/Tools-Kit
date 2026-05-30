@@ -100,7 +100,11 @@ struct DeveloperProfileView: View {
     private func saveProfile() {
         isSaving = true
         Task {
-            try? await profileService.updateProfile(profile)
+            try? await profileService.updateProfile(
+                displayName: profile.displayName,
+                legalName: profile.legalName,
+                bio: profile.bio
+            )
             await MainActor.run {
                 isSaving = false
                 showingSaveAlert = true

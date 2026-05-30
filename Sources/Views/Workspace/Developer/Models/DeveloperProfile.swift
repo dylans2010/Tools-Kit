@@ -58,6 +58,7 @@ public struct DeveloperProfile: Codable {
     public var bio: String
     public var experience: String
     public var credits: String
+    public var organization: String
     public var website: String
     public var github: String
     public var linkedin: String
@@ -84,6 +85,7 @@ public struct DeveloperProfile: Codable {
         bio: String = "",
         experience: String = "",
         credits: String = "",
+        organization: String = "",
         website: String = "",
         github: String = "",
         linkedin: String = "",
@@ -109,6 +111,7 @@ public struct DeveloperProfile: Codable {
         self.bio = bio
         self.experience = experience
         self.credits = credits
+        self.organization = organization
         self.website = website
         self.github = github
         self.linkedin = linkedin
