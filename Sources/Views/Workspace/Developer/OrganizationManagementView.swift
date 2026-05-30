@@ -22,7 +22,7 @@ struct OrganizationManagementView: View {
                     .frame(maxWidth: .infinity)
                 } else {
                     ForEach(orgService.organizations) { org in
-                        NavigationLink(destination: Text(org.name).navigationTitle(org.name)) {
+                        NavigationLink(destination: OrganizationDetailView(organization: org)) {
                             VStack(alignment: .leading) {
                                 Text(org.name).font(.headline)
                                 Text("\(org.members.count) members • \(org.teams.count) teams").font(.caption).foregroundStyle(.secondary)

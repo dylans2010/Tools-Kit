@@ -26,15 +26,17 @@ struct DeveloperSupportTicketView: View {
                     .frame(maxWidth: .infinity)
                 } else {
                     ForEach(store.supportTickets) { ticket in
-                        VStack(alignment: .leading) {
-                            HStack {
-                                Text(ticket.subject).font(.subheadline.bold())
-                                Spacer()
-                                Text(ticket.status).font(.caption2.bold())
-                                    .padding(.horizontal, 6).padding(.vertical, 2)
-                                    .background(Color.blue.opacity(0.1), in: Capsule())
+                        NavigationLink(destination: SupportTicketDetailView(ticket: ticket)) {
+                            VStack(alignment: .leading) {
+                                HStack {
+                                    Text(ticket.subject).font(.subheadline.bold())
+                                    Spacer()
+                                    Text(ticket.status).font(.caption2.bold())
+                                        .padding(.horizontal, 6).padding(.vertical, 2)
+                                        .background(Color.blue.opacity(0.1), in: Capsule())
+                                }
+                                Text(ticket.createdAt.formatted()).font(.caption2).foregroundStyle(.secondary)
                             }
-                            Text(ticket.createdAt.formatted()).font(.caption2).foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -101,7 +103,7 @@ struct DeveloperSupportTicketView: View {
     }
 
     private func topicLink(_ title: String, icon: String) -> some View {
-        NavigationLink(destination: Text(title).navigationTitle(title)) {
+        NavigationLink(destination: FAQDetailView(title: title)) {
             Label(title, systemImage: icon)
         }
     }

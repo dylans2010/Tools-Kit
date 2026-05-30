@@ -14,6 +14,7 @@ struct DeveloperHomeView: View {
                 summaryStrip
                 quickActionsSection
                 healthStatusPanel
+                developerToolsSection
                 recentActivityFeed
                 noticesSection
             }
@@ -34,10 +35,12 @@ struct DeveloperHomeView: View {
             ZStack {
                 Circle().fill(Color.accentColor.opacity(0.1))
                 if !profileService.profile.avatarUrl.isEmpty, let url = URL(string: profileService.profile.avatarUrl) {
-                    AsyncImage(url: url) { image in
-                        image.resizable()
-                    } placeholder: {
-                        ProgressView()
+                    AsyncImage(url: url) { phase in
+                        if let image = phase.image {
+                            image.resizable()
+                        } else {
+                            ProgressView()
+                        }
                     }
                     .clipShape(Circle())
                 } else {
@@ -127,6 +130,58 @@ struct DeveloperHomeView: View {
                     quickActionCard(title: "Analytics", icon: "chart.xyaxis.line", color: .pink)
                 }
             }
+        }
+    }
+
+    private var developerToolsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Developer Tools")
+                .font(.headline)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    toolLink(title: "JSON", icon: "braces", destination: AnyView(DeveloperJSONFormatterView()))
+                    toolLink(title: "Base64", icon: "number", destination: AnyView(Base64ToolView()))
+                    toolLink(title: "URL", icon: "link", destination: AnyView(URLEncoderView()))
+                    toolLink(title: "JWT", icon: "shield.text.ascii", destination: AnyView(JWTDebuggerView()))
+                    toolLink(title: "Markdown", icon: "doc.text", destination: AnyView(MarkdownPreviewerView()))
+                    toolLink(title: "UUID", icon: "barcode", destination: AnyView(DeveloperUUIDGeneratorView()))
+                    toolLink(title: "Hash", icon: "lock.rectangle", destination: AnyView(DeveloperHashGeneratorView()))
+                    toolLink(title: "Password", icon: "key.viewfinder", destination: AnyView(DeveloperPasswordGeneratorView()))
+                    toolLink(title: "Regex", icon: "text.magnifyingglass", destination: AnyView(DeveloperRegexTesterView()))
+                    toolLink(title: "Certs", icon: "seal", destination: AnyView(CertificateValidatorView()))
+                    toolLink(title: "Device", icon: "iphone", destination: AnyView(DeviceInspectorView()))
+                    toolLink(title: "Color", icon: "paintpalette", destination: AnyView(ColorConverterView()))
+                    toolLink(title: "Units", icon: "scalemass", destination: AnyView(DeveloperUnitConverterView()))
+                    toolLink(title: "Cron", icon: "clock.arrow.2.circlepath", destination: AnyView(CronParserView()))
+                    toolLink(title: "HTTP", icon: "network", destination: AnyView(HTTPRequestBuilderView()))
+                    toolLink(title: "Diff", icon: "arrow.left.and.right", destination: AnyView(DiffToolView()))
+                    toolLink(title: "HTML", icon: "chevron.left.forwardslash.chevron.right", destination: AnyView(HTMLInspectorView()))
+                    toolLink(title: "Locales", icon: "character.bubble", destination: AnyView(LocalizationHelperView()))
+                    toolLink(title: "Network", icon: "waveform.path.ecg", destination: AnyView(NetworkReachabilityView()))
+                    toolLink(title: "Metadata", icon: "info.circle", destination: AnyView(ImageMetadataView()))
+                }
+            }
+        }
+    }
+
+    private func toolLink(title: String, icon: String, destination: AnyView) -> some View {
+        NavigationLink(destination: destination) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundStyle(.blue)
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.primary)
+            }
+            .frame(width: 80, height: 80)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.primary.opacity(0.05), lineWidth: 1)
+            )
         }
     }
 

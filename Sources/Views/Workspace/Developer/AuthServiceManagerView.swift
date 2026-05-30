@@ -92,7 +92,16 @@ struct AuthServiceManagerView: View {
                             Text("\(webhook.subscribedEvents.count) events").font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Toggle("", isOn: .constant(webhook.isActive)).labelsHidden()
+                        Toggle("", isOn: Binding(
+                            get: { webhook.isActive },
+                            set: { newValue in
+                                Task {
+                                    var updated = webhook
+                                    updated.isActive = newValue
+                                    try? await webhookService.updateEndpoint(updated)
+                                }
+                            }
+                        )).labelsHidden()
                     }
                     .padding()
                     .background(Color(uiColor: .secondarySystemGroupedBackground))

@@ -2161,6 +2161,29 @@
 		B48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift */; };
 		BBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift */; };
 		B4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift */; };
+		DA0200000000000000000055 /* SupportTicketDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000055 /* SupportTicketDetailView.swift */; };
+		DA0200000000000000000056 /* OrganizationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000056 /* OrganizationDetailView.swift */; };
+		DA0200000000000000000057 /* FAQDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000057 /* FAQDetailView.swift */; };
+		DA0200000000000000000058 /* DeveloperJSONFormatterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000058 /* DeveloperJSONFormatterView.swift */; };
+		DA0200000000000000000059 /* Base64ToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000059 /* Base64ToolView.swift */; };
+		DA020000000000000000005A /* URLEncoderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000005A /* URLEncoderView.swift */; };
+		DA020000000000000000005B /* JWTDebuggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000005B /* JWTDebuggerView.swift */; };
+		DA020000000000000000005C /* MarkdownPreviewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000005C /* MarkdownPreviewerView.swift */; };
+		DA020000000000000000005D /* DeveloperUUIDGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000005D /* DeveloperUUIDGeneratorView.swift */; };
+		DA020000000000000000005E /* DeveloperHashGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000005E /* DeveloperHashGeneratorView.swift */; };
+		DA020000000000000000005F /* DeveloperPasswordGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000005F /* DeveloperPasswordGeneratorView.swift */; };
+		DA0200000000000000000060 /* CertificateValidatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000060 /* CertificateValidatorView.swift */; };
+		DA0200000000000000000061 /* DeveloperRegexTesterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000061 /* DeveloperRegexTesterView.swift */; };
+		DA0200000000000000000062 /* DeviceInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000062 /* DeviceInspectorView.swift */; };
+		DA0200000000000000000063 /* ColorConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000063 /* ColorConverterView.swift */; };
+		DA0200000000000000000064 /* DeveloperUnitConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000064 /* DeveloperUnitConverterView.swift */; };
+		DA0200000000000000000065 /* CronParserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000065 /* CronParserView.swift */; };
+		DA0200000000000000000066 /* HTTPRequestBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000066 /* HTTPRequestBuilderView.swift */; };
+		DA0200000000000000000067 /* DiffToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000067 /* DiffToolView.swift */; };
+		DA0200000000000000000068 /* HTMLInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000068 /* HTMLInspectorView.swift */; };
+		DA0200000000000000000069 /* LocalizationHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000069 /* LocalizationHelperView.swift */; };
+		DA020000000000000000006A /* NetworkReachabilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000006A /* NetworkReachabilityView.swift */; };
+		DA020000000000000000006B /* ImageMetadataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000006B /* ImageMetadataView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -4303,6 +4326,29 @@
 		FBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginSandbox.swift; sourceTree = "<group>"; };
 		F4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConflictResolver.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+		DA0100000000000000000055 /* SupportTicketDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportTicketDetailView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000056 /* OrganizationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizationDetailView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000057 /* FAQDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQDetailView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000058 /* DeveloperJSONFormatterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/DeveloperJSONFormatterView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000059 /* Base64ToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/Base64ToolView.swift; sourceTree = "<group>"; };
+		DA010000000000000000005A /* URLEncoderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/URLEncoderView.swift; sourceTree = "<group>"; };
+		DA010000000000000000005B /* JWTDebuggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/JWTDebuggerView.swift; sourceTree = "<group>"; };
+		DA010000000000000000005C /* MarkdownPreviewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/MarkdownPreviewerView.swift; sourceTree = "<group>"; };
+		DA010000000000000000005D /* DeveloperUUIDGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/DeveloperUUIDGeneratorView.swift; sourceTree = "<group>"; };
+		DA010000000000000000005E /* DeveloperHashGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/DeveloperHashGeneratorView.swift; sourceTree = "<group>"; };
+		DA010000000000000000005F /* DeveloperPasswordGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/DeveloperPasswordGeneratorView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000060 /* CertificateValidatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/CertificateValidatorView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000061 /* DeveloperRegexTesterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/DeveloperRegexTesterView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000062 /* DeviceInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/DeviceInspectorView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000063 /* ColorConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/ColorConverterView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000064 /* DeveloperUnitConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/DeveloperUnitConverterView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000065 /* CronParserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/CronParserView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000066 /* HTTPRequestBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/HTTPRequestBuilderView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000067 /* DiffToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/DiffToolView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000068 /* HTMLInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/HTMLInspectorView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000069 /* LocalizationHelperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/LocalizationHelperView.swift; sourceTree = "<group>"; };
+		DA010000000000000000006A /* NetworkReachabilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/NetworkReachabilityView.swift; sourceTree = "<group>"; };
+		DA010000000000000000006B /* ImageMetadataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tools/ImageMetadataView.swift; sourceTree = "<group>"; };
 
 /* Begin PBXGroup section */
 		DG03000000000000000000001 /* Diagnostics */ = {
@@ -12562,6 +12608,10 @@
 				DA0100000000000000000026 /* ScopeDetailSheet.swift */,
 				DA0100000000000000000027 /* ScopeRequestFormView.swift */,
 				DA0100000000000000000028 /* ScopeAuditLogView.swift */,
+				DA0100000000000000000055 /* SupportTicketDetailView.swift */,
+				DA0100000000000000000056 /* OrganizationDetailView.swift */,
+				DA0100000000000000000057 /* FAQDetailView.swift */,
+				DA0000000000000000000004 /* Tools */,
 				DA0100000000000000000029 /* ScopeTemplatesView.swift */,
 				DA010000000000000000002A /* WebhookDeliveryLogView.swift */,
 				DA010000000000000000002B /* WebhookTestView.swift */,
@@ -12582,6 +12632,33 @@
 				DA0100000000000000000054 /* WebhookManagerView.swift */,
 			);
 			path = Developer;
+			sourceTree = "<group>";
+		};
+		DA0000000000000000000004 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				DA0100000000000000000058 /* DeveloperJSONFormatterView.swift */,
+				DA0100000000000000000059 /* Base64ToolView.swift */,
+				DA010000000000000000005A /* URLEncoderView.swift */,
+				DA010000000000000000005B /* JWTDebuggerView.swift */,
+				DA010000000000000000005C /* MarkdownPreviewerView.swift */,
+				DA010000000000000000005D /* DeveloperUUIDGeneratorView.swift */,
+				DA010000000000000000005E /* DeveloperHashGeneratorView.swift */,
+				DA010000000000000000005F /* DeveloperPasswordGeneratorView.swift */,
+				DA0100000000000000000060 /* CertificateValidatorView.swift */,
+				DA0100000000000000000061 /* DeveloperRegexTesterView.swift */,
+				DA0100000000000000000062 /* DeviceInspectorView.swift */,
+				DA0100000000000000000063 /* ColorConverterView.swift */,
+				DA0100000000000000000064 /* DeveloperUnitConverterView.swift */,
+				DA0100000000000000000065 /* CronParserView.swift */,
+				DA0100000000000000000066 /* HTTPRequestBuilderView.swift */,
+				DA0100000000000000000067 /* DiffToolView.swift */,
+				DA0100000000000000000068 /* HTMLInspectorView.swift */,
+				DA0100000000000000000069 /* LocalizationHelperView.swift */,
+				DA010000000000000000006A /* NetworkReachabilityView.swift */,
+				DA010000000000000000006B /* ImageMetadataView.swift */,
+			);
+			path = Tools;
 			sourceTree = "<group>";
 		};
 		DA0000000000000000000002 /* Models */ = {
@@ -12876,6 +12953,29 @@
 				DA0200000000000000000052 /* OrganizationService.swift in Sources */,
 				DA0200000000000000000053 /* WebhookService.swift in Sources */,
 				DA0200000000000000000054 /* WebhookManagerView.swift in Sources */,
+				DA0200000000000000000055 /* SupportTicketDetailView.swift in Sources */,
+				DA0200000000000000000056 /* OrganizationDetailView.swift in Sources */,
+				DA0200000000000000000057 /* FAQDetailView.swift in Sources */,
+				DA0200000000000000000058 /* DeveloperJSONFormatterView.swift in Sources */,
+				DA0200000000000000000059 /* Base64ToolView.swift in Sources */,
+				DA020000000000000000005A /* URLEncoderView.swift in Sources */,
+				DA020000000000000000005B /* JWTDebuggerView.swift in Sources */,
+				DA020000000000000000005C /* MarkdownPreviewerView.swift in Sources */,
+				DA020000000000000000005D /* DeveloperUUIDGeneratorView.swift in Sources */,
+				DA020000000000000000005E /* DeveloperHashGeneratorView.swift in Sources */,
+				DA020000000000000000005F /* DeveloperPasswordGeneratorView.swift in Sources */,
+				DA0200000000000000000060 /* CertificateValidatorView.swift in Sources */,
+				DA0200000000000000000061 /* DeveloperRegexTesterView.swift in Sources */,
+				DA0200000000000000000062 /* DeviceInspectorView.swift in Sources */,
+				DA0200000000000000000063 /* ColorConverterView.swift in Sources */,
+				DA0200000000000000000064 /* DeveloperUnitConverterView.swift in Sources */,
+				DA0200000000000000000065 /* CronParserView.swift in Sources */,
+				DA0200000000000000000066 /* HTTPRequestBuilderView.swift in Sources */,
+				DA0200000000000000000067 /* DiffToolView.swift in Sources */,
+				DA0200000000000000000068 /* HTMLInspectorView.swift in Sources */,
+				DA0200000000000000000069 /* LocalizationHelperView.swift in Sources */,
+				DA020000000000000000006A /* NetworkReachabilityView.swift in Sources */,
+				DA020000000000000000006B /* ImageMetadataView.swift in Sources */,
 				92E13A73A39F4878870CCFF1 /* SDKResourceAuditView.swift in Sources */,
 				0603EBECCB2849248F4BD1D4 /* SDKGlobalSearchView.swift in Sources */,
 				6FCAA43DB3294F3586F66864 /* SDKDependencyVisualizerView.swift in Sources */,

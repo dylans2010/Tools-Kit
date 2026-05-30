@@ -1,0 +1,27 @@
+		DA0000000000000000000004 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				DA0100000000000000000058 /* DeveloperJSONFormatterView.swift */,
+				DA0100000000000000000059 /* Base64ToolView.swift */,
+				DA010000000000000000005A /* URLEncoderView.swift */,
+				DA010000000000000000005B /* JWTDebuggerView.swift */,
+				DA010000000000000000005C /* MarkdownPreviewerView.swift */,
+				DA010000000000000000005D /* DeveloperUUIDGeneratorView.swift */,
+				DA010000000000000000005E /* DeveloperHashGeneratorView.swift */,
+				DA010000000000000000005F /* DeveloperPasswordGeneratorView.swift */,
+				DA0100000000000000000060 /* CertificateValidatorView.swift */,
+				DA01000000000000000001 /* DeveloperRegexTesterView.swift */,
+				DA0100000000000000000062 /* DeviceInspectorView.swift */,
+				DA0100000000000000000063 /* ColorConverterView.swift */,
+				DA0100000000000000000064 /* DeveloperUnitConverterView.swift */,
+				DA0100000000000000000065 /* CronParserView.swift */,
+				DA0100000000000000000066 /* HTTPRequestBuilderView.swift */,
+				DA0100000000000000000067 /* DiffToolView.swift */,
+				DA0100000000000000000068 /* HTMLInspectorView.swift */,
+				DA0100000000000000000069 /* LocalizationHelperView.swift */,
+				DA010000000000000000006A /* NetworkReachabilityView.swift */,
+				DA010000000000000000006B /* ImageMetadataView.swift */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
