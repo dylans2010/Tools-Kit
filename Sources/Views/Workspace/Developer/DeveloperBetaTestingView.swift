@@ -79,7 +79,7 @@ struct DeveloperBetaTestingView: View {
                     Button("Cancel") { showingCreateGroup = false }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Create") {
+                            Button("Create") {
                         if let appID = selectedAppID {
                             let newGroup = BetaGroup(appID: appID, name: groupName)
                             var current = store.betaGroups

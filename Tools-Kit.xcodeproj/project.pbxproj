@@ -2161,6 +2161,42 @@
 		B48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift */; };
 		BBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift */; };
 		B4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift */; };
+		DA0200000000000000000055 /* FeatureFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000055 /* FeatureFlag.swift */; };
+		DA0200000000000000000056 /* Incident.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000056 /* Incident.swift */; };
+		DA0200000000000000000057 /* PerformanceMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000057 /* PerformanceMetric.swift */; };
+		DA0200000000000000000058 /* RemoteConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000058 /* RemoteConfig.swift */; };
+		DA0200000000000000000059 /* Secret.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000059 /* Secret.swift */; };
+		DA020000000000000000005A /* CrashLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000005A /* CrashLog.swift */; };
+		DA020000000000000000005B /* NetworkRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000005B /* NetworkRequest.swift */; };
+		DA020000000000000000005C /* Pipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000005C /* Pipeline.swift */; };
+		DA020000000000000000005D /* DatabaseSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000005D /* DatabaseSchema.swift */; };
+		DA020000000000000000005E /* LocalizationKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000005E /* LocalizationKey.swift */; };
+		DA020000000000000000005F /* SecurityPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000005F /* SecurityPolicy.swift */; };
+		DA0200000000000000000060 /* InfrastructureNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000060 /* InfrastructureNode.swift */; };
+		DA0200000000000000000061 /* FeatureFlagService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000061 /* FeatureFlagService.swift */; };
+		DA0200000000000000000062 /* IncidentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000062 /* IncidentService.swift */; };
+		DA0200000000000000000063 /* PerformanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000063 /* PerformanceService.swift */; };
+		DA0200000000000000000064 /* RemoteConfigService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000064 /* RemoteConfigService.swift */; };
+		DA0200000000000000000065 /* SecretService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000065 /* SecretService.swift */; };
+		DA0200000000000000000066 /* CrashReportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000066 /* CrashReportService.swift */; };
+		DA0200000000000000000067 /* NetworkMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000067 /* NetworkMonitorService.swift */; };
+		DA0200000000000000000068 /* DeploymentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000068 /* DeploymentService.swift */; };
+		DA0200000000000000000069 /* DatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000069 /* DatabaseService.swift */; };
+		DA020000000000000000006A /* LocalizationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000006A /* LocalizationService.swift */; };
+		DA020000000000000000006B /* SecurityPolicyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000006B /* SecurityPolicyService.swift */; };
+		DA020000000000000000006C /* InfrastructureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000006C /* InfrastructureService.swift */; };
+		DA020000000000000000006D /* DeveloperFeatureFlagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000006D /* DeveloperFeatureFlagView.swift */; };
+		DA020000000000000000006E /* DeveloperIncidentManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000006E /* DeveloperIncidentManagerView.swift */; };
+		DA020000000000000000006F /* DeveloperPerformanceMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000006F /* DeveloperPerformanceMonitorView.swift */; };
+		DA0200000000000000000070 /* DeveloperRemoteConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000070 /* DeveloperRemoteConfigView.swift */; };
+		DA0200000000000000000071 /* DeveloperSecretsManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000071 /* DeveloperSecretsManagerView.swift */; };
+		DA0200000000000000000072 /* DeveloperCrashReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000072 /* DeveloperCrashReportView.swift */; };
+		DA0200000000000000000073 /* DeveloperNetworkTrafficView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000073 /* DeveloperNetworkTrafficView.swift */; };
+		DA0200000000000000000074 /* DeveloperDeploymentPipelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000074 /* DeveloperDeploymentPipelineView.swift */; };
+		DA0200000000000000000075 /* DeveloperDatabaseManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000075 /* DeveloperDatabaseManagerView.swift */; };
+		DA0200000000000000000076 /* DeveloperLocalizationManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000076 /* DeveloperLocalizationManagerView.swift */; };
+		DA0200000000000000000077 /* DeveloperSecurityPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000077 /* DeveloperSecurityPolicyView.swift */; };
+		DA0200000000000000000078 /* DeveloperInfrastructureStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000078 /* DeveloperInfrastructureStatusView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -4302,6 +4338,42 @@
 		F48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKCapabilityQuery.swift; sourceTree = "<group>"; };
 		FBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginSandbox.swift; sourceTree = "<group>"; };
 		F4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConflictResolver.swift; sourceTree = "<group>"; };
+		DA0100000000000000000055 /* FeatureFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlag.swift; sourceTree = "<group>"; };
+		DA0100000000000000000056 /* Incident.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Incident.swift; sourceTree = "<group>"; };
+		DA0100000000000000000057 /* PerformanceMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceMetric.swift; sourceTree = "<group>"; };
+		DA0100000000000000000058 /* RemoteConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfig.swift; sourceTree = "<group>"; };
+		DA0100000000000000000059 /* Secret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secret.swift; sourceTree = "<group>"; };
+		DA010000000000000000005A /* CrashLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashLog.swift; sourceTree = "<group>"; };
+		DA010000000000000000005B /* NetworkRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequest.swift; sourceTree = "<group>"; };
+		DA010000000000000000005C /* Pipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pipeline.swift; sourceTree = "<group>"; };
+		DA010000000000000000005D /* DatabaseSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseSchema.swift; sourceTree = "<group>"; };
+		DA010000000000000000005E /* LocalizationKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationKey.swift; sourceTree = "<group>"; };
+		DA010000000000000000005F /* SecurityPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityPolicy.swift; sourceTree = "<group>"; };
+		DA0100000000000000000060 /* InfrastructureNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfrastructureNode.swift; sourceTree = "<group>"; };
+		DA0100000000000000000061 /* FeatureFlagService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlagService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000062 /* IncidentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncidentService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000063 /* PerformanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000064 /* RemoteConfigService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000065 /* SecretService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000066 /* CrashReportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000067 /* NetworkMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitorService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000068 /* DeploymentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeploymentService.swift; sourceTree = "<group>"; };
+		DA0100000000000000000069 /* DatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseService.swift; sourceTree = "<group>"; };
+		DA010000000000000000006A /* LocalizationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationService.swift; sourceTree = "<group>"; };
+		DA010000000000000000006B /* SecurityPolicyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityPolicyService.swift; sourceTree = "<group>"; };
+		DA010000000000000000006C /* InfrastructureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfrastructureService.swift; sourceTree = "<group>"; };
+		DA010000000000000000006D /* DeveloperFeatureFlagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperFeatureFlagView.swift; sourceTree = "<group>"; };
+		DA010000000000000000006E /* DeveloperIncidentManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperIncidentManagerView.swift; sourceTree = "<group>"; };
+		DA010000000000000000006F /* DeveloperPerformanceMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperPerformanceMonitorView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000070 /* DeveloperRemoteConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperRemoteConfigView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000071 /* DeveloperSecretsManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSecretsManagerView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000072 /* DeveloperCrashReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperCrashReportView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000073 /* DeveloperNetworkTrafficView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperNetworkTrafficView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000074 /* DeveloperDeploymentPipelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperDeploymentPipelineView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000075 /* DeveloperDatabaseManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperDatabaseManagerView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000076 /* DeveloperLocalizationManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperLocalizationManagerView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000077 /* DeveloperSecurityPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSecurityPolicyView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000078 /* DeveloperInfrastructureStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperInfrastructureStatusView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */

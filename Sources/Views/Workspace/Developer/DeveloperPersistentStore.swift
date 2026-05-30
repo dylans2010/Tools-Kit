@@ -22,6 +22,22 @@ public class DeveloperPersistentStore: ObservableObject {
     @Published public var certificates: [DeveloperCertificate]
     @Published public var betaGroups: [BetaGroup]
     @Published public var supportTickets: [SupportTicket]
+    @Published public var installEvents: [InstallEvent]
+    @Published public var customEvents: [CustomEventRecord]
+    @Published public var funnels: [AnalyticsFunnel]
+    @Published public var accountActivities: [AccountActivityEvent]
+    @Published public var featureFlags: [FeatureFlag]
+    @Published public var incidents: [Incident]
+    @Published public var performanceMetrics: [PerformanceMetric]
+    @Published public var remoteConfigs: [RemoteConfig]
+    @Published public var secrets: [Secret]
+    @Published public var crashLogs: [CrashLog]
+    @Published public var networkRequests: [NetworkRequest]
+    @Published public var pipelines: [Pipeline]
+    @Published public var databaseSchemas: [DatabaseSchema]
+    @Published public var localizationKeys: [LocalizationKey]
+    @Published public var securityPolicies: [SecurityPolicy]
+    @Published public var infrastructureNodes: [InfrastructureNode]
 
     private let profileKey = "dev_portal_profile"
     private let appsKey = "dev_portal_apps"
@@ -41,6 +57,22 @@ public class DeveloperPersistentStore: ObservableObject {
     private let certificatesKey = "dev_portal_certificates"
     private let betaGroupsKey = "dev_portal_beta_groups"
     private let supportTicketsKey = "dev_portal_support_tickets"
+    private let installEventsKey = "dev_portal_install_events"
+    private let customEventsKey = "dev_portal_custom_events"
+    private let funnelsKey = "dev_portal_funnels"
+    private let accountActivitiesKey = "dev_portal_account_activities"
+    private let featureFlagsKey = "dev_portal_feature_flags"
+    private let incidentsKey = "dev_portal_incidents"
+    private let performanceMetricsKey = "dev_portal_performance_metrics"
+    private let remoteConfigsKey = "dev_portal_remote_configs"
+    private let secretsKey = "dev_portal_secrets"
+    private let crashLogsKey = "dev_portal_crash_logs"
+    private let networkRequestsKey = "dev_portal_network_requests"
+    private let pipelinesKey = "dev_portal_pipelines"
+    private let databaseSchemasKey = "dev_portal_database_schemas"
+    private let localizationKeysKey = "dev_portal_localization_keys"
+    private let securityPoliciesKey = "dev_portal_security_policies"
+    private let infrastructureNodesKey = "dev_portal_infrastructure_nodes"
 
     private init() {
         self.profile = Self.load(DeveloperProfile.self, key: profileKey) ?? DeveloperProfile()
@@ -61,6 +93,22 @@ public class DeveloperPersistentStore: ObservableObject {
         self.certificates = Self.load([DeveloperCertificate].self, key: certificatesKey) ?? []
         self.betaGroups = Self.load([BetaGroup].self, key: betaGroupsKey) ?? []
         self.supportTickets = Self.load([SupportTicket].self, key: supportTicketsKey) ?? []
+        self.installEvents = Self.load([InstallEvent].self, key: installEventsKey) ?? []
+        self.customEvents = Self.load([CustomEventRecord].self, key: customEventsKey) ?? []
+        self.funnels = Self.load([AnalyticsFunnel].self, key: funnelsKey) ?? []
+        self.accountActivities = Self.load([AccountActivityEvent].self, key: accountActivitiesKey) ?? []
+        self.featureFlags = Self.load([FeatureFlag].self, key: featureFlagsKey) ?? []
+        self.incidents = Self.load([Incident].self, key: incidentsKey) ?? []
+        self.performanceMetrics = Self.load([PerformanceMetric].self, key: performanceMetricsKey) ?? []
+        self.remoteConfigs = Self.load([RemoteConfig].self, key: remoteConfigsKey) ?? []
+        self.secrets = Self.load([Secret].self, key: secretsKey) ?? []
+        self.crashLogs = Self.load([CrashLog].self, key: crashLogsKey) ?? []
+        self.networkRequests = Self.load([NetworkRequest].self, key: networkRequestsKey) ?? []
+        self.pipelines = Self.load([Pipeline].self, key: pipelinesKey) ?? []
+        self.databaseSchemas = Self.load([DatabaseSchema].self, key: databaseSchemasKey) ?? []
+        self.localizationKeys = Self.load([LocalizationKey].self, key: localizationKeysKey) ?? []
+        self.securityPolicies = Self.load([SecurityPolicy].self, key: securityPoliciesKey) ?? []
+        self.infrastructureNodes = Self.load([InfrastructureNode].self, key: infrastructureNodesKey) ?? []
     }
 
     private static func load<T: Decodable>(_ type: T.Type, key: String) -> T? {
@@ -169,6 +217,86 @@ public class DeveloperPersistentStore: ObservableObject {
     public func saveSupportTickets(_ newTickets: [SupportTicket]) {
         save(newTickets, key: supportTicketsKey)
         self.supportTickets = newTickets
+    }
+
+    public func saveInstallEvents(_ newEvents: [InstallEvent]) {
+        save(newEvents, key: installEventsKey)
+        self.installEvents = newEvents
+    }
+
+    public func saveCustomEvents(_ newEvents: [CustomEventRecord]) {
+        save(newEvents, key: customEventsKey)
+        self.customEvents = newEvents
+    }
+
+    public func saveFunnels(_ newFunnels: [AnalyticsFunnel]) {
+        save(newFunnels, key: funnelsKey)
+        self.funnels = newFunnels
+    }
+
+    public func saveAccountActivities(_ newEvents: [AccountActivityEvent]) {
+        save(newEvents, key: accountActivitiesKey)
+        self.accountActivities = newEvents
+    }
+
+    public func saveFeatureFlags(_ newFlags: [FeatureFlag]) {
+        save(newFlags, key: featureFlagsKey)
+        self.featureFlags = newFlags
+    }
+
+    public func saveIncidents(_ newIncidents: [Incident]) {
+        save(newIncidents, key: incidentsKey)
+        self.incidents = newIncidents
+    }
+
+    public func savePerformanceMetrics(_ newMetrics: [PerformanceMetric]) {
+        save(newMetrics, key: performanceMetricsKey)
+        self.performanceMetrics = newMetrics
+    }
+
+    public func saveRemoteConfigs(_ newConfigs: [RemoteConfig]) {
+        save(newConfigs, key: remoteConfigsKey)
+        self.remoteConfigs = newConfigs
+    }
+
+    public func saveSecrets(_ newSecrets: [Secret]) {
+        save(newSecrets, key: secretsKey)
+        self.secrets = newSecrets
+    }
+
+    public func saveCrashLogs(_ newLogs: [CrashLog]) {
+        save(newLogs, key: crashLogsKey)
+        self.crashLogs = newLogs
+    }
+
+    public func saveNetworkRequests(_ newRequests: [NetworkRequest]) {
+        save(newRequests, key: networkRequestsKey)
+        self.networkRequests = newRequests
+    }
+
+    public func savePipelines(_ newPipelines: [Pipeline]) {
+        save(newPipelines, key: pipelinesKey)
+        self.pipelines = newPipelines
+    }
+
+    public func saveDatabaseSchemas(_ newSchemas: [DatabaseSchema]) {
+        save(newSchemas, key: databaseSchemasKey)
+        self.databaseSchemas = newSchemas
+    }
+
+    public func saveLocalizationKeys(_ newKeys: [LocalizationKey]) {
+        save(newKeys, key: localizationKeysKey)
+        self.localizationKeys = newKeys
+    }
+
+    public func saveSecurityPolicies(_ newPolicies: [SecurityPolicy]) {
+        save(newPolicies, key: securityPoliciesKey)
+        self.securityPolicies = newPolicies
+    }
+
+    public func saveInfrastructureNodes(_ newNodes: [InfrastructureNode]) {
+        save(newNodes, key: infrastructureNodesKey)
+        self.infrastructureNodes = newNodes
     }
 }
 
