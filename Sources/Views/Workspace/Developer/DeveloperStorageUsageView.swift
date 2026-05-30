@@ -97,7 +97,9 @@ struct DeveloperStorageUsageView: View {
     }
 
     private var logUsageMB: Double {
-        Double(logService.logEntries.count) * 0.01 // Estimated 10KB per log
+        // Calculate real usage from log entries payload size
+        let totalBytes = logService.logEntries.reduce(0) { $0 + $1.payload.utf8.count + $1.message.utf8.count }
+        return Double(totalBytes) / (1024.0 * 1024.0)
     }
 
     private func usageRow(label: String, value: String, icon: String, color: Color) -> some View {

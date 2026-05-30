@@ -49,12 +49,28 @@ public class WebhookService: ObservableObject {
     }
 
     public func testDelivery(endpointID: UUID) async throws -> (Int, String) {
-        guard let endpoint = endpoints.first(where: { $0.id == endpointID }) else {
-            return (404, "Endpoint not found")
+        guard let endpoint = endpoints.first(where: { $0.id == endpointID }),
+              let url = URL(string: endpoint.url) else {
+            return (404, "Endpoint or URL invalid")
         }
 
-        // Return 200 OK as the delivery simulation result
-        return (200, "OK")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("ToolsKit-Webhook-Test", forHTTPHeaderField: "User-Agent")
+
+        let payload = ["test": true, "timestamp": Date().timeIntervalSince1970]
+        request.httpBody = try? JSONEncoder().encode(payload)
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse {
+                return (httpResponse.statusCode, HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode))
+            }
+            return (0, "Unknown Response")
+        } catch {
+            return (0, error.localizedDescription)
+        }
     }
 
     public func fetchDeliveryLog(endpointID: UUID) async throws -> [WebhookDelivery] {

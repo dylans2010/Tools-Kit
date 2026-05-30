@@ -7,8 +7,12 @@ struct AppDetailView: View {
     @ObservedObject var scopeService = DeveloperScopeService.shared
     @State private var selectedTab = 0
     @State private var showingStatusSheet = false
+    @State private var showingAddVersion = false
     @State private var newStatus: DeveloperAppStatus = .draft
     @State private var statusReason = ""
+    @State private var newVersionString = ""
+    @State private var newBuildString = ""
+    @State private var newNotesString = ""
 
     var app: DeveloperApp? {
         appService.apps.first { $0.id == appID }
@@ -73,6 +77,9 @@ struct AppDetailView: View {
         }
         .sheet(isPresented: $showingStatusSheet) {
             statusUpdateSheet
+        }
+        .sheet(isPresented: $showingAddVersion) {
+            addVersionSheet
         }
     }
 
@@ -152,7 +159,7 @@ struct AppDetailView: View {
                 SectionHeader(title: "Version History", subtitle: nil, icon: nil)
                 Spacer()
                 Button {
-                    // Logic to add version
+                    showingAddVersion = true
                 } label: {
                     Label("New Version", systemImage: "plus")
                         .font(.caption.bold())
@@ -266,6 +273,17 @@ struct AppDetailView: View {
 
     private func moreTab(_ app: DeveloperApp) -> some View {
         VStack(alignment: .leading, spacing: 20) {
+            SectionHeader(title: "Management & Configuration", subtitle: nil, icon: nil)
+
+            VStack(spacing: 12) {
+                NavigationLink(destination: AppEnvironmentsView(appID: app.id)) {
+                    moreActionRow(title: "Environments", icon: "server.rack", color: .blue)
+                }
+                NavigationLink(destination: MarketplaceSubmissionView(appID: app.id)) {
+                    moreActionRow(title: "Marketplace Listing", icon: "storefront", color: .teal)
+                }
+            }
+
             SectionHeader(title: "Collaborators", subtitle: nil, icon: nil)
             if app.collaborators.isEmpty {
                 Text("You are the sole owner of this project.").font(.caption).foregroundStyle(.secondary)
@@ -289,13 +307,14 @@ struct AppDetailView: View {
 
             SectionHeader(title: "Danger Zone", subtitle: nil, icon: nil)
             VStack(spacing: 12) {
-                Button(role: .destructive) {
-                    // Transfer ownership
-                } label: {
+                NavigationLink(destination: TransferOwnershipView(appID: app.id)) {
                     Label("Transfer Ownership", systemImage: "person.2.badge.key")
+                        .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.red.opacity(0.1))
+                        .foregroundStyle(.red)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
-                .buttonStyle(.bordered)
 
                 Button(role: .destructive) {
                     Task {
@@ -303,12 +322,27 @@ struct AppDetailView: View {
                     }
                 } label: {
                     Label("Delete Project", systemImage: "trash")
+                        .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.red.opacity(0.1))
+                        .foregroundStyle(.red)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
-                .buttonStyle(.bordered)
             }
         }
         .padding()
+    }
+
+    private func moreActionRow(title: String, icon: String, color: Color) -> some View {
+        HStack {
+            Image(systemName: icon).foregroundStyle(color).frame(width: 24)
+            Text(title).font(.subheadline)
+            Spacer()
+            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private func infoRow(label: String, value: String) -> some View {
@@ -320,6 +354,45 @@ struct AppDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var addVersionSheet: some View {
+        NavigationStack {
+            Form {
+                Section("New Version Details") {
+                    TextField("Version", text: $newVersionString)
+                    TextField("Build Number", text: $newBuildString)
+                    VStack(alignment: .leading) {
+                        Text("Release Notes").font(.caption).foregroundStyle(.secondary)
+                        TextEditor(text: $newNotesString)
+                            .frame(height: 150)
+                    }
+                }
+            }
+            .navigationTitle("New Version")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showingAddVersion = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Add") {
+                        if !newVersionString.isEmpty && !newBuildString.isEmpty {
+                            let version = AppVersion(version: newVersionString, buildNumber: newBuildString, releaseNotes: newNotesString)
+                            Task {
+                                try? await appService.addVersion(appID: appID, version: version)
+                                await MainActor.run {
+                                    showingAddVersion = false
+                                    newVersionString = ""
+                                    newBuildString = ""
+                                    newNotesString = ""
+                                }
+                            }
+                        }
+                    }
+                    .disabled(newVersionString.isEmpty || newBuildString.isEmpty)
+                }
+            }
+        }
     }
 
     private var statusUpdateSheet: some View {

@@ -87,7 +87,10 @@ struct AnalyticsDashboardView: View {
     }
 
     private var errorCount: Int {
-        errorSummary.values.reduce(0, +)
+        DeveloperLogService.shared.logEntries.filter {
+            $0.severity == .error &&
+            (selectedAppID == nil || $0.sourceAppID == selectedAppID)
+        }.count
     }
 
     private func metricCard(label: String, value: String, icon: String, color: Color) -> some View {

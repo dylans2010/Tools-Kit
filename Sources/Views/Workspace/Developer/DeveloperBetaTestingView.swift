@@ -40,9 +40,11 @@ struct DeveloperBetaTestingView: View {
                         .padding(.vertical, 20)
                     } else {
                         ForEach(betaGroups) { group in
-                            VStack(alignment: .leading) {
-                                Text(group.name).font(.subheadline.bold())
-                                Text("\(group.testerEmails.count) testers").font(.caption).foregroundStyle(.secondary)
+                            NavigationLink(destination: BetaGroupDetailView(groupID: group.id)) {
+                                VStack(alignment: .leading) {
+                                    Text(group.name).font(.subheadline.bold())
+                                    Text("\(group.testerEmails.count) testers").font(.caption).foregroundStyle(.secondary)
+                                }
                             }
                         }
                         .onDelete(perform: deleteGroups)
@@ -94,6 +96,65 @@ struct DeveloperBetaTestingView: View {
             }
         }
     }
+
+struct BetaGroupDetailView: View {
+    let groupID: UUID
+    @ObservedObject var store = DeveloperPersistentStore.shared
+    @State private var newTesterEmail = ""
+
+    var group: BetaGroup? {
+        store.betaGroups.first { $0.id == groupID }
+    }
+
+    var body: some View {
+        List {
+            if let group = group {
+                Section("Add Tester") {
+                    HStack {
+                        TextField("Email Address", text: $newTesterEmail)
+                            .keyboardType(.emailAddress)
+                            .autocapitalization(.none)
+                        Button("Add") {
+                            addTester()
+                        }
+                        .disabled(newTesterEmail.isEmpty || !newTesterEmail.contains("@"))
+                    }
+                }
+
+                Section("Testers (\(group.testerEmails.count))") {
+                    if group.testerEmails.isEmpty {
+                        Text("No testers in this group.").foregroundStyle(.secondary)
+                    } else {
+                        ForEach(group.testerEmails, id: \.self) { email in
+                            Text(email)
+                        }
+                        .onDelete(perform: removeTesters)
+                    }
+                }
+            }
+        }
+        .navigationTitle(group?.name ?? "Beta Group")
+    }
+
+    private func addTester() {
+        guard let group = group else { return }
+        var currentGroups = store.betaGroups
+        if let index = currentGroups.firstIndex(where: { $0.id == group.id }) {
+            currentGroups[index].testerEmails.append(newTesterEmail)
+            store.saveBetaGroups(currentGroups)
+            newTesterEmail = ""
+        }
+    }
+
+    private func removeTesters(at offsets: IndexSet) {
+        guard let group = group else { return }
+        var currentGroups = store.betaGroups
+        if let index = currentGroups.firstIndex(where: { $0.id == group.id }) {
+            currentGroups[index].testerEmails.remove(atOffsets: offsets)
+            store.saveBetaGroups(currentGroups)
+        }
+    }
+}
 
     private func deleteGroups(at offsets: IndexSet) {
         var current = store.betaGroups

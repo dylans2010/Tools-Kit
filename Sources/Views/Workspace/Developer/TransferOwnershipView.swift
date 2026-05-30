@@ -1,10 +1,17 @@
 import SwiftUI
 
 struct TransferOwnershipView: View {
+    @Environment(\.dismiss) var dismiss
     @ObservedObject var appService = DeveloperAppService.shared
+    let appID: UUID?
     @State private var selectedAppID: UUID?
     @State private var recipientAccountIDString = ""
     @State private var confirmationName = ""
+
+    init(appID: UUID? = nil) {
+        self.appID = appID
+        _selectedAppID = State(initialValue: appID)
+    }
 
     var selectedApp: DeveloperApp? {
         appService.apps.first { $0.id == selectedAppID }
@@ -55,6 +62,9 @@ struct TransferOwnershipView: View {
         guard let appID = selectedAppID, let recipientID = UUID(uuidString: recipientAccountIDString) else { return }
         Task {
             try? await appService.transferOwnership(appID: appID, toAccountID: recipientID)
+            await MainActor.run {
+                dismiss()
+            }
         }
     }
 }

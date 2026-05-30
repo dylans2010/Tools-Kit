@@ -34,10 +34,12 @@ struct DeveloperHomeView: View {
             ZStack {
                 Circle().fill(Color.accentColor.opacity(0.1))
                 if !profileService.profile.avatarUrl.isEmpty, let url = URL(string: profileService.profile.avatarUrl) {
-                    AsyncImage(url: url) { image in
-                        image.resizable()
-                    } placeholder: {
-                        ProgressView()
+                    AsyncImage(url: url) { phase in
+                        if let image = phase.image {
+                            image.resizable()
+                        } else {
+                            ProgressView()
+                        }
                     }
                     .clipShape(Circle())
                 } else {
@@ -125,6 +127,18 @@ struct DeveloperHomeView: View {
                 }
                 NavigationLink(destination: AnalyticsDashboardView()) {
                     quickActionCard(title: "Analytics", icon: "chart.xyaxis.line", color: .pink)
+                }
+                NavigationLink(destination: DeveloperSecurityAuditView()) {
+                    quickActionCard(title: "Security", icon: "shield.lefthalf.filled", color: .green)
+                }
+                NavigationLink(destination: DeveloperBetaTestingView()) {
+                    quickActionCard(title: "Beta Testing", icon: "person.3.sequence.fill", color: .indigo)
+                }
+                NavigationLink(destination: DeveloperStorageUsageView()) {
+                    quickActionCard(title: "Storage", icon: "internaldrive", color: .gray)
+                }
+                NavigationLink(destination: DeveloperReleaseManagementView()) {
+                    quickActionCard(title: "Releases", icon: "shippingbox.fill", color: .brown)
                 }
             }
         }

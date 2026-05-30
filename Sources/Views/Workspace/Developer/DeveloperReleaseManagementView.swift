@@ -35,10 +35,16 @@ struct DeveloperReleaseManagementView: View {
                                     Text(release.releaseNotes).font(.caption).lineLimit(1).foregroundStyle(.secondary)
                                 }
                                 Spacer()
-                                Text(release.status).font(.caption2.bold())
-                                    .padding(.horizontal, 8).padding(.vertical, 4)
-                                    .background(Color.blue.opacity(0.1), in: Capsule())
-                                    .foregroundStyle(.blue)
+                                Menu {
+                                    Button("Released") { updateStatus(release, to: "Released") }
+                                    Button("Staged Rollout") { updateStatus(release, to: "Staged Rollout") }
+                                    Button("Draft") { updateStatus(release, to: "Draft") }
+                                } label: {
+                                    Text(release.status).font(.caption2.bold())
+                                        .padding(.horizontal, 8).padding(.vertical, 4)
+                                        .background(Color.blue.opacity(0.1), in: Capsule())
+                                        .foregroundStyle(.blue)
+                                }
                             }
                         }
                     }
@@ -63,7 +69,7 @@ struct DeveloperReleaseManagementView: View {
         NavigationStack {
             Form {
                 Section("New Version Details") {
-                    TextField("Version (e.g. 1.0.1)", text: $version)
+                    TextField("Version", text: $version)
                     TextField("Build Number", text: $build)
                     VStack(alignment: .leading) {
                         Text("Release Notes").font(.caption).foregroundStyle(.secondary)
@@ -77,6 +83,18 @@ struct DeveloperReleaseManagementView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Create") { addRelease() }
                         .disabled(version.isEmpty || build.isEmpty)
+                }
+            }
+        }
+    }
+
+    private func updateStatus(_ release: AppVersion, to newStatus: String) {
+        guard let appID = selectedAppID else { return }
+        Task {
+            if var app = appService.apps.first(where: { $0.id == appID }) {
+                if let index = app.versions.firstIndex(where: { $0.id == release.id }) {
+                    app.versions[index].status = newStatus
+                    try? await appService.updateApp(app)
                 }
             }
         }
