@@ -135,7 +135,10 @@ public class OpsCLIManager {
         commands.append(CLICommand(name: "db:tables", description: "List tables in a schema", category: .operations, usage: "db:tables <schema_id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: db:tables <schema_id>" }
             guard let schema = self.dbService.schemas.first(where: { $0.id == id }) else { return "Schema not found." }
-            return schema.columns.joined(separator: "\n")
+            return schema.columns.map { column in
+                let indexSuffix = column.isIndexed ? " indexed" : ""
+                return "\(column.name) (\(column.type)\(indexSuffix))"
+            }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "db:migrate", description: "Run database migration", category: .operations, usage: "db:migrate <schema_id>", action: { _ in
