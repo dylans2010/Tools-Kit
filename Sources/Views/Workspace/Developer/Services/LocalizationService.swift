@@ -33,6 +33,13 @@ public class LocalizationService: ObservableObject {
         await MainActor.run { self.keys = current }
     }
 
+    public func deleteKey(id: UUID) async throws {
+        var current = store.localizationKeys
+        current.removeAll { $0.id == id }
+        store.saveLocalizationKeys(current)
+        await MainActor.run { self.keys = current }
+    }
+
     public func addLocale(_ locale: LocalizationLocale) {
         locales.append(locale)
     }

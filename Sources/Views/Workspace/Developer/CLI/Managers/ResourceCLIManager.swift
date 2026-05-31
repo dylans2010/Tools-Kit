@@ -119,13 +119,13 @@ public class ResourceCLIManager {
         // --- Marketplace (7 commands) ---
         commands.append(CLICommand(name: "market:list", description: "List marketplace submissions", category: .resources, usage: "market:list", action: { _ in
             let subs = self.marketService.submissions
-            return subs.map { "[\($0.status.rawValue)] \($0.appName) (\($0.id))" }.joined(separator: "\n")
+            return subs.map { "[\($0.status.rawValue)] \($0.metadata.title) (\($0.id))" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "market:inspect", description: "Inspect a submission", category: .resources, usage: "market:inspect <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: market:inspect <id>" }
             guard let s = self.marketService.submissions.first(where: { $0.id == id }) else { return "Not found." }
-            return "App: \(s.appName)\nStatus: \(s.status.rawValue)\nCategory: \(s.category)\nPrice: $\(s.pricing)"
+            return "App: \(s.metadata.title)\nStatus: \(s.status.rawValue)\nCategories: \(s.metadata.categories.joined(separator: ", "))\nVersion: \(s.technicalDetails.version)"
         }))
 
         commands.append(CLICommand(name: "market:submit", description: "Submit an app to marketplace", category: .resources, usage: "market:submit <app_id>", action: { _ in
@@ -134,13 +134,13 @@ public class ResourceCLIManager {
 
         commands.append(CLICommand(name: "market:cancel", description: "Cancel a submission", category: .resources, usage: "market:cancel <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: market:cancel <id>" }
-            try? await self.marketService.cancelSubmission(id: id)
+            try? await self.marketService.updateListingStatus(submissionID: id, newStatus: .paused, reason: "Cancelled from CLI")
             return "Submission cancelled."
         }))
 
         commands.append(CLICommand(name: "market:drafts", description: "List marketplace drafts", category: .resources, usage: "market:drafts", action: { _ in
             let drafts = self.marketService.drafts
-            return drafts.map { $0.appName }.joined(separator: "\n")
+            return drafts.map { $0.metadata.title }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "market:categories", description: "List marketplace categories", category: .resources, usage: "market:categories", action: { _ in
@@ -280,19 +280,21 @@ public class ResourceCLIManager {
         }))
 
         commands.append(CLICommand(name: "analytics:events", description: "List custom events", category: .resources, usage: "analytics:events", action: { _ in
-            let events = self.analyticService.customEvents
-            return events.map { "\($0.name) (\($0.count) occurrences)" }.joined(separator: "\n")
+            let grouped = Dictionary(grouping: self.analyticService.customEvents, by: { $0.eventName })
+            return grouped.keys.sorted().map { "\($0) (\(grouped[$0]?.count ?? 0) occurrences)" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "analytics:funnels", description: "List conversion funnels", category: .resources, usage: "analytics:funnels", action: { _ in
             let funnels = self.analyticService.funnels
-            return funnels.map { "\($0.name): \(String(format: "%.1f", $0.conversionRate))% conversion" }.joined(separator: "\n")
+            return funnels.map { "\($0.name): \($0.steps.count) steps" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "analytics:inspect:event", description: "Inspect a custom event", category: .resources, usage: "analytics:inspect:event <name>", action: { args in
             let n = args.first ?? ""
-            guard let e = self.analyticService.customEvents.first(where: { $0.name == n }) else { return "Not found." }
-            return "Name: \(e.name)\nTotal Count: \(e.count)\nDistinct Users: \(e.distinctUsers)"
+            let matches = self.analyticService.customEvents.filter { $0.eventName == n }
+            guard let e = matches.first else { return "Not found." }
+            let apps = Set(matches.map { $0.appID }).count
+            return "Name: \(e.eventName)\nTotal Count: \(matches.count)\nDistinct Apps: \(apps)"
         }))
 
         commands.append(CLICommand(name: "analytics:clear", description: "Clear analytic data", category: .resources, usage: "analytics:clear", action: { _ in

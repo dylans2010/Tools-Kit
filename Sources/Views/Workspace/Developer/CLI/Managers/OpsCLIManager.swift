@@ -75,19 +75,19 @@ public class OpsCLIManager {
         // --- Infrastructure (10 commands) ---
         commands.append(CLICommand(name: "infra:nodes", description: "List infrastructure nodes", category: .operations, usage: "infra:nodes", action: { _ in
             let nodes = self.infraService.nodes
-            return nodes.map { "[\($0.status)] \($0.name) (\($0.ipAddress))" }.joined(separator: "\n")
+            return nodes.map { "[\($0.status.rawValue)] \($0.name) (\($0.type))" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "infra:status", description: "Get infrastructure health", category: .operations, usage: "infra:status", action: { _ in
             let nodes = self.infraService.nodes
-            let healthy = nodes.filter { $0.status == "Healthy" }.count
+            let healthy = nodes.filter { $0.status == .healthy }.count
             return "Overall Health: \(healthy == nodes.count ? "Stable" : "Degraded") (\(healthy)/\(nodes.count) nodes healthy)"
         }))
 
         commands.append(CLICommand(name: "infra:node:inspect", description: "Inspect a node", category: .operations, usage: "infra:node:inspect <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: infra:node:inspect <id>" }
             guard let node = self.infraService.nodes.first(where: { $0.id == id }) else { return "Node not found." }
-            return "Name: \(node.name)\nIP: \(node.ipAddress)\nStatus: \(node.status)\nRegion: \(node.region)\nCPU: \(node.cpuUsage)%\nRAM: \(node.memoryUsage)%"
+            return "Name: \(node.name)\nType: \(node.type)\nStatus: \(node.status.rawValue)\nRegion: \(node.region)\nCPU: \(node.cpuUsage)%\nRAM: \(node.memoryUsage)%"
         }))
 
         commands.append(CLICommand(name: "infra:restart", description: "Restart a node", category: .operations, usage: "infra:restart <id>", action: { args in
@@ -116,12 +116,12 @@ public class OpsCLIManager {
 
         commands.append(CLICommand(name: "infra:search", description: "Search nodes by IP", category: .operations, usage: "infra:search <ip>", action: { args in
             let ip = args.first ?? ""
-            let nodes = self.infraService.nodes.filter { $0.ipAddress.contains(ip) }
-            return nodes.map { "\($0.name) (\($0.ipAddress))" }.joined(separator: "\n")
+            let nodes = self.infraService.nodes.filter { $0.name.localizedCaseInsensitiveContains(ip) || $0.type.localizedCaseInsensitiveContains(ip) || $0.region.localizedCaseInsensitiveContains(ip) }
+            return nodes.map { "\($0.name) (\($0.type), \($0.region))" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "infra:down", description: "List down nodes", category: .operations, usage: "infra:down", action: { _ in
-            let down = self.infraService.nodes.filter { $0.status != "Healthy" }
+            let down = self.infraService.nodes.filter { $0.status != .healthy }
             if down.isEmpty { return "All nodes healthy." }
             return down.map { $0.name }.joined(separator: ", ")
         }))
@@ -129,13 +129,13 @@ public class OpsCLIManager {
         // --- Database (8 commands) ---
         commands.append(CLICommand(name: "db:schemas", description: "List database schemas", category: .operations, usage: "db:schemas", action: { _ in
             let schemas = self.dbService.schemas
-            return schemas.map { "\($0.name) (\($0.tables.count) tables)" }.joined(separator: "\n")
+            return schemas.map { "\($0.tableName) (\($0.columns.count) columns, v\($0.version))" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "db:tables", description: "List tables in a schema", category: .operations, usage: "db:tables <schema_id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: db:tables <schema_id>" }
             guard let schema = self.dbService.schemas.first(where: { $0.id == id }) else { return "Schema not found." }
-            return schema.tables.map { "\($0.name) (\($0.columns.count) columns)" }.joined(separator: "\n")
+            return schema.columns.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "db:migrate", description: "Run database migration", category: .operations, usage: "db:migrate <schema_id>", action: { _ in
@@ -149,7 +149,7 @@ public class OpsCLIManager {
         commands.append(CLICommand(name: "db:inspect", description: "Inspect a schema", category: .operations, usage: "db:inspect <schema_id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: db:inspect <schema_id>" }
             guard let s = self.dbService.schemas.first(where: { $0.id == id }) else { return "Not found." }
-            return "Name: \(s.name)\nEngine: \(s.engine)\nTables: \(s.tables.count)\nID: \(s.id)"
+            return "Table: \(s.tableName)\nVersion: \(s.version)\nColumns: \(s.columns.count)\nID: \(s.id)"
         }))
 
         commands.append(CLICommand(name: "db:query", description: "Execute a read-only query", category: .operations, usage: "db:query <sql>", action: { _ in
@@ -157,7 +157,7 @@ public class OpsCLIManager {
         }))
 
         commands.append(CLICommand(name: "db:count", description: "Count total tables", category: .operations, usage: "db:count", action: { _ in
-            let count = self.dbService.schemas.flatMap { $0.tables }.count
+            let count = self.dbService.schemas.count
             return "Total tables: \(count)"
         }))
 
@@ -173,7 +173,8 @@ public class OpsCLIManager {
 
         commands.append(CLICommand(name: "pipe:run", description: "Trigger a pipeline run", category: .operations, usage: "pipe:run <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: pipe:run <id>" }
-            try? await self.pipeService.triggerPipeline(id: id)
+            guard let pipeline = self.pipeService.pipelines.first(where: { $0.id == id }) else { return "Pipeline not found." }
+            try? await self.pipeService.triggerPipeline(pipeline)
             return "Pipeline run triggered."
         }))
 
@@ -184,7 +185,7 @@ public class OpsCLIManager {
         commands.append(CLICommand(name: "pipe:inspect", description: "Inspect pipeline config", category: .operations, usage: "pipe:inspect <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: pipe:inspect <id>" }
             guard let p = self.pipeService.pipelines.first(where: { $0.id == id }) else { return "Not found." }
-            return "Name: \(p.name)\nStatus: \(p.status)\nStages: \(p.stages.count)\nLast Run: \(p.lastRunAt?.description ?? "Never")"
+            return "Name: \(p.name)\nStatus: \(p.status.rawValue)\nStages: \(p.stages.count)\nLast Run: \(p.lastRunAt)"
         }))
 
         commands.append(CLICommand(name: "pipe:history", description: "View pipeline run history", category: .operations, usage: "pipe:history <id>", action: { _ in
@@ -196,7 +197,7 @@ public class OpsCLIManager {
         }))
 
         commands.append(CLICommand(name: "pipe:failed", description: "List failed pipelines", category: .operations, usage: "pipe:failed", action: { _ in
-            let failed = self.pipeService.pipelines.filter { $0.status == "Failed" }
+            let failed = self.pipeService.pipelines.filter { $0.status == .failed }
             if failed.isEmpty { return "No failed pipelines." }
             return failed.map { $0.name }.joined(separator: ", ")
         }))
@@ -227,20 +228,20 @@ public class OpsCLIManager {
         }))
 
         commands.append(CLICommand(name: "crash:list", description: "List recent crashes", category: .operations, usage: "crash:list", action: { _ in
-            let crashes = self.crashService.crashes
-            return crashes.map { "[\($0.severity.rawValue)] \($0.title) (\($0.timestamp))" }.joined(separator: "\n")
+            let crashes = self.crashService.crashLogs
+            return crashes.map { "[\($0.version) build \($0.buildNumber)] \($0.deviceModel) (\($0.timestamp))" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "crash:inspect", description: "Inspect a crash report", category: .operations, usage: "crash:inspect <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: crash:inspect <id>" }
-            guard let c = self.crashService.crashes.first(where: { $0.id == id }) else { return "Not found." }
-            return "Title: \(c.title)\nSeverity: \(c.severity.rawValue)\nStack Trace: \(c.stackTrace)\nDevice: \(c.deviceModel)"
+            guard let c = self.crashService.crashLogs.first(where: { $0.id == id }) else { return "Not found." }
+            return "Version: \(c.version)\nBuild: \(c.buildNumber)\nOS: \(c.osVersion)\nStack Trace: \(c.stackTrace)\nDevice: \(c.deviceModel)"
         }))
 
         commands.append(CLICommand(name: "crash:resolve", description: "Mark a crash as resolved", category: .operations, usage: "crash:resolve <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: crash:resolve <id>" }
-            try? await self.crashService.resolveCrash(id: id)
-            return "Crash resolved."
+            let exists = self.crashService.crashLogs.contains { $0.id == id }
+            return exists ? "Crash resolution is not tracked for crash logs." : "Not found."
         }))
 
         commands.append(CLICommand(name: "perf:active", description: "Get active connection count", category: .operations, usage: "perf:active", action: { _ in
@@ -252,7 +253,7 @@ public class OpsCLIManager {
         }))
 
         commands.append(CLICommand(name: "crash:count", description: "Count unresolved crashes", category: .operations, usage: "crash:count", action: { _ in
-            return "Unresolved crashes: \(self.crashService.crashes.filter { $0.status == "Open" }.count)"
+            return "Crash logs: \(self.crashService.crashLogs.count)"
         }))
 
         commands.append(CLICommand(name: "perf:top:endpoints", description: "List slowest endpoints", category: .operations, usage: "perf:top:endpoints", action: { _ in
