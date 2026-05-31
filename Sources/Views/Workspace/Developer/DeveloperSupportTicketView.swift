@@ -111,7 +111,7 @@ private struct SupportTicketRow: View {
                 .font(.system(size: 8, weight: .black))
                 .padding(.horizontal, 6).padding(.vertical, 2)
                 .background(ticket.status == "Closed" ? Color.secondary.opacity(0.1) : Color.green.opacity(0.1))
-                .foregroundStyle(ticket.status == "Closed" ? .secondary : .green)
+                .foregroundStyle(ticket.status == "Closed" ? .secondary : Color.green)
                 .clipShape(Capsule())
         }
         .padding(.vertical, 4)

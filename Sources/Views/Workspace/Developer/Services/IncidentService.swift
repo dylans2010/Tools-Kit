@@ -14,7 +14,8 @@ public class IncidentService: ObservableObject {
         var current = store.incidents
         current.insert(incident, at: 0)
         store.saveIncidents(current)
-        await MainActor.run { self.incidents = current }
+        let updatedIncidents = current
+        await MainActor.run { self.incidents = updatedIncidents }
     }
 
     public func updateIncident(_ incident: Incident) async throws {
@@ -23,7 +24,8 @@ public class IncidentService: ObservableObject {
             current[index] = incident
             current[index].updatedAt = Date()
             store.saveIncidents(current)
-            await MainActor.run { self.incidents = current }
+            let updatedIncidents = current
+            await MainActor.run { self.incidents = updatedIncidents }
         }
     }
 }

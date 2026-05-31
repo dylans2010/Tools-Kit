@@ -15,6 +15,7 @@ public class NetworkMonitorService: ObservableObject {
         current.insert(request, at: 0)
         if current.count > 500 { current.removeLast() }
         store.saveNetworkRequests(current)
-        await MainActor.run { self.requests = current }
+        let updatedRequests = current
+        await MainActor.run { self.requests = updatedRequests }
     }
 }

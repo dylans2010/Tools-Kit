@@ -14,6 +14,7 @@ public class SecretService: ObservableObject {
         var current = store.secrets
         current.insert(secret, at: 0)
         store.saveSecrets(current)
-        await MainActor.run { self.secrets = current }
+        let updatedSecrets = current
+        await MainActor.run { self.secrets = updatedSecrets }
     }
 }

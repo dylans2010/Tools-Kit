@@ -18,13 +18,15 @@ public class SecurityPolicyService: ObservableObject {
             current.append(policy)
         }
         store.saveSecurityPolicies(current)
-        await MainActor.run { self.policies = current }
+        let updatedPolicies = current
+        await MainActor.run { self.policies = updatedPolicies }
     }
     public func deletePolicy(id: UUID) async throws {
         var current = store.securityPolicies
         current.removeAll { $0.id == id }
         store.saveSecurityPolicies(current)
-        await MainActor.run { self.policies = current }
+        let updatedPolicies = current
+        await MainActor.run { self.policies = updatedPolicies }
     }
 
 }

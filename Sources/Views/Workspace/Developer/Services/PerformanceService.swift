@@ -23,9 +23,10 @@ public class PerformanceService: ObservableObject {
         current.insert(metric, at: 0)
         if current.count > 1000 { current.removeLast() }
         store.savePerformanceMetrics(current)
-        let reports = buildReports(from: current)
+        let updatedMetrics = current
+        let reports = buildReports(from: updatedMetrics)
         await MainActor.run {
-            self.metrics = current
+            self.metrics = updatedMetrics
             self.reports = reports
         }
     }

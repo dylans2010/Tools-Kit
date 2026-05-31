@@ -22,7 +22,8 @@ public class DatabaseService: ObservableObject {
             current.append(schema)
         }
         store.saveDatabaseSchemas(current)
-        await MainActor.run { self.schemas = current }
+        let updatedSchemas = current
+        await MainActor.run { self.schemas = updatedSchemas }
     }
 
     public func vacuum(appID: UUID) async throws {

@@ -18,7 +18,8 @@ public class RemoteConfigService: ObservableObject {
             current.append(config)
         }
         store.saveRemoteConfigs(current)
-        await MainActor.run { self.configs = current }
+        let updatedConfigs = current
+        await MainActor.run { self.configs = updatedConfigs }
     }
 
     public func addConfig(_ config: RemoteConfig) {
