@@ -2072,7 +2072,6 @@
 		DA020000000000000000000F /* AppBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000000F /* AppBuilderView.swift */; };
 		DA0200000000000000000010 /* ProjectInstallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000010 /* ProjectInstallManager.swift */; };
 		DA0200000000000000000011 /* ProjectInstallerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000011 /* ProjectInstallerView.swift */; };
-		DA0200000000000000000012 /* DeveloperWebhookManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000012 /* DeveloperWebhookManagerView.swift */; };
 		DA0200000000000000000013 /* DeveloperTeamManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000013 /* DeveloperTeamManagerView.swift */; };
 		DA0200000000000000000014 /* DeveloperAppCertificatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000014 /* DeveloperAppCertificatesView.swift */; };
 		DA0200000000000000000015 /* DeveloperSandboxEnvironmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000015 /* DeveloperSandboxEnvironmentView.swift */; };
@@ -4249,7 +4248,6 @@
 		DA010000000000000000000F /* AppBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBuilderView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000010 /* ProjectInstallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectInstallManager.swift; sourceTree = "<group>"; };
 		DA0100000000000000000011 /* ProjectInstallerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectInstallerView.swift; sourceTree = "<group>"; };
-		DA0100000000000000000012 /* DeveloperWebhookManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperWebhookManagerView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000013 /* DeveloperTeamManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperTeamManagerView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000014 /* DeveloperAppCertificatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperAppCertificatesView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000015 /* DeveloperSandboxEnvironmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSandboxEnvironmentView.swift; sourceTree = "<group>"; };
@@ -12611,7 +12609,6 @@
 				DA010000000000000000000F /* AppBuilderView.swift */,
 				DA0100000000000000000010 /* ProjectInstallManager.swift */,
 				DA0100000000000000000011 /* ProjectInstallerView.swift */,
-				DA0100000000000000000012 /* DeveloperWebhookManagerView.swift */,
 				DA0100000000000000000013 /* DeveloperTeamManagerView.swift */,
 				DA0100000000000000000014 /* DeveloperAppCertificatesView.swift */,
 				DA0100000000000000000015 /* DeveloperSandboxEnvironmentView.swift */,
@@ -12918,7 +12915,6 @@
 				DA020000000000000000000F /* AppBuilderView.swift in Sources */,
 				DA0200000000000000000010 /* ProjectInstallManager.swift in Sources */,
 				DA0200000000000000000011 /* ProjectInstallerView.swift in Sources */,
-				DA0200000000000000000012 /* DeveloperWebhookManagerView.swift in Sources */,
 				DA0200000000000000000013 /* DeveloperTeamManagerView.swift in Sources */,
 				DA0200000000000000000014 /* DeveloperAppCertificatesView.swift in Sources */,
 				DA0200000000000000000015 /* DeveloperSandboxEnvironmentView.swift in Sources */,
