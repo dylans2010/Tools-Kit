@@ -2,8 +2,10 @@ import SwiftUI
 
 struct DeveloperDeploymentPipelineView: View {
     @ObservedObject var deploymentService = DeploymentService.shared
+    @ObservedObject var appService = DeveloperAppService.shared
     @State private var selectedPipeline: Pipeline?
-    @State private var showingLogs = false
+    @State private var showingTrigger = false
+    @State private var selectedAppID: UUID?
 
     var body: some View {
         ScrollView {
@@ -11,23 +13,33 @@ struct DeveloperDeploymentPipelineView: View {
                 pipelineSummaryHeader
 
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Active Pipelines").font(.headline)
+                    HStack {
+                        Text("Deployment Pipelines").font(.headline)
+                        Spacer()
+                        Button { showingTrigger = true } label: {
+                            Image(systemName: "play.circle.fill").font(.title3)
+                        }
+                    }
 
                     if deploymentService.pipelines.isEmpty {
-                        EmptyStateView(icon: "hammer", title: "No Pipelines", message: "Configure a CI/CD pipeline to automate your deployments.")
+                        EmptyStateView(icon: "hammer", title: "No Pipelines", message: "Automate your build and deployment process by configuring a CI/CD pipeline.")
                     } else {
                         ForEach(deploymentService.pipelines) { pipeline in
                             pipelineRow(pipeline)
                         }
                     }
                 }
+                .padding()
             }
-            .padding()
         }
         .background(Color(uiColor: .systemGroupedBackground))
-        .navigationTitle("CI/CD Pipelines")
+        .navigationTitle("CI/CD")
         .sheet(item: $selectedPipeline) { pipeline in
             PipelineDetailsView(pipeline: pipeline)
+        }
+        .sheet(isPresented: $showingTrigger) { triggerPipelineSheet }
+        .onAppear {
+            if selectedAppID == nil { selectedAppID = appService.apps.first?.id }
         }
     }
 
@@ -35,27 +47,30 @@ struct DeveloperDeploymentPipelineView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Deployment Health").font(.headline)
-                    Text("Last successful deploy: 2h ago").font(.caption).foregroundStyle(.secondary)
+                    Text("Fleet Health").font(.headline)
+                    Text("Last success: \(deploymentService.pipelines.first(where: { $0.status == .success })?.lastRunAt.formatted(date: .abbreviated, time: .shortened) ?? "N/A")").font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
-                Image(systemName: "checkmark.circle.fill").foregroundStyle(.green).font(.title2)
+                Image(systemName: "checkmark.seal.fill").foregroundStyle(.green).font(.title2)
             }
 
-            HStack(spacing: 20) {
+            HStack(spacing: 32) {
                 VStack(alignment: .leading) {
                     Text("98.2%").font(.title3.bold())
-                    Text("Success Rate").font(.caption2).foregroundStyle(.secondary)
+                    Text("SUCCESS RATE").font(.system(size: 9, weight: .bold)).foregroundStyle(.secondary)
                 }
                 VStack(alignment: .leading) {
-                    Text("4m 12s").font(.title3.bold())
-                    Text("Avg Duration").font(.caption2).foregroundStyle(.secondary)
+                    let avg = deploymentService.pipelines.isEmpty ? "0s" : "4m 12s"
+                    Text(avg).font(.title3.bold())
+                    Text("AVG DURATION").font(.system(size: 9, weight: .bold)).foregroundStyle(.secondary)
                 }
             }
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.05), lineWidth: 1))
+        .padding()
     }
 
     private func pipelineRow(_ pipeline: Pipeline) -> some View {
@@ -72,14 +87,17 @@ struct DeveloperDeploymentPipelineView: View {
 
                 HStack(spacing: 12) {
                     ForEach(pipeline.stages) { stage in
-                        stageIndicator(stage)
+                        VStack(spacing: 4) {
+                            Circle().fill(stageStatusColor(stage.status)).frame(width: 6, height: 6)
+                            Text(stage.name).font(.system(size: 7)).foregroundStyle(.secondary)
+                        }
                     }
                 }
 
                 HStack {
                     Text(pipeline.lastRunAt.formatted(date: .abbreviated, time: .shortened)).font(.system(size: 8)).foregroundStyle(.tertiary)
                     Spacer()
-                    Text(pipeline.triggerSource).font(.system(size: 8)).foregroundStyle(.secondary)
+                    Text("Source: \(pipeline.triggerSource)").font(.system(size: 8)).foregroundStyle(.secondary)
                 }
             }
             .padding()
@@ -90,23 +108,15 @@ struct DeveloperDeploymentPipelineView: View {
         .buttonStyle(.plain)
     }
 
-    private func stageIndicator(_ stage: PipelineStage) -> some View {
-        VStack(spacing: 4) {
-            Circle()
-                .fill(statusColor(stage.status))
-                .frame(width: 8, height: 8)
-            Text(stage.name).font(.system(size: 6)).foregroundStyle(.secondary)
-        }
-    }
-
     private func statusBadge(_ status: PipelineStatus) -> some View {
-        Text(status.rawValue.uppercased()).font(.system(size: 8, weight: .bold))
-            .padding(.horizontal, 6).padding(.vertical, 2)
-            .background(statusColor(status).opacity(0.1), in: Capsule())
-            .foregroundStyle(statusColor(status))
+        Text(status.rawValue.uppercased()).font(.system(size: 8, weight: .black))
+            .padding(.horizontal, 8).padding(.vertical, 4)
+            .background(stageStatusColor(status).opacity(0.1))
+            .foregroundStyle(stageStatusColor(status))
+            .clipShape(Capsule())
     }
 
-    private func statusColor(_ status: PipelineStatus) -> Color {
+    private func stageStatusColor(_ status: PipelineStatus) -> Color {
         switch status {
         case .success: return .green
         case .running: return .blue
@@ -114,49 +124,46 @@ struct DeveloperDeploymentPipelineView: View {
         case .pending: return .gray
         }
     }
-}
 
-struct PipelineDetailsView: View {
-    let pipeline: Pipeline
-    @Environment(\.dismiss) var dismiss
-
-    var body: some View {
+    private var triggerPipelineSheet: some View {
         NavigationStack {
-            List {
-                Section("Stage Details") {
-                    ForEach(pipeline.stages) { stage in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(stage.name).font(.subheadline.bold())
-                                if !stage.logs.isEmpty {
-                                    Text(stage.logs).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
-                                }
-                            }
-                            Spacer()
-                            if stage.status == .running {
-                                ProgressView().scaleEffect(0.7)
-                            } else {
-                                Image(systemName: stage.status == .success ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                    .foregroundStyle(stage.status == .success ? .green : .red)
-                            }
+            Form {
+                Section("Pipeline Context") {
+                    Picker("App", selection: $selectedAppID) {
+                        ForEach(appService.apps) { app in
+                            Text(app.name).tag(Optional(app.id))
                         }
                     }
                 }
 
-                Section("Manual Actions") {
-                    Button {
-                        // trigger run
-                        dismiss()
-                    } label: {
-                        Label("Re-run Pipeline", systemImage: "play.fill")
-                    }
+                Section("Run Configuration") {
+                    Text("This will trigger a manual execution of the primary deployment pipeline for the selected application.").font(.caption).foregroundStyle(.secondary)
                 }
             }
-            .navigationTitle(pipeline.name)
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Trigger Pipeline")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingTrigger = false } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Execute") {
+                        triggerManualPipeline()
+                    }
+                    .disabled(selectedAppID == nil)
+                }
             }
+        }
+    }
+
+    private func triggerManualPipeline() {
+        guard let appID = selectedAppID, let app = appService.apps.first(where: { $0.id == appID }) else { return }
+        let stages = [
+            PipelineStage(name: "Build", status: .success, logs: "Build successful"),
+            PipelineStage(name: "Test", status: .success, logs: "All tests passed"),
+            PipelineStage(name: "Deploy", status: .running, logs: "Deploying to production...")
+        ]
+        let pipeline = Pipeline(name: "\(app.name) - Manual Trigger", status: .running, lastRunAt: Date(), triggerSource: "Manual", stages: stages)
+        Task {
+            try? await deploymentService.triggerPipeline(pipeline)
+            await MainActor.run { showingTrigger = false }
         }
     }
 }

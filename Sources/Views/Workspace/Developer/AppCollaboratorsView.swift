@@ -90,7 +90,7 @@ struct AppCollaboratorsView: View {
         NavigationStack {
             Form {
                 Section("Recipient") {
-                    TextField("Email Address", text: $inviteEmail)
+                    TextField("Email Address", text: $inviteEmail, prompt: Text("Email Address"))
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
                 }

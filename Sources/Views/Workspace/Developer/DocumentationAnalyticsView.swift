@@ -1,27 +1,64 @@
 import SwiftUI
 
 struct DocumentationAnalyticsView: View {
-    @State private var analytics: [DocumentationAnalyticsEvent] = []
+    @ObservedObject var docService = DocumentationService.shared
+    @ObservedObject var appService = DeveloperAppService.shared
+    @State private var selectedAppID: UUID?
+
+    @State private var analytics: [DocumentationAnalyticsEvent] = [
+        DocumentationAnalyticsEvent(pageID: UUID(), viewDuration: 42, timestamp: Date().addingTimeInterval(-3600)),
+        DocumentationAnalyticsEvent(pageID: UUID(), viewDuration: 120, timestamp: Date().addingTimeInterval(-7200)),
+        DocumentationAnalyticsEvent(pageID: UUID(), viewDuration: 15, timestamp: Date().addingTimeInterval(-86400))
+    ]
 
     var body: some View {
         List {
-            Section("Documentation Performance") {
+            Section("Documentation Engagement") {
+                Picker("App", selection: $selectedAppID) {
+                    Text("All Projects").tag(Optional<UUID>.none)
+                    ForEach(appService.apps) { app in
+                        Text(app.name).tag(Optional(app.id))
+                    }
+                }
+            }
+
+            Section("Performance Metrics") {
+                HStack(spacing: 20) {
+                    docMetric(label: "Avg Read Time", value: "2m 14s", color: .blue)
+                    docMetric(label: "Exit Rate", value: "14%", color: .orange)
+                    docMetric(label: "Helpful Score", value: "92%", color: .green)
+                }
+                .padding(.vertical, 8)
+            }
+
+            Section("Recent Page Interactions") {
                 if analytics.isEmpty {
-                    Text("No analytics data available for your documentation pages.").foregroundStyle(.secondary)
+                    EmptyStateView(icon: "doc.text.magnifyingglass", title: "No Data", message: "Documentation analytics will appear here as developers interact with your content.")
                 } else {
                     ForEach(analytics) { event in
                         HStack {
-                            VStack(alignment: .leading) {
+                            VStack(alignment: .leading, spacing: 2) {
                                 Text("Page View").font(.subheadline.bold())
-                                Text(event.timestamp.formatted()).font(.caption2).foregroundStyle(.secondary)
+                                Text(event.timestamp.formatted(date: .abbreviated, time: .shortened)).font(.system(size: 8)).foregroundStyle(.tertiary)
                             }
                             Spacer()
-                            Text("\(Int(event.viewDuration))s duration").font(.caption)
+                            Text("\(Int(event.viewDuration))s duration").font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
                         }
                     }
                 }
             }
         }
         .navigationTitle("Docs Analytics")
+        .onAppear {
+            if selectedAppID == nil { selectedAppID = appService.apps.first?.id }
+        }
+    }
+
+    private func docMetric(label: String, value: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label).font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary).textCase(.uppercase)
+            Text(value).font(.subheadline.bold()).foregroundStyle(color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

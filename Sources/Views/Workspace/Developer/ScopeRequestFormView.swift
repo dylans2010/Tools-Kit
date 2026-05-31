@@ -15,39 +15,43 @@ struct ScopeRequestFormView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Target Resource") {
-                    Picker("App", selection: $selectedAppID) {
-                        Text("Select App").tag(Optional<UUID>.none)
+                Section("Request Context") {
+                    Picker("Target App", selection: $selectedAppID) {
+                        Text("Account Level").tag(Optional<UUID>.none)
                         ForEach(appService.apps) { app in
                             Text(app.name).tag(Optional(app.id))
                         }
                     }
+
+                    LabeledContent("Scope", value: scopeID)
                 }
 
                 Section("Justification") {
-                    VStack(alignment: .leading) {
-                        Text("Why do you need this scope?").font(.caption).foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Why does this application require this specific permission?").font(.caption).foregroundStyle(.secondary)
                         TextEditor(text: $justification)
-                            .frame(height: 100)
+                            .frame(minHeight: 100)
                     }
                 }
 
-                Section("Usage Details") {
-                    TextField("Expected API Volume", text: $volume)
-                    VStack(alignment: .leading) {
+                Section("Implementation Details") {
+                    TextField("Estimated API Request Volume", text: $volume)
+                        .keyboardType(.numberPad)
+
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("Usage Scenario").font(.caption).foregroundStyle(.secondary)
                         TextEditor(text: $useCase)
-                            .frame(height: 100)
+                            .frame(minHeight: 100)
                     }
                 }
             }
-            .navigationTitle("Request Scope")
+            .navigationTitle("Request Permission")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Submit") { submit() }
-                        .disabled(selectedAppID == nil || justification.isEmpty)
+                        .disabled(justification.count < 10)
                 }
             }
             .disabled(isSubmitting)
@@ -55,10 +59,9 @@ struct ScopeRequestFormView: View {
     }
 
     private func submit() {
-        guard let appID = selectedAppID else { return }
         isSubmitting = true
         let request = ScopeRequest(
-            appId: appID,
+            appId: selectedAppID ?? UUID(),
             scopeIdentifier: scopeID,
             justification: justification,
             useCaseDescription: useCase,

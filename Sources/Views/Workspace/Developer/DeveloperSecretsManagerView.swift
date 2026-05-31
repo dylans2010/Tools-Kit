@@ -2,152 +2,96 @@ import SwiftUI
 
 struct DeveloperSecretsManagerView: View {
     @ObservedObject var secretService = SecretService.shared
+    @ObservedObject var appService = DeveloperAppService.shared
+
     @State private var showingAddSecret = false
-    @State private var selectedEnvironment: KeyEnvironment = .live
-    @State private var revealedSecrets: Set<UUID> = []
+    @State private var secretKey = ""
+    @State private var secretValue = ""
+    @State private var selectedAppID: UUID?
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                secretsSecurityHeader
-
-                VStack(alignment: .leading, spacing: 16) {
-                    HStack {
-                        Text("Secrets").font(.headline)
-                        Spacer()
-                        Button { showingAddSecret = true } label: {
-                            Image(systemName: "plus.circle.fill").font(.title3)
-                        }
-                    }
-
-                    Picker("Environment", selection: $selectedEnvironment) {
-                        ForEach(KeyEnvironment.allCases, id: \.self) { env in
-                            Text(env.rawValue).tag(env)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-
-                    if secretService.secrets.isEmpty {
-                        EmptyStateView(icon: "lock.rectangle", title: "No Secrets", message: "Securely store environment variables and sensitive credentials.")
-                    } else {
-                        ForEach(secretService.secrets.filter { $0.environment == selectedEnvironment }) { secret in
-                            secretCard(secret)
-                        }
-                    }
-                }
-                .padding()
-            }
-        }
-        .background(Color(uiColor: .systemGroupedBackground))
-        .navigationTitle("Secrets Manager")
-        .sheet(isPresented: $showingAddSecret) {
-            AddSecretSheet(environment: selectedEnvironment)
-        }
-    }
-
-    private var secretsSecurityHeader: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Vault Status").font(.headline)
-                    Text("Encrypted at rest (AES-GCM)").font(.caption).foregroundStyle(.secondary)
-                }
-                Spacer()
-                Image(systemName: "lock.shield.fill").foregroundStyle(.blue).font(.title2)
-            }
-
-            Text("Secrets are encrypted and never stored in plain text. Access is logged for security audits.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .padding()
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .padding()
-    }
-
-    private func secretCard(_ secret: Secret) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(secret.key).font(.subheadline.monospaced()).bold()
-                Spacer()
-                Button {
-                    if revealedSecrets.contains(secret.id) {
-                        revealedSecrets.remove(secret.id)
-                    } else {
-                        revealedSecrets.insert(secret.id)
-                    }
-                } label: {
-                    Image(systemName: revealedSecrets.contains(secret.id) ? "eye.slash" : "eye")
+        List {
+            Section("Security Policy") {
+                HStack {
+                    Image(systemName: "shield.lefthalf.filled").foregroundStyle(.blue)
+                    Text("Secrets are encrypted at rest and only exposed during runtime execution environment injection.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                .padding(.vertical, 4)
             }
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Value").font(.caption2.bold()).foregroundStyle(.secondary)
-                if revealedSecrets.contains(secret.id) {
-                    Text(secret.value).font(.subheadline.monospaced())
-                } else {
-                    Text("••••••••••••••••").font(.subheadline.monospaced()).foregroundStyle(.tertiary)
+            Section {
+                Button { showingAddSecret = true } label: {
+                    Label("Add Secure Secret", systemImage: "lock.plus.fill").font(.subheadline.bold())
                 }
             }
 
-            HStack {
-                Text("Created \(secret.createdAt.formatted(date: .abbreviated, time: .shortened))").font(.system(size: 8)).foregroundStyle(.tertiary)
-                Spacer()
-                Button(role: .destructive) {
-                    secretService.deleteSecret(id: secret.id)
-                } label: {
-                    Image(systemName: "trash").font(.caption)
+            Section("Application Secrets") {
+                if secretService.secrets.isEmpty {
+                    EmptyStateView(icon: "lock.shield", title: "No Secrets", message: "Register sensitive environment variables like API credentials or private keys.")
+                } else {
+                    ForEach(secretService.secrets) { secret in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(secret.key).font(.subheadline.bold()).monospaced()
+                                Spacer()
+                                if let app = appService.apps.first(where: { $0.id == secret.appID }) {
+                                    Text(app.name).font(.system(size: 8, weight: .bold)).padding(.horizontal, 6).padding(.vertical, 2).background(Color.primary.opacity(0.05), in: Capsule())
+                                }
+                            }
+                            Text("Last updated \(secret.updatedAt.formatted(date: .abbreviated, time: .shortened))").font(.system(size: 8)).foregroundStyle(.tertiary)
+                        }
+                        .padding(.vertical, 4)
+                    }
                 }
             }
         }
-        .padding()
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05), lineWidth: 1))
+        .navigationTitle("Secrets Manager")
+        .sheet(isPresented: $showingAddSecret) { addSecretSheet }
     }
-}
 
-struct AddSecretSheet: View {
-    @Environment(\.dismiss) var dismiss
-    @ObservedObject var secretService = SecretService.shared
-    let environment: KeyEnvironment
-
-    @State private var key = ""
-    @State private var value = ""
-
-    var body: some View {
+    private var addSecretSheet: some View {
         NavigationStack {
             Form {
-                Section("New Secret") {
-                    TextField("Key (e.g. STRIPE_API_KEY)", text: $key)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
-
-                    VStack(alignment: .leading) {
-                        Text("Value").font(.caption).foregroundStyle(.secondary)
-                        TextEditor(text: $value).frame(height: 100).font(.system(.subheadline, design: .monospaced))
+                Section("Scope") {
+                    Picker("App", selection: $selectedAppID) {
+                        Text("Select App").tag(Optional<UUID>.none)
+                        ForEach(appService.apps) { app in
+                            Text(app.name).tag(Optional(app.id))
+                        }
                     }
                 }
 
-                Section {
-                    Text("This secret will be stored in the \(environment.rawValue) vault.")
-                        .font(.caption).foregroundStyle(.secondary)
+                Section("Data") {
+                    TextField("Secret Key", text: $secretKey, prompt: Text("e.g. STRIPE_API_KEY"))
+                        .autocapitalization(.allCharacters)
+                        .disableAutocorrection(true)
+                    SecureField("Secret Value", text: $secretValue)
                 }
             }
-            .navigationTitle("Add Secret")
+            .navigationTitle("New Secret")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddSecret = false } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        let newSecret = Secret(id: UUID(), key: key, value: value, environment: environment, createdAt: Date())
-                        secretService.addSecret(newSecret)
-                        dismiss()
+                        saveSecret()
                     }
-                    .disabled(key.isEmpty || value.isEmpty)
+                    .disabled(secretKey.isEmpty || secretValue.isEmpty || selectedAppID == nil)
                 }
+            }
+        }
+    }
+
+    private func saveSecret() {
+        guard let appID = selectedAppID else { return }
+        let secret = Secret(appID: appID, key: secretKey, value: secretValue)
+        Task {
+            try? await secretService.saveSecret(secret)
+            await MainActor.run {
+                showingAddSecret = false
+                secretKey = ""
+                secretValue = ""
             }
         }
     }

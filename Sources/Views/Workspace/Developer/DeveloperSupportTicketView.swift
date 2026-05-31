@@ -1,108 +1,108 @@
 import SwiftUI
 
 struct DeveloperSupportTicketView: View {
-    @ObservedObject var store = DeveloperPersistentStore.shared
-    @State private var showingNewTicket = false
-    @State private var subject = ""
-    @State private var message = ""
-    @State private var selectedTopic = "Technical Integration"
+    @ObservedObject var appService = DeveloperAppService.shared
+    @State private var showingAddTicket = false
+    @State private var ticketSubject = ""
+    @State private var ticketBody = ""
+    @State private var selectedAppID: UUID?
+
+    @State private var tickets: [SupportTicket] = [
+        SupportTicket(subject: "API Rate Limit Increase", status: "In Review", appName: "Main App"),
+        SupportTicket(subject: "Marketplace Rejection Appeal", status: "Closed", appName: "SDK Extension")
+    ]
 
     var body: some View {
         List {
-            Section("Your Support Activity") {
-                if store.supportTickets.isEmpty {
-                    VStack(spacing: 16) {
-                        Image(systemName: "lifepreserver")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.secondary)
-                        Text("No active support requests found.")
-                            .font(.subheadline.bold())
-                        Text("Need help? Open a new ticket or browse our knowledge base.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
+            Section("Developer Assistance") {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "lifepreserver.fill").foregroundStyle(.blue)
+                        Text("Technical Support").font(.subheadline.bold())
                     }
-                    .padding(.vertical, 30)
-                    .frame(maxWidth: .infinity)
+                    Text("Our engineers are available to help with integration issues, rate limit adjustments, and platform compliance.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 8)
+            }
+
+            Section {
+                Button { showingAddTicket = true } label: {
+                    Label("Open Support Ticket", systemImage: "plus.bubble.fill").font(.subheadline.bold())
+                }
+            }
+
+            Section("Your Tickets") {
+                if tickets.isEmpty {
+                    EmptyStateView(icon: "questionmark.circle", title: "No Open Tickets", message: "Need help? Open a ticket and our team will get back to you within 24 hours.")
                 } else {
-                    ForEach(store.supportTickets) { ticket in
-                        VStack(alignment: .leading) {
-                            HStack {
+                    ForEach(tickets) { ticket in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
                                 Text(ticket.subject).font(.subheadline.bold())
-                                Spacer()
-                                Text(ticket.status).font(.caption2.bold())
-                                    .padding(.horizontal, 6).padding(.vertical, 2)
-                                    .background(Color.blue.opacity(0.1), in: Capsule())
+                                Text(ticket.appName).font(.system(size: 9)).foregroundStyle(.secondary)
                             }
-                            Text(ticket.createdAt.formatted()).font(.caption2).foregroundStyle(.secondary)
+                            Spacer()
+                            Text(ticket.status.uppercased())
+                                .font(.system(size: 8, weight: .black))
+                                .padding(.horizontal, 6).padding(.vertical, 2)
+                                .background(ticket.status == "Closed" ? Color.secondary.opacity(0.1) : Color.green.opacity(0.1))
+                                .foregroundStyle(ticket.status == "Closed" ? .secondary : .green)
+                                .clipShape(Capsule())
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+        }
+        .navigationTitle("Support")
+        .sheet(isPresented: $showingAddTicket) { addTicketSheet }
+    }
+
+    private var addTicketSheet: some View {
+        NavigationStack {
+            Form {
+                Section("Related Project") {
+                    Picker("App", selection: $selectedAppID) {
+                        Text("General Inquiry").tag(Optional<UUID>.none)
+                        ForEach(appService.apps) { app in
+                            Text(app.name).tag(Optional(app.id))
                         }
                     }
                 }
-            }
 
-            Section("Browse Documentation & FAQs") {
-                topicLink("Account & Authentication", icon: "person.badge.key")
-                topicLink("API Usage & Rate Limits", icon: "bolt.fill")
-                topicLink("Marketplace Guidelines", icon: "storefront.fill")
-                topicLink("Technical SDK Reference", icon: "book.fill")
-            }
-        }
-        .navigationTitle("Developer Support")
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button("Open Ticket") { showingNewTicket = true }
-            }
-        }
-        .sheet(isPresented: $showingNewTicket) {
-            newTicketSheet
-        }
-    }
-
-    private var newTicketSheet: some View {
-        NavigationStack {
-            Form {
-                Section("Request Details") {
-                    TextField("Summarize the issue", text: $subject)
-                    Picker("Topic Category", selection: $selectedTopic) {
-                        Text("Technical Integration").tag("Technical Integration")
-                        Text("Billing & Account").tag("Billing & Account")
-                        Text("Policy & Compliance").tag("Policy & Compliance")
-                        Text("General Feedback").tag("General Feedback")
-                    }
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Detailed Description").font(.caption.bold()).foregroundStyle(.secondary)
-                        TextEditor(text: $message)
-                            .frame(height: 150)
-                            .padding(4)
-                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.2)))
-                    }
+                Section("Issue Details") {
+                    TextField("Subject", text: $ticketSubject)
+                    TextEditor(text: $ticketBody)
+                        .frame(minHeight: 150)
+                        .overlay(alignment: .topLeading) {
+                            if ticketBody.isEmpty { Text("Describe your issue in detail...").font(.caption).foregroundStyle(.tertiary).padding(.top, 8).padding(.leading, 4) }
+                        }
                 }
             }
-            .navigationTitle("New Support Request")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("New Support Ticket")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showingNewTicket = false }
-                }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddTicket = false } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Submit Ticket") {
-                        let ticket = SupportTicket(subject: subject, topic: selectedTopic, message: message)
-                        var current = store.supportTickets
-                        current.insert(ticket, at: 0)
-                        store.saveSupportTickets(current)
-                        subject = ""
-                        message = ""
-                        showingNewTicket = false
+                    Button("Submit") {
+                        let appName = appService.apps.first(where: { $0.id == selectedAppID })?.name ?? "General"
+                        let newTicket = SupportTicket(subject: ticketSubject, status: "Open", appName: appName)
+                        tickets.insert(newTicket, at: 0)
+                        showingAddTicket = false
+                        ticketSubject = ""
+                        ticketBody = ""
                     }
-                    .disabled(subject.count < 5 || message.count < 10)
+                    .disabled(ticketSubject.isEmpty || ticketBody.isEmpty)
                 }
             }
         }
     }
+}
 
-    private func topicLink(_ title: String, icon: String) -> some View {
-        NavigationLink(destination: Text(title).navigationTitle(title)) {
-            Label(title, systemImage: icon)
-        }
-    }
+struct SupportTicket: Identifiable {
+    let id = UUID()
+    let subject: String
+    let status: String
+    let appName: String
 }

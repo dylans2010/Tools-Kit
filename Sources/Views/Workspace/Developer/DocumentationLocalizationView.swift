@@ -1,36 +1,67 @@
 import SwiftUI
 
 struct DocumentationLocalizationView: View {
-    @ObservedObject var localizationService = LocalizationService.shared
-    @State private var selectedLanguage: String = "en"
-    @State private var showingAddLanguage = false
+    @ObservedObject var locService = LocalizationService.shared
+    @ObservedObject var appService = DeveloperAppService.shared
+    @State private var selectedAppID: UUID?
+    @State private var showingAddLocale = false
+
+    var locales: [LocalizationLocale] {
+        locService.locales.filter { $0.appID == selectedAppID }
+    }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
+                appSelector
                 progressDashboard
 
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
                         Text("Active Locales").font(.headline)
                         Spacer()
-                        Button { showingAddLanguage = true } label: {
+                        Button { showingAddLocale = true } label: {
                             Image(systemName: "plus.circle.fill").font(.title3)
                         }
                     }
 
-                    ForEach(localizationService.locales) { locale in
-                        localeCard(locale)
+                    if locales.isEmpty && selectedAppID != nil {
+                        EmptyStateView(icon: "character.book.closed", title: "No Locales", message: "Enable multi-language support for your documentation to reach more developers globally.")
+                    } else {
+                        ForEach(locales) { locale in
+                            localeCard(locale)
+                        }
                     }
                 }
+                .padding()
             }
-            .padding()
         }
         .background(Color(uiColor: .systemGroupedBackground))
-        .navigationTitle("Localization")
-        .sheet(isPresented: $showingAddLanguage) {
-            addLanguageSheet
+        .navigationTitle("Doc Localization")
+        .sheet(isPresented: $showingAddLocale) {
+            addLocaleSheet
         }
+        .onAppear {
+            if selectedAppID == nil { selectedAppID = appService.apps.first?.id }
+        }
+    }
+
+    private var appSelector: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Active Project").font(.system(size: 10, weight: .bold)).foregroundStyle(.secondary).textCase(.uppercase)
+            Picker("App", selection: $selectedAppID) {
+                ForEach(appService.apps) { app in
+                    Text(app.name).tag(Optional(app.id))
+                }
+            }
+            .pickerStyle(.menu)
+            .padding(4)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+        .padding()
+        .background(Color(uiColor: .systemBackground))
+        .overlay(alignment: .bottom) { Divider() }
     }
 
     private var progressDashboard: some View {
@@ -38,23 +69,23 @@ struct DocumentationLocalizationView: View {
             Text("Global Coverage").font(.headline)
 
             HStack(spacing: 20) {
-                coverageMetric(label: "Locales", value: "\(localizationService.locales.count)", color: .blue)
-                coverageMetric(label: "Avg Completion", value: "\(Int(localizationService.overallProgress * 100))%", color: .green)
-                coverageMetric(label: "Pending Keys", value: "\(localizationService.totalPendingKeys)", color: .orange)
+                coverageMetric(label: "Locales", value: "\(locales.count)", color: .blue)
+                let avg = locales.isEmpty ? 0 : locales.map({$0.completionPercentage}).reduce(0, +) / Double(locales.count)
+                coverageMetric(label: "Completion", value: "\(Int(avg * 100))%", color: .green)
+                coverageMetric(label: "Sync Status", value: "OK", color: .orange)
             }
-
-            ProgressView(value: localizationService.overallProgress)
-                .tint(.green)
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.05), lineWidth: 1))
+        .padding()
     }
 
     private func coverageMetric(label: String, value: String, color: Color) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(value).font(.title3.bold()).foregroundStyle(color)
-            Text(label).font(.caption2).foregroundStyle(.secondary)
+            Text(label).font(.system(size: 9, weight: .bold)).foregroundStyle(.secondary).textCase(.uppercase)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -62,23 +93,22 @@ struct DocumentationLocalizationView: View {
     private func localeCard(_ locale: LocalizationLocale) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(locale.flag).font(.title3)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(locale.name).font(.subheadline.bold())
-                    Text(locale.code.uppercased()).font(.caption2).foregroundStyle(.secondary)
+                    Text(locale.code.uppercased()).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
                 }
                 Spacer()
-                Text("\(Int(locale.progress * 100))%").font(.caption.bold())
+                Text("\(Int(locale.completionPercentage * 100))%").font(.caption.bold())
             }
 
-            ProgressView(value: locale.progress)
+            ProgressView(value: locale.completionPercentage)
                 .progressViewStyle(.linear)
-                .tint(locale.progress == 1.0 ? .green : .blue)
+                .tint(locale.completionPercentage == 1.0 ? .green : .blue)
 
             HStack {
-                Text("\(locale.translatedKeys) / \(locale.totalKeys) keys translated").font(.system(size: 9)).foregroundStyle(.secondary)
+                Text("Sync active").font(.system(size: 8)).foregroundStyle(.secondary)
                 Spacer()
-                NavigationLink(destination: LocaleEditorView(locale: locale)) {
+                NavigationLink(destination: Text("\(locale.name) Editor")) {
                     Text("Translate").font(.system(size: 10, weight: .bold))
                 }
             }
@@ -86,58 +116,44 @@ struct DocumentationLocalizationView: View {
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05)))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05), lineWidth: 1))
     }
 
-    private var addLanguageSheet: some View {
+    private var addLocaleSheet: some View {
         NavigationStack {
             List {
-                Section("Available Languages") {
-                    Text("Spanish (ES)").onTapGesture { addLocale("es", name: "Spanish", flag: "🇪🇸") }
-                    Text("French (FR)").onTapGesture { addLocale("fr", name: "French", flag: "🇫🇷") }
-                    Text("German (DE)").onTapGesture { addLocale("de", name: "German", flag: "🇩🇪") }
-                    Text("Japanese (JP)").onTapGesture { addLocale("ja", name: "Japanese", flag: "🇯🇵") }
+                Section("Available Regions") {
+                    localeOption(code: "es-ES", name: "Spanish")
+                    localeOption(code: "fr-FR", name: "French")
+                    localeOption(code: "de-DE", name: "German")
+                    localeOption(code: "ja-JP", name: "Japanese")
                 }
             }
-            .navigationTitle("Add Locale")
+            .navigationTitle("Add Language")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddLanguage = false } }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddLocale = false } }
             }
         }
     }
 
-    private func addLocale(_ code: String, name: String, flag: String) {
-        let newLocale = LocalizationLocale(code: code, name: name, flag: flag, translatedKeys: 0, totalKeys: 120)
-        localizationService.addLocale(newLocale)
-        showingAddLanguage = false
-    }
-}
-
-struct LocaleEditorView: View {
-    let locale: LocalizationLocale
-    @ObservedObject var localizationService = LocalizationService.shared
-    @State private var searchText = ""
-
-    var body: some View {
-        List {
-            Section("Translation Interface") {
-                TextField("Search keys...", text: $searchText)
-                    .textFieldStyle(.roundedBorder)
-            }
-
-            Section("Pending Translations") {
-                ForEach(0..<5) { i in
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("auth_login_welcome").font(.caption.monospaced()).foregroundStyle(.secondary)
-                        Text("Welcome back to the portal!").font(.subheadline)
-                        TextField("Translation", text: .constant(""))
-                            .textFieldStyle(.roundedBorder)
-                            .font(.subheadline)
-                    }
-                    .padding(.vertical, 4)
-                }
+    private func localeOption(code: String, name: String) -> some View {
+        Button {
+            addLocale(code, name: name)
+        } label: {
+            HStack {
+                Text(name).font(.subheadline)
+                Spacer()
+                Text(code).font(.caption.monospaced()).foregroundStyle(.secondary)
             }
         }
-        .navigationTitle("\(locale.name) Translation")
+    }
+
+    private func addLocale(_ code: String, name: String) {
+        guard let appID = selectedAppID else { return }
+        let newLocale = LocalizationLocale(appID: appID, code: code, name: name)
+        Task {
+            try? await locService.addLocale(newLocale)
+            await MainActor.run { showingAddLocale = false }
+        }
     }
 }

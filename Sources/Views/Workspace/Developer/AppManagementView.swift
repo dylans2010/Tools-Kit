@@ -6,6 +6,8 @@ struct AppManagementView: View {
     @State private var searchText = ""
     @State private var selectedType: DeveloperAppType?
     @State private var showingImportSheet = false
+    @State private var appToDelete: DeveloperApp?
+    @State private var showingDeleteAlert = false
 
     var filteredApps: [DeveloperApp] {
         appService.apps.filter { app in
@@ -16,14 +18,14 @@ struct AppManagementView: View {
 
     var body: some View {
         List {
-            Section {
-                if !projectManager.projects.isEmpty {
+            if !projectManager.projects.isEmpty {
+                Section {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Image(systemName: "lightbulb.fill").foregroundStyle(.yellow)
-                            Text("Import Existing Work").font(.subheadline.bold())
+                            Image(systemName: "sparkles").foregroundStyle(.yellow)
+                            Text("Import Projects").font(.subheadline.bold())
                         }
-                        Text("We detected \(projectManager.projects.count) SDK projects. You can import them to manage as apps.")
+                        Text("We found \(projectManager.projects.count) SDK projects that can be registered as applications.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
 
@@ -33,18 +35,18 @@ struct AppManagementView: View {
                             Text("Review SDK Projects")
                                 .font(.caption.bold())
                                 .padding(.horizontal, 12).padding(.vertical, 6)
-                                .background(Color.accentColor)
-                                .foregroundStyle(.white)
+                                .background(Color.primary)
+                                .foregroundStyle(Color(uiColor: .systemBackground))
                                 .clipShape(Capsule())
                         }
                     }
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 4)
                 }
             }
 
             Section {
-                Picker("Filter by Type", selection: $selectedType) {
-                    Text("All Types").tag(Optional<DeveloperAppType>.none)
+                Picker("Type", selection: $selectedType) {
+                    Text("All Categories").tag(Optional<DeveloperAppType>.none)
                     ForEach(DeveloperAppType.allCases, id: \.self) { type in
                         Text(type.rawValue).tag(Optional(type))
                     }
@@ -53,42 +55,26 @@ struct AppManagementView: View {
 
             Section {
                 if filteredApps.isEmpty {
-                    VStack(spacing: 16) {
-                        Image(systemName: "square.stack.3d.up.slash")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.secondary)
-                        Text(searchText.isEmpty ? "No apps registered." : "No apps match your search.")
-                            .font(.headline)
-                        Text("Register your app to manage its lifecycle, versions, and scopes.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-
-                        if searchText.isEmpty {
-                            NavigationLink(destination: AppBuilderView()) {
-                                Text("Register First App")
-                                    .fontWeight(.bold)
-                                    .padding(.horizontal, 24)
-                                    .padding(.vertical, 12)
-                                    .background(Color.accentColor)
-                                    .foregroundStyle(.white)
-                                    .clipShape(Capsule())
-                            }
-                        }
-                    }
-                    .padding(.vertical, 40)
-                    .frame(maxWidth: .infinity)
+                    EmptyStateView(icon: "square.stack.3d.up.slash", title: "No Applications", message: searchText.isEmpty ? "Register your first application to start managing its lifecycle." : "No applications match your search criteria.")
+                        .padding(.vertical, 40)
                 } else {
                     ForEach(filteredApps) { app in
                         NavigationLink(destination: AppDetailView(appID: app.id)) {
                             appRow(app)
                         }
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                appToDelete = app
+                                showingDeleteAlert = true
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                     }
-                    .onDelete(perform: deleteApps)
                 }
             }
         }
-        .searchable(text: $searchText, prompt: "Search apps by name or bundle ID")
+        .searchable(text: $searchText, prompt: "Search by name or bundle ID")
         .navigationTitle("App Management")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -103,12 +89,21 @@ struct AppManagementView: View {
         .refreshable {
             appService.loadApps()
         }
+        .confirmationDialog("Delete Application", isPresented: $showingDeleteAlert, titleVisibility: .visible) {
+            Button("Delete \(appToDelete?.name ?? "App")", role: .destructive) {
+                if let id = appToDelete?.id {
+                    Task { try? await appService.deleteApp(id: id) }
+                }
+            }
+        } message: {
+            Text("This will permanently remove the application and all associated metadata. This action cannot be undone.")
+        }
     }
 
     private func appRow(_ app: DeveloperApp) -> some View {
         HStack(spacing: 12) {
             Image(systemName: app.iconName)
-                .font(.title2)
+                .font(.system(size: 20))
                 .foregroundStyle(Color.accentColor)
                 .frame(width: 44, height: 44)
                 .background(Color.accentColor.opacity(0.1))
@@ -116,24 +111,24 @@ struct AppManagementView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(app.name).font(.subheadline.bold())
-                Text("\(app.type.rawValue) • \(app.version)").font(.caption2).foregroundStyle(.secondary)
+                Text("\(app.type.rawValue) • \(app.version)").font(.system(size: 10)).foregroundStyle(.secondary)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 4) {
                 statusBadge(app.status)
-                if app.installCount > 0 {
-                    Text("\(app.installCount) installs").font(.system(size: 8)).foregroundStyle(.tertiary)
-                }
+                Text(app.bundleId).font(.system(size: 8, design: .monospaced)).foregroundStyle(.tertiary)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 
     private func statusBadge(_ status: DeveloperAppStatus) -> some View {
-        Text(status.rawValue).font(.system(size: 10, weight: .bold))
-            .padding(.horizontal, 8).padding(.vertical, 4)
-            .background(statusColor(status).opacity(0.1), in: Capsule())
+        Text(status.rawValue.uppercased())
+            .font(.system(size: 8, weight: .bold))
+            .padding(.horizontal, 6).padding(.vertical, 2)
+            .background(statusColor(status).opacity(0.1))
             .foregroundStyle(statusColor(status))
+            .clipShape(Capsule())
     }
 
     private func statusColor(_ status: DeveloperAppStatus) -> Color {
@@ -144,65 +139,6 @@ struct AppManagementView: View {
         case .suspended: return .red
         case .deprecated: return .secondary
         case .archived: return .black
-        }
-    }
-
-    private func deleteApps(at offsets: IndexSet) {
-        for index in offsets {
-            let app = filteredApps[index]
-            Task {
-                try? await appService.deleteApp(id: app.id)
-            }
-        }
-    }
-}
-
-struct ProjectImportView: View {
-    @Environment(\.dismiss) var dismiss
-    @StateObject private var projectManager = SDKProjectManager.shared
-    @ObservedObject var appService = DeveloperAppService.shared
-
-    var body: some View {
-        NavigationStack {
-            List(projectManager.projects) { project in
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(project.name).font(.subheadline.bold())
-                        Text("v\(project.version)").font(.caption).foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    if appService.apps.contains(where: { $0.name == project.name }) {
-                        Text("Imported").font(.caption2.bold()).foregroundStyle(.green)
-                    } else {
-                        Button("Import") {
-                            importProject(project)
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                    }
-                }
-            }
-            .navigationTitle("Import SDK Projects")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") { dismiss() }
-                }
-            }
-        }
-    }
-
-    private func importProject(_ project: SDKProject) {
-        let newApp = DeveloperApp(
-            name: project.name,
-            type: .app,
-            status: .draft,
-            version: "\(project.version).0.0",
-            description: project.description,
-            bundleId: "com.sdk.\(project.id.uuidString.prefix(8).lowercased())",
-            grantedScopes: project.enabledScopes
-        )
-        Task {
-            try? await appService.createApp(newApp)
         }
     }
 }

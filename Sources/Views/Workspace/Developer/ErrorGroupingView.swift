@@ -1,49 +1,34 @@
 import SwiftUI
 
 struct ErrorGroupingView: View {
-    @ObservedObject var logService = DeveloperLogService.shared
-    @State private var selectedError: String?
-
-    var groupedErrors: [(message: String, count: Int, lastSeen: Date)] {
-        let errors = logService.logEntries.filter { $0.severity == .error || $0.severity == .critical }
-        let groups = Dictionary(grouping: errors, by: { $0.message })
-        return groups.map { (message: $0.key, count: $0.value.count, lastSeen: $0.value.map { $0.timestamp }.max() ?? Date()) }
-            .sorted(by: { $0.count > $1.count })
-    }
+    @ObservedObject var analyticsService = AnalyticsService.shared
+    @State private var errors: [String: Int] = [:]
 
     var body: some View {
         List {
-            if groupedErrors.isEmpty {
-                EmptyStateView(icon: "checkmark.circle", title: "No Errors", message: "No critical errors reported.")
-            } else {
-                ForEach(groupedErrors, id: \.message) { group in
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text(group.message)
-                                .font(.subheadline.bold())
-                                .lineLimit(2)
-                            Spacer()
-                            Text("\(group.count)")
-                                .font(.caption.bold())
-                                .padding(.horizontal, 8).padding(.vertical, 4)
-                                .background(Color.red.opacity(0.1), in: Capsule())
-                                .foregroundStyle(.red)
-                        }
-
-                        HStack {
-                            Text("Last seen: \(group.lastSeen.formatted())")
-                            Spacer()
-                            Button("View Instances") {
-                                selectedError = group.message
+            Section("Grouped Exceptions") {
+                if errors.isEmpty {
+                    Text("No errors reported in the last 24 hours.").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(errors.sorted(by: { $0.value > $1.value }), id: \.key) { key, value in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(key).font(.subheadline.bold()).lineLimit(1)
+                                Spacer()
+                                Text("\(value) events").font(.system(size: 8, weight: .bold)).foregroundStyle(.red)
                             }
+                            Text("Last seen 5m ago").font(.system(size: 8)).foregroundStyle(.tertiary)
                         }
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
                     }
-                    .padding(.vertical, 4)
                 }
             }
         }
         .navigationTitle("Error Grouping")
+        .onAppear {
+            Task {
+                let report = try? await analyticsService.fetchErrorSummary(appID: nil, from: Date().addingTimeInterval(-86400), to: Date())
+                await MainActor.run { self.errors = report ?? [:] }
+            }
+        }
     }
 }

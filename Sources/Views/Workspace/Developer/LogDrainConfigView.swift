@@ -1,37 +1,58 @@
 import SwiftUI
 
 struct LogDrainConfigView: View {
-    @ObservedObject var logService = DeveloperLogService.shared
-    @State private var showingAdd = false
-    @State private var newName = ""
-    @State private var newURL = ""
+    @State private var showingAddDrain = false
+    @State private var drainUrl = "https://"
+    @State private var drainType: DrainType = .http
+
+    enum DrainType: String, CaseIterable {
+        case http = "HTTP POST"
+        case syslog = "Syslog"
+        case datadog = "Datadog"
+        case logflare = "Logflare"
+    }
 
     var body: some View {
         List {
-            Section("External Log Drains") {
-                if logService.logDrains.isEmpty {
-                    Text("No log drains configured. Stream your logs to external providers for long-term storage and analysis.").foregroundStyle(.secondary)
-                } else {
-                    ForEach(logService.logDrains) { drain in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(drain.name).font(.headline)
-                            Text(drain.targetURL).font(.caption).foregroundStyle(.secondary)
-                        }
+            Section("Streaming Configuration") {
+                Text("Configure external endpoints to stream your application logs in real-time for long-term retention and external analysis.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
+            Section("Active Drains") {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("Default Data Lake").font(.subheadline.bold())
+                        Text("https://ingest.internal.lake").font(.caption).monospaced().foregroundStyle(.secondary)
                     }
-                    .onDelete(perform: deleteDrain)
+                    Spacer()
+                    Text("ACTIVE").font(.system(size: 8, weight: .bold)).foregroundStyle(.green)
                 }
+            }
+
+            Section {
+                Button { showingAddDrain = true } label: { Label("Add Log Drain", systemImage: "plus.circle") }
             }
         }
         .navigationTitle("Log Drains")
-        .toolbar {
-            Button { showingAdd = true } label: { Image(systemName: "plus") }
-        }
-    }
-
-    private func deleteDrain(at offsets: IndexSet) {
-        for index in offsets {
-            let drain = logService.logDrains[index]
-            Task { try? await logService.deleteLogDrain(id: drain.id) }
+        .sheet(isPresented: $showingAddDrain) {
+            NavigationStack {
+                Form {
+                    Section("Drain Details") {
+                        TextField("Endpoint URL", text: $drainUrl)
+                        Picker("Type", selection: $drainType) {
+                            ForEach(DrainType.allCases, id: \.self) { type in
+                                Text(type.rawValue).tag(type)
+                            }
+                        }
+                    }
+                }
+                .navigationTitle("New Drain")
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddDrain = false } }
+                    ToolbarItem(placement: .confirmationAction) { Button("Add") { showingAddDrain = false } }
+                }
+            }
         }
     }
 }
