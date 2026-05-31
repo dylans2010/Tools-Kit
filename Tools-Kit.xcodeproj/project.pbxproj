@@ -2132,7 +2132,7 @@
 		DA020000000000000000004D /* DeveloperLogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000004D /* DeveloperLogService.swift */; };
 		DA020000000000000000004E /* DeveloperProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000004E /* DeveloperProfileService.swift */; };
 		DA020000000000000000004F /* DeveloperScopeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000004F /* DeveloperScopeService.swift */; };
-		EX0200000000000000000001 /* MCPModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EX0100000000000000000001 /* MCPModels.swift */; };
+		XM0200000000000000000001 /* MCPModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = XM0100000000000000000001 /* MCPModels.swift */; };
 		EX0200000000000000000002 /* MCPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EX0100000000000000000002 /* MCPManager.swift */; };
 		EX0200000000000000000003 /* MCPMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EX0100000000000000000003 /* MCPMainView.swift */; };
 		DA0200000000000000000050 /* DocumentationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000050 /* DocumentationService.swift */; };
@@ -4318,7 +4318,7 @@
 		DA010000000000000000004D /* DeveloperLogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeveloperLogService.swift; path = Sources/Views/Workspace/Developer/Services/DeveloperLogService.swift; sourceTree = SOURCE_ROOT; };
 		DA010000000000000000004E /* DeveloperProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeveloperProfileService.swift; path = Sources/Views/Workspace/Developer/Services/DeveloperProfileService.swift; sourceTree = SOURCE_ROOT; };
 		DA010000000000000000004F /* DeveloperScopeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeveloperScopeService.swift; path = Sources/Views/Workspace/Developer/Services/DeveloperScopeService.swift; sourceTree = SOURCE_ROOT; };
-		EX0100000000000000000001 /* MCPModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MCPModels.swift; path = Sources/Views/External/MCPModels.swift; sourceTree = SOURCE_ROOT; };
+		XM0100000000000000000001 /* MCPModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MCPModels.swift; path = Sources/Views/External/MCPModels.swift; sourceTree = SOURCE_ROOT; };
 		EX0100000000000000000002 /* MCPManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MCPManager.swift; path = Sources/Views/External/MCPManager.swift; sourceTree = SOURCE_ROOT; };
 		EX0100000000000000000003 /* MCPMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MCPMainView.swift; path = Sources/Views/External/MCPMainView.swift; sourceTree = SOURCE_ROOT; };
 		DA0100000000000000000050 /* DocumentationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DocumentationService.swift; path = Sources/Views/Workspace/Developer/Services/DocumentationService.swift; sourceTree = SOURCE_ROOT; };
@@ -12750,7 +12750,7 @@
 				DA010000000000000000004D /* DeveloperLogService.swift */,
 				DA010000000000000000004E /* DeveloperProfileService.swift */,
 				DA010000000000000000004F /* DeveloperScopeService.swift */,
-				EX0100000000000000000001 /* MCPModels.swift */,
+				XM0100000000000000000001 /* MCPModels.swift */,
 				EX0100000000000000000002 /* MCPManager.swift */,
 				EX0100000000000000000003 /* MCPMainView.swift */,
 				DA0100000000000000000050 /* DocumentationService.swift */,
@@ -13020,7 +13020,7 @@
 				DA020000000000000000004D /* DeveloperLogService.swift in Sources */,
 				DA020000000000000000004E /* DeveloperProfileService.swift in Sources */,
 				DA020000000000000000004F /* DeveloperScopeService.swift in Sources */,
-				EX0200000000000000000001 /* MCPModels.swift in Sources */,
+				XM0200000000000000000001 /* MCPModels.swift in Sources */,
 				EX0200000000000000000002 /* MCPManager.swift in Sources */,
 				EX0200000000000000000003 /* MCPMainView.swift in Sources */,
 				DA0200000000000000000050 /* DocumentationService.swift in Sources */,
