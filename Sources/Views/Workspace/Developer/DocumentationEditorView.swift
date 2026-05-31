@@ -123,6 +123,11 @@ struct DocumentationEditorView: View {
                     Text("Published: \(publishedAt.formatted())")
                         .font(.caption2).foregroundStyle(.green)
                 }
+
+                NavigationLink(destination: DocSectionEditor()) {
+                    Image(systemName: "square.and.pencil")
+                        .font(.caption)
+                }
             }
             .padding()
             .background(Color(uiColor: .systemGroupedBackground))

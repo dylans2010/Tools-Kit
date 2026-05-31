@@ -7,6 +7,7 @@ struct ScopeManagementView: View {
     @State private var justifications: [String: String] = [:]
     @State private var selectedAppID: UUID?
     @State private var showingTemplateSheet = false
+    @State private var selectedScope: DeveloperScope?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -35,6 +36,9 @@ struct ScopeManagementView: View {
         }
         .sheet(isPresented: $showingTemplateSheet) {
             ScopeTemplatePickerView(selectedAppID: $selectedAppID)
+        }
+        .sheet(item: $selectedScope) { scope in
+            ScopeDetailSheet(scope: scope)
         }
     }
 
@@ -119,8 +123,14 @@ struct ScopeManagementView: View {
                 }
                 .padding(.horizontal)
 
-                SectionHeader(title: "Available Scopes", subtitle: "Select scopes and provide justifications where required.", icon: nil)
-                    .padding(.horizontal)
+                HStack {
+                    SectionHeader(title: "Available Scopes", subtitle: "Select scopes and provide justifications where required.", icon: nil)
+                    Spacer()
+                    NavigationLink(destination: ScopeRequestFormView()) {
+                        Text("Custom Request").font(.caption.bold())
+                    }
+                }
+                .padding(.horizontal)
 
                 ForEach(scopeService.catalog) { scope in
                     scopeCard(scope)
@@ -138,11 +148,20 @@ struct ScopeManagementView: View {
                 riskBadge(scope.riskLevel)
             }
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(scope.name).font(.subheadline.bold())
-                Text(scope.id).font(.caption2.monospaced()).foregroundStyle(.tertiary)
-                Text(scope.description).font(.caption).foregroundStyle(.secondary)
+            Button {
+                selectedScope = scope
+            } label: {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(scope.name).font(.subheadline.bold())
+                        Spacer()
+                        Image(systemName: "info.circle").font(.caption).foregroundStyle(.secondary)
+                    }
+                    Text(scope.id).font(.caption2.monospaced()).foregroundStyle(.tertiary)
+                    Text(scope.description).font(.caption).foregroundStyle(.secondary)
+                }
             }
+            .buttonStyle(.plain)
 
             if scope.riskLevel == .high || scope.riskLevel == .critical {
                 VStack(alignment: .leading, spacing: 8) {

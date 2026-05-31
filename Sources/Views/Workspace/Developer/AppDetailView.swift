@@ -26,14 +26,14 @@ struct AppDetailView: View {
         Group {
             if let app = app {
                 ScrollView {
-                    VStack(spacing: 20) {
+                    VStack(spacing: 24) {
                         appHeader(app)
 
                         Picker("Details", selection: $selectedTab) {
                             Text("Overview").tag(0)
                             Text("Versions").tag(1)
                             Text("Scopes").tag(2)
-                            Text("Auth").tag(3)
+                            Text("Security").tag(3)
                             Text("More").tag(4)
                         }
                         .pickerStyle(.segmented)
@@ -48,7 +48,7 @@ struct AppDetailView: View {
                             case 2:
                                 scopesTab(app)
                             case 3:
-                                authTab(app)
+                                securityTab(app)
                             case 4:
                                 moreTab(app)
                             default:
@@ -57,16 +57,18 @@ struct AppDetailView: View {
                         }
                         .transition(.opacity)
                     }
+                    .padding(.bottom, 32)
                 }
             } else {
                 VStack(spacing: 12) {
-                    Image(systemName: "exclamationmark.triangle.fill").font(.largeTitle).foregroundStyle(.orange)
+                    Image(systemName: "exclamationmark.triangle.fill").font(.largeTitle).foregroundStyle(.secondary)
                     Text("App Not Found").font(.headline)
                     Text("This project may have been deleted or moved.").font(.subheadline).foregroundStyle(.secondary)
                 }
                 .padding()
             }
         }
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("App Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -91,23 +93,23 @@ struct AppDetailView: View {
     }
 
     private func appHeader(_ app: DeveloperApp) -> some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 20) {
             ZStack {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.accentColor.opacity(0.1))
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(Color.primary.opacity(0.05))
                 Image(systemName: app.iconName)
-                    .font(.system(size: 40))
-                    .foregroundStyle(Color.accentColor)
+                    .font(.system(size: 32))
+                    .foregroundStyle(.primary)
             }
-            .frame(width: 80, height: 80)
+            .frame(width: 72, height: 72)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(app.name).font(.title3.bold())
-                Text(app.bundleId).font(.caption).monospaced().foregroundStyle(.secondary)
-                HStack {
-                    Text(app.type.rawValue).font(.system(size: 10, weight: .bold))
+                Text(app.bundleId).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
+                HStack(spacing: 8) {
+                    Text(app.type.rawValue).font(.system(size: 8, weight: .bold))
                         .padding(.horizontal, 6).padding(.vertical, 2)
-                        .background(Color.accentColor.opacity(0.1), in: Capsule())
+                        .background(Color.primary.opacity(0.05), in: Capsule())
                     statusBadge(app.status)
                 }
             }
@@ -115,30 +117,19 @@ struct AppDetailView: View {
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
         .padding(.horizontal)
     }
 
     private func statusBadge(_ status: DeveloperAppStatus) -> some View {
-        Text(status.rawValue).font(.system(size: 10, weight: .bold))
+        Text(status.rawValue.uppercased()).font(.system(size: 8, weight: .bold))
             .padding(.horizontal, 8).padding(.vertical, 4)
-            .background(statusColor(status).opacity(0.1), in: Capsule())
-            .foregroundStyle(statusColor(status))
-    }
-
-    private func statusColor(_ status: DeveloperAppStatus) -> Color {
-        switch status {
-        case .draft: return .gray
-        case .underReview: return .orange
-        case .live: return .green
-        case .suspended: return .red
-        case .deprecated: return .secondary
-        case .archived: return .black
-        }
+            .background(Color.primary.opacity(status == .live ? 0.8 : 0.1), in: Capsule())
+            .foregroundStyle(status == .live ? .white : .primary)
     }
 
     private func overviewTab(_ app: DeveloperApp) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 24) {
             SectionHeader(title: "Project Information", subtitle: nil, icon: nil)
 
             VStack(spacing: 12) {
@@ -150,33 +141,25 @@ struct AppDetailView: View {
             }
 
             SectionHeader(title: "Management & Compliance", subtitle: nil, icon: nil)
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 NavigationLink(destination: AppEnvironmentsView()) {
                     toolLink(title: "Environments", icon: "square.stack.3d.down.right")
                 }
                 NavigationLink(destination: PrivacyManifestEditorView()) {
-                    toolLink(title: "Privacy Manifest", icon: "hand.raised.fill")
+                    toolLink(title: "Privacy Manifest", icon: "hand.raised")
                 }
                 NavigationLink(destination: AppBundleValidatorView()) {
-                    toolLink(title: "Bundle Validator", icon: "checkmark.seal.fill")
+                    toolLink(title: "Bundle Validator", icon: "checkmark.seal")
                 }
                 NavigationLink(destination: AppVersionHistoryView()) {
                     toolLink(title: "Version History", icon: "clock.arrow.circlepath")
                 }
                 NavigationLink(destination: DeveloperIncidentManagerView()) {
-                    toolLink(title: "Incidents", icon: "exclamationmark.triangle.fill")
+                    toolLink(title: "Incidents", icon: "exclamationmark.triangle")
                 }
                 NavigationLink(destination: FunnelBuilderView()) {
                     toolLink(title: "Funnels", icon: "filter")
                 }
-            }
-
-            SectionHeader(title: "Platform Targets", subtitle: nil, icon: nil)
-            FlowLayout(app.platformTargets, spacing: 8) { target in
-                Text(target.rawValue)
-                    .font(.caption.bold())
-                    .padding(.horizontal, 10).padding(.vertical, 5)
-                    .background(Color.secondary.opacity(0.1), in: Capsule())
             }
         }
         .padding()
@@ -185,19 +168,18 @@ struct AppDetailView: View {
     private func toolLink(title: String, icon: String) -> some View {
         HStack {
             Image(systemName: icon).font(.caption).foregroundStyle(.secondary)
-            Text(title).font(.caption)
+            Text(title).font(.system(size: 11, weight: .medium))
             Spacer()
         }
-        .padding(10)
+        .padding(14)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.primary.opacity(0.05), lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private func versionsTab(_ app: DeveloperApp) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 20) {
             HStack {
-                SectionHeader(title: "Version History", subtitle: nil, icon: nil)
+                SectionHeader(title: "Release History", subtitle: nil, icon: nil)
                 Spacer()
                 Button {
                     showingAddVersion = true
@@ -211,23 +193,23 @@ struct AppDetailView: View {
                 EmptyStateView(icon: "shippingbox", title: "No Versions", message: "No versions released yet.")
             } else {
                 ForEach(app.versions.sorted(by: { $0.createdAt > $1.createdAt })) { version in
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 10) {
                         HStack {
                             Text("v\(version.version)").font(.subheadline.bold())
-                            Text("(\(version.buildNumber))").font(.caption).foregroundStyle(.secondary)
+                            Text("(\(version.buildNumber))").font(.caption).monospaced().foregroundStyle(.secondary)
                             Spacer()
-                            Text(version.status).font(.caption2.bold())
-                                .padding(.horizontal, 6).padding(.vertical, 2)
-                                .background(Color.blue.opacity(0.1), in: Capsule())
+                            Text(version.status.uppercased()).font(.system(size: 8, weight: .bold))
+                                .padding(.horizontal, 8).padding(.vertical, 4)
+                                .background(Color.primary.opacity(0.05), in: Capsule())
                         }
                         if !version.releaseNotes.isEmpty {
-                            Text(version.releaseNotes).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                            Text(version.releaseNotes).font(.caption).foregroundStyle(.secondary).lineLimit(3)
                         }
                         Text(version.createdAt.formatted(date: .abbreviated, time: .shortened)).font(.system(size: 8)).foregroundStyle(.tertiary)
                     }
                     .padding()
                     .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
             }
         }
@@ -235,8 +217,8 @@ struct AppDetailView: View {
     }
 
     private func scopesTab(_ app: DeveloperApp) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "Granted Permissions", subtitle: nil, icon: nil)
+        VStack(alignment: .leading, spacing: 20) {
+            SectionHeader(title: "Active Permissions", subtitle: nil, icon: nil)
 
             if app.grantedScopes.isEmpty {
                 EmptyStateView(icon: "shield.slash", title: "No Permissions", message: "No permissions granted yet.")
@@ -244,36 +226,36 @@ struct AppDetailView: View {
                 ForEach(app.grantedScopes, id: \.self) { scopeID in
                     if let scope = scopeService.fetchScope(identifier: scopeID) {
                         HStack {
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: 4) {
                                 Text(scope.name).font(.subheadline.bold())
                                 Text(scope.id).font(.caption2.monospaced()).foregroundStyle(.tertiary)
                             }
                             Spacer()
-                            Image(systemName: "checkmark.shield.fill").foregroundStyle(.green)
+                            Image(systemName: "checkmark.shield").foregroundStyle(.secondary)
                         }
                         .padding()
                         .background(Color(uiColor: .secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
                     }
                 }
             }
 
             NavigationLink(destination: ScopeManagementView()) {
-                Label("Request More Scopes", systemImage: "shield.fill")
+                Label("Request Permissions", systemImage: "shield")
                     .font(.subheadline.bold())
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.accentColor.opacity(0.1))
-                    .foregroundStyle(Color.accentColor)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .background(Color.primary.opacity(0.05))
+                    .foregroundStyle(.primary)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
             }
         }
         .padding()
     }
 
-    private func authTab(_ app: DeveloperApp) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "Assigned API Keys", subtitle: nil, icon: nil)
+    private func securityTab(_ app: DeveloperApp) -> some View {
+        VStack(alignment: .leading, spacing: 20) {
+            SectionHeader(title: "Identity & Security", subtitle: nil, icon: nil)
 
             let assignedKeys = keyService.keys.filter { $0.appID == app.id }
 
@@ -282,38 +264,48 @@ struct AppDetailView: View {
             } else {
                 ForEach(assignedKeys) { key in
                     HStack {
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: 4) {
                             Text(key.label).font(.subheadline.bold())
                             Text(key.maskedValue).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Text(key.environment.rawValue).font(.system(size: 8, weight: .bold))
-                            .padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(key.environment == .live ? Color.green.opacity(0.1) : Color.orange.opacity(0.1))
-                            .foregroundStyle(key.environment == .live ? .green : .orange)
-                            .clipShape(Capsule())
+                        Text(key.environment.rawValue.uppercased()).font(.system(size: 8, weight: .bold))
+                            .padding(.horizontal, 8).padding(.vertical, 4)
+                            .background(Color.primary.opacity(0.05), in: Capsule())
                     }
                     .padding()
                     .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
             }
 
-            NavigationLink(destination: AuthServiceManagerView()) {
-                Label("Manage All Keys", systemImage: "key.fill")
-                    .font(.subheadline.bold())
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor)
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            VStack(spacing: 12) {
+                NavigationLink(destination: AuthServiceManagerView()) {
+                    Label("Manage API Keys", systemImage: "key")
+                        .font(.subheadline.bold())
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.primary)
+                        .foregroundStyle(Color(uiColor: .systemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+
+                NavigationLink(destination: DeveloperAppCertificatesView()) {
+                    Label("Certificates", systemImage: "doc.badge.gearshape")
+                        .font(.subheadline.bold())
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.primary.opacity(0.05))
+                        .foregroundStyle(.primary)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
             }
         }
         .padding()
     }
 
     private func moreTab(_ app: DeveloperApp) -> some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 24) {
             HStack {
                 SectionHeader(title: "Collaborators", subtitle: nil, icon: nil)
                 Spacer()
@@ -323,31 +315,35 @@ struct AppDetailView: View {
             }
             if app.collaborators.isEmpty {
                 Text("You are the sole owner of this project.").font(.caption).foregroundStyle(.secondary)
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
             } else {
                 ForEach(app.collaborators) { collab in
                     HStack {
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: 2) {
                             Text(collab.name).font(.subheadline.bold())
                             Text(collab.email).font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Text(collab.role).font(.caption2.bold()).foregroundColor(.accentColor)
+                        Text(collab.role).font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary)
                     }
                     .padding()
                     .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
             }
 
             Divider()
 
-            SectionHeader(title: "Advanced Features", subtitle: nil, icon: nil)
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+            SectionHeader(title: "Commercial & Advanced", subtitle: nil, icon: nil)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 NavigationLink(destination: DeveloperMonetizationView()) {
-                    toolLink(title: "Monetization", icon: "dollarsign.circle.fill")
+                    toolLink(title: "Monetization", icon: "dollarsign.circle")
                 }
                 NavigationLink(destination: CustomEventManagerView()) {
-                    toolLink(title: "Events", icon: "bolt.fill")
+                    toolLink(title: "Custom Events", icon: "bolt")
                 }
             }
 
@@ -355,13 +351,15 @@ struct AppDetailView: View {
 
             SectionHeader(title: "Danger Zone", subtitle: nil, icon: nil)
             VStack(spacing: 12) {
-                Button(role: .destructive) {
-                    showingTransferOwnership = true
-                } label: {
+                NavigationLink(destination: TransferOwnershipView()) {
                     Label("Transfer Ownership", systemImage: "person.2.badge.key")
+                        .font(.subheadline.bold())
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(Color.red.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.plain)
 
                 Button(role: .destructive) {
                     Task {
@@ -369,9 +367,12 @@ struct AppDetailView: View {
                     }
                 } label: {
                     Label("Delete Project", systemImage: "trash")
+                        .font(.subheadline.bold())
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(Color.red.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .buttonStyle(.bordered)
             }
         }
         .padding()
@@ -385,7 +386,7 @@ struct AppDetailView: View {
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private var addVersionSheet: some View {
@@ -488,5 +489,3 @@ struct AppDetailView: View {
         }
     }
 }
-
-

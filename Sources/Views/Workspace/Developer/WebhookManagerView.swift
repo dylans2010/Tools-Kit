@@ -28,6 +28,10 @@ struct WebhookManagerView: View {
                 Button { showingAddEndpoint = true } label: {
                     Label("Add Endpoint", systemImage: "plus.circle.fill")
                 }
+
+                NavigationLink(destination: WebhookTestView()) {
+                    Label("Webhook Tester", systemImage: "bolt.badge.a")
+                }
             }
         }
         .navigationTitle("Webhook Management")
@@ -80,6 +84,14 @@ struct WebhookManagerView: View {
         for index in offsets {
             let endpoint = webhookService.endpoints[index]
             Task { try? await webhookService.deleteEndpoint(id: endpoint.id) }
+        }
+    }
+}
+
+extension WebhookManagerView {
+    var testViewLink: some View {
+        NavigationLink(destination: WebhookTestView()) {
+            Label("Advanced Testing", systemImage: "bolt.badge.a")
         }
     }
 }

@@ -31,6 +31,30 @@ struct DeveloperInfrastructureStatusView: View {
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Infrastructure")
+        .sheet(isPresented: $showingAddNode) {
+            addNodeSheet
+        }
+    }
+
+    private var addNodeSheet: some View {
+        NavigationStack {
+            Form {
+                Section("Node Details") {
+                    TextField("Node Name", text: .constant(""))
+                    TextField("Region", text: .constant(""))
+                }
+            }
+            .navigationTitle("Provision Node")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddNode = false } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Provision") {
+                        // Task { try? await infrastructureService.provisionNode(...) }
+                        showingAddNode = false
+                    }
+                }
+            }
+        }
     }
 
     private var globalHealthSummary: some View {

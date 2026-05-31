@@ -43,6 +43,21 @@ struct DeveloperSandboxEnvironmentView: View {
             }
         }
         .navigationTitle("Sandbox Environments")
+        .safeAreaInset(edge: .top) {
+            NavigationLink(destination: SandboxEnvironmentView()) {
+                HStack {
+                    Image(systemName: "testtube.2").foregroundStyle(.secondary)
+                    Text("Legacy Sandbox Settings").font(.subheadline)
+                    Spacer()
+                    Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
+                }
+                .padding()
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .padding()
+            }
+            .buttonStyle(.plain)
+        }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button { showingAddSandbox = true } label: { Image(systemName: "plus") }

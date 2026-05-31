@@ -2,19 +2,18 @@ import SwiftUI
 
 struct DeveloperRemoteConfigView: View {
     @ObservedObject var configService = RemoteConfigService.shared
-    @State private var selectedAppID: UUID?
     @State private var selectedEnvironment: KeyEnvironment = .live
     @State private var showingAddConfig = false
-    @State private var searchText = ""
+    @State private var editingConfig: RemoteConfig?
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 24) {
                 configOverview
 
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Text("Config Keys").font(.headline)
+                        Text("Configurations").font(.headline)
                         Spacer()
                         Button { showingAddConfig = true } label: {
                             Image(systemName: "plus.circle.fill").font(.title3)
@@ -28,10 +27,11 @@ struct DeveloperRemoteConfigView: View {
                     }
                     .pickerStyle(.segmented)
 
-                    if configService.configs.isEmpty {
-                        EmptyStateView(icon: "gearshape.2", title: "No Configurations", message: "Add remote configuration keys to dynamically update your app.")
+                    let configs = configService.configs.filter { $0.environment == selectedEnvironment }
+                    if configs.isEmpty {
+                        EmptyStateView(icon: "gearshape.2", title: "No Configurations", message: "Add remote configuration keys to dynamically update your app behavior.")
                     } else {
-                        ForEach(configService.configs.filter { $0.environment == selectedEnvironment }) { config in
+                        ForEach(configs) { config in
                             configCard(config)
                         }
                     }
@@ -44,6 +44,9 @@ struct DeveloperRemoteConfigView: View {
         .sheet(isPresented: $showingAddConfig) {
             AddConfigSheet(environment: selectedEnvironment)
         }
+        .sheet(item: $editingConfig) { config in
+            EditConfigSheet(config: config)
+        }
     }
 
     private var configOverview: some View {
@@ -54,7 +57,7 @@ struct DeveloperRemoteConfigView: View {
                     Text("Last synced: \(Date().formatted(date: .abbreviated, time: .shortened))").font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
-                Image(systemName: "cloud.fill").foregroundStyle(.blue)
+                Image(systemName: "cloud.fill").foregroundStyle(.secondary)
             }
 
             HStack(spacing: 20) {
@@ -71,7 +74,7 @@ struct DeveloperRemoteConfigView: View {
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .padding()
+        .padding([.horizontal, .top])
     }
 
     private func configCard(_ config: RemoteConfig) -> some View {
@@ -79,15 +82,14 @@ struct DeveloperRemoteConfigView: View {
             HStack {
                 Text(config.key).font(.subheadline.monospaced()).bold()
                 Spacer()
-                Text(config.valueType.rawValue).font(.system(size: 8, weight: .bold))
+                Text(config.valueType.rawValue.uppercased()).font(.system(size: 8, weight: .bold))
                     .padding(.horizontal, 6).padding(.vertical, 2)
-                    .background(Color.accentColor.opacity(0.1), in: Capsule())
-                    .foregroundStyle(Color.accentColor)
+                    .background(Color.primary.opacity(0.05), in: Capsule())
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Value:").font(.caption2.bold()).foregroundStyle(.secondary)
-                Text(config.value).font(.subheadline.monospaced()).lineLimit(2)
+                Text("Value").font(.caption2.bold()).foregroundStyle(.secondary)
+                Text(config.value).font(.subheadline.monospaced()).lineLimit(3)
             }
 
             Divider()
@@ -95,36 +97,46 @@ struct DeveloperRemoteConfigView: View {
             HStack {
                 Text("v\(config.version)").font(.system(size: 8)).foregroundStyle(.tertiary)
                 Spacer()
-                Button {
-                    // edit logic
-                } label: {
-                    Text("Edit").font(.system(size: 10, weight: .bold))
+                HStack(spacing: 16) {
+                    Button(role: .destructive) {
+                        Task { try? await configService.deleteConfig(id: config.id) }
+                    } label: {
+                        Image(systemName: "trash").font(.caption)
+                    }
+
+                    Button {
+                        editingConfig = config
+                    } label: {
+                        Text("Edit").font(.system(size: 10, weight: .bold))
+                    }
                 }
             }
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05)))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
 
-struct AddConfigSheet: View {
+struct EditConfigSheet: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var configService = RemoteConfigService.shared
-    let environment: KeyEnvironment
+    let config: RemoteConfig
 
-    @State private var key = ""
-    @State private var value = ""
-    @State private var valueType: RemoteConfigValueType = .string
+    @State private var value: String
+    @State private var valueType: RemoteConfigValueType
+
+    init(config: RemoteConfig) {
+        self.config = config
+        _value = State(initialValue: config.value)
+        _valueType = State(initialValue: config.valueType)
+    }
 
     var body: some View {
         NavigationStack {
             Form {
-                Section("New Configuration") {
-                    TextField("Key (e.g. feature_login_v2)", text: $key)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
+                Section("Update Configuration") {
+                    Text(config.key).font(.subheadline.monospaced()).foregroundStyle(.secondary)
 
                     Picker("Type", selection: $valueType) {
                         ForEach(RemoteConfigValueType.allCases, id: \.self) { type in
@@ -137,22 +149,18 @@ struct AddConfigSheet: View {
                         TextEditor(text: $value).frame(height: 100).font(.system(.subheadline, design: .monospaced))
                     }
                 }
-
-                Section {
-                    Text("Configuring for \(environment.rawValue) environment.")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
             }
-            .navigationTitle("Add Config")
+            .navigationTitle("Edit Config")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        let newConfig = RemoteConfig(key: key, value: value, valueType: valueType, environment: environment, version: 1)
-                        configService.addConfig(newConfig)
-                        dismiss()
+                    Button("Update") {
+                        Task {
+                            try? await configService.updateConfig(id: config.id, value: value, type: valueType)
+                            await MainActor.run { dismiss() }
+                        }
                     }
-                    .disabled(key.isEmpty || value.isEmpty)
+                    .disabled(value.isEmpty)
                 }
             }
         }

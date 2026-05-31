@@ -13,7 +13,9 @@ struct MarketplaceListingManagerView: View {
                     EmptyStateView(icon: "storefront", title: "No Listings", message: "No active or pending listings.")
                 } else {
                     ForEach(marketplaceService.submissions) { submission in
-                        listingRow(submission)
+                        NavigationLink(destination: MarketplaceReviewFeedbackView(submissionID: submission.id)) {
+                            listingRow(submission)
+                        }
                     }
                 }
             }
