@@ -10,6 +10,10 @@ public class InfrastructureService: ObservableObject {
 
     public func loadNodes() { self.nodes = store.infrastructureNodes }
 
+    public func fetchNodes() async throws -> [InfrastructureNode] {
+        store.infrastructureNodes
+    }
+
     public func restartNode(id: UUID) async throws {
         guard var node = store.infrastructureNodes.first(where: { $0.id == id }) else { return }
         node.status = .healthy
