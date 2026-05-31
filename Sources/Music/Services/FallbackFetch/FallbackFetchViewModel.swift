@@ -194,8 +194,8 @@ final class FallbackFetchViewModel: ObservableObject {
             errorMessage = "Failed to read CSV: \(error.localizedDescription)"
             Task {
                 await LogManager.shared.log(
-                    level: .error,
-                    stage: .parsing,
+                    level: FetchLogLevel.error,
+                    stage: PipelineStage.parsing,
                     message: "Failed to read CSV",
                     metadata: ["error": error.localizedDescription]
                 )
@@ -209,8 +209,8 @@ final class FallbackFetchViewModel: ObservableObject {
             errorMessage = "CSV file is empty or invalid"
             Task {
                 await LogManager.shared.log(
-                    level: .error,
-                    stage: .parsing,
+                    level: FetchLogLevel.error,
+                    stage: PipelineStage.parsing,
                     message: "CSV file is empty or invalid",
                     metadata: nil as [String: String]?
                 )
@@ -226,8 +226,8 @@ final class FallbackFetchViewModel: ObservableObject {
             errorMessage = "Could not find 'Track Name' and 'Artist Name(s)' columns in CSV"
             Task {
                 await LogManager.shared.log(
-                    level: .error,
-                    stage: .parsing,
+                    level: FetchLogLevel.error,
+                    stage: PipelineStage.parsing,
                     message: "CSV header missing required columns",
                     metadata: ["headers": "\(normalizedHeaders)"]
                 )
@@ -252,8 +252,8 @@ final class FallbackFetchViewModel: ObservableObject {
         let snapshot = importedSongs
         Task {
             await LogManager.shared.log(
-                level: .info,
-                stage: .parsing,
+                level: FetchLogLevel.info,
+                stage: PipelineStage.parsing,
                 message: "CSV parsed",
                 metadata: ["count": "\(snapshot.count)"]
             )
@@ -285,8 +285,8 @@ final class FallbackFetchViewModel: ObservableObject {
     func startFetchingFromUI() {
         Task {
             await LogManager.shared.log(
-                level: .info,
-                stage: .ui,
+                level: FetchLogLevel.info,
+                stage: PipelineStage.ui,
                 message: "Start Fetching tapped from UI",
                 metadata: nil as [String: String]?
             )
@@ -297,8 +297,8 @@ final class FallbackFetchViewModel: ObservableObject {
     func startFetching() async {
         await LogManager.shared.clear()
         await LogManager.shared.log(
-            level: .info,
-            stage: .ui,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.ui,
             message: "Start Fetching triggered",
             metadata: nil as [String: String]?
         )
@@ -309,16 +309,16 @@ final class FallbackFetchViewModel: ObservableObject {
         activeZylaAPIKey = snapshot.2
 
         await LogManager.shared.log(
-            level: .info,
-            stage: .ui,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.ui,
             message: "Songs loaded: \(songsSnapshot.count) total",
             metadata: ["count": "\(songsSnapshot.count)"]
         )
 
         let preview = songsSnapshot.prefix(3).map { $0.title }.joined(separator: ", ")
         await LogManager.shared.log(
-            level: .debug,
-            stage: .ui,
+            level: FetchLogLevel.debug,
+            stage: PipelineStage.ui,
             message: "First songs: \(preview)",
             metadata: nil as [String: String]?
         )
@@ -336,8 +336,8 @@ final class FallbackFetchViewModel: ObservableObject {
 
         guard !songsSnapshot.isEmpty else {
             await LogManager.shared.log(
-                level: .error,
-                stage: .ui,
+                level: FetchLogLevel.error,
+                stage: PipelineStage.ui,
                 message: "ABORT: songs array is empty at runtime",
                 metadata: nil as [String: String]?
             )
@@ -347,8 +347,8 @@ final class FallbackFetchViewModel: ObservableObject {
 
         guard !activeYouTubeAPIKey.isEmpty else {
             await LogManager.shared.log(
-                level: .error,
-                stage: .ui,
+                level: FetchLogLevel.error,
+                stage: PipelineStage.ui,
                 message: "ABORT: missing YouTube Data API key",
                 metadata: nil as [String: String]?
             )
@@ -358,8 +358,8 @@ final class FallbackFetchViewModel: ObservableObject {
 
         if activeZylaAPIKey.isEmpty {
             await LogManager.shared.log(
-                level: .warning,
-                stage: .ui,
+                level: FetchLogLevel.warning,
+                stage: PipelineStage.ui,
                 message: "Zyla API key missing; pipeline will use no-key provider fallback only",
                 metadata: nil as [String: String]?
             )
@@ -378,8 +378,8 @@ final class FallbackFetchViewModel: ObservableObject {
 
         for (index, song) in currentSongs.enumerated() {
             await LogManager.shared.log(
-                level: .info,
-                stage: .system,
+                level: FetchLogLevel.info,
+                stage: PipelineStage.system,
                 message: "[\(index + 1)/\(currentSongs.count)] Processing: \(song.title) — \(song.artist)",
                 metadata: nil as [String: String]?
             )
@@ -388,8 +388,8 @@ final class FallbackFetchViewModel: ObservableObject {
             do {
                 let result = try await processSong(song)
                 await LogManager.shared.log(
-                    level: .info,
-                    stage: .system,
+                    level: FetchLogLevel.info,
+                    stage: PipelineStage.system,
                     message: "[\(index + 1)/\(currentSongs.count)] SUCCESS: \(song.title)",
                     metadata: nil as [String: String]?
                 )
@@ -406,8 +406,8 @@ final class FallbackFetchViewModel: ObservableObject {
                 }
             } catch {
                 await LogManager.shared.log(
-                    level: .error,
-                    stage: .system,
+                    level: FetchLogLevel.error,
+                    stage: PipelineStage.system,
                     message: "[\(index + 1)/\(currentSongs.count)] FAILED: \(song.title) — \(error.localizedDescription)",
                     metadata: ["error": "\(error)"]
                 )
@@ -448,8 +448,8 @@ final class FallbackFetchViewModel: ObservableObject {
 
         guard !files.isEmpty else {
             await LogManager.shared.log(
-                level: .warning,
-                stage: .zip,
+                level: FetchLogLevel.warning,
+                stage: PipelineStage.zip,
                 message: "ZIP creation skipped: no downloaded files",
                 metadata: nil as [String: String]?
             )
@@ -466,8 +466,8 @@ final class FallbackFetchViewModel: ObservableObject {
             }
         } catch {
             await LogManager.shared.log(
-                level: .error,
-                stage: .zip,
+                level: FetchLogLevel.error,
+                stage: PipelineStage.zip,
                 message: "ZIP creation failed: \(error.localizedDescription)",
                 metadata: ["error": "\(error)"]
             )
@@ -497,16 +497,16 @@ final class FallbackFetchViewModel: ObservableObject {
 
     private func searchYouTube(_ song: SongFetchItem) async throws -> String {
         await LogManager.shared.log(
-            level: .info,
-            stage: .youtube,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.youtube,
             message: "Searching YouTube for: \(song.title) — \(song.artist)",
             metadata: nil as [String: String]?
         )
 
         let url = try buildYouTubeURL(song)
         await LogManager.shared.log(
-            level: .debug,
-            stage: .youtube,
+            level: FetchLogLevel.debug,
+            stage: PipelineStage.youtube,
             message: "YouTube request prepared",
             metadata: ["url": url.absoluteString]
         )
@@ -517,8 +517,8 @@ final class FallbackFetchViewModel: ObservableObject {
         }
 
         await LogManager.shared.log(
-            level: .info,
-            stage: .youtube,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.youtube,
             message: "YouTube HTTP status: \(http.statusCode)",
             metadata: ["song": song.title, "status": "\(http.statusCode)"]
         )
@@ -526,8 +526,8 @@ final class FallbackFetchViewModel: ObservableObject {
         guard http.statusCode == 200 else {
             let raw = String(data: data, encoding: .utf8) ?? "unreadable"
             await LogManager.shared.log(
-                level: .error,
-                stage: .youtube,
+                level: FetchLogLevel.error,
+                stage: PipelineStage.youtube,
                 message: "YouTube non-200 response",
                 metadata: ["status": "\(http.statusCode)", "body_snippet": String(raw.prefix(300))]
             )
@@ -539,8 +539,8 @@ final class FallbackFetchViewModel: ObservableObject {
 
         if let videoId = (items?.first?["id"] as? [String: Any])?["videoId"] as? String {
             await LogManager.shared.log(
-                level: .info,
-                stage: .youtube,
+                level: FetchLogLevel.info,
+                stage: PipelineStage.youtube,
                 message: "videoId found: \(videoId)",
                 metadata: ["song": song.title, "videoId": videoId]
             )
@@ -548,8 +548,8 @@ final class FallbackFetchViewModel: ObservableObject {
         }
 
         await LogManager.shared.log(
-            level: .warning,
-            stage: .youtube,
+            level: FetchLogLevel.warning,
+            stage: PipelineStage.youtube,
             message: "No results for full query, retrying with title only",
             metadata: ["song": song.title]
         )
@@ -567,8 +567,8 @@ final class FallbackFetchViewModel: ObservableObject {
         guard let url = URL(string: urlString) else { throw FetchError.invalidURL(urlString) }
 
         await LogManager.shared.log(
-            level: .debug,
-            stage: .youtube,
+            level: FetchLogLevel.debug,
+            stage: PipelineStage.youtube,
             message: "Fallback YouTube search",
             metadata: ["url": urlString]
         )
@@ -583,8 +583,8 @@ final class FallbackFetchViewModel: ObservableObject {
 
         if let videoId = (items?.first?["id"] as? [String: Any])?["videoId"] as? String {
             await LogManager.shared.log(
-                level: .info,
-                stage: .youtube,
+                level: FetchLogLevel.info,
+                stage: PipelineStage.youtube,
                 message: "Fallback videoId found: \(videoId)",
                 metadata: ["title": title]
             )
@@ -592,8 +592,8 @@ final class FallbackFetchViewModel: ObservableObject {
         }
 
         await LogManager.shared.log(
-            level: .error,
-            stage: .youtube,
+            level: FetchLogLevel.error,
+            stage: PipelineStage.youtube,
             message: "No YouTube results after fallback",
             metadata: ["title": title]
         )
@@ -610,8 +610,8 @@ final class FallbackFetchViewModel: ObservableObject {
                 let jobId = try await convertToMP3(videoId: videoId)
                 let resolved = try await pollJobStatus(jobId: jobId)
                 await LogManager.shared.log(
-                    level: .info,
-                    stage: .provider,
+                    level: FetchLogLevel.info,
+                    stage: PipelineStage.provider,
                     message: "Resolved by Zyla provider",
                     metadata: ["song": song.title]
                 )
@@ -620,8 +620,8 @@ final class FallbackFetchViewModel: ObservableObject {
                 let reason = "Zyla failed: \(error.localizedDescription)"
                 errors.append(reason)
                 await LogManager.shared.log(
-                    level: .warning,
-                    stage: .provider,
+                    level: FetchLogLevel.warning,
+                    stage: PipelineStage.provider,
                     message: reason,
                     metadata: ["song": song.title]
                 )
@@ -631,8 +631,8 @@ final class FallbackFetchViewModel: ObservableObject {
         do {
             let providerURL = try await extractWithYtDlpIo(videoId: videoId)
             await LogManager.shared.log(
-                level: .info,
-                stage: .provider,
+                level: FetchLogLevel.info,
+                stage: PipelineStage.provider,
                 message: "Resolved by no-key provider ytdlp.online",
                 metadata: ["song": song.title]
             )
@@ -641,8 +641,8 @@ final class FallbackFetchViewModel: ObservableObject {
             let reason = "ytdlp.online failed: \(error.localizedDescription)"
             errors.append(reason)
             await LogManager.shared.log(
-                level: .warning,
-                stage: .provider,
+                level: FetchLogLevel.warning,
+                stage: PipelineStage.provider,
                 message: reason,
                 metadata: ["song": song.title]
             )
@@ -651,8 +651,8 @@ final class FallbackFetchViewModel: ObservableObject {
         do {
             let providerURL = try await extractWithCobalt(videoId: videoId)
             await LogManager.shared.log(
-                level: .info,
-                stage: .provider,
+                level: FetchLogLevel.info,
+                stage: PipelineStage.provider,
                 message: "Resolved by no-key provider Cobalt",
                 metadata: ["song": song.title]
             )
@@ -661,8 +661,8 @@ final class FallbackFetchViewModel: ObservableObject {
             let reason = "Cobalt failed: \(error.localizedDescription)"
             errors.append(reason)
             await LogManager.shared.log(
-                level: .warning,
-                stage: .provider,
+                level: FetchLogLevel.warning,
+                stage: PipelineStage.provider,
                 message: reason,
                 metadata: ["song": song.title]
             )
@@ -742,8 +742,8 @@ final class FallbackFetchViewModel: ObservableObject {
         let fullURL = "https://www.youtube.com/watch?v=\(videoId)"
 
         await LogManager.shared.log(
-            level: .info,
-            stage: .zyla,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.zyla,
             message: "Sending to Zyla: \(fullURL)",
             metadata: ["videoId": videoId, "fullURL": fullURL]
         )
@@ -761,8 +761,8 @@ final class FallbackFetchViewModel: ObservableObject {
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         await LogManager.shared.log(
-            level: .debug,
-            stage: .zyla,
+            level: FetchLogLevel.debug,
+            stage: PipelineStage.zyla,
             message: "Zyla request headers set",
             metadata: ["body": "\(body)"]
         )
@@ -773,16 +773,16 @@ final class FallbackFetchViewModel: ObservableObject {
         let rawBody = String(data: data, encoding: .utf8) ?? "unreadable"
 
         await LogManager.shared.log(
-            level: .info,
-            stage: .zyla,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.zyla,
             message: "Zyla response: HTTP \(http?.statusCode ?? -1)",
             metadata: ["status": "\(http?.statusCode ?? -1)", "body_snippet": String(rawBody.prefix(500))]
         )
 
         guard let status = http?.statusCode, status == 200 || status == 202 else {
             await LogManager.shared.log(
-                level: .error,
-                stage: .zyla,
+                level: FetchLogLevel.error,
+                stage: PipelineStage.zyla,
                 message: "Zyla non-success response",
                 metadata: ["body": rawBody]
             )
@@ -793,8 +793,8 @@ final class FallbackFetchViewModel: ObservableObject {
 
         if let link = json?["link"] as? String, !link.isEmpty {
             await LogManager.shared.log(
-                level: .info,
-                stage: .zyla,
+                level: FetchLogLevel.info,
+                stage: PipelineStage.zyla,
                 message: "Direct download link returned",
                 metadata: ["url": link]
             )
@@ -803,8 +803,8 @@ final class FallbackFetchViewModel: ObservableObject {
 
         guard let jobId = json?["job_id"] as? String ?? json?["jobId"] as? String ?? json?["id"] as? String else {
             await LogManager.shared.log(
-                level: .error,
-                stage: .zyla,
+                level: FetchLogLevel.error,
+                stage: PipelineStage.zyla,
                 message: "No job_id in Zyla response",
                 metadata: ["full_body": rawBody]
             )
@@ -812,8 +812,8 @@ final class FallbackFetchViewModel: ObservableObject {
         }
 
         await LogManager.shared.log(
-            level: .info,
-            stage: .zyla,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.zyla,
             message: "job_id received: \(jobId)",
             metadata: ["jobId": jobId]
         )
@@ -825,8 +825,8 @@ final class FallbackFetchViewModel: ObservableObject {
         // If the Zyla API returned a direct URL, bypass polling entirely.
         if jobId.lowercased().hasPrefix("http") {
             await LogManager.shared.log(
-                level: .info,
-                stage: .polling,
+                level: FetchLogLevel.info,
+                stage: PipelineStage.polling,
                 message: "Polling bypassed, direct URL supplied",
                 metadata: ["url": jobId]
             )
@@ -837,8 +837,8 @@ final class FallbackFetchViewModel: ObservableObject {
         let delaySeconds: UInt64 = 3_000_000_000
 
         await LogManager.shared.log(
-            level: .info,
-            stage: .polling,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.polling,
             message: "Polling started for job: \(jobId)",
             metadata: ["jobId": jobId, "maxAttempts": "\(maxAttempts)"]
         )
@@ -847,8 +847,8 @@ final class FallbackFetchViewModel: ObservableObject {
             try await Task.sleep(nanoseconds: delaySeconds)
 
             await LogManager.shared.log(
-                level: .debug,
-                stage: .polling,
+                level: FetchLogLevel.debug,
+                stage: PipelineStage.polling,
                 message: "Poll attempt \(attempt)/\(maxAttempts)",
                 metadata: ["jobId": jobId, "attempt": "\(attempt)"]
             )
@@ -866,8 +866,8 @@ final class FallbackFetchViewModel: ObservableObject {
             let status = json?["status"] as? String ?? "unknown"
 
             await LogManager.shared.log(
-                level: .info,
-                stage: .polling,
+                level: FetchLogLevel.info,
+                stage: PipelineStage.polling,
                 message: "Poll \(attempt) status: \(status)",
                 metadata: ["jobId": jobId, "status": status]
             )
@@ -879,16 +879,16 @@ final class FallbackFetchViewModel: ObservableObject {
                     ?? json?["mp3_url"] as? String
                     ?? json?["link"] as? String {
                     await LogManager.shared.log(
-                        level: .info,
-                        stage: .polling,
+                        level: FetchLogLevel.info,
+                        stage: PipelineStage.polling,
                         message: "Download URL obtained: \(downloadURL)",
                         metadata: ["jobId": jobId, "url": downloadURL]
                     )
                     return downloadURL
                 } else {
                     await LogManager.shared.log(
-                        level: .error,
-                        stage: .polling,
+                        level: FetchLogLevel.error,
+                        stage: PipelineStage.polling,
                         message: "Status completed but no download URL found",
                         metadata: ["body": rawBody]
                     )
@@ -896,8 +896,8 @@ final class FallbackFetchViewModel: ObservableObject {
                 }
             case "failed", "error":
                 await LogManager.shared.log(
-                    level: .error,
-                    stage: .polling,
+                    level: FetchLogLevel.error,
+                    stage: PipelineStage.polling,
                     message: "Job explicitly failed at attempt \(attempt)",
                     metadata: ["jobId": jobId, "body": rawBody]
                 )
@@ -908,8 +908,8 @@ final class FallbackFetchViewModel: ObservableObject {
         }
 
         await LogManager.shared.log(
-            level: .error,
-            stage: .polling,
+            level: FetchLogLevel.error,
+            stage: PipelineStage.polling,
             message: "Polling timed out after \(maxAttempts) attempts",
             metadata: ["jobId": jobId]
         )
@@ -921,8 +921,8 @@ final class FallbackFetchViewModel: ObservableObject {
     private func downloadMP3(from urlString: String, for song: SongFetchItem) async throws -> URL {
         guard let url = URL(string: urlString) else {
             await LogManager.shared.log(
-                level: .error,
-                stage: .download,
+                level: FetchLogLevel.error,
+                stage: PipelineStage.download,
                 message: "Invalid download URL: \(urlString)",
                 metadata: ["song": song.title]
             )
@@ -930,8 +930,8 @@ final class FallbackFetchViewModel: ObservableObject {
         }
 
         await LogManager.shared.log(
-            level: .info,
-            stage: .download,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.download,
             message: "Downloading MP3 for: \(song.title)",
             metadata: ["url": urlString]
         )
@@ -940,8 +940,8 @@ final class FallbackFetchViewModel: ObservableObject {
         let http = response as? HTTPURLResponse
 
         await LogManager.shared.log(
-            level: .info,
-            stage: .download,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.download,
             message: "Download response: HTTP \(http?.statusCode ?? -1)",
             metadata: ["song": song.title]
         )
@@ -966,16 +966,16 @@ final class FallbackFetchViewModel: ObservableObject {
         let fileSize = (try? FileManager.default.attributesOfItem(atPath: destination.path)[.size] as? Int) ?? 0
 
         await LogManager.shared.log(
-            level: .info,
-            stage: .download,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.download,
             message: "File saved: \(destination.lastPathComponent) (\(fileSize) bytes)",
             metadata: ["song": song.title, "path": destination.path, "bytes": "\(fileSize)"]
         )
 
         if fileSize <= 1_000 {
             await LogManager.shared.log(
-                level: .warning,
-                stage: .download,
+                level: FetchLogLevel.warning,
+                stage: PipelineStage.download,
                 message: "File suspiciously small — may be corrupt",
                 metadata: ["song": song.title, "bytes": "\(fileSize)"]
             )
@@ -988,8 +988,8 @@ final class FallbackFetchViewModel: ObservableObject {
 
     private func createZIPArchive(from files: [URL]) async throws -> URL {
         await LogManager.shared.log(
-            level: .info,
-            stage: .zip,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.zip,
             message: "Starting ZIP creation for \(files.count) files",
             metadata: nil as [String: String]?
         )
@@ -1005,8 +1005,8 @@ final class FallbackFetchViewModel: ObservableObject {
 
         for fileURL in files {
             await LogManager.shared.log(
-                level: .debug,
-                stage: .zip,
+                level: FetchLogLevel.debug,
+                stage: PipelineStage.zip,
                 message: "Adding to ZIP: \(fileURL.lastPathComponent)",
                 metadata: nil as [String: String]?
             )
@@ -1019,8 +1019,8 @@ final class FallbackFetchViewModel: ObservableObject {
         let zipSize = (try? FileManager.default.attributesOfItem(atPath: zipURL.path)[.size] as? Int) ?? 0
 
         await LogManager.shared.log(
-            level: .info,
-            stage: .zip,
+            level: FetchLogLevel.info,
+            stage: PipelineStage.zip,
             message: "ZIP created successfully: \(zipSize) bytes",
             metadata: ["path": zipURL.path, "fileCount": "\(files.count)", "bytes": "\(zipSize)"]
         )
