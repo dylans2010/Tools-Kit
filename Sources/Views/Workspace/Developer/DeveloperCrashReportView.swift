@@ -12,45 +12,89 @@ struct DeveloperCrashReportView: View {
 
     var body: some View {
         List {
-            Section {
-                Picker("App", selection: $selectedAppID) {
-                    Text("All Apps").tag(Optional<UUID>.none)
-                    ForEach(appService.apps) { app in
-                        Text(app.name).tag(Optional(app.id))
-                    }
-                }
-            }
-
-            Section("Crash Events") {
-                if reports.isEmpty && !isRefreshing {
-                    EmptyStateView(icon: "bandage.fill", title: "All Stable", message: "No crash reports detected for the selected application.")
-                } else {
-                    ForEach(reports) { report in
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text(report.exceptionType).font(.subheadline.bold()).foregroundStyle(.red)
-                                Spacer()
-                                Text(report.timestamp.formatted(date: .abbreviated, time: .shortened)).font(.system(size: 8)).foregroundStyle(.secondary)
-                            }
-
-                            Text(report.reason).font(.system(size: 11)).lineLimit(2)
-
-                            HStack {
-                                Label(report.version, systemImage: "shippingbox").font(.system(size: 8, weight: .bold))
-                                Spacer()
-                                if report.isSymbolicated {
-                                    Label("Symbolicated", systemImage: "checkmark.circle.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.green)
-                                }
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-            }
+            appPickerSection
+            crashEventsSection
         }
         .navigationTitle("Crash Reports")
         .onAppear { refreshReports() }
         .onChange(of: selectedAppID) { _ in refreshReports() }
+    }
+
+    private var appPickerSection: some View {
+        Section {
+            Picker("App", selection: $selectedAppID) {
+                Text("All Apps").tag(Optional<UUID>.none)
+                ForEach(apps) { app in
+                    Text(app.name).tag(Optional(app.id))
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var crashEventsSection: some View {
+        Section("Crash Events") {
+            if reports.isEmpty && !isRefreshing {
+                crashReportsEmptyState
+            } else {
+                crashReportRows
+            }
+        }
+    }
+
+    private var crashReportsEmptyState: some View {
+        EmptyStateView(
+            icon: "bandage.fill",
+            title: "All Stable",
+            message: "No crash reports detected for the selected application."
+        )
+    }
+
+    private var crashReportRows: some View {
+        ForEach(reports) { report in
+            crashReportRow(report)
+        }
+    }
+
+    private func crashReportRow(_ report: CrashReport) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            crashReportHeader(report)
+            crashReportReason(report)
+            crashReportFooter(report)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func crashReportHeader(_ report: CrashReport) -> some View {
+        HStack {
+            Text(report.exceptionType)
+                .font(.subheadline.bold())
+                .foregroundStyle(.red)
+            Spacer()
+            Text(report.timestamp.formatted(date: .abbreviated, time: .shortened))
+                .font(.system(size: 8))
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func crashReportReason(_ report: CrashReport) -> some View {
+        Text(report.reason)
+            .font(.system(size: 11))
+            .lineLimit(2)
+    }
+
+    @ViewBuilder
+    private func crashReportFooter(_ report: CrashReport) -> some View {
+        HStack {
+            Label(report.version, systemImage: "shippingbox")
+                .font(.system(size: 8, weight: .bold))
+            Spacer()
+            if report.isSymbolicated {
+                Label("Symbolicated", systemImage: "checkmark.circle.fill")
+                    .font(.system(size: 8, weight: .bold))
+                    .foregroundStyle(.green)
+            }
+        }
     }
 
     private func refreshReports() {
