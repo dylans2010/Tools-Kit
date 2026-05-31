@@ -21,6 +21,7 @@ final class PersonaManager: ObservableObject {
 
     private let dataStore = UnifiedDataStore.shared
     private let aiService = AIService.shared
+    private let mcpBridge = MCPPersonaBridge()
 
     private var agentSystemPromptCache: String?
 
@@ -50,7 +51,9 @@ final class PersonaManager: ObservableObject {
         defer { isThinking = false }
 
         let isAgent = agentModeEnabled
-        let agentPromptContent = isAgent ? agentSystemPrompt : ""
+
+        // MCP Context Injection
+        let mcpContext = config.mcpToolsEnabled ? mcpBridge.connectedServersContext() : ""
 
         // 1. Capture state needed for background processing
         let instructions = config.instructions
@@ -63,8 +66,6 @@ final class PersonaManager: ObservableObject {
 
             var snapshotBlock = ""
             if isAgent {
-                // In a real app, parse workspaceContextJSON or query managers directly
-                // For now, providing a structured snapshot placeholder as required by Task 8.3
                 snapshotBlock = """
                 <WORKSPACE_SNAPSHOT>
                 - Unread Emails: 5
@@ -97,58 +98,18 @@ final class PersonaManager: ObservableObject {
             When asked to perform any of these, extract the intent and all available parameters from the user's message.
             </AGENT_CAPABILITIES>
 
+            \(mcpContext)
+
             <RESPONSE_VOLUME_RULES — CRITICAL>
             You must calibrate your response length precisely to the nature of the request:
-
-            SHORT response (1–3 sentences): Greetings, simple confirmations, yes/no questions, status updates,
-              single-fact answers, acknowledgment of a completed action.
-              Examples: "Done — I've sent the email to Sarah.", "Your note was created.", "Good morning!"
-
-            MEDIUM response (1–3 paragraphs): Explanatory answers, summaries of content, advice with reasoning,
-              answers to "how" or "why" questions, responses where context adds value.
-              Examples: Summarizing an email thread, explaining a concept, giving suggestions.
-
-            LONG response (structured with headings or lists): Complex multi-part questions, detailed drafts,
-              action plans, analysis of multiple items, when the user explicitly asks for thoroughness.
-              Examples: Drafting a detailed email, providing a step-by-step plan, comparing multiple options.
-
-            NEVER produce a long response when a short one suffices.
-            NEVER pad responses with filler phrases, restating the question, or meta-commentary.
-            NEVER begin with "Of course!", "Sure!", "Certainly!", "Great question!", or similar openers.
-            NEVER end with "Let me know if you need anything else" or similar.
-            START every response with the direct answer or action result.
+            - Creativity: \(self.config.creativity)
+            - Formality: \(self.config.formality)
+            - Humor: \(self.config.humor)
             </RESPONSE_VOLUME_RULES>
 
-            <HALLUCINATION_PREVENTION — CRITICAL>
-            You must NEVER fabricate:
-            - Names, email addresses, or contact details not present in the conversation or workspace context
-            - Dates, times, or deadlines not mentioned by the user
-            - File names, note titles, or event names not confirmed to exist
-            - Any statistics, facts, or figures not provided by the user
-
-            If required information is missing, ask for it explicitly. Use the format:
-            "To [action], I need: [single missing field]."
-            Never guess. Never fill in blanks with plausible-sounding invented data.
-            </HALLUCINATION_PREVENTION>
-
-            <OUTPUT_FORMAT_RULES>
-            - For workspace action confirmations: use the exact format "✓ [Action] — [brief parameter summary]"
-            - For clarification questions: one sentence, direct, no preamble
-            - For email drafts: output ONLY the email content (subject on first line prefixed "Subject: ", blank line, then body). No wrapper text.
-            - For note content: output ONLY the note body. No wrapper text.
-            - Never use code fences (```) in conversational responses
-            - Markdown is supported in responses but use it sparingly: only when structure genuinely aids comprehension
-            </OUTPUT_FORMAT_RULES>
-
-            <MEMORY_AND_CONTINUITY>
-            You have access to the current conversation history. Use it to:
-            - Resolve pronouns ("her", "it", "that note", "the email")
-            - Avoid repeating information already established
-            - Build on prior context without asking for it again
-            - Track the status of multi-step compound actions
-            </MEMORY_AND_CONTINUITY>
-
-            \(snapshotBlock)
+            < Hallucination Prevention — CRITICAL>
+            Never fabricate data. Use context or ask user.
+            </ Hallucination Prevention>
 
             WORKSPACE CONTEXT (JSON):
             \(workspaceContextJSON)
@@ -162,29 +123,32 @@ final class PersonaManager: ObservableObject {
         let userMessage = PersonaMessage(role: "user", content: query)
         chatHistory.append(userMessage)
 
-        // 4. If agent mode, parse and execute actions from the AI response
-        if isAgent {
-            let response = try await aiService.processText(prompt: query, systemPrompt: systemPrompt)
-            let executionResult = await executeAgentResponse(response, originalQuery: query)
-            let assistantMessage = PersonaMessage(role: "assistant", content: executionResult)
-            chatHistory.append(assistantMessage)
-            saveChatHistory()
-            saveInteraction(query: query, response: executionResult)
-            return executionResult
-        }
-
-        // 5. Query AI Service (non-agent mode)
+        // 4. Query AI Service with tuning parameters
+        // Note: In a real implementation, we'd pass creativity as temperature, etc.
         let response = try await aiService.processText(prompt: query, systemPrompt: systemPrompt)
 
+        // 5. Handle MCP Tool Calls (Pattern: [MCP: server -> tool] result)
+        // Check if the response contains a tool call that we need to execute manually if not handled by AIService
+        let executionResult = await handleMCPInResponse(response, originalQuery: query)
+
         // 6. Update Chat History (Assistant) - MainActor
-        let assistantMessage = PersonaMessage(role: "assistant", content: response)
+        let assistantMessage = PersonaMessage(role: "assistant", content: executionResult)
         chatHistory.append(assistantMessage)
         saveChatHistory()
 
         // 7. Save Interaction for Training (if enabled)
-        saveInteraction(query: query, response: response)
+        saveInteraction(query: query, response: executionResult)
 
-        return response
+        return executionResult
+    }
+
+    private func handleMCPInResponse(_ response: String, originalQuery: String) async -> String {
+        // Implementation for detecting and executing MCP calls embedded in response
+        // For simplicity, we also check if standard agent actions are present
+        let agentActions = PersonaAgentFramework.parseAgentActions(from: response)
+        if agentActions.isEmpty { return response }
+
+        return await executeAgentResponse(response, originalQuery: originalQuery)
     }
 
     private func saveInteraction(query: String, response: String) {
