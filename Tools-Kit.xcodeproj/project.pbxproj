@@ -4248,9 +4248,9 @@
 		DA0100000000000000000008 /* DocumentationEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentationEditorView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000009 /* AnalyticsDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsDashboardView.swift; sourceTree = "<group>"; };
 		DA010000000000000000000A /* DeveloperModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperModels.swift; sourceTree = "<group>"; };
-		DA010000000000000000000B /* AppDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDetailView.swift; sourceTree = "<group>"; };
-		DA010000000000000000000C /* SubmissionWizardSteps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmissionWizardSteps.swift; sourceTree = "<group>"; };
-		DA010000000000000000000D /* DocSectionEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocSectionEditor.swift; sourceTree = "<group>"; };
+		DA010000000000000000000B /* AppDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDetailView.swift; path = Sources/Views/Workspace/Developer/AppDetailView.swift; sourceTree = SOURCE_ROOT; };
+		DA010000000000000000000C /* SubmissionWizardSteps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SubmissionWizardSteps.swift; path = Sources/Views/Workspace/Developer/SubmissionWizardSteps.swift; sourceTree = SOURCE_ROOT; };
+		DA010000000000000000000D /* DocSectionEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DocSectionEditor.swift; path = Sources/Views/Workspace/Developer/DocSectionEditor.swift; sourceTree = SOURCE_ROOT; };
 		DA010000000000000000000E /* DeveloperPersistentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperPersistentStore.swift; sourceTree = "<group>"; };
 		DA010000000000000000000F /* AppBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBuilderView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000010 /* ProjectInstallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectInstallManager.swift; sourceTree = "<group>"; };
