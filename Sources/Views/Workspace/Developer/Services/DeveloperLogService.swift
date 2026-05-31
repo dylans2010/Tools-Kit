@@ -120,6 +120,10 @@ public class DeveloperLogService: ObservableObject {
         return fileURL
     }
 
+    public func createAlertRule(_ rule: LogAlertRule) async throws {
+        try await saveAlertRule(rule)
+    }
+
     public func saveAlertRule(_ rule: LogAlertRule) async throws {
         if let index = alertRules.firstIndex(where: { $0.id == rule.id }) {
             alertRules[index] = rule

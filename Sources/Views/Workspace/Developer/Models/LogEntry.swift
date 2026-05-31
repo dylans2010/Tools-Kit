@@ -14,6 +14,8 @@ public enum LogCategory: String, Codable, CaseIterable {
     case authentication = "Authentication"
     case database = "Database"
     case networking = "Networking"
+    case security = "Security"
+    case application = "Application"
 }
 
 public struct LogSource: Codable, Hashable {

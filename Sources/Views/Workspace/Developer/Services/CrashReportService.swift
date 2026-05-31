@@ -10,6 +10,13 @@ public class CrashReportService: ObservableObject {
 
     public func loadCrashLogs() { self.crashLogs = store.crashLogs }
 
+    public func fetchReports(appID: UUID?) async throws -> [CrashLog] {
+        if let appID = appID {
+            return store.crashLogs.filter { $0.appID == appID }
+        }
+        return store.crashLogs
+    }
+
     public func reportCrash(_ log: CrashLog) async throws {
         var current = store.crashLogs
         current.insert(log, at: 0)

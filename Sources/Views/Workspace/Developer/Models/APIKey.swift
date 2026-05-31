@@ -36,6 +36,7 @@ public struct KeyRotationRecord: Codable, Identifiable, Hashable {
 
 public struct APIKey: Identifiable, Codable, Hashable {
     public var id: UUID
+    public var value: String = ""
     public var maskedValue: String
     public var label: String
     public var type: APIKeyType

@@ -169,7 +169,7 @@ struct AppDetailView: View {
                 NavigationLink(destination: DeveloperBetaTestingView()) {
                     toolTile(title: "Beta Testing", icon: "person.3.sequence.fill", description: "Invite external testers")
                 }
-                NavigationLink(destination: AppVersionHistoryView()) {
+                NavigationLink(destination: AppVersionHistoryView(appID: app.id)) {
                     toolTile(title: "All Versions", icon: "clock.arrow.circlepath", description: "Full historical audit")
                 }
                 NavigationLink(destination: DeveloperDeploymentPipelineView()) {
@@ -308,7 +308,7 @@ struct AppDetailView: View {
 
     private func toolTile(title: String, icon: String, description: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: icon).font(.system(size: 18)).foregroundStyle(.accentColor)
+            Image(systemName: icon).font(.system(size: 18)).foregroundStyle(Color.accentColor)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(.system(size: 12, weight: .bold))
                 Text(description).font(.system(size: 9)).foregroundStyle(.secondary).lineLimit(2)

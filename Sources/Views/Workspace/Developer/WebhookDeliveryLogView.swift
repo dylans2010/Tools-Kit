@@ -67,8 +67,9 @@ struct WebhookDeliveryLogView: View {
 
     private func refreshLog() {
         isRefreshing = true
+        let id = endpointID
         Task {
-            let log = try? await webhookService.fetchDeliveryLog(endpointID: endpointID)
+            let log = try? await webhookService.fetchDeliveryLog(endpointID: id)
             await MainActor.run {
                 deliveries = log ?? []
                 isRefreshing = false

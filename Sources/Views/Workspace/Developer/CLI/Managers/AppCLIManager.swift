@@ -379,7 +379,7 @@ public class AppCLIManager {
 
         commands.append(CLICommand(name: "env:keys", description: "List keys assigned to environment", category: .apps, usage: "env:keys <app_id> <env_id>", action: { args in
             guard args.count >= 2, let appID = UUID(uuidString: args[0]), let envID = UUID(uuidString: args[1]) else { return "Usage: env:keys <app_id> <env_id>" }
-            guard let app = self.appService.apps.first(where: { $0.id == id }) else { return "App not found." }
+            guard let app = self.appService.apps.first(where: { $0.id == appID }) else { return "App not found." }
             guard let env = app.environments.first(where: { $0.id == envID }) else { return "Env not found." }
             return "Assigned Key IDs: \(env.assignedKeyIDs.map { $0.uuidString }.joined(separator: ", "))"
         }))

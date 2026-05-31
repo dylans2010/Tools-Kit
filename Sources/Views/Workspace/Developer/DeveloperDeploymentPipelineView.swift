@@ -1,5 +1,12 @@
 import SwiftUI
 
+private struct PipelineDetailsView: View {
+    let pipeline: Pipeline
+    var body: some View {
+        Text("Pipeline Details: \(pipeline.name)")
+    }
+}
+
 struct DeveloperDeploymentPipelineView: View {
     @ObservedObject var deploymentService = DeploymentService.shared
     @ObservedObject var appService = DeveloperAppService.shared

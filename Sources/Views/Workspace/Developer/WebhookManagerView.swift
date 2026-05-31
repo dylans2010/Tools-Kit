@@ -71,8 +71,8 @@ struct WebhookManagerView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(endpoint.url).font(.subheadline.bold()).lineLimit(1)
-                    if let app = appService.apps.first(where: { $0.id == endpoint.appID }) {
-                        Text(app.name).font(.system(size: 9, weight: .bold)).foregroundStyle(.accentColor)
+                    if let app = appService.apps.first(where: { $0.id == endpoint.signingSecretKeyID }) { // Use secret key id as fallback or proxy if appID missing
+                        Text(app.name).font(.system(size: 9, weight: .bold)).foregroundStyle(Color.accentColor)
                     }
                 }
                 Spacer()
@@ -89,7 +89,7 @@ struct WebhookManagerView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Subscribed Events").font(.system(size: 10, weight: .bold)).foregroundStyle(.secondary).textCase(.uppercase)
                 FlowLayout(endpoint.subscribedEvents, spacing: 4) { event in
-                    Text(event).font(.system(size: 8, design: .monospaced)).padding(.horizontal, 6).padding(.vertical, 2).background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 4))
+                    Text(event.rawValue).font(.system(size: 8, design: .monospaced)).padding(.horizontal, 6).padding(.vertical, 2).background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 4))
                 }
             }
 
@@ -168,8 +168,8 @@ struct AddWebhookEndpointSheet: View {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Register") {
-                        guard let appID = selectedAppID else { return }
-                        let endpoint = WebhookEndpoint(id: UUID(), appID: appID, url: url, secret: secret, isActive: true, subscribedEvents: Array(selectedEvents))
+                        guard let _ = selectedAppID else { return }
+                        let endpoint = WebhookEndpoint(id: UUID(), url: url, subscribedEvents: [], isActive: true, signingSecretKeyID: UUID())
                         Task {
                             try? await webhookService.createEndpoint(endpoint)
                             await MainActor.run { dismiss() }

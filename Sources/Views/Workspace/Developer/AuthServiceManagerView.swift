@@ -1,5 +1,9 @@
 import SwiftUI
 
+private enum APIKeyEnvironment: String, CaseIterable, Hashable {
+    case development, staging, production, sandbox, live
+}
+
 struct AuthServiceManagerView: View {
     @ObservedObject var keyService = APIKeyService.shared
     @ObservedObject var appService = DeveloperAppService.shared
@@ -78,7 +82,7 @@ struct AuthServiceManagerView: View {
         .swipeActions {
             if !key.isRevoked {
                 Button(role: .destructive) {
-                    Task { try? await keyService.revokeKey(id: key.id) }
+                    Task { try? await keyService.revokeKey(id: key.id, reason: .other) }
                 } label: {
                     Label("Revoke", systemImage: "xmark.circle")
                 }
@@ -184,16 +188,20 @@ struct AuthServiceManagerView: View {
         let expiresAt = Date().addingTimeInterval(90 * 24 * 3600)
 
         Task {
-            let key = try? await keyService.createKey(
+            let env: KeyEnvironment = (selectedEnv == .live ? .live : .test)
+            let keyString = try? await keyService.createKey(
                 label: keyLabel,
+                type: .developerAPI,
+                environment: env,
+                scopeIdentifiers: ["*"],
                 appID: appID,
-                environment: selectedEnv,
-                scopes: ["*"],
                 expiresAt: expiresAt
             )
 
             await MainActor.run {
-                newlyCreatedKey = key
+                if let keyString = keyString {
+                    newlyCreatedKey = APIKey(maskedValue: "...", label: keyLabel, type: .developerAPI, environment: env, value: keyString)
+                }
                 showingCreateKey = false
                 showingKeyModal = true
                 keyLabel = ""

@@ -154,15 +154,18 @@ struct CLITokenView: View {
     private func generate() {
         Task {
             let expiry = Date().addingTimeInterval(selectedTTL)
-            let token = try? await keyService.createKey(
+            let tokenString = try? await keyService.createKey(
                 label: tokenLabel,
-                appID: UUID(), // Global CLI token
                 type: .cli,
                 environment: .live,
+                scopeIdentifiers: ["*"],
+                appID: UUID(), // Global CLI token
                 expiresAt: expiry
             )
             await MainActor.run {
-                newlyCreatedToken = token
+                if let tokenString = tokenString {
+                    newlyCreatedToken = APIKey(maskedValue: "...", label: tokenLabel, type: .cli, environment: .live, value: tokenString)
+                }
                 tokenLabel = ""
                 showingAddToken = false
                 showingTokenModal = true
@@ -173,7 +176,7 @@ struct CLITokenView: View {
     private func revokeTokens(at offsets: IndexSet) {
         for index in offsets {
             let token = cliTokens[index]
-            Task { try? await keyService.revokeKey(id: token.id) }
+            Task { try? await keyService.revokeKey(id: token.id, reason: .other) }
         }
     }
 }

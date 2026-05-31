@@ -6,9 +6,9 @@ struct DocumentationAnalyticsView: View {
     @State private var selectedAppID: UUID?
 
     @State private var analytics: [DocumentationAnalyticsEvent] = [
-        DocumentationAnalyticsEvent(pageID: UUID(), viewDuration: 42, timestamp: Date().addingTimeInterval(-3600)),
-        DocumentationAnalyticsEvent(pageID: UUID(), viewDuration: 120, timestamp: Date().addingTimeInterval(-7200)),
-        DocumentationAnalyticsEvent(pageID: UUID(), viewDuration: 15, timestamp: Date().addingTimeInterval(-86400))
+        DocumentationAnalyticsEvent(pageID: UUID(), timestamp: Date().addingTimeInterval(-3600), viewDuration: 42),
+        DocumentationAnalyticsEvent(pageID: UUID(), timestamp: Date().addingTimeInterval(-7200), viewDuration: 120),
+        DocumentationAnalyticsEvent(pageID: UUID(), timestamp: Date().addingTimeInterval(-86400), viewDuration: 15)
     ]
 
     var body: some View {
