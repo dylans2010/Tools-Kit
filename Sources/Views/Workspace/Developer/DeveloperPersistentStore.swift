@@ -335,13 +335,31 @@ public struct BetaGroup: Identifiable, Codable, Hashable {
 public struct SupportTicket: Identifiable, Codable, Hashable {
     public var id: UUID
     public var subject: String
+    public var topic: String
     public var status: String
     public var appName: String
+    public var message: String
 
-    public init(id: UUID = UUID(), subject: String, status: String, appName: String) {
+    public init(id: UUID = UUID(), subject: String, topic: String = "General", status: String, appName: String, message: String = "") {
         self.id = id
         self.subject = subject
+        self.topic = topic
         self.status = status
         self.appName = appName
+        self.message = message
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, subject, topic, status, appName, message
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        self.subject = try container.decode(String.self, forKey: .subject)
+        self.topic = try container.decodeIfPresent(String.self, forKey: .topic) ?? "General"
+        self.status = try container.decode(String.self, forKey: .status)
+        self.appName = try container.decode(String.self, forKey: .appName)
+        self.message = try container.decodeIfPresent(String.self, forKey: .message) ?? ""
     }
 }

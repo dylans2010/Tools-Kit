@@ -1,21 +1,5 @@
 import SwiftUI
 
-private struct ThreadMetric: Identifiable, Hashable {
-    let id = UUID()
-    var name: String
-    var utilization: Double
-    var activeTime: Int
-}
-
-private struct PerformanceReport: Identifiable, Hashable {
-    let id = UUID()
-    var p99Latency: Int
-    var avgFPS: Double
-    var coldStartTime: Int
-    var peakMemoryMB: Int
-    var threadMetrics: [ThreadMetric]
-}
-
 struct DeveloperPerformanceMonitorView: View {
     @ObservedObject var performanceService = PerformanceService.shared
     @ObservedObject var appService = DeveloperAppService.shared

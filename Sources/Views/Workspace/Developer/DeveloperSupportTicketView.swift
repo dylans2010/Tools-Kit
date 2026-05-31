@@ -87,7 +87,7 @@ struct DeveloperSupportTicketView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Submit") {
                         let appName = appService.apps.first(where: { $0.id == selectedAppID })?.name ?? "General"
-                        let newTicket = SupportTicket(subject: ticketSubject, status: "Open", appName: appName)
+                        let newTicket = SupportTicket(subject: ticketSubject, status: "Open", appName: appName, message: ticketBody)
                         tickets.insert(newTicket, at: 0)
                         showingAddTicket = false
                         ticketSubject = ""

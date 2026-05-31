@@ -1,6 +1,6 @@
 import SwiftUI
 
-private enum APIKeyEnvironment: String, CaseIterable, Hashable {
+enum APIKeyEnvironment: String, CaseIterable, Hashable {
     case development, staging, production, sandbox, live
 }
 
@@ -143,6 +143,11 @@ struct AddConfigSheet: View {
     @State private var value = ""
     @State private var valueType: RemoteConfigValueType = .string
 
+    init(appID: UUID?, environment: APIKeyEnvironment) {
+        self._appID = State(initialValue: appID)
+        self.environment = environment
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -185,9 +190,9 @@ struct AddConfigSheet: View {
     }
 
     private func saveConfig() {
-        guard let _ = appID else { return }
+        guard let appID else { return }
         let env: KeyEnvironment = (environment == .live ? .live : .test)
-        let newConfig = RemoteConfig(key: key, value: value, valueType: valueType, environment: env, version: 1)
+        let newConfig = RemoteConfig(appID: appID, key: key, value: value, valueType: valueType, environment: env, version: 1)
         configService.addConfig(newConfig)
         dismiss()
     }
