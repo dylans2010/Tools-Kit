@@ -68,7 +68,8 @@ struct DeveloperHomeView: View {
                         ("Error Grouping", AnyView(ErrorGroupingView()), "square.grid.3x1.below.line.grid.1x2")
                     ])
 
-                    domainGrid(title: "Account & Support", icon: "person.crop.circle", systems: [
+                    domainGrid(title: "Support & Identity", icon: "person.crop.circle", systems: [
+                        ("Developer CLI", AnyView(DeveloperCLIView()), "terminal.fill"),
                         ("Account Activity", AnyView(DeveloperAccountActivityView()), "person.text.rectangle"),
                         ("Profile", AnyView(DeveloperProfileView()), "person.crop.circle"),
                         ("Verification", AnyView(DeveloperVerificationView()), "person.badge.shield.checkmark"),

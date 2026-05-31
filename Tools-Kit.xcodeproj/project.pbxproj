@@ -2196,6 +2196,13 @@
 		DA0200000000000000000076 /* DeveloperLocalizationManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000076 /* DeveloperLocalizationManagerView.swift */; };
 		DA0200000000000000000077 /* DeveloperSecurityPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000077 /* DeveloperSecurityPolicyView.swift */; };
 		DA0200000000000000000078 /* DeveloperInfrastructureStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000078 /* DeveloperInfrastructureStatusView.swift */; };
+		DA0200000000000000000079 /* CLIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000079 /* CLIModels.swift */; };
+		DA020000000000000000007A /* AppCLIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007A /* AppCLIManager.swift */; };
+		DA020000000000000000007B /* SecurityCLIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007B /* SecurityCLIManager.swift */; };
+		DA020000000000000000007C /* OpsCLIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007C /* OpsCLIManager.swift */; };
+		DA020000000000000000007D /* ResourceCLIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007D /* ResourceCLIManager.swift */; };
+		DA020000000000000000007E /* DeveloperCLIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007E /* DeveloperCLIManager.swift */; };
+		DA020000000000000000007F /* DeveloperCLIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007F /* DeveloperCLIView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -4372,6 +4379,13 @@
 		DA0100000000000000000076 /* DeveloperLocalizationManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperLocalizationManagerView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000077 /* DeveloperSecurityPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSecurityPolicyView.swift; sourceTree = "<group>"; };
 		DA0100000000000000000078 /* DeveloperInfrastructureStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperInfrastructureStatusView.swift; sourceTree = "<group>"; };
+		DA0100000000000000000079 /* CLIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIModels.swift; sourceTree = "<group>"; };
+		DA010000000000000000007A /* AppCLIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCLIManager.swift; sourceTree = "<group>"; };
+		DA010000000000000000007B /* SecurityCLIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityCLIManager.swift; sourceTree = "<group>"; };
+		DA010000000000000000007C /* OpsCLIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpsCLIManager.swift; sourceTree = "<group>"; };
+		DA010000000000000000007D /* ResourceCLIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceCLIManager.swift; sourceTree = "<group>"; };
+		DA010000000000000000007E /* DeveloperCLIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperCLIManager.swift; sourceTree = "<group>"; };
+		DA010000000000000000007F /* DeveloperCLIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperCLIView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -12661,8 +12675,31 @@
 				DA0100000000000000000076 /* DeveloperLocalizationManagerView.swift */,
 				DA0100000000000000000077 /* DeveloperSecurityPolicyView.swift */,
 				DA0100000000000000000078 /* DeveloperInfrastructureStatusView.swift */,
+				DA0000000000000000000004 /* CLI */,
 			);
 			path = Developer;
+		};
+		DA0000000000000000000004 /* CLI */ = {
+			isa = PBXGroup;
+			children = (
+				DA0100000000000000000079 /* CLIModels.swift */,
+				DA010000000000000000007F /* DeveloperCLIView.swift */,
+				DA0000000000000000000005 /* Managers */,
+			);
+			path = CLI;
+			sourceTree = "<group>";
+		};
+		DA0000000000000000000005 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				DA010000000000000000007A /* AppCLIManager.swift */,
+				DA010000000000000000007B /* SecurityCLIManager.swift */,
+				DA010000000000000000007C /* OpsCLIManager.swift */,
+				DA010000000000000000007D /* ResourceCLIManager.swift */,
+				DA010000000000000000007E /* DeveloperCLIManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
 			sourceTree = "<group>";
 		};
 		DA0000000000000000000002 /* Models */ = {
@@ -12724,6 +12761,13 @@
 				DA010000000000000000006A /* LocalizationService.swift */,
 				DA010000000000000000006B /* SecurityPolicyService.swift */,
 				DA010000000000000000006C /* InfrastructureService.swift */,
+				DA0200000000000000000079 /* CLIModels.swift in Sources */,
+				DA020000000000000000007A /* AppCLIManager.swift in Sources */,
+				DA020000000000000000007B /* SecurityCLIManager.swift in Sources */,
+				DA020000000000000000007C /* OpsCLIManager.swift in Sources */,
+				DA020000000000000000007D /* ResourceCLIManager.swift in Sources */,
+				DA020000000000000000007E /* DeveloperCLIManager.swift in Sources */,
+				DA020000000000000000007F /* DeveloperCLIView.swift in Sources */,
 			);
 			path = Services;
 			sourceTree = "<group>";
