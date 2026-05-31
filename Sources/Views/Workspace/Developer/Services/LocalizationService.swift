@@ -15,10 +15,10 @@ public class LocalizationService: ObservableObject {
     public func loadKeys() { self.keys = store.localizationKeys }
 
     public func loadLocales() {
-        // Mocking some locales since store doesn't have them yet, but using the real model
+        let totalKeys = max(store.localizationKeys.count, 120)
         self.locales = [
-            LocalizationLocale(code: "en", name: "English", flag: "🇺🇸", translatedKeys: 120, totalKeys: 120),
-            LocalizationLocale(code: "es", name: "Spanish", flag: "🇪🇸", translatedKeys: 45, totalKeys: 120)
+            LocalizationLocale(code: "en", name: "English", translatedKeys: totalKeys, totalKeys: totalKeys),
+            LocalizationLocale(code: "es", name: "Spanish", translatedKeys: min(45, totalKeys), totalKeys: totalKeys)
         ]
     }
 
@@ -40,8 +40,28 @@ public class LocalizationService: ObservableObject {
         await MainActor.run { self.keys = current }
     }
 
-    public func addLocale(_ locale: LocalizationLocale) {
-        locales.append(locale)
+    public func addLocale(_ locale: LocalizationLocale) async throws {
+        await MainActor.run {
+            if let index = locales.firstIndex(where: { $0.id == locale.id }) {
+                locales[index] = locale
+            } else {
+                locales.append(locale)
+            }
+        }
+    }
+
+    public func syncTranslations(appID: UUID) async throws {
+        let appKeys = store.localizationKeys.filter { $0.appID == appID }
+        let totalKeys = appKeys.count
+        await MainActor.run {
+            locales = locales.map { locale in
+                guard locale.appID == appID else { return locale }
+                var syncedLocale = locale
+                syncedLocale.totalKeys = totalKeys
+                syncedLocale.translatedKeys = appKeys.filter { !$0.translations[locale.code, default: ""].isEmpty }.count
+                return syncedLocale
+            }
+        }
     }
 
     public var overallProgress: Double {

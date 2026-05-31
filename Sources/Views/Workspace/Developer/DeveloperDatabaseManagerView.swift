@@ -25,14 +25,14 @@ struct DeveloperDatabaseManagerView: View {
                         Text("No schemas detected for this application environment.").font(.caption).foregroundStyle(.secondary)
                     } else {
                         ForEach(schemas) { schema in
-                            NavigationLink(destination: Text("Schema Explorer for \(schema.name)")) {
+                            NavigationLink(destination: Text("Schema Explorer for \(schema.tableName)")) {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text(schema.name).font(.subheadline.bold())
-                                        Text("\(schema.tableCount) tables • \(schema.sizeMB) MB").font(.system(size: 9)).foregroundStyle(.secondary)
+                                        Text(schema.tableName).font(.subheadline.bold())
+                                        Text("\(schema.columns.count) columns • v\(schema.version)").font(.system(size: 9)).foregroundStyle(.secondary)
                                     }
                                     Spacer()
-                                    Text(schema.engine.rawValue).font(.system(size: 8, weight: .black)).foregroundStyle(.tertiary)
+                                    Text("SCHEMA").font(.system(size: 8, weight: .black)).foregroundStyle(.tertiary)
                                 }
                             }
                         }

@@ -2,8 +2,14 @@ import SwiftUI
 
 struct DeveloperInfrastructureStatusView: View {
     @ObservedObject var infraService = InfrastructureService.shared
-    @State private var nodes: [InfraNode] = []
+    @State private var nodes: [InfrastructureNode] = []
     @State private var isRefreshing = false
+
+    private var averageCPUUsage: Int {
+        guard !nodes.isEmpty else { return 0 }
+        let totalUsage = nodes.map { $0.cpuUsage }.reduce(0, +)
+        return Int(totalUsage / Double(nodes.count) * 100)
+    }
 
     var body: some View {
         ScrollView {
@@ -48,7 +54,7 @@ struct DeveloperInfrastructureStatusView: View {
             }
 
             HStack(spacing: 24) {
-                infraMetric(label: "CPU Usage", value: "\(nodes.isEmpty ? 0 : Int(nodes.map({$0.load}).reduce(0, +) / Double(nodes.count) * 100))%", color: .blue)
+                infraMetric(label: "CPU Usage", value: "\(averageCPUUsage)%", color: .blue)
                 infraMetric(label: "Memory", value: "2.4 GB", color: .purple)
                 infraMetric(label: "Storage", value: "84%", color: .orange)
             }
@@ -67,7 +73,7 @@ struct DeveloperInfrastructureStatusView: View {
         }
     }
 
-    private func nodeRow(_ node: InfraNode) -> some View {
+    private func nodeRow(_ node: InfrastructureNode) -> some View {
         HStack(spacing: 16) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8).fill(node.status == .healthy ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
@@ -77,11 +83,11 @@ struct DeveloperInfrastructureStatusView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(node.name).font(.subheadline.bold())
-                Text(node.ipAddress).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
+                Text(node.type).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
-                Text("\(Int(node.load * 100))% LOAD").font(.system(size: 8, weight: .black))
+                Text("\(Int(node.cpuUsage * 100))% LOAD").font(.system(size: 8, weight: .black))
                 Text(node.region).font(.system(size: 8)).foregroundStyle(.tertiary)
             }
         }
