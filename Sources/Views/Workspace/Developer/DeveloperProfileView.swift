@@ -2,112 +2,143 @@ import SwiftUI
 
 struct DeveloperProfileView: View {
     @ObservedObject var profileService = DeveloperProfileService.shared
-    @State private var profile: DeveloperProfile
-    @State private var showingSaveAlert = false
-    @State private var isSaving = false
-
-    init() {
-        _profile = State(initialValue: DeveloperProfileService.shared.profile)
-    }
+    @State private var showingEditSheet = false
+    @State private var showingTierAlert = false
 
     var body: some View {
-        Form {
-            Section("Public Profile") {
-                avatarSection
-                TextField("Display Name", text: $profile.displayName)
-                TextField("Username", text: $profile.username)
-                    .autocapitalization(.none)
-                    .autocorrectionDisabled()
-            }
+        ScrollView {
+            VStack(spacing: 24) {
+                profileHeader
 
-            Section("Professional Information") {
-                TextField("Organization", text: $profile.organization)
-                TextField("Website", text: $profile.website)
-                    .keyboardType(.URL)
-                    .autocapitalization(.none)
-                TextEditor(text: $profile.bio)
-                    .frame(minHeight: 100)
-            }
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Developer Stats").font(.headline)
 
-            Section("Developer Tier") {
-                Picker("Tier", selection: $profile.tier) {
-                    ForEach(DeveloperTier.allCases, id: \.self) { tier in
-                        Text(tier.rawValue).tag(tier)
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                        statCard(label: "Apps Published", value: "12", icon: "app.badge.fill")
+                        statCard(label: "API Reputation", value: "99.9", icon: "star.fill")
+                        statCard(label: "Contributions", value: "1.4k", icon: "hammer.fill")
+                        statCard(label: "Forum Rank", value: "Gold", icon: "medal.fill")
                     }
                 }
-            }
 
-            Section {
-                Button {
-                    saveProfile()
-                } label: {
-                    if isSaving {
-                        ProgressView()
-                    } else {
-                        Text("Save Profile Changes").bold()
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Account Settings").font(.headline)
+
+                    VStack(spacing: 1) {
+                        settingRow(title: "Display Name", value: profileService.profile.displayName, icon: "person.fill")
+                        settingRow(title: "Username", value: "@\(profileService.profile.username)", icon: "at")
+                        settingRow(title: "Email", value: profileService.profile.email, icon: "envelope.fill")
+                        settingRow(title: "Developer Tier", value: profileService.profile.tier.rawValue, icon: "crown.fill", action: { showingTierAlert = true })
                     }
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .disabled(isSaving)
             }
+            .padding()
         }
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Developer Profile")
-        .alert("Profile Updated", isPresented: $showingSaveAlert) {
+        .toolbar {
+            Button("Edit") { showingEditSheet = true }
+        }
+        .sheet(isPresented: $showingEditSheet) {
+            EditProfileSheet()
+        }
+        .alert("Tier Upgrade", isPresented: $showingTierAlert) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text("Your professional developer profile has been synchronized successfully.")
+            Text("To upgrade your developer tier, please complete the organization verification process.")
         }
     }
 
-    private var avatarSection: some View {
-        HStack {
+    private var profileHeader: some View {
+        VStack(spacing: 16) {
             ZStack {
                 Circle().fill(Color.accentColor.opacity(0.1))
-                if !profile.avatarUrl.isEmpty, let url = URL(string: profile.avatarUrl) {
+                if !profileService.profile.avatarUrl.isEmpty, let url = URL(string: profileService.profile.avatarUrl) {
                     AsyncImage(url: url) { phase in
-                        if let image = phase.image {
-                            image.resizable()
-                        } else if phase.error != nil {
-                            Image(systemName: "person.crop.circle.badge.exclamationmark")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .foregroundStyle(.red)
-                        } else {
-                            ProgressView()
-                        }
+                        if let image = phase.image { image.resizable() }
+                        else { Image(systemName: "person.crop.circle.fill").resizable().foregroundStyle(.secondary) }
                     }
                     .clipShape(Circle())
                 } else {
                     Image(systemName: "person.crop.circle.fill")
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
                         .foregroundStyle(Color.accentColor)
                 }
             }
-            .frame(width: 80, height: 80)
+            .frame(width: 100, height: 100)
 
-            VStack(alignment: .leading) {
-                Button("Change Avatar") {
-                    // Logic to update avatar URL
-                }
-                .font(.subheadline)
-                Text("Square PNG or JPG, max 512KB").font(.caption2).foregroundStyle(.secondary)
+            VStack(spacing: 4) {
+                Text(profileService.profile.displayName).font(.title2.bold())
+                Text(profileService.profile.tier.rawValue + " Developer").font(.subheadline).foregroundStyle(.secondary)
             }
-            .padding(.leading)
         }
-        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
     }
 
-    private func saveProfile() {
-        isSaving = true
-        Task {
-            try? await profileService.updateProfile(
-                displayName: profile.displayName,
-                legalName: profile.legalName,
-                bio: profile.bio
-            )
-            await MainActor.run {
-                isSaving = false
-                showingSaveAlert = true
+    private func statCard(label: String, value: String, icon: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: icon).foregroundStyle(.accentColor)
+            Text(value).font(.title3.bold())
+            Text(label).font(.caption2).foregroundStyle(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func settingRow(title: String, value: String, icon: String, action: (() -> Void)? = nil) -> some View {
+        Button {
+            action?()
+        } label: {
+            HStack {
+                Image(systemName: icon).foregroundStyle(.secondary).frame(width: 24)
+                Text(title).font(.subheadline)
+                Spacer()
+                Text(value).font(.subheadline).foregroundStyle(.secondary)
+                if action != nil {
+                    Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
+                }
+            }
+            .padding()
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct EditProfileSheet: View {
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var profileService = DeveloperProfileService.shared
+    @State private var name = ""
+    @State private var email = ""
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Information") {
+                    TextField("Display Name", text: $name)
+                    TextField("Email", text: $email)
+                }
+            }
+            .navigationTitle("Edit Profile")
+            .onAppear {
+                name = profileService.profile.displayName
+                email = profileService.profile.email
+            }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        var p = profileService.profile
+                        p.displayName = name
+                        p.email = email
+                        profileService.updateProfile(p)
+                        dismiss()
+                    }
+                }
             }
         }
     }

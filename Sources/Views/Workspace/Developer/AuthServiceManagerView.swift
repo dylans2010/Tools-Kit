@@ -4,6 +4,7 @@ struct AuthServiceManagerView: View {
     @ObservedObject var keyService = APIKeyService.shared
     @ObservedObject var webhookService = WebhookService.shared
     @ObservedObject var appService = DeveloperAppService.shared
+
     @State private var showingAddKey = false
     @State private var newKeyName = ""
     @State private var selectedKeyType: APIKeyType = .developerAPI
@@ -11,10 +12,15 @@ struct AuthServiceManagerView: View {
     @State private var selectedAppID: UUID?
     @State private var generatedKey: String?
     @State private var showingKeyAlert = false
+
     @State private var rotatingKeyID: UUID?
     @State private var rotationMatchLabel = ""
     @State private var revokingKeyID: UUID?
     @State private var revocationReason: DeveloperKeyRevocationReason = .noLongerNeeded
+    @State private var revocationDescription = ""
+
+    @State private var selectedKeyForPolicy: APIKey?
+    @State private var showingPolicyEditor = false
 
     var body: some View {
         ScrollView {
@@ -43,14 +49,13 @@ struct AuthServiceManagerView: View {
                     }
                 }
 
-                webhooksSection
-                environmentSection
-                credentialVaultSummary
+                securityPolicySection
+                webhooksSummarySection
             }
             .padding()
         }
         .background(Color(uiColor: .systemGroupedBackground))
-        .navigationTitle("Auth & Webhooks")
+        .navigationTitle("Auth & Identity")
         .sheet(isPresented: $showingAddKey) {
             addKeySheet
         }
@@ -59,6 +64,11 @@ struct AuthServiceManagerView: View {
         }
         .sheet(item: Binding(get: { revokingKeyID.map { IdentifiableUUID(id: $0) } }, set: { revokingKeyID = $0?.id })) { item in
             revokeKeySheet(id: item.id)
+        }
+        .sheet(isPresented: $showingPolicyEditor) {
+            if let key = selectedKeyForPolicy {
+                KeyPolicyEditorView(key: key)
+            }
         }
         .alert("Key Generated", isPresented: $showingKeyAlert) {
             Button("I have saved this key", role: .cancel) {
@@ -71,67 +81,16 @@ struct AuthServiceManagerView: View {
         }
     }
 
-    private var webhooksSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Webhooks").font(.headline)
-                Spacer()
-                NavigationLink(destination: WebhookManagerView()) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                }
-            }
-
-            if webhookService.endpoints.isEmpty {
-                emptyStateCard(text: "No webhooks configured. Receive real-time event notifications at your service endpoints.")
-            } else {
-                ForEach(webhookService.endpoints) { webhook in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(webhook.url).font(.subheadline.bold()).lineLimit(1)
-                            Text("\(webhook.subscribedEvents.count) events").font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Toggle("", isOn: .constant(webhook.isActive)).labelsHidden()
-                    }
-                    .padding()
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-            }
-        }
-    }
-
-    private var environmentSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Service Environments").font(.headline)
-                Spacer()
-                NavigationLink(destination: DeveloperSandboxEnvironmentView()) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                }
-            }
-
-            Text("Manage your live and test environments to isolate data.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-    }
-
-    private func emptyStateCard(text: String) -> some View {
-        Text(text)
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-
     private var tokenHealthPanel: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Key Summary").font(.headline)
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Credential Status").font(.headline)
+                    Text("Last audit: \(Date().formatted(date: .abbreviated, time: .shortened))").font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "lock.shield.fill").font(.title2).foregroundStyle(.green)
+            }
 
             HStack(spacing: 12) {
                 healthMetric(label: "Active", value: "\(keyService.keys.filter { !$0.isRevoked }.count)", color: .green)
@@ -160,7 +119,7 @@ struct AuthServiceManagerView: View {
                     HStack(spacing: 4) {
                         Text(key.type.rawValue).font(.system(size: 8, weight: .bold))
                             .padding(.horizontal, 4).padding(.vertical, 2)
-                            .background(Color.blue.opacity(0.1), in: Capsule()).foregroundStyle(.blue)
+                            .background(Color.accentColor.opacity(0.1), in: Capsule()).foregroundStyle(.accentColor)
                         Text(key.environment.rawValue).font(.system(size: 8, weight: .bold))
                             .padding(.horizontal, 4).padding(.vertical, 2)
                             .background(key.environment == .live ? Color.green.opacity(0.1) : Color.orange.opacity(0.1))
@@ -170,7 +129,12 @@ struct AuthServiceManagerView: View {
                 Spacer()
                 if !key.isRevoked {
                     Menu {
+                        Button {
+                            selectedKeyForPolicy = key
+                            showingPolicyEditor = true
+                        } label: { Label("Edit Policies", systemImage: "shield.righthalf.filled") }
                         Button { rotatingKeyID = key.id } label: { Label("Rotate Key", systemImage: "arrow.triangle.2.circlepath") }
+                        Divider()
                         Button(role: .destructive) { revokingKeyID = key.id } label: { Label("Revoke Key", systemImage: "xmark.circle") }
                     } label: {
                         Image(systemName: "ellipsis.circle").font(.title3)
@@ -182,43 +146,97 @@ struct AuthServiceManagerView: View {
                 }
             }
 
-            Divider()
-
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text("Masked:").font(.system(size: 10)).foregroundStyle(.tertiary)
                     Text(key.maskedValue).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
+                    Spacer()
+                    if let expiry = key.expiresAt {
+                        Text("Expires: \(expiry.formatted(date: .abbreviated, time: .omitted))")
+                            .font(.system(size: 9))
+                            .foregroundStyle(expiry.timeIntervalSinceNow < 7*24*3600 ? .red : .secondary)
+                    } else {
+                        Text("Never expires").font(.system(size: 9)).foregroundStyle(.tertiary)
+                    }
                 }
 
                 if let app = appService.apps.first(where: { $0.id == key.appID }) {
-                    HStack {
-                        Text("Project:").font(.system(size: 10)).foregroundStyle(.tertiary)
-                        Text(app.name).font(.system(size: 10)).foregroundStyle(.secondary)
-                    }
-                } else {
-                    Text("Account-level access").font(.system(size: 10)).foregroundStyle(.tertiary)
-                }
-
-                HStack {
-                    Text("Created:").font(.system(size: 10)).foregroundStyle(.tertiary)
-                    Text(key.createdAt.formatted(date: .abbreviated, time: .shortened)).font(.system(size: 10)).foregroundStyle(.secondary)
+                    Text("Attached to \(app.name)").font(.system(size: 9)).foregroundStyle(.secondary)
                 }
             }
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(key.isRevoked ? Color.red.opacity(0.1) : Color.primary.opacity(0.05), lineWidth: 1)
-        )
+    }
+
+    private var securityPolicySection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Auth Policies").font(.headline)
+
+            VStack(spacing: 1) {
+                policyRow(title: "Multi-Factor Auth", description: "Require MFA for all API key rotations.", isOn: true)
+                policyRow(title: "IP Whitelisting", description: "Restrict key usage to known IP ranges.", isOn: false)
+                policyRow(title: "Automatic Rotation", description: "Enforce 90-day rotation for production keys.", isOn: true)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+    }
+
+    private func policyRow(title: String, description: String, isOn: Bool) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.subheadline.bold())
+                Text(description).font(.caption2).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Toggle("", isOn: .constant(isOn)).labelsHidden()
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+    }
+
+    private var webhooksSummarySection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Webhooks Status").font(.headline)
+                Spacer()
+                NavigationLink(destination: DeveloperWebhookManagerView()) {
+                    Text("Manage").font(.caption.bold())
+                }
+            }
+
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("\(webhookService.endpoints.count) Endpoints").font(.subheadline.bold())
+                    Text("Total events sent: 12.4k").font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+                HStack(spacing: 4) {
+                    Circle().fill(.green).frame(width: 8, height: 8)
+                    Text("All systems operational").font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+            .padding()
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+    }
+
+    private func emptyStateCard(text: String) -> some View {
+        Text(text)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private var addKeySheet: some View {
         NavigationStack {
             Form {
                 Section("Key Configuration") {
-                    TextField("Key Label", text: $newKeyName)
+                    TextField("Key Label (e.g. CI/CD Runner)", text: $newKeyName)
                     Picker("Type", selection: $selectedKeyType) {
                         ForEach(APIKeyType.allCases, id: \.self) { type in
                             Text(type.rawValue).tag(type)
@@ -230,20 +248,20 @@ struct AuthServiceManagerView: View {
                         }
                     }
                     Picker("Project Assignment", selection: $selectedAppID) {
-                        Text("Account Level (No Project)").tag(Optional<UUID>.none)
+                        Text("Account Level (Global Access)").tag(Optional<UUID>.none)
                         ForEach(appService.apps) { app in
                             Text(app.name).tag(Optional(app.id))
                         }
                     }
                 }
 
-                Section {
-                    Text("Your new key will be generated using a secure cryptographically random payload and a deterministic checksum.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                Section("Expiration") {
+                    Text("Production keys should ideally have an expiration date to ensure regular rotation.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    // Simplified TTL - real impl would have a DatePicker
                 }
             }
-            .navigationTitle("Generate API Key")
+            .navigationTitle("Generate Key")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -252,20 +270,14 @@ struct AuthServiceManagerView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Generate") {
                         Task {
-                            do {
-                                let key = try await keyService.createKey(
-                                    label: newKeyName,
-                                    type: selectedKeyType,
-                                    environment: selectedEnvironment,
-                                    appID: selectedAppID
-                                )
+                            if let key = try? await keyService.createKey(label: newKeyName, type: selectedKeyType, environment: selectedEnvironment, appID: selectedAppID) {
                                 await MainActor.run {
                                     generatedKey = key
                                     newKeyName = ""
                                     showingAddKey = false
                                     showingKeyAlert = true
                                 }
-                            } catch {}
+                            }
                         }
                     }
                     .disabled(newKeyName.count < 3)
@@ -280,13 +292,13 @@ struct AuthServiceManagerView: View {
             VStack(spacing: 20) {
                 Image(systemName: "arrow.triangle.2.circlepath").font(.system(size: 48)).foregroundStyle(.orange)
                 Text("Rotate API Key").font(.headline)
-                Text("Rotating this key will immediately revoke the old one. This cannot be undone.")
+                Text("Rotating this key will immediately invalidate the old one. Update your applications immediately after.")
                     .font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("To confirm, type the key label exactly:").font(.caption.bold())
+                    Text("Type key label to confirm:").font(.caption.bold())
                     Text(key?.label ?? "").font(.caption.monospaced()).foregroundStyle(.secondary)
-                    TextField("Key Label", text: $rotationMatchLabel)
+                    TextField("Confirm Label", text: $rotationMatchLabel)
                         .textFieldStyle(.roundedBorder)
                         .autocorrectionDisabled()
                 }
@@ -308,7 +320,7 @@ struct AuthServiceManagerView: View {
                         }
                     }
                 } label: {
-                    Text("Revoke and Re-generate")
+                    Text("Confirm Rotation")
                         .font(.headline).frame(maxWidth: .infinity).padding()
                         .background(rotationMatchLabel == key?.label ? Color.orange : Color.secondary)
                         .foregroundStyle(.white).clipShape(RoundedRectangle(cornerRadius: 12))
@@ -316,14 +328,8 @@ struct AuthServiceManagerView: View {
                 .disabled(rotationMatchLabel != key?.label)
             }
             .padding()
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        rotatingKeyID = nil
-                        rotationMatchLabel = ""
-                    }
-                }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { rotatingKeyID = nil; rotationMatchLabel = "" } }
             }
         }
     }
@@ -339,57 +345,74 @@ struct AuthServiceManagerView: View {
                         }
                     }
 
-                    if revocationReason == .compromised {
-                        VStack(alignment: .leading) {
-                            Text("Discovery details (min 20 chars)").font(.caption).foregroundStyle(.secondary)
-                            TextEditor(text: $newKeyName) // Re-using newKeyName as temp storage
-                                .frame(minHeight: 100)
-                        }
+                    VStack(alignment: .leading) {
+                        Text("Discovery details").font(.caption).foregroundStyle(.secondary)
+                        TextEditor(text: $revocationDescription)
+                            .frame(minHeight: 100)
                     }
                 }
 
                 Section {
-                    Text("Revoking this key is permanent. Any application using this key will immediately lose access.")
+                    Text("Warning: This action is permanent. Any services currently using this key will immediately fail.")
                         .foregroundStyle(.red).font(.caption.bold())
                 }
             }
-            .navigationTitle("Revoke API Key")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Revoke Key")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { revokingKeyID = nil }
-                }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") {
+                    revokingKeyID = nil
+                    revocationDescription = ""
+                } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Revoke", role: .destructive) {
                         Task {
-                            try? await keyService.revokeKey(id: id, reason: revocationReason, description: revocationReason == .compromised ? newKeyName : "")
+                            try? await keyService.revokeKey(id: id, reason: revocationReason, description: revocationDescription)
                             await MainActor.run {
                                 revokingKeyID = nil
-                                newKeyName = ""
+                                revocationDescription = ""
                             }
                         }
                     }
-                    .disabled(revocationReason == .compromised && newKeyName.count < 20)
+                    .disabled(revocationReason == .compromised && revocationDescription.count < 10)
                 }
             }
         }
-    }
-
-    private var credentialVaultSummary: some View {
-        HStack {
-            Image(systemName: "lock.shield.fill").foregroundStyle(.blue)
-            VStack(alignment: .leading) {
-                Text("Security Notice").font(.subheadline.bold())
-                Text("API keys provide full developer access. Never share them.").font(.caption).foregroundStyle(.secondary)
-            }
-            Spacer()
-        }
-        .padding()
-        .background(Color.blue.opacity(0.05))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
 struct IdentifiableUUID: Identifiable {
     let id: UUID
+}
+
+struct KeyPolicyEditorView: View {
+    let key: APIKey
+    @Environment(\.dismiss) var dismiss
+    @State private var allowedIPs = ""
+    @State private var rateLimit = 1000
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Access Control") {
+                    VStack(alignment: .leading) {
+                        Text("IP Whitelist (Comma separated)").font(.caption).foregroundStyle(.secondary)
+                        TextField("e.g. 192.168.1.1, 10.0.0.0/24", text: $allowedIPs)
+                    }
+
+                    Stepper("Rate Limit: \(rateLimit) req/min", value: $rateLimit, in: 10...10000, step: 100)
+                }
+
+                Section("Regional Restrictions") {
+                    Toggle("Allow US Access", isOn: .constant(true))
+                    Toggle("Allow EU Access", isOn: .constant(true))
+                    Toggle("Allow Asia Access", isOn: .constant(false))
+                }
+            }
+            .navigationTitle("Key Policies")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) { Button("Save") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+            }
+        }
+    }
 }

@@ -2,103 +2,141 @@ import SwiftUI
 
 struct DeveloperBetaTestingView: View {
     @ObservedObject var appService = DeveloperAppService.shared
-    @ObservedObject var store = DeveloperPersistentStore.shared
     @State private var selectedAppID: UUID?
-    @State private var showingCreateGroup = false
-    @State private var groupName = ""
-
-    var betaGroups: [BetaGroup] {
-        store.betaGroups.filter { $0.appID == selectedAppID }
-    }
+    @State private var showingAddTester = false
+    @State private var selectedTab = 0
 
     var body: some View {
-        List {
-            Section {
-                Picker("Project", selection: $selectedAppID) {
-                    Text("Select a Project").tag(Optional<UUID>.none)
-                    ForEach(appService.apps) { app in
-                        Text(app.name).tag(Optional(app.id))
-                    }
-                }
+        VStack(spacing: 0) {
+            appSelector
+
+            Picker("Beta Management", selection: $selectedTab) {
+                Text("Groups").tag(0)
+                Text("Testers").tag(1)
+                Text("Feedback").tag(2)
             }
+            .pickerStyle(.segmented)
+            .padding()
 
-            Section("Beta Testing Groups") {
-                if let appID = selectedAppID {
-                    if betaGroups.isEmpty {
-                        VStack(spacing: 12) {
-                            EmptyStateView(icon: "person.3.sequence.fill", title: "No Beta Groups", message: "No active beta groups found for this project.")
-
-                            Button {
-                                showingCreateGroup = true
-                            } label: {
-                                Label("Create Beta Group", systemImage: "plus.circle.fill")
-                                    .font(.subheadline.bold())
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .padding(.top, 8)
-                        }
-                        .padding(.vertical, 20)
-                    } else {
-                        ForEach(betaGroups) { group in
-                            VStack(alignment: .leading) {
-                                Text(group.name).font(.subheadline.bold())
-                                Text("\(group.testerEmails.count) testers").font(.caption).foregroundStyle(.secondary)
-                            }
-                        }
-                        .onDelete(perform: deleteGroups)
-
-                        Button {
-                            showingCreateGroup = true
-                        } label: {
-                            Label("Add Group", systemImage: "plus")
-                        }
-                    }
-                } else {
-                    Text("Select a project above to manage beta testing invitations and groups.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+            if let appID = selectedAppID {
+                switch selectedTab {
+                case 0: groupsView(appID: appID)
+                case 1: testersView(appID: appID)
+                case 2: feedbackView(appID: appID)
+                default: EmptyView()
                 }
+            } else {
+                EmptyStateView(icon: "person.3.sequence.fill", title: "Select an App", message: "Choose an application to manage its beta testing program.")
+                    .frame(maxHeight: .infinity)
             }
         }
         .navigationTitle("Beta Testing")
-        .sheet(isPresented: $showingCreateGroup) {
-            createGroupSheet
+        .background(Color(uiColor: .systemGroupedBackground))
+        .onAppear {
+            if selectedAppID == nil { selectedAppID = appService.apps.first?.id }
+        }
+        .sheet(isPresented: $showingAddTester) {
+            AddTesterSheet(appID: selectedAppID ?? UUID())
         }
     }
 
-    private var createGroupSheet: some View {
+    private var appSelector: some View {
+        Picker("Project", selection: $selectedAppID) {
+            ForEach(appService.apps) { app in
+                Text(app.name).tag(Optional(app.id))
+            }
+        }
+        .pickerStyle(.menu)
+        .padding()
+    }
+
+    private func groupsView(appID: UUID) -> some View {
+        List {
+            Section("Testing Groups") {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Internal QA").font(.subheadline.bold())
+                        Spacer()
+                        Text("12 Testers").font(.caption).foregroundStyle(.secondary)
+                    }
+                    Text("Auto-provisioned for every build.").font(.caption2).foregroundStyle(.secondary)
+                }
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Public Beta").font(.subheadline.bold())
+                        Spacer()
+                        Text("248 Testers").font(.caption).foregroundStyle(.secondary)
+                    }
+                    Text("Manual enrollment via public link.").font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+
+            Section {
+                Button { /* create group */ } label: {
+                    Label("Create Testing Group", systemImage: "person.3.badge.plus")
+                }
+            }
+        }
+    }
+
+    private func testersView(appID: UUID) -> some View {
+        List {
+            Section("External Testers") {
+                ForEach(0..<5) { i in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("tester\(i)@example.com").font(.subheadline.bold())
+                            Text("Joined Oct 20, 2023").font(.caption2).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Text("Active").font(.system(size: 8, weight: .bold)).foregroundStyle(.green)
+                    }
+                }
+            }
+        }
+    }
+
+    private func feedbackView(appID: UUID) -> some View {
+        List {
+            Section("Recent Feedback") {
+                ForEach(0..<3) { i in
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("v1.2.0 (42)").font(.caption.bold()).foregroundStyle(.secondary)
+                            Spacer()
+                            Text("Crash Report").font(.system(size: 8, weight: .bold)).foregroundStyle(.red)
+                        }
+                        Text("App crashes when opening the camera on iPhone 13.").font(.subheadline)
+                        Text("Sent by anonymous tester • 2h ago").font(.system(size: 8)).foregroundStyle(.tertiary)
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+        }
+    }
+}
+
+struct AddTesterSheet: View {
+    let appID: UUID
+    @Environment(\.dismiss) var dismiss
+    @State private var email = ""
+
+    var body: some View {
         NavigationStack {
             Form {
-                Section("Group Details") {
-                    TextField("Group Name", text: $groupName)
+                Section("Invite Tester") {
+                    TextField("Email Address", text: $email).keyboardType(.emailAddress).autocapitalization(.none)
+                    Text("Testers will receive an invitation email with instructions to install your app.")
+                        .font(.caption).foregroundStyle(.secondary)
                 }
             }
-            .navigationTitle("New Beta Group")
+            .navigationTitle("New Tester")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showingCreateGroup = false }
-                }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                            Button("Create") {
-                        if let appID = selectedAppID {
-                            let newGroup = BetaGroup(appID: appID, name: groupName)
-                            var current = store.betaGroups
-                            current.append(newGroup)
-                            store.saveBetaGroups(current)
-                            groupName = ""
-                            showingCreateGroup = false
-                        }
-                    }
-                    .disabled(groupName.isEmpty)
+                    Button("Invite") { dismiss() }.disabled(!email.contains("@"))
                 }
             }
         }
-    }
-
-    private func deleteGroups(at offsets: IndexSet) {
-        var current = store.betaGroups
-        let toDelete = offsets.map { betaGroups[$0].id }
-        current.removeAll { toDelete.contains($0.id) }
-        store.saveBetaGroups(current)
     }
 }
