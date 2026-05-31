@@ -12700,7 +12700,6 @@
 			);
 			path = Managers;
 			sourceTree = "<group>";
-			sourceTree = "<group>";
 		};
 		DA0000000000000000000002 /* Models */ = {
 			isa = PBXGroup;
@@ -12761,13 +12760,6 @@
 				DA010000000000000000006A /* LocalizationService.swift */,
 				DA010000000000000000006B /* SecurityPolicyService.swift */,
 				DA010000000000000000006C /* InfrastructureService.swift */,
-				DA0200000000000000000079 /* CLIModels.swift in Sources */,
-				DA020000000000000000007A /* AppCLIManager.swift in Sources */,
-				DA020000000000000000007B /* SecurityCLIManager.swift in Sources */,
-				DA020000000000000000007C /* OpsCLIManager.swift in Sources */,
-				DA020000000000000000007D /* ResourceCLIManager.swift in Sources */,
-				DA020000000000000000007E /* DeveloperCLIManager.swift in Sources */,
-				DA020000000000000000007F /* DeveloperCLIView.swift in Sources */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -13060,6 +13052,13 @@
 				DA0200000000000000000076 /* DeveloperLocalizationManagerView.swift in Sources */,
 				DA0200000000000000000077 /* DeveloperSecurityPolicyView.swift in Sources */,
 				DA0200000000000000000078 /* DeveloperInfrastructureStatusView.swift in Sources */,
+				DA0200000000000000000079 /* CLIModels.swift in Sources */,
+				DA020000000000000000007A /* AppCLIManager.swift in Sources */,
+				DA020000000000000000007B /* SecurityCLIManager.swift in Sources */,
+				DA020000000000000000007C /* OpsCLIManager.swift in Sources */,
+				DA020000000000000000007D /* ResourceCLIManager.swift in Sources */,
+				DA020000000000000000007E /* DeveloperCLIManager.swift in Sources */,
+				DA020000000000000000007F /* DeveloperCLIView.swift in Sources */,
 				92E13A73A39F4878870CCFF1 /* SDKResourceAuditView.swift in Sources */,
 				0603EBECCB2849248F4BD1D4 /* SDKGlobalSearchView.swift in Sources */,
 				6FCAA43DB3294F3586F66864 /* SDKDependencyVisualizerView.swift in Sources */,
