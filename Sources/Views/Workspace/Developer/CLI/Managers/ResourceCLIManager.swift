@@ -11,6 +11,7 @@ public class ResourceCLIManager {
     private let incidentService = IncidentService.shared
     private let ticketService = DeveloperPersistentStore.shared
     private let analyticService = AnalyticsService.shared
+    private let appService = DeveloperAppService.shared
 
     private init() {}
 
@@ -20,19 +21,30 @@ public class ResourceCLIManager {
         // --- Localization (8 commands) ---
         commands.append(CLICommand(name: "loc:list", description: "List localization keys", category: .resources, usage: "loc:list", action: { _ in
             let keys = self.locService.keys
-            return keys.map { "\($0.key) (\($0.language))" }.joined(separator: "\n")
+            return keys.map { key in
+                let languages = key.translations.keys.sorted().joined(separator: ", ")
+                return "\(key.key) [\(languages)]"
+            }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "loc:add", description: "Add a localization key", category: .resources, usage: "loc:add <key> <lang> <val>", action: { args in
             guard args.count >= 3 else { return "Usage: loc:add <key> <lang> <val>" }
-            let k = LocalizationKey(key: args[0], value: args[2], language: args[1])
-            try? await self.locService.addKey(k)
+            let language = args[1]
+            let value = args.dropFirst(2).joined(separator: " ")
+            if var existing = self.locService.keys.first(where: { $0.key == args[0] }) {
+                existing.translations[language] = value
+                try? await self.locService.saveKey(existing)
+            } else {
+                let appID = self.defaultAppID()
+                let k = LocalizationKey(appID: appID, key: args[0], translations: [language: value])
+                try? await self.locService.saveKey(k)
+            }
             return "Key added."
         }))
 
         commands.append(CLICommand(name: "loc:langs", description: "List supported languages", category: .resources, usage: "loc:langs", action: { _ in
-            let langs = Set(self.locService.keys.map { $0.language })
-            return langs.joined(separator: ", ")
+            let langs = Set(self.locService.keys.flatMap { $0.translations.keys })
+            return langs.sorted().joined(separator: ", ")
         }))
 
         commands.append(CLICommand(name: "loc:missing", description: "List missing translations", category: .resources, usage: "loc:missing", action: { _ in
@@ -42,7 +54,9 @@ public class ResourceCLIManager {
         commands.append(CLICommand(name: "loc:inspect", description: "Inspect a localization key", category: .resources, usage: "loc:inspect <key>", action: { args in
             let k = args.first ?? ""
             let keys = self.locService.keys.filter { $0.key == k }
-            return keys.map { "\($0.language): \($0.value)" }.joined(separator: "\n")
+            return keys.flatMap { key in
+                key.translations.sorted { $0.key < $1.key }.map { "\($0.key): \($0.value)" }
+            }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "loc:delete", description: "Delete a localization key", category: .resources, usage: "loc:delete <id>", action: { args in
@@ -62,13 +76,13 @@ public class ResourceCLIManager {
         // --- Documentation (7 commands) ---
         commands.append(CLICommand(name: "docs:list", description: "List documentation pages", category: .resources, usage: "docs:list", action: { _ in
             let pages = self.docService.pages
-            return pages.map { "\($0.title) (\($0.category))" }.joined(separator: "\n")
+            return pages.map { "\($0.title) (\($0.sectionType.rawValue))" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "docs:inspect", description: "View a doc page", category: .resources, usage: "docs:inspect <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: docs:inspect <id>" }
             guard let p = self.docService.pages.first(where: { $0.id == id }) else { return "Not found." }
-            return "Title: \(p.title)\nCategory: \(p.category)\nContent Length: \(p.content.count) chars"
+            return "Title: \(p.title)\nSection: \(p.sectionType.rawValue)\nSlug: \(p.slug)\nOrder: \(p.order)\nContent Length: \(p.content.count) chars"
         }))
 
         commands.append(CLICommand(name: "docs:search", description: "Search documentation", category: .resources, usage: "docs:search <query>", action: { args in
@@ -77,9 +91,12 @@ public class ResourceCLIManager {
             return filtered.map { $0.title }.joined(separator: "\n")
         }))
 
-        commands.append(CLICommand(name: "docs:create", description: "Create a doc page", category: .resources, usage: "docs:create <title> <cat>", action: { args in
-            guard args.count >= 2 else { return "Usage: docs:create <title> <cat>" }
-            let p = DocumentationPage(title: args[0], content: "Initial content", category: args[1])
+        commands.append(CLICommand(name: "docs:create", description: "Create a doc page", category: .resources, usage: "docs:create <app_id> <title> [section]", action: { args in
+            guard args.count >= 2, let appID = UUID(uuidString: args[0]) else { return "Usage: docs:create <app_id> <title> [section]" }
+            let title = args[1]
+            let sectionType = args.count >= 3 ? self.documentationSectionType(from: args[2]) : .guide
+            let order = (self.docService.pages.filter { $0.appID == appID }.map { $0.order }.max() ?? -1) + 1
+            let p = DocumentationPage(appID: appID, title: title, slug: self.slug(from: title), content: "Initial content", sectionType: sectionType, order: order)
             try? await self.docService.savePage(p)
             return "Page created."
         }))
@@ -90,9 +107,9 @@ public class ResourceCLIManager {
             return "Page deleted."
         }))
 
-        commands.append(CLICommand(name: "docs:categories", description: "List doc categories", category: .resources, usage: "docs:categories", action: { _ in
-            let cats = Set(self.docService.pages.map { $0.category })
-            return cats.joined(separator: ", ")
+        commands.append(CLICommand(name: "docs:categories", description: "List doc sections", category: .resources, usage: "docs:categories", action: { _ in
+            let sections = Set(self.docService.pages.map { $0.sectionType.rawValue })
+            return sections.sorted().joined(separator: ", ")
         }))
 
         commands.append(CLICommand(name: "docs:publish", description: "Publish documentation to live site", category: .resources, usage: "docs:publish", action: { _ in
@@ -143,7 +160,7 @@ public class ResourceCLIManager {
         commands.append(CLICommand(name: "org:inspect", description: "Inspect an organization", category: .resources, usage: "org:inspect <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: org:inspect <id>" }
             guard let o = self.orgService.organizations.first(where: { $0.id == id }) else { return "Not found." }
-            return "Name: \(o.name)\nDomain: \(o.domain)\nMembers: \(o.members.count)\nApps: \(o.apps.count)"
+            return "Name: \(o.name)\nWebsite: \(o.website)\nMembers: \(o.members.count)\nTeams: \(o.teams.count)"
         }))
 
         commands.append(CLICommand(name: "team:list", description: "List team members", category: .resources, usage: "team:list <org_id>", action: { args in
@@ -160,10 +177,14 @@ public class ResourceCLIManager {
             return "Member removed."
         }))
 
-        commands.append(CLICommand(name: "org:create", description: "Create a new organization", category: .resources, usage: "org:create <name> <domain>", action: { args in
-            guard args.count >= 2 else { return "Usage: org:create <name> <domain>" }
-            let o = DeveloperOrganization(name: args[0], domain: args[1], members: [], apps: [])
-            try? await self.orgService.createOrganization(o)
+        commands.append(CLICommand(name: "org:create", description: "Create a new organization", category: .resources, usage: "org:create <name> [website]", action: { args in
+            guard let name = args.first else { return "Usage: org:create <name> [website]" }
+            let website = args.count >= 2 ? args[1] : ""
+            let org = DeveloperOrganization(name: name, website: website)
+            var current = self.ticketService.organizations
+            current.append(org)
+            self.ticketService.saveOrganizations(current)
+            self.orgService.loadOrganizations()
             return "Organization created."
         }))
 
@@ -189,8 +210,8 @@ public class ResourceCLIManager {
 
         commands.append(CLICommand(name: "flags:create", description: "Create a feature flag", category: .resources, usage: "flags:create <app_id> <key>", action: { args in
             guard args.count >= 2, let appID = UUID(uuidString: args[0]) else { return "Usage: flags:create <app_id> <key>" }
-            let f = FeatureFlag(appID: appID, key: args[1], isEnabled: false, description: "CLI Flag")
-            try? await self.flagService.addFlag(f)
+            let f = FeatureFlag(appID: appID, key: args[1], name: args[1], description: "CLI Flag", isEnabled: false)
+            try? await self.flagService.createFlag(f)
             return "Flag created."
         }))
 
@@ -279,5 +300,23 @@ public class ResourceCLIManager {
         }))
 
         return commands
+    }
+
+    private func defaultAppID() -> UUID {
+        appService.apps.first?.id ?? UUID()
+    }
+
+    private func documentationSectionType(from value: String) -> DocumentationSectionType {
+        DocumentationSectionType.allCases.first { section in
+            section.rawValue.caseInsensitiveCompare(value) == .orderedSame
+                || String(describing: section).caseInsensitiveCompare(value) == .orderedSame
+        } ?? .guide
+    }
+
+    private func slug(from title: String) -> String {
+        let slug = title.lowercased()
+            .replacingOccurrences(of: " ", with: "-")
+            .filter { $0.isLetter || $0.isNumber || $0 == "-" }
+        return slug.isEmpty ? "untitled" : slug
     }
 }
