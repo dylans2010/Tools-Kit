@@ -1,8 +1,5 @@
 import SwiftUI
 
-extension URL: Identifiable {
-    public var id: String { absoluteString }
-}
 
 class SDKAppBuilderViewModel: ObservableObject {
     @Published var name: String = ""
@@ -50,8 +47,13 @@ struct SDKAppBuilderView: View {
             navigationButtons
         }
         .navigationTitle("App Builder")
-        .sheet(item: $exportedURL) { url in
-            AppBuilderShareSheet(activityItems: [url])
+        .sheet(isPresented: Binding(
+            get: { exportedURL != nil },
+            set: { if !$0 { exportedURL = nil } }
+        )) {
+            if let url = exportedURL {
+                AppBuilderShareSheet(activityItems: [url])
+            }
         }
     }
 
@@ -204,4 +206,3 @@ private struct AppBuilderShareSheet: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
-

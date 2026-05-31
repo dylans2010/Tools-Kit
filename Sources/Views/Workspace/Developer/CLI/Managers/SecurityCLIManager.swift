@@ -210,29 +210,31 @@ public class SecurityCLIManager {
         // --- Scopes (10 commands) ---
         commands.append(CLICommand(name: "scopes:list", description: "List all granted scopes", category: .security, usage: "scopes:list", action: { _ in
             let scopes = self.scopeService.grantedScopes
-            return scopes.map { "\($0.scope) (\($0.appID))" }.joined(separator: "\n")
+            return scopes.map { "\($0.scopeIdentifier) (\($0.appID?.uuidString ?? "No app"))" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "scopes:request", description: "Request a new scope", category: .security, usage: "scopes:request <app_id> <scope>", action: { args in
             guard args.count >= 2, let appID = UUID(uuidString: args[0]) else { return "Usage: scopes:request <app_id> <scope>" }
-            try? await self.scopeService.requestScope(appID: appID, scope: args[1], justification: "CLI Request")
+            try? await self.scopeService.submitRequest(ScopeRequest(appId: appID, scopeIdentifier: args[1], justification: "CLI Request"))
             return "Scope \(args[1]) requested."
         }))
 
         commands.append(CLICommand(name: "scopes:revoke", description: "Revoke a granted scope", category: .security, usage: "scopes:revoke <app_id> <scope>", action: { args in
             guard args.count >= 2, let appID = UUID(uuidString: args[0]) else { return "Usage: scopes:revoke <app_id> <scope>" }
-            try? await self.scopeService.revokeScope(appID: appID, scope: args[1])
+            if let grant = self.scopeService.grantedScopes.first(where: { $0.appID == appID && $0.scopeIdentifier == args[1] }) {
+                try? await self.scopeService.revokeScope(id: grant.id)
+            }
             return "Scope \(args[1]) revoked."
         }))
 
         commands.append(CLICommand(name: "scopes:audit", description: "View scope audit logs", category: .security, usage: "scopes:audit", action: { _ in
-            let logs = self.scopeService.auditLogs
-            return logs.map { "[\($0.action)] \($0.scope) by \($0.performer) - \($0.timestamp)" }.joined(separator: "\n")
+            let logs = self.scopeService.auditLog
+            return logs.map { "[\($0.eventType)] \($0.scopeIdentifier) by \($0.actorID) - \($0.timestamp)" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "scopes:pending", description: "List pending scope requests", category: .security, usage: "scopes:pending", action: { _ in
-            let pending = self.scopeService.requests.filter { $0.status == .pending }
-            return pending.map { "\($0.scope) (\($0.appID))" }.joined(separator: "\n")
+            let pending = self.scopeService.pendingRequests
+            return pending.map { "\($0.scopeIdentifier) (\($0.appId))" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "scopes:templates", description: "List scope templates", category: .security, usage: "scopes:templates", action: { _ in
@@ -249,7 +251,7 @@ public class SecurityCLIManager {
 
         commands.append(CLICommand(name: "scopes:apps", description: "List apps for a scope", category: .security, usage: "scopes:apps <scope>", action: { args in
             let s = args.first ?? ""
-            let apps = self.scopeService.grantedScopes.filter { $0.scope == s }.map { $0.appID.uuidString }
+            let apps = self.scopeService.grantedScopes.filter { $0.scopeIdentifier == s }.compactMap { $0.appID?.uuidString }
             return apps.joined(separator: ", ")
         }))
 
@@ -260,25 +262,28 @@ public class SecurityCLIManager {
         // --- Policies (7 commands) ---
         commands.append(CLICommand(name: "policy:list", description: "List security policies", category: .security, usage: "policy:list", action: { _ in
             let policies = self.policyService.policies
-            return policies.map { "[\($0.isEnabled ? "ON" : "OFF")] \($0.name)" }.joined(separator: "\n")
+            return policies.map { "[\($0.isCompliant ? "COMPLIANT" : "NON-COMPLIANT")] \($0.name)" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "policy:toggle", description: "Enable/disable a policy", category: .security, usage: "policy:toggle <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: policy:toggle <id>" }
-            try? await self.policyService.togglePolicy(id: id)
+            if var policy = self.policyService.policies.first(where: { $0.id == id }) {
+                policy.isCompliant.toggle()
+                try? await self.policyService.updatePolicy(policy)
+            }
             return "Policy toggled."
         }))
 
         commands.append(CLICommand(name: "policy:inspect", description: "Inspect a policy", category: .security, usage: "policy:inspect <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: policy:inspect <id>" }
             guard let p = self.policyService.policies.first(where: { $0.id == id }) else { return "Not found." }
-            return "Name: \(p.name)\nDescription: \(p.description)\nEnabled: \(p.isEnabled)"
+            return "Name: \(p.name)\nDescription: \(p.description)\nCompliant: \(p.isCompliant)"
         }))
 
         commands.append(CLICommand(name: "policy:create", description: "Create a security policy", category: .security, usage: "policy:create <name> <desc>", action: { args in
             guard args.count >= 2 else { return "Usage: policy:create <name> <desc>" }
-            let p = SecurityPolicy(name: args[0], description: args[1], isEnabled: true)
-            try? await self.policyService.addPolicy(p)
+            let p = SecurityPolicy(name: args[0], description: args[1], isCompliant: true)
+            try? await self.policyService.updatePolicy(p)
             return "Policy created."
         }))
 
@@ -293,7 +298,7 @@ public class SecurityCLIManager {
         }))
 
         commands.append(CLICommand(name: "policy:active", description: "List enabled policies", category: .security, usage: "policy:active", action: { _ in
-            return self.policyService.policies.filter { $0.isEnabled }.map { $0.name }.joined(separator: ", ")
+            return self.policyService.policies.filter { $0.isCompliant }.map { $0.name }.joined(separator: ", ")
         }))
 
         return commands

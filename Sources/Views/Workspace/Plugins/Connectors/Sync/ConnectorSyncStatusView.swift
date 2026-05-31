@@ -57,8 +57,12 @@ struct ConnectorSyncStatusView: View {
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
         }
-        .sheet(item: $selectedJobID) { jobID in
-            if let job = syncJobs.first(where: { $0.id == jobID }) {
+        .sheet(isPresented: Binding(
+            get: { selectedJobID != nil },
+            set: { if !$0 { selectedJobID = nil } }
+        )) {
+            if let jobID = selectedJobID,
+               let job = syncJobs.first(where: { $0.id == jobID }) {
                 NavigationStack { syncJobDetailSheet(job) }
                     .presentationDetents([.medium])
                     .presentationDragIndicator(.visible)
@@ -481,11 +485,6 @@ struct ConnectorSyncStatusView: View {
     }
 }
 
-// MARK: - Extension for UUID Identifiable sheet binding
-
-extension UUID: @retroactive Identifiable {
-    public var id: UUID { self }
-}
 
 // MARK: - Private Models
 

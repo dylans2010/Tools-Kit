@@ -42,8 +42,13 @@ struct DeveloperLogsView: View {
                 }
             }
         }
-        .sheet(item: $exportURL) { url in
-            LogActivityView(activityItems: [url])
+        .sheet(isPresented: Binding(
+            get: { exportURL != nil },
+            set: { if !$0 { exportURL = nil } }
+        )) {
+            if let url = exportURL {
+                LogActivityView(activityItems: [url])
+            }
         }
     }
 
@@ -157,9 +162,6 @@ struct DeveloperLogsView: View {
     }
 }
 
-extension URL: Identifiable {
-    public var id: String { absoluteString }
-}
 
 struct LogActivityView: UIViewControllerRepresentable {
     let activityItems: [Any]

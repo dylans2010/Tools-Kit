@@ -19,57 +19,57 @@ public class OpsCLIManager {
         // --- Logs (10 commands) ---
         commands.append(CLICommand(name: "logs:tail", description: "Show latest log entries", category: .operations, usage: "logs:tail <count>", action: { args in
             let count = Int(args.first ?? "10") ?? 10
-            let logs = self.logService.logs.suffix(count)
-            return logs.map { "[\($0.level.rawValue)] \($0.timestamp): \($0.message)" }.joined(separator: "\n")
+            let logs = self.logService.logEntries.suffix(count)
+            return logs.map { "[\($0.severity.rawValue)] \($0.timestamp): \($0.message)" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "logs:search", description: "Search logs for a keyword", category: .operations, usage: "logs:search <query>", action: { args in
             let q = args.joined(separator: " ").lowercased()
-            let filtered = self.logService.logs.filter { $0.message.lowercased().contains(q) }
+            let filtered = self.logService.logEntries.filter { $0.message.lowercased().contains(q) }
             return filtered.map { "\($0.timestamp): \($0.message)" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "logs:error", description: "List error logs", category: .operations, usage: "logs:error", action: { _ in
-            let errors = self.logService.logs.filter { $0.level == .error }
+            let errors = self.logService.logEntries.filter { $0.severity == .error }
             return errors.map { "\($0.timestamp): \($0.message)" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "logs:clear", description: "Clear log history", category: .operations, usage: "logs:clear", action: { _ in
-            try? await self.logService.clearLogs()
+            await self.logService.clearLogEntries()
             return "Logs cleared."
         }))
 
         commands.append(CLICommand(name: "logs:export", description: "Export logs to JSON", category: .operations, usage: "logs:export", action: { _ in
-            let data = try? JSONEncoder().encode(self.logService.logs)
+            let data = try? JSONEncoder().encode(self.logService.logEntries)
             return data.flatMap { String(data: $0, encoding: .utf8) } ?? "Export failed."
         }))
 
         commands.append(CLICommand(name: "logs:count", description: "Count logs", category: .operations, usage: "logs:count", action: { _ in
-            return "Total logs: \(self.logService.logs.count)"
+            return "Total logs: \(self.logService.logEntries.count)"
         }))
 
         commands.append(CLICommand(name: "logs:stats", description: "Show log level statistics", category: .operations, usage: "logs:stats", action: { _ in
-            let logs = self.logService.logs
-            let errors = logs.filter { $0.level == .error }.count
-            let warns = logs.filter { $0.level == .warning }.count
-            let infos = logs.filter { $0.level == .info }.count
+            let logs = self.logService.logEntries
+            let errors = logs.filter { $0.severity == .error }.count
+            let warns = logs.filter { $0.severity == .warning }.count
+            let infos = logs.filter { $0.severity == .info }.count
             return "Errors: \(errors), Warnings: \(warns), Info: \(infos)"
         }))
 
         commands.append(CLICommand(name: "logs:filter", description: "Filter logs by level", category: .operations, usage: "logs:filter <level>", action: { args in
             let level = args.first?.lowercased() ?? "info"
-            let filtered = self.logService.logs.filter { $0.level.rawValue.lowercased() == level }
+            let filtered = self.logService.logEntries.filter { $0.severity.rawValue.lowercased() == level }
             return filtered.map { $0.message }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "logs:latest", description: "Show most recent log", category: .operations, usage: "logs:latest", action: { _ in
-            guard let log = self.logService.logs.last else { return "No logs." }
-            return "[\(log.level.rawValue)] \(log.timestamp): \(log.message)"
+            guard let log = self.logService.logEntries.last else { return "No logs." }
+            return "[\(log.severity.rawValue)] \(log.timestamp): \(log.message)"
         }))
 
         commands.append(CLICommand(name: "logs:oldest", description: "Show oldest log", category: .operations, usage: "logs:oldest", action: { _ in
-            guard let log = self.logService.logs.first else { return "No logs." }
-            return "[\(log.level.rawValue)] \(log.timestamp): \(log.message)"
+            guard let log = self.logService.logEntries.first else { return "No logs." }
+            return "[\(log.severity.rawValue)] \(log.timestamp): \(log.message)"
         }))
 
         // --- Infrastructure (10 commands) ---

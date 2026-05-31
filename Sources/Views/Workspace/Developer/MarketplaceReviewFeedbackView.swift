@@ -45,8 +45,13 @@ struct MarketplaceReviewFeedbackView: View {
             }
         }
         .navigationTitle("Review Audit")
-        .sheet(item: $respondingToID) { id in
-            responseSheet(feedbackID: id)
+        .sheet(isPresented: Binding(
+            get: { respondingToID != nil },
+            set: { if !$0 { respondingToID = nil } }
+        )) {
+            if let id = respondingToID {
+                responseSheet(feedbackID: id)
+            }
         }
     }
 
@@ -115,8 +120,4 @@ struct MarketplaceReviewFeedbackView: View {
             }
         }
     }
-}
-
-extension UUID: Identifiable {
-    public var id: String { uuidString }
 }
