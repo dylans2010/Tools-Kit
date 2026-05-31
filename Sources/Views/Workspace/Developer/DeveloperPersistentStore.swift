@@ -332,25 +332,45 @@ public struct BetaGroup: Identifiable, Codable, Hashable {
     }
 }
 
+public struct TicketComment: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var sender: String
+    public var content: String
+    public var timestamp: Date
+
+    public init(id: UUID = UUID(), sender: String, content: String, timestamp: Date = Date()) {
+        self.id = id
+        self.sender = sender
+        self.content = content
+        self.timestamp = timestamp
+    }
+}
+
 public struct SupportTicket: Identifiable, Codable, Hashable {
     public var id: UUID
     public var subject: String
     public var topic: String
+    public var priority: String // Low, Medium, High, Critical
     public var status: String
     public var appName: String
     public var message: String
+    public var comments: [TicketComment]
+    public var createdAt: Date
 
-    public init(id: UUID = UUID(), subject: String, topic: String = "General", status: String, appName: String, message: String = "") {
+    public init(id: UUID = UUID(), subject: String, topic: String = "General", priority: String = "Medium", status: String, appName: String, message: String = "", comments: [TicketComment] = [], createdAt: Date = Date()) {
         self.id = id
         self.subject = subject
         self.topic = topic
+        self.priority = priority
         self.status = status
         self.appName = appName
         self.message = message
+        self.comments = comments
+        self.createdAt = createdAt
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, subject, topic, status, appName, message
+        case id, subject, topic, priority, status, appName, message, comments, createdAt
     }
 
     public init(from decoder: Decoder) throws {
@@ -358,8 +378,11 @@ public struct SupportTicket: Identifiable, Codable, Hashable {
         self.id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
         self.subject = try container.decode(String.self, forKey: .subject)
         self.topic = try container.decodeIfPresent(String.self, forKey: .topic) ?? "General"
+        self.priority = try container.decodeIfPresent(String.self, forKey: .priority) ?? "Medium"
         self.status = try container.decode(String.self, forKey: .status)
         self.appName = try container.decode(String.self, forKey: .appName)
         self.message = try container.decodeIfPresent(String.self, forKey: .message) ?? ""
+        self.comments = try container.decodeIfPresent([TicketComment].self, forKey: .comments) ?? []
+        self.createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date()
     }
 }

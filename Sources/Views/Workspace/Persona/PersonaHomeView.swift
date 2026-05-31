@@ -995,8 +995,15 @@ private struct PersonaHomeToolbar: ToolbarContent {
         }
 
         ToolbarItem(placement: .topBarLeading) {
-            Button(action: onShowWelcome) {
-                Image(systemName: "info.circle")
+            HStack {
+                Button(action: onShowWelcome) {
+                    Image(systemName: "info.circle")
+                }
+
+                NavigationLink(destination: MCPMainView()) {
+                    Image(systemName: "network")
+                        .foregroundStyle(.blue)
+                }
             }
         }
     }

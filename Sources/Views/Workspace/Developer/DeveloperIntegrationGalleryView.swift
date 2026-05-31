@@ -11,8 +11,104 @@ private struct IntegrationItem: Identifiable, Hashable {
 
 private struct IntegrationDetailView: View {
     let item: IntegrationItem
+    @Environment(\.dismiss) var dismiss
+    @State private var apiKey = ""
+    @State private var apiEndpoint = ""
+    @State private var secretKey = ""
+    @State private var environment = "Development"
+    @State private var isInstalling = false
+    @State private var showSuccess = false
+
     var body: some View {
-        Text("Integration: \(item.name)")
+        NavigationStack {
+            Form {
+                Section {
+                    HStack(spacing: 16) {
+                        Image(systemName: item.icon)
+                            .font(.system(size: 40))
+                            .foregroundStyle(Color.accentColor)
+                            .frame(width: 60, height: 60)
+                            .background(Color.accentColor.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(item.name).font(.headline)
+                            Text(item.category).font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 8)
+
+                    Text(item.description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                if item.isInstalled {
+                    Section("Connection Details") {
+                        LabeledContent("Status", value: "Active").foregroundStyle(.green)
+                        LabeledContent("Environment", value: environment)
+                        LabeledContent("API Endpoint", value: apiEndpoint.isEmpty ? "https://api.\(item.name.lowercased().replacingOccurrences(of: " ", with: "")).com" : apiEndpoint)
+                    }
+
+                    Section {
+                        Button(role: .destructive) {
+                            // Uninstall logic
+                            dismiss()
+                        } label: {
+                            Text("Uninstall Integration")
+                        }
+                    }
+                } else {
+                    Section("Configuration") {
+                        TextField("API Key", text: $apiKey)
+                        TextField("API Endpoint", text: $apiEndpoint, prompt: Text("https://api.\(item.name.lowercased().replacingOccurrences(of: " ", with: "")).com"))
+                        SecureField("Secret Key", text: $secretKey)
+                        Picker("Environment", selection: $environment) {
+                            ForEach(["Development", "Staging", "Production"], id: \.self) { Text($0) }
+                        }
+                    }
+
+                    Section {
+                        Button {
+                            install()
+                        } label: {
+                            if isInstalling {
+                                ProgressView().tint(.white)
+                            } else {
+                                Text("Install Integration")
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .disabled(apiKey.isEmpty || isInstalling)
+                    }
+                    .listRowBackground(apiKey.isEmpty ? Color.secondary.opacity(0.1) : Color.accentColor)
+                    .foregroundStyle(.white)
+                }
+            }
+            .navigationTitle(item.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }
+                }
+            }
+            .alert("Success", isPresented: $showSuccess) {
+                Button("OK") { dismiss() }
+            } message: {
+                Text("\(item.name) has been successfully integrated into your workspace.")
+            }
+        }
+    }
+
+    private func install() {
+        isInstalling = true
+        Task {
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            await MainActor.run {
+                isInstalling = false
+                showSuccess = true
+            }
+        }
     }
 }
 

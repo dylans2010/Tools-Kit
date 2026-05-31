@@ -16,6 +16,44 @@ struct AppBuilderView: View {
 
     var body: some View {
         Form {
+            if !projectManager.projects.isEmpty {
+                Section("Import from Workspace") {
+                    Text("Select an existing SDK project to pre-fill the registration details.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(projectManager.projects) { project in
+                                Button {
+                                    importProject(project)
+                                } label: {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        HStack {
+                                            Image(systemName: "cube.box.fill")
+                                                .foregroundStyle(.blue)
+                                            Text(project.name)
+                                                .font(.system(size: 11, weight: .bold))
+                                                .lineLimit(1)
+                                        }
+                                        Text(project.description)
+                                            .font(.system(size: 8))
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(2)
+                                    }
+                                    .padding(10)
+                                    .frame(width: 140, height: 70, alignment: .topLeading)
+                                    .background(Color.primary.opacity(0.05))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+
             Section("Basic Information") {
                 TextField("App Name", text: $name)
                 Picker("Type", selection: $type) {
@@ -86,6 +124,16 @@ struct AppBuilderView: View {
         }
         .navigationTitle("New App")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func importProject(_ project: SDKProject) {
+        self.name = project.name
+        self.description = project.description
+        self.bundleId = "com.workspace.\(project.name.lowercased().replacingOccurrences(of: " ", with: "."))"
+
+        if project.name.contains("Plugin") { self.type = .plugin }
+        else if project.name.contains("Connector") { self.type = .connector }
+        else { self.type = .app }
     }
 
     private func createApp() {
