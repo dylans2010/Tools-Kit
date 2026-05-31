@@ -1,39 +1,355 @@
 import Foundation
+import SwiftUI
 
-public enum MCPServerStatus: String, Codable {
-    case connected = "Connected"
-    case disconnected = "Disconnected"
-    case connecting = "Connecting"
-    case error = "Error"
-}
+// MARK: - Auth Models
 
-public struct MCPTool: Identifiable, Codable, Hashable {
-    public var id: String { name }
-    public var name: String
-    public var description: String
-    public var parameters: [String: String] // Name: Type
+enum MCPAuthType: String, Codable, CaseIterable, Identifiable {
+    case none, apiKey, bearerToken, basicAuth,
+         oauth2AuthCode, oauth2ClientCredentials, customHeaders
 
-    public init(name: String, description: String, parameters: [String: String] = [:]) {
-        self.name = name
-        self.description = description
-        self.parameters = parameters
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .none: return "No Authentication"
+        case .apiKey: return "API Key"
+        case .bearerToken: return "Bearer Token"
+        case .basicAuth: return "Basic Auth"
+        case .oauth2AuthCode: return "OAuth2 (Auth Code)"
+        case .oauth2ClientCredentials: return "OAuth2 (Client Credentials)"
+        case .customHeaders: return "Custom Headers"
+        }
+    }
+
+    var setupGuide: String {
+        switch self {
+        case .none:
+            return "No credentials required for this server. Use for local or open-access MCP endpoints."
+        case .apiKey:
+            return "Provide the header name (e.g., X-API-Key) and the secret key. The key will be securely stored in your Keychain."
+        case .bearerToken:
+            return "Enter your personal access token. It will be sent in the 'Authorization: Bearer <token>' header."
+        case .basicAuth:
+            return "Enter your username and password. They will be base64-encoded and sent in the 'Authorization: Basic' header."
+        case .oauth2AuthCode:
+            return "Standard OAuth2 PKCE flow. You will be redirected to the provider's login page to authorize this app."
+        case .oauth2ClientCredentials:
+            return "Service-to-service authentication. Requires a Client ID and Client Secret to obtain an access token."
+        case .customHeaders:
+            return "Define arbitrary key-value pairs that will be included in every request header."
+        }
     }
 }
 
-public struct MCPServerConfig: Identifiable, Codable, Hashable {
-    public var id: UUID
-    public var name: String
-    public var url: URL
-    public var status: MCPServerStatus
-    public var tools: [MCPTool]
-    public var lastSeen: Date
+struct MCPAuthConfig: Codable {
+    var type: MCPAuthType = .none
+    // API Key
+    var apiKeyHeaderName: String = "X-API-Key"
+    // Bearer / refresh
+    var tokenEndpoint: String = ""
+    // Basic Auth
+    var username: String = ""
+    // OAuth2 Auth Code
+    var authorizationEndpoint: String = ""
+    var redirectURI: String = "toolskit://oauth/callback"
+    var clientId: String = ""
+    var scopes: String = ""
+    // OAuth2 Client Credentials
+    var clientSecret: String = ""
+    // Custom headers — stored as parallel arrays so it's Codable without a custom encoder
+    var customHeaderKeys: [String] = []
+    var customHeaderValues: [String] = []
+    // Secrets NOT stored here; they live in Keychain only
+}
 
-    public init(id: UUID = UUID(), name: String, url: URL, status: MCPServerStatus = .disconnected, tools: [MCPTool] = [], lastSeen: Date = Date()) {
-        self.id = id
-        self.name = name
-        self.url = url
-        self.status = status
-        self.tools = tools
-        self.lastSeen = lastSeen
+// MARK: - Server & Tool Models
+
+enum MCPConnectionStatus: String, Codable {
+    case disconnected, connecting, authenticating, discovering, connected, failed
+
+    var color: Color {
+        switch self {
+        case .disconnected: return .gray
+        case .connecting: return .orange
+        case .authenticating: return .blue
+        case .discovering: return .purple
+        case .connected: return .green
+        case .failed: return .red
+        }
+    }
+
+    var label: String {
+        switch self {
+        case .disconnected: return "Disconnected"
+        case .connecting: return "Connecting"
+        case .authenticating: return "Authenticating"
+        case .discovering: return "Discovering Tools"
+        case .connected: return "Connected"
+        case .failed: return "Connection Failed"
+        }
+    }
+}
+
+struct MCPTool: Identifiable, Codable, Hashable {
+    var id: UUID = UUID()
+    var name: String
+    var description: String
+    var inputSchema: MCPJSONSchema
+    var isBuiltIn: Bool = false
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
+
+    static func == (lhs: MCPTool, rhs: MCPTool) -> Bool {
+        lhs.name == rhs.name
+    }
+}
+
+struct MCPJSONSchema: Codable {
+    var type: String
+    var properties: [String: MCPSchemaProperty]?
+    var required: [String]?
+}
+
+struct MCPSchemaProperty: Codable {
+    var type: String
+    var description: String?
+    var enumValues: [String]?
+    private enum CodingKeys: String, CodingKey {
+        case type, description, enumValues = "enum"
+    }
+}
+
+struct MCPServer: Identifiable, Codable {
+    var id: UUID = UUID()
+    var name: String
+    var baseURL: String
+    var authConfig: MCPAuthConfig = MCPAuthConfig()
+    var connectionStatus: MCPConnectionStatus = .disconnected
+    var discoveredTools: [MCPTool] = []
+    var serverInfo: MCPServerInfo?
+    var lastConnected: Date?
+    var lastError: String?
+    var sessionId: String?
+    var notes: String = ""
+}
+
+struct MCPServerInfo: Codable {
+    var name: String
+    var version: String
+    var protocolVersion: String
+}
+
+// MARK: - JSON-RPC 2.0 Wire Types
+
+struct MCPRequest: Encodable {
+    let jsonrpc: String = "2.0"
+    let id: Int?
+    let method: String
+    let params: MCPRequestParams?
+}
+
+enum MCPRequestParams: Encodable {
+    case initialize(MCPInitializeParams)
+    case empty
+    case toolCall(MCPToolCallParams)
+    case notification
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .initialize(let params):
+            try container.encode(params)
+        case .empty:
+            try container.encode([String: String]())
+        case .toolCall(let params):
+            try container.encode(params)
+        case .notification:
+            // Notifications often have no params or are encoded differently
+            try container.encode([String: String]())
+        }
+    }
+}
+
+struct MCPInitializeParams: Encodable {
+    let protocolVersion: String = "2025-06-18"
+    let capabilities: MCPClientCapabilities = MCPClientCapabilities()
+    let clientInfo: MCPClientInfo = MCPClientInfo()
+}
+
+struct MCPClientCapabilities: Encodable {
+    let sampling: [String: String] = [:]
+}
+
+struct MCPClientInfo: Encodable {
+    let name: String = "Tools-Kit"
+    let version: String = "1.0"
+}
+
+struct MCPToolCallParams: Encodable {
+    let name: String
+    let arguments: [String: AnyCodable]
+}
+
+struct MCPResponse: Decodable {
+    let jsonrpc: String
+    let id: Int?
+    let result: MCPResult?
+    let error: MCPResponseError?
+}
+
+struct MCPResult: Decodable {
+    let protocolVersion: String?
+    let capabilities: MCPServerCapabilities?
+    let serverInfo: MCPServerInfo?
+    let tools: [MCPTool]?
+    let content: [MCPContentBlock]?
+}
+
+struct MCPServerCapabilities: Decodable {
+    let tools: MCPToolCapability?
+    let resources: [String: Bool]?
+    let prompts: [String: Bool]?
+}
+
+struct MCPToolCapability: Decodable {
+    let listChanged: Bool?
+}
+
+struct MCPContentBlock: Decodable {
+    let type: String
+    let text: String?
+}
+
+struct MCPResponseError: Decodable {
+    let code: Int
+    let message: String
+}
+
+// MARK: - AnyCodable
+
+struct AnyCodable: Codable {
+    let value: Any
+
+    init(_ value: Any) {
+        self.value = value
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if container.decodeNil() {
+            self.value = NSNull()
+        } else if let bool = try? container.decode(Bool.self) {
+            self.value = bool
+        } else if let int = try? container.decode(Int.self) {
+            self.value = int
+        } else if let double = try? container.decode(Double.self) {
+            self.value = double
+        } else if let string = try? container.decode(String.self) {
+            self.value = string
+        } else if let array = try? container.decode([AnyCodable].self) {
+            self.value = array.map { $0.value }
+        } else if let dictionary = try? container.decode([String: AnyCodable].self) {
+            self.value = dictionary.mapValues { $0.value }
+        } else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "AnyCodable value cannot be decoded")
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch value {
+        case is NSNull:
+            try container.encodeNil()
+        case let bool as Bool:
+            try container.encode(bool)
+        case let int as Int:
+            try container.encode(int)
+        case let double as Double:
+            try container.encode(double)
+        case let string as String:
+            try container.encode(string)
+        case let array as [Any]:
+            try container.encode(array.map { AnyCodable($0) })
+        case let dictionary as [String: Any]:
+            try container.encode(dictionary.mapValues { AnyCodable($0) })
+        default:
+            throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: container.codingPath, debugDescription: "AnyCodable value cannot be encoded"))
+        }
+    }
+}
+
+// MARK: - Persona ↔ MCP Bridge Models
+
+struct MCPToolInvocation: Identifiable {
+    var id: UUID = UUID()
+    var serverId: UUID
+    var serverName: String
+    var toolName: String
+    var purpose: String
+    var arguments: [String: Any]
+    var status: MCPInvocationStatus
+    var result: String?
+    var startedAt: Date = Date()
+    var completedAt: Date?
+    var errorMessage: String?
+}
+
+enum MCPInvocationStatus {
+    case pending, connecting, executing, completed, failed
+
+    var label: String {
+        switch self {
+        case .pending: return "Pending"
+        case .connecting: return "Connecting"
+        case .executing: return "Executing"
+        case .completed: return "Completed"
+        case .failed: return "Failed"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .pending: return .gray
+        case .connecting: return .orange
+        case .executing: return .blue
+        case .completed: return .green
+        case .failed: return .red
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .pending: return "clock"
+        case .connecting: return "arrow.2.circlepath"
+        case .executing: return "terminal"
+        case .completed: return "checkmark.circle.fill"
+        case .failed: return "exclamationmark.triangle.fill"
+        }
+    }
+}
+
+// MARK: - Errors
+
+enum MCPError: LocalizedError {
+    case invalidURL
+    case authenticationFailed(String)
+    case connectionFailed(String)
+    case serverError(code: Int, message: String)
+    case toolNotFound(String)
+    case invalidResponse
+    case keychainError(OSStatus)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL: return "The server URL is invalid."
+        case .authenticationFailed(let reason): return "Authentication failed: \(reason)"
+        case .connectionFailed(let reason): return "Connection failed: \(reason)"
+        case .serverError(let code, let message): return "Server error (\(code)): \(message)"
+        case .toolNotFound(let name): return "Tool '\(name)' not found."
+        case .invalidResponse: return "The server returned an invalid response."
+        case .keychainError(let status): return "Keychain error: \(status)"
+        }
     }
 }
