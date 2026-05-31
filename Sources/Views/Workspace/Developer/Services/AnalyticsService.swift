@@ -6,6 +6,14 @@ public class AnalyticsService: ObservableObject {
 
     private init() {}
 
+    public var customEvents: [CustomEventRecord] {
+        store.customEvents
+    }
+
+    public var funnels: [AnalyticsFunnel] {
+        store.funnels
+    }
+
     public func fetchInstallTrend(appID: UUID?, from: Date, to: Date) async throws -> [InstallEvent] {
         return []
     }
