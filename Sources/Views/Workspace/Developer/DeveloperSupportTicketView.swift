@@ -100,9 +100,3 @@ struct DeveloperSupportTicketView: View {
     }
 }
 
-struct SupportTicket: Identifiable {
-    let id = UUID()
-    let subject: String
-    let status: String
-    let appName: String
-}

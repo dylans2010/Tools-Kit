@@ -93,7 +93,9 @@ struct TeamManagementView: View {
     private func removeMember(at offsets: IndexSet) {
         for index in offsets {
             let member = orgService.members[index]
-            Task { try? await orgService.removeMember(memberID: member.id) }
+            if let orgID = orgService.organizations.first?.id {
+                Task { try? await orgService.removeMember(orgID: orgID, memberID: member.id) }
+            }
         }
     }
 }

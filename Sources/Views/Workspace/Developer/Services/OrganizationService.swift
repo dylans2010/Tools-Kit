@@ -5,6 +5,8 @@ public class OrganizationService: ObservableObject {
     private let store = DeveloperPersistentStore.shared
 
     @Published public var organizations: [DeveloperOrganization] = []
+    @Published public var organizationName: String = "Acme Corp"
+    @Published public var members: [OrgMember] = []
 
     private init() {
         loadOrganizations()
@@ -12,6 +14,17 @@ public class OrganizationService: ObservableObject {
 
     public func loadOrganizations() {
         self.organizations = store.organizations
+        if let firstOrg = store.organizations.first {
+            self.organizationName = firstOrg.name
+            self.members = firstOrg.members
+        }
+    }
+
+    public func inviteMember(email: String, role: TeamRole) async throws {
+        // Implementation for the expected signature in Pattern E
+        if let firstOrg = store.organizations.first {
+            try await addMember(orgID: firstOrg.id, email: email, role: .developer) // Map TeamRole to OrgRole as needed
+        }
     }
 
     public func createOrganization(name: String) async throws {

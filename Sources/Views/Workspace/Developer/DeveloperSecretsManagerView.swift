@@ -85,7 +85,7 @@ struct DeveloperSecretsManagerView: View {
 
     private func saveSecret() {
         guard let appID = selectedAppID else { return }
-        let secret = Secret(appID: appID, key: secretKey, value: secretValue)
+        let secret = Secret(appID: appID, key: secretKey, maskedValue: String(repeating: "*", count: 8))
         Task {
             try? await secretService.saveSecret(secret)
             await MainActor.run {

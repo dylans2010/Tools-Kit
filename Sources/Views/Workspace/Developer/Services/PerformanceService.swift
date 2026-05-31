@@ -5,10 +5,18 @@ public class PerformanceService: ObservableObject {
     private let store = DeveloperPersistentStore.shared
 
     @Published public var metrics: [PerformanceMetric] = []
+    @Published public var reports: [PerformanceMetric] = [] // Added for compatibility if needed, though metrics exists
 
     private init() { loadMetrics() }
 
-    public func loadMetrics() { self.metrics = store.performanceMetrics }
+    public func loadMetrics() {
+        self.metrics = store.performanceMetrics
+        self.reports = store.performanceMetrics
+    }
+
+    public func getLatestReport(appID: UUID) async throws -> PerformanceMetric? {
+        return store.performanceMetrics.first { $0.appID == appID }
+    }
 
     public func recordMetric(_ metric: PerformanceMetric) async throws {
         var current = store.performanceMetrics

@@ -111,7 +111,8 @@ struct LogAlertRulesView: View {
             category: selectedCategory,
             severity: selectedSeverity,
             threshold: Int(threshold) ?? 10,
-            timeWindow: TimeInterval(window) ?? 60
+            timeWindow: TimeInterval(window) ?? 60,
+            notificationMethod: "Push"
         )
         Task {
             try? await logService.createAlertRule(rule)

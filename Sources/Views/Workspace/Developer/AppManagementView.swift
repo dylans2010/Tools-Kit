@@ -1,5 +1,11 @@
 import SwiftUI
 
+private struct ProjectImportView: View {
+    var body: some View {
+        Text("Import Project")
+    }
+}
+
 struct AppManagementView: View {
     @ObservedObject var appService = DeveloperAppService.shared
     @StateObject private var projectManager = SDKProjectManager.shared

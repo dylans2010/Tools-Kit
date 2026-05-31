@@ -49,10 +49,3 @@ struct DeveloperAccountActivityView: View {
     }
 }
 
-struct AccountActivityEvent: Identifiable {
-    let id = UUID()
-    let eventType: String
-    let deviceName: String
-    let ipAddress: String
-    let timestamp: Date
-}

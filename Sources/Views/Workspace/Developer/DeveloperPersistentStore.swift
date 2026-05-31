@@ -335,17 +335,13 @@ public struct BetaGroup: Identifiable, Codable, Hashable {
 public struct SupportTicket: Identifiable, Codable, Hashable {
     public var id: UUID
     public var subject: String
-    public var topic: String
-    public var message: String
     public var status: String
-    public var createdAt: Date
+    public var appName: String
 
-    public init(id: UUID = UUID(), subject: String, topic: String, message: String, status: String = "Open", createdAt: Date = Date()) {
+    public init(id: UUID = UUID(), subject: String, status: String, appName: String) {
         self.id = id
         self.subject = subject
-        self.topic = topic
-        self.message = message
         self.status = status
-        self.createdAt = createdAt
+        self.appName = appName
     }
 }

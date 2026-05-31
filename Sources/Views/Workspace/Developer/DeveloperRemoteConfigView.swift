@@ -1,5 +1,9 @@
 import SwiftUI
 
+private enum APIKeyEnvironment: String, CaseIterable, Hashable {
+    case development, staging, production, sandbox, live
+}
+
 struct DeveloperRemoteConfigView: View {
     @ObservedObject var configService = RemoteConfigService.shared
     @ObservedObject var appService = DeveloperAppService.shared
@@ -10,7 +14,7 @@ struct DeveloperRemoteConfigView: View {
     var filteredConfigs: [RemoteConfig] {
         configService.configs.filter { config in
             (selectedAppID == nil || config.appID == selectedAppID) &&
-            (config.environment == (selectedEnvironment == .live ? .live : .sandbox))
+            (config.environment == (selectedEnvironment == .live ? .live : .test))
         }
     }
 
@@ -121,12 +125,18 @@ struct DeveloperRemoteConfigView: View {
     }
 }
 
+private struct AddConfigView: View {
+    var body: some View {
+        Text("Add Configuration")
+    }
+}
+
 struct AddConfigSheet: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var configService = RemoteConfigService.shared
     @ObservedObject var appService = DeveloperAppService.shared
 
-    @State var appID: UUID?
+    @State private var appID: UUID?
     let environment: APIKeyEnvironment
 
     @State private var key = ""
@@ -163,7 +173,7 @@ struct AddConfigSheet: View {
             }
             .navigationTitle("New Configuration")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddConfig = false } }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         saveConfig()
@@ -175,9 +185,9 @@ struct AddConfigSheet: View {
     }
 
     private func saveConfig() {
-        guard let appID = appID else { return }
-        let env: KeyEnvironment = (environment == .live ? .live : .sandbox)
-        let newConfig = RemoteConfig(appID: appID, key: key, value: value, valueType: valueType, environment: env, version: 1)
+        guard let _ = appID else { return }
+        let env: KeyEnvironment = (environment == .live ? .live : .test)
+        let newConfig = RemoteConfig(key: key, value: value, valueType: valueType, environment: env, version: 1)
         configService.addConfig(newConfig)
         dismiss()
     }

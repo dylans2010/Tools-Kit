@@ -5,6 +5,7 @@ public enum DeveloperTier: String, Codable, CaseIterable {
     case registered = "Registered"
     case verified = "Verified"
     case enterprise = "Enterprise"
+    case free = "Free"
 }
 
 public enum DeveloperVerificationStatus: String, Codable, CaseIterable {
@@ -63,6 +64,7 @@ public struct DeveloperProfile: Codable {
     public var github: String
     public var linkedin: String
     public var socialLinks: [String: String]
+    public var email: String = ""
     public var contactEmail: String
     public var supportEmail: String
     public var isPublic: Bool

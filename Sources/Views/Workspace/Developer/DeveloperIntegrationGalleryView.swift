@@ -1,5 +1,21 @@
 import SwiftUI
 
+private struct IntegrationItem: Identifiable, Hashable {
+    let id = UUID()
+    var name: String
+    var description: String
+    var icon: String
+    var category: String
+    var isInstalled: Bool
+}
+
+private struct IntegrationDetailView: View {
+    let item: IntegrationItem
+    var body: some View {
+        Text("Integration: \(item.name)")
+    }
+}
+
 struct DeveloperIntegrationGalleryView: View {
     @ObservedObject var marketplaceService = MarketplaceService.shared
     @State private var selectedCategory: String = "All"
@@ -28,7 +44,7 @@ struct DeveloperIntegrationGalleryView: View {
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Integrations")
-        .sheet(item: $selectedIntegration) { item in
+        .sheet(item: $selectedIntegration) { (item: IntegrationItem) in
             IntegrationDetailView(item: item)
         }
     }
@@ -41,7 +57,7 @@ struct DeveloperIntegrationGalleryView: View {
                     Text("Connect 3rd-party services to your workspace.").font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
-                Image(systemName: "puzzlepiece.fill").foregroundStyle(.accentColor).font(.title2)
+                Image(systemName: "puzzlepiece.fill").foregroundStyle(Color.accentColor).font(.title2)
             }
         }
         .padding()
@@ -75,7 +91,7 @@ struct DeveloperIntegrationGalleryView: View {
         } label: {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Image(systemName: item.icon).font(.headline).foregroundStyle(.accentColor)
+                    Image(systemName: item.icon).font(.headline).foregroundStyle(Color.accentColor)
                     Spacer()
                     if item.isInstalled {
                         Image(systemName: "checkmark.circle.fill").foregroundStyle(.green).font(.caption)

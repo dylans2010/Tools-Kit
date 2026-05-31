@@ -76,7 +76,7 @@ struct DeveloperLogsView: View {
                     }
                     .padding(.horizontal, 10).padding(.vertical, 6)
                     .background(filterCategory == nil ? Color.primary.opacity(0.05) : Color.accentColor.opacity(0.1))
-                    .foregroundStyle(filterCategory == nil ? .secondary : .accentColor)
+                    .foregroundStyle(filterCategory == nil ? .secondary : Color.accentColor)
                     .clipShape(Capsule())
                 }
 

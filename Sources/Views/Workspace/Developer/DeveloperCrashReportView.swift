@@ -8,6 +8,8 @@ struct DeveloperCrashReportView: View {
     @State private var reports: [CrashReport] = []
     @State private var isRefreshing = false
 
+    private var apps: [DeveloperApp] { appService.apps }
+
     var body: some View {
         List {
             Section {
@@ -53,8 +55,9 @@ struct DeveloperCrashReportView: View {
 
     private func refreshReports() {
         isRefreshing = true
+        let appID = selectedAppID
         Task {
-            let fetched = try? await crashService.fetchReports(appID: selectedAppID)
+            let fetched = try? await crashService.fetchReports(appID: appID)
             await MainActor.run {
                 self.reports = fetched ?? []
                 self.isRefreshing = false

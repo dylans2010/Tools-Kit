@@ -1,5 +1,11 @@
 import SwiftUI
 
+private struct EditProfileSheet: View {
+    var body: some View {
+        Text("Edit Profile")
+    }
+}
+
 struct DeveloperProfileView: View {
     @ObservedObject var profileService = DeveloperProfileService.shared
     @State private var showingEditSheet = false
@@ -90,7 +96,7 @@ struct DeveloperProfileView: View {
 
     private func statCard(label: String, value: String, icon: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: icon).font(.caption).foregroundStyle(.accentColor)
+            Image(systemName: icon).font(.caption).foregroundStyle(Color.accentColor)
             Text(value).font(.title3.bold())
             Text(label).font(.system(size: 9, weight: .bold)).foregroundStyle(.secondary).textCase(.uppercase)
         }
