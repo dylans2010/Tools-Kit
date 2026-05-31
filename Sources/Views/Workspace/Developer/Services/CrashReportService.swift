@@ -21,6 +21,7 @@ public class CrashReportService: ObservableObject {
         var current = store.crashLogs
         current.insert(log, at: 0)
         store.saveCrashLogs(current)
-        await MainActor.run { self.crashLogs = current }
+        let updatedCrashLogs = current
+        await MainActor.run { self.crashLogs = updatedCrashLogs }
     }
 }

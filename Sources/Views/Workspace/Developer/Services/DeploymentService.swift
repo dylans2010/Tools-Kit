@@ -14,6 +14,7 @@ public class DeploymentService: ObservableObject {
         var current = store.pipelines
         current.insert(pipeline, at: 0)
         store.savePipelines(current)
-        await MainActor.run { self.pipelines = current }
+        let updatedPipelines = current
+        await MainActor.run { self.pipelines = updatedPipelines }
     }
 }

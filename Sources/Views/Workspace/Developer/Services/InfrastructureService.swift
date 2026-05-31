@@ -28,6 +28,7 @@ public class InfrastructureService: ObservableObject {
             current.append(node)
         }
         store.saveInfrastructureNodes(current)
-        await MainActor.run { self.nodes = current }
+        let updatedNodes = current
+        await MainActor.run { self.nodes = updatedNodes }
     }
 }
