@@ -16,15 +16,17 @@ public struct WebhookDelivery: Identifiable, Codable, Hashable {
     public var eventType: WebhookEventType
     public var statusCode: Int
     public var responseSnippet: String
+    public var duration: TimeInterval
     public var retryCount: Int
     public var finalFailure: Bool
 
-    public init(id: UUID = UUID(), timestamp: Date = Date(), eventType: WebhookEventType, statusCode: Int, responseSnippet: String = "", retryCount: Int = 0, finalFailure: Bool = false) {
+    public init(id: UUID = UUID(), timestamp: Date = Date(), eventType: WebhookEventType, statusCode: Int, responseSnippet: String = "", duration: TimeInterval = 0, retryCount: Int = 0, finalFailure: Bool = false) {
         self.id = id
         self.timestamp = timestamp
         self.eventType = eventType
         self.statusCode = statusCode
         self.responseSnippet = responseSnippet
+        self.duration = duration
         self.retryCount = retryCount
         self.finalFailure = finalFailure
     }

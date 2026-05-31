@@ -13,14 +13,17 @@ struct DeveloperSupportTicketView: View {
     ]
 
     var body: some View {
-        List {
+        let assistanceTitle = "Technical Support"
+        let assistanceMessage = "Our engineers are available to help with integration issues, rate limit adjustments, and platform compliance."
+
+        return List {
             Section("Developer Assistance") {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Image(systemName: "lifepreserver.fill").foregroundStyle(.blue)
-                        Text("Technical Support").font(.subheadline.bold())
+                        Text(assistanceTitle).font(.subheadline.bold())
                     }
-                    Text("Our engineers are available to help with integration issues, rate limit adjustments, and platform compliance.")
+                    Text(assistanceMessage)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

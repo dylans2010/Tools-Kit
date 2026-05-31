@@ -164,7 +164,9 @@ struct CLITokenView: View {
             )
             await MainActor.run {
                 if let tokenString = tokenString {
-                    newlyCreatedToken = APIKey(maskedValue: "...", label: tokenLabel, type: .cli, environment: .live, value: tokenString)
+                    var createdToken = APIKey(maskedValue: "...", label: tokenLabel, type: .cli, environment: .live)
+                    createdToken.value = tokenString
+                    newlyCreatedToken = createdToken
                 }
                 tokenLabel = ""
                 showingAddToken = false

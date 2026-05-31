@@ -171,7 +171,7 @@ struct AddWebhookEndpointSheet: View {
                         guard let _ = selectedAppID else { return }
                         let endpoint = WebhookEndpoint(id: UUID(), url: url, subscribedEvents: [], isActive: true, signingSecretKeyID: UUID())
                         Task {
-                            try? await webhookService.createEndpoint(endpoint)
+                            try? await webhookService.createEndpoint(url: endpoint.url, events: endpoint.subscribedEvents)
                             await MainActor.run { dismiss() }
                         }
                     }) {

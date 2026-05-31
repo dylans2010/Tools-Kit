@@ -1,20 +1,16 @@
 import SwiftUI
 
-enum APIKeyEnvironment: String, CaseIterable, Hashable {
-    case development, staging, production, sandbox, live
-}
-
 struct DeveloperRemoteConfigView: View {
     @ObservedObject var configService = RemoteConfigService.shared
     @ObservedObject var appService = DeveloperAppService.shared
     @State private var selectedAppID: UUID?
-    @State private var selectedEnvironment: APIKeyEnvironment = .sandbox
+    @State private var selectedEnvironment: APIKeyEnvironment = .development
     @State private var showingAddConfig = false
 
     var filteredConfigs: [RemoteConfig] {
         configService.configs.filter { config in
             (selectedAppID == nil || config.appID == selectedAppID) &&
-            (config.environment == (selectedEnvironment == .live ? .live : .test))
+            (config.environment == (selectedEnvironment == APIKeyEnvironment.live ? .live : .test))
         }
     }
 
@@ -33,8 +29,9 @@ struct DeveloperRemoteConfigView: View {
                     }
 
                     Picker("Environment", selection: $selectedEnvironment) {
-                        Text("Sandbox").tag(APIKeyEnvironment.sandbox)
-                        Text("Live").tag(APIKeyEnvironment.live)
+                        ForEach(APIKeyEnvironment.allCases, id: \.self) { env in
+                            Text(env.rawValue).tag(env)
+                        }
                     }
                     .pickerStyle(.segmented)
 
@@ -191,7 +188,7 @@ struct AddConfigSheet: View {
 
     private func saveConfig() {
         guard let appID else { return }
-        let env: KeyEnvironment = (environment == .live ? .live : .test)
+        let env: KeyEnvironment = (environment == APIKeyEnvironment.live ? .live : .test)
         let newConfig = RemoteConfig(appID: appID, key: key, value: value, valueType: valueType, environment: env, version: 1)
         configService.addConfig(newConfig)
         dismiss()

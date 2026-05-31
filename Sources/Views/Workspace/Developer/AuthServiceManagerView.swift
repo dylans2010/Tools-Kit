@@ -1,6 +1,6 @@
 import SwiftUI
 
-private enum APIKeyEnvironment: String, CaseIterable, Hashable {
+enum APIKeyEnvironment: String, CaseIterable, Hashable {
     case development, staging, production, sandbox, live
 }
 
@@ -11,7 +11,7 @@ struct AuthServiceManagerView: View {
     @State private var showingCreateKey = false
     @State private var keyLabel = ""
     @State private var selectedAppID: UUID?
-    @State private var selectedEnv: APIKeyEnvironment = .sandbox
+    @State private var selectedEnvironment: APIKeyEnvironment = .development
     @State private var selectedScopes: Set<String> = []
 
     @State private var newlyCreatedKey: APIKey?
@@ -113,9 +113,10 @@ struct AuthServiceManagerView: View {
                 }
 
                 Section("Environment") {
-                    Picker("Env", selection: $selectedEnv) {
-                        Text("Sandbox").tag(APIKeyEnvironment.sandbox)
-                        Text("Live").tag(APIKeyEnvironment.live)
+                    Picker("Environment", selection: $selectedEnvironment) {
+                        ForEach(APIKeyEnvironment.allCases, id: \.self) { env in
+                            Text(env.rawValue).tag(env)
+                        }
                     }
                     .pickerStyle(.segmented)
                 }
@@ -188,7 +189,7 @@ struct AuthServiceManagerView: View {
         let expiresAt = Date().addingTimeInterval(90 * 24 * 3600)
 
         Task {
-            let env: KeyEnvironment = (selectedEnv == .live ? .live : .test)
+            let env: KeyEnvironment = (selectedEnvironment == APIKeyEnvironment.live ? .live : .test)
             let keyString = try? await keyService.createKey(
                 label: keyLabel,
                 type: .developerAPI,
@@ -200,7 +201,9 @@ struct AuthServiceManagerView: View {
 
             await MainActor.run {
                 if let keyString = keyString {
-                    newlyCreatedKey = APIKey(maskedValue: "...", label: keyLabel, type: .developerAPI, environment: env, value: keyString)
+                    var createdKey = APIKey(maskedValue: "...", label: keyLabel, type: .developerAPI, environment: env)
+                    createdKey.value = keyString
+                    newlyCreatedKey = createdKey
                 }
                 showingCreateKey = false
                 showingKeyModal = true
