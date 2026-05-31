@@ -55,6 +55,13 @@ public class DeveloperLogService: ObservableObject {
         }
     }
 
+    public func clearLogEntries() async {
+        store.saveLogs([])
+        await MainActor.run {
+            self.logEntries = []
+        }
+    }
+
     public func queryLogs(filters: [String: Any], page: Int = 0) async throws -> [LogEntry] {
         var results = store.logEntries
 
