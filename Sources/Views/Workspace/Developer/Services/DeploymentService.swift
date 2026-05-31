@@ -17,4 +17,14 @@ public class DeploymentService: ObservableObject {
         let updatedPipelines = current
         await MainActor.run { self.pipelines = updatedPipelines }
     }
+
+    public func updatePipeline(_ pipeline: Pipeline) async throws {
+        var current = store.pipelines
+        if let index = current.firstIndex(where: { $0.id == pipeline.id }) {
+            current[index] = pipeline
+            store.savePipelines(current)
+            let updatedPipelines = current
+            await MainActor.run { self.pipelines = updatedPipelines }
+        }
+    }
 }

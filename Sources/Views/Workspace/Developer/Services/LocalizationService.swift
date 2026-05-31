@@ -34,6 +34,16 @@ public class LocalizationService: ObservableObject {
         await MainActor.run { self.keys = updatedKeys }
     }
 
+    public func updateString(keyID: UUID, localeCode: String, value: String) async throws {
+        var current = store.localizationKeys
+        if let index = current.firstIndex(where: { $0.id == keyID }) {
+            current[index].translations[localeCode] = value
+            store.saveLocalizationKeys(current)
+            let updatedKeys = current
+            await MainActor.run { self.keys = updatedKeys }
+        }
+    }
+
     public func deleteKey(id: UUID) async throws {
         var current = store.localizationKeys
         current.removeAll { $0.id == id }

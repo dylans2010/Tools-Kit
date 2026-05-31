@@ -1,9 +1,107 @@
 import SwiftUI
 
 private struct PipelineDetailsView: View {
-    let pipeline: Pipeline
+    @State var pipeline: Pipeline
+    @Environment(\.dismiss) var dismiss
+
     var body: some View {
-        Text("Pipeline Details: \(pipeline.name)")
+        NavigationStack {
+            List {
+                Section("Pipeline Overview") {
+                    LabeledContent("Name", value: pipeline.name)
+                    LabeledContent("Status", value: pipeline.status.rawValue.uppercased())
+                    LabeledContent("Trigger", value: pipeline.triggerSource)
+                    LabeledContent("Started", value: pipeline.lastRunAt.formatted(date: .abbreviated, time: .shortened))
+                }
+
+                Section("Execution Stages") {
+                    ForEach(pipeline.stages) { stage in
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                stageStatusIcon(stage.status)
+                                Text(stage.name).font(.headline)
+                                Spacer()
+                                Button {
+                                    rerunStage(stage)
+                                } label: {
+                                    Image(systemName: "arrow.clockwise")
+                                        .font(.caption)
+                                }
+                                .buttonStyle(.bordered)
+                            }
+
+                            if !stage.logs.isEmpty {
+                                ScrollView {
+                                    Text(stage.logs)
+                                        .font(.system(size: 10, design: .monospaced))
+                                        .padding(8)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(Color.black.opacity(0.05))
+                                        .cornerRadius(4)
+                                }
+                                .frame(height: 100)
+                            }
+                        }
+                        .padding(.vertical, 8)
+                    }
+                }
+
+                Section("Environment Variables") {
+                    Text("NODE_ENV=production").font(.system(size: 10, design: .monospaced))
+                    Text("API_VERSION=v2").font(.system(size: 10, design: .monospaced))
+                    Text("DEPLOY_REGION=us-east-1").font(.system(size: 10, design: .monospaced))
+                }
+
+                Section {
+                    Button(role: .destructive) {
+                        stopPipeline()
+                    } label: {
+                        Text("Stop Pipeline Execution")
+                    }
+                    .disabled(pipeline.status != .running)
+                }
+            }
+            .navigationTitle(pipeline.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }
+                }
+            }
+        }
+    }
+
+    private func stageStatusIcon(_ status: PipelineStatus) -> some View {
+        switch status {
+        case .success: return Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+        case .running: return Image(systemName: "arrow.triangle.2.circlepath.circle.fill").foregroundStyle(.blue)
+        case .failed: return Image(systemName: "xmark.circle.fill").foregroundStyle(.red)
+        case .pending: return Image(systemName: "clock.fill").foregroundStyle(.gray)
+        }
+    }
+
+    private func rerunStage(_ stage: PipelineStage) {
+        var updated = pipeline
+        if let idx = updated.stages.firstIndex(where: { $0.id == stage.id }) {
+            updated.stages[idx].status = .running
+            updated.stages[idx].logs += "\n[RE-RUN] Re-starting stage..."
+            updated.status = .running
+            self.pipeline = updated
+            Task { try? await DeploymentService.shared.updatePipeline(updated) }
+        }
+    }
+
+    private func stopPipeline() {
+        var updated = pipeline
+        updated.status = .failed
+        for i in 0..<updated.stages.count {
+            if updated.stages[i].status == .running || updated.stages[i].status == .pending {
+                updated.stages[i].status = .failed
+                updated.stages[i].logs += "\n[ABORTED] Pipeline execution stopped by user."
+            }
+        }
+        self.pipeline = updated
+        Task { try? await DeploymentService.shared.updatePipeline(updated) }
     }
 }
 

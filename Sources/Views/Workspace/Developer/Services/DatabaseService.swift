@@ -26,6 +26,14 @@ public class DatabaseService: ObservableObject {
         await MainActor.run { self.schemas = updatedSchemas }
     }
 
+    public func deleteSchema(id: UUID) async throws {
+        var current = store.databaseSchemas
+        current.removeAll { $0.id == id }
+        store.saveDatabaseSchemas(current)
+        let updatedSchemas = current
+        await MainActor.run { self.schemas = updatedSchemas }
+    }
+
     public func vacuum(appID: UUID) async throws {
         let current = store.databaseSchemas.filter { $0.appID == appID }
         await MainActor.run { self.schemas = store.databaseSchemas }
