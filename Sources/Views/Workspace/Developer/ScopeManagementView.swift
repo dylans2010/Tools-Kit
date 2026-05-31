@@ -6,6 +6,7 @@ struct ScopeManagementView: View {
     @State private var selectedTab = 0
     @State private var justifications: [String: String] = [:]
     @State private var selectedAppID: UUID?
+    @State private var showingTemplateSheet = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -27,6 +28,14 @@ struct ScopeManagementView: View {
         }
         .navigationTitle("Scope Management")
         .background(Color(uiColor: .systemGroupedBackground))
+        .toolbar {
+            if selectedTab == 1 {
+                Button { showingTemplateSheet = true } label: { Image(systemName: "rectangle.stack.badge.plus") }
+            }
+        }
+        .sheet(isPresented: $showingTemplateSheet) {
+            ScopeTemplatePickerView(selectedAppID: $selectedAppID)
+        }
     }
 
     private var myGrantedScopesList: some View {
@@ -110,7 +119,7 @@ struct ScopeManagementView: View {
                 }
                 .padding(.horizontal)
 
-                SectionHeader(title: "Available Scopes", subtitle: nil, icon: nil)
+                SectionHeader(title: "Available Scopes", subtitle: "Select scopes and provide justifications where required.", icon: nil)
                     .padding(.horizontal)
 
                 ForEach(scopeService.catalog) { scope in
@@ -137,16 +146,32 @@ struct ScopeManagementView: View {
 
             if scope.riskLevel == .high || scope.riskLevel == .critical {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Justification Required").font(.caption.bold())
-                    TextField("Briefly explain your use case...", text: Binding(
+                    HStack {
+                        Image(systemName: "exclamationmark.shield.fill").foregroundStyle(.orange)
+                        Text("Mandatory Justification").font(.caption.bold())
+                    }
+                    Text("This scope provides sensitive access. Explain why your app needs this functionality in detail.")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.secondary)
+
+                    TextEditor(text: Binding(
                         get: { justifications[scope.id] ?? "" },
                         set: { justifications[scope.id] = $0 }
                     ))
-                    .textFieldStyle(.roundedBorder)
+                    .frame(height: 80)
                     .font(.caption)
+                    .padding(4)
+                    .background(Color.primary.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                    if (justifications[scope.id]?.count ?? 0) < 20 {
+                        Text("\(20 - (justifications[scope.id]?.count ?? 0)) more characters required")
+                            .font(.system(size: 8))
+                            .foregroundStyle(.red)
+                    }
                 }
                 .padding()
-                .background(Color.secondary.opacity(0.05))
+                .background(Color.orange.opacity(0.05))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
 
@@ -176,7 +201,7 @@ struct ScopeManagementView: View {
 
     private func canRequest(_ scope: DeveloperScope) -> Bool {
         if scope.riskLevel == .high || scope.riskLevel == .critical {
-            return (justifications[scope.id]?.count ?? 0) > 10
+            return (justifications[scope.id]?.count ?? 0) >= 20
         }
         return true
     }
@@ -223,4 +248,64 @@ struct ScopeManagementView: View {
             }
         }
     }
+}
+
+struct ScopeTemplatePickerView: View {
+    @Environment(\.dismiss) var dismiss
+    @Binding var selectedAppID: UUID?
+    @ObservedObject var scopeService = DeveloperScopeService.shared
+
+    let templates = [
+        ScopeTemplate(name: "Basic Identity", description: "Read user profile and email.", scopes: ["user.read", "user.email"]),
+        ScopeTemplate(name: "Data Analyst", description: "Read-only access to all data points.", scopes: ["data.read", "analytics.view"]),
+        ScopeTemplate(name: "Full Admin", description: "Full read/write access to system resources.", scopes: ["user.write", "data.write", "system.manage"])
+    ]
+
+    var body: some View {
+        NavigationStack {
+            List(templates) { template in
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text(template.name).font(.headline)
+                        Spacer()
+                        Button("Apply") {
+                            applyTemplate(template)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                    }
+                    Text(template.description).font(.caption).foregroundStyle(.secondary)
+                    FlowLayout(template.scopes, spacing: 4) { scope in
+                        Text(scope).font(.system(size: 8, design: .monospaced))
+                            .padding(4)
+                            .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 4))
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+            .navigationTitle("Scope Templates")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+            }
+        }
+    }
+
+    private func applyTemplate(_ template: ScopeTemplate) {
+        for scopeID in template.scopes {
+            let request = ScopeRequest(
+                appId: selectedAppID ?? UUID(),
+                scopeIdentifier: scopeID,
+                justification: "Applied via \(template.name) template."
+            )
+            Task { try? await scopeService.submitRequest(request) }
+        }
+        dismiss()
+    }
+}
+
+struct ScopeTemplate: Identifiable {
+    let id = UUID()
+    let name: String
+    let description: String
+    let scopes: [String]
 }

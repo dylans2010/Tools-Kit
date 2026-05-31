@@ -2,78 +2,168 @@ import SwiftUI
 
 struct DeveloperAppCertificatesView: View {
     @ObservedObject var appService = DeveloperAppService.shared
-    @ObservedObject var store = DeveloperPersistentStore.shared
-    @State private var selectedAppID: UUID?
-    @State private var showingRequestDialog = false
-
-    var appCertificates: [DeveloperCertificate] {
-        store.certificates.filter { $0.appID == selectedAppID }
-    }
+    @State private var showingAddCertificate = false
+    @State private var certificates: [AppCertificate] = [
+        AppCertificate(name: "Development: John Doe", type: .development, expiry: Date().addingTimeInterval(365*24*3600), status: .active),
+        AppCertificate(name: "Distribution: My Org", type: .distribution, expiry: Date().addingTimeInterval(30*24*3600), status: .expiringSoon)
+    ]
 
     var body: some View {
         List {
             Section {
-                Picker("Project", selection: $selectedAppID) {
-                    Text("Select a Project").tag(Optional<UUID>.none)
-                    ForEach(appService.apps) { app in
-                        Text(app.name).tag(Optional(app.id))
-                    }
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Certificates & Profiles").font(.headline)
+                    Text("Manage signing identities and provisioning profiles for your applications.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
+                .padding(.vertical, 8)
             }
 
             Section("Signing Certificates") {
-                if let appID = selectedAppID {
-                    if appCertificates.isEmpty {
-                        VStack(spacing: 12) {
-                            EmptyStateView(icon: "doc.badge.gearshape", title: "No Certificates", message: "No active signing certificates found.")
-
-                            Button {
-                                showingRequestDialog = true
-                            } label: {
-                                Label("Request New Certificate", systemImage: "plus.app.fill")
-                                    .font(.subheadline.bold())
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .padding(.top, 8)
-                        }
-                        .padding(.vertical, 20)
-                    } else {
-                        ForEach(appCertificates) { cert in
-                            VStack(alignment: .leading) {
-                                Text(cert.name).font(.subheadline.bold())
-                                Text("Expires: \(cert.expiresAt.formatted(date: .abbreviated, time: .omitted))")
-                                    .font(.caption).foregroundStyle(.secondary)
-                            }
-                        }
-                        .onDelete(perform: deleteCertificates)
-                    }
+                if certificates.isEmpty {
+                    Text("No certificates found.").font(.caption).foregroundStyle(.secondary)
                 } else {
-                    Text("Select a project above to manage its cryptographic signing certificates.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    ForEach(certificates) { cert in
+                        certificateRow(cert)
+                    }
+                    .onDelete(perform: deleteCertificate)
+                }
+            }
+
+            Section("Provisioning Profiles") {
+                ForEach(appService.apps) { app in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(app.name).font(.subheadline.bold())
+                            Text(app.bundleId).font(.caption2).monospaced().foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Text("Active").font(.system(size: 8, weight: .bold))
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(Color.green.opacity(0.1), in: Capsule())
+                            .foregroundStyle(.green)
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+
+            Section {
+                Button {
+                    showingAddCertificate = true
+                } label: {
+                    Label("Request Certificate", systemImage: "plus.app.fill")
+                        .font(.subheadline.bold())
                 }
             }
         }
         .navigationTitle("Certificates")
-        .alert("Certificate Request", isPresented: $showingRequestDialog) {
-            Button("Cancel", role: .cancel) {}
-            Button("Request") {
-                if let appID = selectedAppID {
-                    let newCert = DeveloperCertificate(appID: appID, name: "Development Certificate", type: "Development")
-                    var current = store.certificates
-                    current.append(newCert)
-                    store.saveCertificates(current)
-                }
-            }
-        } message: {
-            Text("This will initiate a certificate signing request (CSR) process.")
+        .sheet(isPresented: $showingAddCertificate) {
+            AddCertificateSheet(certificates: $certificates)
         }
     }
 
-    private func deleteCertificates(at offsets: IndexSet) {
-        var current = store.certificates
-        let toDelete = offsets.map { appCertificates[$0].id }
-        current.removeAll { toDelete.contains($0.id) }
-        store.saveCertificates(current)
+    private func certificateRow(_ cert: AppCertificate) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "seal.fill")
+                .font(.title2)
+                .foregroundStyle(cert.status == .active ? .green : .orange)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(cert.name).font(.subheadline.bold())
+                Text(cert.type.rawValue).font(.caption2).foregroundStyle(.secondary)
+                Text("Expires \(cert.expiry.formatted(date: .abbreviated, time: .omitted))")
+                    .font(.system(size: 8))
+                    .foregroundStyle(cert.status == .expiringSoon ? .orange : .secondary)
+            }
+            Spacer()
+            statusBadge(cert.status)
+        }
+        .padding(.vertical, 4)
     }
+
+    private func statusBadge(_ status: AppCertificateStatus) -> some View {
+        Text(status.rawValue).font(.system(size: 10, weight: .bold))
+            .padding(.horizontal, 8).padding(.vertical, 4)
+            .background(statusColor(status).opacity(0.1), in: Capsule())
+            .foregroundStyle(statusColor(status))
+    }
+
+    private func statusColor(_ status: AppCertificateStatus) -> Color {
+        switch status {
+        case .active: return .green
+        case .expiringSoon: return .orange
+        case .expired: return .red
+        case .revoked: return .gray
+        }
+    }
+
+    private func deleteCertificate(at offsets: IndexSet) {
+        certificates.remove(atOffsets: offsets)
+    }
+}
+
+struct AddCertificateSheet: View {
+    @Environment(\.dismiss) var dismiss
+    @Binding var certificates: [AppCertificate]
+    @State private var certName = ""
+    @State private var certType: AppCertificateType = .development
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Request New Certificate") {
+                    TextField("Common Name", text: $certName)
+                    Picker("Type", selection: $certType) {
+                        Text("Development").tag(AppCertificateType.development)
+                        Text("Distribution").tag(AppCertificateType.distribution)
+                        Text("Push Notifications").tag(AppCertificateType.push)
+                    }
+                }
+
+                Section {
+                    Text("This will generate a Certificate Signing Request (CSR) and submit it for processing.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle("New Certificate")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Request") {
+                        let newCert = AppCertificate(
+                            name: certName,
+                            type: certType,
+                            expiry: Date().addingTimeInterval(365*24*3600),
+                            status: .active
+                        )
+                        certificates.append(newCert)
+                        dismiss()
+                    }
+                    .disabled(certName.isEmpty)
+                }
+            }
+        }
+    }
+}
+
+struct AppCertificate: Identifiable {
+    let id = UUID()
+    let name: String
+    let type: AppCertificateType
+    let expiry: Date
+    let status: AppCertificateStatus
+}
+
+enum AppCertificateType: String {
+    case development = "Development"
+    case distribution = "Distribution"
+    case push = "Push Notifications"
+}
+
+enum AppCertificateStatus: String {
+    case active = "Active"
+    case expiringSoon = "Expiring Soon"
+    case expired = "Expired"
+    case revoked = "Revoked"
 }

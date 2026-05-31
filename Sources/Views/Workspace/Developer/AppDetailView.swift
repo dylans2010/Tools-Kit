@@ -149,6 +149,28 @@ struct AppDetailView: View {
                 infoRow(label: "Created", value: app.createdAt.formatted(date: .abbreviated, time: .omitted))
             }
 
+            SectionHeader(title: "Management & Compliance", subtitle: nil, icon: nil)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                NavigationLink(destination: AppEnvironmentsView()) {
+                    toolLink(title: "Environments", icon: "square.stack.3d.down.right")
+                }
+                NavigationLink(destination: PrivacyManifestEditorView()) {
+                    toolLink(title: "Privacy Manifest", icon: "hand.raised.fill")
+                }
+                NavigationLink(destination: AppBundleValidatorView()) {
+                    toolLink(title: "Bundle Validator", icon: "checkmark.seal.fill")
+                }
+                NavigationLink(destination: AppVersionHistoryView()) {
+                    toolLink(title: "Version History", icon: "clock.arrow.circlepath")
+                }
+                NavigationLink(destination: DeveloperIncidentManagerView()) {
+                    toolLink(title: "Incidents", icon: "exclamationmark.triangle.fill")
+                }
+                NavigationLink(destination: FunnelBuilderView()) {
+                    toolLink(title: "Funnels", icon: "filter")
+                }
+            }
+
             SectionHeader(title: "Platform Targets", subtitle: nil, icon: nil)
             FlowLayout(app.platformTargets, spacing: 8) { target in
                 Text(target.rawValue)
@@ -158,6 +180,18 @@ struct AppDetailView: View {
             }
         }
         .padding()
+    }
+
+    private func toolLink(title: String, icon: String) -> some View {
+        HStack {
+            Image(systemName: icon).font(.caption).foregroundStyle(.secondary)
+            Text(title).font(.caption)
+            Spacer()
+        }
+        .padding(10)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.primary.opacity(0.05), lineWidth: 1))
     }
 
     private func versionsTab(_ app: DeveloperApp) -> some View {
@@ -280,7 +314,13 @@ struct AppDetailView: View {
 
     private func moreTab(_ app: DeveloperApp) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            SectionHeader(title: "Collaborators", subtitle: nil, icon: nil)
+            HStack {
+                SectionHeader(title: "Collaborators", subtitle: nil, icon: nil)
+                Spacer()
+                NavigationLink(destination: AppCollaboratorsView(appID: app.id)) {
+                    Text("Manage").font(.caption.bold())
+                }
+            }
             if app.collaborators.isEmpty {
                 Text("You are the sole owner of this project.").font(.caption).foregroundStyle(.secondary)
             } else {
@@ -296,6 +336,18 @@ struct AppDetailView: View {
                     .padding()
                     .background(Color(uiColor: .secondarySystemGroupedBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+            }
+
+            Divider()
+
+            SectionHeader(title: "Advanced Features", subtitle: nil, icon: nil)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                NavigationLink(destination: DeveloperMonetizationView()) {
+                    toolLink(title: "Monetization", icon: "dollarsign.circle.fill")
+                }
+                NavigationLink(destination: CustomEventManagerView()) {
+                    toolLink(title: "Events", icon: "bolt.fill")
                 }
             }
 

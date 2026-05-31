@@ -3,6 +3,8 @@ import SwiftUI
 struct AppBuilderView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var appService = DeveloperAppService.shared
+    @StateObject private var projectManager = SDKProjectManager.shared
+
     @State private var currentStep = 0
     @State private var projectName = ""
     @State private var projectDescription = ""
@@ -14,34 +16,98 @@ struct AppBuilderView: View {
     @State private var socialLinks: [String: String] = [:]
     @State private var selectedScopes: Set<String> = []
 
+    @State private var selectedSDKProject: SDKProject?
+
     var body: some View {
         VStack(spacing: 0) {
             stepIndicator
 
             TabView(selection: $currentStep) {
-                identityStep.tag(0)
-                typeStep.tag(1)
-                aboutStep.tag(2)
-                scopesStep.tag(3)
-                reviewStep.tag(4)
+                selectionStep.tag(0)
+                identityStep.tag(1)
+                typeStep.tag(2)
+                aboutStep.tag(3)
+                scopesStep.tag(4)
+                reviewStep.tag(5)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
 
             footer
         }
-        .navigationTitle("Register Existing App")
+        .navigationTitle("Register App")
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private var stepIndicator: some View {
         HStack(spacing: 8) {
-            ForEach(0..<5) { index in
+            ForEach(0..<6) { index in
                 Circle()
                     .fill(index <= currentStep ? Color.accentColor : Color.secondary.opacity(0.3))
                     .frame(width: 8, height: 8)
             }
         }
         .padding()
+    }
+
+    private var selectionStep: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Select Source").font(.headline)
+
+                Button {
+                    selectedSDKProject = nil
+                    currentStep = 1
+                } label: {
+                    sourceCard(title: "New Project", subtitle: "Start with a clean slate and manual configuration.", icon: "plus.square.fill", isSelected: selectedSDKProject == nil)
+                }
+                .buttonStyle(.plain)
+
+                if !projectManager.projects.isEmpty {
+                    Text("Existing Workspace Projects").font(.subheadline.bold()).padding(.top)
+                    ForEach(projectManager.projects) { project in
+                        Button {
+                            useSDKProject(project)
+                        } label: {
+                            sourceCard(title: project.name, subtitle: "v\(project.version) • Created \(project.createdAt.formatted(date: .abbreviated, time: .omitted))", icon: "square.stack.3d.up.fill", isSelected: selectedSDKProject?.id == project.id)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            .padding()
+        }
+    }
+
+    private func sourceCard(title: String, subtitle: String, icon: String, isSelected: Bool) -> some View {
+        HStack(spacing: 16) {
+            Image(systemName: icon)
+                .font(.title)
+                .foregroundStyle(isSelected ? .accentColor : .secondary)
+                .frame(width: 44, height: 44)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.subheadline.bold())
+                Text(subtitle).font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(.accentColor)
+            }
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 2))
+    }
+
+    private func useSDKProject(_ project: SDKProject) {
+        selectedSDKProject = project
+        projectName = project.name
+        projectDescription = project.description
+        projectVersion = "\(project.version).0.0"
+        bundleId = "com.sdk.\(project.id.uuidString.prefix(8).lowercased())"
+        selectedScopes = Set(project.enabledScopes)
+        currentStep = 5 // Go straight to review
     }
 
     private var identityStep: some View {
@@ -152,10 +218,10 @@ struct AppBuilderView: View {
                     .buttonStyle(.bordered)
             }
             Spacer()
-            if currentStep < 4 {
+            if currentStep < 5 {
                 Button("Next") { currentStep += 1 }
                     .buttonStyle(.borderedProminent)
-                    .disabled(currentStep == 0 && projectName.isEmpty)
+                    .disabled(currentStep == 1 && projectName.isEmpty)
             }
         }
         .padding()

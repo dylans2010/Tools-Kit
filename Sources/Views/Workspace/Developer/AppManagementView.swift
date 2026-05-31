@@ -2,8 +2,10 @@ import SwiftUI
 
 struct AppManagementView: View {
     @ObservedObject var appService = DeveloperAppService.shared
+    @StateObject private var projectManager = SDKProjectManager.shared
     @State private var searchText = ""
     @State private var selectedType: DeveloperAppType?
+    @State private var showingImportSheet = false
 
     var filteredApps: [DeveloperApp] {
         appService.apps.filter { app in
@@ -14,6 +16,32 @@ struct AppManagementView: View {
 
     var body: some View {
         List {
+            Section {
+                if !projectManager.projects.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image(systemName: "lightbulb.fill").foregroundStyle(.yellow)
+                            Text("Import Existing Work").font(.subheadline.bold())
+                        }
+                        Text("We detected \(projectManager.projects.count) SDK projects. You can import them to manage as apps.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+
+                        Button {
+                            showingImportSheet = true
+                        } label: {
+                            Text("Review SDK Projects")
+                                .font(.caption.bold())
+                                .padding(.horizontal, 12).padding(.vertical, 6)
+                                .background(Color.accentColor)
+                                .foregroundStyle(.white)
+                                .clipShape(Capsule())
+                        }
+                    }
+                    .padding(.vertical, 8)
+                }
+            }
+
             Section {
                 Picker("Filter by Type", selection: $selectedType) {
                     Text("All Types").tag(Optional<DeveloperAppType>.none)
@@ -69,6 +97,9 @@ struct AppManagementView: View {
                 }
             }
         }
+        .sheet(isPresented: $showingImportSheet) {
+            ProjectImportView()
+        }
         .refreshable {
             appService.loadApps()
         }
@@ -122,6 +153,56 @@ struct AppManagementView: View {
             Task {
                 try? await appService.deleteApp(id: app.id)
             }
+        }
+    }
+}
+
+struct ProjectImportView: View {
+    @Environment(\.dismiss) var dismiss
+    @StateObject private var projectManager = SDKProjectManager.shared
+    @ObservedObject var appService = DeveloperAppService.shared
+
+    var body: some View {
+        NavigationStack {
+            List(projectManager.projects) { project in
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text(project.name).font(.subheadline.bold())
+                        Text("v\(project.version)").font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    if appService.apps.contains(where: { $0.name == project.name }) {
+                        Text("Imported").font(.caption2.bold()).foregroundStyle(.green)
+                    } else {
+                        Button("Import") {
+                            importProject(project)
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+                }
+            }
+            .navigationTitle("Import SDK Projects")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+    }
+
+    private func importProject(_ project: SDKProject) {
+        let newApp = DeveloperApp(
+            name: project.name,
+            type: .app,
+            status: .draft,
+            version: "\(project.version).0.0",
+            description: project.description,
+            bundleId: "com.sdk.\(project.id.uuidString.prefix(8).lowercased())",
+            grantedScopes: project.enabledScopes
+        )
+        Task {
+            try? await appService.createApp(newApp)
         }
     }
 }

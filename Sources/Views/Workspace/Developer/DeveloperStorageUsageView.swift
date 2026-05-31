@@ -2,111 +2,112 @@ import SwiftUI
 
 struct DeveloperStorageUsageView: View {
     @ObservedObject var appService = DeveloperAppService.shared
-    @ObservedObject var logService = DeveloperLogService.shared
+    @State private var showingAddStorage = false
     @State private var selectedAppID: UUID?
-    @State private var showingClearConfirmation = false
 
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                appPickerSection
-                storageUsageSection
-                categoryUsageSection
-                clearCacheSection
+                storageHeader
+
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack {
+                        Text("Active Storage").font(.headline)
+                        Spacer()
+                        Button { showingAddStorage = true } label: {
+                            Image(systemName: "plus.circle.fill").font(.title3)
+                        }
+                    }
+
+                    ForEach(storageNodes) { node in
+                        storageCard(node)
+                    }
+                }
+                .padding()
             }
-            .padding()
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Storage Usage")
-        .confirmationDialog("Clear Cached Data?", isPresented: $showingClearConfirmation, titleVisibility: .visible) {
-            Button("Clear All Logs", role: .destructive) {
-                Task {
-                    // Logic to clear logs
-                }
-            }
-            Button("Cancel", role: .cancel) {}
+        .alert("Provision Storage", isPresented: $showingAddStorage) {
+            Button("Cancel", role: .cancel) { }
+            Button("Provision 10GB") { /* Provision logic */ }
         } message: {
-            Text("This will permanently delete local logs and cached app data. This action cannot be undone.")
+            Text("Select an app and size to provision additional block storage.")
         }
     }
 
-    @ViewBuilder
-    private var appPickerSection: some View {
-        Section {
-            Picker("App", selection: $selectedAppID) {
-                Text("All Apps").tag(Optional<UUID>.none)
-                ForEach(appService.apps) { app in
-                    Text(app.name).tag(Optional(app.id))
-                }
-            }
-            .pickerStyle(.menu)
-            .padding()
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-    }
-
-    @ViewBuilder
-    private var storageUsageSection: some View {
+    private var storageHeader: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Storage Usage").font(.headline)
             HStack {
-                VStack(alignment: .leading) {
-                    Text("\(currentUsageGB, specifier: "%.2f") GB / 5.0 GB").font(.title3.bold())
-                    ProgressView(value: currentUsageGB, total: 5.0).tint(.blue)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Total Utilization").font(.headline)
+                    Text("Last audit: 12m ago").font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
-                Text("\(Int(currentUsageGB / 5.0 * 100))%").font(.headline).foregroundStyle(.secondary)
+                Image(systemName: "archivebox.fill").foregroundStyle(.purple).font(.title2)
             }
+
+            HStack(spacing: 20) {
+                storageMetric(label: "Used", value: "142 GB", color: .purple)
+                storageMetric(label: "Available", value: "858 GB", color: .secondary)
+                storageMetric(label: "Objects", value: "1.2M", color: .blue)
+            }
+
+            ProgressView(value: 0.14)
+                .tint(.purple)
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding()
     }
 
-    @ViewBuilder
-    private var categoryUsageSection: some View {
+    private func storageMetric(label: String, value: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(value).font(.title3.bold()).foregroundStyle(color)
+            Text(label).font(.caption2).foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func storageCard(_ node: StorageNode) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Usage by Category").font(.headline)
-            usageRow(label: "Database", value: "0 MB", icon: "cylinder.split.1x2.fill", color: .blue)
-            usageRow(label: "Assets", value: "0 MB", icon: "photo.on.rectangle.angled", color: .green)
-            usageRow(label: "Logs", value: "\(String(format: "%.1f", logUsageMB)) MB", icon: "list.bullet.rectangle", color: .purple)
+            HStack {
+                Text(node.name).font(.subheadline.bold())
+                Spacer()
+                Text(node.type).font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text("\(Int(node.usage * 100))% full").font(.system(size: 8)).foregroundStyle(.secondary)
+                    Spacer()
+                    Text("\(node.usedSize) / \(node.totalSize)").font(.system(size: 8)).foregroundStyle(.secondary)
+                }
+                ProgressView(value: node.usage)
+                    .progressViewStyle(.linear)
+                    .tint(.purple)
+            }
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05), lineWidth: 1))
     }
 
-    @ViewBuilder
-    private var clearCacheSection: some View {
-        Section {
-            Button(role: .destructive) {
-                showingClearConfirmation = true
-            } label: {
-                Label("Clear Cached Data", systemImage: "trash")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.red.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-        }
+    private var storageNodes: [StorageNode] {
+        [
+            StorageNode(name: "Production Assets", type: "Object S3", usedSize: "120GB", totalSize: "500GB", usage: 0.24),
+            StorageNode(name: "Log Archive", type: "Cold Storage", usedSize: "22GB", totalSize: "500GB", usage: 0.04)
+        ]
     }
+}
 
-    private var currentUsageGB: Double {
-        logUsageMB / 1024.0
-    }
-
-    private var logUsageMB: Double {
-        Double(logService.logEntries.count) * 0.01 // Estimated 10KB per log
-    }
-
-    private func usageRow(label: String, value: String, icon: String, color: Color) -> some View {
-        HStack {
-            Image(systemName: icon).foregroundStyle(color).frame(width: 24)
-            Text(label).font(.subheadline)
-            Spacer()
-            Text(value).font(.subheadline.bold()).foregroundStyle(.secondary)
-        }
-        .padding(.vertical, 8)
-    }
+struct StorageNode: Identifiable {
+    let id = UUID()
+    let name: String
+    let type: String
+    let usedSize: String
+    let totalSize: String
+    let usage: Double
 }
