@@ -18,7 +18,8 @@ public class FeatureFlagService: ObservableObject {
         var current = store.featureFlags
         current.append(flag)
         store.saveFeatureFlags(current)
-        await MainActor.run { self.flags = current }
+        let updatedFlags = current
+        await MainActor.run { self.flags = updatedFlags }
     }
 
     public func updateFlag(_ flag: FeatureFlag) async throws {
@@ -27,7 +28,8 @@ public class FeatureFlagService: ObservableObject {
             current[index] = flag
             current[index].updatedAt = Date()
             store.saveFeatureFlags(current)
-            await MainActor.run { self.flags = current }
+            let updatedFlags = current
+            await MainActor.run { self.flags = updatedFlags }
         }
     }
 
@@ -37,7 +39,8 @@ public class FeatureFlagService: ObservableObject {
             current[index].isEnabled.toggle()
             current[index].updatedAt = Date()
             store.saveFeatureFlags(current)
-            await MainActor.run { self.flags = current }
+            let updatedFlags = current
+            await MainActor.run { self.flags = updatedFlags }
         }
     }
 
@@ -45,6 +48,7 @@ public class FeatureFlagService: ObservableObject {
         var current = store.featureFlags
         current.removeAll { $0.id == id }
         store.saveFeatureFlags(current)
-        await MainActor.run { self.flags = current }
+        let updatedFlags = current
+        await MainActor.run { self.flags = updatedFlags }
     }
 }

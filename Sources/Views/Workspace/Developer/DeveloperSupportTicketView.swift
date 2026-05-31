@@ -13,54 +13,48 @@ struct DeveloperSupportTicketView: View {
     ]
 
     var body: some View {
-        let assistanceTitle = "Technical Support"
-        let assistanceMessage = "Our engineers are available to help with integration issues, rate limit adjustments, and platform compliance."
-
-        return List {
-            Section("Developer Assistance") {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Image(systemName: "lifepreserver.fill").foregroundStyle(.blue)
-                        Text(assistanceTitle).font(.subheadline.bold())
-                    }
-                    Text(assistanceMessage)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.vertical, 8)
-            }
-
-            Section {
-                Button { showingAddTicket = true } label: {
-                    Label("Open Support Ticket", systemImage: "plus.bubble.fill").font(.subheadline.bold())
-                }
-            }
-
-            Section("Your Tickets") {
-                if tickets.isEmpty {
-                    EmptyStateView(icon: "questionmark.circle", title: "No Open Tickets", message: "Need help? Open a ticket and our team will get back to you within 24 hours.")
-                } else {
-                    ForEach(tickets) { ticket in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(ticket.subject).font(.subheadline.bold())
-                                Text(ticket.appName).font(.system(size: 9)).foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            Text(ticket.status.uppercased())
-                                .font(.system(size: 8, weight: .black))
-                                .padding(.horizontal, 6).padding(.vertical, 2)
-                                .background(ticket.status == "Closed" ? Color.secondary.opacity(0.1) : Color.green.opacity(0.1))
-                                .foregroundStyle(ticket.status == "Closed" ? .secondary : .green)
-                                .clipShape(Capsule())
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-            }
+        List {
+            developerAssistanceSection
+            openTicketSection
+            ticketsSection
         }
         .navigationTitle("Support")
         .sheet(isPresented: $showingAddTicket) { addTicketSheet }
+    }
+
+    private var developerAssistanceSection: some View {
+        Section("Developer Assistance") {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: "lifepreserver.fill").foregroundStyle(.blue)
+                    Text("Technical Support").font(.subheadline.bold())
+                }
+                Text("Our engineers are available to help with integration issues, rate limit adjustments, and platform compliance.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.vertical, 8)
+        }
+    }
+
+    private var openTicketSection: some View {
+        Section {
+            Button { showingAddTicket = true } label: {
+                Label("Open Support Ticket", systemImage: "plus.bubble.fill").font(.subheadline.bold())
+            }
+        }
+    }
+
+    private var ticketsSection: some View {
+        Section("Your Tickets") {
+            if tickets.isEmpty {
+                EmptyStateView(icon: "questionmark.circle", title: "No Open Tickets", message: "Need help? Open a ticket and our team will get back to you within 24 hours.")
+            } else {
+                ForEach(tickets) { ticket in
+                    SupportTicketRow(ticket: ticket)
+                }
+            }
+        }
     }
 
     private var addTicketSheet: some View {
@@ -103,3 +97,23 @@ struct DeveloperSupportTicketView: View {
     }
 }
 
+private struct SupportTicketRow: View {
+    let ticket: SupportTicket
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(ticket.subject).font(.subheadline.bold())
+                Text(ticket.appName).font(.system(size: 9)).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Text(ticket.status.uppercased())
+                .font(.system(size: 8, weight: .black))
+                .padding(.horizontal, 6).padding(.vertical, 2)
+                .background(ticket.status == "Closed" ? Color.secondary.opacity(0.1) : Color.green.opacity(0.1))
+                .foregroundStyle(ticket.status == "Closed" ? .secondary : .green)
+                .clipShape(Capsule())
+        }
+        .padding(.vertical, 4)
+    }
+}
