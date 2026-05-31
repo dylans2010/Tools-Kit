@@ -2137,6 +2137,8 @@
 		EX0200000000000000000003 /* MCPMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EX0100000000000000000003 /* MCPMainView.swift */; };
 		EX0200000000000000000004 /* ConnectionMCP.swift in Sources */ = {isa = PBXBuildFile; fileRef = EX0100000000000000000004 /* ConnectionMCP.swift */; };
 		EX0200000000000000000005 /* MCPConnectState.swift in Sources */ = {isa = PBXBuildFile; fileRef = EX0100000000000000000005 /* MCPConnectState.swift */; };
+		EX0200000000000000000006 /* MCPServers.json in Resources */ = {isa = PBXBuildFile; fileRef = EX0100000000000000000006 /* MCPServers.json */; };
+		EX0200000000000000000007 /* MCPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EX0100000000000000000007 /* MCPService.swift */; };
 		DA0200000000000000000050 /* DocumentationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000050 /* DocumentationService.swift */; };
 		DA0200000000000000000051 /* MarketplaceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000051 /* MarketplaceService.swift */; };
 		DA0200000000000000000052 /* OrganizationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000052 /* OrganizationService.swift */; };
@@ -4325,6 +4327,8 @@
 		EX0100000000000000000003 /* MCPMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MCPMainView.swift; path = Sources/Views/External/MCPMainView.swift; sourceTree = SOURCE_ROOT; };
 		EX0100000000000000000004 /* ConnectionMCP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ConnectionMCP.swift; path = Sources/Views/External/ConnectionMCP.swift; sourceTree = SOURCE_ROOT; };
 		EX0100000000000000000005 /* MCPConnectState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MCPConnectState.swift; path = Sources/Views/External/MCPConnectState.swift; sourceTree = SOURCE_ROOT; };
+		EX0100000000000000000006 /* MCPServers.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = MCPServers.json; path = Sources/Views/External/MCPServers.json; sourceTree = SOURCE_ROOT; };
+		EX0100000000000000000007 /* MCPService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MCPService.swift; path = Sources/Views/External/MCPService.swift; sourceTree = SOURCE_ROOT; };
 		DA0100000000000000000050 /* DocumentationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DocumentationService.swift; path = Sources/Views/Workspace/Developer/Services/DocumentationService.swift; sourceTree = SOURCE_ROOT; };
 		DA0100000000000000000051 /* MarketplaceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MarketplaceService.swift; path = Sources/Views/Workspace/Developer/Services/MarketplaceService.swift; sourceTree = SOURCE_ROOT; };
 		DA0100000000000000000052 /* OrganizationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OrganizationService.swift; path = Sources/Views/Workspace/Developer/Services/OrganizationService.swift; sourceTree = SOURCE_ROOT; };
@@ -12759,6 +12763,8 @@
 				EX0100000000000000000003 /* MCPMainView.swift */,
 				EX0100000000000000000004 /* ConnectionMCP.swift */,
 				EX0100000000000000000005 /* MCPConnectState.swift */,
+				EX0100000000000000000006 /* MCPServers.json */,
+				EX0100000000000000000007 /* MCPService.swift */,
 				DA0100000000000000000050 /* DocumentationService.swift */,
 				DA0100000000000000000051 /* MarketplaceService.swift */,
 				DA0100000000000000000052 /* OrganizationService.swift */,
@@ -12906,6 +12912,7 @@
 					B1C2D3E4F5A60708090A0D05 /* Config.plist in Resources */,
 					SDKD2000000000000000003 /* SDK_AI_System.md in Resources */,
 					A913A8000000000000000001 /* AgentPersonaSystem.md in Resources */,
+					EX0200000000000000000006 /* MCPServers.json in Resources */,
 				);
 				runOnlyForDeploymentPostprocessing = 0;
 			};
@@ -13027,6 +13034,7 @@
 				DA020000000000000000004E /* DeveloperProfileService.swift in Sources */,
 				DA020000000000000000004F /* DeveloperScopeService.swift in Sources */,
 				XM0200000000000000000001 /* MCPModels.swift in Sources */,
+				EX0200000000000000000007 /* MCPService.swift in Sources */,
 				EX0200000000000000000002 /* MCPManager.swift in Sources */,
 				EX0200000000000000000003 /* MCPMainView.swift in Sources */,
 				EX0200000000000000000004 /* ConnectionMCP.swift in Sources */,
