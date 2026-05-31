@@ -167,13 +167,15 @@ struct AddWebhookEndpointSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Register") {
+                    Button(action: {
                         guard let _ = selectedAppID else { return }
                         let endpoint = WebhookEndpoint(id: UUID(), url: url, subscribedEvents: [], isActive: true, signingSecretKeyID: UUID())
                         Task {
                             try? await webhookService.createEndpoint(endpoint)
                             await MainActor.run { dismiss() }
                         }
+                    }) {
+                        Text("Register")
                     }
                     .disabled(url.count < 10 || selectedAppID == nil)
                 }
