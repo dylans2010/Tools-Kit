@@ -13,60 +13,66 @@ struct DeveloperSandboxEnvironmentView: View {
 
     var body: some View {
         List {
-            Section {
-                Picker("App", selection: $selectedAppID) {
-                    Text("Select an App").tag(Optional<UUID>.none)
+            Section("Management Scope") {
+                Picker("App Filter", selection: $selectedAppID) {
+                    Text("Select an Application").tag(Optional<UUID>.none)
                     ForEach(appService.apps) { app in
                         Text(app.name).tag(Optional(app.id))
                     }
                 }
             }
 
-            Section("Environments") {
+            Section("Application Environments") {
                 if let app = selectedApp {
                     if app.environments.isEmpty {
-                        Text("No sandbox environments configured.").font(.caption).foregroundStyle(.secondary)
+                        EmptyStateView(icon: "square.dashed", title: "No Environments", message: "Configure a sandbox or staging environment to test your application in isolation.")
                     } else {
                         ForEach(app.environments) { env in
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text(env.name).font(.subheadline.bold())
-                                    Text(env.apiBaseURL).font(.caption).foregroundStyle(.secondary)
-                                }
-                                Spacer()
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(env.name).font(.subheadline.bold())
+                                Text(env.apiBaseURL).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 4)
+                            .swipeActions {
+                                Button(role: .destructive) { deleteSandbox(env.id) } label: { Label("Delete", systemImage: "trash") }
                             }
                         }
                     }
                 } else {
-                    Text("Select an app to manage environments.").font(.caption).foregroundStyle(.secondary)
+                    Text("Choose an application to manage its isolated runtime environments.").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+
+            if selectedApp != nil {
+                Section {
+                    Button { showingAddSandbox = true } label: {
+                        Label("Add Testing Environment", systemImage: "plus.circle.fill").font(.subheadline.bold())
+                    }
                 }
             }
         }
         .navigationTitle("Sandbox Environments")
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button { showingAddSandbox = true } label: { Image(systemName: "plus") }
-                    .disabled(selectedAppID == nil)
-            }
-        }
-        .sheet(isPresented: $showingAddSandbox) {
-            addSandboxSheet
+        .sheet(isPresented: $showingAddSandbox) { addSandboxSheet }
+        .onAppear {
+            if selectedAppID == nil { selectedAppID = appService.apps.first?.id }
         }
     }
 
     private var addSandboxSheet: some View {
         NavigationStack {
             Form {
-                TextField("Environment Name", text: $newName)
-                TextField("API Base URL", text: $newURL)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
+                Section("Environment Identity") {
+                    TextField("Name (e.g. Staging Beta)", text: $newName)
+                    TextField("Base API URL", text: $newURL)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                }
             }
-            .navigationTitle("Add Environment")
+            .navigationTitle("New Sandbox")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddSandbox = false } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") { addSandbox() }
+                    Button("Register") { addSandbox() }
                         .disabled(newName.isEmpty || newURL.isEmpty)
                 }
             }
@@ -74,18 +80,22 @@ struct DeveloperSandboxEnvironmentView: View {
     }
 
     private func addSandbox() {
-        guard let appID = selectedAppID else { return }
+        guard let appID = selectedAppID, var app = appService.apps.first(where: { $0.id == appID }) else { return }
         let env = AppEnvironment(name: newName, apiBaseURL: newURL)
+        app.environments.append(env)
         Task {
-            if var app = appService.apps.first(where: { $0.id == appID }) {
-                app.environments.append(env)
-                try? await appService.updateApp(app)
-            }
+            try? await appService.updateApp(app)
             await MainActor.run {
                 showingAddSandbox = false
                 newName = ""
                 newURL = ""
             }
         }
+    }
+
+    private func deleteSandbox(_ id: UUID) {
+        guard let appID = selectedAppID, var app = appService.apps.first(where: { $0.id == appID }) else { return }
+        app.environments.removeAll { $0.id == id }
+        Task { try? await appService.updateApp(app) }
     }
 }

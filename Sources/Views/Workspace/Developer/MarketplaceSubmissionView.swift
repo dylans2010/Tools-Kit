@@ -57,7 +57,7 @@ struct MarketplaceSubmissionView: View {
 
     private var stepIndicator: some View {
         HStack(spacing: 8) {
-            ForEach(0..<5) { index in
+            ForEach(0..<5, id: \.self) { index in
                 Circle()
                     .fill(index == currentStep ? Color.accentColor : (index < currentStep ? Color.accentColor.opacity(0.5) : Color.secondary.opacity(0.3)))
                     .frame(width: 8, height: 8)
@@ -72,7 +72,7 @@ struct MarketplaceSubmissionView: View {
                 SectionHeader(title: "App Listing Metadata", subtitle: nil, icon: nil)
 
                 VStack(alignment: .leading, spacing: 12) {
-                    submissionField(label: "Listing Title", text: $draft.metadata.title, hint: "e.g. My Productivity Tool")
+                    submissionField(label: "Listing Title", text: $draft.metadata.title, hint: "Title of your application")
                     submissionField(label: "Subtitle", text: $draft.metadata.subtitle, hint: "Brief summary of what your app does")
 
                     VStack(alignment: .leading, spacing: 4) {
@@ -93,7 +93,7 @@ struct MarketplaceSubmissionView: View {
             VStack(alignment: .leading, spacing: 20) {
                 SectionHeader(title: "Visual Assets", subtitle: nil, icon: nil)
 
-                submissionField(label: "Icon URL (512x512 PNG)", text: $draft.assets.iconURL, hint: "https://example.com/icon.png")
+                submissionField(label: "Icon URL (512x512 PNG)", text: $draft.assets.iconURL, hint: "URL to your app icon")
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Screenshots (URLs, one per line)").font(.caption.bold()).foregroundStyle(.secondary)
@@ -120,7 +120,7 @@ struct MarketplaceSubmissionView: View {
                     submissionField(label: "Build", text: $draft.technicalDetails.buildNumber, hint: "100")
                 }
 
-                submissionField(label: "Minimum OS Version", text: $draft.technicalDetails.minOSVersion, hint: "macOS 13.0")
+                submissionField(label: "Minimum OS Version", text: $draft.technicalDetails.minOSVersion, hint: "OS version requirement")
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Release Notes").font(.caption.bold()).foregroundStyle(.secondary)
@@ -139,9 +139,9 @@ struct MarketplaceSubmissionView: View {
             VStack(alignment: .leading, spacing: 20) {
                 SectionHeader(title: "Support & Compliance", subtitle: nil, icon: nil)
 
-                submissionField(label: "Support Email", text: $draft.supportConfig.supportEmail, hint: "support@example.com")
-                submissionField(label: "Support Website", text: $draft.supportConfig.supportURL, hint: "https://example.com/support")
-                submissionField(label: "Privacy Policy URL", text: $draft.supportConfig.privacyPolicyURL, hint: "https://example.com/privacy")
+                submissionField(label: "Support Email", text: $draft.supportConfig.supportEmail, hint: "Email for user support")
+                submissionField(label: "Support Website", text: $draft.supportConfig.supportURL, hint: "URL for user support")
+                submissionField(label: "Privacy Policy URL", text: $draft.supportConfig.privacyPolicyURL, hint: "URL to privacy policy")
 
                 Divider()
 

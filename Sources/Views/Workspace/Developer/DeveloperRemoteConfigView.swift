@@ -2,17 +2,24 @@ import SwiftUI
 
 struct DeveloperRemoteConfigView: View {
     @ObservedObject var configService = RemoteConfigService.shared
+    @ObservedObject var appService = DeveloperAppService.shared
     @State private var selectedAppID: UUID?
-    @State private var selectedEnvironment: KeyEnvironment = .live
+    @State private var selectedEnvironment: APIKeyEnvironment = .sandbox
     @State private var showingAddConfig = false
-    @State private var searchText = ""
+
+    var filteredConfigs: [RemoteConfig] {
+        configService.configs.filter { config in
+            (selectedAppID == nil || config.appID == selectedAppID) &&
+            (config.environment == (selectedEnvironment == .live ? .live : .sandbox))
+        }
+    }
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
-                configOverview
+            VStack(spacing: 24) {
+                configOverviewHeader
 
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 16) {
                     HStack {
                         Text("Config Keys").font(.headline)
                         Spacer()
@@ -22,16 +29,16 @@ struct DeveloperRemoteConfigView: View {
                     }
 
                     Picker("Environment", selection: $selectedEnvironment) {
-                        ForEach(KeyEnvironment.allCases, id: \.self) { env in
-                            Text(env.rawValue).tag(env)
-                        }
+                        Text("Sandbox").tag(APIKeyEnvironment.sandbox)
+                        Text("Live").tag(APIKeyEnvironment.live)
                     }
                     .pickerStyle(.segmented)
 
-                    if configService.configs.isEmpty {
-                        EmptyStateView(icon: "gearshape.2", title: "No Configurations", message: "Add remote configuration keys to dynamically update your app.")
+                    if filteredConfigs.isEmpty {
+                        EmptyStateView(icon: "gearshape.2", title: "No Configurations", message: "Add remote configuration keys to dynamically update your application state without code changes.")
+                            .padding(.vertical, 40)
                     } else {
-                        ForEach(configService.configs.filter { $0.environment == selectedEnvironment }) { config in
+                        ForEach(filteredConfigs) { config in
                             configCard(config)
                         }
                     }
@@ -42,35 +49,39 @@ struct DeveloperRemoteConfigView: View {
         .navigationTitle("Remote Config")
         .background(Color(uiColor: .systemGroupedBackground))
         .sheet(isPresented: $showingAddConfig) {
-            AddConfigSheet(environment: selectedEnvironment)
+            AddConfigSheet(appID: selectedAppID, environment: selectedEnvironment)
+        }
+        .onAppear {
+            if selectedAppID == nil { selectedAppID = appService.apps.first?.id }
         }
     }
 
-    private var configOverview: some View {
+    private var configOverviewHeader: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Configuration State").font(.headline)
-                    Text("Last synced: \(Date().formatted(date: .abbreviated, time: .shortened))").font(.caption).foregroundStyle(.secondary)
+                    Text("Sync Integrity").font(.headline)
+                    Text("Fleet-wide consistency verified").font(.caption).foregroundStyle(.green)
                 }
                 Spacer()
-                Image(systemName: "cloud.fill").foregroundStyle(.blue)
+                Image(systemName: "cloud.fill").foregroundStyle(.blue).font(.title2)
             }
 
-            HStack(spacing: 20) {
+            HStack(spacing: 32) {
                 VStack(alignment: .leading) {
-                    Text("\(configService.configs.count)").font(.title3.bold())
-                    Text("Total Keys").font(.caption2).foregroundStyle(.secondary)
+                    Text("\(filteredConfigs.count)").font(.title3.bold())
+                    Text("ACTIVE KEYS").font(.system(size: 9, weight: .bold)).foregroundStyle(.secondary)
                 }
                 VStack(alignment: .leading) {
                     Text("12.4ms").font(.title3.bold())
-                    Text("Avg Latency").font(.caption2).foregroundStyle(.secondary)
+                    Text("AVG PROPAGATION").font(.system(size: 9, weight: .bold)).foregroundStyle(.secondary)
                 }
             }
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.05), lineWidth: 1))
         .padding()
     }
 
@@ -79,40 +90,44 @@ struct DeveloperRemoteConfigView: View {
             HStack {
                 Text(config.key).font(.subheadline.monospaced()).bold()
                 Spacer()
-                Text(config.valueType.rawValue).font(.system(size: 8, weight: .bold))
+                Text(config.valueType.rawValue.uppercased()).font(.system(size: 8, weight: .black))
                     .padding(.horizontal, 6).padding(.vertical, 2)
-                    .background(Color.accentColor.opacity(0.1), in: Capsule())
+                    .background(Color.accentColor.opacity(0.1))
                     .foregroundStyle(Color.accentColor)
+                    .clipShape(Capsule())
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Value:").font(.caption2.bold()).foregroundStyle(.secondary)
+                Text("Value").font(.system(size: 9, weight: .bold)).foregroundStyle(.secondary).textCase(.uppercase)
                 Text(config.value).font(.subheadline.monospaced()).lineLimit(2)
             }
 
             Divider()
 
             HStack {
-                Text("v\(config.version)").font(.system(size: 8)).foregroundStyle(.tertiary)
+                Text("Version \(config.version)").font(.system(size: 8)).foregroundStyle(.tertiary)
                 Spacer()
                 Button {
                     // edit logic
                 } label: {
-                    Text("Edit").font(.system(size: 10, weight: .bold))
+                    Text("Modify").font(.system(size: 10, weight: .bold))
                 }
             }
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05)))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05), lineWidth: 1))
     }
 }
 
 struct AddConfigSheet: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var configService = RemoteConfigService.shared
-    let environment: KeyEnvironment
+    @ObservedObject var appService = DeveloperAppService.shared
+
+    @State var appID: UUID?
+    let environment: APIKeyEnvironment
 
     @State private var key = ""
     @State private var value = ""
@@ -121,40 +136,49 @@ struct AddConfigSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("New Configuration") {
-                    TextField("Key (e.g. feature_login_v2)", text: $key)
+                Section("Target Application") {
+                    Picker("App", selection: $appID) {
+                        ForEach(appService.apps) { app in
+                            Text(app.name).tag(Optional(app.id))
+                        }
+                    }
+                }
+
+                Section("Configuration Details") {
+                    TextField("Config Key", text: $key, prompt: Text("e.g. session_timeout"))
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
 
-                    Picker("Type", selection: $valueType) {
+                    Picker("Value Type", selection: $valueType) {
                         ForEach(RemoteConfigValueType.allCases, id: \.self) { type in
                             Text(type.rawValue).tag(type)
                         }
                     }
 
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("Value").font(.caption).foregroundStyle(.secondary)
                         TextEditor(text: $value).frame(height: 100).font(.system(.subheadline, design: .monospaced))
                     }
                 }
-
-                Section {
-                    Text("Configuring for \(environment.rawValue) environment.")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
             }
-            .navigationTitle("Add Config")
+            .navigationTitle("New Configuration")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddConfig = false } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        let newConfig = RemoteConfig(key: key, value: value, valueType: valueType, environment: environment, version: 1)
-                        configService.addConfig(newConfig)
-                        dismiss()
+                        saveConfig()
                     }
-                    .disabled(key.isEmpty || value.isEmpty)
+                    .disabled(key.isEmpty || value.isEmpty || appID == nil)
                 }
             }
         }
+    }
+
+    private func saveConfig() {
+        guard let appID = appID else { return }
+        let env: KeyEnvironment = (environment == .live ? .live : .sandbox)
+        let newConfig = RemoteConfig(appID: appID, key: key, value: value, valueType: valueType, environment: env, version: 1)
+        configService.addConfig(newConfig)
+        dismiss()
     }
 }

@@ -2,69 +2,90 @@ import SwiftUI
 
 struct OrganizationManagementView: View {
     @ObservedObject var orgService = OrganizationService.shared
-    @State private var showingCreate = false
-    @State private var newOrgName = ""
+    @State private var showingAddMember = false
+    @State private var email = ""
+    @State private var role: TeamRole = .developer
 
     var body: some View {
         List {
-            Section("Your Organizations") {
-                if orgService.organizations.isEmpty {
-                    VStack(spacing: 12) {
-                        Image(systemName: "building.2")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.secondary)
-                        Text("You are not part of any organizations. Create one to manage teams and shared projects.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
+            Section("Organization Profile") {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 16) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 12).fill(Color.primary.opacity(0.05))
+                            Image(systemName: "building.2.fill").font(.title2).foregroundStyle(.secondary)
+                        }
+                        .frame(width: 56, height: 56)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(orgService.organizationName).font(.headline)
+                            Text("Enterprise Verified").font(.caption).foregroundStyle(.green)
+                        }
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity)
+                }
+                .padding(.vertical, 8)
+            }
+
+            Section("Team Members") {
+                if orgService.members.isEmpty {
+                    Text("No other members in this organization.").font(.caption).foregroundStyle(.secondary)
                 } else {
-                    ForEach(orgService.organizations) { org in
-                        NavigationLink(destination: Text(org.name).navigationTitle(org.name)) {
-                            VStack(alignment: .leading) {
-                                Text(org.name).font(.headline)
-                                Text("\(org.members.count) members • \(org.teams.count) teams").font(.caption).foregroundStyle(.secondary)
+                    ForEach(orgService.members) { member in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(member.name).font(.subheadline.bold())
+                                Text(member.email).font(.system(size: 9)).foregroundStyle(.secondary)
                             }
+                            Spacer()
+                            Text(member.role.rawValue.uppercased())
+                                .font(.system(size: 8, weight: .black))
+                                .padding(.horizontal, 6).padding(.vertical, 2)
+                                .background(member.role.color.opacity(0.1))
+                                .foregroundStyle(member.role.color)
+                                .clipShape(Capsule())
                         }
                     }
                 }
             }
-        }
-        .navigationTitle("Organizations")
-        .toolbar {
-            Button { showingCreate = true } label: { Image(systemName: "plus") }
-        }
-        .sheet(isPresented: $showingCreate) {
-            createOrgSheet
-        }
-    }
 
-    private var createOrgSheet: some View {
-        NavigationStack {
-            Form {
-                TextField("Organization Name", text: $newOrgName)
-            }
-            .navigationTitle("Create Organization")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingCreate = false } }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Create") {
-                        createOrg()
-                    }
-                    .disabled(newOrgName.isEmpty)
+            Section {
+                Button { showingAddMember = true } label: {
+                    Label("Invite Team Member", systemImage: "person.badge.plus.fill").font(.subheadline.bold())
                 }
             }
-        }
-    }
 
-    private func createOrg() {
-        Task {
-            try? await orgService.createOrganization(name: newOrgName)
-            await MainActor.run {
-                showingCreate = false
-                newOrgName = ""
+            Section("Legal & Compliance") {
+                NavigationLink(destination: Text("Service Agreement")) { Label("Developer Agreement", systemImage: "doc.text.fill") }
+                NavigationLink(destination: Text("Tax Documents")) { Label("Tax Information", systemImage: "banknote.fill") }
+                NavigationLink(destination: Text("Banking")) { Label("Payout Methods", systemImage: "creditcard.fill") }
+            }
+        }
+        .navigationTitle("Organization")
+        .sheet(isPresented: $showingAddMember) {
+            NavigationStack {
+                Form {
+                    Section("Member Details") {
+                        TextField("Email Address", text: $email).keyboardType(.emailAddress).autocapitalization(.none)
+                        Picker("Role", selection: $role) {
+                            ForEach(TeamRole.allCases, id: \.self) { role in
+                                Text(role.rawValue).tag(role)
+                            }
+                        }
+                    }
+                }
+                .navigationTitle("Invite Member")
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddMember = false } }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Invite") {
+                            Task {
+                                try? await orgService.inviteMember(email: email, role: role)
+                                await MainActor.run { showingAddMember = false; email = "" }
+                            }
+                        }
+                        .disabled(email.isEmpty)
+                    }
+                }
             }
         }
     }

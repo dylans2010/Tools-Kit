@@ -5,17 +5,17 @@ struct AppDetailView: View {
     @ObservedObject var appService = DeveloperAppService.shared
     @ObservedObject var keyService = APIKeyService.shared
     @ObservedObject var scopeService = DeveloperScopeService.shared
+
     @State private var selectedTab = 0
     @State private var showingStatusSheet = false
     @State private var showingAddVersion = false
     @State private var showingTransferOwnership = false
+
     @State private var newStatus: DeveloperAppStatus = .draft
     @State private var statusReason = ""
-
     @State private var newVersionNumber = ""
     @State private var newBuildNumber = ""
     @State private var newReleaseNotes = ""
-
     @State private var transferEmail = ""
 
     var app: DeveloperApp? {
@@ -26,88 +26,69 @@ struct AppDetailView: View {
         Group {
             if let app = app {
                 ScrollView {
-                    VStack(spacing: 20) {
+                    VStack(spacing: 24) {
                         appHeader(app)
 
                         Picker("Details", selection: $selectedTab) {
                             Text("Overview").tag(0)
-                            Text("Versions").tag(1)
-                            Text("Scopes").tag(2)
-                            Text("Auth").tag(3)
-                            Text("More").tag(4)
+                            Text("Lifecycle").tag(1)
+                            Text("Security").tag(2)
+                            Text("Infrastructure").tag(3)
                         }
                         .pickerStyle(.segmented)
                         .padding(.horizontal)
 
                         VStack(spacing: 0) {
                             switch selectedTab {
-                            case 0:
-                                overviewTab(app)
-                            case 1:
-                                versionsTab(app)
-                            case 2:
-                                scopesTab(app)
-                            case 3:
-                                authTab(app)
-                            case 4:
-                                moreTab(app)
-                            default:
-                                Color.clear
+                            case 0: overviewTab(app)
+                            case 1: lifecycleTab(app)
+                            case 2: securityTab(app)
+                            case 3: infrastructureTab(app)
+                            default: Color.clear
                             }
                         }
-                        .transition(.opacity)
                     }
                 }
             } else {
-                VStack(spacing: 12) {
-                    Image(systemName: "exclamationmark.triangle.fill").font(.largeTitle).foregroundStyle(.orange)
-                    Text("App Not Found").font(.headline)
-                    Text("This project may have been deleted or moved.").font(.subheadline).foregroundStyle(.secondary)
-                }
-                .padding()
+                EmptyStateView(icon: "exclamationmark.triangle", title: "App Not Found", message: "The requested application could not be found in the registry.")
             }
         }
-        .navigationTitle("App Details")
+        .navigationTitle("App Detail")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("Update Status") {
+                Button {
                     if let app = app {
                         newStatus = app.status
                         showingStatusSheet = true
                     }
+                } label: {
+                    Text("Status").font(.subheadline.bold())
                 }
             }
         }
-        .sheet(isPresented: $showingStatusSheet) {
-            statusUpdateSheet
-        }
-        .sheet(isPresented: $showingAddVersion) {
-            addVersionSheet
-        }
-        .sheet(isPresented: $showingTransferOwnership) {
-            transferOwnershipSheet
-        }
+        .sheet(isPresented: $showingStatusSheet) { statusUpdateSheet }
+        .sheet(isPresented: $showingAddVersion) { addVersionSheet }
+        .sheet(isPresented: $showingTransferOwnership) { transferOwnershipSheet }
     }
 
     private func appHeader(_ app: DeveloperApp) -> some View {
         HStack(spacing: 16) {
             ZStack {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.accentColor.opacity(0.1))
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.primary.opacity(0.03))
                 Image(systemName: app.iconName)
-                    .font(.system(size: 40))
+                    .font(.system(size: 32))
                     .foregroundStyle(Color.accentColor)
             }
-            .frame(width: 80, height: 80)
+            .frame(width: 64, height: 64)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(app.name).font(.title3.bold())
-                Text(app.bundleId).font(.caption).monospaced().foregroundStyle(.secondary)
-                HStack {
-                    Text(app.type.rawValue).font(.system(size: 10, weight: .bold))
-                        .padding(.horizontal, 6).padding(.vertical, 2)
-                        .background(Color.accentColor.opacity(0.1), in: Capsule())
+            VStack(alignment: .leading, spacing: 2) {
+                Text(app.name).font(.headline)
+                Text(app.bundleId).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
+                HStack(spacing: 8) {
+                    Text(app.type.rawValue).font(.system(size: 9, weight: .bold)).textCase(.uppercase).foregroundStyle(.secondary)
+                    Circle().fill(Color.secondary.opacity(0.3)).frame(width: 3, height: 3)
                     statusBadge(app.status)
                 }
             }
@@ -116,304 +97,311 @@ struct AppDetailView: View {
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.05), lineWidth: 1))
         .padding(.horizontal)
     }
 
     private func statusBadge(_ status: DeveloperAppStatus) -> some View {
-        Text(status.rawValue).font(.system(size: 10, weight: .bold))
-            .padding(.horizontal, 8).padding(.vertical, 4)
-            .background(statusColor(status).opacity(0.1), in: Capsule())
+        Text(status.rawValue.uppercased())
+            .font(.system(size: 8, weight: .black))
             .foregroundStyle(statusColor(status))
     }
 
     private func statusColor(_ status: DeveloperAppStatus) -> Color {
         switch status {
-        case .draft: return .gray
-        case .underReview: return .orange
         case .live: return .green
+        case .underReview: return .orange
         case .suspended: return .red
-        case .deprecated: return .secondary
-        case .archived: return .black
+        default: return .secondary
         }
     }
 
     private func overviewTab(_ app: DeveloperApp) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "Project Information", subtitle: nil, icon: nil)
+        VStack(alignment: .leading, spacing: 20) {
+            infoSection(app)
 
-            VStack(spacing: 12) {
-                infoRow(label: "Description", value: app.description)
-                infoRow(label: "Current Version", value: app.version)
-                infoRow(label: "Installs", value: "\(app.installCount)")
-                infoRow(label: "Monetization", value: app.monetizationModel.rawValue)
-                infoRow(label: "Created", value: app.createdAt.formatted(date: .abbreviated, time: .omitted))
-            }
-
-            SectionHeader(title: "Management & Compliance", subtitle: nil, icon: nil)
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                NavigationLink(destination: AppEnvironmentsView()) {
-                    toolLink(title: "Environments", icon: "square.stack.3d.down.right")
-                }
+            SectionHeader(title: "Compliance & Management", subtitle: nil, icon: nil)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 NavigationLink(destination: PrivacyManifestEditorView()) {
-                    toolLink(title: "Privacy Manifest", icon: "hand.raised.fill")
+                    toolTile(title: "Privacy Manifest", icon: "hand.raised.fill", description: "Audit scope justifications")
                 }
                 NavigationLink(destination: AppBundleValidatorView()) {
-                    toolLink(title: "Bundle Validator", icon: "checkmark.seal.fill")
+                    toolTile(title: "Bundle Validator", icon: "checkmark.seal.fill", description: "Verify package integrity")
                 }
-                NavigationLink(destination: AppVersionHistoryView()) {
-                    toolLink(title: "Version History", icon: "clock.arrow.circlepath")
+                NavigationLink(destination: DataHandlingPolicyBuilderView()) {
+                    toolTile(title: "Data Policies", icon: "doc.text.magnifyingglass", description: "Manage retention policies")
                 }
-                NavigationLink(destination: DeveloperIncidentManagerView()) {
-                    toolLink(title: "Incidents", icon: "exclamationmark.triangle.fill")
-                }
-                NavigationLink(destination: FunnelBuilderView()) {
-                    toolLink(title: "Funnels", icon: "filter")
+                NavigationLink(destination: DeveloperMonetizationView()) {
+                    toolTile(title: "Monetization", icon: "dollarsign.circle.fill", description: "Revenue & pricing config")
                 }
             }
 
-            SectionHeader(title: "Platform Targets", subtitle: nil, icon: nil)
+            SectionHeader(title: "Targets", subtitle: nil, icon: nil)
             FlowLayout(app.platformTargets, spacing: 8) { target in
                 Text(target.rawValue)
-                    .font(.caption.bold())
+                    .font(.system(size: 10, weight: .bold))
                     .padding(.horizontal, 10).padding(.vertical, 5)
-                    .background(Color.secondary.opacity(0.1), in: Capsule())
+                    .background(Color.primary.opacity(0.05), in: Capsule())
             }
         }
         .padding()
     }
 
-    private func toolLink(title: String, icon: String) -> some View {
-        HStack {
-            Image(systemName: icon).font(.caption).foregroundStyle(.secondary)
-            Text(title).font(.caption)
-            Spacer()
-        }
-        .padding(10)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.primary.opacity(0.05), lineWidth: 1))
-    }
-
-    private func versionsTab(_ app: DeveloperApp) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
+    private func lifecycleTab(_ app: DeveloperApp) -> some View {
+        VStack(alignment: .leading, spacing: 20) {
             HStack {
                 SectionHeader(title: "Version History", subtitle: nil, icon: nil)
                 Spacer()
-                Button {
-                    showingAddVersion = true
-                } label: {
-                    Label("New Version", systemImage: "plus")
-                        .font(.caption.bold())
+                Button { showingAddVersion = true } label: {
+                    Label("Add Version", systemImage: "plus.circle.fill").font(.caption.bold())
                 }
             }
 
-            if app.versions.isEmpty {
-                EmptyStateView(icon: "shippingbox", title: "No Versions", message: "No versions released yet.")
-            } else {
-                ForEach(app.versions.sorted(by: { $0.createdAt > $1.createdAt })) { version in
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("v\(version.version)").font(.subheadline.bold())
-                            Text("(\(version.buildNumber))").font(.caption).foregroundStyle(.secondary)
-                            Spacer()
-                            Text(version.status).font(.caption2.bold())
-                                .padding(.horizontal, 6).padding(.vertical, 2)
-                                .background(Color.blue.opacity(0.1), in: Capsule())
-                        }
-                        if !version.releaseNotes.isEmpty {
-                            Text(version.releaseNotes).font(.caption).foregroundStyle(.secondary).lineLimit(2)
-                        }
-                        Text(version.createdAt.formatted(date: .abbreviated, time: .shortened)).font(.system(size: 8)).foregroundStyle(.tertiary)
-                    }
-                    .padding()
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            ForEach(app.versions.sorted(by: { $0.createdAt > $1.createdAt })) { version in
+                versionRow(version)
+            }
+
+            SectionHeader(title: "Release Operations", subtitle: nil, icon: nil)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                NavigationLink(destination: DeveloperReleaseManagementView()) {
+                    toolTile(title: "Releases", icon: "shippingbox.fill", description: "Manage rollout cycles")
+                }
+                NavigationLink(destination: DeveloperBetaTestingView()) {
+                    toolTile(title: "Beta Testing", icon: "person.3.sequence.fill", description: "Invite external testers")
+                }
+                NavigationLink(destination: AppVersionHistoryView()) {
+                    toolTile(title: "All Versions", icon: "clock.arrow.circlepath", description: "Full historical audit")
+                }
+                NavigationLink(destination: DeveloperDeploymentPipelineView()) {
+                    toolTile(title: "Pipelines", icon: "hammer.fill", description: "CI/CD execution status")
                 }
             }
         }
         .padding()
     }
 
-    private func scopesTab(_ app: DeveloperApp) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "Granted Permissions", subtitle: nil, icon: nil)
-
-            if app.grantedScopes.isEmpty {
-                EmptyStateView(icon: "shield.slash", title: "No Permissions", message: "No permissions granted yet.")
-            } else {
-                ForEach(app.grantedScopes, id: \.self) { scopeID in
-                    if let scope = scopeService.fetchScope(identifier: scopeID) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(scope.name).font(.subheadline.bold())
-                                Text(scope.id).font(.caption2.monospaced()).foregroundStyle(.tertiary)
-                            }
-                            Spacer()
-                            Image(systemName: "checkmark.shield.fill").foregroundStyle(.green)
-                        }
-                        .padding()
-                        .background(Color(uiColor: .secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                    }
-                }
-            }
-
-            NavigationLink(destination: ScopeManagementView()) {
-                Label("Request More Scopes", systemImage: "shield.fill")
-                    .font(.subheadline.bold())
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor.opacity(0.1))
-                    .foregroundStyle(Color.accentColor)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-        }
-        .padding()
-    }
-
-    private func authTab(_ app: DeveloperApp) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "Assigned API Keys", subtitle: nil, icon: nil)
-
-            let assignedKeys = keyService.keys.filter { $0.appID == app.id }
-
-            if assignedKeys.isEmpty {
-                EmptyStateView(icon: "key.slash", title: "No API Keys", message: "No API keys assigned to this project.")
-            } else {
-                ForEach(assignedKeys) { key in
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(key.label).font(.subheadline.bold())
-                            Text(key.maskedValue).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Text(key.environment.rawValue).font(.system(size: 8, weight: .bold))
-                            .padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(key.environment == .live ? Color.green.opacity(0.1) : Color.orange.opacity(0.1))
-                            .foregroundStyle(key.environment == .live ? .green : .orange)
-                            .clipShape(Capsule())
-                    }
-                    .padding()
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-            }
-
-            NavigationLink(destination: AuthServiceManagerView()) {
-                Label("Manage All Keys", systemImage: "key.fill")
-                    .font(.subheadline.bold())
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor)
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-        }
-        .padding()
-    }
-
-    private func moreTab(_ app: DeveloperApp) -> some View {
+    private func securityTab(_ app: DeveloperApp) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            HStack {
-                SectionHeader(title: "Collaborators", subtitle: nil, icon: nil)
-                Spacer()
-                NavigationLink(destination: AppCollaboratorsView(appID: app.id)) {
-                    Text("Manage").font(.caption.bold())
+            SectionHeader(title: "Authentication & Keys", subtitle: nil, icon: nil)
+
+            let appKeys = keyService.keys.filter { $0.appID == app.id }
+            if appKeys.isEmpty {
+                Text("No API keys assigned to this project.").font(.caption).foregroundStyle(.secondary).padding(.horizontal)
+            } else {
+                ForEach(appKeys) { key in
+                    keyRow(key)
                 }
             }
-            if app.collaborators.isEmpty {
-                Text("You are the sole owner of this project.").font(.caption).foregroundStyle(.secondary)
-            } else {
-                ForEach(app.collaborators) { collab in
+
+            SectionHeader(title: "Permissions", subtitle: nil, icon: nil)
+            NavigationLink(destination: ScopeManagementView()) {
+                HStack {
+                    Label("\(app.grantedScopes.count) Scopes Granted", systemImage: "shield.fill")
+                    Spacer()
+                    Image(systemName: "chevron.right").font(.caption2)
+                }
+                .font(.subheadline.bold())
+                .padding()
+                .background(Color.accentColor.opacity(0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            SectionHeader(title: "Security Tools", subtitle: nil, icon: nil)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                NavigationLink(destination: DeveloperSecretsManagerView()) {
+                    toolTile(title: "Secrets", icon: "lock.rectangle.fill", description: "Secure env variables")
+                }
+                NavigationLink(destination: DeveloperAppCertificatesView()) {
+                    toolTile(title: "Certificates", icon: "doc.badge.gearshape.fill", description: "Provisioning profiles")
+                }
+                NavigationLink(destination: DeveloperSecurityAuditView()) {
+                    toolTile(title: "Security Audit", icon: "checkmark.shield.fill", description: "Compliance scan reports")
+                }
+                NavigationLink(destination: AuthServiceManagerView()) {
+                    toolTile(title: "Auth Settings", icon: "key.fill", description: "Global auth config")
+                }
+            }
+        }
+        .padding()
+    }
+
+    private func infrastructureTab(_ app: DeveloperApp) -> some View {
+        VStack(alignment: .leading, spacing: 20) {
+            SectionHeader(title: "Environment Management", subtitle: nil, icon: nil)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                NavigationLink(destination: AppEnvironmentsView()) {
+                    toolTile(title: "Environments", icon: "square.stack.3d.down.right.fill", description: "Base URL & configs")
+                }
+                NavigationLink(destination: DeveloperSandboxEnvironmentView()) {
+                    toolTile(title: "Sandbox", icon: "square.dashed", description: "Testing isolated state")
+                }
+                NavigationLink(destination: WebhookManagerView()) {
+                    toolTile(title: "Webhooks", icon: "bolt.horizontal.fill", description: "Event delivery endpoints")
+                }
+                NavigationLink(destination: DeveloperDatabaseManagerView()) {
+                    toolTile(title: "Database", icon: "tablecells.fill", description: "Schema & data explorer")
+                }
+            }
+
+            SectionHeader(title: "Observability", subtitle: nil, icon: nil)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                NavigationLink(destination: DeveloperLogsView()) {
+                    toolTile(title: "System Logs", icon: "list.bullet.rectangle.fill", description: "Real-time log stream")
+                }
+                NavigationLink(destination: AnalyticsDashboardView()) {
+                    toolTile(title: "Analytics", icon: "chart.xyaxis.line", description: "Usage & trend metrics")
+                }
+                NavigationLink(destination: DeveloperCrashReportView()) {
+                    toolTile(title: "Crash Reports", icon: "heart.text.square.fill", description: "Symbolicated stack traces")
+                }
+                NavigationLink(destination: DeveloperPerformanceMonitorView()) {
+                    toolTile(title: "Performance", icon: "gauge.with.needle.fill", description: "latency & resource usage")
+                }
+            }
+
+            SectionHeader(title: "Operations", subtitle: nil, icon: nil)
+            VStack(spacing: 12) {
+                NavigationLink(destination: AppCollaboratorsView(appID: app.id)) {
                     HStack {
-                        VStack(alignment: .leading) {
-                            Text(collab.name).font(.subheadline.bold())
-                            Text(collab.email).font(.caption).foregroundStyle(.secondary)
-                        }
+                        Label("Team & Collaborators", systemImage: "person.2.fill")
                         Spacer()
-                        Text(collab.role).font(.caption2.bold()).foregroundColor(.accentColor)
+                        Text("\(app.collaborators.count)").font(.caption.bold()).padding(.horizontal, 8).padding(.vertical, 2).background(Color.primary.opacity(0.1), in: Capsule())
                     }
+                    .font(.subheadline.bold())
                     .padding()
                     .background(Color(uiColor: .secondarySystemGroupedBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-            }
 
-            Divider()
-
-            SectionHeader(title: "Advanced Features", subtitle: nil, icon: nil)
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                NavigationLink(destination: DeveloperMonetizationView()) {
-                    toolLink(title: "Monetization", icon: "dollarsign.circle.fill")
-                }
-                NavigationLink(destination: CustomEventManagerView()) {
-                    toolLink(title: "Events", icon: "bolt.fill")
-                }
-            }
-
-            Divider()
-
-            SectionHeader(title: "Danger Zone", subtitle: nil, icon: nil)
-            VStack(spacing: 12) {
-                Button(role: .destructive) {
-                    showingTransferOwnership = true
-                } label: {
-                    Label("Transfer Ownership", systemImage: "person.2.badge.key")
+                Button(role: .destructive) { showingTransferOwnership = true } label: {
+                    Label("Transfer Ownership", systemImage: "person.2.badge.key.fill")
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(Color.red.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .buttonStyle(.bordered)
-
-                Button(role: .destructive) {
-                    Task {
-                        try? await appService.deleteApp(id: app.id)
-                    }
-                } label: {
-                    Label("Delete Project", systemImage: "trash")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .buttonStyle(.bordered)
             }
         }
         .padding()
+    }
+
+    private func infoSection(_ app: DeveloperApp) -> some View {
+        VStack(spacing: 1) {
+            infoRow(label: "Description", value: app.description)
+            infoRow(label: "Version", value: app.version)
+            infoRow(label: "Bundle", value: app.bundleId)
+            infoRow(label: "Created", value: app.createdAt.formatted(date: .abbreviated, time: .omitted))
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05), lineWidth: 1))
     }
 
     private func infoRow(label: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(label).font(.caption.bold()).foregroundStyle(.secondary)
-            Text(value.isEmpty ? "—" : value).font(.subheadline)
+        HStack {
+            Text(label).font(.system(size: 12, weight: .bold)).foregroundStyle(.secondary).textCase(.uppercase)
+            Spacer()
+            Text(value.isEmpty ? "—" : value).font(.system(size: 13))
         }
         .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+    }
+
+    private func toolTile(title: String, icon: String, description: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: icon).font(.system(size: 18)).foregroundStyle(.accentColor)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.system(size: 12, weight: .bold))
+                Text(description).font(.system(size: 9)).foregroundStyle(.secondary).lineLimit(2)
+            }
+        }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05), lineWidth: 1))
+    }
+
+    private func versionRow(_ version: AppVersion) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("v\(version.version)").font(.subheadline.bold())
+                Text(version.createdAt.formatted(date: .abbreviated, time: .omitted)).font(.system(size: 9)).foregroundStyle(.tertiary)
+            }
+            Spacer()
+            Text(version.status.uppercased()).font(.system(size: 8, weight: .black)).padding(.horizontal, 6).padding(.vertical, 2).background(Color.primary.opacity(0.05), in: Capsule())
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func keyRow(_ key: APIKey) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(key.label).font(.subheadline.bold())
+                Text(key.maskedValue).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Text(key.environment.rawValue.uppercased()).font(.system(size: 8, weight: .bold)).padding(.horizontal, 6).padding(.vertical, 2).background(key.environment == .live ? Color.green.opacity(0.1) : Color.orange.opacity(0.1)).foregroundStyle(key.environment == .live ? .green : .orange).clipShape(Capsule())
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var statusUpdateSheet: some View {
+        NavigationStack {
+            Form {
+                Section("Target Status") {
+                    Picker("New Status", selection: $newStatus) {
+                        ForEach(DeveloperAppStatus.allCases, id: \.self) { status in
+                            Text(status.rawValue).tag(status)
+                        }
+                    }
+                    TextEditor(text: $statusReason)
+                        .frame(minHeight: 100)
+                        .overlay(alignment: .topLeading) {
+                            if statusReason.isEmpty { Text("Provide a reason...").font(.caption).foregroundStyle(.tertiary).padding(.top, 8).padding(.leading, 4) }
+                        }
+                }
+            }
+            .navigationTitle("Update Status")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingStatusSheet = false } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Update") {
+                        Task {
+                            try? await appService.transitionStatus(id: appID, newStatus: newStatus, reason: statusReason)
+                            await MainActor.run { showingStatusSheet = false; statusReason = "" }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private var addVersionSheet: some View {
         NavigationStack {
             Form {
-                Section("New Version Details") {
-                    TextField("Version Number", text: $newVersionNumber)
+                Section("Version Information") {
+                    TextField("Version Number", text: $newVersionNumber, prompt: Text("e.g. 1.0.1"))
                     TextField("Build Number", text: $newBuildNumber)
-                    VStack(alignment: .leading) {
-                        Text("Release Notes").font(.caption).foregroundStyle(.secondary)
-                        TextEditor(text: $newReleaseNotes).frame(height: 100)
-                    }
+                    TextEditor(text: $newReleaseNotes)
+                        .frame(minHeight: 100)
+                        .overlay(alignment: .topLeading) {
+                            if newReleaseNotes.isEmpty { Text("What's new?").font(.caption).foregroundStyle(.tertiary).padding(.top, 8).padding(.leading, 4) }
+                        }
                 }
             }
-            .navigationTitle("Add Version")
+            .navigationTitle("New Version")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingAddVersion = false } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") {
-                        let version = AppVersion(version: newVersionNumber, buildNumber: newBuildNumber, releaseNotes: newReleaseNotes)
+                        let v = AppVersion(version: newVersionNumber, buildNumber: newBuildNumber, releaseNotes: newReleaseNotes)
                         Task {
-                            try? await appService.addVersion(appID: appID, version: version)
-                            await MainActor.run {
-                                showingAddVersion = false
-                                newVersionNumber = ""
-                                newBuildNumber = ""
-                                newReleaseNotes = ""
-                            }
+                            try? await appService.addVersion(appID: appID, version: v)
+                            await MainActor.run { showingAddVersion = false; newVersionNumber = ""; newBuildNumber = ""; newReleaseNotes = "" }
                         }
                     }
                     .disabled(newVersionNumber.isEmpty || newBuildNumber.isEmpty)
@@ -425,10 +413,9 @@ struct AppDetailView: View {
     private var transferOwnershipSheet: some View {
         NavigationStack {
             Form {
-                Section("Recipient") {
-                    TextField("Recipient Email", text: $transferEmail)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
+                Section("Recipient Email") {
+                    TextField("Email Address", text: $transferEmail).keyboardType(.emailAddress).autocapitalization(.none)
+                    Text("This will grant 'Owner' permissions to the recipient.").font(.caption).foregroundStyle(.secondary)
                 }
             }
             .navigationTitle("Transfer Ownership")
@@ -438,10 +425,7 @@ struct AppDetailView: View {
                     Button("Transfer") {
                         Task {
                             try? await appService.transferOwnership(appID: appID, toEmail: transferEmail)
-                            await MainActor.run {
-                                showingTransferOwnership = false
-                                transferEmail = ""
-                            }
+                            await MainActor.run { showingTransferOwnership = false; transferEmail = "" }
                         }
                     }
                     .disabled(transferEmail.isEmpty)
@@ -449,44 +433,4 @@ struct AppDetailView: View {
             }
         }
     }
-
-    private var statusUpdateSheet: some View {
-        NavigationStack {
-            Form {
-                Section("Update Project Status") {
-                    Picker("New Status", selection: $newStatus) {
-                        ForEach(DeveloperAppStatus.allCases, id: \.self) { status in
-                            Text(status.rawValue).tag(status)
-                        }
-                    }
-
-                    VStack(alignment: .leading) {
-                        Text("Reason for change").font(.caption).foregroundStyle(.secondary)
-                        TextEditor(text: $statusReason)
-                            .frame(minHeight: 100)
-                    }
-                }
-            }
-            .navigationTitle("Project Status")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showingStatusSheet = false }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Update") {
-                        Task {
-                            try? await appService.transitionStatus(id: appID, newStatus: newStatus, reason: statusReason)
-                            await MainActor.run {
-                                showingStatusSheet = false
-                                statusReason = ""
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
-
-

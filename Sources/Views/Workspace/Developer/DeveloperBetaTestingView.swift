@@ -72,7 +72,7 @@ struct DeveloperBetaTestingView: View {
             }
 
             Section {
-                Button { /* create group */ } label: {
+                Button { /* group creation logic */ } label: {
                     Label("Create Testing Group", systemImage: "person.3.badge.plus")
                 }
             }
@@ -81,16 +81,23 @@ struct DeveloperBetaTestingView: View {
 
     private func testersView(appID: UUID) -> some View {
         List {
-            Section("External Testers") {
+            Section("Active Testers") {
+                // In a production app, this would fetch from a BetaTesterService
                 ForEach(0..<5) { i in
                     HStack {
                         VStack(alignment: .leading) {
                             Text("tester\(i)@example.com").font(.subheadline.bold())
-                            Text("Joined Oct 20, 2023").font(.caption2).foregroundStyle(.secondary)
+                            Text("Active since \(Date().addingTimeInterval(-Double(i)*86400).formatted(date: .abbreviated, time: .omitted))").font(.caption2).foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Text("Active").font(.system(size: 8, weight: .bold)).foregroundStyle(.green)
+                        Circle().fill(.green).frame(width: 8, height: 8)
                     }
+                }
+            }
+
+            Section {
+                Button { showingAddTester = true } label: {
+                    Label("Invite Beta Tester", systemImage: "person.badge.plus")
                 }
             }
         }
@@ -98,16 +105,21 @@ struct DeveloperBetaTestingView: View {
 
     private func feedbackView(appID: UUID) -> some View {
         List {
-            Section("Recent Feedback") {
+            Section("Incoming Reports") {
                 ForEach(0..<3) { i in
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            Text("v1.2.0 (42)").font(.caption.bold()).foregroundStyle(.secondary)
+                            Text("v1.2.0 (4\(i))").font(.caption.bold()).foregroundStyle(.secondary)
                             Spacer()
-                            Text("Crash Report").font(.system(size: 8, weight: .bold)).foregroundStyle(.red)
+                            Text(i == 0 ? "CRASH" : "FEEDBACK").font(.system(size: 8, weight: .black))
+                                .padding(.horizontal, 6).padding(.vertical, 2)
+                                .background(i == 0 ? Color.red.opacity(0.1) : Color.blue.opacity(0.1))
+                                .foregroundStyle(i == 0 ? .red : .blue)
+                                .clipShape(Capsule())
                         }
-                        Text("App crashes when opening the camera on iPhone 13.").font(.subheadline)
-                        Text("Sent by anonymous tester • 2h ago").font(.system(size: 8)).foregroundStyle(.tertiary)
+                        Text(i == 0 ? "Unexpected signal SIGABRT on startup." : "The new UI layout is much cleaner, but the font size on labels is a bit small.")
+                            .font(.subheadline)
+                        Text("Reported by tester • \(i+1)h ago").font(.system(size: 8)).foregroundStyle(.tertiary)
                     }
                     .padding(.vertical, 4)
                 }
@@ -124,17 +136,20 @@ struct AddTesterSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Invite Tester") {
+                Section("Tester Details") {
                     TextField("Email Address", text: $email).keyboardType(.emailAddress).autocapitalization(.none)
-                    Text("Testers will receive an invitation email with instructions to install your app.")
+                    Text("Invitations grant access to the most recent 'Public Beta' build.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
             }
-            .navigationTitle("New Tester")
+            .navigationTitle("Invite Tester")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Invite") { dismiss() }.disabled(!email.contains("@"))
+                    Button("Invite") {
+                        // send invitation logic
+                        dismiss()
+                    }.disabled(!email.contains("@") || !email.contains("."))
                 }
             }
         }

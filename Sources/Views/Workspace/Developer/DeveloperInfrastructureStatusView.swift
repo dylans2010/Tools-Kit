@@ -1,88 +1,88 @@
 import SwiftUI
 
 struct DeveloperInfrastructureStatusView: View {
-    @ObservedObject var infrastructureService = InfrastructureService.shared
-    @State private var showingAddNode = false
+    @ObservedObject var infraService = InfrastructureService.shared
+    @State private var nodes: [InfraNode] = []
+    @State private var isRefreshing = false
 
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                globalHealthSummary
+                statusHeader
 
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Text("Active Nodes").font(.headline)
+                        SectionHeader(title: "Compute Clusters", subtitle: nil, icon: "cpu")
                         Spacer()
-                        Button { requestNewNode() } label: {
-                             Image(systemName: "plus.circle.fill").font(.title3)
-                        }
+                        if isRefreshing { ProgressView().controlSize(.small) }
                     }
 
-                    if infrastructureService.nodes.isEmpty {
-                        EmptyStateView(icon: "server.rack", title: "No Nodes", message: "Connect your infrastructure to monitor health and resource utilization.")
+                    if nodes.isEmpty {
+                        EmptyStateView(icon: "server.rack", title: "No Nodes Detected", message: "Initialize your infrastructure cluster to start monitoring compute resources.")
                     } else {
-                        ForEach(infrastructureService.nodes) { node in
-                            nodeCard(node)
+                        ForEach(nodes) { node in
+                            nodeRow(node)
                         }
                     }
                 }
+                .padding()
+
+                operationalInsights
             }
-            .padding()
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Infrastructure")
+        .refreshable { refreshInfra() }
+        .onAppear { refreshInfra() }
     }
 
-    private var globalHealthSummary: some View {
+    private var statusHeader: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("System Status").font(.headline)
-                    Text("All clusters reporting healthy").font(.caption).foregroundStyle(.secondary)
+                    Text("All systems operational").font(.caption).foregroundStyle(.green)
                 }
                 Spacer()
-                Image(systemName: "waveform.path.ecg").foregroundStyle(.green).font(.title2)
+                Circle().fill(.green).frame(width: 12, height: 12)
             }
 
-            HStack(spacing: 20) {
-                metricBox(label: "Uptime", value: "99.99%", color: .green)
-                metricBox(label: "Avg CPU", value: "24%", color: .blue)
-                metricBox(label: "Avg Memory", value: "4.2GB", color: .purple)
+            HStack(spacing: 24) {
+                infraMetric(label: "CPU Usage", value: "\(nodes.isEmpty ? 0 : Int(nodes.map({$0.load}).reduce(0, +) / Double(nodes.count) * 100))%", color: .blue)
+                infraMetric(label: "Memory", value: "2.4 GB", color: .purple)
+                infraMetric(label: "Storage", value: "84%", color: .orange)
             }
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.05), lineWidth: 1))
+        .padding()
     }
 
-    private func metricBox(label: String, value: String, color: Color) -> some View {
+    private func infraMetric(label: String, value: String, color: Color) -> some View {
         VStack(alignment: .leading, spacing: 4) {
+            Text(label).font(.system(size: 9, weight: .bold)).foregroundStyle(.secondary).textCase(.uppercase)
             Text(value).font(.title3.bold()).foregroundStyle(color)
-            Text(label).font(.caption2).foregroundStyle(.secondary)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func nodeCard(_ node: InfrastructureNode) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(node.name).font(.subheadline.bold())
-                    Text(node.region).font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary)
-                }
-                Spacer()
-                statusBadge(node.status)
+    private func nodeRow(_ node: InfraNode) -> some View {
+        HStack(spacing: 16) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8).fill(node.status == .healthy ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
+                Image(systemName: "server.rack").font(.system(size: 14)).foregroundStyle(node.status == .healthy ? .green : .red)
             }
+            .frame(width: 36, height: 36)
 
-            VStack(spacing: 8) {
-                resourceBar(label: "CPU", value: node.cpuUsage, color: .blue)
-                resourceBar(label: "Memory", value: node.memoryUsage, color: .purple)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(node.name).font(.subheadline.bold())
+                Text(node.ipAddress).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary)
             }
-
-            HStack {
-                Text(node.ipAddress).font(.system(size: 8, design: .monospaced)).foregroundStyle(.tertiary)
-                Spacer()
-                Text("v\(node.version)").font(.system(size: 8)).foregroundStyle(.secondary)
+            Spacer()
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("\(Int(node.load * 100))% LOAD").font(.system(size: 8, weight: .black))
+                Text(node.region).font(.system(size: 8)).foregroundStyle(.tertiary)
             }
         }
         .padding()
@@ -91,37 +91,38 @@ struct DeveloperInfrastructureStatusView: View {
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05), lineWidth: 1))
     }
 
-    private func resourceBar(label: String, value: Double, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(label).font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary)
-                Spacer()
-                Text("\(Int(value * 100))%").font(.system(size: 8)).foregroundStyle(.secondary)
+    private var operationalInsights: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeader(title: "Traffic Insights", subtitle: nil, icon: "chart.bar.fill")
+
+            HStack(alignment: .bottom, spacing: 4) {
+                ForEach(0..<20, id: \.self) { _ in
+                    RoundedRectangle(cornerRadius: 1)
+                        .fill(Color.blue.opacity(0.4))
+                        .frame(height: 20)
+                        .frame(maxWidth: .infinity)
+                }
             }
-            ProgressView(value: value)
-                .progressViewStyle(.linear)
-                .tint(value > 0.8 ? .red : color)
+            .frame(height: 40)
+
+            Text("Edge nodes are experiencing normal throughput. Global load balancing is active.")
+                .font(.system(size: 11))
+                .foregroundStyle(.secondary)
         }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal)
     }
 
-    private func statusBadge(_ status: NodeStatus) -> some View {
-        Text(status.rawValue.uppercased()).font(.system(size: 8, weight: .bold))
-            .padding(.horizontal, 6).padding(.vertical, 2)
-            .background(statusColor(status).opacity(0.1), in: Capsule())
-            .foregroundStyle(statusColor(status))
-    }
-
-    private func statusColor(_ status: NodeStatus) -> Color {
-        switch status {
-        case .online: return .green
-        case .offline: return .red
-        case .maintenance: return .orange
-        case .provisioning: return .blue
+    private func refreshInfra() {
+        isRefreshing = true
+        Task {
+            let fetchedNodes = try? await infraService.fetchNodes()
+            await MainActor.run {
+                self.nodes = fetchedNodes ?? []
+                self.isRefreshing = false
+            }
         }
-    }
-
-    private func requestNewNode() {
-        // Logic to request a new infrastructure node
-        showingAddNode = true
     }
 }

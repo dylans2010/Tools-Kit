@@ -3,41 +3,62 @@ import SwiftUI
 struct DeveloperCrashReportView: View {
     @ObservedObject var crashService = CrashReportService.shared
     @ObservedObject var appService = DeveloperAppService.shared
-    @State private var selectedAppID: UUID?
 
-    var filteredCrashes: [CrashLog] {
-        crashService.crashLogs.filter { selectedAppID == nil || $0.appID == selectedAppID }
-    }
+    @State private var selectedAppID: UUID?
+    @State private var reports: [CrashReport] = []
+    @State private var isRefreshing = false
 
     var body: some View {
         List {
             Section {
                 Picker("App", selection: $selectedAppID) {
-                    Text("All Projects").tag(Optional<UUID>.none)
+                    Text("All Apps").tag(Optional<UUID>.none)
                     ForEach(appService.apps) { app in
                         Text(app.name).tag(Optional(app.id))
                     }
                 }
             }
 
-            Section("Crash Reports") {
-                if filteredCrashes.isEmpty {
-                    EmptyStateView(icon: "heart.text.square", title: "No Crashes", message: "No crash reports detected for the selected period.")
+            Section("Crash Events") {
+                if reports.isEmpty && !isRefreshing {
+                    EmptyStateView(icon: "bandage.fill", title: "All Stable", message: "No crash reports detected for the selected application.")
                 } else {
-                    ForEach(filteredCrashes) { log in
-                        VStack(alignment: .leading, spacing: 6) {
+                    ForEach(reports) { report in
+                        VStack(alignment: .leading, spacing: 8) {
                             HStack {
-                                Text(log.version).font(.caption.bold()).foregroundStyle(.secondary)
+                                Text(report.exceptionType).font(.subheadline.bold()).foregroundStyle(.red)
                                 Spacer()
-                                Text(log.timestamp.formatted()).font(.system(size: 8)).foregroundStyle(.tertiary)
+                                Text(report.timestamp.formatted(date: .abbreviated, time: .shortened)).font(.system(size: 8)).foregroundStyle(.secondary)
                             }
-                            Text(log.deviceModel).font(.subheadline.bold())
-                            Text(log.stackTrace.prefix(100) + "...").font(.system(size: 10, design: .monospaced)).foregroundStyle(.red)
+
+                            Text(report.reason).font(.system(size: 11)).lineLimit(2)
+
+                            HStack {
+                                Label(report.version, systemImage: "shippingbox").font(.system(size: 8, weight: .bold))
+                                Spacer()
+                                if report.isSymbolicated {
+                                    Label("Symbolicated", systemImage: "checkmark.circle.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.green)
+                                }
+                            }
                         }
+                        .padding(.vertical, 4)
                     }
                 }
             }
         }
-        .navigationTitle("Crash Reporting")
+        .navigationTitle("Crash Reports")
+        .onAppear { refreshReports() }
+        .onChange(of: selectedAppID) { _ in refreshReports() }
+    }
+
+    private func refreshReports() {
+        isRefreshing = true
+        Task {
+            let fetched = try? await crashService.fetchReports(appID: selectedAppID)
+            await MainActor.run {
+                self.reports = fetched ?? []
+                self.isRefreshing = false
+            }
+        }
     }
 }

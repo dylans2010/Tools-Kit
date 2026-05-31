@@ -8,29 +8,30 @@ struct DeveloperReleaseManagementView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 0) {
                 appSelector
 
                 if let appID = selectedAppID, let app = appService.apps.first(where: { $0.id == appID }) {
                     trackSelector
 
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 20) {
                         HStack {
-                            Text("\(selectedTrack.rawValue) Releases").font(.headline)
+                            Text("\(selectedTrack.rawValue) Track").font(.headline)
                             Spacer()
                             Button { showingReleaseCreator = true } label: {
-                                Label("New Release", systemImage: "plus.app")
-                                    .font(.caption.bold())
+                                Label("Promote Build", systemImage: "plus.app.fill")
+                                    .font(.system(size: 11, weight: .bold))
                             }
                         }
 
                         let trackReleases = app.versions.filter { releaseTrack(for: $0) == selectedTrack }
 
                         if trackReleases.isEmpty {
-                            EmptyStateView(icon: "shippingbox", title: "No \(selectedTrack.rawValue) Releases", message: "Start by promoting a build to this track.")
+                            EmptyStateView(icon: "shippingbox", title: "No Builds", message: "Promote a build to the \(selectedTrack.rawValue.lowercased()) track to start distribution.")
+                                .padding(.top, 40)
                         } else {
                             ForEach(trackReleases.sorted(by: { $0.createdAt > $1.createdAt })) { release in
-                                releaseCard(release)
+                                releaseCard(release, app: app)
                             }
                         }
                     }
@@ -41,12 +42,10 @@ struct DeveloperReleaseManagementView: View {
                 }
             }
         }
-        .navigationTitle("Builds & Releases")
+        .navigationTitle("Releases")
         .background(Color(uiColor: .systemGroupedBackground))
         .onAppear {
-            if selectedAppID == nil {
-                selectedAppID = appService.apps.first?.id
-            }
+            if selectedAppID == nil { selectedAppID = appService.apps.first?.id }
         }
         .sheet(isPresented: $showingReleaseCreator) {
             if let appID = selectedAppID {
@@ -57,19 +56,21 @@ struct DeveloperReleaseManagementView: View {
 
     private var appSelector: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Active Project").font(.caption.bold()).foregroundStyle(.secondary)
+            Text("Active Project").font(.system(size: 10, weight: .bold)).foregroundStyle(.secondary).textCase(.uppercase)
             Picker("App", selection: $selectedAppID) {
                 ForEach(appService.apps) { app in
                     Text(app.name).tag(Optional(app.id))
                 }
             }
             .pickerStyle(.menu)
-            .padding(10)
+            .padding(4)
             .background(Color(uiColor: .secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 12))
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05)))
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05), lineWidth: 1))
         }
         .padding()
+        .background(Color(uiColor: .systemBackground))
+        .overlay(alignment: .bottom) { Divider() }
     }
 
     private var trackSelector: some View {
@@ -78,28 +79,30 @@ struct DeveloperReleaseManagementView: View {
                 Button {
                     selectedTrack = track
                 } label: {
-                    VStack(spacing: 8) {
+                    VStack(spacing: 12) {
                         Text(track.rawValue)
-                            .font(.system(size: 12, weight: selectedTrack == track ? .bold : .medium))
+                            .font(.system(size: 11, weight: selectedTrack == track ? .bold : .medium))
                             .foregroundStyle(selectedTrack == track ? .primary : .secondary)
 
                         Rectangle()
-                            .fill(selectedTrack == track ? Color.accentColor : Color.clear)
+                            .fill(selectedTrack == track ? Color.primary : Color.clear)
                             .frame(height: 2)
                     }
                 }
                 .frame(maxWidth: .infinity)
             }
         }
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .padding(.top, 12)
+        .background(Color(uiColor: .systemBackground))
+        .overlay(alignment: .bottom) { Divider() }
     }
 
-    private func releaseCard(_ release: AppVersion) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+    private func releaseCard(_ release: AppVersion, app: DeveloperApp) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("v\(release.version)").font(.subheadline.bold())
-                    Text("Build \(release.buildNumber)").font(.caption2.monospaced()).foregroundStyle(.secondary)
+                    Text("Build \(release.buildNumber)").font(.system(size: 9, design: .monospaced)).foregroundStyle(.secondary)
                 }
                 Spacer()
                 statusBadge(release.status)
@@ -107,39 +110,51 @@ struct DeveloperReleaseManagementView: View {
 
             if !release.releaseNotes.isEmpty {
                 Text(release.releaseNotes)
-                    .font(.caption)
+                    .font(.system(size: 13))
                     .foregroundStyle(.secondary)
-                    .lineLimit(3)
+                    .lineLimit(2)
             }
 
             HStack {
                 Text(release.createdAt.formatted(date: .abbreviated, time: .shortened)).font(.system(size: 8)).foregroundStyle(.tertiary)
                 Spacer()
-                Button {
-                    // rollout details
-                } label: {
-                    Text("Details").font(.system(size: 10, weight: .bold))
+                if release.version != app.version {
+                    Button {
+                        promoteToPrimary(release)
+                    } label: {
+                        Text("Promote to Prod").font(.system(size: 9, weight: .bold))
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.mini)
                 }
             }
         }
         .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05)))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.05), lineWidth: 1))
     }
 
     private func statusBadge(_ status: String) -> some View {
-        Text(status.uppercased()).font(.system(size: 8, weight: .bold))
-            .padding(.horizontal, 6).padding(.vertical, 2)
-            .background(Color.green.opacity(0.1), in: Capsule())
-            .foregroundStyle(.green)
+        Text(status.uppercased()).font(.system(size: 8, weight: .black))
+            .padding(.horizontal, 8).padding(.vertical, 4)
+            .background(Color.primary.opacity(0.05))
+            .foregroundStyle(.secondary)
+            .clipShape(Capsule())
     }
 
     private func releaseTrack(for version: AppVersion) -> ReleaseTrack {
-        // Simplified track logic based on status or version suffix
         if version.status.contains("Alpha") { return .alpha }
         if version.status.contains("Beta") { return .beta }
         return .production
+    }
+
+    private func promoteToPrimary(_ release: AppVersion) {
+        guard var updatedApp = appService.apps.first(where: { $0.id == selectedAppID }) else { return }
+        updatedApp.version = release.version
+        Task {
+            try? await appService.updateApp(updatedApp)
+        }
     }
 }
 
@@ -162,31 +177,27 @@ struct NewReleaseSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Release Identity") {
-                    TextField("Version Number (e.g. 1.2.0)", text: $version)
-                    TextField("Build Number (e.g. 42)", text: $build)
-                    Picker("Track", selection: $track) {
+                Section("Release Metadata") {
+                    TextField("Version (e.g. 1.1.0)", text: $version)
+                    TextField("Build (e.g. 1204)", text: $build)
+                    Picker("Target Track", selection: $track) {
                         ForEach(ReleaseTrack.allCases, id: \.self) { track in
                             Text(track.rawValue).tag(track)
                         }
                     }
                 }
 
-                Section("Release Notes") {
+                Section("Changelog") {
                     TextEditor(text: $notes).frame(height: 120)
-                }
-
-                Section {
-                    Text("Submitting this release will immediately promote it to the selected track.")
-                        .font(.caption).foregroundStyle(.secondary)
                 }
             }
             .navigationTitle("New Release")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Release") {
-                        let newVersion = AppVersion(version: version, buildNumber: build, releaseNotes: notes, status: track == .production ? "Released" : "\(track.rawValue) Released")
+                    Button("Promote") {
+                        let status = track == .production ? "Released" : "\(track.rawValue) Released"
+                        let newVersion = AppVersion(version: version, buildNumber: build, releaseNotes: notes, status: status)
                         Task {
                             try? await appService.addVersion(appID: appID, version: newVersion)
                             await MainActor.run { dismiss() }

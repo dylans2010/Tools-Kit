@@ -2,157 +2,181 @@ import SwiftUI
 
 struct WebhookManagerView: View {
     @ObservedObject var webhookService = WebhookService.shared
+    @ObservedObject var appService = DeveloperAppService.shared
     @State private var showingAddEndpoint = false
-    @State private var newUrl = ""
-    @State private var selectedEvents: Set<WebhookEventType> = []
 
     var body: some View {
-        List {
-            Section("Endpoints") {
-                if webhookService.endpoints.isEmpty {
-                    EmptyStateView(icon: "antenna.radiowaves.left.and.right", title: "No webhook endpoints configured.", message: "Add an endpoint to receive signed webhook delivery events.")
-                } else {
-                    ForEach(webhookService.endpoints) { endpoint in
-                        NavigationLink(destination: WebhookDetailView(endpointID: endpoint.id)) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(endpoint.url).font(.subheadline.bold())
-                                Text("\(endpoint.subscribedEvents.count) events subscribed").font(.caption2).foregroundStyle(.secondary)
-                            }
+        ScrollView {
+            VStack(spacing: 24) {
+                webhookHealthHeader
+
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack {
+                        Text("Endpoints").font(.headline)
+                        Spacer()
+                        Button { showingAddEndpoint = true } label: {
+                            Image(systemName: "plus.circle.fill").font(.title3)
                         }
                     }
-                    .onDelete(perform: deleteEndpoints)
-                }
-            }
 
-            Section {
-                Button { showingAddEndpoint = true } label: {
-                    Label("Add Endpoint", systemImage: "plus.circle.fill")
+                    if webhookService.endpoints.isEmpty {
+                        EmptyStateView(icon: "bolt.horizontal.fill", title: "No Endpoints", message: "Register a webhook endpoint to receive real-time event notifications for your applications.")
+                    } else {
+                        ForEach(webhookService.endpoints) { endpoint in
+                            endpointCard(endpoint)
+                        }
+                    }
                 }
+                .padding()
             }
         }
-        .navigationTitle("Webhook Management")
+        .background(Color(uiColor: .systemGroupedBackground))
+        .navigationTitle("Webhooks")
         .sheet(isPresented: $showingAddEndpoint) {
-            addEndpointSheet
+            AddWebhookEndpointSheet()
         }
     }
 
-    private var addEndpointSheet: some View {
-        NavigationStack {
-            Form {
-                Section("Endpoint Configuration") {
-                    TextField("Endpoint URL", text: $newUrl)
-                        .keyboardType(.URL)
-                        .autocapitalization(.none)
+    private var webhookHealthHeader: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Delivery Status").font(.headline)
+                    Text("99.8% Success Rate").font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "bolt.fill").foregroundStyle(.yellow).font(.title2)
+            }
+
+            HStack(spacing: 32) {
+                VStack(alignment: .leading) {
+                    Text("1,242").font(.title3.bold())
+                    Text("Events (24h)").font(.system(size: 10, weight: .bold)).foregroundStyle(.secondary).textCase(.uppercase)
+                }
+                VStack(alignment: .leading) {
+                    Text("142ms").font(.title3.bold())
+                    Text("Avg Latency").font(.system(size: 10, weight: .bold)).foregroundStyle(.secondary).textCase(.uppercase)
+                }
+            }
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.05), lineWidth: 1))
+        .padding()
+    }
+
+    private func endpointCard(_ endpoint: WebhookEndpoint) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(endpoint.url).font(.subheadline.bold()).lineLimit(1)
+                    if let app = appService.apps.first(where: { $0.id == endpoint.appID }) {
+                        Text(app.name).font(.system(size: 9, weight: .bold)).foregroundStyle(.accentColor)
+                    }
+                }
+                Spacer()
+                Toggle("", isOn: Binding(
+                    get: { endpoint.isActive },
+                    set: { val in
+                        var updated = endpoint
+                        updated.isActive = val
+                        Task { try? await webhookService.updateEndpoint(updated) }
+                    }
+                )).labelsHidden().scaleEffect(0.8)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Subscribed Events").font(.system(size: 10, weight: .bold)).foregroundStyle(.secondary).textCase(.uppercase)
+                FlowLayout(endpoint.subscribedEvents, spacing: 4) { event in
+                    Text(event).font(.system(size: 8, design: .monospaced)).padding(.horizontal, 6).padding(.vertical, 2).background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 4))
+                }
+            }
+
+            Divider()
+
+            HStack(spacing: 20) {
+                NavigationLink(destination: WebhookDeliveryLogView(endpointID: endpoint.id)) {
+                    Label("Delivery Logs", systemImage: "list.bullet.indent").font(.system(size: 10, weight: .bold))
                 }
 
-                Section("Events to Subscribe") {
-                    ForEach(WebhookEventType.allCases, id: \.self) { event in
-                        Toggle(event.rawValue, isOn: Binding(
+                Spacer()
+
+                Button {
+                    testEndpoint(endpoint)
+                } label: {
+                    Label("Test Delivery", systemImage: "paperplane.fill").font(.system(size: 10, weight: .bold))
+                }
+            }
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05), lineWidth: 1))
+    }
+
+    private func testEndpoint(_ endpoint: WebhookEndpoint) {
+        Task {
+            try? await webhookService.testDelivery(endpointID: endpoint.id)
+        }
+    }
+}
+
+struct AddWebhookEndpointSheet: View {
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var webhookService = WebhookService.shared
+    @ObservedObject var appService = DeveloperAppService.shared
+
+    @State private var url = "https://"
+    @State private var secret = ""
+    @State private var selectedAppID: UUID?
+    @State private var selectedEvents: Set<String> = ["app.updated", "release.published"]
+
+    let availableEvents = ["app.created", "app.updated", "app.deleted", "release.published", "beta.invited", "incident.created"]
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Application Context") {
+                    Picker("App", selection: $selectedAppID) {
+                        Text("Select App").tag(Optional<UUID>.none)
+                        ForEach(appService.apps) { app in
+                            Text(app.name).tag(Optional(app.id))
+                        }
+                    }
+                }
+
+                Section("Endpoint Configuration") {
+                    TextField("Endpoint URL", text: $url).keyboardType(.URL).autocapitalization(.none)
+                    TextField("Signing Secret (Optional)", text: $secret).autocapitalization(.none)
+                }
+
+                Section("Subscribed Events") {
+                    ForEach(availableEvents, id: \.self) { event in
+                        Toggle(event, isOn: Binding(
                             get: { selectedEvents.contains(event) },
-                            set: { if $0 { selectedEvents.insert(event) } else { selectedEvents.remove(event) } }
+                            set: { val in
+                                if val { selectedEvents.insert(event) }
+                                else { selectedEvents.remove(event) }
+                            }
                         ))
                     }
                 }
             }
             .navigationTitle("New Webhook")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showingAddEndpoint = false }
-                }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Create") {
+                    Button("Register") {
+                        guard let appID = selectedAppID else { return }
+                        let endpoint = WebhookEndpoint(id: UUID(), appID: appID, url: url, secret: secret, isActive: true, subscribedEvents: Array(selectedEvents))
                         Task {
-                            try? await webhookService.createEndpoint(url: newUrl, events: Array(selectedEvents))
-                            await MainActor.run {
-                                newUrl = ""
-                                selectedEvents = []
-                                showingAddEndpoint = false
-                            }
+                            try? await webhookService.createEndpoint(endpoint)
+                            await MainActor.run { dismiss() }
                         }
                     }
-                    .disabled(newUrl.isEmpty || selectedEvents.isEmpty)
+                    .disabled(url.count < 10 || selectedAppID == nil)
                 }
-            }
-        }
-    }
-
-    private func deleteEndpoints(at offsets: IndexSet) {
-        for index in offsets {
-            let endpoint = webhookService.endpoints[index]
-            Task { try? await webhookService.deleteEndpoint(id: endpoint.id) }
-        }
-    }
-}
-
-struct WebhookDetailView: View {
-    let endpointID: UUID
-    @ObservedObject var webhookService = WebhookService.shared
-    @State private var testStatus: String?
-    @State private var isTesting = false
-
-    var endpoint: WebhookEndpoint? {
-        webhookService.endpoints.first { $0.id == endpointID }
-    }
-
-    var body: some View {
-        if let endpoint = endpoint {
-            List {
-                Section("Configuration") {
-                    infoRow(label: "URL", value: endpoint.url)
-                    infoRow(label: "Signing Secret", value: "••••••••••••••••")
-                    Toggle("Active", isOn: Binding(
-                        get: { endpoint.isActive },
-                        set: { isActive in
-                            var updated = endpoint
-                            updated.isActive = isActive
-                            Task { try? await webhookService.updateEndpoint(updated) }
-                        }
-                    ))
-                }
-
-                Section("Events") {
-                    ForEach(endpoint.subscribedEvents, id: \.self) { event in
-                        Text(event.rawValue).font(.subheadline)
-                    }
-                }
-
-                Section {
-                    Button {
-                        testWebhook()
-                    } label: {
-                        if isTesting {
-                            ProgressView()
-                        } else {
-                            Label("Send Test Event", systemImage: "paperplane")
-                        }
-                    }
-                    .disabled(isTesting)
-
-                    if let status = testStatus {
-                        Text(status).font(.caption).foregroundStyle(.secondary)
-                    }
-                }
-            }
-            .navigationTitle("Webhook Details")
-        }
-    }
-
-    private func infoRow(label: String, value: String) -> some View {
-        HStack {
-            Text(label).foregroundStyle(.secondary)
-            Spacer()
-            Text(value).bold()
-        }
-        .font(.subheadline)
-    }
-
-    private func testWebhook() {
-        isTesting = true
-        Task {
-            let (code, message) = try await webhookService.testDelivery(endpointID: endpointID)
-            await MainActor.run {
-                isTesting = false
-                testStatus = "Last test: \(code) \(message)"
             }
         }
     }
