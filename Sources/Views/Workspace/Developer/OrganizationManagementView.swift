@@ -7,9 +7,11 @@ struct OrganizationManagementView: View {
     @State private var role: TeamRole = .developer
 
     var body: some View {
-        List {
-            Section("Organization Profile") {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
                 VStack(alignment: .leading, spacing: 12) {
+                    Text("Organization Profile")
+                        .font(.headline)
                     HStack(spacing: 16) {
                         ZStack {
                             RoundedRectangle(cornerRadius: 12).fill(Color.primary.opacity(0.05))
@@ -21,44 +23,73 @@ struct OrganizationManagementView: View {
                             Text(orgService.organizationName).font(.headline)
                             Text("Enterprise Verified").font(.caption).foregroundStyle(.green)
                         }
+                        Spacer()
                     }
                 }
-                .padding(.vertical, 8)
-            }
+                .padding()
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
 
-            Section("Team Members") {
-                if orgService.members.isEmpty {
-                    Text("No other members in this organization.").font(.caption).foregroundStyle(.secondary)
-                } else {
-                    ForEach(orgService.members) { member in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(member.name).font(.subheadline.bold())
-                                Text(member.email).font(.system(size: 9)).foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Team Members")
+                        .font(.headline)
+                        .padding(.horizontal)
+                        .padding(.bottom, 8)
+
+                    HStack {
+                        Text("Name").font(.caption.bold()).frame(maxWidth: .infinity, alignment: .leading)
+                        Text("Email").font(.caption.bold()).frame(maxWidth: .infinity, alignment: .leading)
+                        Text("Role").font(.caption.bold()).frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                    Divider()
+
+                    if orgService.members.isEmpty {
+                        Text("No other members in this organization.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding()
+                    } else {
+                        ForEach(orgService.members, id: \.id) { member in
+                            VStack(spacing: 0) {
+                                HStack {
+                                    Text(member.name).font(.subheadline.bold()).frame(maxWidth: .infinity, alignment: .leading)
+                                    Text(member.email).font(.system(size: 9)).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
+                                    Text(member.role.rawValue.uppercased())
+                                        .font(.system(size: 8, weight: .black))
+                                        .padding(.horizontal, 6).padding(.vertical, 2)
+                                        .background(member.role.color.opacity(0.1))
+                                        .foregroundStyle(member.role.color)
+                                        .clipShape(Capsule())
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .padding(.horizontal).padding(.vertical, 10)
+                                Divider()
                             }
-                            Spacer()
-                            Text(member.role.rawValue.uppercased())
-                                .font(.system(size: 8, weight: .black))
-                                .padding(.horizontal, 6).padding(.vertical, 2)
-                                .background(member.role.color.opacity(0.1))
-                                .foregroundStyle(member.role.color)
-                                .clipShape(Capsule())
                         }
                     }
                 }
-            }
 
-            Section {
                 Button { showingAddMember = true } label: {
                     Label("Invite Team Member", systemImage: "person.badge.plus.fill").font(.subheadline.bold())
                 }
-            }
+                .padding(.horizontal)
 
-            Section("Legal & Compliance") {
-                NavigationLink(destination: Text("Service Agreement")) { Label("Developer Agreement", systemImage: "doc.text.fill") }
-                NavigationLink(destination: Text("Tax Documents")) { Label("Tax Information", systemImage: "banknote.fill") }
-                NavigationLink(destination: Text("Banking")) { Label("Payout Methods", systemImage: "creditcard.fill") }
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Legal & Compliance")
+                        .font(.headline)
+                    NavigationLink(destination: Text("Service Agreement")) { Label("Developer Agreement", systemImage: "doc.text.fill") }
+                    NavigationLink(destination: Text("Tax Documents")) { Label("Tax Information", systemImage: "banknote.fill") }
+                    NavigationLink(destination: Text("Banking")) { Label("Payout Methods", systemImage: "creditcard.fill") }
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
             }
+            .padding()
         }
         .navigationTitle("Organization")
         .sheet(isPresented: $showingAddMember) {
@@ -89,4 +120,5 @@ struct OrganizationManagementView: View {
             }
         }
     }
+
 }

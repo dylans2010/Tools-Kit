@@ -8,38 +8,60 @@ struct TeamManagementView: View {
     @State private var selectedRole: TeamRole = .developer
 
     var body: some View {
-        List {
-            Section("Workspace Team") {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
                 VStack(alignment: .leading, spacing: 8) {
+                    Text("Workspace Team")
+                        .font(.headline)
                     Text(orgService.organizationName).font(.headline)
                     Text("Manage cross-functional roles for your entire developer organization.").font(.caption).foregroundStyle(.secondary)
                 }
-                .padding(.vertical, 4)
-            }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
 
-            Section("Members") {
-                if orgService.members.isEmpty {
-                    EmptyStateView(icon: "person.2", title: "No Members", message: "Invite your teammates to start collaborating on projects.")
-                } else {
-                    ForEach(orgService.members) { member in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(member.name).font(.subheadline.bold())
-                                Text(member.email).font(.system(size: 9)).foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Members")
+                        .font(.headline)
+                        .padding(.horizontal)
+                        .padding(.bottom, 8)
+
+                    HStack {
+                        Text("Name").font(.caption.bold()).frame(maxWidth: .infinity, alignment: .leading)
+                        Text("Email").font(.caption.bold()).frame(maxWidth: .infinity, alignment: .leading)
+                        Text("Role").font(.caption.bold()).frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                    Divider()
+
+                    if orgService.members.isEmpty {
+                        EmptyStateView(icon: "person.2", title: "No Members", message: "Invite your teammates to start collaborating on projects.")
+                            .padding()
+                    } else {
+                        ForEach(orgService.members, id: \.id) { member in
+                            VStack(spacing: 0) {
+                                HStack {
+                                    Text(member.name).font(.subheadline.bold()).frame(maxWidth: .infinity, alignment: .leading)
+                                    Text(member.email).font(.system(size: 9)).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
+                                    roleBadge(TeamRole(rawValue: member.role.rawValue.lowercased()) ?? .developer)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .padding(.horizontal).padding(.vertical, 10)
+                                Divider()
                             }
-                            Spacer()
-                            roleBadge(member.role)
                         }
                     }
-                    .onDelete(perform: removeMember)
                 }
-            }
 
-            Section {
                 Button { showingAddMember = true } label: {
                     Label("Invite New Member", systemImage: "person.badge.plus.fill").font(.subheadline.bold())
                 }
+                .padding(.horizontal)
             }
+            .padding()
         }
         .navigationTitle("Team")
         .sheet(isPresented: $showingAddMember) { inviteMemberSheet }

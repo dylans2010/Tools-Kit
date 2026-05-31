@@ -5,7 +5,7 @@ struct DeveloperCrashReportView: View {
     @ObservedObject var appService = DeveloperAppService.shared
 
     @State private var selectedAppID: UUID?
-    @State private var reports: [CrashReport] = []
+    @State private var reports: [CrashLog] = []
     @State private var isRefreshing = false
 
     private var apps: [DeveloperApp] { appService.apps }
@@ -56,7 +56,7 @@ struct DeveloperCrashReportView: View {
         }
     }
 
-    private func crashReportRow(_ report: CrashReport) -> some View {
+    private func crashReportRow(_ report: CrashLog) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             crashReportHeader(report)
             crashReportReason(report)
@@ -65,7 +65,7 @@ struct DeveloperCrashReportView: View {
         .padding(.vertical, 4)
     }
 
-    private func crashReportHeader(_ report: CrashReport) -> some View {
+    private func crashReportHeader(_ report: CrashLog) -> some View {
         HStack {
             Text(report.exceptionType)
                 .font(.subheadline.bold())
@@ -77,14 +77,14 @@ struct DeveloperCrashReportView: View {
         }
     }
 
-    private func crashReportReason(_ report: CrashReport) -> some View {
+    private func crashReportReason(_ report: CrashLog) -> some View {
         Text(report.reason)
             .font(.system(size: 11))
             .lineLimit(2)
     }
 
     @ViewBuilder
-    private func crashReportFooter(_ report: CrashReport) -> some View {
+    private func crashReportFooter(_ report: CrashLog) -> some View {
         HStack {
             Label(report.version, systemImage: "shippingbox")
                 .font(.system(size: 8, weight: .bold))
@@ -99,7 +99,7 @@ struct DeveloperCrashReportView: View {
 
     private func refreshReports() {
         isRefreshing = true
-        let appID = selectedAppID
+        let appID: UUID? = selectedAppID
         Task {
             let fetched = try? await crashService.fetchReports(appID: appID)
             await MainActor.run {

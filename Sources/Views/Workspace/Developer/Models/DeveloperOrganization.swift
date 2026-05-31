@@ -17,7 +17,18 @@ public enum OrgRole: String, Codable, CaseIterable {
     case owner = "Owner"
     case admin = "Admin"
     case billing = "Billing"
+    case developer = "Developer"
     case member = "Member"
+
+    public var color: Color {
+        switch self {
+        case .owner: return .purple
+        case .admin: return .blue
+        case .billing: return .orange
+        case .developer: return .green
+        case .member: return .gray
+        }
+    }
 }
 
 public struct OrgMember: Identifiable, Codable, Hashable {

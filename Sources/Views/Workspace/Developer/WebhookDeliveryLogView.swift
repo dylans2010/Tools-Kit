@@ -7,14 +7,17 @@ struct WebhookDeliveryLogView: View {
     @State private var isRefreshing = false
 
     var body: some View {
-        List {
+        let historyTitle = "Delivery Status"
+        let historyMessage = "Detailed audit trail of event payloads sent to your registered endpoint in the last 24 hours."
+
+        return List {
             Section("Transmission History") {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Image(systemName: "list.bullet.indent").foregroundStyle(.secondary)
-                        Text("Delivery Status").font(.subheadline.bold())
+                        Text(historyTitle).font(.subheadline.bold())
                     }
-                    Text("Detailed audit trail of event payloads sent to your registered endpoint in the last 24 hours.")
+                    Text(historyMessage)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

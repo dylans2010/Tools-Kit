@@ -3,9 +3,9 @@ import SwiftUI
 struct DeveloperAccountActivityView: View {
     @ObservedObject var profileService = DeveloperProfileService.shared
     @State private var activities: [AccountActivityEvent] = [
-        AccountActivityEvent(eventType: "Console Login", deviceName: "MacBook Pro 16", ipAddress: "192.168.1.42", timestamp: Date().addingTimeInterval(-3600)),
-        AccountActivityEvent(eventType: "API Key Created", deviceName: "CLI / Terminal", ipAddress: "192.168.1.42", timestamp: Date().addingTimeInterval(-7200)),
-        AccountActivityEvent(eventType: "Password Change", deviceName: "Web Browser", ipAddress: "104.22.4.12", timestamp: Date().addingTimeInterval(-86400))
+        AccountActivityEvent(timestamp: Date().addingTimeInterval(-3600), eventType: "Console Login", ipAddress: "192.168.1.42", deviceName: "MacBook Pro 16"),
+        AccountActivityEvent(timestamp: Date().addingTimeInterval(-7200), eventType: "API Key Created", ipAddress: "192.168.1.42", deviceName: "CLI / Terminal"),
+        AccountActivityEvent(timestamp: Date().addingTimeInterval(-86400), eventType: "Password Change", ipAddress: "104.22.4.12", deviceName: "Web Browser")
     ]
 
     var body: some View {

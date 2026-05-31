@@ -125,7 +125,7 @@ struct AppDetailView: View {
                 NavigationLink(destination: PrivacyManifestEditorView()) {
                     toolTile(title: "Privacy Manifest", icon: "hand.raised.fill", description: "Audit scope justifications")
                 }
-                NavigationLink(destination: AppBundleValidatorView()) {
+                NavigationLink(destination: AppBundleValidatorView(appID: app.id)) {
                     toolTile(title: "Bundle Validator", icon: "checkmark.seal.fill", description: "Verify package integrity")
                 }
                 NavigationLink(destination: DataHandlingPolicyBuilderView()) {
