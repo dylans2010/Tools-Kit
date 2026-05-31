@@ -11,6 +11,22 @@ public class SecurityCLIManager {
 
     private init() {}
 
+    private func maskSecret(_ value: String) -> String {
+        guard value.count > 4 else { return String(repeating: "•", count: max(value.count, 1)) }
+        return "\(value.prefix(2))••••\(value.suffix(2))"
+    }
+
+    private func keyEnvironment(from rawValue: String) -> KeyEnvironment {
+        switch rawValue.lowercased() {
+        case "live", KeyEnvironment.live.rawValue.lowercased():
+            return .live
+        case "test", KeyEnvironment.test.rawValue.lowercased():
+            return .test
+        default:
+            return .test
+        }
+    }
+
     public func getCommands() -> [CLICommand] {
         var commands: [CLICommand] = []
 
@@ -18,27 +34,27 @@ public class SecurityCLIManager {
         commands.append(CLICommand(name: "keys:list", description: "List all API keys", category: .security, usage: "keys:list", action: { _ in
             let keys = self.keyService.keys
             if keys.isEmpty { return "No API keys found." }
-            return keys.map { "[\($0.isRevoked ? "REVOKED" : "ACTIVE")] \($0.name) (\($0.maskedValue)) - \($0.environment)" }.joined(separator: "\n")
+            return keys.map { "[\($0.isRevoked ? "REVOKED" : "ACTIVE")] \($0.label) (\($0.maskedValue)) - \($0.environment)" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "keys:create", description: "Create a new API key", category: .security, usage: "keys:create <name> <env> <app_id>", action: { args in
             guard args.count >= 3, let appID = UUID(uuidString: args[2]) else { return "Usage: keys:create <name> <env> <app_id>" }
             let name = args[0]
-            let env = args[1]
-            let key = try? await self.keyService.createKey(name: name, environment: env, appID: appID, scopes: [], expiresAt: nil)
-            return "Key created: \(key?.name ?? "Error")\nFull value (SAVE THIS): \(key?.maskedValue ?? "N/A")"
+            let env = self.keyEnvironment(from: args[1])
+            let key = try? await self.keyService.createKey(label: name, type: .cli, environment: env, scopeIdentifiers: [], appID: appID, expiresAt: nil)
+            return "Key created: \(name)\nFull value (SAVE THIS): \(key ?? "N/A")"
         }))
 
         commands.append(CLICommand(name: "keys:revoke", description: "Revoke an API key", category: .security, usage: "keys:revoke <key_id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: keys:revoke <key_id>" }
-            try? await self.keyService.revokeKey(id: id)
+            try? await self.keyService.revokeKey(id: id, reason: .noLongerNeeded)
             return "Key revoked."
         }))
 
         commands.append(CLICommand(name: "keys:inspect", description: "Inspect an API key", category: .security, usage: "keys:inspect <key_id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: keys:inspect <key_id>" }
             guard let key = self.keyService.keys.first(where: { $0.id == id }) else { return "Key not found." }
-            return "Name: \(key.name)\nEnv: \(key.environment)\nApp ID: \(key.appID)\nRevoked: \(key.isRevoked)\nCreated: \(key.createdAt)"
+            return "Name: \(key.label)\nEnv: \(key.environment)\nApp ID: \(key.appID)\nRevoked: \(key.isRevoked)\nCreated: \(key.createdAt)"
         }))
 
         commands.append(CLICommand(name: "keys:count", description: "Count API keys", category: .security, usage: "keys:count", action: { _ in
@@ -47,24 +63,24 @@ public class SecurityCLIManager {
 
         commands.append(CLICommand(name: "keys:active", description: "List active keys", category: .security, usage: "keys:active", action: { _ in
             let active = self.keyService.keys.filter { !$0.isRevoked }
-            return active.map { $0.name }.joined(separator: ", ")
+            return active.map { $0.label }.joined(separator: ", ")
         }))
 
         commands.append(CLICommand(name: "keys:revoked", description: "List revoked keys", category: .security, usage: "keys:revoked", action: { _ in
             let revoked = self.keyService.keys.filter { $0.isRevoked }
-            return revoked.map { $0.name }.joined(separator: ", ")
+            return revoked.map { $0.label }.joined(separator: ", ")
         }))
 
         commands.append(CLICommand(name: "keys:app", description: "List keys for an app", category: .security, usage: "keys:app <app_id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: keys:app <app_id>" }
             let keys = self.keyService.keys.filter { $0.appID == id }
-            return keys.map { $0.name }.joined(separator: "\n")
+            return keys.map { $0.label }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "keys:rename", description: "Rename an API key", category: .security, usage: "keys:rename <key_id> <new_name>", action: { args in
             guard args.count >= 2, let id = UUID(uuidString: args[0]) else { return "Usage: keys:rename <key_id> <new_name>" }
-            if var key = self.keyService.keys.first(where: { $0.id == id }) {
-                key.name = args[1]
+            if let key = self.keyService.keys.first(where: { $0.id == id }) {
+                try? await self.keyService.updateKeyMetadata(id: id, label: args[1], notes: key.notes, ipAllowlist: key.ipAllowlist)
                 return "Key renamed to \(args[1])"
             }
             return "Key not found."
@@ -81,7 +97,7 @@ public class SecurityCLIManager {
         commands.append(CLICommand(name: "keys:scopes", description: "List scopes for a key", category: .security, usage: "keys:scopes <key_id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: keys:scopes <key_id>" }
             guard let key = self.keyService.keys.first(where: { $0.id == id }) else { return "Key not found." }
-            return key.scopes.joined(separator: ", ")
+            return key.scopeIdentifiers.joined(separator: ", ")
         }))
 
         commands.append(CLICommand(name: "keys:rotate", description: "Rotate an API key", category: .security, usage: "keys:rotate <key_id>", action: { args in
@@ -94,8 +110,8 @@ public class SecurityCLIManager {
 
         commands.append(CLICommand(name: "keys:search", description: "Search keys by name", category: .security, usage: "keys:search <query>", action: { args in
             let query = args.joined(separator: " ").lowercased()
-            let filtered = self.keyService.keys.filter { $0.name.lowercased().contains(query) }
-            return filtered.map { "\($0.name) (\($0.id))" }.joined(separator: "\n")
+            let filtered = self.keyService.keys.filter { $0.label.lowercased().contains(query) }
+            return filtered.map { "\($0.label) (\($0.id))" }.joined(separator: "\n")
         }))
 
         // --- Webhooks (10 commands) ---
@@ -106,9 +122,9 @@ public class SecurityCLIManager {
         }))
 
         commands.append(CLICommand(name: "webhooks:create", description: "Create a webhook", category: .security, usage: "webhooks:create <url> <app_id>", action: { args in
-            guard args.count >= 2, let appID = UUID(uuidString: args[1]) else { return "Usage: webhooks:create <url> <app_id>" }
-            let endpoint = WebhookEndpoint(appID: appID, url: URL(string: args[0])!, events: ["*"], secret: "cli_secret")
-            try? await self.webhookService.createEndpoint(endpoint)
+            guard args.count >= 2, UUID(uuidString: args[1]) != nil else { return "Usage: webhooks:create <url> <app_id>" }
+            guard URL(string: args[0]) != nil else { return "Invalid webhook URL." }
+            try? await self.webhookService.createEndpoint(url: args[0], events: WebhookEventType.allCases)
             return "Webhook created for \(args[0])"
         }))
 
@@ -120,14 +136,14 @@ public class SecurityCLIManager {
 
         commands.append(CLICommand(name: "webhooks:test", description: "Test a webhook endpoint", category: .security, usage: "webhooks:test <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: webhooks:test <id>" }
-            let success = await self.webhookService.testDelivery(id: id)
-            return success ? "Test successful (200 OK)" : "Test failed."
+            guard let result = try? await self.webhookService.testDelivery(endpointID: id) else { return "Test failed." }
+            return result.0 == 200 ? "Test successful (\(result.0) \(result.1))" : "Test failed (\(result.0) \(result.1))."
         }))
 
         commands.append(CLICommand(name: "webhooks:logs", description: "View webhook delivery logs", category: .security, usage: "webhooks:logs <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: webhooks:logs <id>" }
-            let logs = self.webhookService.deliveryLogs.filter { $0.endpointID == id }
-            return logs.map { "[\($0.statusCode)] \($0.event) - \($0.timestamp)" }.joined(separator: "\n")
+            let logs = (try? await self.webhookService.fetchDeliveryLog(endpointID: id)) ?? []
+            return logs.map { "[\($0.statusCode)] \($0.eventType.rawValue) - \($0.timestamp)" }.joined(separator: "\n")
         }))
 
         commands.append(CLICommand(name: "webhooks:toggle", description: "Enable/disable a webhook", category: .security, usage: "webhooks:toggle <id>", action: { args in
@@ -147,7 +163,11 @@ public class SecurityCLIManager {
         commands.append(CLICommand(name: "webhooks:events", description: "Update webhook events", category: .security, usage: "webhooks:events <id> <event1,event2>", action: { args in
             guard args.count >= 2, let id = UUID(uuidString: args[0]) else { return "Usage: webhooks:events <id> <events>" }
             if var ep = self.webhookService.endpoints.first(where: { $0.id == id }) {
-                ep.events = args[1].components(separatedBy: ",")
+                let events = args[1]
+                    .components(separatedBy: ",")
+                    .compactMap { WebhookEventType(rawValue: $0.trimmingCharacters(in: .whitespacesAndNewlines)) }
+                guard !events.isEmpty else { return "No valid webhook events provided." }
+                ep.subscribedEvents = events
                 try? await self.webhookService.updateEndpoint(ep)
                 return "Events updated."
             }
@@ -157,7 +177,7 @@ public class SecurityCLIManager {
         commands.append(CLICommand(name: "webhooks:inspect", description: "Inspect webhook config", category: .security, usage: "webhooks:inspect <id>", action: { args in
             guard let id = UUID(uuidString: args.first ?? "") else { return "Usage: webhooks:inspect <id>" }
             guard let ep = self.webhookService.endpoints.first(where: { $0.id == id }) else { return "Not found." }
-            return "URL: \(ep.url)\nActive: \(ep.isActive)\nEvents: \(ep.events.joined(separator: ","))\nCreated: \(ep.createdAt)"
+            return "URL: \(ep.url)\nActive: \(ep.isActive)\nEvents: \(ep.subscribedEvents.map(\.rawValue).joined(separator: ","))\nCreated: \(ep.createdAt)"
         }))
 
         commands.append(CLICommand(name: "webhooks:clear:logs", description: "Clear webhook logs", category: .security, usage: "webhooks:clear:logs <id>", action: { _ in
@@ -173,20 +193,19 @@ public class SecurityCLIManager {
 
         commands.append(CLICommand(name: "secrets:set", description: "Set a secret", category: .security, usage: "secrets:set <app_id> <key> <value>", action: { args in
             guard args.count >= 3, let appID = UUID(uuidString: args[0]) else { return "Usage: secrets:set <app_id> <key> <value>" }
-            let secret = Secret(appID: appID, key: args[1], value: args[2])
+            let secret = Secret(appID: appID, key: args[1], maskedValue: self.maskSecret(args[2]))
             try? await self.secretService.saveSecret(secret)
             return "Secret \(args[1]) set."
         }))
 
         commands.append(CLICommand(name: "secrets:delete", description: "Delete a secret", category: .security, usage: "secrets:delete <app_id> <key>", action: { args in
-            guard args.count >= 2, let appID = UUID(uuidString: args[0]) else { return "Usage: secrets:delete <app_id> <key>" }
-            try? await self.secretService.deleteSecret(appID: appID, key: args[1])
-            return "Secret \(args[1]) deleted."
+            guard args.count >= 2, UUID(uuidString: args[0]) != nil else { return "Usage: secrets:delete <app_id> <key>" }
+            return "Secret deletion is not supported by the current secret service."
         }))
 
         commands.append(CLICommand(name: "secrets:get", description: "Get a secret value (Owner only)", category: .security, usage: "secrets:get <app_id> <key>", action: { args in
             guard args.count >= 2, let appID = UUID(uuidString: args[0]) else { return "Usage: secrets:get <app_id> <key>" }
-            let val = self.secretService.secrets.first(where: { $0.appID == appID && $0.key == args[1] })?.value
+            let val = self.secretService.secrets.first(where: { $0.appID == appID && $0.key == args[1] })?.maskedValue
             return val ?? "Secret not found."
         }))
 
