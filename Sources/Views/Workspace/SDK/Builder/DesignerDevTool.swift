@@ -215,7 +215,7 @@ struct DesignerView: View {
                 Text("Color Palette")
                     .font(.headline)
 
-                FlowLayout(spacing: 10) {
+                FlowStack(spacing: 10) {
                     ForEach(data.colors) { color in
                         VStack(spacing: 4) {
                             RoundedRectangle(cornerRadius: 8)
@@ -305,51 +305,6 @@ struct DesignerView: View {
                 .background(Color(uiColor: .tertiarySystemBackground))
                 .cornerRadius(8)
                 .textSelection(.enabled)
-        }
-    }
-}
-
-// MARK: - Helpers
-
-// Generic Flow Layout for tags/palette
-struct FlowLayout: Layout {
-    var spacing: CGFloat = 8
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let result = FlowResult(in: proposal.width ?? 0, subviews: subviews, spacing: spacing)
-        return result.size
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let result = FlowResult(in: bounds.width, subviews: subviews, spacing: spacing)
-        for (index, point) in result.offsets.enumerated() {
-            subviews[index].place(at: CGPoint(x: bounds.minX + point.x, y: bounds.minY + point.y), proposal: .unspecified)
-        }
-    }
-
-    struct FlowResult {
-        var size: CGSize = .zero
-        var offsets: [CGPoint] = []
-
-        init(in maxWidth: CGFloat, subviews: LayoutSubviews, spacing: CGFloat) {
-            var currentX: CGFloat = 0
-            var currentY: CGFloat = 0
-            var lineHeight: CGFloat = 0
-
-            for subview in subviews {
-                let size = subview.sizeThatFits(.unspecified)
-                if currentX + size.width > maxWidth {
-                    currentX = 0
-                    currentY += lineHeight + spacing
-                    lineHeight = 0
-                }
-
-                offsets.append(CGPoint(x: currentX, y: currentY))
-                currentX += size.width + spacing
-                lineHeight = max(lineHeight, size.height)
-            }
-
-            self.size = CGSize(width: maxWidth, height: currentY + lineHeight)
         }
     }
 }

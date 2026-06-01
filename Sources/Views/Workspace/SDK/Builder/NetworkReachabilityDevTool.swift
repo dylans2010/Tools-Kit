@@ -20,7 +20,7 @@ struct NetworkReachabilityView: View {
         Form {
             Section(header: Text("Status")) {
                 HStack {
-                    Text(viewModel.status.description)
+                    Text(viewModel.statusDisplayText)
                         .font(.caption2.bold())
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
@@ -113,6 +113,10 @@ class NetworkReachabilityViewModel: ObservableObject {
     @Published var interfaces: [String] = []
     @Published var history: [HistoryItem] = []
 
+    var statusDisplayText: String {
+        status.displayText
+    }
+
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitor")
 
@@ -141,13 +145,13 @@ class NetworkReachabilityViewModel: ObservableObject {
         interfaceType = currentInterfaces.joined(separator: ", ")
 
         if oldStatus != status {
-            history.insert(HistoryItem(title: "Status Changed", detail: "Network status changed to \(status.description)"), at: 0)
+            history.insert(HistoryItem(title: "Status Changed", detail: "Network status changed to \(status.displayText)"), at: 0)
         }
     }
 }
 
-extension NWPath.Status: CustomStringConvertible {
-    public var description: String {
+private extension NWPath.Status {
+    var displayText: String {
         switch self {
         case .satisfied: return "Satisfied"
         case .unsatisfied: return "Unsatisfied"
