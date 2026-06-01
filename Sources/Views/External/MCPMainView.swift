@@ -183,7 +183,10 @@ struct MCPServerDetailView: View {
 
                 MCPAuthFormView(server: $server)
 
-                MCPAuthGuideView(type: server.authConfig.type)
+                NavigationLink(destination: MCPGuideView()) {
+                    Label("View Setup Guide", systemImage: "book.fill")
+                        .foregroundStyle(.blue)
+                }
             }
 
             if server.connectionStatus == .connected {
@@ -322,50 +325,6 @@ struct MCPAuthFormView: View {
                 secretInput = mcpManager.loadSecret(key: "password", for: server)
             }
         }
-    }
-}
-
-struct MCPAuthGuideView: View {
-    let type: MCPAuthType
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Label("Setup Guide", systemImage: "info.circle.fill")
-                .font(.headline)
-
-            Text(type.setupGuide)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            Divider()
-
-            Group {
-                switch type {
-                case .apiKey:
-                    guideItem("1", "Check service documentation for API keys.")
-                    guideItem("2", "Usually 'X-API-Key' or similar header is expected.")
-                case .bearerToken:
-                    guideItem("1", "Generate a Personal Access Token (PAT).")
-                    guideItem("2", "Paste the full token; 'Bearer' prefix is added by app.")
-                case .oauth2AuthCode:
-                    guideItem("1", "Register Tools-Kit as an app in your provider.")
-                    guideItem("2", "Set redirect URI to toolskit://oauth/callback.")
-                default:
-                    EmptyView()
-                }
-            }
-        }
-        .padding()
-        .background(Color.secondary.opacity(0.05))
-        .cornerRadius(8)
-    }
-
-    func guideItem(_ step: String, _ text: String) -> some View {
-        HStack(alignment: .top) {
-            Text(step).bold()
-            Text(text)
-        }
-        .font(.caption2)
     }
 }
 
@@ -698,31 +657,63 @@ struct MCPEmptyStateView: View {
     let onAdd: () -> Void
 
     var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "network")
-                .font(.system(size: 60))
-                .foregroundStyle(.blue)
-                .padding(.top, 40)
+        VStack(spacing: 24) {
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [.blue.opacity(0.2), .purple.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 120, height: 120)
+                    .blur(radius: 20)
 
-            Text("No MCP Servers")
-                .font(.title2.bold())
+                Image(systemName: "network")
+                    .font(.system(size: 64, weight: .light))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.blue, .purple],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .shadow(color: .blue.opacity(0.3), radius: 10, x: 0, y: 5)
+            }
+            .padding(.top, 60)
 
-            Text("Connect to external services using the Model Context Protocol. You can add local or remote servers to extend the AI's capabilities.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+            VStack(spacing: 8) {
+                Text("No MCP Servers")
+                    .font(.title2.bold())
+                    .tracking(-0.5)
+
+                Text("Connect to external services using the Model Context Protocol. Extend your AI with custom tools and data sources.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+            }
 
             Button(action: onAdd) {
-                Label("Add Your First Server", systemImage: "plus")
-                    .padding()
-                    .background(Color.blue, in: Capsule())
-                    .foregroundStyle(.white)
-                    .bold()
+                HStack {
+                    Image(systemName: "plus.circle.fill")
+                    Text("Add Your First Server")
+                }
+                .font(.headline)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 14)
+                .background(
+                    Capsule()
+                        .fill(.primary)
+                )
+                .foregroundStyle(.systemBackground)
             }
-            .padding(.top, 10)
+            .padding(.top, 12)
+            .shadow(color: .primary.opacity(0.2), radius: 15, x: 0, y: 8)
         }
         .frame(maxWidth: .infinity)
         .listRowBackground(Color.clear)
+        .padding(.bottom, 40)
     }
 }
