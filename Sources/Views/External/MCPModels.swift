@@ -185,9 +185,13 @@ enum MCPRequestParams: Encodable {
 }
 
 struct MCPInitializeParams: Encodable {
-    let protocolVersion: String = "2025-06-18"
+    let protocolVersion: String
     let capabilities: MCPClientCapabilities = MCPClientCapabilities()
     let clientInfo: MCPClientInfo = MCPClientInfo()
+
+    init(protocolVersion: String = "2025-06-18") {
+        self.protocolVersion = protocolVersion
+    }
 }
 
 struct MCPClientCapabilities: Encodable {

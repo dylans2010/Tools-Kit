@@ -32,10 +32,15 @@ final class MCPService {
             throw MCPError.authenticationFailed("HTTP \(httpResponse.statusCode)")
         }
 
-        if !(200...299).contains(httpResponse.statusCode) {
-            throw MCPError.connectionFailed("HTTP Status \(httpResponse.statusCode)")
+        // Even for 400 Bad Request or other errors, try to decode the body
+        // Many MCP servers return JSON-RPC error details in the 400 response body
+        do {
+            return try JSONDecoder().decode(R.self, from: data)
+        } catch {
+            if !(200...299).contains(httpResponse.statusCode) {
+                throw MCPError.connectionFailed("HTTP Status \(httpResponse.statusCode)")
+            }
+            throw error
         }
-
-        return try JSONDecoder().decode(R.self, from: data)
     }
 }

@@ -132,9 +132,24 @@ final class MCPManager: ObservableObject {
 
         do {
             // 1. Initialize Handshake
-            let initParams = MCPInitializeParams()
-            let initRequest = MCPRequest(id: 1, method: "initialize", params: .initialize(initParams))
-            let initResponse = try await send(request: initRequest, to: servers[index], decoding: MCPResponse.self)
+            var initResponse: MCPResponse
+            do {
+                // Try modern version first
+                let initParams = MCPInitializeParams(protocolVersion: "2025-06-18")
+                let initRequest = MCPRequest(id: 1, method: "initialize", params: .initialize(initParams))
+                initResponse = try await send(request: initRequest, to: servers[index], decoding: MCPResponse.self)
+
+                // If server returns a protocol error or 400, it might need legacy version
+                if let error = initResponse.error,
+                   (error.message.lowercased().contains("protocol") || error.code == -32600) {
+                    throw MCPError.serverError(code: error.code, message: error.message)
+                }
+            } catch {
+                // Fallback to legacy version if first attempt fails with version/request error
+                let initParams = MCPInitializeParams(protocolVersion: "2024-11-05")
+                let initRequest = MCPRequest(id: 1, method: "initialize", params: .initialize(initParams))
+                initResponse = try await send(request: initRequest, to: servers[index], decoding: MCPResponse.self)
+            }
 
             if let error = initResponse.error {
                 throw MCPError.serverError(code: error.code, message: error.message)
@@ -240,15 +255,26 @@ final class MCPManager: ObservableObject {
 
     func testConnection(server: MCPServer) async throws -> MCPServerInfo {
         // 1. Validate URL reachability
-        guard let url = URL(string: server.baseURL) else {
+        guard let _ = URL(string: server.baseURL) else {
             throw MCPError.invalidURL
         }
 
         // 2. Perform initialization handshake to verify protocol support
-        let initParams = MCPInitializeParams()
-        let initRequest = MCPRequest(id: 1, method: "initialize", params: .initialize(initParams))
+        var response: MCPResponse
+        do {
+            let initParams = MCPInitializeParams(protocolVersion: "2025-06-18")
+            let initRequest = MCPRequest(id: 1, method: "initialize", params: .initialize(initParams))
+            response = try await send(request: initRequest, to: server, decoding: MCPResponse.self)
 
-        let response = try await send(request: initRequest, to: server, decoding: MCPResponse.self)
+            if let error = response.error,
+               (error.message.lowercased().contains("protocol") || error.code == -32600) {
+                throw MCPError.serverError(code: error.code, message: error.message)
+            }
+        } catch {
+            let initParams = MCPInitializeParams(protocolVersion: "2024-11-05")
+            let initRequest = MCPRequest(id: 1, method: "initialize", params: .initialize(initParams))
+            response = try await send(request: initRequest, to: server, decoding: MCPResponse.self)
+        }
 
         if let error = response.error {
             // Check specifically for auth errors
