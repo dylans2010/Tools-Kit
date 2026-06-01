@@ -233,6 +233,67 @@ final class DevToolRegistry: ObservableObject {
         // New Tools - Performance
         register(BundleSizeAnalyzerDevTool())
 
+        // Batch 1 - Data
+        register(JSONMinifierDevTool())
+        register(XMLMinifierDevTool())
+        register(SQLFormatterDevTool())
+        register(JSFormatterDevTool())
+        register(CSSFormatterDevTool())
+        register(Base64ToHexDevTool())
+        register(HexToBase64DevTool())
+        register(CSVToJSONDevTool())
+        register(JSONToCSVDevTool())
+        register(NanoIDGeneratorDevTool())
+        register(ULIDGeneratorDevTool())
+
+        // Batch 2 - Encoding & Security
+        register(Base32EncoderDevTool())
+        register(Base32DecoderDevTool())
+        register(DataURIGeneratorDevTool())
+        register(HMACGeneratorDevTool())
+        register(AESEncryptionDevTool())
+        register(CreditCardValidatorDevTool())
+        register(IBANValidatorDevTool())
+        register(PasswordStrengthDevTool())
+        register(JWTDebuggerDevTool())
+        register(CertificateInfoDevTool())
+
+        // Batch 3 - UI Design & Networking
+        register(AspectRatioCalculatorDevTool())
+        register(PXtoREMDevTool())
+        register(GoldenRatioDevTool())
+        register(FontBrowserDevTool())
+        register(EmojiSearchDevTool())
+        register(ASCIIArtDevTool())
+        register(ColorBlindSimDevTool())
+        register(LoremImageDevTool())
+        register(ROT47CipherDevTool())
+        register(UserAgentParserDevTool())
+
+        // Batch 4 - Networking & Utility
+        register(MACAddressGenDevTool())
+        register(IPv6AddressGenDevTool())
+        register(URLSplitterDevTool())
+        register(UnitConverterDevTool())
+        register(LineSorterDevTool())
+        register(DuplicateRemoverDevTool())
+        register(StringReverserDevTool())
+        register(MarkdownToHTMLDevTool())
+        register(HTMLToMarkdownDevTool())
+        register(WordCloudDevTool())
+
+        // Batch 5 - System & Debugging
+        register(EnvVarDevTool())
+        register(ScreenInfoDevTool())
+        register(HardwareDetailsDevTool())
+        register(ReflectionExplorerDevTool())
+        register(SideBySideDiffDevTool())
+        register(ZlibCompressDevTool())
+        register(GzipCompressDevTool())
+        register(Base64ImagePreviewDevTool())
+        register(UnicodeNormalizerDevTool())
+        register(JSMinifierDevTool())
+
         // SDK Builder Specialized Tools
         register(SDKBuildAnalyzerDevTool())
         register(SDKAssetOptimizerDevTool())
