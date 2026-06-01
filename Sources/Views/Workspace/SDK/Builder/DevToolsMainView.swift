@@ -227,7 +227,6 @@ final class DevToolRegistry: ObservableObject {
         register(CharacterEscaperDevTool())
 
         // New Tools - Diagnostics
-        register(AccessibilityAuditDevTool())
         register(LocaleInspectorDevTool())
 
         // New Tools - Performance
