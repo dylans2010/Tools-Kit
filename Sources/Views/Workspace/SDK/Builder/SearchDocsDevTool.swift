@@ -3,12 +3,12 @@ import Combine
 
 // MARK: - Models
 
-struct DocElement: Identifiable {
+struct DocElement: Identifiable, Sendable {
     let id = UUID()
     let type: ElementType
     let content: String
 
-    enum ElementType {
+    enum ElementType: Sendable {
         case heading1, heading2, heading3, paragraph, code, list
     }
 }
@@ -75,7 +75,7 @@ class SearchDocsViewModel: ObservableObject {
 
             // Move parsing to background to avoid blocking main thread
             let parsedElements = try await Task.detached(priority: .userInitiated) {
-                return try self.parseHTML(html)
+                try Self.parseHTML(html)
             }.value
 
             self.elements = parsedElements
@@ -88,7 +88,7 @@ class SearchDocsViewModel: ObservableObject {
         isLoading = false
     }
 
-    private func parseHTML(_ html: String) throws -> [DocElement] {
+    nonisolated private static func parseHTML(_ html: String) throws -> [DocElement] {
         var parsed: [DocElement] = []
 
         let patterns: [(DocElement.ElementType, String)] = [
@@ -123,7 +123,7 @@ class SearchDocsViewModel: ObservableObject {
             if let (type, match) = earliestMatch {
                 if let contentRange = Range(match.range(at: 1), in: html) {
                     let rawContent = String(html[contentRange])
-                    let cleanContent = cleanTags(rawContent)
+                    let cleanContent = Self.cleanTags(rawContent)
                     if !cleanContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         parsed.append(DocElement(type: type, content: cleanContent))
                     }
@@ -144,7 +144,7 @@ class SearchDocsViewModel: ObservableObject {
         return parsed
     }
 
-    private func cleanTags(_ html: String) -> String {
+    nonisolated private static func cleanTags(_ html: String) -> String {
         return html.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
             .replacingOccurrences(of: "&amp;", with: "&")
             .replacingOccurrences(of: "&lt;", with: "<")
@@ -336,7 +336,7 @@ struct SearchDocsView: View {
                     Task { await viewModel.askAI() }
                 }) {
                     Image(systemName: "paperplane.fill")
-                        .foregroundStyle(viewModel.currentQuery.isEmpty ? .secondary : .accentColor)
+                        .foregroundStyle(viewModel.currentQuery.isEmpty ? .secondary : Color.accentColor)
                 }
                 .disabled(viewModel.currentQuery.isEmpty)
             }
