@@ -160,7 +160,9 @@ struct DesignerView: View {
 
                         Button(action: {
                             withAnimation {
-                                Task { await viewModel.analyze() }
+                                Task(priority: .userInitiated) {
+                                    await viewModel.analyze()
+                                }
                             }
                         }) {
                             HStack {
