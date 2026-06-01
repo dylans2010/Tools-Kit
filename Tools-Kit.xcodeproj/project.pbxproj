@@ -12826,7 +12826,7 @@
 				DY0200000000000000000001 /* Daily */,
 				ZF0000000000000000000002 /* ZIPFoundation */,
 				AU0200000000000000000001 /* Aurora */,
-				EX0200000000000000000001 /* SwiftMCP */,
+				E8A1C3D5F7094B2D8E6A0C15 /* SwiftMCP */,
 			);
 			productName = Tools-Kit;
 			productReference = 732E3165BFBB323BD8081B3F /* Tools-Kit.app */;
@@ -12914,7 +12914,7 @@
 				DY0100000000000000000001 /* XCRemoteSwiftPackageReference "daily-client-ios" */,
 				ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				AU0100000000000000000001 /* XCRemoteSwiftPackageReference "Aurora" */,
-				EX0100000000000000000001 /* XCRemoteSwiftPackageReference "SwiftMCP" */,
+				E8A1C3D5F7094B2D8E6A0C14 /* XCRemoteSwiftPackageReference "SwiftMCP" */,
 			);
 			targets = (
 				F3353FBEDEEBF7704E1E6451 /* Tools-Kit */,
@@ -15570,7 +15570,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		EX0100000000000000000001 /* XCRemoteSwiftPackageReference "SwiftMCP" */ = {
+		E8A1C3D5F7094B2D8E6A0C14 /* XCRemoteSwiftPackageReference "SwiftMCP" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/dylans2010/SwiftMCP.git";
 			requirement = {
@@ -15621,9 +15621,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		EX0200000000000000000001 /* SwiftMCP */ = {
+		E8A1C3D5F7094B2D8E6A0C15 /* SwiftMCP */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = EX0100000000000000000001 /* XCRemoteSwiftPackageReference "SwiftMCP" */;
+			package = E8A1C3D5F7094B2D8E6A0C14 /* XCRemoteSwiftPackageReference "SwiftMCP" */;
 			productName = SwiftMCP;
 		};
 		AW0200000000000000000001 /* Appwrite */ = {
