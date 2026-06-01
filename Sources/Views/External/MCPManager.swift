@@ -125,7 +125,7 @@ final class MCPManager: ObservableObject {
         saveServers()
 
         do {
-            // 1. Initialize
+            // 1. Initialize Handshake
             let initParams = MCPInitializeParams()
             let initRequest = MCPRequest(id: 1, method: "initialize", params: .initialize(initParams))
             let initResponse = try await send(request: initRequest, to: servers[index], decoding: MCPResponse.self)
@@ -134,20 +134,26 @@ final class MCPManager: ObservableObject {
                 throw MCPError.serverError(code: error.code, message: error.message)
             }
 
-            servers[index].serverInfo = initResponse.result?.serverInfo
-            servers[index].connectionStatus = .authenticating // If auth was needed, it happened during send()
+            guard let result = initResponse.result else {
+                throw MCPError.invalidResponse
+            }
 
-            // 2. Initialized Notification
+            // Update server info and capabilities from handshake
+            servers[index].serverInfo = result.serverInfo
+            servers[index].connectionStatus = .authenticating
+
+            // 2. Initialized Notification (Protocol requirement)
             let initializedNotification = MCPRequest(id: nil, method: "notifications/initialized", params: .notification)
             _ = try? await send(request: initializedNotification, to: servers[index], decoding: MCPResponse.self)
 
-            // 3. Discover Tools
+            // 3. Discover Tools Dynamically
             servers[index].connectionStatus = .discovering
             saveServers()
 
             let tools = try await discoverTools(for: servers[index])
 
-            servers[index].discoveredTools = tools
+            // Filter out any potential non-functional tools and update
+            servers[index].discoveredTools = tools.filter { !$0.name.isEmpty }
             servers[index].connectionStatus = .connected
             servers[index].lastConnected = Date()
             saveServers()
@@ -227,17 +233,34 @@ final class MCPManager: ObservableObject {
     }
 
     func testConnection(server: MCPServer) async throws -> MCPServerInfo {
+        // 1. Validate URL reachability
+        guard let url = URL(string: server.baseURL) else {
+            throw MCPError.invalidURL
+        }
+
+        // 2. Perform initialization handshake to verify protocol support
         let initParams = MCPInitializeParams()
         let initRequest = MCPRequest(id: 1, method: "initialize", params: .initialize(initParams))
+
         let response = try await send(request: initRequest, to: server, decoding: MCPResponse.self)
 
         if let error = response.error {
+            // Check specifically for auth errors
+            if error.code == 401 || error.code == 403 {
+                throw MCPError.authenticationFailed(error.message)
+            }
             throw MCPError.serverError(code: error.code, message: error.message)
         }
 
         guard let info = response.result?.serverInfo else {
             throw MCPError.invalidResponse
         }
+
+        // 3. Optional: Verify tools list capability
+        if let capabilities = response.result?.capabilities, capabilities.tools == nil {
+            print("Warning: Server does not declare tool capabilities")
+        }
+
         return info
     }
 
@@ -317,42 +340,14 @@ final class MCPManager: ObservableObject {
         to server: MCPServer,
         decoding: R.Type
     ) async throws -> R {
-        guard let url = URL(string: server.baseURL) else { throw MCPError.invalidURL }
-
-        var urlRequest = URLRequest(url: url)
-        urlRequest.httpMethod = "POST"
-        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
         let headers = try await authHeaders(for: server)
-        for (key, value) in headers {
-            urlRequest.setValue(value, forHTTPHeaderField: key)
-        }
-
-        urlRequest.httpBody = try JSONEncoder().encode(request)
-
-        let (data, response) = try await URLSession.shared.data(for: urlRequest)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw MCPError.connectionFailed("No HTTP response")
-        }
-
-        if httpResponse.statusCode == 401 {
-            // Potential refresh logic here
-            throw MCPError.authenticationFailed("Unauthorized (401)")
-        }
-
-        if !(200...299).contains(httpResponse.statusCode) {
-            throw MCPError.connectionFailed("HTTP Status \(httpResponse.statusCode)")
-        }
-
-        return try JSONDecoder().decode(R.self, from: data)
+        return try await MCPService.shared.send(request: request, to: server, authHeaders: headers)
     }
 
     // MARK: - OAuth2 PKCE
 
     internal func performOAuth2PKCE(server: MCPServer) async throws {
-        // Implementation placeholder for ASWebAuthenticationSession
-        // In a real app, this would use a coordinator to handle the UI part
+        // ASWebAuthenticationSession logic to be integrated with AppCoordinator
         print("OAuth2 PKCE initiated for \(server.name)")
     }
 }

@@ -3,6 +3,7 @@ import SwiftUI
 struct MCPMainView: View {
     @StateObject private var mcpManager = MCPManager.shared
     @State private var showingAddServer = false
+    @State private var showingBrowseServers = false
 
     var body: some View {
         NavigationStack {
@@ -27,15 +28,33 @@ struct MCPMainView: View {
             .navigationTitle("MCP Servers")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showingAddServer = true
-                    } label: {
-                        Image(systemName: "plus")
+                    HStack {
+                        Button {
+                            showingBrowseServers = true
+                        } label: {
+                            Label("Browse", systemImage: "magnifyingglass.circle")
+                        }
+
+                        Button {
+                            showingAddServer = true
+                        } label: {
+                            Image(systemName: "plus")
+                        }
                     }
                 }
             }
             .sheet(isPresented: $showingAddServer) {
                 MCPAddServerView()
+            }
+            .sheet(isPresented: $showingBrowseServers) {
+                MCPListModelsSheet { server in
+                    let newServer = MCPServer(
+                        name: server.name,
+                        baseURL: server.url,
+                        authConfig: MCPAuthConfig(type: server.authenticationType)
+                    )
+                    mcpManager.addServer(newServer)
+                }
             }
         }
     }
@@ -103,18 +122,24 @@ struct MCPServerDetailView: View {
 
                 HStack(spacing: 12) {
                     if server.connectionStatus == .connected {
-                        Button("Disconnect") {
+                        Button {
                             mcpManager.disconnect(server: server)
+                        } label: {
+                            Label("Disconnect", systemImage: "power")
                         }
-                        .foregroundStyle(.red)
+                        .buttonStyle(.borderedProminent)
+                        .tint(.red)
                     } else {
-                        Button("Connect") {
+                        Button {
                             Task {
                                 isConnecting = true
                                 try? await mcpManager.connect(to: server)
                                 isConnecting = false
                             }
+                        } label: {
+                            Label("Connect", systemImage: "network")
                         }
+                        .buttonStyle(.borderedProminent)
                         .disabled(isConnecting)
                     }
 
@@ -124,7 +149,7 @@ struct MCPServerDetailView: View {
 
                     Spacer()
 
-                    Button("Test Connection") {
+                    Button {
                         Task {
                             do {
                                 let info = try await mcpManager.testConnection(server: server)
@@ -133,8 +158,10 @@ struct MCPServerDetailView: View {
                                 testResult = "Failed: \(error.localizedDescription)"
                             }
                         }
+                    } label: {
+                        Label("Test", systemImage: "bolt.fill")
                     }
-                    .font(.subheadline)
+                    .buttonStyle(.bordered)
                 }
 
                 if let testResult = testResult {
@@ -408,10 +435,34 @@ struct MCPAddServerView: View {
     @State private var name = ""
     @State private var url = ""
     @State private var authType: MCPAuthType = .none
+    @State private var showingBrowse = false
+    @State private var isTesting = false
+    @State private var testStatus: String?
+
+    private var isValid: Bool {
+        !name.trimmingCharacters(in: .whitespaces).isEmpty &&
+        isValidURL(url)
+    }
+
+    private func isValidURL(_ urlString: String) -> Bool {
+        guard let url = URL(string: urlString) else { return false }
+        return url.scheme != nil && (url.host != nil || url.scheme == "file")
+    }
 
     var body: some View {
         NavigationStack {
             Form {
+                Section {
+                    Button {
+                        showingBrowse = true
+                    } label: {
+                        Label("Browse MCP Directory", systemImage: "safari")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .listRowBackground(Color.clear)
+                }
+
                 Section("Server Details") {
                     TextField("Server Name", text: $name)
                     TextField("Base URL (e.g. https://.../mcp)", text: $url)
@@ -430,6 +481,38 @@ struct MCPAddServerView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+
+                Section {
+                    Button {
+                        Task {
+                            isTesting = true
+                            testStatus = nil
+                            do {
+                                let mockServer = MCPServer(name: name, baseURL: url, authConfig: MCPAuthConfig(type: authType))
+                                let info = try await MCPManager.shared.testConnection(server: mockServer)
+                                testStatus = "Verified: \(info.name) (\(info.version))"
+                            } catch {
+                                testStatus = "Error: \(error.localizedDescription)"
+                            }
+                            isTesting = false
+                        }
+                    } label: {
+                        HStack {
+                            if isTesting {
+                                ProgressView().padding(.trailing, 8)
+                            }
+                            Label("Test Connection", systemImage: "antenna.radiowaves.left.and.right")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .disabled(!isValid || isTesting)
+
+                    if let status = testStatus {
+                        Text(status)
+                            .font(.caption)
+                            .foregroundStyle(status.hasPrefix("Verified") ? .green : .red)
+                    }
+                }
             }
             .navigationTitle("Add MCP Server")
             .toolbar {
@@ -446,10 +529,168 @@ struct MCPAddServerView: View {
                         MCPManager.shared.addServer(newServer)
                         dismiss()
                     }
-                    .disabled(name.isEmpty || url.isEmpty)
+                    .disabled(!isValid)
+                }
+            }
+            .sheet(isPresented: $showingBrowse) {
+                MCPListModelsSheet { server in
+                    self.name = server.name
+                    self.url = server.url
+                    self.authType = server.authenticationType
                 }
             }
         }
+    }
+}
+
+// MARK: - MCP Directory Models & Sheet
+
+struct MCPServerTemplate: Identifiable, Codable {
+    let id: String
+    let name: String
+    let description: String
+    let url: String
+    let authenticationType: MCPAuthType
+    let category: String
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, description, url, category
+        case authenticationType = "authentication_type"
+    }
+}
+
+struct MCPListModelsSheet: View {
+    @Environment(\.dismiss) var dismiss
+    let onSelect: (MCPServerTemplate) -> Void
+
+    @State private var servers: [MCPServerTemplate] = []
+    @State private var searchText = ""
+    @State private var selectedCategory: String?
+    @State private var isLoading = true
+
+    var filteredServers: [MCPServerTemplate] {
+        servers.filter { server in
+            let matchesSearch = searchText.isEmpty ||
+                server.name.localizedCaseInsensitiveContains(searchText) ||
+                server.description.localizedCaseInsensitiveContains(searchText)
+            let matchesCategory = selectedCategory == nil || server.category == selectedCategory
+            return matchesSearch && matchesCategory
+        }
+    }
+
+    var categories: [String] {
+        Array(Set(servers.map { $0.category })).sorted()
+    }
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if isLoading {
+                    ProgressView("Loading directory...")
+                } else {
+                    VStack(spacing: 0) {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                FilterChip(title: "All", isSelected: selectedCategory == nil) {
+                                    selectedCategory = nil
+                                }
+                                ForEach(categories, id: \.self) { category in
+                                    FilterChip(title: category, isSelected: selectedCategory == category) {
+                                        selectedCategory = category
+                                    }
+                                }
+                            }
+                            .padding()
+                        }
+                        .background(Color(.systemGroupedBackground))
+
+                        List(filteredServers) { server in
+                            Button {
+                                onSelect(server)
+                                dismiss()
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack {
+                                        Text(server.name)
+                                            .font(.headline)
+                                        Spacer()
+                                        Text(server.category)
+                                            .font(.caption2.bold())
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.accentColor.opacity(0.1), in: Capsule())
+                                    }
+
+                                    Text(server.description)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(2)
+
+                                    HStack {
+                                        Label(server.authenticationType.displayName, systemImage: "lock.shield")
+                                            .font(.caption2)
+                                        Spacer()
+                                        Text(server.url)
+                                            .font(.system(size: 10, design: .monospaced))
+                                            .foregroundStyle(.tertiary)
+                                    }
+                                    .padding(.top, 4)
+                                }
+                                .padding(.vertical, 4)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("MCP Directory")
+            .navigationBarTitleDisplayMode(.inline)
+            .searchable(text: $searchText, prompt: "Search servers...")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }
+                }
+            }
+            .task {
+                loadServers()
+            }
+        }
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
+    }
+
+    private func loadServers() {
+        guard let url = Bundle.main.url(forResource: "MCPServers", withExtension: "json") else {
+            print("MCPServers.json not found")
+            isLoading = false
+            return
+        }
+
+        do {
+            let data = try Data(contentsOf: url)
+            self.servers = try JSONDecoder().decode([MCPServerTemplate].self, from: data)
+        } catch {
+            print("Failed to decode MCPServers.json: \(error)")
+        }
+        isLoading = false
+    }
+}
+
+struct FilterChip: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline.bold())
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(isSelected ? Color.accentColor : Color(.systemGray5), in: Capsule())
+                .foregroundStyle(isSelected ? .white : .primary)
+        }
+        .buttonStyle(.plain)
     }
 }
 

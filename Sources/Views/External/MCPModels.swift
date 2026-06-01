@@ -5,7 +5,7 @@ import SwiftUI
 
 enum MCPAuthType: String, Codable, CaseIterable, Identifiable {
     case none, apiKey, bearerToken, basicAuth,
-         oauth2AuthCode, oauth2ClientCredentials, customHeaders
+         oauth, oauth2AuthCode, oauth2ClientCredentials, customHeaders
 
     var id: String { rawValue }
 
@@ -15,7 +15,7 @@ enum MCPAuthType: String, Codable, CaseIterable, Identifiable {
         case .apiKey: return "API Key"
         case .bearerToken: return "Bearer Token"
         case .basicAuth: return "Basic Auth"
-        case .oauth2AuthCode: return "OAuth2 (Auth Code)"
+        case .oauth, .oauth2AuthCode: return "OAuth2"
         case .oauth2ClientCredentials: return "OAuth2 (Client Credentials)"
         case .customHeaders: return "Custom Headers"
         }
@@ -31,7 +31,7 @@ enum MCPAuthType: String, Codable, CaseIterable, Identifiable {
             return "Enter your personal access token. It will be sent in the 'Authorization: Bearer <token>' header."
         case .basicAuth:
             return "Enter your username and password. They will be base64-encoded and sent in the 'Authorization: Basic' header."
-        case .oauth2AuthCode:
+        case .oauth, .oauth2AuthCode:
             return "Standard OAuth2 PKCE flow. You will be redirected to the provider's login page to authorize this app."
         case .oauth2ClientCredentials:
             return "Service-to-service authentication. Requires a Client ID and Client Secret to obtain an access token."
@@ -95,7 +95,6 @@ struct MCPTool: Identifiable, Codable, Hashable {
     var name: String
     var description: String
     var inputSchema: MCPJSONSchema
-    var isBuiltIn: Bool = false
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(name)
