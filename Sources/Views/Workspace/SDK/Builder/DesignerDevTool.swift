@@ -58,9 +58,11 @@ class DesignerViewModel: ObservableObject {
             return
         }
 
-        isAnalyzing = true
-        errorMessage = nil
-        result = nil
+        withAnimation {
+            isAnalyzing = true
+            errorMessage = nil
+            result = nil
+        }
 
         do {
             var request = URLRequest(url: analyzeURL)
@@ -85,7 +87,9 @@ class DesignerViewModel: ObservableObject {
             errorMessage = "Analysis failed: \(error.localizedDescription)"
         }
 
-        isAnalyzing = false
+        withAnimation {
+            isAnalyzing = false
+        }
     }
 
     private func generateDesignSystem(from data: DesignSystemResult) async {
@@ -159,10 +163,8 @@ struct DesignerView: View {
                         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.1), lineWidth: 1))
 
                         Button(action: {
-                            withAnimation {
-                                Task(priority: .userInitiated) {
-                                    await viewModel.analyze()
-                                }
+                            Task {
+                                await viewModel.analyze()
                             }
                         }) {
                             HStack {
