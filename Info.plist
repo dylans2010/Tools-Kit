@@ -113,6 +113,22 @@
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
+			<key>50.21.181.105</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSTemporaryExceptionMinimumTLSVersion</key>
+				<string>TLSv1.0</string>
+			</dict>
+			<key>localhost</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
 			<key>imap.mail.me.com</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
