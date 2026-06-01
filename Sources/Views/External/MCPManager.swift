@@ -301,10 +301,12 @@ final class MCPManager: ObservableObject {
             if let data = authString.data(using: .utf8) {
                 headers["Authorization"] = "Basic \(data.base64EncodedString())"
             }
-        case .oauth2AuthCode:
-            var token = loadSecret(key: "accessToken", for: server)
+        case .oauth, .oauth2AuthCode:
+            let token = loadSecret(key: "accessToken", for: server)
             // In a real app, check expiry and refresh if needed
-            headers["Authorization"] = "Bearer \(token)"
+            if !token.isEmpty {
+                headers["Authorization"] = "Bearer \(token)"
+            }
         case .oauth2ClientCredentials:
             var token = loadSecret(key: "accessToken", for: server)
             if token.isEmpty {
@@ -355,13 +357,10 @@ final class MCPManager: ObservableObject {
         }
 
         do {
-            let response = try await MCPService.shared.send(request: request, to: server, authHeaders: headers)
+            let response: R = try await MCPService.shared.send(request: request, to: server, authHeaders: headers)
 
             // Log Response
-            if let responseData = try? JSONEncoder().encode(response),
-               let responseString = String(data: responseData, encoding: .utf8) {
-                logTraffic(direction: .response, method: request.method, payload: responseString, for: server)
-            }
+            logTraffic(direction: .response, method: request.method, payload: String(describing: response), for: server)
 
             return response
         } catch {
