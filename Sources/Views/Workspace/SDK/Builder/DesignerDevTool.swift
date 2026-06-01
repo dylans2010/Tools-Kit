@@ -131,98 +131,170 @@ class DesignerViewModel: ObservableObject {
 struct DesignerView: View {
     @StateObject private var viewModel = DesignerViewModel()
     @State private var selectedTab = 0
+    @Namespace private var animation
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Header Input
-            VStack(spacing: 12) {
-                HStack {
-                    TextField("Enter website URL (e.g. https://apple.com)", text: $viewModel.urlString)
-                        .textFieldStyle(.roundedBorder)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
-                        .keyboardType(.URL)
+        ZStack {
+            // Modern Background
+            Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
 
-                    Button(action: {
-                        Task { await viewModel.analyze() }
-                    }) {
-                        if viewModel.isAnalyzing {
-                            ProgressView()
-                                .controlSize(.small)
-                        } else {
-                            Text("Analyze")
-                                .bold()
+            LinearGradient(colors: [Color.accentColor.opacity(0.05), Color.clear], startPoint: .topLeading, endPoint: .bottomTrailing)
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Modern Header Input
+                VStack(spacing: 16) {
+                    HStack(spacing: 12) {
+                        HStack {
+                            Image(systemName: "globe")
+                                .foregroundStyle(.secondary)
+                            TextField("https://apple.com", text: $viewModel.urlString)
+                                .autocorrectionDisabled()
+                                .textInputAutocapitalization(.never)
+                                .keyboardType(.URL)
                         }
+                        .padding(12)
+                        .background(Color(uiColor: .tertiarySystemBackground))
+                        .cornerRadius(12)
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.1), lineWidth: 1))
+
+                        Button(action: {
+                            withAnimation {
+                                Task { await viewModel.analyze() }
+                            }
+                        }) {
+                            HStack {
+                                if viewModel.isAnalyzing {
+                                    ProgressView().controlSize(.small)
+                                } else {
+                                    Image(systemName: "sparkles")
+                                    Text("Analyze")
+                                }
+                            }
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                            .background(viewModel.urlString.isEmpty ? Color.gray : Color.accentColor)
+                            .cornerRadius(12)
+                            .shadow(color: Color.accentColor.opacity(0.3), radius: 5, x: 0, y: 3)
+                        }
+                        .disabled(viewModel.urlString.isEmpty || viewModel.isAnalyzing)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(viewModel.urlString.isEmpty || viewModel.isAnalyzing)
-                }
 
-                if let error = viewModel.errorMessage {
-                    Text(error)
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if let error = viewModel.errorMessage {
+                        Label(error, systemImage: "exclamationmark.triangle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
-            }
-            .padding()
-            .background(Color(uiColor: .secondarySystemBackground))
-
-            if let result = viewModel.result {
-                Picker("View", selection: $selectedTab) {
-                    Text("System").tag(0)
-                    Text("DESIGN.md").tag(1)
-                    Text("SwiftUI").tag(2)
-                }
-                .pickerStyle(.segmented)
                 .padding()
+                .background(.ultraThinMaterial)
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        if selectedTab == 0 {
-                            designSummary(result)
-                        } else if selectedTab == 1 {
-                            codeView(viewModel.designDoc)
-                        } else {
-                            codeView(viewModel.swiftUITokens)
+                if let result = viewModel.result {
+                    // Modern Tab Picker
+                    HStack(spacing: 20) {
+                        ForEach(["System", "DESIGN.md", "SwiftUI"].indices, id: \.self) { index in
+                            Button(action: { withAnimation(.spring()) { selectedTab = index } }) {
+                                VStack(spacing: 8) {
+                                    Text(["System", "DESIGN.md", "SwiftUI"][index])
+                                        .font(.subheadline.weight(selectedTab == index ? .bold : .medium))
+                                        .foregroundStyle(selectedTab == index ? .primary : .secondary)
+
+                                    if selectedTab == index {
+                                        RoundedRectangle(cornerRadius: 2)
+                                            .fill(Color.accentColor)
+                                            .frame(height: 2)
+                                            .matchedGeometryEffect(id: "tab", in: animation)
+                                    } else {
+                                        Color.clear.frame(height: 2)
+                                    }
+                                }
+                            }
                         }
                     }
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.top, 12)
+
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 24) {
+                            if selectedTab == 0 {
+                                designSummary(result)
+                                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                            } else if selectedTab == 1 {
+                                codeView(viewModel.designDoc)
+                                    .transition(.opacity)
+                            } else {
+                                codeView(viewModel.swiftUITokens)
+                                    .transition(.opacity)
+                            }
+                        }
+                        .padding()
+                    }
+                } else if !viewModel.isAnalyzing {
+                    VStack(spacing: 24) {
+                        Spacer()
+                        ZStack {
+                            Circle()
+                                .fill(Color.accentColor.opacity(0.1))
+                                .frame(width: 120, height: 120)
+                            Image(systemName: "wand.and.stars")
+                                .font(.system(size: 50))
+                                .foregroundStyle(LinearGradient(colors: [.accentColor, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        }
+
+                        VStack(spacing: 8) {
+                            Text("Engine Your Design")
+                                .font(.title2.bold())
+                            Text("Enter a URL to reverse-engineer its visual identity into a production-ready design system.")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 40)
+                        }
+                        Spacer()
+                    }
+                } else {
+                    VStack(spacing: 20) {
+                        Spacer()
+                        ProgressView()
+                            .scaleEffect(1.5)
+                        Text("Extracting Design DNA...")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                        Text("Analyzing colors, typography and spacing patterns")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                        Spacer()
+                    }
+                    .frame(maxHeight: .infinity)
                 }
-            } else if !viewModel.isAnalyzing {
-                ContentUnavailableView(
-                    "Ready to Engine",
-                    systemImage: "browser.display",
-                    description: Text("Enter a URL to extract its design DNA.")
-                )
-            } else {
-                VStack(spacing: 20) {
-                    ProgressView()
-                    Text("Reverse-engineering styles...")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxHeight: .infinity)
             }
         }
     }
 
     @ViewBuilder
     private func designSummary(_ data: DesignSystemResult) -> some View {
-        VStack(alignment: .leading, spacing: 24) {
-            // Colors
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Color Palette")
-                    .font(.headline)
+        VStack(alignment: .leading, spacing: 28) {
+            // Colors Section
+            sectionHeader(title: "Color Palette", icon: "paintpalette.fill")
 
-                FlowStack(spacing: 10) {
-                    ForEach(data.colors) { color in
-                        VStack(spacing: 4) {
-                            RoundedRectangle(cornerRadius: 8)
+            FlowStack(spacing: 12) {
+                ForEach(data.colors) { color in
+                    VStack(spacing: 8) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 .fill(Color(hex: color.hex))
-                                .frame(width: 60, height: 60)
-                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.primary.opacity(0.1), lineWidth: 1))
+                                .frame(width: 70, height: 70)
+                                .shadow(color: Color(hex: color.hex).opacity(0.3), radius: 4, x: 0, y: 2)
 
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                .frame(width: 70, height: 70)
+                        }
+
+                        VStack(spacing: 2) {
                             Text(color.hex.uppercased())
                                 .font(.system(size: 10, weight: .bold, design: .monospaced))
 
@@ -230,81 +302,130 @@ struct DesignerView: View {
                                 Text(role)
                                     .font(.system(size: 8))
                                     .foregroundStyle(.secondary)
+                                    .textCase(.uppercase)
                             }
                         }
                     }
+                    .padding(8)
+                    .background(Color(uiColor: .tertiarySystemBackground))
+                    .cornerRadius(16)
                 }
             }
 
-            Divider()
+            // Typography Section
+            sectionHeader(title: "Typography", icon: "textformat")
 
-            // Typography
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Typography")
-                    .font(.headline)
-
+            VStack(spacing: 12) {
                 ForEach(data.typography) { font in
-                    HStack(alignment: .firstTextBaseline) {
-                        VStack(alignment: .leading) {
-                            Text("Aa")
-                                .font(.system(size: font.size))
-                            Text("\(font.family) (\(font.weight))")
+                    HStack(spacing: 16) {
+                        Text("Aa")
+                            .font(.system(size: min(font.size, 32), weight: .medium))
+                            .frame(width: 44)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(font.family)
+                                .font(.subheadline.bold())
+                            Text(font.weight)
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }
+
                         Spacer()
+
                         Text("\(Int(font.size))pt")
-                            .font(.system(size: 12, design: .monospaced))
-                            .foregroundStyle(.tertiary)
+                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.accentColor.opacity(0.1))
+                            .foregroundStyle(Color.accentColor)
+                            .cornerRadius(6)
                     }
-                    .padding(.vertical, 4)
+                    .padding()
+                    .background(Color(uiColor: .tertiarySystemBackground))
+                    .cornerRadius(16)
                 }
             }
 
-            Divider()
+            // Radius Section
+            sectionHeader(title: "Radius Scale", icon: "square.dashed")
 
-            // Radius
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Radius Scale")
-                    .font(.headline)
-
-                HStack(spacing: 15) {
-                    ForEach(data.radii, id: \.self) { r in
-                        VStack {
+            HStack(spacing: 16) {
+                ForEach(data.radii, id: \.self) { r in
+                    VStack(spacing: 12) {
+                        ZStack {
                             RoundedRectangle(cornerRadius: r)
-                                .stroke(Color.accentColor, lineWidth: 2)
-                                .frame(width: 40, height: 40)
-                            Text("\(Int(r))")
-                                .font(.system(size: 10, design: .monospaced))
+                                .fill(Color.accentColor.opacity(0.1))
+                                .frame(width: 50, height: 50)
+
+                            RoundedRectangle(cornerRadius: r)
+                                .stroke(Color.accentColor, lineWidth: 1.5)
+                                .frame(width: 50, height: 50)
                         }
+
+                        Text("\(Int(r))px")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
                     }
+                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity)
+                    .background(Color(uiColor: .tertiarySystemBackground))
+                    .cornerRadius(16)
                 }
             }
         }
     }
 
     @ViewBuilder
+    private func sectionHeader(title: String, icon: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .foregroundStyle(Color.accentColor)
+                .font(.headline)
+            Text(title)
+                .font(.headline)
+            Spacer()
+        }
+    }
+
+    @ViewBuilder
     private func codeView(_ content: String) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Generated Implementation")
+                Label("Generated Implementation", systemImage: "chevron.left.forwardslash.chevron.right")
                     .font(.subheadline.bold())
                 Spacer()
                 Button(action: {
                     UIPasteboard.general.string = content
+                    let generator = UINotificationFeedbackGenerator()
+                    generator.notificationOccurred(.success)
                 }) {
-                    Image(systemName: "doc.on.doc")
-                        .font(.caption)
+                    HStack {
+                        Image(systemName: "doc.on.doc")
+                        Text("Copy")
+                    }
+                    .font(.caption.bold())
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.accentColor)
+                    .foregroundStyle(.white)
+                    .cornerRadius(8)
                 }
             }
 
-            Text(content)
-                .font(.system(size: 12, design: .monospaced))
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(uiColor: .tertiarySystemBackground))
-                .cornerRadius(8)
-                .textSelection(.enabled)
+            ScrollView {
+                Text(content)
+                    .font(.system(size: 12, design: .monospaced))
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.black.opacity(0.05))
+                    .cornerRadius(12)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.1), lineWidth: 1))
+            }
+            .frame(maxHeight: 400)
+            .textSelection(.enabled)
         }
+        .padding()
+        .background(Color(uiColor: .tertiarySystemBackground))
+        .cornerRadius(20)
+        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
     }
 }
