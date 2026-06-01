@@ -8,10 +8,10 @@ struct PersonaHomeView: View {
     @State private var activeModal: PersonaHomeModal?
     @State private var chatThreads: [PersonaChatThread] = []
     @State private var activeThreadID: UUID?
-    @State private var agentModeEnabled = false
     @State private var pendingAction: PersonaAgentFramework.PersonaActionPreview?
     @State private var pendingIntent: PersonaAgentFramework.PersonaIntent?
     @State private var clarificationMissingField: String?
+    @State private var showingFullScreenMCP = false
 
     enum PersonaHomeModal: Identifiable {
         case chats, settings, discovery, actions, exportOptions
@@ -33,7 +33,7 @@ struct PersonaHomeView: View {
             PersonaHomeNavigationContent(
                 chatHistory: manager.chatHistory,
                 isThinking: manager.isThinking,
-                agentMode: agentModeEnabled,
+                agentMode: manager.agentModeEnabled,
                 query: $query,
                 pendingAction: pendingAction,
                 onSend: sendMessage,
@@ -43,13 +43,11 @@ struct PersonaHomeView: View {
                 onConfirm: handleConfirmation(_:)
             )
         }
-        .aiAnimationLoading(manager.isThinking)
+        .modifier(AILoadingModifier(isLoading: manager.isThinking))
         .navigationTitle("AI Persona")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             PersonaHomeToolbar(
-                agentMode: $agentModeEnabled,
-                onShowWelcome: { activeModal = .discovery },
                 onShowTuning: { activeModal = .settings }
             )
         }
@@ -68,8 +66,19 @@ struct PersonaHomeView: View {
                     activeThreadID = thread.id
                     manager.chatHistory = thread.messages
                 },
-                activeModal: $activeModal
+                activeModal: $activeModal,
+                showingFullScreenMCP: $showingFullScreenMCP
             )
+        }
+        .fullScreenCover(isPresented: $showingFullScreenMCP) {
+            NavigationStack {
+                MCPMainView()
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Close") { showingFullScreenMCP = false }
+                        }
+                    }
+            }
         }
     }
 
@@ -77,70 +86,12 @@ struct PersonaHomeView: View {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         query = ""
-        manager.agentModeEnabled = agentModeEnabled
-        if agentModeEnabled {
-            Task { await processAgentMessage(trimmed) }
-        } else {
-            Task { await manager.queryPersonaSafely(query: trimmed) }
-        }
-    }
-
-    // Existing Agent Logic Preserved
-    private func processAgentMessage(_ input: String) async {
-        let history = manager.chatHistory
-        let engine = PersonaAgentFramework.PersonaIntentEngine()
-        let dispatcher = PersonaAgentFramework.PersonaActionDispatcher()
-        let contacts = AccountManager.shared.accounts.map { PersonaAgentFramework.PersonaContact(name: $0.displayName, email: $0.emailAddress) }
-        let context = PersonaAgentFramework.PersonaWorkspaceContext(contacts: contacts, lastAccessedNote: nil, activeDraft: nil, recentEmails: [])
-
-        manager.chatHistory.append(PersonaMessage(role: "user", content: input))
-        manager.isThinking = true
-
-        var finalIntent: PersonaAgentFramework.PersonaIntent
-        if let missing = clarificationMissingField, var intent = pendingIntent {
-            switch intent {
-            case .sendEmail(var p): if missing == "recipients" { p.recipients = [input] }; intent = .sendEmail(parameters: p)
-            case .createNote(var p): if missing == "body" { p.body = input }; intent = .createNote(parameters: p)
-            default: break
-            }
-            finalIntent = intent
-            clarificationMissingField = nil
-            pendingIntent = nil
-        } else {
-            finalIntent = await engine.classify(input: input, conversationHistory: history, workspaceContext: context)
-        }
-
-        if case .compound(let steps) = finalIntent {
-            for step in steps {
-                let res = await dispatcher.dispatch(step, in: context)
-                await handleActionResult(res, intent: step)
-                if case .failed = res { break }
-            }
-        } else {
-            let res = await dispatcher.dispatch(finalIntent, in: context)
-            await handleActionResult(res, intent: finalIntent)
-        }
-        manager.isThinking = false
-    }
-
-    private func handleActionResult(_ result: PersonaAgentFramework.PersonaActionResult, intent: PersonaAgentFramework.PersonaIntent) async {
-        switch result {
-        case .success(let s, _): manager.chatHistory.append(PersonaMessage(role: "assistant", content: s))
-        case .requiresConfirmation(let p): pendingAction = p; pendingIntent = intent
-        case .failed(let e): manager.chatHistory.append(PersonaMessage(role: "assistant", content: "Error: \(e.localizedDescription)"))
-        case .clarificationNeeded(let q, let f):
-            manager.chatHistory.append(PersonaMessage(role: "assistant", content: q))
-            clarificationMissingField = f
-            pendingIntent = intent
-        }
+        Task { await manager.queryPersonaSafely(query: trimmed) }
     }
 
     private func handleConfirmation(_ confirmed: Bool) {
         guard confirmed, let intent = pendingIntent else { pendingAction = nil; pendingIntent = nil; return }
         Task {
-            let dispatcher = PersonaAgentFramework.PersonaActionDispatcher()
-            let contacts = AccountManager.shared.accounts.map { PersonaAgentFramework.PersonaContact(name: $0.displayName, email: $0.emailAddress) }
-            let context = PersonaAgentFramework.PersonaWorkspaceContext(contacts: contacts, lastAccessedNote: nil, activeDraft: nil, recentEmails: [])
             let result: PersonaAgentFramework.PersonaActionResult
             switch intent {
             case .deleteNote(let id): result = .from(try! await PersonaAgentFramework.shared.execute(.deleteWorkspaceItem(id: id, type: .note)))
@@ -150,7 +101,19 @@ struct PersonaHomeView: View {
             }
             pendingAction = nil
             pendingIntent = nil
-            await handleActionResult(result, intent: intent)
+        }
+    }
+}
+
+// MARK: - Loading Modifier
+
+struct AILoadingModifier: ViewModifier {
+    let isLoading: Bool
+    func body(content: Content) -> some View {
+        if isLoading {
+            content.aiAnimationLoading(true)
+        } else {
+            content
         }
     }
 }
@@ -238,12 +201,19 @@ struct TuningSheetView: View {
     @ObservedObject var manager: PersonaManager
     @Environment(\.dismiss) var dismiss
     let onExport: () -> Void
+    @Binding var showingFullScreenMCP: Bool
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("Persona Identity") {
                     TextField("Name", text: $manager.config.name)
+                    Picker("Base Model", selection: $manager.config.baseModel) {
+                        Text("GPT-4").tag("gpt-4")
+                        Text("GPT-4o").tag("gpt-4o")
+                        Text("Claude 3.5 Sonnet").tag("claude-3-5")
+                        Text("Llama 3.1").tag("llama-3-1")
+                    }
                     TextEditor(text: $manager.config.instructions).frame(height: 80)
                 }
                 Section("Personality Sliders") {
@@ -251,23 +221,50 @@ struct TuningSheetView: View {
                     tuningSlider(label: "Formality", value: $manager.config.formality)
                     tuningSlider(label: "Humor", value: $manager.config.humor)
                 }
+                Section("Advanced Parameters") {
+                    tuningSlider(label: "Temperature", value: $manager.config.temperature)
+                    VStack(alignment: .leading) {
+                        HStack {
+                            Text("Max Tokens")
+                            Spacer()
+                            Text("\(manager.config.maxTokens)")
+                        }
+                        Slider(value: Binding(get: { Double(manager.config.maxTokens) }, set: { manager.config.maxTokens = Int($0) }), in: 256...4096, step: 128)
+                    }
+                }
                 Section("Behavior Toggles") {
+                    Toggle("Agent Mode", isOn: $manager.agentModeEnabled)
+                    Toggle("Continuous Training", isOn: $manager.config.isTrainingEnabled)
                     Toggle("Web Search", isOn: $manager.config.webSearchEnabled)
                     Toggle("Memory Enabled", isOn: $manager.config.memoryEnabled)
                     Toggle("MCP Tools Enabled", isOn: $manager.config.mcpToolsEnabled)
                 }
                 Section("MCP Servers") {
-                    NavigationLink(destination: MCPMainView()) {
-                        HStack { Text("Connected Servers"); Spacer(); Text("\(MCPManager.shared.servers.count)").foregroundStyle(.secondary) }
+                    Button {
+                        dismiss()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            showingFullScreenMCP = true
+                        }
+                    } label: {
+                        HStack {
+                            Text("Connected Servers")
+                            Spacer()
+                            Text("\(MCPManager.shared.servers.count)").foregroundStyle(.secondary)
+                            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
+                        }
                     }
                 }
                 Section("Danger Zone") {
-                    Button("Reset Persona", role: .destructive) { manager.config = PersonaConfig(name: "Expert Assistant", instructions: "You are an expert AI Persona.", baseModel: "gpt-4", workspaceScope: ["All"]); manager.saveConfig() }
+                    Button("Reset Persona", role: .destructive) {
+                        manager.config = PersonaConfig(name: "Expert Assistant", instructions: "You are an expert AI Persona.", baseModel: "gpt-4", workspaceScope: ["All"])
+                        manager.saveConfig()
+                    }
                     Button("Clear Chat History", role: .destructive) { manager.clearHistory(); dismiss() }
                 }
                 Section { Button(action: onExport) { Label("Export Chat", systemImage: "square.and.arrow.up") } }
             }
-            .navigationTitle("Tuning").toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { manager.saveConfig(); dismiss() } } }
+            .navigationTitle("Tuning")
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { manager.saveConfig(); dismiss() } } }
         }
     }
 
@@ -287,11 +284,12 @@ private struct PersonaHomeModalContent: View {
     let onPromptSelection: (String) -> Void
     let onThreadSelection: (PersonaChatThread) -> Void
     @Binding var activeModal: PersonaHomeView.PersonaHomeModal?
+    @Binding var showingFullScreenMCP: Bool
 
     var body: some View {
         Group {
             switch modal {
-            case .settings: TuningSheetView(manager: manager, onExport: { activeModal = .exportOptions })
+            case .settings: TuningSheetView(manager: manager, onExport: { activeModal = .exportOptions }, showingFullScreenMCP: $showingFullScreenMCP)
             case .discovery: PromptDiscoveryView(onSelect: onPromptSelection).presentationDetents([.medium])
             case .chats: PersonaChatHistorySheet(threads: $manager.chatThreads, onContinue: onThreadSelection)
             case .actions: PersonaAgentActionGalleryView().presentationDetents([.medium, .large])
@@ -309,21 +307,10 @@ private struct PersonaHomeModalContent: View {
 // MARK: - Re-integrated Components from Original
 
 private struct PersonaHomeToolbar: ToolbarContent {
-    @Binding var agentMode: Bool
-    let onShowWelcome: () -> Void
     let onShowTuning: () -> Void
     var body: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            HStack {
-                Toggle(isOn: $agentMode) { Label("Agent", systemImage: "bolt.shield") }.toggleStyle(.button).tint(.orange)
-                Button(action: onShowTuning) { Image(systemName: "slider.horizontal.3") }
-            }
-        }
-        ToolbarItem(placement: .topBarLeading) {
-            HStack {
-                Button(action: onShowWelcome) { Image(systemName: "info.circle") }
-                NavigationLink(destination: MCPMainView()) { Image(systemName: "network").foregroundStyle(.blue) }
-            }
+            Button(action: onShowTuning) { Image(systemName: "slider.horizontal.3") }
         }
     }
 }
@@ -334,8 +321,14 @@ private struct PersonaChatBubble: View {
     var body: some View {
         HStack {
             if isUser { Spacer() }
-            Text(message.content).padding(14).background(isUser ? Color.blue.opacity(0.8) : Color.primary.opacity(0.05))
-                .clipShape(RoundedRectangle(cornerRadius: 20)).foregroundStyle(isUser ? .white : .primary)
+            Group {
+                if isUser {
+                    Text(message.content).padding(14).background(Color.blue.opacity(0.8)).foregroundStyle(.white)
+                } else {
+                    SDKMarkdownView(text: message.content).padding(14).background(Color.primary.opacity(0.05)).foregroundStyle(.primary)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 20))
             if !isUser { Spacer() }
         }.padding(.horizontal)
     }
@@ -352,7 +345,6 @@ private struct PersonaEmptyStateView: View {
     }
 }
 
-// Stub for Missing View from Original
 struct PromptDiscoveryView: View {
     @Environment(\.dismiss) var dismiss
     let onSelect: (String) -> Void
