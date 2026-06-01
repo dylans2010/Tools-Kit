@@ -50,7 +50,7 @@ final class PersonaManager: ObservableObject {
         isThinking = true
         defer { isThinking = false }
 
-        // 1. Capture state needed for background processing
+        // 1. Capture state needed for background processing on MainActor
         let creativity = config.creativity
         let formality = config.formality
         let humor = config.humor
@@ -60,10 +60,12 @@ final class PersonaManager: ObservableObject {
         let historySuffix = chatHistory.suffix(10).map { "\($0.role): \($0.content)" }.joined(separator: "\n")
         let basePrompt = agentSystemPrompt
 
+        // Capture MCP Context on MainActor before entering detached task
+        let mcpContext = mcpEnabled ? await mcpBridge.connectedServersContext() : "No MCP servers connected."
+
         // 2. Perform heavy workspace data gathering and prompt building in background
         let systemPrompt = await Task.detached(priority: .userInitiated) {
             let workspaceContextJSON = await PersonaWorkspace.gatherFullWorkspaceData()
-            let mcpContext = mcpEnabled ? await MCPPersonaBridge().connectedServersContext() : "No MCP servers connected."
 
             var prompt = basePrompt
             prompt = prompt.replacingOccurrences(of: "{{creativity}}", with: String(format: "%.1f", creativity))

@@ -8,6 +8,7 @@ struct PersonaHomeView: View {
     @State private var activeModal: PersonaHomeModal?
     @State private var chatThreads: [PersonaChatThread] = []
     @State private var activeThreadID: UUID?
+    @State private var agentModeEnabled = false
     @State private var pendingAction: PersonaAgentFramework.PersonaActionPreview?
     @State private var pendingIntent: PersonaAgentFramework.PersonaIntent?
     @State private var clarificationMissingField: String?
@@ -109,12 +110,23 @@ struct PersonaHomeView: View {
 
 struct AILoadingModifier: ViewModifier {
     let isLoading: Bool
+    @State private var shouldShow = false
+
     func body(content: Content) -> some View {
-        if isLoading {
-            content.aiAnimationLoading(true)
-        } else {
-            content
-        }
+        content
+            .aiAnimationLoading(shouldShow)
+            .onChange(of: isLoading) { _, newValue in
+                if newValue {
+                    // Apply a short delay before showing to avoid flickering on fast responses
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        if isLoading {
+                            withAnimation { shouldShow = true }
+                        }
+                    }
+                } else {
+                    withAnimation { shouldShow = false }
+                }
+            }
     }
 }
 

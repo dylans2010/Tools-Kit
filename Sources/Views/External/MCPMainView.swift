@@ -786,14 +786,11 @@ struct MCPListModelsSheet: View {
                                             .font(.caption2)
                                         Spacer()
                                         if let authLink = server.authLink, let url = URL(string: authLink) {
-                                            Button {
-                                                UIApplication.shared.open(url)
-                                            } label: {
-                                                Text("Get Credentials")
+                                            if let linkUrl = URL(string: authLink) {
+                                                Link("Get Credentials", destination: linkUrl)
                                                     .font(.caption2.bold())
                                                     .foregroundStyle(.blue)
                                             }
-                                            .buttonStyle(.plain)
                                         }
                                         Text(server.url)
                                             .font(.system(size: 10, design: .monospaced))
