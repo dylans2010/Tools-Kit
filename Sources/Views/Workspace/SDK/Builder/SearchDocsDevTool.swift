@@ -45,6 +45,7 @@ class SearchDocsViewModel: ObservableObject {
     @Published var currentQuery: String = ""
     @Published var errorMessage: String?
     @Published var viewMode: DocViewMode = .reader
+    @Published var isTyping: Bool = false
 
     enum DocViewMode {
         case reader, chat
@@ -91,24 +92,55 @@ class SearchDocsViewModel: ObservableObject {
     nonisolated private static func parseHTML(_ html: String) throws -> [DocElement] {
         var parsed: [DocElement] = []
 
-        let patterns: [(DocElement.ElementType, String)] = [
-            (.heading1, "<h1[^>]*>(.*?)</h1>"),
-            (.heading2, "<h2[^>]*>(.*?)</h2>"),
-            (.heading3, "<h3[^>]*>(.*?)</h3>"),
-            (.code, "<pre[^>]*><code[^>]*>([\\s\\S]*?)</code></pre>"),
-            (.paragraph, "<p[^>]*>(.*?)</p>"),
-            (.list, "<li[^>]*>(.*?)</li>")
+        // 1. Pre-process: Strip noisy tags that shouldn't be parsed
+        var cleanHTML = html
+        let noisePatterns = [
+            "<script[\\s\\S]*?>[\\s\\S]*?</script>",
+            "<style[\\s\\S]*?>[\\s\\S]*?</style>",
+            "<nav[\\s\\S]*?>[\\s\\S]*?</nav>",
+            "<footer[\\s\\S]*?>[\\s\\S]*?</footer>",
+            "<!--[\\s\\S]*?-->"
         ]
 
-        var currentIndex = html.startIndex
+        for pattern in noisePatterns {
+            if let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) {
+                cleanHTML = regex.stringByReplacingMatches(in: cleanHTML, options: [], range: NSRange(location: 0, length: cleanHTML.utf16.count), withTemplate: "")
+            }
+        }
 
-        while currentIndex < html.endIndex {
+        // 2. Try to isolate main content area
+        var targetHTML = cleanHTML
+        let contentContainers = ["<main[\\s\\S]*?>([\\s\\S]*?)</main>", "<article[\\s\\S]*?>([\\s\\S]*?)</article>", "<div[^>]*class=\"[^\"]*content[^\"]*\"[\\s\\S]*?>([\\s\\S]*?)</div>"]
+
+        for containerPattern in contentContainers {
+            if let regex = try? NSRegularExpression(pattern: containerPattern, options: [.caseInsensitive]) {
+                let range = NSRange(location: 0, length: targetHTML.utf16.count)
+                if let match = regex.firstMatch(in: targetHTML, options: [], range: range),
+                   let contentRange = Range(match.range(at: 1), in: targetHTML) {
+                    targetHTML = String(targetHTML[contentRange])
+                    break
+                }
+            }
+        }
+
+        // 3. Extract semantic blocks
+        let patterns: [(DocElement.ElementType, String)] = [
+            (.heading1, "<h1[^>]*>([\\s\\S]*?)</h1>"),
+            (.heading2, "<h2[^>]*>([\\s\\S]*?)</h2>"),
+            (.heading3, "<h3[^>]*>([\\s\\S]*?)</h3>"),
+            (.code, "<pre[^>]*>([\\s\\S]*?)</pre>"),
+            (.paragraph, "<p[^>]*>([\\s\\S]*?)</p>"),
+            (.list, "<li[^>]*>([\\s\\S]*?)</li>")
+        ]
+
+        var currentIndex = targetHTML.startIndex
+        while currentIndex < targetHTML.endIndex {
             var earliestMatch: (DocElement.ElementType, NSTextCheckingResult)?
 
             for (type, pattern) in patterns {
                 if let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators]) {
-                    let range = NSRange(currentIndex..., in: html)
-                    if let match = regex.firstMatch(in: html, options: [], range: range) {
+                    let range = NSRange(currentIndex..., in: targetHTML)
+                    if let match = regex.firstMatch(in: targetHTML, options: [], range: range) {
                         if let earliest = earliestMatch {
                             if match.range.location < earliest.1.range.location {
                                 earliestMatch = (type, match)
@@ -121,23 +153,34 @@ class SearchDocsViewModel: ObservableObject {
             }
 
             if let (type, match) = earliestMatch {
-                if let contentRange = Range(match.range(at: 1), in: html) {
-                    let rawContent = String(html[contentRange])
+                if let contentRange = Range(match.range(at: 1), in: targetHTML) {
+                    let rawContent = String(targetHTML[contentRange])
                     let cleanContent = Self.cleanTags(rawContent)
                     if !cleanContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         parsed.append(DocElement(type: type, content: cleanContent))
                     }
                 }
 
-                // Safe index advancement using Range(NSRange, in: String)
-                if let matchRange = Range(match.range, in: html) {
+                if let matchRange = Range(match.range, in: targetHTML) {
                     currentIndex = matchRange.upperBound
                 } else {
-                    // Fallback to avoid infinite loop
-                    currentIndex = html.index(after: currentIndex)
+                    currentIndex = targetHTML.index(after: currentIndex)
                 }
             } else {
                 break
+            }
+        }
+
+        // 4. Fallback: If nothing found, grab all text from body
+        if parsed.isEmpty {
+            let bodyPattern = "<body[\\s\\S]*?>([\\s\\S]*?)</body>"
+            if let regex = try? NSRegularExpression(pattern: bodyPattern, options: [.caseInsensitive]),
+               let match = regex.firstMatch(in: cleanHTML, options: [], range: NSRange(location: 0, length: cleanHTML.utf16.count)),
+               let contentRange = Range(match.range(at: 1), in: cleanHTML) {
+                let bodyText = Self.cleanTags(String(cleanHTML[contentRange]))
+                if !bodyText.isEmpty {
+                    parsed.append(DocElement(type: .paragraph, content: bodyText))
+                }
             }
         }
 
@@ -162,6 +205,8 @@ class SearchDocsViewModel: ObservableObject {
         let query = currentQuery
         currentQuery = ""
 
+        isTyping = true
+
         let context = elements.map { "\($0.type): \($0.content)" }.joined(separator: "\n")
         let prompt = """
         Use ONLY the following documentation context to answer the user's question.
@@ -179,6 +224,8 @@ class SearchDocsViewModel: ObservableObject {
         } catch {
             chatHistory.append(ChatMessageEntry(role: "assistant", content: "Error communicating with AI: \(error.localizedDescription)"))
         }
+
+        isTyping = false
     }
 }
 
@@ -292,56 +339,144 @@ struct SearchDocsView: View {
         VStack(spacing: 0) {
             ScrollViewReader { proxy in
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 16) {
                         ForEach(viewModel.chatHistory) { entry in
-                            HStack {
-                                if entry.role == "user" { Spacer(minLength: 40) }
+                            chatBubble(entry)
+                        }
 
-                                Text(entry.content)
-                                    .font(.system(size: 14))
-                                    .padding(10)
-                                    .background(
-                                        entry.role == "user"
-                                        ? Color.accentColor
-                                        : Color(uiColor: .tertiarySystemBackground)
-                                    )
-                                    .foregroundStyle(entry.role == "user" ? .white : .primary)
-                                    .cornerRadius(12)
-                                    .textSelection(.enabled)
-
-                                if entry.role == "assistant" { Spacer(minLength: 40) }
-                            }
-                            .id(entry.id)
+                        if viewModel.isTyping {
+                            typingIndicator
+                                .id("typingIndicator")
                         }
                     }
                     .padding()
                 }
                 .onChange(of: viewModel.chatHistory.count) { _ in
-                    if let lastId = viewModel.chatHistory.last?.id {
-                        withAnimation { proxy.scrollTo(lastId, anchor: .bottom) }
+                    scrollToBottom(proxy)
+                }
+                .onChange(of: viewModel.isTyping) { _ in
+                    scrollToBottom(proxy)
+                }
+            }
+
+            // Modern Message Input
+            VStack(spacing: 0) {
+                Divider()
+                HStack(spacing: 12) {
+                    HStack {
+                        TextField("Ask about the docs...", text: $viewModel.currentQuery, axis: .vertical)
+                            .textFieldStyle(.plain)
+                            .lineLimit(1...5)
                     }
-                }
-            }
-
-            Divider()
-
-            HStack(spacing: 12) {
-                TextField("Ask about the docs...", text: $viewModel.currentQuery)
-                    .textFieldStyle(.plain)
-                    .padding(8)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                     .background(Color(uiColor: .tertiarySystemBackground))
-                    .cornerRadius(8)
+                    .cornerRadius(20)
+                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.primary.opacity(0.1), lineWidth: 1))
 
-                Button(action: {
-                    Task { await viewModel.askAI() }
-                }) {
-                    Image(systemName: "paperplane.fill")
-                        .foregroundStyle(viewModel.currentQuery.isEmpty ? .secondary : Color.accentColor)
+                    Button(action: {
+                        Task { await viewModel.askAI() }
+                    }) {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .resizable()
+                            .frame(width: 32, height: 32)
+                            .foregroundStyle(viewModel.currentQuery.isEmpty ? .secondary : Color.accentColor)
+                    }
+                    .disabled(viewModel.currentQuery.isEmpty)
                 }
-                .disabled(viewModel.currentQuery.isEmpty)
+                .padding()
+                .background(.ultraThinMaterial)
             }
-            .padding()
-            .background(Color(uiColor: .secondarySystemBackground))
         }
+    }
+
+    @ViewBuilder
+    private func chatBubble(_ entry: ChatMessageEntry) -> some View {
+        HStack(alignment: .bottom, spacing: 8) {
+            if entry.role == "user" { Spacer(minLength: 40) }
+
+            if entry.role == "assistant" {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 14))
+                    .padding(8)
+                    .background(Color.accentColor.opacity(0.1), in: Circle())
+                    .foregroundStyle(Color.accentColor)
+            }
+
+            VStack(alignment: entry.role == "user" ? .trailing : .leading, spacing: 4) {
+                if entry.role == "user" {
+                    Text(entry.content)
+                        .font(.system(size: 15))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(
+                            LinearGradient(colors: [Color.accentColor, Color.accentColor.opacity(0.8)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
+                        .foregroundStyle(.white)
+                        .cornerRadius(18, corners: [.topLeft, .topRight, .bottomLeft])
+                } else {
+                    SDKMarkdownView(text: entry.content)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(Color(uiColor: .tertiarySystemBackground))
+                        .cornerRadius(18, corners: [.topLeft, .topRight, .bottomRight])
+                        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.primary.opacity(0.05), lineWidth: 1))
+                }
+            }
+            .id(entry.id)
+
+            if entry.role == "assistant" { Spacer(minLength: 40) }
+        }
+    }
+
+    private var typingIndicator: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 14))
+                .padding(8)
+                .background(Color.accentColor.opacity(0.1), in: Circle())
+                .foregroundStyle(Color.accentColor)
+
+            HStack(spacing: 4) {
+                ForEach(0..<3) { index in
+                    Circle()
+                        .fill(Color.secondary.opacity(0.5))
+                        .frame(width: 6, height: 6)
+                        .offset(y: viewModel.isTyping ? -3 : 0)
+                        .animation(.easeInOut(duration: 0.5).repeatForever().delay(Double(index) * 0.2), value: viewModel.isTyping)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color(uiColor: .tertiarySystemBackground))
+            .cornerRadius(18)
+        }
+    }
+
+    private func scrollToBottom(_ proxy: ScrollViewProxy) {
+        withAnimation {
+            if viewModel.isTyping {
+                proxy.scrollTo("typingIndicator", anchor: .bottom)
+            } else if let lastId = viewModel.chatHistory.last?.id {
+                proxy.scrollTo(lastId, anchor: .bottom)
+            }
+        }
+    }
+}
+
+// Helper for selective corner radius
+extension View {
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape(RoundedCorner(radius: radius, corners: corners))
+    }
+}
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+        return Path(path.cgPath)
     }
 }
