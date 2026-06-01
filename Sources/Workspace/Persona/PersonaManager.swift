@@ -50,76 +50,33 @@ final class PersonaManager: ObservableObject {
         isThinking = true
         defer { isThinking = false }
 
-        let isAgent = agentModeEnabled
-
-        // MCP Context Injection
-        let mcpContext = config.mcpToolsEnabled ? mcpBridge.connectedServersContext() : ""
-
         // 1. Capture state needed for background processing
-        let instructions = config.instructions
-        let personaName = config.name
         let creativity = config.creativity
         let formality = config.formality
         let humor = config.humor
+        let temperature = config.temperature
+        let maxTokens = config.maxTokens
+        let mcpEnabled = config.mcpToolsEnabled
         let historySuffix = chatHistory.suffix(10).map { "\($0.role): \($0.content)" }.joined(separator: "\n")
+        let basePrompt = agentSystemPrompt
 
         // 2. Perform heavy workspace data gathering and prompt building in background
         let systemPrompt = await Task.detached(priority: .userInitiated) {
             let workspaceContextJSON = await PersonaWorkspace.gatherFullWorkspaceData()
+            let mcpContext = mcpEnabled ? await MCPPersonaBridge().connectedServersContext() : "No MCP servers connected."
 
-            var snapshotBlock = ""
-            if isAgent {
-                snapshotBlock = """
-                <WORKSPACE_SNAPSHOT>
-                - Unread Emails: 5
-                - Notes Count: 12
-                - Upcoming Events (7 days): 3
-                - Recently Accessed Note: "Project Overview"
-                - Active Draft: "Weekly Sync Follow-up"
-                </WORKSPACE_SNAPSHOT>
-                """
-            }
+            var prompt = basePrompt
+            prompt = prompt.replacingOccurrences(of: "{{creativity}}", with: String(format: "%.1f", creativity))
+            prompt = prompt.replacingOccurrences(of: "{{formality}}", with: String(format: "%.1f", formality))
+            prompt = prompt.replacingOccurrences(of: "{{humor}}", with: String(format: "%.1f", humor))
+            prompt = prompt.replacingOccurrences(of: "{{temperature}}", with: String(format: "%.1f", temperature))
+            prompt = prompt.replacingOccurrences(of: "{{maxTokens}}", with: "\(maxTokens)")
+            prompt = prompt.replacingOccurrences(of: "{{workspace_context}}", with: workspaceContextJSON)
+            prompt = prompt.replacingOccurrences(of: "{{mcp_context}}", with: mcpContext)
+            prompt = prompt.replacingOccurrences(of: "{{chat_history}}", with: historySuffix)
+            prompt = prompt.replacingOccurrences(of: "{{user_query}}", with: query)
 
-            return """
-            <PERSONA_IDENTITY>
-            You are \(personaName), an AI assistant integrated into Tools-Kit, a professional iOS productivity application.
-            \(instructions)
-            </PERSONA_IDENTITY>
-
-            <WORKSPACE_CONTEXT>
-            You have access to the user's workspace which contains: emails, notes, calendar events, and tasks.
-            When the user asks you to perform workspace actions, you must extract the action parameters precisely
-            from their natural language and confirm before executing destructive operations.
-            </WORKSPACE_CONTEXT>
-
-            <AGENT_CAPABILITIES>
-            As an agent, you can:
-            - Send, draft, and reply to emails
-            - Create, edit, and delete notes
-            - Create and manage calendar events
-            - Create and complete tasks
-            When asked to perform any of these, extract the intent and all available parameters from the user's message.
-            </AGENT_CAPABILITIES>
-
-            \(mcpContext)
-
-            <RESPONSE_VOLUME_RULES — CRITICAL>
-            You must calibrate your response length precisely to the nature of the request:
-            - Creativity: \(creativity)
-            - Formality: \(formality)
-            - Humor: \(humor)
-            </RESPONSE_VOLUME_RULES>
-
-            < Hallucination Prevention — CRITICAL>
-            Never fabricate data. Use context or ask user.
-            </ Hallucination Prevention>
-
-            WORKSPACE CONTEXT (JSON):
-            \(workspaceContextJSON)
-
-            PREVIOUS CHAT HISTORY:
-            \(historySuffix)
-            """
+            return prompt
         }.value
 
         // 3. Update Chat History (User) - MainActor
@@ -127,11 +84,9 @@ final class PersonaManager: ObservableObject {
         chatHistory.append(userMessage)
 
         // 4. Query AI Service with tuning parameters
-        // Note: In a real implementation, we'd pass creativity as temperature, etc.
         let response = try await aiService.processText(prompt: query, systemPrompt: systemPrompt)
 
         // 5. Handle MCP Tool Calls (Pattern: [MCP: server -> tool] result)
-        // Check if the response contains a tool call that we need to execute manually if not handled by AIService
         let executionResult = await handleMCPInResponse(response, originalQuery: query)
 
         // 6. Update Chat History (Assistant) - MainActor
@@ -146,8 +101,6 @@ final class PersonaManager: ObservableObject {
     }
 
     private func handleMCPInResponse(_ response: String, originalQuery: String) async -> String {
-        // Implementation for detecting and executing MCP calls embedded in response
-        // For simplicity, we also check if standard agent actions are present
         let agentActions = PersonaAgentFramework.parseAgentActions(from: response)
         if agentActions.isEmpty { return response }
 
@@ -207,8 +160,6 @@ final class PersonaManager: ObservableObject {
         return "\(preamble)\n\n\(actionSummary)"
     }
 
-
-
     func queryPersonaSafely(query: String) async {
         do {
             _ = try await queryPersona(query: query)
@@ -232,19 +183,15 @@ final class PersonaManager: ObservableObject {
         saveChatHistory()
     }
 
-
-    /// Legacy compatibility API used by Workspace SDK wrappers.
     func recentMemories(limit: Int? = nil) -> [PersonaInteraction] {
         let history = interactions
-        guard let limit else { return history }
+        guard let limit = limit else { return history }
         return Array(history.suffix(max(0, limit)))
     }
 
-    /// Legacy compatibility API used by Workspace SDK wrappers.
     func injectMemory(entityID: UUID, content: String) {
         let memory = PersonaInteraction(query: "Memory Injection [\(entityID.uuidString)]", response: content, contextUsed: ["manual_memory_injection"])
         interactions.append(memory)
         try? dataStore.savePersonaInteraction(memory)
     }
-
 }

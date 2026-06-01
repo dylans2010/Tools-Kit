@@ -9,9 +9,13 @@ struct MCPGuideView: View {
         case configuration = "Advanced Configuration"
         case persona = "Persona AI Integration"
         case debugging = "Debugging & Logs"
-        case useCases = "Use Cases"
         case protocolOverview = "Protocol Overview"
+        case advancedRPC = "Advanced JSON-RPC"
+        case security = "Security & Privacy"
+        case customServers = "Custom Server Development"
+        case useCases = "Use Cases"
         case bestPractices = "Best Practices"
+        case production = "Production Deployment"
         case troubleshooting = "Troubleshooting"
 
         var id: String { rawValue }
@@ -22,9 +26,13 @@ struct MCPGuideView: View {
             case .configuration: return "gearshape.2"
             case .persona: return "brain.head.profile"
             case .debugging: return "terminal"
-            case .useCases: return "lightbulb"
             case .protocolOverview: return "network"
+            case .advancedRPC: return "cpu"
+            case .security: return "shield.checkered"
+            case .customServers: return "hammer"
+            case .useCases: return "lightbulb"
             case .bestPractices: return "star"
+            case .production: return "shippingbox"
             case .troubleshooting: return "wrench.and.screwdriver"
             }
         }
@@ -49,9 +57,13 @@ struct MCPGuideView: View {
             case .configuration: ConfigurationSection()
             case .persona: PersonaIntegrationSection()
             case .debugging: DebuggingSection()
-            case .useCases: UseCasesSection()
             case .protocolOverview: ProtocolOverviewSection()
+            case .advancedRPC: AdvancedRPCSection()
+            case .security: SecuritySection()
+            case .customServers: CustomServersSection()
+            case .useCases: UseCasesSection()
             case .bestPractices: BestPracticesSection()
+            case .production: ProductionSection()
             case .troubleshooting: TroubleshootingSection()
             }
         }
@@ -129,22 +141,6 @@ private struct AuthenticationSection: View {
                 GuideDefRow(name: "Scopes", description: "Define necessary permissions (e.g., repo, user)", icon: "checklist")
             }
         }
-
-        Section(header: Text("Custom Headers")) {
-            Text("For unique requirements, you can define multiple arbitrary header key-value pairs.")
-                .font(.caption2).foregroundStyle(.secondary)
-        }
-    }
-}
-
-private struct UseCasesSection: View {
-    var body: some View {
-        Section(header: Text("Common Use Cases")) {
-            GuideDefRow(name: "Local Development", description: "Connect to a local server to let the AI run shell scripts or access your local file system.", icon: "terminal")
-            GuideDefRow(name: "Data Analysis", description: "Bridge to a SQL database or CSV processor to analyze large datasets directly.", icon: "chart.bar.xaxis")
-            GuideDefRow(name: "API Integration", description: "Connect to specialized services like GitHub, Slack, or Jira without custom SDKs.", icon: "link")
-            GuideDefRow(name: "Home Automation", description: "Control smart home devices via a local MCP bridge.", icon: "house")
-        }
     }
 }
 
@@ -160,21 +156,9 @@ private struct ProtocolOverviewSection: View {
             .padding(.vertical, 4)
         }
 
-        Section(header: Text("JSON-RPC Example")) {
-            Text("""
-            {
-              "jsonrpc": "2.0",
-              "method": "tools/call",
-              "params": {
-                "name": "get_weather",
-                "arguments": { "city": "San Francisco" }
-              },
-              "id": 1
-            }
-            """)
-            .font(.system(size: 10, design: .monospaced))
-            .padding(8)
-            .background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+        Section(header: Text("JSON-RPC Lifecycle")) {
+            Text("MCP uses JSON-RPC 2.0 over various transports (SSE, Stdio, WebSockets). Tools-Kit primarily uses SSE for remote servers.")
+                .font(.caption2).foregroundStyle(.secondary)
         }
     }
 
@@ -190,6 +174,90 @@ private struct ProtocolOverviewSection: View {
                 Text(title).font(.subheadline.bold())
                 Text(desc).font(.caption).foregroundStyle(.secondary)
             }
+        }
+    }
+}
+
+private struct AdvancedRPCSection: View {
+    var body: some View {
+        Section(header: Text("Sampling Capabilities")) {
+            Text("Sampling allows servers to request completions from the AI model via the client.")
+                .font(.subheadline).foregroundStyle(.secondary)
+
+            Text("""
+            Method: sampling/createMessage
+            Description: Server asks the AI for help.
+            """)
+            .font(.system(size: 10, design: .monospaced))
+            .padding(8)
+            .background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+        }
+
+        Section(header: Text("Pagination & Streaming")) {
+            GuideDefRow(name: "List Pagination", description: "Use 'nextCursor' in results to fetch more items.", icon: "arrow.right.circle")
+            GuideDefRow(name: "Streaming Resources", description: "Subscribe to resource updates for real-time data flow.", icon: "wave.3.right")
+        }
+    }
+}
+
+private struct SecuritySection: View {
+    var body: some View {
+        Section(header: Text("Data Privacy")) {
+            GuideDefRow(name: "On-Device Storage", description: "All MCP credentials are encrypted and stored in the iOS Keychain.", icon: "lock.icloud")
+            GuideDefRow(name: "No Proxy", description: "Connections are made directly from your device to the server.", icon: "arrow.left.and.right.circle")
+        }
+
+        Section(header: Text("Access Control")) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Recommended Security Headers:").font(.caption.bold())
+                Text("""
+                Strict-Transport-Security: max-age=31536000
+                Content-Security-Policy: default-src 'none'
+                """)
+                .font(.system(size: 10, design: .monospaced))
+                .padding(8)
+                .background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+            }
+        }
+    }
+}
+
+private struct CustomServersSection: View {
+    var body: some View {
+        Section(header: Text("Building with Python")) {
+            Text("The official 'mcp' Python SDK is the fastest way to build servers.")
+                .font(.subheadline).foregroundStyle(.secondary)
+
+            Text("""
+            from mcp.server import Server
+            app = Server("weather-service")
+
+            @app.tool()
+            def get_weather(city: str) -> str:
+                return f"Sunny in {city}"
+            """)
+            .font(.system(size: 10, design: .monospaced))
+            .padding(8)
+            .background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 6))
+        }
+
+        Section(header: Text("TypeScript / Node.js")) {
+            Text("Use @modelcontextprotocol/sdk for TypeScript environments.")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+    }
+}
+
+private struct ProductionSection: View {
+    var body: some View {
+        Section(header: Text("Hosting Options")) {
+            GuideDefRow(name: "Railway / Fly.io", description: "Excellent for persistent SSE servers.", icon: "cloud.fill")
+            GuideDefRow(name: "Vercel / AWS Lambda", description: "Best for stateless HTTP-based tool execution.", icon: "bolt.fill")
+        }
+
+        Section(header: Text("Monitoring")) {
+            GuideDefRow(name: "Health Checks", description: "Implement /health endpoint for uptime monitoring.", icon: "heart.pulse")
+            GuideDefRow(name: "Usage Limits", description: "Apply rate limiting to prevent tool abuse.", icon: "gauge.medium")
         }
     }
 }
@@ -237,35 +305,6 @@ private struct PersonaIntegrationSection: View {
             GuideDefRow(name: "Capability Injection", description: "Tool definitions are injected into the AI's system prompt.", icon: "plus.message")
             GuideDefRow(name: "Real-time Execution", description: "AI requests tool execution; Tools-Kit handles the networking.", icon: "bolt.horizontal.circle")
         }
-
-        Section(header: Text("Sample Conversation")) {
-            VStack(alignment: .leading, spacing: 10) {
-                ChatBubble(role: "user", text: "What's the weather in London?")
-                ChatBubble(role: "assistant", text: "Let me check that for you.")
-                HStack {
-                    Image(systemName: "terminal.fill").font(.caption)
-                    Text("Executing: weather_server.get_weather(city: \"London\")").font(.caption2.monospaced())
-                }
-                .padding(6)
-                .background(Color.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 4))
-                .foregroundStyle(.blue)
-            }
-        }
-    }
-
-    struct ChatBubble: View {
-        let role: String
-        let text: String
-        var body: some View {
-            HStack {
-                if role == "assistant" { Spacer() }
-                Text(text)
-                    .font(.caption)
-                    .padding(8)
-                    .background(role == "user" ? Color.accentColor.opacity(0.1) : Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
-                if role == "user" { Spacer() }
-            }
-        }
     }
 }
 
@@ -287,6 +326,17 @@ private struct DebuggingSection: View {
             GuideDefRow(name: "-32700", description: "Parse Error: Invalid JSON received by the server.", icon: "exclamationmark.square")
             GuideDefRow(name: "-32601", description: "Method Not Found: The tool name is incorrect.", icon: "questionmark.square")
             GuideDefRow(name: "-32602", description: "Invalid Params: Check the tool's input schema.", icon: "xmark.square")
+        }
+    }
+}
+
+private struct UseCasesSection: View {
+    var body: some View {
+        Section(header: Text("Common Use Cases")) {
+            GuideDefRow(name: "Local Development", description: "Connect to a local server to let the AI run shell scripts or access your local file system.", icon: "terminal")
+            GuideDefRow(name: "Data Analysis", description: "Bridge to a SQL database or CSV processor to analyze large datasets directly.", icon: "chart.bar.xaxis")
+            GuideDefRow(name: "API Integration", description: "Connect to specialized services like GitHub, Slack, or Jira without custom SDKs.", icon: "link")
+            GuideDefRow(name: "Home Automation", description: "Control smart home devices via a local MCP bridge.", icon: "house")
         }
     }
 }

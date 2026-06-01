@@ -518,6 +518,8 @@ struct MCPAddServerView: View {
     @State private var name = ""
     @State private var url = ""
     @State private var authType: MCPAuthType = .none
+    @State private var authConfig = MCPAuthConfig()
+    @State private var tempSecret = ""
     @State private var showingBrowse = false
     @State private var isTesting = false
     @State private var testStatus: String?
@@ -554,15 +556,16 @@ struct MCPAddServerView: View {
                         .keyboardType(.URL)
                 }
 
-                Section("Initial Authentication") {
+                Section("Authentication") {
                     Picker("Auth Type", selection: $authType) {
                         ForEach(MCPAuthType.allCases) { type in
                             Text(type.displayName).tag(type)
                         }
                     }
-                    Text("You can configure full credentials after adding the server.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+
+                    if authType != .none {
+                        AddServerAuthFields(authType: $authType, authConfig: $authConfig, tempSecret: $tempSecret)
+                    }
                 }
 
                 Section {
@@ -571,7 +574,7 @@ struct MCPAddServerView: View {
                             isTesting = true
                             testStatus = nil
                             do {
-                                let mockServer = MCPServer(name: name, baseURL: url, authConfig: MCPAuthConfig(type: authType))
+                                let mockServer = MCPServer(name: name, baseURL: url, authConfig: authConfig)
                                 let info = try await MCPManager.shared.testConnection(server: mockServer)
                                 testStatus = "Verified: \(info.name) (\(info.version))"
                             } catch {
@@ -604,12 +607,27 @@ struct MCPAddServerView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") {
+                        var finalConfig = authConfig
+                        finalConfig.type = authType
                         let newServer = MCPServer(
                             name: name,
                             baseURL: url,
-                            authConfig: MCPAuthConfig(type: authType)
+                            authConfig: finalConfig
                         )
                         MCPManager.shared.addServer(newServer)
+
+                        if !tempSecret.isEmpty {
+                            let key: String
+                            switch authType {
+                            case .apiKey: key = "apiKey"
+                            case .bearerToken: key = "bearerToken"
+                            case .basicAuth: key = "password"
+                            default: key = ""
+                            }
+                            if !key.isEmpty {
+                                MCPManager.shared.saveSecret(tempSecret, key: key, for: newServer)
+                            }
+                        }
                         dismiss()
                     }
                     .disabled(!isValid)
@@ -626,6 +644,59 @@ struct MCPAddServerView: View {
     }
 }
 
+struct AddServerAuthFields: View {
+    @Binding var authType: MCPAuthType
+    @Binding var authConfig: MCPAuthConfig
+    @Binding var tempSecret: String
+
+    var body: some View {
+        Group {
+            switch authType {
+            case .apiKey:
+                TextField("Header Name", text: $authConfig.apiKeyHeaderName)
+                SecureField("API Key", text: $tempSecret)
+            case .bearerToken:
+                SecureField("Token", text: $tempSecret)
+                TextField("Refresh Endpoint (Optional)", text: $authConfig.tokenEndpoint)
+            case .basicAuth:
+                TextField("Username", text: $authConfig.username)
+                SecureField("Password", text: $tempSecret)
+            case .oauth, .oauth2AuthCode:
+                TextField("Auth Endpoint", text: $authConfig.authorizationEndpoint)
+                TextField("Token Endpoint", text: $authConfig.tokenEndpoint)
+                TextField("Client ID", text: $authConfig.clientId)
+                TextField("Scopes", text: $authConfig.scopes)
+            case .oauth2ClientCredentials:
+                TextField("Token Endpoint", text: $authConfig.tokenEndpoint)
+                TextField("Client ID", text: $authConfig.clientId)
+                SecureField("Client Secret", text: $tempSecret)
+            case .customHeaders:
+                VStack(alignment: .leading) {
+                    ForEach(0..<authConfig.customHeaderKeys.count, id: \.self) { index in
+                        HStack {
+                            TextField("Key", text: $authConfig.customHeaderKeys[index])
+                            TextField("Value", text: $authConfig.customHeaderValues[index])
+                            Button {
+                                authConfig.customHeaderKeys.remove(at: index)
+                                authConfig.customHeaderValues.remove(at: index)
+                            } label: {
+                                Image(systemName: "minus.circle.fill").foregroundStyle(.red)
+                            }
+                        }
+                    }
+                    Button {
+                        authConfig.customHeaderKeys.append("")
+                        authConfig.customHeaderValues.append("")
+                    } label: {
+                        Label("Add Header", systemImage: "plus.circle.fill")
+                    }
+                }
+            default: EmptyView()
+            }
+        }
+    }
+}
+
 // MARK: - MCP Directory Models & Sheet
 
 struct MCPServerTemplate: Identifiable, Codable {
@@ -635,9 +706,10 @@ struct MCPServerTemplate: Identifiable, Codable {
     let url: String
     let authenticationType: MCPAuthType
     let category: String
+    let authLink: String?
 
     enum CodingKeys: String, CodingKey {
-        case id, name, description, url, category
+        case id, name, description, url, category, authLink = "auth_link"
         case authenticationType = "authentication_type"
     }
 }
@@ -713,6 +785,16 @@ struct MCPListModelsSheet: View {
                                         Label(server.authenticationType.displayName, systemImage: "lock.shield")
                                             .font(.caption2)
                                         Spacer()
+                                        if let authLink = server.authLink, let url = URL(string: authLink) {
+                                            Button {
+                                                UIApplication.shared.open(url)
+                                            } label: {
+                                                Text("Get Credentials")
+                                                    .font(.caption2.bold())
+                                                    .foregroundStyle(.blue)
+                                            }
+                                            .buttonStyle(.plain)
+                                        }
                                         Text(server.url)
                                             .font(.system(size: 10, design: .monospaced))
                                             .foregroundStyle(.tertiary)
@@ -876,23 +958,6 @@ struct MCPEmptyStateView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 40)
             }
-
-            Button(action: onAdd) {
-                HStack {
-                    Image(systemName: "plus.circle.fill")
-                    Text("Add Your First Server")
-                }
-                .font(.headline)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 14)
-                .background(
-                    Capsule()
-                        .fill(.primary)
-                )
-                .foregroundStyle(Color(uiColor: .systemBackground))
-            }
-            .padding(.top, 12)
-            .shadow(color: .primary.opacity(0.2), radius: 15, x: 0, y: 8)
         }
         .frame(maxWidth: .infinity)
         .listRowBackground(Color.clear)

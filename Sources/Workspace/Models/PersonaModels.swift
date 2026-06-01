@@ -10,6 +10,8 @@ struct PersonaConfig: Codable {
     var creativity: Double = 0.5
     var formality: Double = 0.5
     var humor: Double = 0.5
+    var temperature: Double = 0.7
+    var maxTokens: Int = 2048
     var webSearchEnabled: Bool = false
     var memoryEnabled: Bool = true
     var mcpToolsEnabled: Bool = false
@@ -24,6 +26,8 @@ struct PersonaConfig: Codable {
         creativity: Double = 0.5,
         formality: Double = 0.5,
         humor: Double = 0.5,
+        temperature: Double = 0.7,
+        maxTokens: Int = 2048,
         webSearchEnabled: Bool = false,
         memoryEnabled: Bool = true,
         mcpToolsEnabled: Bool = false
@@ -37,6 +41,8 @@ struct PersonaConfig: Codable {
         self.creativity = creativity
         self.formality = formality
         self.humor = humor
+        self.temperature = temperature
+        self.maxTokens = maxTokens
         self.webSearchEnabled = webSearchEnabled
         self.memoryEnabled = memoryEnabled
         self.mcpToolsEnabled = mcpToolsEnabled
@@ -44,7 +50,7 @@ struct PersonaConfig: Codable {
 
     private enum CodingKeys: String, CodingKey {
         case name, instructions, baseModel, workspaceScope, isTrainingEnabled, trainingPrompt
-        case creativity, formality, humor, webSearchEnabled, memoryEnabled, mcpToolsEnabled
+        case creativity, formality, humor, temperature, maxTokens, webSearchEnabled, memoryEnabled, mcpToolsEnabled
     }
 
     init(from decoder: Decoder) throws {
@@ -58,6 +64,8 @@ struct PersonaConfig: Codable {
         creativity = try container.decodeIfPresent(Double.self, forKey: .creativity) ?? 0.5
         formality = try container.decodeIfPresent(Double.self, forKey: .formality) ?? 0.5
         humor = try container.decodeIfPresent(Double.self, forKey: .humor) ?? 0.5
+        temperature = try container.decodeIfPresent(Double.self, forKey: .temperature) ?? 0.7
+        maxTokens = try container.decodeIfPresent(Int.self, forKey: .maxTokens) ?? 2048
         webSearchEnabled = try container.decodeIfPresent(Bool.self, forKey: .webSearchEnabled) ?? false
         memoryEnabled = try container.decodeIfPresent(Bool.self, forKey: .memoryEnabled) ?? true
         mcpToolsEnabled = try container.decodeIfPresent(Bool.self, forKey: .mcpToolsEnabled) ?? false
