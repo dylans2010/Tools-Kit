@@ -396,7 +396,7 @@ struct MCPAuthFormView: View {
                     secretInput = ""
                 }
 
-            case .oauth2AuthCode:
+            case .oauth, .oauth2AuthCode:
                 TextField("Auth Endpoint", text: $server.authConfig.authorizationEndpoint)
                 TextField("Token Endpoint", text: $server.authConfig.tokenEndpoint)
                 TextField("Client ID", text: $server.authConfig.clientId)
@@ -759,23 +759,6 @@ struct MCPListModelsSheet: View {
     }
 }
 
-struct FilterChip: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.subheadline.bold())
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(isSelected ? Color.accentColor : Color(.systemGray5), in: Capsule())
-                .foregroundStyle(isSelected ? .white : .primary)
-        }
-        .buttonStyle(.plain)
-    }
-}
 
 struct MCPTrafficInspectorView: View {
     let server: MCPServer
@@ -906,7 +889,7 @@ struct MCPEmptyStateView: View {
                     Capsule()
                         .fill(.primary)
                 )
-                .foregroundStyle(.systemBackground)
+                .foregroundStyle(Color(uiColor: .systemBackground))
             }
             .padding(.top, 12)
             .shadow(color: .primary.opacity(0.2), radius: 15, x: 0, y: 8)

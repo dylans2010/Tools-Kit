@@ -85,7 +85,7 @@ struct MCPConnectStateDetail: View {
                     // Info Grid
                     VStack(spacing: 12) {
                         InfoRow(label: "Purpose", value: invocation.purpose)
-                        InfoRow(label: "Started", value: invocation.startedAt.formatted(date: .omitted, time: .medium))
+                        InfoRow(label: "Started", value: invocation.startedAt.formatted(date: .omitted, time: .standard))
 
                         if let completedAt = invocation.completedAt {
                             let duration = completedAt.timeIntervalSince(invocation.startedAt)

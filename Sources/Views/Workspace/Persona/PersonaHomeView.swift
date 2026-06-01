@@ -373,3 +373,163 @@ struct PersonaChatHistorySheet: View {
         }
     }
 }
+struct ThinkingIndicator: View {
+    @State private var isAnimating = false
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(0..<3, id: \.self) { index in
+                Circle()
+                    .fill(Color.secondary)
+                    .frame(width: 8, height: 8)
+                    .scaleEffect(isAnimating ? 1.0 : 0.55)
+                    .opacity(isAnimating ? 1.0 : 0.45)
+                    .animation(
+                        .easeInOut(duration: 0.6)
+                            .repeatForever()
+                            .delay(Double(index) * 0.18),
+                        value: isAnimating
+                    )
+            }
+            Text("Persona is thinking…")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(.thinMaterial, in: Capsule())
+        .onAppear { isAnimating = true }
+    }
+}
+
+struct PersonaActionConfirmationCard: View {
+    let preview: PersonaAgentFramework.PersonaActionPreview
+    let onConfirm: (Bool) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                Text("Confirm Agent Action")
+                    .font(.headline)
+                Spacer()
+            }
+
+            Text(preview.intentDescription)
+                .font(.subheadline)
+
+            if !preview.parameterSummary.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(preview.parameterSummary.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+                        HStack(alignment: .top) {
+                            Text(key)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Text(value)
+                                .font(.caption)
+                                .multilineTextAlignment(.trailing)
+                        }
+                    }
+                }
+            }
+
+            if let warning = preview.warningMessage, !warning.isEmpty {
+                Text(warning)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack {
+                Button(role: .cancel) { onConfirm(false) } label: {
+                    Text("Cancel")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+
+                Button(role: .destructive) { onConfirm(true) } label: {
+                    Text("Confirm")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .padding()
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: .black.opacity(0.18), radius: 20, x: 0, y: 10)
+    }
+}
+
+struct PersonaAgentActionGalleryView: View {
+    private let actionGroups: [(title: String, icon: String, actions: [String])] = [
+        ("Mail", "envelope.fill", ["Send email", "Draft email", "Reply to email", "Forward email"]),
+        ("Notes", "note.text", ["Create note", "Edit note", "Search notes", "Delete note"]),
+        ("Calendar & Tasks", "calendar.badge.clock", ["Create event", "Edit event", "Create task", "Complete task"])
+    ]
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(actionGroups, id: \.title) { group in
+                    Section {
+                        ForEach(group.actions, id: \.self) { action in
+                            Label(action, systemImage: group.icon)
+                        }
+                    } header: {
+                        Text(group.title)
+                    }
+                }
+            }
+            .navigationTitle("Agent Actions")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+struct PersonaExportOptionsView: View {
+    let messages: [PersonaMessage]
+    let persona: PersonaConfig
+    let agentMode: Bool
+    let onExport: (Data, String) -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Formats") {
+                    Button {
+                        exportJSON()
+                    } label: {
+                        Label("Export JSON", systemImage: "curlybraces")
+                    }
+
+                    Button {
+                        exportPlainText()
+                    } label: {
+                        Label("Export Transcript", systemImage: "doc.plaintext")
+                    }
+                }
+            }
+            .navigationTitle("Export Chat")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+
+    private func exportJSON() {
+        let data = (try? PersonaChatExporter.export(
+            messages: messages,
+            actions: [],
+            persona: persona,
+            agentMode: agentMode,
+            conversationID: UUID()
+        )) ?? Data()
+        onExport(data, "persona-chat.json")
+    }
+
+    private func exportPlainText() {
+        let transcript = messages.map { message in
+            "[\(message.timestamp.formatted(date: .abbreviated, time: .shortened))] \(message.role.capitalized): \(message.content)"
+        }.joined(separator: "\n\n")
+        onExport(Data(transcript.utf8), "persona-chat.txt")
+    }
+}
