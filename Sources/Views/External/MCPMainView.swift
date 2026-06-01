@@ -26,70 +26,17 @@ struct MCPMainView: View {
                         }
                     } header: {
                         HStack {
-                            Text("Your Servers")
+                            Text("Active Servers")
                             Spacer()
-                            Menu {
-                                Button {
-                                    Task {
-                                        for server in mcpManager.servers {
-                                            try? await mcpManager.connect(to: server)
-                                        }
-                                    }
-                                } label: {
-                                    Label("Connect All", systemImage: "bolt.fill")
-                                }
-
-                                Button(role: .destructive) {
-                                    for server in mcpManager.servers {
-                                        mcpManager.disconnect(server: server)
-                                    }
-                                } label: {
-                                    Label("Disconnect All", systemImage: "power")
-                                }
-                            } label: {
-                                Label("Bulk Actions", systemImage: "ellipsis.circle")
-                                    .font(.caption)
-                            }
+                            bulkActionsMenu
                         }
                     }
                 }
             }
-            .navigationTitle("MCP Servers")
+            .navigationTitle("MCP Core")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Menu {
-                        Button {
-                            Task {
-                                for server in mcpManager.servers {
-                                    try? await mcpManager.connect(to: server)
-                                }
-                            }
-                        } label: {
-                            Label("Connect All", systemImage: "bolt.fill")
-                        }
-
-                        Button(role: .destructive) {
-                            for server in mcpManager.servers {
-                                mcpManager.disconnect(server: server)
-                            }
-                        } label: {
-                            Label("Disconnect All", systemImage: "power")
-                        }
-
-                        Divider()
-
-                        Button {
-                            Task {
-                                for server in mcpManager.servers where server.connectionStatus == .connected {
-                                    try? await mcpManager.connect(to: server)
-                                }
-                            }
-                        } label: {
-                            Label("Refresh All", systemImage: "arrow.clockwise")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
+                    bulkActionsMenu
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
@@ -97,13 +44,14 @@ struct MCPMainView: View {
                         Button {
                             showingBrowseServers = true
                         } label: {
-                            Label("Browse", systemImage: "magnifyingglass.circle")
+                            Label("Browse", systemImage: "safari")
                         }
 
                         Button {
                             showingAddServer = true
                         } label: {
-                            Image(systemName: "plus")
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundStyle(.blue)
                         }
                     }
                 }
@@ -116,11 +64,52 @@ struct MCPMainView: View {
                     let newServer = MCPServer(
                         name: server.name,
                         baseURL: server.url,
-                        authConfig: MCPAuthConfig(type: server.authenticationType)
+                        authConfig: MCPAuthConfig()
                     )
-                    mcpManager.addServer(newServer)
+                    var updatedConfig = newServer.authConfig
+                    updatedConfig.type = server.authenticationType
+                    var finalServer = newServer
+                    finalServer.authConfig = updatedConfig
+                    mcpManager.addServer(finalServer)
                 }
             }
+        }
+    }
+
+    private var bulkActionsMenu: some View {
+        Menu {
+            Button {
+                Task {
+                    for server in mcpManager.servers {
+                        try? await mcpManager.connect(to: server)
+                    }
+                }
+            } label: {
+                Label("Connect All", systemImage: "bolt.fill")
+            }
+
+            Button(role: .destructive) {
+                for server in mcpManager.servers {
+                    mcpManager.disconnect(server: server)
+                }
+            } label: {
+                Label("Disconnect All", systemImage: "power")
+            }
+
+            Divider()
+
+            Button {
+                Task {
+                    for server in mcpManager.servers where server.connectionStatus == .connected {
+                        try? await mcpManager.connect(to: server)
+                    }
+                }
+            } label: {
+                Label("Refresh All", systemImage: "arrow.clockwise")
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
+                .font(.caption)
         }
     }
 }
@@ -136,30 +125,43 @@ struct MCPServerRowView: View {
             ZStack {
                 Circle()
                     .fill(server.connectionStatus.color.opacity(0.1))
-                    .frame(width: 32, height: 32)
+                    .frame(width: 36, height: 36)
 
-                Image(systemName: server.connectionStatus == .connected ? "checkmark.circle.fill" : "network")
-                    .font(.system(size: 14))
+                Image(systemName: server.connectionStatus == .connected ? "checkmark.seal.fill" : "network")
+                    .font(.system(size: 16))
                     .foregroundStyle(server.connectionStatus.color)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(server.name)
                     .font(.headline)
-                Text(server.baseURL)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+
+                HStack(spacing: 8) {
+                    Text(server.baseURL)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+
+                    if let latency = server.latency {
+                        Text("\(Int(latency))ms")
+                            .font(.system(size: 9, weight: .bold, design: .monospaced))
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1)
+                            .background(latency < 200 ? Color.green.opacity(0.2) : Color.orange.opacity(0.2))
+                            .cornerRadius(4)
+                    }
+                }
             }
 
             Spacer()
 
             if server.connectionStatus == .connected {
-                Text("\(server.discoveredTools.count)")
-                    .font(.caption2.bold())
+                let toolCount = mcpManager.toolRegistry[server.id.uuidString]?.count ?? 0
+                Text("\(toolCount) tools")
+                    .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
                     .background(Color.blue, in: Capsule())
             }
 
@@ -192,23 +194,43 @@ struct MCPServerDetailView: View {
 
     var body: some View {
         Form {
-            Section("Connection") {
-                TextField("Base URL", text: $server.baseURL)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-
+            Section("Status & Metrics") {
                 HStack {
-                    Text("Status")
+                    Label("Connection", systemImage: "antenna.radiowaves.left.and.right")
                     Spacer()
                     Text(server.connectionStatus.label)
                         .foregroundStyle(server.connectionStatus.color)
                         .bold()
                 }
 
+                if let latency = server.latency {
+                    HStack {
+                        Label("Latency", systemImage: "timer")
+                        Spacer()
+                        Text("\(Int(latency)) ms")
+                            .font(.system(.body, design: .monospaced))
+                    }
+                }
+
+                if let lastConnected = server.lastConnected {
+                    HStack {
+                        Label("Last Seen", systemImage: "clock")
+                        Spacer()
+                        Text(lastConnected, style: .relative)
+                            .font(.caption)
+                    }
+                }
+
                 if let lastError = server.lastError {
-                    Text(lastError)
-                        .font(.caption)
-                        .foregroundStyle(.red)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Label("Last Error", systemImage: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                            .font(.caption.bold())
+                        Text(lastError)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 4)
                 }
 
                 HStack(spacing: 12) {
@@ -228,7 +250,7 @@ struct MCPServerDetailView: View {
                                 isConnecting = false
                             }
                         } label: {
-                            Label("Connect", systemImage: "network")
+                            Label("Establish Connection", systemImage: "bolt.fill")
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(isConnecting)
@@ -244,13 +266,13 @@ struct MCPServerDetailView: View {
                         Task {
                             do {
                                 let info = try await mcpManager.testConnection(server: server)
-                                testResult = "Success: \(info.name) v\(info.version)"
+                                testResult = "Success: \(info.name) v\(info.version) (\(info.protocolVersion))"
                             } catch {
                                 testResult = "Failed: \(error.localizedDescription)"
                             }
                         }
                     } label: {
-                        Label("Test", systemImage: "bolt.fill")
+                        Label("Ping", systemImage: "waveform.path.ecg")
                     }
                     .buttonStyle(.bordered)
                 }
@@ -262,58 +284,62 @@ struct MCPServerDetailView: View {
                 }
             }
 
+            Section("Endpoint") {
+                TextField("Base URL", text: $server.baseURL)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+
+                Toggle(isOn: $server.isTrusted) {
+                    Label("Trust this server", systemImage: "shield.checkered")
+                }
+                .tint(.blue)
+
+                if !server.baseURL.lowercased().hasPrefix("https") && !server.isTrusted {
+                    Text("Warning: Non-HTTPS connections are insecure. You must 'Trust' this server to connect.")
+                        .font(.caption2)
+                        .foregroundStyle(.orange)
+                }
+            }
+
             Section("Authentication") {
-                Picker("Auth Type", selection: $server.authConfig.type) {
+                Picker("Mechanism", selection: $server.authConfig.type) {
                     ForEach(MCPAuthType.allCases) { type in
                         Text(type.displayName).tag(type)
                     }
                 }
-                .onChange(of: server.authConfig.type) { _, _ in
-                    mcpManager.updateServer(server)
-                }
 
                 MCPAuthFormView(server: $server)
-
-                NavigationLink(destination: MCPGuideView()) {
-                    Label("View Setup Guide", systemImage: "book.fill")
-                        .foregroundStyle(.blue)
-                }
             }
 
             if server.connectionStatus == .connected {
-                Section("Discovered Tools") {
-                    if server.discoveredTools.isEmpty {
-                        Text("No tools found")
+                Section("Live Tool Registry") {
+                    let tools = mcpManager.toolRegistry[server.id.uuidString] ?? []
+                    if tools.isEmpty {
+                        Text("No functional tools discovered.")
                             .foregroundStyle(.secondary)
                     } else {
-                        ForEach(server.discoveredTools) { tool in
+                        ForEach(tools) { tool in
                             MCPToolRowView(tool: tool)
                         }
                     }
 
-                    Button("Refresh Tools") {
+                    Button {
                         Task {
                             try? await mcpManager.connect(to: server)
                         }
+                    } label: {
+                        Label("Re-scan for Tools", systemImage: "arrow.clockwise.circle")
                     }
                 }
-            }
-
-            Section("Server Notes") {
-                TextEditor(text: $server.notes)
-                    .frame(minHeight: 100)
-                    .onChange(of: server.notes) { _, _ in
-                        mcpManager.updateServer(server)
-                    }
             }
 
             Section("Traffic Inspector") {
                 if let logs = server.trafficLogs, !logs.isEmpty {
                     NavigationLink(destination: MCPTrafficInspectorView(server: server)) {
-                        Label("View \(logs.count) entries", systemImage: "list.bullet.rectangle.portrait")
+                        Label("Analyze \(logs.count) packets", systemImage: "gauge.with.needle")
                     }
                 } else {
-                    Text("No logs recorded yet.")
+                    Text("No telemetry data recorded.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -323,22 +349,22 @@ struct MCPServerDetailView: View {
                 Button {
                     var newServer = server
                     newServer.id = UUID()
-                    newServer.name += " (Copy)"
+                    newServer.name += " (Clone)"
                     newServer.connectionStatus = .disconnected
                     newServer.discoveredTools = []
                     newServer.trafficLogs = []
                     mcpManager.addServer(newServer)
                 } label: {
-                    Label("Duplicate Server", systemImage: "plus.square.on.square")
+                    Label("Clone Server Configuration", systemImage: "doc.on.doc")
                 }
 
                 Button {
                     showingExport = true
                 } label: {
-                    Label("Export Configuration", systemImage: "square.and.arrow.up")
+                    Label("Export Manifest", systemImage: "square.and.arrow.up")
                 }
 
-                Button("Remove Server", role: .destructive) {
+                Button("Purge Server", role: .destructive) {
                     mcpManager.removeServer(id: server.id)
                 }
             }
@@ -349,7 +375,7 @@ struct MCPServerDetailView: View {
         .navigationTitle(server.name)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Save") {
+                Button("Commit Changes") {
                     mcpManager.updateServer(server)
                 }
             }
@@ -368,52 +394,31 @@ struct MCPAuthFormView: View {
         Group {
             switch server.authConfig.type {
             case .none:
-                Text("No configuration required.")
+                Text("Public access. No credentials required.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
             case .apiKey:
-                TextField("Header Name", text: $server.authConfig.apiKeyHeaderName)
-                SecureField("API Key", text: $secretInput)
-                Button("Save Key") {
+                TextField("Header Key", text: $server.authConfig.apiKeyHeaderName)
+                SecureField("Secret Value", text: $secretInput)
+                Button("Persist Key") {
                     mcpManager.saveSecret(secretInput, key: "apiKey", for: server)
                     secretInput = ""
                 }
 
             case .bearerToken:
-                SecureField("Token", text: $secretInput)
-                TextField("Refresh Endpoint (Optional)", text: $server.authConfig.tokenEndpoint)
-                Button("Save Token") {
+                SecureField("Token Payload", text: $secretInput)
+                Button("Persist Token") {
                     mcpManager.saveSecret(secretInput, key: "bearerToken", for: server)
                     secretInput = ""
                 }
 
             case .basicAuth:
-                TextField("Username", text: $server.authConfig.username)
-                SecureField("Password", text: $secretInput)
-                Button("Save Credentials") {
+                TextField("Identifier", text: $server.authConfig.username)
+                SecureField("Credential", text: $secretInput)
+                Button("Persist Identity") {
                     mcpManager.saveSecret(secretInput, key: "password", for: server)
                     secretInput = ""
-                }
-
-            case .oauth, .oauth2AuthCode:
-                TextField("Auth Endpoint", text: $server.authConfig.authorizationEndpoint)
-                TextField("Token Endpoint", text: $server.authConfig.tokenEndpoint)
-                TextField("Client ID", text: $server.authConfig.clientId)
-                TextField("Scopes", text: $server.authConfig.scopes)
-                Button("Start OAuth Flow") {
-                    Task {
-                        try? await mcpManager.performOAuth2PKCE(server: server)
-                    }
-                }
-
-            case .oauth2ClientCredentials:
-                TextField("Token Endpoint", text: $server.authConfig.tokenEndpoint)
-                TextField("Client ID", text: $server.authConfig.clientId)
-                SecureField("Client Secret", text: $clientSecretInput)
-                Button("Save Secret") {
-                    mcpManager.saveSecret(clientSecretInput, key: "clientSecret", for: server)
-                    clientSecretInput = ""
                 }
 
             case .customHeaders:
@@ -426,8 +431,7 @@ struct MCPAuthFormView: View {
                                 server.authConfig.customHeaderKeys.remove(at: index)
                                 server.authConfig.customHeaderValues.remove(at: index)
                             } label: {
-                                Image(systemName: "minus.circle.fill")
-                                    .foregroundStyle(.red)
+                                Image(systemName: "minus.circle.fill").foregroundStyle(.red)
                             }
                         }
                     }
@@ -435,9 +439,30 @@ struct MCPAuthFormView: View {
                         server.authConfig.customHeaderKeys.append("")
                         server.authConfig.customHeaderValues.append("")
                     } label: {
-                        Label("Add Header", systemImage: "plus.circle.fill")
+                        Label("Inject Header", systemImage: "plus.circle.fill")
                     }
                 }
+            case .oauth, .oauth2AuthCode:
+                TextField("Auth Endpoint", text: $server.authConfig.authorizationEndpoint)
+                TextField("Token Endpoint", text: $server.authConfig.tokenEndpoint)
+                TextField("Client ID", text: $server.authConfig.clientId)
+                TextField("Scopes", text: $server.authConfig.scopes)
+                Button("Start Authorization Flow") {
+                    Task {
+                        try? await mcpManager.performOAuth2PKCE(server: server)
+                    }
+                }
+
+            case .oauth2ClientCredentials:
+                TextField("Token Endpoint", text: $server.authConfig.tokenEndpoint)
+                TextField("Client ID", text: $server.authConfig.clientId)
+                SecureField("Client Secret", text: $clientSecretInput)
+                Button("Save Client Secret") {
+                    mcpManager.saveSecret(clientSecretInput, key: "clientSecret", for: server)
+                    clientSecretInput = ""
+                }
+            default:
+                EmptyView()
             }
         }
         .onAppear {
@@ -457,59 +482,65 @@ struct MCPToolRowView: View {
     @State private var isExpanded = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
             Button {
-                isExpanded.toggle()
+                withAnimation(.spring()) {
+                    isExpanded.toggle()
+                }
             } label: {
                 HStack {
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(tool.name)
-                            .font(.system(.body, design: .monospaced))
+                            .font(.system(.subheadline, design: .monospaced))
                             .bold()
                         Text(tool.description)
-                            .font(.caption)
+                            .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                        .font(.caption)
+                    Image(systemName: "chevron.right")
+                        .font(.caption2)
+                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
                 }
             }
             .buttonStyle(.plain)
 
             if isExpanded {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Input Schema")
-                        .font(.caption2.bold())
-                        .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Execution Schema")
+                        .font(.system(size: 10, weight: .black))
+                        .foregroundStyle(.blue)
+                        .padding(.top, 4)
 
                     if let props = tool.inputSchema.properties {
                         ForEach(props.sorted(by: { $0.key < $1.key }), id: \.key) { key, prop in
-                            HStack {
-                                Text(key)
-                                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                Text("(\(prop.type))")
-                                    .font(.system(size: 10, design: .monospaced))
-                                    .foregroundStyle(.secondary)
-                                if let desc = prop.description {
-                                    Text("— \(desc)")
-                                        .font(.system(size: 11))
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack {
+                                    Text(key)
+                                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                                    Text("(\(prop.value as? String ?? "mixed"))")
+                                        .font(.system(size: 9, design: .monospaced))
                                         .foregroundStyle(.secondary)
+                                }
+                                if let desc = (prop.value as? [String: Any])?["description"] as? String {
+                                    Text(desc)
+                                        .font(.system(size: 10))
+                                        .foregroundStyle(.tertiary)
                                 }
                             }
                         }
                     } else {
-                        Text("No arguments required")
+                        Text("Static tool. No parameters required.")
                             .font(.caption2)
                             .italic()
                     }
                 }
-                .padding(8)
-                .background(Color.black.opacity(0.05))
-                .cornerRadius(4)
+                .padding(10)
+                .background(Color.primary.opacity(0.03))
+                .cornerRadius(8)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 6)
     }
 }
 
@@ -531,7 +562,7 @@ struct MCPAddServerView: View {
 
     private func isValidURL(_ urlString: String) -> Bool {
         guard let url = URL(string: urlString) else { return false }
-        return url.scheme != nil && (url.host != nil || url.scheme == "file")
+        return url.scheme != nil && url.host != nil
     }
 
     var body: some View {
@@ -541,23 +572,23 @@ struct MCPAddServerView: View {
                     Button {
                         showingBrowse = true
                     } label: {
-                        Label("Browse MCP Directory", systemImage: "safari")
+                        Label("Discover MCP Servers", systemImage: "sparkles")
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.borderedProminent)
                     .listRowBackground(Color.clear)
                 }
 
-                Section("Server Details") {
-                    TextField("Server Name", text: $name)
-                    TextField("Base URL (e.g. https://.../mcp)", text: $url)
+                Section("Infrastructure") {
+                    TextField("Instance Name", text: $name)
+                    TextField("Protocol Endpoint (HTTPS)", text: $url)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
                         .keyboardType(.URL)
                 }
 
-                Section("Authentication") {
-                    Picker("Auth Type", selection: $authType) {
+                Section("Security") {
+                    Picker("Auth Mode", selection: $authType) {
                         ForEach(MCPAuthType.allCases) { type in
                             Text(type.displayName).tag(type)
                         }
@@ -576,9 +607,9 @@ struct MCPAddServerView: View {
                             do {
                                 let mockServer = MCPServer(name: name, baseURL: url, authConfig: authConfig)
                                 let info = try await MCPManager.shared.testConnection(server: mockServer)
-                                testStatus = "Verified: \(info.name) (\(info.version))"
+                                testStatus = "Verified: \(info.name) v\(info.version)"
                             } catch {
-                                testStatus = "Error: \(error.localizedDescription)"
+                                testStatus = "Refused: \(error.localizedDescription)"
                             }
                             isTesting = false
                         }
@@ -587,7 +618,7 @@ struct MCPAddServerView: View {
                             if isTesting {
                                 ProgressView().padding(.trailing, 8)
                             }
-                            Label("Test Connection", systemImage: "antenna.radiowaves.left.and.right")
+                            Label("Validate Endpoint", systemImage: "shield.checkerboard")
                         }
                         .frame(maxWidth: .infinity)
                     }
@@ -600,13 +631,13 @@ struct MCPAddServerView: View {
                     }
                 }
             }
-            .navigationTitle("Add MCP Server")
+            .navigationTitle("Register Server")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Abort") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
+                    Button("Register") {
                         var finalConfig = authConfig
                         finalConfig.type = authType
                         let newServer = MCPServer(
@@ -697,23 +728,6 @@ struct AddServerAuthFields: View {
     }
 }
 
-// MARK: - MCP Directory Models & Sheet
-
-struct MCPServerTemplate: Identifiable, Codable {
-    let id: String
-    let name: String
-    let description: String
-    let url: String
-    let authenticationType: MCPAuthType
-    let category: String
-    let authLink: String?
-
-    enum CodingKeys: String, CodingKey {
-        case id, name, description, url, category, authLink = "auth_link"
-        case authenticationType = "authentication_type"
-    }
-}
-
 struct MCPListModelsSheet: View {
     @Environment(\.dismiss) var dismiss
     let onSelect: (MCPServerTemplate) -> Void
@@ -785,16 +799,6 @@ struct MCPListModelsSheet: View {
                                         Label(server.authenticationType.displayName, systemImage: "lock.shield")
                                             .font(.caption2)
                                         Spacer()
-                                        if let authLink = server.authLink, let url = URL(string: authLink) {
-                                            Button {
-                                                UIApplication.shared.open(url)
-                                            } label: {
-                                                Text("Get Credentials")
-                                                    .font(.caption2.bold())
-                                                    .foregroundStyle(.blue)
-                                            }
-                                            .buttonStyle(.plain)
-                                        }
                                         Text(server.url)
                                             .font(.system(size: 10, design: .monospaced))
                                             .foregroundStyle(.tertiary)
@@ -841,6 +845,20 @@ struct MCPListModelsSheet: View {
     }
 }
 
+struct MCPServerTemplate: Identifiable, Codable {
+    let id: String
+    let name: String
+    let description: String
+    let url: String
+    let authenticationType: MCPAuthType
+    let category: String
+    let authLink: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, description, url, category, authLink = "auth_link"
+        case authenticationType = "authentication_type"
+    }
+}
 
 struct MCPTrafficInspectorView: View {
     let server: MCPServer
@@ -900,7 +918,7 @@ struct MCPExportView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("Export Config")
+            .navigationTitle("Export Manifest")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }
@@ -962,5 +980,24 @@ struct MCPEmptyStateView: View {
         .frame(maxWidth: .infinity)
         .listRowBackground(Color.clear)
         .padding(.bottom, 40)
+    }
+}
+
+struct FilterChip: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 12, weight: .medium))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(isSelected ? Color.blue : Color.primary.opacity(0.05))
+                .foregroundStyle(isSelected ? .white : .primary)
+                .cornerRadius(16)
+        }
+        .buttonStyle(.plain)
     }
 }
