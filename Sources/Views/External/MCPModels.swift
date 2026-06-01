@@ -167,6 +167,7 @@ enum MCPRequestParams: Encodable {
     case empty
     case toolCall(MCPToolCallParams)
     case notification
+    case custom(AnyCodable)
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -180,6 +181,8 @@ enum MCPRequestParams: Encodable {
         case .notification:
             // Notifications often have no params or are encoded differently
             try container.encode([String: String]())
+        case .custom(let anyCodable):
+            try container.encode(anyCodable)
         }
     }
 }
@@ -221,12 +224,64 @@ struct MCPResult: Decodable {
     let serverInfo: MCPServerInfo?
     let tools: [MCPTool]?
     let content: [MCPContentBlock]?
+    var additionalFields: [String: AnyCodable]?
+
+    enum CodingKeys: String, CodingKey {
+        case protocolVersion, capabilities, serverInfo, tools, content
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        protocolVersion = try container.decodeIfPresent(String.self, forKey: .protocolVersion)
+        capabilities = try container.decodeIfPresent(MCPServerCapabilities.self, forKey: .capabilities)
+        serverInfo = try container.decodeIfPresent(MCPServerInfo.self, forKey: .serverInfo)
+        tools = try container.decodeIfPresent([MCPTool].self, forKey: .tools)
+        content = try container.decodeIfPresent([MCPContentBlock].self, forKey: .content)
+
+        // Decode additional fields
+        let allKeysContainer = try decoder.container(keyedBy: AnyCodingKey.self)
+        let allKeys = allKeysContainer.allKeys
+        var extra = [String: AnyCodable]()
+        for key in allKeys {
+            if CodingKeys(stringValue: key.stringValue) == nil {
+                if let value = try? allKeysContainer.decode(AnyCodable.self, forKey: key) {
+                    extra[key.stringValue] = value
+                }
+            }
+        }
+        self.additionalFields = extra.isEmpty ? nil : extra
+    }
 }
 
 struct MCPServerCapabilities: Decodable {
     let tools: MCPToolCapability?
     let resources: [String: Bool]?
     let prompts: [String: Bool]?
+    var additionalFields: [String: AnyCodable]?
+
+    enum CodingKeys: String, CodingKey {
+        case tools, resources, prompts
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        tools = try container.decodeIfPresent(MCPToolCapability.self, forKey: .tools)
+        resources = try container.decodeIfPresent([String: Bool].self, forKey: .resources)
+        prompts = try container.decodeIfPresent([String: Bool].self, forKey: .prompts)
+
+        // Decode additional fields
+        let allKeysContainer = try decoder.container(keyedBy: AnyCodingKey.self)
+        let allKeys = allKeysContainer.allKeys
+        var extra = [String: AnyCodable]()
+        for key in allKeys {
+            if CodingKeys(stringValue: key.stringValue) == nil {
+                if let value = try? allKeysContainer.decode(AnyCodable.self, forKey: key) {
+                    extra[key.stringValue] = value
+                }
+            }
+        }
+        self.additionalFields = extra.isEmpty ? nil : extra
+    }
 }
 
 struct MCPToolCapability: Decodable {
@@ -241,6 +296,22 @@ struct MCPContentBlock: Decodable {
 struct MCPResponseError: Decodable {
     let code: Int
     let message: String
+}
+
+// MARK: - Codable Helpers
+
+struct AnyCodingKey: CodingKey {
+    var stringValue: String
+    var intValue: Int?
+
+    init?(stringValue: String) {
+        self.stringValue = stringValue
+    }
+
+    init?(intValue: Int) {
+        self.stringValue = "\(intValue)"
+        self.intValue = intValue
+    }
 }
 
 
