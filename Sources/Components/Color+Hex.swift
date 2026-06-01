@@ -2,6 +2,34 @@ import SwiftUI
 
 /// Extension to handle hex color conversion for Codable conformance.
 extension Color {
+    /// Initializes a Color from a CSS-style string (Hex, RGB, or RGBA).
+    init(parsing string: String) {
+        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+
+        if trimmed.hasPrefix("rgb") {
+            // Handle rgb() and rgba()
+            let components = trimmed
+                .replacingOccurrences(of: "rgba(", with: "")
+                .replacingOccurrences(of: "rgb(", with: "")
+                .replacingOccurrences(of: ")", with: "")
+                .components(separatedBy: ",")
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .compactMap { Double($0.replacingOccurrences(of: "%", with: "")) }
+
+            if components.count >= 3 {
+                let r = components[0] / (trimmed.contains("%") && components[0] <= 100 ? 100 : 255)
+                let g = components[1] / (trimmed.contains("%") && components[1] <= 100 ? 100 : 255)
+                let b = components[2] / (trimmed.contains("%") && components[2] <= 100 ? 100 : 255)
+                let a = components.count >= 4 ? (components[3] > 1 ? components[3] / 100 : components[3]) : 1.0
+                self.init(.sRGB, red: r, green: g, blue: b, opacity: a)
+                return
+            }
+        }
+
+        // Fallback to hex parsing
+        self.init(hex: string)
+    }
+
     /// Initializes a Color from a hex string.
     /// Supports formats: #RGB, #RRGGBB, #RRGGBBAA, and their counterparts without the # prefix.
     init(hex: String) {

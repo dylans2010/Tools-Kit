@@ -779,43 +779,44 @@ class AIService {
 
     // MARK: - Designer Module Helpers
 
-    func generateDesignMarkdown(title: String, colors: [String], fonts: [String], radii: [String]) -> String {
-        var markdown = "# \(title)\n\n"
+    @MainActor
+    func generateDesignMarkdown(title: String, colors: [String], fonts: [String], radii: [String]) async -> String {
+        let systemPrompt = """
+        You are the 'Ultimate Designer AI'. Your task is to generate a comprehensive, professional, and intuitive 'DESIGN.md' file based on extracted design tokens.
 
-        markdown += "## Colors\n\n"
-        if colors.isEmpty {
-            markdown += "* None detected\n"
-        } else {
-            for color in colors {
-                markdown += "* \(color)\n"
-            }
+        This file is NOT just a list; it is a 'Design Persona' training document. It should describe the 'soul' of the design so that another AI model, upon reading this file, can perfectly replicate the brand's aesthetic, tone, and UI behavior.
+
+        Guidelines for the DESIGN.md:
+        1. **Executive Summary**: Describe the overall vibe (e.g., "Minimalist high-tech", "Warm organic", "Corporate brutalist").
+        2. **Color Palette**: Categorize the colors (Primary, Secondary, Surface, Accents). Explain their semantic purpose.
+        3. **Typography**: Analyze the font choices and suggest a hierarchy (Headings, Body, Captions).
+        4. **Shape & Form**: Describe the use of corner radii and spacing (e.g., "Soft pill-shaped buttons", "Sharp aggressive edges").
+        5. **Persona Training Section**: Write a specific block titled 'AI Styling Instructions' that a user can paste into an AI to 'train' it on this specific style.
+
+        Output ONLY the Markdown content.
+        """
+
+        let prompt = """
+        Generate a Designer.md file for a project titled '\(title)'.
+
+        Extracted Tokens:
+        - Colors: \(colors.joined(separator: ", "))
+        - Fonts: \(fonts.joined(separator: ", "))
+        - Corner Radii: \(radii.joined(separator: ", "))
+
+        Make it beautiful, technical, and ready for AI persona training.
+        """
+
+        do {
+            return try await processText(prompt: prompt, systemPrompt: systemPrompt)
+        } catch {
+            // Fallback to basic markdown if AI fails
+            var markdown = "# \(title) (Basic Export)\n\n"
+            markdown += "## Colors\n" + colors.map { "* \($0)" }.joined(separator: "\n") + "\n\n"
+            markdown += "## Fonts\n" + fonts.map { "* \($0)" }.joined(separator: "\n") + "\n\n"
+            markdown += "## Radii\n" + radii.map { "* \($0)" }.joined(separator: "\n") + "\n"
+            return markdown
         }
-        markdown += "\n"
-
-        markdown += "## Fonts\n\n"
-        if fonts.isEmpty {
-            markdown += "* None detected\n"
-        } else {
-            for font in fonts {
-                markdown += "* \(font)\n"
-            }
-        }
-        markdown += "\n"
-
-        markdown += "## Border Radius\n\n"
-        if radii.isEmpty {
-            markdown += "* none detected\n"
-        } else {
-            for radius in radii {
-                markdown += "* \(radius)\n"
-            }
-        }
-        markdown += "\n"
-
-        markdown += "## Screenshot\n\n"
-        markdown += "[Screenshot Available]\n"
-
-        return markdown
     }
 
     func saveDesignDocument(content: String) {
