@@ -63,7 +63,7 @@ final class PersonaManager: ObservableObject {
         // 2. Perform heavy workspace data gathering and prompt building in background
         let systemPrompt = await Task.detached(priority: .userInitiated) {
             let workspaceContextJSON = await PersonaWorkspace.gatherFullWorkspaceData()
-            let mcpContext = mcpEnabled ? await MCPPersonaBridge().connectedServersContext() : "No MCP servers connected."
+            let mcpContext = mcpEnabled ? await MainActor.run { MCPPersonaBridge().connectedServersContext() } : "No MCP servers connected."
 
             var prompt = basePrompt
             prompt = prompt.replacingOccurrences(of: "{{creativity}}", with: String(format: "%.1f", creativity))
