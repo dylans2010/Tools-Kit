@@ -406,7 +406,7 @@ final class GoogleOAuthManager: NSObject, ASWebAuthenticationPresentationContext
     }
 }
 
-private struct OAuthTokenResponse: Decodable {
+private struct OAuthTokenResponse: Codable {
     let accessToken: String
     let refreshToken: String?
     let tokenType: String?

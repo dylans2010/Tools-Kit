@@ -13,20 +13,85 @@ struct MCPMainView: View {
                         showingAddServer = true
                     }
                 } else {
-                    ForEach(mcpManager.servers) { server in
-                        NavigationLink(destination: MCPServerDetailView(server: server)) {
-                            MCPServerRowView(server: server)
+                    Section {
+                        ForEach(mcpManager.servers) { server in
+                            NavigationLink(destination: MCPServerDetailView(server: server)) {
+                                MCPServerRowView(server: server)
+                            }
                         }
-                    }
-                    .onDelete { indexSet in
-                        for index in indexSet {
-                            mcpManager.removeServer(id: mcpManager.servers[index].id)
+                        .onDelete { indexSet in
+                            for index in indexSet {
+                                mcpManager.removeServer(id: mcpManager.servers[index].id)
+                            }
+                        }
+                    } header: {
+                        HStack {
+                            Text("Your Servers")
+                            Spacer()
+                            Menu {
+                                Button {
+                                    Task {
+                                        for server in mcpManager.servers {
+                                            try? await mcpManager.connect(to: server)
+                                        }
+                                    }
+                                } label: {
+                                    Label("Connect All", systemImage: "bolt.fill")
+                                }
+
+                                Button(role: .destructive) {
+                                    for server in mcpManager.servers {
+                                        mcpManager.disconnect(server: server)
+                                    }
+                                } label: {
+                                    Label("Disconnect All", systemImage: "power")
+                                }
+                            } label: {
+                                Label("Bulk Actions", systemImage: "ellipsis.circle")
+                                    .font(.caption)
+                            }
                         }
                     }
                 }
             }
             .navigationTitle("MCP Servers")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Button {
+                            Task {
+                                for server in mcpManager.servers {
+                                    try? await mcpManager.connect(to: server)
+                                }
+                            }
+                        } label: {
+                            Label("Connect All", systemImage: "bolt.fill")
+                        }
+
+                        Button(role: .destructive) {
+                            for server in mcpManager.servers {
+                                mcpManager.disconnect(server: server)
+                            }
+                        } label: {
+                            Label("Disconnect All", systemImage: "power")
+                        }
+
+                        Divider()
+
+                        Button {
+                            Task {
+                                for server in mcpManager.servers where server.connectionStatus == .connected {
+                                    try? await mcpManager.connect(to: server)
+                                }
+                            }
+                        } label: {
+                            Label("Refresh All", systemImage: "arrow.clockwise")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
+
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
                         Button {
@@ -64,18 +129,25 @@ struct MCPMainView: View {
 
 struct MCPServerRowView: View {
     let server: MCPServer
+    @StateObject private var mcpManager = MCPManager.shared
 
     var body: some View {
         HStack(spacing: 12) {
-            Circle()
-                .fill(server.connectionStatus.color)
-                .frame(width: 10, height: 10)
+            ZStack {
+                Circle()
+                    .fill(server.connectionStatus.color.opacity(0.1))
+                    .frame(width: 32, height: 32)
+
+                Image(systemName: server.connectionStatus == .connected ? "checkmark.circle.fill" : "network")
+                    .font(.system(size: 14))
+                    .foregroundStyle(server.connectionStatus.color)
+            }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(server.name)
                     .font(.headline)
                 Text(server.baseURL)
-                    .font(.caption)
+                    .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
@@ -83,13 +155,31 @@ struct MCPServerRowView: View {
             Spacer()
 
             if server.connectionStatus == .connected {
-                Text("\(server.discoveredTools.count) tools")
-                    .font(.caption2)
+                Text("\(server.discoveredTools.count)")
+                    .font(.caption2.bold())
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
-                    .background(Color.blue.opacity(0.1), in: Capsule())
+                    .background(Color.blue, in: Capsule())
             }
+
+            Toggle("", isOn: Binding(
+                get: { server.connectionStatus == .connected },
+                set: { newValue in
+                    Task {
+                        if newValue {
+                            try? await mcpManager.connect(to: server)
+                        } else {
+                            mcpManager.disconnect(server: server)
+                        }
+                    }
+                }
+            ))
+            .toggleStyle(SwitchToggleStyle(tint: .accentColor))
+            .labelsHidden()
+            .scaleEffect(0.7)
         }
+        .padding(.vertical, 4)
     }
 }
 
@@ -98,6 +188,7 @@ struct MCPServerDetailView: View {
     @ObservedObject private var mcpManager = MCPManager.shared
     @State private var isConnecting = false
     @State private var testResult: String?
+    @State private var showingExport = false
 
     var body: some View {
         Form {
@@ -216,11 +307,44 @@ struct MCPServerDetailView: View {
                     }
             }
 
-            Section {
+            Section("Traffic Inspector") {
+                if let logs = server.trafficLogs, !logs.isEmpty {
+                    NavigationLink(destination: MCPTrafficInspectorView(server: server)) {
+                        Label("View \(logs.count) entries", systemImage: "list.bullet.rectangle.portrait")
+                    }
+                } else {
+                    Text("No logs recorded yet.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Section("Management") {
+                Button {
+                    var newServer = server
+                    newServer.id = UUID()
+                    newServer.name += " (Copy)"
+                    newServer.connectionStatus = .disconnected
+                    newServer.discoveredTools = []
+                    newServer.trafficLogs = []
+                    mcpManager.addServer(newServer)
+                } label: {
+                    Label("Duplicate Server", systemImage: "plus.square.on.square")
+                }
+
+                Button {
+                    showingExport = true
+                } label: {
+                    Label("Export Configuration", systemImage: "square.and.arrow.up")
+                }
+
                 Button("Remove Server", role: .destructive) {
                     mcpManager.removeServer(id: server.id)
                 }
             }
+        }
+        .sheet(isPresented: $showingExport) {
+            MCPExportView(server: server)
         }
         .navigationTitle(server.name)
         .toolbar {
@@ -650,6 +774,81 @@ struct FilterChip: View {
                 .foregroundStyle(isSelected ? .white : .primary)
         }
         .buttonStyle(.plain)
+    }
+}
+
+struct MCPTrafficInspectorView: View {
+    let server: MCPServer
+
+    var body: some View {
+        List((server.trafficLogs ?? []).reversed()) { log in
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Image(systemName: log.direction == .request ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
+                        .foregroundStyle(log.direction == .request ? .blue : .green)
+                    Text(log.direction.rawValue.uppercased())
+                        .font(.caption2.bold())
+
+                    if let method = log.method {
+                        Text(method)
+                            .font(.system(size: 10, weight: .bold, design: .monospaced))
+                            .padding(.horizontal, 4)
+                            .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 4))
+                    }
+
+                    Spacer()
+                    Text(log.timestamp, style: .time)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+
+                Text(log.payload)
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(5)
+            }
+            .padding(.vertical, 4)
+        }
+        .navigationTitle("Traffic: \(server.name)")
+    }
+}
+
+struct MCPExportView: View {
+    let server: MCPServer
+    @Environment(\.dismiss) var dismiss
+
+    var jsonString: String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        if let data = try? encoder.encode(server), let string = String(data: data, encoding: .utf8) {
+            return string
+        }
+        return "Failed to encode configuration."
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                Text(jsonString)
+                    .font(.system(size: 12, design: .monospaced))
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("Export Config")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        UIPasteboard.general.string = jsonString
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                }
+            }
+        }
     }
 }
 

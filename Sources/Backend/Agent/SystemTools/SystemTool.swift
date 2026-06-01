@@ -1,16 +1,22 @@
 import Foundation
 
 /// Protocol for all system tools.
-protocol SystemTool {
+public protocol SystemTool {
     var name: String { get }
     func execute(input: [String: Any], context: SystemToolContext) async throws -> SystemToolResponse
 }
 
 /// Standard context for tool execution.
-struct SystemToolContext: Codable {
-    let workspaceId: String
-    let sessionId: String
-    let timestamp: String
+public struct SystemToolContext: Codable {
+    public let workspaceId: String
+    public let sessionId: String
+    public let timestamp: String
+
+    public init(workspaceId: String, sessionId: String, timestamp: String) {
+        self.workspaceId = workspaceId
+        self.sessionId = sessionId
+        self.timestamp = timestamp
+    }
 
     enum CodingKeys: String, CodingKey {
         case workspaceId = "workspace_id"
@@ -20,14 +26,24 @@ struct SystemToolContext: Codable {
 }
 
 /// Standard response structure for all system tools.
-struct SystemToolResponse: Codable {
-    let tool: String
-    let status: String
-    let requestId: String
-    let input: [String: AnyCodable]
-    let output: [String: AnyCodable]
-    let error: SystemToolError?
-    let context: SystemToolContext
+public struct SystemToolResponse: Codable {
+    public let tool: String
+    public let status: String
+    public let requestId: String
+    public let input: [String: AnyCodable]
+    public let output: [String: AnyCodable]
+    public let error: SystemToolError?
+    public let context: SystemToolContext
+
+    public init(tool: String, status: String, requestId: String, input: [String: AnyCodable], output: [String: AnyCodable], error: SystemToolError?, context: SystemToolContext) {
+        self.tool = tool
+        self.status = status
+        self.requestId = requestId
+        self.input = input
+        self.output = output
+        self.error = error
+        self.context = context
+    }
 
     enum CodingKeys: String, CodingKey {
         case tool
@@ -40,15 +56,20 @@ struct SystemToolResponse: Codable {
     }
 }
 
-struct SystemToolError: Error, Codable {
-    let message: String
-    let code: String
+public struct SystemToolError: Error, Codable {
+    public let message: String
+    public let code: String
 
-    static func missingParameter(_ parameter: String) -> SystemToolError {
+    public init(message: String, code: String) {
+        self.message = message
+        self.code = code
+    }
+
+    public static func missingParameter(_ parameter: String) -> SystemToolError {
         SystemToolError(message: "Missing required parameter: \(parameter)", code: "missing_parameter")
     }
 
-    static func unsupportedOperation(_ operation: String) -> SystemToolError {
+    public static func unsupportedOperation(_ operation: String) -> SystemToolError {
         SystemToolError(message: "Unsupported operation: \(operation)", code: "unsupported_operation")
     }
 }
@@ -157,16 +178,18 @@ extension SystemTool {
 }
 
 /// Type-erased Codable for handling dynamic JSON objects.
-struct AnyCodable: Codable {
-    let value: Any
+public struct AnyCodable: Codable {
+    public let value: Any
 
-    init(_ value: Any) {
+    public init(_ value: Any) {
         self.value = value
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        if let bool = try? container.decode(Bool.self) {
+        if container.decodeNil() {
+            value = NSNull()
+        } else if let bool = try? container.decode(Bool.self) {
             value = bool
         } else if let int = try? container.decode(Int.self) {
             value = int
@@ -183,9 +206,11 @@ struct AnyCodable: Codable {
         }
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        if let bool = value as? Bool {
+        if value is NSNull {
+            try container.encodeNil()
+        } else if let bool = value as? Bool {
             try container.encode(bool)
         } else if let int = value as? Int {
             try container.encode(int)
