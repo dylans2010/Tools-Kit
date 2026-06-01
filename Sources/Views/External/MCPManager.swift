@@ -60,11 +60,12 @@ public final class MCPManager: ObservableObject {
             try await validateEndpoint(server: servers[index])
 
             // 2. Transport Configuration
+            let headers = try await getAuthHeaders(for: servers[index])
             let proxy: MCPServerProxy
             switch servers[index].transportType {
             case .httpSse:
                 guard let url = URL(string: servers[index].baseURL) else { throw MCPError.invalidURL }
-                let sseConfig = MCPServerSseConfig(url: url)
+                let sseConfig = MCPServerSseConfig(url: url, headers: headers)
                 proxy = MCPServerProxy(config: .sse(config: sseConfig))
             case .tcp:
                 let tcpConfig = MCPServerTcpConfig(serviceName: servers[index].name)
@@ -73,19 +74,16 @@ public final class MCPManager: ObservableObject {
                 throw MCPError.connectionFailed("stdio transport not supported on iOS.")
             }
 
-            // 3. Authentication Injection
-            try await injectAuth(to: proxy, for: servers[index])
-
-            // 4. Initialize
+            // 3. Initialize
             updateStatus(id: server.id, to: .initializing)
             try await proxy.connect()
             proxies[server.id] = proxy
 
-            // 5. Discover Tools
+            // 4. Discover Tools
             updateStatus(id: server.id, to: .discoveringTools)
             let tools = try await discoverToolsViaProxy(proxy)
 
-            // 6. Finalize
+            // 5. Finalize
             if let idx = servers.firstIndex(where: { $0.id == server.id }) {
                 servers[idx].discoveredTools = tools
                 servers[idx].connectionStatus = .connected
@@ -134,7 +132,7 @@ public final class MCPManager: ObservableObject {
         request.timeoutInterval = 5
 
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (_, response) = try await URLSession.shared.data(for: request)
             guard let http = response as? HTTPURLResponse else {
                 throw MCPError.connectionFailed("The server did not return a valid HTTP response.")
             }
@@ -165,13 +163,6 @@ public final class MCPManager: ObservableObject {
                 }
             }
             throw MCPError.connectionFailed("Validation failed: \(error.localizedDescription)")
-        }
-    }
-
-    private func injectAuth(to proxy: MCPServerProxy, for server: MCPServer) async throws {
-        let headers = try await getAuthHeaders(for: server)
-        for (key, value) in headers {
-            proxy.setExtraHeader(key: key, value: value)
         }
     }
 
@@ -259,7 +250,7 @@ public final class MCPManager: ObservableObject {
 
         let invocationId = UUID()
         let anyArgs = arguments.mapValues { AnyCodable($0) }
-        let invocation = MCPToolInvocation(
+        var invocation = MCPToolInvocation(
             serverId: server.id,
             serverName: server.name,
             toolName: toolName,
@@ -271,19 +262,8 @@ public final class MCPManager: ObservableObject {
         activeInvocations.insert(invocation, at: 0)
 
         do {
-            let result = try await proxy.callTool(name: toolName, arguments: arguments)
-
-            // Format results into a single string for AI synthesis
-            let outputText = result.content.compactMap { content -> String? in
-                switch content {
-                case .text(let text):
-                    return text.text
-                case .image(let image):
-                    return "[Image Output: \(image.mimeType)]"
-                case .resource(let resource):
-                    return "[Resource Output: \(resource.resource.uri)]"
-                }
-            }.joined(separator: "\n")
+            let jsonArgs = try makeJSONDictionary(from: arguments)
+            let outputText = try await proxy.callTool(toolName, arguments: jsonArgs)
 
             updateInvocation(id: invocationId, status: .completed, result: outputText)
             return outputText
@@ -291,6 +271,12 @@ public final class MCPManager: ObservableObject {
             updateInvocation(id: invocationId, status: .failed, errorMessage: error.localizedDescription)
             throw error
         }
+    }
+
+    private func makeJSONDictionary(from arguments: [String: Any]) throws -> JSONDictionary {
+        let encodableArguments = arguments.mapValues { AnyCodable($0) }
+        let data = try JSONEncoder().encode(encodableArguments)
+        return try JSONDecoder().decode(JSONDictionary.self, from: data)
     }
 
     private func updateInvocation(id: UUID, status: MCPInvocationStatus, result: String? = nil, errorMessage: String? = nil) {
@@ -338,10 +324,10 @@ public final class MCPManager: ObservableObject {
 
     public func testConnection(server: MCPServer) async throws -> MCPServerInfo {
         guard let url = URL(string: server.baseURL) else { throw MCPError.invalidURL }
-        let sseConfig = MCPServerSseConfig(url: url)
+        let headers = try await getAuthHeaders(for: server)
+        let sseConfig = MCPServerSseConfig(url: url, headers: headers)
         let proxy = MCPServerProxy(config: .sse(config: sseConfig))
 
-        try await injectAuth(to: proxy, for: server)
         try await proxy.connect()
 
         // MCPServerProxy might not have public access to serverInfo yet, we rely on successful connect

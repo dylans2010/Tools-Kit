@@ -939,22 +939,3 @@ struct MCPEmptyStateView: View {
         .padding(.bottom, 40)
     }
 }
-
-struct FilterChip: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 12, weight: .medium))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(isSelected ? Color.blue : Color.primary.opacity(0.05))
-                .foregroundStyle(isSelected ? .white : .primary)
-                .cornerRadius(16)
-        }
-        .buttonStyle(.plain)
-    }
-}
