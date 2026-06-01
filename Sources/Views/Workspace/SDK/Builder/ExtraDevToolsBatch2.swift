@@ -15,17 +15,18 @@ struct Base32EncoderDevTool: DevTool {
         let data = Data(input.utf8)
         var result = ""
         var bits = 0
-        var value = 0
+        var value: UInt32 = 0
         for byte in data {
-            value = (value << 8) | Int(byte)
+            value = (value << 8) | UInt32(byte)
             bits += 8
             while bits >= 5 {
-                result.append(alphabet[(value >> (bits - 5)) & 31])
+                result.append(alphabet[Int((value >> (bits - 5)) & 31)])
                 bits -= 5
             }
+            value &= (1 << bits) - 1 // Maintain state without overflow
         }
         if bits > 0 {
-            result.append(alphabet[(value << (5 - bits)) & 31])
+            result.append(alphabet[Int((value << (5 - bits)) & 31)])
         }
         while result.count % 8 != 0 { result.append("=") }
         return result
@@ -42,15 +43,16 @@ struct Base32DecoderDevTool: DevTool {
         let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
         let clean = input.uppercased().replacingOccurrences(of: "=", with: "")
         var bits = 0
-        var value = 0
+        var value: UInt32 = 0
         var data = Data()
         for char in clean {
             guard let idx = alphabet.firstIndex(of: char) else { return "Invalid Base32" }
-            value = (value << 5) | alphabet.distance(from: alphabet.startIndex, to: idx)
+            value = (value << 5) | UInt32(alphabet.distance(from: alphabet.startIndex, to: idx))
             bits += 5
             if bits >= 8 {
                 data.append(UInt8((value >> (bits - 8)) & 255))
                 bits -= 8
+                value &= (1 << bits) - 1
             }
         }
         return String(data: data, encoding: .utf8) ?? "Binary Data: \(data.count) bytes"

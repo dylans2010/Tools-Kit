@@ -109,13 +109,33 @@ struct EmojiSearchDevTool: DevTool {
 
 struct EmojiSearchView: View {
     @State private var search = ""
-    let emojis = ["😀", "🚀", "💡", "🔥", "✅", "❌", "📱", "💻", "🎨", "🔒", "🛠️", "⚙️", "📦", "📊", "🌐"]
+    let allEmojis = [
+        ("😀", "smile,happy,face"), ("🚀", "rocket,launch,fast"), ("💡", "light,idea,innovation"),
+        ("🔥", "fire,hot,trending"), ("✅", "check,done,success"), ("❌", "cross,fail,error"),
+        ("📱", "phone,mobile,ios"), ("💻", "computer,mac,laptop"), ("🎨", "paint,design,color"),
+        ("🔒", "lock,secure,private"), ("🛠️", "tool,wrench,fix"), ("⚙️", "gear,setting,config"),
+        ("📦", "box,package,shipping"), ("📊", "chart,graph,data"), ("🌐", "globe,world,network"),
+        ("❤️", "heart,love,like"), ("👍", "thumbsup,ok,good"), ("🌟", "star,favorite,best"),
+        ("🎉", "party,celebration,congrats"), ("📅", "calendar,date,time"), ("✉️", "mail,email,message"),
+        ("🔍", "search,lookup,find"), ("⚡", "bolt,flash,power"), ("🌈", "rainbow,color,pride"),
+        ("🍎", "apple,fruit,food"), ("⚽", "soccer,ball,sport"), ("🎮", "game,play,video"),
+        ("🎵", "music,note,sound"), ("📷", "camera,photo,image"), ("🏠", "home,house,stay"),
+        ("✈️", "plane,flight,travel")
+    ]
+
+    var filteredEmojis: [String] {
+        if search.isEmpty { return allEmojis.map { $0.0 } }
+        return allEmojis.filter { $0.1.localizedCaseInsensitiveContains(search) || $0.0 == search }.map { $0.0 }
+    }
+
     var body: some View {
         VStack {
-            TextField("Search emojis...", text: $search).textFieldStyle(.roundedBorder).padding()
+            TextField("Search (e.g. 'rocket', 'ios')...", text: $search)
+                .textFieldStyle(.roundedBorder)
+                .padding()
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
-                    ForEach(emojis, id: \.self) { emoji in
+                    ForEach(filteredEmojis, id: \.self) { emoji in
                         Button(emoji) { UIPasteboard.general.string = emoji }
                             .font(.system(size: 30))
                             .padding(8)
@@ -131,9 +151,13 @@ struct ASCIIArtDevTool: DevTool {
     let name = "ASCII Art Gen"
     let category: DevToolCategory = .uiDesign
     let icon = "text.below.photo"
-    let description = "Generate simple ASCII art representations"
-    func render() -> some View { SimpleDevToolView(title: name, placeholder: "Enter word") { input in
-        "  _______ \n |   _   |\n |.  |   |\n |.  |   |\n |:  |   |\n |::.|   |\n `---'---' " + input
+    let description = "Generate simple ASCII art box for text"
+    func render() -> some View { SimpleDevToolView(title: name, placeholder: "Enter text") { input in
+        let lines = input.components(separatedBy: .newlines)
+        let maxLen = lines.map { $0.count }.max() ?? 0
+        let border = "+" + String(repeating: "-", count: maxLen + 2) + "+"
+        let content = lines.map { "| " + $0.padding(toLength: maxLen, withPad: " ", startingAt: 0) + " |" }.joined(separator: "\n")
+        return "\(border)\n\(content)\n\(border)"
     }}
 }
 
@@ -148,16 +172,42 @@ struct ColorBlindSimDevTool: DevTool {
 
 struct ColorBlindSimView: View {
     @State private var color = Color.blue
+
     var body: some View {
         Form {
             ColorPicker("Pick a color", selection: $color)
             Section("Simulations") {
                 HStack { Text("Original"); Spacer(); Circle().fill(color).frame(width: 30) }
-                HStack { Text("Protanopia"); Spacer(); Circle().fill(color.opacity(0.7)).frame(width: 30) }
-                HStack { Text("Deuteranopia"); Spacer(); Circle().fill(color.opacity(0.8)).frame(width: 30) }
-                HStack { Text("Tritanopia"); Spacer(); Circle().fill(color.opacity(0.9)).frame(width: 30) }
+                HStack { Text("Protanopia"); Spacer(); Circle().fill(simulate(color, type: .protanopia)).frame(width: 30) }
+                HStack { Text("Deuteranopia"); Spacer(); Circle().fill(simulate(color, type: .deuteranopia)).frame(width: 30) }
+                HStack { Text("Tritanopia"); Spacer(); Circle().fill(simulate(color, type: .tritanopia)).frame(width: 30) }
             }
         }
+    }
+
+    enum BlindnessType { case protanopia, deuteranopia, tritanopia }
+
+    private func simulate(_ color: Color, type: BlindnessType) -> Color {
+        let components = color.getComponents()
+        let r = Double(components.r), g = Double(components.g), b = Double(components.b)
+
+        var sr = 0.0, sg = 0.0, sb = 0.0
+
+        switch type {
+        case .protanopia:
+            sr = 0.56667 * r + 0.43333 * g
+            sg = 0.55833 * r + 0.44167 * g
+            sb = 0.24167 * g + 0.75833 * b
+        case .deuteranopia:
+            sr = 0.625 * r + 0.375 * g
+            sg = 0.7 * r + 0.3 * g
+            sb = 0.3 * g + 0.7 * b
+        case .tritanopia:
+            sr = 0.95 * r + 0.05 * g
+            sg = 0.43333 * g + 0.56667 * b
+            sb = 0.475 * g + 0.525 * b
+        }
+        return Color(red: sr, green: sg, blue: sb)
     }
 }
 

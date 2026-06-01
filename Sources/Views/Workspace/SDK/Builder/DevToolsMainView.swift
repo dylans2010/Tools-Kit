@@ -294,6 +294,18 @@ final class DevToolRegistry: ObservableObject {
         register(UnicodeNormalizerDevTool())
         register(JSMinifierDevTool())
 
+        // Batch 6 - Extra
+        register(URITemplateTesterDevTool())
+        register(MarkdownTableGeneratorDevTool())
+        register(JSONStringifierDevTool())
+        register(HTMLEntityListDevTool())
+        register(ColorContrastRatioDevTool())
+        register(FileExtensionInspectorDevTool())
+        register(StringLengthStatsDevTool())
+        register(Base64URLConverterDevTool())
+        register(HTTPStatusRefDevTool())
+        register(LoremIpsumBatchDevTool())
+
         // SDK Builder Specialized Tools
         register(SDKBuildAnalyzerDevTool())
         register(SDKAssetOptimizerDevTool())
@@ -426,15 +438,6 @@ struct VerboseLog: Identifiable {
     var timestamp = Date()
     let level: String
     let message: String
-}
-
-extension Color {
-    func getComponents() -> (r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat) {
-        let uiColor = UIColor(self)
-        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-        uiColor.getRed(&r, green: &g, blue: &b, alpha: &a)
-        return (r, g, b, a)
-    }
 }
 
 

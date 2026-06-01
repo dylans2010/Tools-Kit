@@ -1,4 +1,5 @@
 import SwiftUI
+import CryptoKit
 
 // MARK: - Encoding Tools
 
@@ -299,8 +300,6 @@ struct WordCounterDevTool: DevTool {
     func render() -> some View { SimpleDevToolView(title: name, placeholder: "Paste text to analyze") { input in let words = input.split { $0.isWhitespace }.count; let chars = input.count; let sentences = input.components(separatedBy: CharacterSet(charactersIn: ".!?")).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.count; let paragraphs = input.components(separatedBy: "\n\n").filter { !$0.isEmpty }.count; return "Words: \(words)\nCharacters: \(chars)\nSentences: \(sentences)\nParagraphs: \(paragraphs)\nReading Time: ~\(max(1, words / 200)) min" } }
 }
 
-import CryptoKit
-
 struct FileHashDevTool: DevTool {
     let id = "file-hash"
     let name = "File Hash Calculator"
@@ -348,62 +347,6 @@ struct BundleSizeAnalyzerDevTool: DevTool {
     let icon = "chart.pie"
     let description = "Analyze app bundle composition and size"
     func render() -> some View { SimpleDevToolView(title: name, placeholder: "Analyze current bundle") { _ in let bundle = Bundle.main; let path = bundle.bundlePath; return "Bundle: \(path.components(separatedBy: "/").last ?? path)\nExecutable: \(bundle.executableURL?.lastPathComponent ?? "N/A")\nInfo.plist keys: \(bundle.infoDictionary?.count ?? 0)\nLocalizations: \(bundle.localizations.joined(separator: ", "))" } }
-}
-
-// MARK: - Shared Simple Tool View
-
-private struct SimpleDevToolView: View {
-    let title: String
-    let placeholder: String
-    let transform: (String) -> String
-    @State private var input = ""
-    @State private var output = ""
-
-    var body: some View {
-        Form {
-            Section(header: Text("Input")) {
-                TextEditor(text: $input)
-                    .font(.system(.body, design: .monospaced))
-                    .frame(minHeight: 80)
-                    .overlay(alignment: .topLeading) {
-                        if input.isEmpty {
-                            Text(placeholder)
-                                .foregroundStyle(.tertiary)
-                                .font(.system(.body, design: .monospaced))
-                                .padding(.top, 8)
-                                .padding(.leading, 4)
-                                .allowsHitTesting(false)
-                        }
-                    }
-            }
-
-            Section {
-                Button {
-                    output = transform(input)
-                } label: {
-                    Label("Process", systemImage: "play.fill")
-                        .frame(maxWidth: .infinity)
-                        .bold()
-                }
-                .buttonStyle(.borderedProminent)
-            }
-            .listRowBackground(Color.clear)
-
-            if !output.isEmpty {
-                Section(header: Text("Output")) {
-                    Text(output)
-                        .font(.system(.body, design: .monospaced))
-                        .textSelection(.enabled)
-
-                    Button {
-                        UIPasteboard.general.string = output
-                    } label: {
-                        Label("Copy Output", systemImage: "doc.on.clipboard")
-                    }
-                }
-            }
-        }
-    }
 }
 
 // MARK: - String Helper

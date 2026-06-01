@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 // MARK: - Shared Data Models
 
@@ -91,5 +94,16 @@ struct SimpleDevToolView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Extensions
+
+extension Color {
+    func getComponents() -> (r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat) {
+        let uiColor = UIColor(self)
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        uiColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return (r, g, b, a)
     }
 }

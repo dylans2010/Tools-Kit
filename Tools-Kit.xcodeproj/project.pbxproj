@@ -1739,6 +1739,7 @@
 		DA02000000000000000000E7 /* ExtraDevToolsBatch3.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01000000000000000000E7 /* ExtraDevToolsBatch3.swift */; };
 		DA02000000000000000000E8 /* ExtraDevToolsBatch4.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01000000000000000000E8 /* ExtraDevToolsBatch4.swift */; };
 		DA02000000000000000000E9 /* ExtraDevToolsBatch5.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01000000000000000000E9 /* ExtraDevToolsBatch5.swift */; };
+		DA02000000000000000000EA /* ExtraDevToolsBatch6.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01000000000000000000EA /* ExtraDevToolsBatch6.swift */; };
 		NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */; };
 		DG02000000000000000000000130 /* Diag_IMEIInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000130 /* Diag_IMEIInfoView.swift */; };
 		DG02000000000000000000000131 /* Diag_MDMDetectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000131 /* Diag_MDMDetectionView.swift */; };
@@ -3944,6 +3945,7 @@
 		DA01000000000000000000E7 /* ExtraDevToolsBatch3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ExtraDevToolsBatch3.swift; sourceTree = "<group>"; };
 		DA01000000000000000000E8 /* ExtraDevToolsBatch4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ExtraDevToolsBatch4.swift; sourceTree = "<group>"; };
 		DA01000000000000000000E9 /* ExtraDevToolsBatch5.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ExtraDevToolsBatch5.swift; sourceTree = "<group>"; };
+		DA01000000000000000000EA /* ExtraDevToolsBatch6.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ExtraDevToolsBatch6.swift; sourceTree = "<group>"; };
 		NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/NewDevTools.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000130 /* Diag_IMEIInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IMEIInfoView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000131 /* Diag_MDMDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MDMDetectionView.swift; sourceTree = "<group>"; };
@@ -9504,6 +9506,7 @@
 				DA01000000000000000000E7 /* ExtraDevToolsBatch3.swift */,
 				DA01000000000000000000E8 /* ExtraDevToolsBatch4.swift */,
 				DA01000000000000000000E9 /* ExtraDevToolsBatch5.swift */,
+				DA01000000000000000000EA /* ExtraDevToolsBatch6.swift */,
 				NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */,
 );
 			path = SDK;
@@ -15186,6 +15189,7 @@
 				DA02000000000000000000E7 /* ExtraDevToolsBatch3.swift in Sources */,
 				DA02000000000000000000E8 /* ExtraDevToolsBatch4.swift in Sources */,
 				DA02000000000000000000E9 /* ExtraDevToolsBatch5.swift in Sources */,
+				DA02000000000000000000EA /* ExtraDevToolsBatch6.swift in Sources */,
 				NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */,
 				B604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift in Sources */,
 				B5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift in Sources */,
