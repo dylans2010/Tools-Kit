@@ -150,7 +150,7 @@ class DesignerViewModel: ObservableObject {
 
                 // Generate and Save Design.md
                 let ai = AIService.shared
-                let mdContent = ai.generateDesignMarkdown(
+                let mdContent = await ai.generateDesignMarkdown(
                     title: snapshot.title,
                     colors: snapshot.colors,
                     fonts: snapshot.fonts,
@@ -356,9 +356,9 @@ struct DesignerView: View {
                     VStack(spacing: 8) {
                         ZStack {
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(Color(hex: colorHex))
+                                .fill(Color(parsing: colorHex))
                                 .frame(width: 70, height: 70)
-                                .shadow(color: Color(hex: colorHex).opacity(0.3), radius: 4, x: 0, y: 2)
+                                .shadow(color: Color(parsing: colorHex).opacity(0.3), radius: 4, x: 0, y: 2)
 
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 .stroke(Color.white.opacity(0.2), lineWidth: 1)
