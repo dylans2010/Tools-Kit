@@ -4,16 +4,26 @@ struct MCPMainView: View {
     @StateObject private var mcpManager = MCPManager.shared
     @State private var showingAddServer = false
     @State private var showingBrowseServers = false
+    @State private var showingDebug = false
 
     var body: some View {
         NavigationStack {
             List {
-                if mcpManager.servers.isEmpty {
-                    MCPEmptyStateView {
-                        showingAddServer = true
+                Section("Platform Health") {
+                    HStack(spacing: 20) {
+                        HealthMetricView(label: "Connected", value: "\(connectedCount)", color: .green)
+                        HealthMetricView(label: "Latency", value: avgLatency, color: .blue)
+                        HealthMetricView(label: "Tools", value: "\(totalTools)", color: .purple)
                     }
-                } else {
-                    Section {
+                    .padding(.vertical, 8)
+                }
+
+                Section("Connected Servers") {
+                    if mcpManager.servers.isEmpty {
+                        MCPEmptyStateView {
+                            showingAddServer = true
+                        }
+                    } else {
                         ForEach(mcpManager.servers) { server in
                             NavigationLink(destination: MCPServerDetailView(server: server)) {
                                 MCPServerRowView(server: server)
@@ -24,19 +34,17 @@ struct MCPMainView: View {
                                 mcpManager.removeServer(id: mcpManager.servers[index].id)
                             }
                         }
-                    } header: {
-                        HStack {
-                            Text("Active Servers")
-                            Spacer()
-                            bulkActionsMenu
-                        }
                     }
                 }
             }
             .navigationTitle("MCP Core")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    bulkActionsMenu
+                    Button {
+                        showingDebug = true
+                    } label: {
+                        Label("Debug", systemImage: "terminal")
+                    }
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
@@ -73,44 +81,43 @@ struct MCPMainView: View {
                     mcpManager.addServer(finalServer)
                 }
             }
+            .sheet(isPresented: $showingDebug) {
+                MCPDebugConsole()
+            }
         }
     }
 
-    private var bulkActionsMenu: some View {
-        Menu {
-            Button {
-                Task {
-                    for server in mcpManager.servers {
-                        try? await mcpManager.connect(to: server)
-                    }
-                }
-            } label: {
-                Label("Connect All", systemImage: "bolt.fill")
-            }
+    private var connectedCount: Int {
+        mcpManager.servers.filter { $0.connectionStatus == .connected }.count
+    }
 
-            Button(role: .destructive) {
-                for server in mcpManager.servers {
-                    mcpManager.disconnect(server: server)
-                }
-            } label: {
-                Label("Disconnect All", systemImage: "power")
-            }
+    private var totalTools: Int {
+        mcpManager.toolRegistry.values.reduce(0) { $0 + $1.count }
+    }
 
-            Divider()
+    private var avgLatency: String {
+        let latencies = mcpManager.servers.compactMap { $0.latency }
+        guard !latencies.isEmpty else { return "--" }
+        let avg = latencies.reduce(0, +) / Double(latencies.count)
+        return "\(Int(avg))ms"
+    }
+}
 
-            Button {
-                Task {
-                    for server in mcpManager.servers where server.connectionStatus == .connected {
-                        try? await mcpManager.connect(to: server)
-                    }
-                }
-            } label: {
-                Label("Refresh All", systemImage: "arrow.clockwise")
-            }
-        } label: {
-            Image(systemName: "ellipsis.circle")
-                .font(.caption)
+struct HealthMetricView: View {
+    let label: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.system(size: 18, weight: .black, design: .monospaced))
+                .foregroundStyle(color)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -333,18 +340,6 @@ struct MCPServerDetailView: View {
                 }
             }
 
-            Section("Traffic Inspector") {
-                if let logs = server.trafficLogs, !logs.isEmpty {
-                    NavigationLink(destination: MCPTrafficInspectorView(server: server)) {
-                        Label("Analyze \(logs.count) packets", systemImage: "gauge.with.needle")
-                    }
-                } else {
-                    Text("No telemetry data recorded.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
             Section("Management") {
                 Button {
                     var newServer = server
@@ -447,11 +442,6 @@ struct MCPAuthFormView: View {
                 TextField("Token Endpoint", text: $server.authConfig.tokenEndpoint)
                 TextField("Client ID", text: $server.authConfig.clientId)
                 TextField("Scopes", text: $server.authConfig.scopes)
-                Button("Start Authorization Flow") {
-                    Task {
-                        try? await mcpManager.performOAuth2PKCE(server: server)
-                    }
-                }
 
             case .oauth2ClientCredentials:
                 TextField("Token Endpoint", text: $server.authConfig.tokenEndpoint)
@@ -512,17 +502,20 @@ struct MCPToolRowView: View {
                         .foregroundStyle(.blue)
                         .padding(.top, 4)
 
-                    if let props = tool.inputSchema.properties {
-                        ForEach(props.sorted(by: { $0.key < $1.key }), id: \.key) { key, prop in
+                    if let props = tool.inputSchema.value as? [String: Any],
+                       let properties = props["properties"] as? [String: Any] {
+                        ForEach(properties.sorted(by: { $0.key < $1.key }), id: \.key) { key, prop in
                             VStack(alignment: .leading, spacing: 2) {
                                 HStack {
                                     Text(key)
                                         .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                    Text("(\(prop.value as? String ?? "mixed"))")
-                                        .font(.system(size: 9, design: .monospaced))
-                                        .foregroundStyle(.secondary)
+                                    if let type = (prop as? [String: Any])?["type"] as? String {
+                                        Text("(\(type))")
+                                            .font(.system(size: 9, design: .monospaced))
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
-                                if let desc = (prop.value as? [String: Any])?["description"] as? String {
+                                if let desc = (prop as? [String: Any])?["description"] as? String {
                                     Text(desc)
                                         .font(.system(size: 10))
                                         .foregroundStyle(.tertiary)
@@ -857,42 +850,6 @@ struct MCPServerTemplate: Identifiable, Codable {
     enum CodingKeys: String, CodingKey {
         case id, name, description, url, category, authLink = "auth_link"
         case authenticationType = "authentication_type"
-    }
-}
-
-struct MCPTrafficInspectorView: View {
-    let server: MCPServer
-
-    var body: some View {
-        List((server.trafficLogs ?? []).reversed()) { log in
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Image(systemName: log.direction == .request ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
-                        .foregroundStyle(log.direction == .request ? .blue : .green)
-                    Text(log.direction.rawValue.uppercased())
-                        .font(.caption2.bold())
-
-                    if let method = log.method {
-                        Text(method)
-                            .font(.system(size: 10, weight: .bold, design: .monospaced))
-                            .padding(.horizontal, 4)
-                            .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 4))
-                    }
-
-                    Spacer()
-                    Text(log.timestamp, style: .time)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-
-                Text(log.payload)
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(5)
-            }
-            .padding(.vertical, 4)
-        }
-        .navigationTitle("Traffic: \(server.name)")
     }
 }
 

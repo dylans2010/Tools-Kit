@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import SwiftMCP
 
 // MARK: - Auth Models
 
@@ -60,15 +61,18 @@ public struct MCPAuthConfig: Codable {
 // MARK: - Server & Tool Models
 
 public enum MCPConnectionStatus: String, Codable {
-    case disconnected, connecting, authenticating, discovering, connected, failed
+    case disconnected, connecting, validating, initializing, discoveringTools, connected, degraded, reconnecting, failed
 
     public var color: Color {
         switch self {
         case .disconnected: return .gray
         case .connecting: return .orange
-        case .authenticating: return .blue
-        case .discovering: return .purple
+        case .validating: return .blue
+        case .initializing: return .cyan
+        case .discoveringTools: return .purple
         case .connected: return .green
+        case .degraded: return .yellow
+        case .reconnecting: return .orange
         case .failed: return .red
         }
     }
@@ -77,9 +81,12 @@ public enum MCPConnectionStatus: String, Codable {
         switch self {
         case .disconnected: return "Disconnected"
         case .connecting: return "Connecting"
-        case .authenticating: return "Authenticating"
-        case .discovering: return "Discovering Tools"
+        case .validating: return "Validating"
+        case .initializing: return "Initializing"
+        case .discoveringTools: return "Discovering Tools"
         case .connected: return "Connected"
+        case .degraded: return "Degraded"
+        case .reconnecting: return "Reconnecting"
         case .failed: return "Connection Failed"
         }
     }
@@ -89,9 +96,9 @@ public struct MCPTool: Identifiable, Codable, Hashable {
     public var id: UUID = UUID()
     public var name: String
     public var description: String
-    public var inputSchema: MCPJSONSchema
+    public var inputSchema: AnyCodable
 
-    public init(name: String, description: String, inputSchema: MCPJSONSchema) {
+    public init(name: String, description: String, inputSchema: AnyCodable) {
         self.name = name
         self.description = description
         self.inputSchema = inputSchema
@@ -106,22 +113,11 @@ public struct MCPTool: Identifiable, Codable, Hashable {
     }
 }
 
-public struct MCPJSONSchema: Codable {
-    public var type: String
-    public var properties: [String: AnyCodable]?
-    public var required: [String]?
-
-    public init(type: String, properties: [String: AnyCodable]? = nil, required: [String]? = nil) {
-        self.type = type
-        self.properties = properties
-        self.required = required
-    }
-}
-
 public struct MCPServer: Identifiable, Codable {
     public var id: UUID = UUID()
     public var name: String
     public var baseURL: String
+    public var transportType: MCPTransportType = .httpSse
     public var authConfig: MCPAuthConfig = MCPAuthConfig()
     public var connectionStatus: MCPConnectionStatus = .disconnected
     public var discoveredTools: [MCPTool] = []
@@ -133,12 +129,24 @@ public struct MCPServer: Identifiable, Codable {
     public var trafficLogs: [MCPTrafficLog]? = []
     public var latency: Double? // in milliseconds
     public var isTrusted: Bool = false
-    public var capabilities: MCPServerCapabilities?
+    public var capabilities: AnyCodable?
 
     public init(name: String, baseURL: String, authConfig: MCPAuthConfig = MCPAuthConfig()) {
         self.name = name
         self.baseURL = baseURL
         self.authConfig = authConfig
+    }
+}
+
+public enum MCPTransportType: String, Codable, CaseIterable, Identifiable {
+    case httpSse, stdio, tcp
+    public var id: String { rawValue }
+    public var displayName: String {
+        switch self {
+        case .httpSse: return "HTTP + SSE"
+        case .stdio: return "Standard I/O"
+        case .tcp: return "TCP + Bonjour"
+        }
     }
 }
 
@@ -166,7 +174,7 @@ public struct MCPServerInfo: Codable {
     public var protocolVersion: String
 }
 
-// MARK: - JSON-RPC 2.0 Wire Types
+// MARK: - JSON-RPC 2.0 Wire Types (Deprecated in favor of SwiftMCP where possible)
 
 public struct MCPRequest: Encodable {
     public let jsonrpc: String = "2.0"
@@ -222,37 +230,11 @@ public struct MCPResponse: Decodable {
     public let error: MCPResponseError?
 }
 
-public struct MCPServerCapabilities: Codable {
-    public let tools: MCPToolCapability?
-    public let resources: AnyCodable?
-    public let prompts: AnyCodable?
-    public let logging: AnyCodable?
-}
-
-public struct MCPToolCapability: Codable {
-    public let listChanged: Bool?
-}
-
-public struct MCPContentBlock: Codable {
-    public let type: String
-    public let text: String?
-    public let data: String?
-    public let mimeType: String?
-
-    public init(type: String, text: String? = nil, data: String? = nil, mimeType: String? = nil) {
-        self.type = type
-        self.text = text
-        self.data = data
-        self.mimeType = mimeType
-    }
-}
-
 public struct MCPResponseError: Codable {
     public let code: Int
     public let message: String
     public let data: AnyCodable?
 }
-
 
 // MARK: - Persona ↔ MCP Bridge Models
 

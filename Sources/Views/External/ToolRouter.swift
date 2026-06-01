@@ -4,27 +4,21 @@ import Foundation
 public final class ToolRouter: ObservableObject {
     public static let shared = ToolRouter()
 
-    private let mcpManager = MCPManager.shared
+    private let registry = MCPToolRegistry.shared
 
     private init() {}
 
     /// Finds the best matching tool(s) for a given query and available context.
     public func route(query: String) -> [RoutedTool] {
-        let allTools = mcpManager.getAllTools()
+        let allTools = registry.getAllTools()
         var candidates: [RoutedTool] = []
 
-        for (serverId, tools) in allTools {
-            guard let server = mcpManager.servers.first(where: { $0.id.uuidString == serverId }) else { continue }
-
-            for tool in tools {
-                let score = calculateRelevance(query: query, tool: tool)
-                if score > 0.2 { // Threshold for matching
-                    candidates.append(RoutedTool(
-                        server: server,
-                        tool: tool,
-                        relevanceScore: score
-                    ))
-                }
+        for routed in allTools {
+            let score = calculateRelevance(query: query, tool: routed.tool)
+            if score > 0.2 {
+                var updated = routed
+                updated.relevanceScore = score
+                candidates.append(updated)
             }
         }
 
@@ -34,19 +28,23 @@ public final class ToolRouter: ObservableObject {
 
     /// Aggregates all tools from connected servers into a flat list with namespacing.
     public func getAvailableToolsContext() -> String {
-        let connectedTools = mcpManager.getConnectedTools()
-        if connectedTools.isEmpty { return "No MCP tools available." }
+        let connectedServers = MCPManager.shared.servers.filter { $0.connectionStatus == .connected }
+        if connectedServers.isEmpty { return "No MCP tools available." }
 
         var context = "## Available MCP Tools\n"
-        for (serverId, tools) in connectedTools {
-            guard let server = mcpManager.servers.first(where: { $0.id.uuidString == serverId }) else { continue }
+        for server in connectedServers {
+            let tools = registry.tools[server.id] ?? []
+            if tools.isEmpty { continue }
+
             context += "### Server: \(server.name)\n"
             for tool in tools {
                 // Namespacing for the AI: serverName.toolName
                 let namespacedName = "\(server.name.replacingOccurrences(of: " ", with: "_")).\(tool.name)"
                 context += "- **\(namespacedName)**: \(tool.description)\n"
-                if let props = tool.inputSchema.properties {
-                    context += "  - Parameters: \(props.keys.joined(separator: ", "))\n"
+                // SwiftMCP schemas are dynamic, but we can try to extract param names for context
+                if let dict = tool.inputSchema.value as? [String: Any],
+                   let properties = dict["properties"] as? [String: Any] {
+                    context += "  - Parameters: \(properties.keys.joined(separator: ", "))\n"
                 }
             }
             context += "\n"
@@ -89,5 +87,5 @@ public struct RoutedTool: Identifiable {
     public var id: String { "\(server.id.uuidString).\(tool.name)" }
     public let server: MCPServer
     public let tool: MCPTool
-    public let relevanceScore: Double
+    public var relevanceScore: Double
 }

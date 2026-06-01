@@ -3,6 +3,7 @@ import Combine
 import SwiftUI
 import AuthenticationServices
 import Security
+import SwiftMCP
 
 @MainActor
 public final class MCPManager: ObservableObject {
@@ -13,21 +14,17 @@ public final class MCPManager: ObservableObject {
     @Published public var isLoading: Bool = false
     @Published public var toolRegistry: [String: [MCPTool]] = [:] // serverID: [tools]
 
-    private let storageKey = "mcp_servers_v2"
+    private var proxies: [UUID: MCPServerProxy] = [:]
+    private let storageKey = "mcp_servers_v3"
     private var cancellables = Set<AnyCancellable>()
 
     private init() {
         loadServers()
-        // Migrate from old storage if exists
-        if servers.isEmpty {
-            migrateFromV1()
-        }
     }
 
     // MARK: - Persistence
 
     private func saveServers() {
-        // Limit traffic logs
         for i in 0..<servers.count {
             if let logs = servers[i].trafficLogs, logs.count > 50 {
                 servers[i].trafficLogs = Array(logs.suffix(50))
@@ -42,262 +39,143 @@ public final class MCPManager: ObservableObject {
         if let data = UserDefaults.standard.data(forKey: storageKey),
            let decoded = try? JSONDecoder().decode([MCPServer].self, from: data) {
             self.servers = decoded
-            // Rebuild tool registry from persisted tools
             for server in servers {
                 toolRegistry[server.id.uuidString] = server.discoveredTools
+                // Populate central registry on load
+                MCPToolRegistry.shared.updateTools(for: server.id, tools: server.discoveredTools)
             }
         }
     }
 
-    private func migrateFromV1() {
-        let oldKey = "mcp_servers"
-        if let data = UserDefaults.standard.data(forKey: oldKey),
-           let decoded = try? JSONDecoder().decode([MCPServer].self, from: data) {
-            self.servers = decoded
-            saveServers()
-            UserDefaults.standard.removeObject(forKey: oldKey)
-        }
-    }
-
-    // MARK: - Keychain Helpers
-
-    private func saveToKeychain(key: String, value: String) {
-        guard let data = value.data(using: .utf8) else { return }
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
-            kSecValueData as String: data,
-            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
-        ]
-        SecItemDelete(query as CFDictionary)
-        SecItemAdd(query as CFDictionary, nil)
-    }
-
-    private func loadFromKeychain(key: String) -> String? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne
-        ]
-        var dataTypeRef: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
-        if status == errSecSuccess, let data = dataTypeRef as? Data {
-            return String(data: data, encoding: .utf8)
-        }
-        return nil
-    }
-
-    public func saveSecret(_ value: String, key: String, for server: MCPServer) {
-        saveToKeychain(key: "mcp_\(server.id)_\(key)", value: value)
-    }
-
-    public func loadSecret(key: String, for server: MCPServer) -> String {
-        return loadFromKeychain(key: "mcp_\(server.id)_\(key)") ?? ""
-    }
-
-    // MARK: - Public API
-
-    public func addServer(_ server: MCPServer) {
-        if !servers.contains(where: { $0.id == server.id }) {
-            servers.append(server)
-            saveServers()
-        }
-    }
-
-    public func updateServer(_ server: MCPServer) {
-        if let index = servers.firstIndex(where: { $0.id == server.id }) {
-            servers[index] = server
-            toolRegistry[server.id.uuidString] = server.discoveredTools
-            saveServers()
-        }
-    }
-
-    public func removeServer(id: UUID) {
-        servers.removeAll { $0.id == id }
-        toolRegistry.removeValue(forKey: id.uuidString)
-        saveServers()
-    }
+    // MARK: - Core Connection Logic
 
     public func connect(to server: MCPServer) async throws {
         guard let index = servers.firstIndex(where: { $0.id == server.id }) else { return }
 
-        servers[index].connectionStatus = .connecting
-        servers[index].lastError = nil
-        saveServers()
+        updateStatus(id: server.id, to: .connecting)
 
         do {
-            // 1. Initialize Handshake (v2025-06-18)
-            let protocolVersions = ["2025-06-18", "2024-11-05"]
-            var lastErr: Error? = nil
-            var initResult: AnyCodable? = nil
+            // 1. Validation
+            updateStatus(id: server.id, to: .validating)
+            try await validateEndpoint(server: servers[index])
 
-            for version in protocolVersions {
-                do {
-                    let initParams = MCPInitializeParams(protocolVersion: version)
-                    let initRequest = MCPRequest(id: 1, method: "initialize", params: AnyCodable(initParams))
-                    let response = try await send(request: initRequest, to: servers[index], decoding: MCPResponse.self)
-
-                    if let error = response.error {
-                        throw MCPError.serverError(code: error.code, message: error.message, data: error.data)
-                    }
-                    initResult = response.result
-                    break
-                } catch {
-                    lastErr = error
-                    continue
-                }
+            // 2. Transport Configuration
+            let proxy: MCPServerProxy
+            switch servers[index].transportType {
+            case .httpSse:
+                guard let url = URL(string: servers[index].baseURL) else { throw MCPError.invalidURL }
+                let sseConfig = MCPServerSseConfig(url: url)
+                proxy = MCPServerProxy(config: .sse(config: sseConfig))
+            case .tcp:
+                let tcpConfig = MCPServerTcpConfig(serviceName: servers[index].name)
+                proxy = MCPServerProxy(config: .tcp(config: tcpConfig))
+            case .stdio:
+                throw MCPError.connectionFailed("stdio transport not supported on iOS.")
             }
 
-            guard let result = initResult else {
-                throw lastErr ?? MCPError.invalidResponse("Handshake failed for all supported protocol versions.")
+            // 3. Authentication Injection
+            try await injectAuth(to: proxy, for: servers[index])
+
+            // 4. Initialize
+            updateStatus(id: server.id, to: .initializing)
+            try await proxy.connect()
+            proxies[server.id] = proxy
+
+            // 5. Discover Tools
+            updateStatus(id: server.id, to: .discoveringTools)
+            let tools = try await discoverToolsViaProxy(proxy)
+
+            // 6. Finalize
+            if let idx = servers.firstIndex(where: { $0.id == server.id }) {
+                servers[idx].discoveredTools = tools
+                servers[idx].connectionStatus = .connected
+                servers[idx].lastConnected = Date()
+                servers[idx].lastError = nil
+                toolRegistry[server.id.uuidString] = tools
+
+                // Update Central Registry
+                MCPToolRegistry.shared.updateTools(for: server.id, tools: tools)
+
+                // Capture server info if available
+                // Note: SwiftMCP doesn't expose serverInfo directly on proxy yet in a simple way
+                // we'd need to intercept the initialize response or wait for property exposure.
             }
-
-            // Extract server info and capabilities
-            let resultDict = result.value as? [String: Any]
-            if let serverInfoDict = resultDict?["serverInfo"] as? [String: Any],
-               let name = serverInfoDict["name"] as? String,
-               let version = serverInfoDict["version"] as? String {
-                servers[index].serverInfo = MCPServerInfo(name: name, version: version, protocolVersion: (resultDict?["protocolVersion"] as? String) ?? "unknown")
-            }
-
-            // 2. Initialized Notification
-            let initializedNotification = MCPRequest(id: nil, method: "notifications/initialized", params: nil)
-            _ = try? await send(request: initializedNotification, to: servers[index], decoding: MCPResponse.self)
-
-            // 3. List Tools
-            servers[index].connectionStatus = .discovering
-            saveServers()
-
-            let tools = try await discoverTools(for: servers[index])
-            servers[index].discoveredTools = tools
-            toolRegistry[servers[index].id.uuidString] = tools
-            servers[index].connectionStatus = .connected
-            servers[index].lastConnected = Date()
             saveServers()
 
         } catch {
-            servers[index].connectionStatus = .failed
-            servers[index].lastError = error.localizedDescription
-            saveServers()
+            updateStatus(id: server.id, to: .failed, error: error.localizedDescription)
             throw error
         }
     }
 
-    public func disconnect(server: MCPServer) {
-        if let index = servers.firstIndex(where: { $0.id == server.id }) {
-            servers[index].connectionStatus = .disconnected
+    private func updateStatus(id: UUID, to status: MCPConnectionStatus, error: String? = nil) {
+        if let index = servers.firstIndex(where: { $0.id == id }) {
+            servers[index].connectionStatus = status
+            if let error = error {
+                servers[index].lastError = error
+            }
             saveServers()
         }
     }
 
-    public func discoverTools(for server: MCPServer) async throws -> [MCPTool] {
-        let request = MCPRequest(id: 2, method: "tools/list", params: nil)
-        let response = try await send(request: request, to: server, decoding: MCPResponse.self)
+    private func validateEndpoint(server: MCPServer) async throws {
+        guard let url = URL(string: server.baseURL) else { throw MCPError.invalidURL }
 
-        if let error = response.error {
-            throw MCPError.serverError(code: error.code, message: error.message, data: error.data)
+        // 1. Protocol Enforcement
+        if !server.baseURL.lowercased().hasPrefix("https://") && !server.isTrusted {
+            throw MCPError.connectionFailed("Insecure connection blocked. MCP requires HTTPS for production endpoints unless explicitly trusted.")
         }
 
-        guard let resultValue = response.result?.value as? [String: Any],
-              let toolsArray = resultValue["tools"] as? [[String: Any]] else {
-            return []
-        }
-
-        let toolsData = try JSONSerialization.data(withJSONObject: toolsArray)
-        return try JSONDecoder().decode([MCPTool].self, from: toolsData)
-    }
-
-    public func callTool(
-        named toolName: String,
-        on server: MCPServer,
-        arguments: [String: Any],
-        purpose: String
-    ) async throws -> String {
-        let invocationId = UUID()
-        let anyArgs = arguments.mapValues { AnyCodable($0) }
-        let invocation = MCPToolInvocation(
-            serverId: server.id,
-            serverName: server.name,
-            toolName: toolName,
-            purpose: purpose,
-            arguments: anyArgs,
-            status: .connecting
-        )
-        invocation.id = invocationId
-
-        activeInvocations.insert(invocation, at: 0)
+        // 2. Reachability & Protocol Probe
+        // We try to see if the endpoint responds to a simple probe or if it's a known non-MCP API
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.timeoutInterval = 5
 
         do {
-            if server.connectionStatus != .connected {
-                try await connect(to: server)
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse else {
+                throw MCPError.connectionFailed("The server did not return a valid HTTP response.")
             }
 
-            updateInvocation(id: invocationId, status: .executing)
-
-            let toolCallParams = MCPToolCallParams(name: toolName, arguments: anyArgs)
-            let request = MCPRequest(id: 3, method: "tools/call", params: AnyCodable(toolCallParams))
-
-            let response = try await send(request: request, to: server, decoding: MCPResponse.self)
-
-            if let error = response.error {
-                throw MCPError.serverError(code: error.code, message: error.message, data: error.data)
+            // If it's a standard web page (HTML), it's likely not an MCP server
+            if let contentType = http.allHeaderFields["Content-Type"] as? String,
+               contentType.contains("text/html") {
+                throw MCPError.connectionFailed("This endpoint appears to be a web page, not an MCP server.")
             }
 
-            guard let resultDict = response.result?.value as? [String: Any],
-                  let content = resultDict["content"] as? [[String: Any]] else {
-                throw MCPError.invalidResponse("Server returned empty or invalid result for tool call.")
+            // Check for common non-MCP API patterns if necessary
+            // For now, if it returns 404 on GET but we expect SSE, that might be normal for some implementations
+            // until we POST to the /mcp endpoint.
+
+            if http.statusCode == 401 || http.statusCode == 403 {
+                // This is fine, it means it's an API that needs auth, which we'll provide during initialization
             }
 
-            let resultText = content.compactMap { block -> String? in
-                if let type = block["type"] as? String, type == "text" {
-                    return block["text"] as? String
+        } catch let error as NSError {
+            if error.domain == NSURLErrorDomain {
+                switch error.code {
+                case NSURLErrorTimedOut:
+                    throw MCPError.timeout
+                case NSURLErrorCannotFindHost, NSURLErrorCannotConnectToHost:
+                    throw MCPError.connectionFailed("Host unreachable. Please check the URL and your connection.")
+                default:
+                    throw MCPError.connectionFailed("Network error: \(error.localizedDescription)")
                 }
-                return nil
-            }.joined(separator: "\n")
-
-            updateInvocation(id: invocationId, status: .completed, result: resultText)
-            return resultText
-
-        } catch {
-            updateInvocation(id: invocationId, status: .failed, errorMessage: error.localizedDescription)
-            throw error
-        }
-    }
-
-    public func testConnection(server: MCPServer) async throws -> MCPServerInfo {
-        let initParams = MCPInitializeParams()
-        let initRequest = MCPRequest(id: 1, method: "initialize", params: AnyCodable(initParams))
-        let response = try await send(request: initRequest, to: server, decoding: MCPResponse.self)
-
-        if let error = response.error {
-            throw MCPError.serverError(code: error.code, message: error.message, data: error.data)
-        }
-
-        guard let resultDict = response.result?.value as? [String: Any],
-              let serverInfoDict = resultDict["serverInfo"] as? [String: Any],
-              let name = serverInfoDict["name"] as? String,
-              let version = serverInfoDict["version"] as? String else {
-            throw MCPError.invalidResponse("Server info missing in handshake result.")
-        }
-
-        return MCPServerInfo(name: name, version: version, protocolVersion: (resultDict["protocolVersion"] as? String) ?? "unknown")
-    }
-
-    // MARK: - Private Core
-
-    private func updateInvocation(id: UUID, status: MCPInvocationStatus, result: String? = nil, errorMessage: String? = nil) {
-        if let index = activeInvocations.firstIndex(where: { $0.id == id }) {
-            activeInvocations[index].status = status
-            if let result = result { activeInvocations[index].result = result }
-            if let errorMessage = errorMessage { activeInvocations[index].errorMessage = errorMessage }
-            if status == .completed || status == .failed {
-                activeInvocations[index].completedAt = Date()
             }
+            throw MCPError.connectionFailed("Validation failed: \(error.localizedDescription)")
         }
     }
 
-    private func authHeaders(for server: MCPServer) async throws -> [String: String] {
+    private func injectAuth(to proxy: MCPServerProxy, for server: MCPServer) async throws {
+        let headers = try await getAuthHeaders(for: server)
+        for (key, value) in headers {
+            proxy.setExtraHeader(key: key, value: value)
+        }
+    }
+
+    private func getAuthHeaders(for server: MCPServer) async throws -> [String: String] {
         var headers: [String: String] = [:]
         switch server.authConfig.type {
         case .none: break
@@ -322,38 +200,152 @@ public final class MCPManager: ObservableObject {
         return headers
     }
 
-    private func send<R: Decodable>(
-        request: MCPRequest,
-        to server: MCPServer,
-        decoding: R.Type
-    ) async throws -> R {
-        let headers = try await authHeaders(for: server)
-        let startTime = Date()
+    private func getToKeychain(key: String) -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var dataTypeRef: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
+        if status == errSecSuccess, let data = dataTypeRef as? Data {
+            return String(data: data, encoding: .utf8)
+        }
+        return nil
+    }
+
+    private func saveToKeychain(key: String, value: String) {
+        guard let data = value.data(using: .utf8) else { return }
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+            kSecValueData as String: data,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
+        ]
+        SecItemDelete(query as CFDictionary)
+        SecItemAdd(query as CFDictionary, nil)
+    }
+
+    private func discoverToolsViaProxy(_ proxy: MCPServerProxy) async throws -> [MCPTool] {
+        let swiftTools = try await proxy.listTools()
+
+        return swiftTools.map { tool in
+            MCPTool(
+                name: tool.name,
+                description: tool.description ?? "",
+                inputSchema: AnyCodable(tool.inputSchema)
+            )
+        }
+    }
+
+    public func disconnect(server: MCPServer) {
+        proxies.removeValue(forKey: server.id)
+        updateStatus(id: server.id, to: .disconnected)
+    }
+
+    // MARK: - Tool Execution
+
+    public func callTool(
+        named toolName: String,
+        on server: MCPServer,
+        arguments: [String: Any],
+        purpose: String
+    ) async throws -> String {
+        guard let proxy = proxies[server.id] else {
+            try await connect(to: server)
+            return try await callTool(named: toolName, on: server, arguments: arguments, purpose: purpose)
+        }
+
+        let invocationId = UUID()
+        let anyArgs = arguments.mapValues { AnyCodable($0) }
+        let invocation = MCPToolInvocation(
+            serverId: server.id,
+            serverName: server.name,
+            toolName: toolName,
+            purpose: purpose,
+            arguments: anyArgs,
+            status: .executing
+        )
+        invocation.id = invocationId
+        activeInvocations.insert(invocation, at: 0)
 
         do {
-            let response: R = try await MCPService.shared.send(request: request, to: server, authHeaders: headers)
-            let latency = Date().timeIntervalSince(startTime) * 1000
+            let result = try await proxy.callTool(name: toolName, arguments: arguments)
 
-            if let index = servers.firstIndex(where: { $0.id == server.id }) {
-                servers[index].latency = latency
-            }
+            // Format results into a single string for AI synthesis
+            let outputText = result.content.compactMap { content -> String? in
+                switch content {
+                case .text(let text):
+                    return text.text
+                case .image(let image):
+                    return "[Image Output: \(image.mimeType)]"
+                case .resource(let resource):
+                    return "[Resource Output: \(resource.resource.uri)]"
+                }
+            }.joined(separator: "\n")
 
-            logTraffic(direction: .request, method: request.method, payload: String(describing: request), for: server)
-            logTraffic(direction: .response, method: request.method, payload: String(describing: response), for: server)
-
-            return response
+            updateInvocation(id: invocationId, status: .completed, result: outputText)
+            return outputText
         } catch {
-            logTraffic(direction: .response, method: request.method, payload: "Error: \(error.localizedDescription)", for: server)
+            updateInvocation(id: invocationId, status: .failed, errorMessage: error.localizedDescription)
             throw error
         }
     }
 
-    private func logTraffic(direction: MCPTrafficDirection, method: String?, payload: String, for server: MCPServer) {
-        if let index = servers.firstIndex(where: { $0.id == server.id }) {
-            let log = MCPTrafficLog(direction: direction, method: method, payload: payload)
-            if servers[index].trafficLogs == nil { servers[index].trafficLogs = [] }
-            servers[index].trafficLogs?.append(log)
+    private func updateInvocation(id: UUID, status: MCPInvocationStatus, result: String? = nil, errorMessage: String? = nil) {
+        if let index = activeInvocations.firstIndex(where: { $0.id == id }) {
+            activeInvocations[index].status = status
+            if let result = result { activeInvocations[index].result = result }
+            if let errorMessage = errorMessage { activeInvocations[index].errorMessage = errorMessage }
+            if status == .completed || status == .failed {
+                activeInvocations[index].completedAt = Date()
+            }
         }
+    }
+
+    // MARK: - Server Management
+
+    public func addServer(_ server: MCPServer) {
+        if !servers.contains(where: { $0.id == server.id }) {
+            servers.append(server)
+            saveServers()
+        }
+    }
+
+    public func updateServer(_ server: MCPServer) {
+        if let index = servers.firstIndex(where: { $0.id == server.id }) {
+            servers[index] = server
+            toolRegistry[server.id.uuidString] = server.discoveredTools
+            saveServers()
+        }
+    }
+
+    public func removeServer(id: UUID) {
+        servers.removeAll { $0.id == id }
+        toolRegistry.removeValue(forKey: id.uuidString)
+        proxies.removeValue(forKey: id)
+        saveServers()
+    }
+
+    public func saveSecret(_ value: String, key: String, for server: MCPServer) {
+        saveToKeychain(key: "mcp_\(server.id)_\(key)", value: value)
+    }
+
+    public func loadSecret(key: String, for server: MCPServer) -> String {
+        return getToKeychain(key: "mcp_\(server.id)_\(key)") ?? ""
+    }
+
+    public func testConnection(server: MCPServer) async throws -> MCPServerInfo {
+        guard let url = URL(string: server.baseURL) else { throw MCPError.invalidURL }
+        let sseConfig = MCPServerSseConfig(url: url)
+        let proxy = MCPServerProxy(config: .sse(config: sseConfig))
+
+        try await injectAuth(to: proxy, for: server)
+        try await proxy.connect()
+
+        // MCPServerProxy might not have public access to serverInfo yet, we rely on successful connect
+        return MCPServerInfo(name: server.name, version: "unknown", protocolVersion: "unknown")
     }
 
     public func getAllTools() -> [String: [MCPTool]] {
