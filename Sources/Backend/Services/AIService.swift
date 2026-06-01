@@ -281,24 +281,15 @@ class AIService {
         }
 
         // Handle MCP Tool Calls (pattern [MCP_CALL: ...])
-        let mcpCalls = await MainActor.run(body: { MCPToolCallParser.extractMCPCalls(from: response) })
-        if !mcpCalls.isEmpty {
+        let mcpResults = await MainActor.run {
+            await MCPExecutionEngine.shared.processAIResponse(response)
+        }
+
+        if !mcpResults.isEmpty {
             var currentMessages = messages + [ChatMessage(role: "assistant", content: response)]
 
-            for mcpCall in mcpCalls {
-                do {
-                    let mcpResult = try await MainActor.run {
-                        try await MCPPersonaBridge().execute(
-                            serverName: mcpCall.serverName,
-                            toolName: mcpCall.toolName,
-                            arguments: mcpCall.arguments,
-                            purpose: mcpCall.purpose
-                        )
-                    }
-                    currentMessages.append(ChatMessage(role: "system", content: "MCP Tool Execution Result (\(mcpCall.toolName)): \(mcpResult)"))
-                } catch {
-                    currentMessages.append(ChatMessage(role: "system", content: "MCP Tool Execution Failed (\(mcpCall.toolName)): \(error.localizedDescription)"))
-                }
+            for result in mcpResults {
+                currentMessages.append(ChatMessage(role: "system", content: result.summary))
             }
 
             // Recurse to generate final response incorporating all tool outputs
