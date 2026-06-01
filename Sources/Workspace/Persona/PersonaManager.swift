@@ -58,6 +58,9 @@ final class PersonaManager: ObservableObject {
         // 1. Capture state needed for background processing
         let instructions = config.instructions
         let personaName = config.name
+        let creativity = config.creativity
+        let formality = config.formality
+        let humor = config.humor
         let historySuffix = chatHistory.suffix(10).map { "\($0.role): \($0.content)" }.joined(separator: "\n")
 
         // 2. Perform heavy workspace data gathering and prompt building in background
@@ -102,9 +105,9 @@ final class PersonaManager: ObservableObject {
 
             <RESPONSE_VOLUME_RULES — CRITICAL>
             You must calibrate your response length precisely to the nature of the request:
-            - Creativity: \(self.config.creativity)
-            - Formality: \(self.config.formality)
-            - Humor: \(self.config.humor)
+            - Creativity: \(creativity)
+            - Formality: \(formality)
+            - Humor: \(humor)
             </RESPONSE_VOLUME_RULES>
 
             < Hallucination Prevention — CRITICAL>
