@@ -22,6 +22,12 @@ final class MCPManager: ObservableObject {
     // MARK: - Persistence
 
     private func saveServers() {
+        // Limit traffic logs to last 50 entries per server to avoid bloating UserDefaults
+        for i in 0..<servers.count {
+            if let logs = servers[i].trafficLogs, logs.count > 50 {
+                servers[i].trafficLogs = Array(logs.suffix(50))
+            }
+        }
         if let encoded = try? JSONEncoder().encode(servers) {
             UserDefaults.standard.set(encoded, forKey: storageKey)
         }
@@ -330,9 +336,9 @@ final class MCPManager: ObservableObject {
             throw MCPError.authenticationFailed("Token request failed")
         }
 
-        let tokenResponse = try JSONDecoder().decode(OAuthTokenResponse.self, from: data)
-        saveSecret(tokenResponse.access_token, key: "accessToken", for: server)
-        return tokenResponse.access_token
+        let tokenResponse = try JSONDecoder().decode(MCPOAuthTokenResponse.self, from: data)
+        saveSecret(tokenResponse.accessToken, key: "accessToken", for: server)
+        return tokenResponse.accessToken
     }
 
     private func send<R: Decodable>(
@@ -341,7 +347,38 @@ final class MCPManager: ObservableObject {
         decoding: R.Type
     ) async throws -> R {
         let headers = try await authHeaders(for: server)
-        return try await MCPService.shared.send(request: request, to: server, authHeaders: headers)
+
+        // Log Request
+        if let requestData = try? JSONEncoder().encode(request),
+           let requestString = String(data: requestData, encoding: .utf8) {
+            logTraffic(direction: .request, method: request.method, payload: requestString, for: server)
+        }
+
+        do {
+            let response = try await MCPService.shared.send(request: request, to: server, authHeaders: headers)
+
+            // Log Response
+            if let responseData = try? JSONEncoder().encode(response),
+               let responseString = String(data: responseData, encoding: .utf8) {
+                logTraffic(direction: .response, method: request.method, payload: responseString, for: server)
+            }
+
+            return response
+        } catch {
+            logTraffic(direction: .response, method: request.method, payload: "Error: \(error.localizedDescription)", for: server)
+            throw error
+        }
+    }
+
+    private func logTraffic(direction: MCPTrafficDirection, method: String?, payload: String, for server: MCPServer) {
+        if let index = servers.firstIndex(where: { $0.id == server.id }) {
+            let log = MCPTrafficLog(direction: direction, method: method, payload: payload)
+            if servers[index].trafficLogs == nil {
+                servers[index].trafficLogs = []
+            }
+            servers[index].trafficLogs?.append(log)
+            // Save happens periodically or after important state changes
+        }
     }
 
     // MARK: - OAuth2 PKCE
@@ -352,9 +389,18 @@ final class MCPManager: ObservableObject {
     }
 }
 
-struct OAuthTokenResponse: Decodable {
-    let access_token: String
-    let token_type: String?
-    let expires_in: Int?
-    let refresh_token: String?
+struct MCPOAuthTokenResponse: Decodable {
+    let accessToken: String
+    let tokenType: String?
+    let expiresIn: Int?
+    let refreshToken: String?
+    let scope: String?
+
+    enum CodingKeys: String, CodingKey {
+        case accessToken = "access_token"
+        case tokenType = "token_type"
+        case expiresIn = "expires_in"
+        case refreshToken = "refresh_token"
+        case scope
+    }
 }
