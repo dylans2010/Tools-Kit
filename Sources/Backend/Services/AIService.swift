@@ -281,9 +281,7 @@ class AIService {
         }
 
         // Handle MCP Tool Calls (pattern [MCP_CALL: ...])
-        let mcpResults = await MainActor.run {
-            await MCPExecutionEngine.shared.processAIResponse(response)
-        }
+        let mcpResults = await MCPExecutionEngine.shared.processAIResponse(response)
 
         if !mcpResults.isEmpty {
             var currentMessages = messages + [ChatMessage(role: "assistant", content: response)]
