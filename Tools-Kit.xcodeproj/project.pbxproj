@@ -1730,6 +1730,9 @@
 		3ACD485C621F41389BE35DB5 /* TypographyScaleDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7702CF69F348E4BC0B7488 /* TypographyScaleDevTool.swift */; };
 		DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E813EF936284C389651EA24 /* ColorMixerDevTool.swift */; };
 		21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5619C319AF314C56B15BA1E5 /* DevToolsMainView.swift */; };
+		DA02000000000000000000E1 /* DesignerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01000000000000000000E1 /* DesignerDevTool.swift */; };
+		DA02000000000000000000E2 /* SearchDocsDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01000000000000000000E2 /* SearchDocsDevTool.swift */; };
+		DA02000000000000000000E3 /* DatabaseCreateDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01000000000000000000E3 /* DatabaseCreateDevTool.swift */; };
 		NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */; };
 		DG02000000000000000000000130 /* Diag_IMEIInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000130 /* Diag_IMEIInfoView.swift */; };
 		DG02000000000000000000000131 /* Diag_MDMDetectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000131 /* Diag_MDMDetectionView.swift */; };
@@ -3926,6 +3929,9 @@
 		2D7702CF69F348E4BC0B7488 /* TypographyScaleDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/TypographyScaleDevTool.swift; sourceTree = "<group>"; };
 		8E813EF936284C389651EA24 /* ColorMixerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ColorMixerDevTool.swift; sourceTree = "<group>"; };
 		5619C319AF314C56B15BA1E5 /* DevToolsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DevToolsMainView.swift; sourceTree = "<group>"; };
+		DA01000000000000000000E1 /* DesignerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DesignerDevTool.swift; sourceTree = "<group>"; };
+		DA01000000000000000000E2 /* SearchDocsDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SearchDocsDevTool.swift; sourceTree = "<group>"; };
+		DA01000000000000000000E3 /* DatabaseCreateDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DatabaseCreateDevTool.swift; sourceTree = "<group>"; };
 		NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/NewDevTools.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000130 /* Diag_IMEIInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IMEIInfoView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000131 /* Diag_MDMDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MDMDetectionView.swift; sourceTree = "<group>"; };
@@ -9477,6 +9483,9 @@
 				2D7702CF69F348E4BC0B7488 /* TypographyScaleDevTool.swift */,
 				8E813EF936284C389651EA24 /* ColorMixerDevTool.swift */,
 				5619C319AF314C56B15BA1E5 /* DevToolsMainView.swift */,
+				DA01000000000000000000E1 /* DesignerDevTool.swift */,
+				DA01000000000000000000E2 /* SearchDocsDevTool.swift */,
+				DA01000000000000000000E3 /* DatabaseCreateDevTool.swift */,
 				NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */,
 );
 			path = SDK;
@@ -15150,6 +15159,9 @@
 				3ACD485C621F41389BE35DB5 /* TypographyScaleDevTool.swift in Sources */,
 				DAA98BBDBC7A47B79C1E78CA /* ColorMixerDevTool.swift in Sources */,
 				21612A03D6FA4179B50657B5 /* DevToolsMainView.swift in Sources */,
+				DA02000000000000000000E1 /* DesignerDevTool.swift in Sources */,
+				DA02000000000000000000E2 /* SearchDocsDevTool.swift in Sources */,
+				DA02000000000000000000E3 /* DatabaseCreateDevTool.swift in Sources */,
 				NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */,
 				B604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift in Sources */,
 				B5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift in Sources */,

@@ -237,6 +237,11 @@ final class DevToolRegistry: ObservableObject {
         register(SDKBuildAnalyzerDevTool())
         register(SDKAssetOptimizerDevTool())
         register(SDKSecurityAuditDevTool())
+
+        // REQUIRED CORE DEVTOOLS
+        register(DesignerDevTool())
+        register(SearchDocsDevTool())
+        register(DatabaseCreateDevTool())
     }
 }
 
@@ -245,13 +250,7 @@ final class DevToolRegistry: ObservableObject {
 struct DevToolsMainView: View {
     @StateObject private var registry = DevToolRegistry.shared
     @State private var searchText = ""
-    @State private var expandedCategories: Set<DevToolCategory> = Set(DevToolCategory.allCases)
     @State private var selectedCategory: DevToolCategory?
-    @State private var viewMode: ViewMode = .grid
-
-    private enum ViewMode: String {
-        case list, grid
-    }
 
     private var filteredTools: [AnyDevTool] {
         var tools = registry.tools
@@ -261,120 +260,88 @@ struct DevToolsMainView: View {
         if !searchText.isEmpty {
             tools = tools.filter {
                 $0.name.localizedCaseInsensitiveContains(searchText) ||
-                $0.description.localizedCaseInsensitiveContains(searchText)
+                $0.description.localizedCaseInsensitiveContains(searchText) ||
+                $0.category.rawValue.localizedCaseInsensitiveContains(searchText)
             }
         }
-        return tools
-    }
-
-    private var toolsByCategory: [DevToolCategory: [AnyDevTool]] {
-        Dictionary(grouping: filteredTools) { $0.category }
+        return tools.sorted { $0.name < $1.name }
     }
 
     var body: some View {
         VStack(spacing: 0) {
+            // Fast Category Filter
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    categoryChip(nil, label: "All")
+                HStack(spacing: 6) {
+                    filterChip(nil, label: "All")
                     ForEach(DevToolCategory.allCases) { category in
-                        categoryChip(category, label: category.rawValue)
+                        filterChip(category, label: category.rawValue)
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
             }
-            .background(Color(.systemGroupedBackground))
+            .background(Color(uiColor: .systemBackground))
+            Divider()
 
+            // Flat, Developer-First Tool Index
             List {
-                ForEach(DevToolCategory.allCases) { category in
-                    if let tools = toolsByCategory[category], !tools.isEmpty {
-                        Section(isExpanded: Binding(
-                            get: { expandedCategories.contains(category) },
-                            set: { isExpanded in
-                                if isExpanded {
-                                    expandedCategories.insert(category)
-                                } else {
-                                    expandedCategories.remove(category)
-                                }
+                ForEach(filteredTools) { tool in
+                    NavigationLink(destination: tool.render().navigationTitle(tool.name)) {
+                        HStack(spacing: 12) {
+                            Image(systemName: tool.icon)
+                                .font(.system(size: 14))
+                                .frame(width: 24, alignment: .center)
+                                .foregroundStyle(.secondary)
+
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(tool.name)
+                                    .font(.system(size: 15, weight: .medium, design: .monospaced))
+                                Text(tool.description)
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(.tertiary)
+                                    .lineLimit(1)
                             }
-                        )) {
-                            ForEach(tools) { tool in
-                                NavigationLink(destination: tool.render().navigationTitle(tool.name)) {
-                                    HStack(spacing: 14) {
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                                .fill(Color.accentColor.opacity(0.1))
-                                                .frame(width: 38, height: 38)
-                                            Image(systemName: tool.icon)
-                                                .font(.system(size: 16))
-                                                .foregroundStyle(Color.accentColor)
-                                        }
-                                        VStack(alignment: .leading, spacing: 3) {
-                                            Text(tool.name)
-                                                .font(.subheadline.weight(.semibold))
-                                            Text(tool.description)
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                                .lineLimit(1)
-                                        }
-                                    }
-                                    .padding(.vertical, 2)
-                                }
-                            }
-                        } header: {
-                            HStack {
-                                Image(systemName: category.icon)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Text(category.rawValue)
-                                    .font(.subheadline.weight(.semibold))
-                                Spacer()
-                                Text("\(tools.count)")
-                                    .font(.caption2.monospaced().weight(.medium))
-                                    .padding(.horizontal, 7)
-                                    .padding(.vertical, 3)
-                                    .background(Color.accentColor.opacity(0.12), in: Capsule())
-                                    .foregroundStyle(Color.accentColor)
-                            }
+
+                            Spacer()
+
+                            Text(tool.category.rawValue.uppercased())
+                                .font(.system(size: 8, weight: .bold))
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 2)
+                                .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 3))
+                                .foregroundStyle(.secondary)
                         }
                     }
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 }
             }
-            .listStyle(.sidebar)
+            .listStyle(.plain)
         }
-        .background(Color(.systemGroupedBackground))
-        .navigationTitle("Dev Tools")
-        .searchable(text: $searchText, prompt: "Search \(registry.tools.count) tools...")
+        .navigationTitle("ToolsKit OS")
+        .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Index lookup...")
         .overlay {
-            if filteredTools.isEmpty && !searchText.isEmpty {
+            if filteredTools.isEmpty {
                 ContentUnavailableView.search(text: searchText)
-            } else if registry.tools.isEmpty {
-                ContentUnavailableView {
-                    Label("No Tools Registered", systemImage: "hammer")
-                } description: {
-                    Text("Register tools to see them here.")
-                }
             }
         }
     }
 
-    private func categoryChip(_ category: DevToolCategory?, label: String) -> some View {
+    private func filterChip(_ category: DevToolCategory?, label: String) -> some View {
         Button {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                selectedCategory = category
-            }
+            selectedCategory = category
         } label: {
             Text(label)
-                .font(.caption.weight(.semibold))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+                .font(.system(size: 11, weight: .semibold))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
                 .background(
                     selectedCategory == category
-                        ? Color.accentColor
-                        : Color(.tertiarySystemBackground),
-                    in: Capsule()
+                        ? Color.primary
+                        : Color.secondary.opacity(0.1),
+                    in: RoundedRectangle(cornerRadius: 4)
                 )
-                .foregroundStyle(selectedCategory == category ? .white : .primary)
+                .foregroundStyle(selectedCategory == category ? Color(uiColor: .systemBackground) : .primary)
         }
         .buttonStyle(.plain)
     }
