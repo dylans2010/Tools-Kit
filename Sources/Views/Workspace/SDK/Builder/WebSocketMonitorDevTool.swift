@@ -44,11 +44,6 @@ struct WebSocketMonitorView: View {
                         .foregroundStyle(.white)
                         .background(viewModel.isConnected ? Color.green : Color.secondary, in: RoundedRectangle(cornerRadius: 4))
                     Spacer()
-                    if viewModel.isConnected {
-                        Text("Latency: \(viewModel.latency)ms")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
                 }
             }
 
@@ -122,14 +117,6 @@ class WebSocketMonitorViewModel: ObservableObject {
         webSocketTask?.resume()
         isConnected = true
         receive()
-
-        // Mock latency monitoring
-        Timer.publish(every: 2, on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] _ in
-                self?.latency = Int.random(in: 20...150)
-            }
-            .store(in: &cancellables)
     }
 
     func disconnect() {
