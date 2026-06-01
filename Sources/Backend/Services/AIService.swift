@@ -776,6 +776,60 @@ class AIService {
         }
         return trimmed
     }
+
+    // MARK: - Designer Module Helpers
+
+    func generateDesignMarkdown(title: String, colors: [String], fonts: [String], radii: [String]) -> String {
+        var markdown = "# \(title)\n\n"
+
+        markdown += "## Colors\n\n"
+        if colors.isEmpty {
+            markdown += "* None detected\n"
+        } else {
+            for color in colors {
+                markdown += "* \(color)\n"
+            }
+        }
+        markdown += "\n"
+
+        markdown += "## Fonts\n\n"
+        if fonts.isEmpty {
+            markdown += "* None detected\n"
+        } else {
+            for font in fonts {
+                markdown += "* \(font)\n"
+            }
+        }
+        markdown += "\n"
+
+        markdown += "## Border Radius\n\n"
+        if radii.isEmpty {
+            markdown += "* none detected\n"
+        } else {
+            for radius in radii {
+                markdown += "* \(radius)\n"
+            }
+        }
+        markdown += "\n"
+
+        markdown += "## Screenshot\n\n"
+        markdown += "[Screenshot Available]\n"
+
+        return markdown
+    }
+
+    func saveDesignDocument(content: String) {
+        let fileName = "Design.md"
+        guard let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        let fileURL = documentsURL.appendingPathComponent(fileName)
+
+        do {
+            try content.write(to: fileURL, atomically: true, encoding: .utf8)
+            print("Successfully saved design document to \(fileURL.path)")
+        } catch {
+            print("Failed to save design document: \(error)")
+        }
+    }
 }
 
 // MARK: - Dynamic AI Model Routing

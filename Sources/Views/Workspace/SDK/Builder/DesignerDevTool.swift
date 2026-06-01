@@ -3,25 +3,90 @@ import Combine
 
 // MARK: - Models
 
-struct DesignSystemResult: Codable {
-    let title: String
-    let colors: [ExtractedColor]
-    let typography: [ExtractedFont]
-    let radii: [CGFloat]
-    let screenshotBase64: String?
-    let layoutHints: [String]?
+struct APIResponse: Codable {
+    let success: Bool
+    let data: DesignData?
+    let error: String?
+}
 
-    struct ExtractedColor: Codable, Identifiable {
-        var id: String { hex }
-        let hex: String
-        let role: String? // primary, secondary, background, etc.
+struct DesignData: Codable {
+    let title: String
+    let colors: [String]
+    let fonts: [String]
+    let radii: [String]
+    let screenshot: String
+}
+
+struct DesignSnapshot: Codable {
+    let title: String
+    let colors: [String]
+    let fonts: [String]
+    let radii: [String]
+    let screenshotBase64: String
+    let isValid: Bool
+
+    init(from data: DesignData) {
+        self.title = data.title
+        self.screenshotBase64 = data.screenshot
+
+        // Normalize Colors: Remove duplicates, filter transparent, limit to 50
+        let cleanedColors = data.colors
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { $0.lowercased() != "rgba(0, 0, 0, 0)" && $0.lowercased() != "rgba(0,0,0,0)" && !$0.isEmpty }
+
+        var seenColors = Set<String>()
+        var uniqueColors: [String] = []
+        for color in cleanedColors {
+            if !seenColors.contains(color) {
+                uniqueColors.append(color)
+                seenColors.insert(color)
+            }
+            if uniqueColors.count >= 50 { break }
+        }
+        self.colors = uniqueColors
+
+        // Normalize Fonts: Split stacks, trim, deduplicate
+        var uniqueFonts: [String] = []
+        var seenFonts = Set<String>()
+        for fontStack in data.fonts {
+            let parts = fontStack.components(separatedBy: ",")
+            for part in parts {
+                let trimmed = part.trimmingCharacters(in: .whitespacesAndNewlines)
+                    .trimmingCharacters(in: CharacterSet(charactersIn: "'\""))
+                if !trimmed.isEmpty && !seenFonts.contains(trimmed) {
+                    uniqueFonts.append(trimmed)
+                    seenFonts.insert(trimmed)
+                }
+            }
+        }
+        self.fonts = uniqueFonts
+
+        // Normalize Radii: Remove "0px", deduplicate
+        var uniqueRadii: [String] = []
+        var seenRadii = Set<String>()
+        for radius in data.radii {
+            let trimmed = radius.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed != "0px" && trimmed != "0" && !trimmed.isEmpty && !seenRadii.contains(trimmed) {
+                uniqueRadii.append(trimmed)
+                seenRadii.insert(trimmed)
+            }
+        }
+        self.radii = uniqueRadii
+
+        self.isValid = true
     }
 
-    struct ExtractedFont: Codable, Identifiable {
-        var id: String { family + "\(size)" }
-        let family: String
-        let size: CGFloat
-        let weight: String
+    static var empty: DesignSnapshot {
+        DesignSnapshot(title: "", colors: [], fonts: [], radii: [], screenshotBase64: "", isValid: false)
+    }
+
+    private init(title: String, colors: [String], fonts: [String], radii: [String], screenshotBase64: String, isValid: Bool) {
+        self.title = title
+        self.colors = colors
+        self.fonts = fonts
+        self.radii = radii
+        self.screenshotBase64 = screenshotBase64
+        self.isValid = isValid
     }
 }
 
@@ -45,7 +110,7 @@ struct DesignerDevTool: DevTool {
 class DesignerViewModel: ObservableObject {
     @Published var urlString: String = ""
     @Published var isAnalyzing: Bool = false
-    @Published var result: DesignSystemResult?
+    @Published var result: DesignSnapshot?
     @Published var errorMessage: String?
     @Published var designDoc: String = ""
     @Published var swiftUITokens: String = ""
@@ -77,11 +142,28 @@ class DesignerViewModel: ObservableObject {
                 throw URLError(.badServerResponse)
             }
 
-            let decodedResult = try JSONDecoder().decode(DesignSystemResult.self, from: data)
-            self.result = decodedResult
+            let apiResponse = try JSONDecoder().decode(APIResponse.self, from: data)
 
-            // Normalize with AI
-            await generateDesignSystem(from: decodedResult)
+            if apiResponse.success, let designData = apiResponse.data {
+                let snapshot = DesignSnapshot(from: designData)
+                self.result = snapshot
+
+                // Generate and Save Design.md
+                let ai = AIService.shared
+                let mdContent = ai.generateDesignMarkdown(
+                    title: snapshot.title,
+                    colors: snapshot.colors,
+                    fonts: snapshot.fonts,
+                    radii: snapshot.radii
+                )
+                self.designDoc = mdContent
+                ai.saveDesignDocument(content: mdContent)
+
+                // Still generate SwiftUI tokens with AI for the extra tab
+                await generateSwiftUITokens(from: snapshot)
+            } else {
+                errorMessage = apiResponse.error ?? "Analysis failed without an error message."
+            }
 
         } catch {
             errorMessage = "Analysis failed: \(error.localizedDescription)"
@@ -92,40 +174,25 @@ class DesignerViewModel: ObservableObject {
         }
     }
 
-    private func generateDesignSystem(from data: DesignSystemResult) async {
+    private func generateSwiftUITokens(from snapshot: DesignSnapshot) async {
         let ai = AIService.shared
 
         let prompt = """
-        Analyze the following extracted website design data and generate:
-        1. A production-ready DESIGN.md explaining the design system.
-        2. A SwiftUI extension on Color and Font containing these tokens.
+        Analyze the following extracted website design data and generate a SwiftUI extension on Color and Font containing these tokens.
 
         Extracted Data:
-        Title: \(data.title)
-        Colors: \(data.colors.map { "\($0.hex) (\($0.role ?? "unknown"))" }.joined(separator: ", "))
-        Typography: \(data.typography.map { "\($0.family) \($0.size)pt \($0.weight)" }.joined(separator: ", "))
-        Corner Radii: \(data.radii.map { "\($0)pt" }.joined(separator: ", "))
-        Layout Hints: \(data.layoutHints?.joined(separator: ", ") ?? "none")
+        Title: \(snapshot.title)
+        Colors: \(snapshot.colors.joined(separator: ", "))
+        Fonts: \(snapshot.fonts.joined(separator: ", "))
+        Corner Radii: \(snapshot.radii.joined(separator: ", "))
 
-        Return the result in two distinct blocks clearly marked with [DESIGN.MD] and [SWIFTUI_TOKENS].
+        Return ONLY the SwiftUI code block.
         """
 
         do {
-            let aiResponse = try await ai.processText(prompt: prompt, systemPrompt: "You are a design system engineer. Output only the requested blocks based on real data.")
-
-            if let docRange = aiResponse.range(of: "[DESIGN.MD]"),
-               let tokensRange = aiResponse.range(of: "[SWIFTUI_TOKENS]") {
-
-                let docPart = aiResponse[docRange.upperBound..<tokensRange.lowerBound].trimmingCharacters(in: .whitespacesAndNewlines)
-                let tokensPart = aiResponse[tokensRange.upperBound...].trimmingCharacters(in: .whitespacesAndNewlines)
-
-                self.designDoc = docPart
-                self.swiftUITokens = tokensPart
-            } else {
-                self.designDoc = aiResponse
-            }
+            self.swiftUITokens = try await ai.processText(prompt: prompt, systemPrompt: "You are a design system engineer. Output only SwiftUI code.")
         } catch {
-            self.designDoc = "AI normalization failed, but raw data is available above."
+            self.swiftUITokens = "// AI token generation failed."
         }
     }
 }
@@ -279,19 +346,19 @@ struct DesignerView: View {
     }
 
     @ViewBuilder
-    private func designSummary(_ data: DesignSystemResult) -> some View {
+    private func designSummary(_ data: DesignSnapshot) -> some View {
         VStack(alignment: .leading, spacing: 28) {
             // Colors Section
             sectionHeader(title: "Color Palette", icon: "paintpalette.fill")
 
             FlowStack(spacing: 12) {
-                ForEach(data.colors) { color in
+                ForEach(data.colors, id: \.self) { colorHex in
                     VStack(spacing: 8) {
                         ZStack {
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(Color(hex: color.hex))
+                                .fill(Color(hex: colorHex))
                                 .frame(width: 70, height: 70)
-                                .shadow(color: Color(hex: color.hex).opacity(0.3), radius: 4, x: 0, y: 2)
+                                .shadow(color: Color(hex: colorHex).opacity(0.3), radius: 4, x: 0, y: 2)
 
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 .stroke(Color.white.opacity(0.2), lineWidth: 1)
@@ -299,15 +366,8 @@ struct DesignerView: View {
                         }
 
                         VStack(spacing: 2) {
-                            Text(color.hex.uppercased())
+                            Text(colorHex.uppercased())
                                 .font(.system(size: 10, weight: .bold, design: .monospaced))
-
-                            if let role = color.role {
-                                Text(role)
-                                    .font(.system(size: 8))
-                                    .foregroundStyle(.secondary)
-                                    .textCase(.uppercase)
-                            }
                         }
                     }
                     .padding(8)
@@ -320,29 +380,18 @@ struct DesignerView: View {
             sectionHeader(title: "Typography", icon: "textformat")
 
             VStack(spacing: 12) {
-                ForEach(data.typography) { font in
+                ForEach(data.fonts, id: \.self) { fontName in
                     HStack(spacing: 16) {
                         Text("Aa")
-                            .font(.system(size: min(font.size, 32), weight: .medium))
+                            .font(.system(size: 24, weight: .medium))
                             .frame(width: 44)
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(font.family)
+                            Text(fontName)
                                 .font(.subheadline.bold())
-                            Text(font.weight)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
                         }
 
                         Spacer()
-
-                        Text("\(Int(font.size))pt")
-                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.accentColor.opacity(0.1))
-                            .foregroundStyle(Color.accentColor)
-                            .cornerRadius(6)
                     }
                     .padding()
                     .background(Color(uiColor: .tertiarySystemBackground))
@@ -354,25 +403,35 @@ struct DesignerView: View {
             sectionHeader(title: "Radius Scale", icon: "square.dashed")
 
             HStack(spacing: 16) {
-                ForEach(data.radii, id: \.self) { r in
-                    VStack(spacing: 12) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: r)
-                                .fill(Color.accentColor.opacity(0.1))
-                                .frame(width: 50, height: 50)
+                if data.radii.isEmpty {
+                    Text("none detected")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color(uiColor: .tertiarySystemBackground))
+                        .cornerRadius(16)
+                } else {
+                    ForEach(data.radii, id: \.self) { r in
+                        VStack(spacing: 12) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.accentColor.opacity(0.1))
+                                    .frame(width: 50, height: 50)
 
-                            RoundedRectangle(cornerRadius: r)
-                                .stroke(Color.accentColor, lineWidth: 1.5)
-                                .frame(width: 50, height: 50)
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.accentColor, lineWidth: 1.5)
+                                    .frame(width: 50, height: 50)
+                            }
+
+                            Text(r)
+                                .font(.system(size: 11, weight: .bold, design: .monospaced))
                         }
-
-                        Text("\(Int(r))px")
-                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .padding(.vertical, 12)
+                        .frame(maxWidth: .infinity)
+                        .background(Color(uiColor: .tertiarySystemBackground))
+                        .cornerRadius(16)
                     }
-                    .padding(.vertical, 12)
-                    .frame(maxWidth: .infinity)
-                    .background(Color(uiColor: .tertiarySystemBackground))
-                    .cornerRadius(16)
                 }
             }
         }
