@@ -190,47 +190,103 @@ final class DevToolRegistry: ObservableObject {
         register(ScriptRunnerDevTool())
         register(TaskAutomationDevTool())
 
-        // New Tools - Encoding
+        // Encoding
         register(ROT13CipherDevTool())
         register(MorseCodeDevTool())
         register(BinaryConverterDevTool())
         register(OctalConverterDevTool())
+        register(BinaryHexConverterDevTool())
+        register(Base32ConverterDevTool())
+        register(PunycodeConverterDevTool())
 
-        // New Tools - Data
+        // Data
         register(CRONParserDevTool())
         register(PlaceholderDataDevTool())
         register(ProtobufInspectorDevTool())
         register(TOMLParserDevTool())
         register(INIParserDevTool())
+        register(GraphQLSchemaExplorerDevTool())
+        register(JSONSchemaGeneratorDevTool())
+        register(JSONSchemaValidatorDevTool())
+        register(XMLToJSONConverterDevTool())
+        register(YAMLToJSONConverterDevTool())
+        register(PlistViewerDevTool())
+        register(SQLFormatterDevTool())
+        register(SQLQueryGeneratorDevTool())
 
-        // New Tools - Networking
+        // Networking
         register(CURLConverterDevTool())
         register(SSLCertInspectorDevTool())
         register(ProxyConfigDevTool())
         register(HTTPHeaderAnalyzerDevTool())
+        register(CURLGeneratorDevTool())
+        register(IPSubnetCalculatorDevTool())
+        register(HTTPStatusCodeRefDevTool())
+        register(MimeTypeLookupDevTool())
 
-        // New Tools - Security
+        // Security
         register(PasswordGeneratorDevTool())
         register(CSRFTokenDevTool())
         register(SecretScannerDevTool())
+        register(AESEncryptionDevTool())
+        register(RSAGeneratorDevTool())
+        register(HMACCalculatorDevTool())
+        register(PBKDF2GeneratorDevTool())
+        register(JWTBuilderDevTool())
+        register(KeychainItemManagerDevTool())
+        register(AppReceiptInspectorDevTool())
+        register(BiometricAuthSimDevTool())
 
-        // New Tools - UI Design
+        // UI Design
         register(SpacingCalculatorDevTool())
         register(ResponsiveBreakpointDevTool())
         register(IconPreviewDevTool())
+        register(MeshGradientBuilderDevTool())
+        register(BezierPathCodeDevTool())
+        register(SwiftUIAnimationSandboxDevTool())
+        register(ColorBlendingDevTool())
+        register(AccessibilityContrastGridDevTool())
+        register(DeviceScreenSizeRefDevTool())
+        register(SFSymbolAnimationDevTool())
+        register(ShadowLayeringDevTool())
+        register(FontMetricDevTool())
+        register(ImageAssetOptimizerDevTool())
 
-        // New Tools - Utilities
+        // Utilities
         register(EpochConverterDevTool())
         register(SlugGeneratorDevTool())
         register(WordCounterDevTool())
         register(FileHashDevTool())
         register(CharacterEscaperDevTool())
+        register(AdvancedRegexDebuggerDevTool())
+        register(QRCodeGeneratorDevTool())
+        register(BarcodeGeneratorDevTool())
+        register(DiffMatchPatchDevTool())
+        register(UnitConverterDevTool())
 
-        // New Tools - Diagnostics
+        // Diagnostics
         register(LocaleInspectorDevTool())
+        register(EnvVarInspectorDevTool())
+        register(SystemSignalRefDevTool())
+        register(MemoryLeakGuideDevTool())
+        register(PermissionTesterDevTool())
 
-        // New Tools - Performance
+        // Performance
         register(BundleSizeAnalyzerDevTool())
+
+        // Automation
+        register(CrontabGeneratorDevTool())
+        register(SwiftCodeFormatterDevTool())
+        register(LocalizationKeyGeneratorDevTool())
+        register(PushNotificationSimDevTool())
+        register(DeepLinkTesterDevTool())
+
+        // Debugging
+        register(ObjectPropertyInspectorDevTool())
+        register(MethodTraceSimDevTool())
+
+        // Storage
+        register(AppSandboxExplorerDevTool())
 
         // SDK Builder Specialized Tools
         register(SDKBuildAnalyzerDevTool())
