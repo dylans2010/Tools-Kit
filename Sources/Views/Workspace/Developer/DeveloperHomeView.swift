@@ -21,6 +21,30 @@ struct DeveloperHomeView: View {
                         ("Project Installer", AnyView(ProjectInstallerView()), "square.and.arrow.down")
                     ])
 
+                    domainGrid(title: "SDK & Projects", icon: "shippingbox", systems: [
+                        ("SDK Templates", AnyView(SDKTemplateListView()), "square.stack.3d.up.fill"),
+                        ("Versions", AnyView(SDKVersionManagerView()), "tag.fill"),
+                        ("Dependencies", AnyView(SDKDependencyMapView()), "point.3.filled.connected.trianglepath.dotted"),
+                        ("Artifacts", AnyView(SDKBuildArtifactView()), "hammer.fill"),
+                        ("Archive", AnyView(SDKProjectArchiveView()), "archivebox")
+                    ])
+
+                    domainGrid(title: "Extensions & Plugins", icon: "puzzlepiece.extension", systems: [
+                        ("Marketplace", AnyView(DeveloperPluginMarketplaceView()), "storefront.fill"),
+                        ("Lifecycle", AnyView(PluginLifecycleView()), "arrow.triangle.2.circlepath"),
+                        ("Sandbox", AnyView(PluginSandboxConfigView()), "shield.lefthalf.filled"),
+                        ("Analytics", AnyView(PluginUsageAnalyticsView()), "chart.bar.fill"),
+                        ("Dev Console", AnyView(PluginDevConsoleView()), "terminal.fill")
+                    ])
+
+                    domainGrid(title: "External Connectors", icon: "link.badge.plus", systems: [
+                        ("Connectors", AnyView(ExternalConnectorConfigView()), "link"),
+                        ("Traffic", AnyView(ConnectorTrafficDebuggerView()), "antenna.radiowaves.left.and.right"),
+                        ("Authentication", AnyView(ConnectorAuthManagerView()), "lock.shield.fill"),
+                        ("Logic", AnyView(ConnectorLogicEditorView()), "curlybraces"),
+                        ("Health", AnyView(ConnectorHealthMonitorView()), "heart.text.square.fill")
+                    ])
+
                     domainGrid(title: "Operations & Delivery", icon: "arrow.triangle.pull", systems: [
                         ("CI/CD Pipelines", AnyView(DeveloperDeploymentPipelineView()), "hammer"),
                         ("Releases", AnyView(DeveloperReleaseManagementView()), "shippingbox"),
@@ -34,6 +58,14 @@ struct DeveloperHomeView: View {
                         ("Database", AnyView(DeveloperDatabaseManagerView()), "tablecells"),
                         ("Analytics", AnyView(AnalyticsDashboardView()), "chart.xyaxis.line"),
                         ("Log Drains", AnyView(LogDrainConfigView()), "externaldrive.badge.plus")
+                    ])
+
+                    domainGrid(title: "Quality & Performance", icon: "gauge.with.needle", systems: [
+                        ("Test Dashboard", AnyView(SDKTestDashboardView()), "checklist.checked"),
+                        ("Benchmarking", AnyView(SDKPerformanceBenchmarkingView()), "gauge.with.needle.fill"),
+                        ("Doc Gen", AnyView(SDKDocGeneratorView()), "book.closed.fill"),
+                        ("Rate Limits", AnyView(APIRateLimitConfigView()), "timer"),
+                        ("Module Registry", AnyView(SDKModuleRegistryView()), "registry.toolbox")
                     ])
 
                     domainGrid(title: "Security & Privacy", icon: "lock.shield", systems: [
@@ -68,13 +100,13 @@ struct DeveloperHomeView: View {
                         ("Error Grouping", AnyView(ErrorGroupingView()), "square.grid.3x1.below.line.grid.1x2")
                     ])
 
-                    domainGrid(title: "Support & Identity", icon: "person.crop.circle", systems: [
+                    domainGrid(title: "Support & Rewards", icon: "person.crop.circle", systems: [
+                        ("Bounty Manager", AnyView(DeveloperBountyManagerView()), "bitcoinsign.circle.fill"),
                         ("Developer CLI", AnyView(DeveloperCLIView()), "terminal.fill"),
                         ("Account Activity", AnyView(DeveloperAccountActivityView()), "person.text.rectangle"),
                         ("Profile", AnyView(DeveloperProfileView()), "person.crop.circle"),
                         ("Verification", AnyView(DeveloperVerificationView()), "person.badge.shield.checkmark"),
-                        ("Support Tickets", AnyView(DeveloperSupportTicketView()), "questionmark.circle"),
-                        ("CLI Tokens", AnyView(CLITokenView()), "terminal")
+                        ("Support Tickets", AnyView(DeveloperSupportTicketView()), "questionmark.circle")
                     ])
                 }
             }

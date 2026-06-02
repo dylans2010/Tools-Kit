@@ -2293,6 +2293,29 @@
 		DA020000000000000000007D /* ResourceCLIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007D /* ResourceCLIManager.swift */; };
 		DA020000000000000000007E /* DeveloperCLIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007E /* DeveloperCLIManager.swift */; };
 		DA020000000000000000007F /* DeveloperCLIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007F /* DeveloperCLIView.swift */; };
+		DA0200000000000000000080 /* SDKModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000080 /* SDKModels.swift */; };
+		DA0200000000000000000081 /* ExtensionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000081 /* ExtensionModels.swift */; };
+		DA0200000000000000000082 /* SDKTemplateListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000082 /* SDKTemplateListView.swift */; };
+		DA0200000000000000000083 /* SDKVersionManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000083 /* SDKVersionManagerView.swift */; };
+		DA0200000000000000000084 /* SDKDependencyMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000084 /* SDKDependencyMapView.swift */; };
+		DA0200000000000000000085 /* SDKBuildArtifactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000085 /* SDKBuildArtifactView.swift */; };
+		DA0200000000000000000086 /* SDKModuleRegistryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000086 /* SDKModuleRegistryView.swift */; };
+		DA0200000000000000000087 /* SDKDocGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000087 /* SDKDocGeneratorView.swift */; };
+		DA0200000000000000000088 /* SDKPerformanceBenchmarkingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000088 /* SDKPerformanceBenchmarkingView.swift */; };
+		DA0200000000000000000089 /* SDKTestDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000089 /* SDKTestDashboardView.swift */; };
+		DA020000000000000000008A /* SDKProjectArchiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000008A /* SDKProjectArchiveView.swift */; };
+		DA020000000000000000008B /* APIRateLimitConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000008B /* APIRateLimitConfigView.swift */; };
+		DA020000000000000000008C /* DeveloperPluginMarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000008C /* DeveloperPluginMarketplaceView.swift */; };
+		DA020000000000000000008D /* PluginSandboxConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000008D /* PluginSandboxConfigView.swift */; };
+		DA020000000000000000008E /* PluginLifecycleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000008E /* PluginLifecycleView.swift */; };
+		DA020000000000000000008F /* PluginUsageAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000008F /* PluginUsageAnalyticsView.swift */; };
+		DA0200000000000000000090 /* PluginDevConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000090 /* PluginDevConsoleView.swift */; };
+		DA0200000000000000000091 /* ExternalConnectorConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000091 /* ExternalConnectorConfigView.swift */; };
+		DA0200000000000000000092 /* ConnectorTrafficDebuggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000092 /* ConnectorTrafficDebuggerView.swift */; };
+		DA0200000000000000000093 /* ConnectorAuthManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000093 /* ConnectorAuthManagerView.swift */; };
+		DA0200000000000000000094 /* ConnectorLogicEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000094 /* ConnectorLogicEditorView.swift */; };
+		DA0200000000000000000095 /* ConnectorHealthMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000095 /* ConnectorHealthMonitorView.swift */; };
+		DA0200000000000000000096 /* DeveloperBountyManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000096 /* DeveloperBountyManagerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -4566,6 +4589,29 @@
 		DA010000000000000000007D /* ResourceCLIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ResourceCLIManager.swift; path = Sources/Views/Workspace/Developer/CLI/Managers/ResourceCLIManager.swift; sourceTree = SOURCE_ROOT; };
 		DA010000000000000000007E /* DeveloperCLIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeveloperCLIManager.swift; path = Sources/Views/Workspace/Developer/CLI/Managers/DeveloperCLIManager.swift; sourceTree = SOURCE_ROOT; };
 		DA010000000000000000007F /* DeveloperCLIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeveloperCLIView.swift; path = Sources/Views/Workspace/Developer/CLI/DeveloperCLIView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000080 /* SDKModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SDKModels.swift; path = Sources/Views/Workspace/Developer/Models/SDKModels.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000081 /* ExtensionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExtensionModels.swift; path = Sources/Views/Workspace/Developer/Models/ExtensionModels.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000082 /* SDKTemplateListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SDKTemplateListView.swift; path = Sources/Views/Workspace/Developer/SDKTemplateListView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000083 /* SDKVersionManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SDKVersionManagerView.swift; path = Sources/Views/Workspace/Developer/SDKVersionManagerView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000084 /* SDKDependencyMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SDKDependencyMapView.swift; path = Sources/Views/Workspace/Developer/SDKDependencyMapView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000085 /* SDKBuildArtifactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SDKBuildArtifactView.swift; path = Sources/Views/Workspace/Developer/SDKBuildArtifactView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000086 /* SDKModuleRegistryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SDKModuleRegistryView.swift; path = Sources/Views/Workspace/Developer/SDKModuleRegistryView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000087 /* SDKDocGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SDKDocGeneratorView.swift; path = Sources/Views/Workspace/Developer/SDKDocGeneratorView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000088 /* SDKPerformanceBenchmarkingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SDKPerformanceBenchmarkingView.swift; path = Sources/Views/Workspace/Developer/SDKPerformanceBenchmarkingView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000089 /* SDKTestDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SDKTestDashboardView.swift; path = Sources/Views/Workspace/Developer/SDKTestDashboardView.swift; sourceTree = SOURCE_ROOT; };
+		DA010000000000000000008A /* SDKProjectArchiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SDKProjectArchiveView.swift; path = Sources/Views/Workspace/Developer/SDKProjectArchiveView.swift; sourceTree = SOURCE_ROOT; };
+		DA010000000000000000008B /* APIRateLimitConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = APIRateLimitConfigView.swift; path = Sources/Views/Workspace/Developer/APIRateLimitConfigView.swift; sourceTree = SOURCE_ROOT; };
+		DA010000000000000000008C /* DeveloperPluginMarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeveloperPluginMarketplaceView.swift; path = Sources/Views/Workspace/Developer/DeveloperPluginMarketplaceView.swift; sourceTree = SOURCE_ROOT; };
+		DA010000000000000000008D /* PluginSandboxConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PluginSandboxConfigView.swift; path = Sources/Views/Workspace/Developer/PluginSandboxConfigView.swift; sourceTree = SOURCE_ROOT; };
+		DA010000000000000000008E /* PluginLifecycleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PluginLifecycleView.swift; path = Sources/Views/Workspace/Developer/PluginLifecycleView.swift; sourceTree = SOURCE_ROOT; };
+		DA010000000000000000008F /* PluginUsageAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PluginUsageAnalyticsView.swift; path = Sources/Views/Workspace/Developer/PluginUsageAnalyticsView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000090 /* PluginDevConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PluginDevConsoleView.swift; path = Sources/Views/Workspace/Developer/PluginDevConsoleView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000091 /* ExternalConnectorConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExternalConnectorConfigView.swift; path = Sources/Views/Workspace/Developer/ExternalConnectorConfigView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000092 /* ConnectorTrafficDebuggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ConnectorTrafficDebuggerView.swift; path = Sources/Views/Workspace/Developer/ConnectorTrafficDebuggerView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000093 /* ConnectorAuthManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ConnectorAuthManagerView.swift; path = Sources/Views/Workspace/Developer/ConnectorAuthManagerView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000094 /* ConnectorLogicEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ConnectorLogicEditorView.swift; path = Sources/Views/Workspace/Developer/ConnectorLogicEditorView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000095 /* ConnectorHealthMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ConnectorHealthMonitorView.swift; path = Sources/Views/Workspace/Developer/ConnectorHealthMonitorView.swift; sourceTree = SOURCE_ROOT; };
+		DA0100000000000000000096 /* DeveloperBountyManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeveloperBountyManagerView.swift; path = Sources/Views/Workspace/Developer/DeveloperBountyManagerView.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -12932,6 +12978,27 @@
 				DA0100000000000000000076 /* DeveloperLocalizationManagerView.swift */,
 				DA0100000000000000000077 /* DeveloperSecurityPolicyView.swift */,
 				DA0100000000000000000078 /* DeveloperInfrastructureStatusView.swift */,
+				DA0100000000000000000082 /* SDKTemplateListView.swift */,
+				DA0100000000000000000083 /* SDKVersionManagerView.swift */,
+				DA0100000000000000000084 /* SDKDependencyMapView.swift */,
+				DA0100000000000000000085 /* SDKBuildArtifactView.swift */,
+				DA0100000000000000000086 /* SDKModuleRegistryView.swift */,
+				DA0100000000000000000087 /* SDKDocGeneratorView.swift */,
+				DA0100000000000000000088 /* SDKPerformanceBenchmarkingView.swift */,
+				DA0100000000000000000089 /* SDKTestDashboardView.swift */,
+				DA010000000000000000008A /* SDKProjectArchiveView.swift */,
+				DA010000000000000000008B /* APIRateLimitConfigView.swift */,
+				DA010000000000000000008C /* DeveloperPluginMarketplaceView.swift */,
+				DA010000000000000000008D /* PluginSandboxConfigView.swift */,
+				DA010000000000000000008E /* PluginLifecycleView.swift */,
+				DA010000000000000000008F /* PluginUsageAnalyticsView.swift */,
+				DA0100000000000000000090 /* PluginDevConsoleView.swift */,
+				DA0100000000000000000091 /* ExternalConnectorConfigView.swift */,
+				DA0100000000000000000092 /* ConnectorTrafficDebuggerView.swift */,
+				DA0100000000000000000093 /* ConnectorAuthManagerView.swift */,
+				DA0100000000000000000094 /* ConnectorLogicEditorView.swift */,
+				DA0100000000000000000095 /* ConnectorHealthMonitorView.swift */,
+				DA0100000000000000000096 /* DeveloperBountyManagerView.swift */,
 				DA0000000000000000000004 /* CLI */,
 			);
 			path = Developer;
@@ -12987,6 +13054,8 @@
 				DA010000000000000000005E /* LocalizationKey.swift */,
 				DA010000000000000000005F /* SecurityPolicy.swift */,
 				DA0100000000000000000060 /* InfrastructureNode.swift */,
+				DA0100000000000000000080 /* SDKModels.swift */,
+				DA0100000000000000000081 /* ExtensionModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -13344,6 +13413,29 @@
 				DA020000000000000000007D /* ResourceCLIManager.swift in Sources */,
 				DA020000000000000000007E /* DeveloperCLIManager.swift in Sources */,
 				DA020000000000000000007F /* DeveloperCLIView.swift in Sources */,
+				DA0200000000000000000080 /* SDKModels.swift in Sources */,
+				DA0200000000000000000081 /* ExtensionModels.swift in Sources */,
+				DA0200000000000000000082 /* SDKTemplateListView.swift in Sources */,
+				DA0200000000000000000083 /* SDKVersionManagerView.swift in Sources */,
+				DA0200000000000000000084 /* SDKDependencyMapView.swift in Sources */,
+				DA0200000000000000000085 /* SDKBuildArtifactView.swift in Sources */,
+				DA0200000000000000000086 /* SDKModuleRegistryView.swift in Sources */,
+				DA0200000000000000000087 /* SDKDocGeneratorView.swift in Sources */,
+				DA0200000000000000000088 /* SDKPerformanceBenchmarkingView.swift in Sources */,
+				DA0200000000000000000089 /* SDKTestDashboardView.swift in Sources */,
+				DA020000000000000000008A /* SDKProjectArchiveView.swift in Sources */,
+				DA020000000000000000008B /* APIRateLimitConfigView.swift in Sources */,
+				DA020000000000000000008C /* DeveloperPluginMarketplaceView.swift in Sources */,
+				DA020000000000000000008D /* PluginSandboxConfigView.swift in Sources */,
+				DA020000000000000000008E /* PluginLifecycleView.swift in Sources */,
+				DA020000000000000000008F /* PluginUsageAnalyticsView.swift in Sources */,
+				DA0200000000000000000090 /* PluginDevConsoleView.swift in Sources */,
+				DA0200000000000000000091 /* ExternalConnectorConfigView.swift in Sources */,
+				DA0200000000000000000092 /* ConnectorTrafficDebuggerView.swift in Sources */,
+				DA0200000000000000000093 /* ConnectorAuthManagerView.swift in Sources */,
+				DA0200000000000000000094 /* ConnectorLogicEditorView.swift in Sources */,
+				DA0200000000000000000095 /* ConnectorHealthMonitorView.swift in Sources */,
+				DA0200000000000000000096 /* DeveloperBountyManagerView.swift in Sources */,
 				92E13A73A39F4878870CCFF1 /* SDKResourceAuditView.swift in Sources */,
 				0603EBECCB2849248F4BD1D4 /* SDKGlobalSearchView.swift in Sources */,
 				6FCAA43DB3294F3586F66864 /* SDKDependencyVisualizerView.swift in Sources */,
