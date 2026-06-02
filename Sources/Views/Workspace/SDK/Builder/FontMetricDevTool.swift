@@ -27,6 +27,6 @@ struct FontMetricDevTool: DevTool {
     }
 
     func render() -> some View {
-        self
+        body
     }
 }
