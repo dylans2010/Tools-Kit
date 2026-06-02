@@ -22,7 +22,7 @@ struct SFSymbolAnimationView: View {
                 .font(.system(size: 80))
                 .symbolEffect(.bounce, value: isAnimating)
                 .symbolEffect(.pulse, isActive: isAnimating)
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
 
             Form {
                 TextField("Symbol Name", text: $symbol)
