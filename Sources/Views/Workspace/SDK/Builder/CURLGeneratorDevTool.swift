@@ -15,7 +15,7 @@ struct CURLGeneratorDevTool: DevTool {
 struct CURLGeneratorView: View {
     @State private var url = "https://api.example.com"
     @State private var method = "GET"
-    @State private var body = ""
+    @State private var requestBody = ""
     @State private var headers = "Content-Type: application/json"
     @State private var result = ""
 
@@ -33,7 +33,7 @@ struct CURLGeneratorView: View {
                     .frame(height: 80)
             }
             Section("Body") {
-                TextEditor(text: $body)
+                TextEditor(text: $requestBody)
                     .font(.system(.caption, design: .monospaced))
                     .frame(height: 100)
             }
@@ -56,8 +56,8 @@ struct CURLGeneratorView: View {
         var cmd = "curl -X \(method) \"\(url)\""
         let lines = headers.components(separatedBy: "\n").filter { !$0.isEmpty }
         for line in lines { cmd += " -H \"\(line)\"" }
-        if !body.isEmpty && method != "GET" {
-            cmd += " -d '\(body)'"
+        if !requestBody.isEmpty && method != "GET" {
+            cmd += " -d '\(requestBody)'"
         }
         result = cmd
     }

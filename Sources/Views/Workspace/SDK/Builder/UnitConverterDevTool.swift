@@ -8,11 +8,11 @@ struct UnitConverterDevTool: DevTool {
     let description = "Convert between various physical units (length, weight, etc.)"
 
     func render() -> some View {
-        UnitConverterView()
+        UnitConverterDevToolView()
     }
 }
 
-struct UnitConverterView: View {
+struct UnitConverterDevToolView: View {
     @State private var value: Double = 1.0
     @State private var result = ""
 
