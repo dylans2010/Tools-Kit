@@ -54,12 +54,26 @@ class CacheViewerViewModel: ObservableObject {
         let cacheURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
         totalCacheSize = calculateSize(at: cacheURL)
 
-        // Mock sub-buckets
-        buckets = [
-            CacheBucket(name: "Image Cache", path: "/Caches/Images", size: "1.2 MB"),
-            CacheBucket(name: "Network Response Cache", path: "/Caches/Network", size: "4.5 MB"),
-            CacheBucket(name: "Temporary Files", path: "/tmp", size: "800 KB")
-        ]
+        do {
+            let subdirs = try FileManager.default.contentsOfDirectory(at: cacheURL, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles])
+            buckets = subdirs.map { url in
+                CacheBucket(
+                    name: url.lastPathComponent,
+                    path: url.path.replacingOccurrences(of: NSHomeDirectory(), with: "~"),
+                    size: calculateSize(at: url)
+                )
+            }.sorted(by: { $0.name < $1.name })
+
+            // Add tmp directory too
+            let tmpURL = FileManager.default.temporaryDirectory
+            buckets.append(CacheBucket(
+                name: "Temporary Files",
+                path: "/tmp",
+                size: calculateSize(at: tmpURL)
+            ))
+        } catch {
+            buckets = []
+        }
     }
 
     func clearAll() {

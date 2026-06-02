@@ -18,10 +18,29 @@ struct LayoutGridPreviewView: View {
     var body: some View {
         VStack {
             ZStack {
-                // Content Mock
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.accentColor.opacity(0.1))
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                // Example UI Layout
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        Circle().fill(Color.accentColor.opacity(0.2)).frame(width: 40, height: 40)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Rectangle().fill(Color.accentColor.opacity(0.2)).frame(height: 12).cornerRadius(2)
+                            Rectangle().fill(Color.accentColor.opacity(0.1)).frame(width: 100, height: 8).cornerRadius(2)
+                        }
+                        Spacer()
+                    }
+
+                    Rectangle().fill(Color.accentColor.opacity(0.05)).frame(height: 80).cornerRadius(8)
+
+                    HStack(spacing: 12) {
+                        ForEach(0..<3) { _ in
+                            Rectangle().fill(Color.accentColor.opacity(0.1)).frame(height: 40).cornerRadius(4)
+                        }
+                    }
+                }
+                .padding()
+                .background(Color(uiColor: .systemBackground))
+                .cornerRadius(12)
+                .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
 
                 // Grid Overlay
                 HStack(spacing: viewModel.gutter) {

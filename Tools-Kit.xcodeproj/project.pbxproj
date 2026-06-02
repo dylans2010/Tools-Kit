@@ -1700,6 +1700,81 @@
 		ABB00809F5814D2BACB28E80 /* PermissionInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25AECACC30C14716B3013901 /* PermissionInspectorDevTool.swift */; };
 		096FA3D6396F4067881183B7 /* JWTDecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2208A9C0CF904CB4B32C0FBE /* JWTDecoderDevTool.swift */; };
 		713E0533E5E542B3860C049B /* Base64EncoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C1AA20141840DF8DAC155B /* Base64EncoderDevTool.swift */; };
+		DT0200000000000000000000 /* AESEncryptionDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000000 /* AESEncryptionDevTool.swift */; };
+		DT0200000000000000000001 /* AccessibilityContrastGridDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000001 /* AccessibilityContrastGridDevTool.swift */; };
+		DT0200000000000000000002 /* AdvancedRegexDebuggerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000002 /* AdvancedRegexDebuggerDevTool.swift */; };
+		DT0200000000000000000003 /* AppReceiptInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000003 /* AppReceiptInspectorDevTool.swift */; };
+		DT0200000000000000000004 /* AppSandboxExplorerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000004 /* AppSandboxExplorerDevTool.swift */; };
+		DT0200000000000000000005 /* BarcodeGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000005 /* BarcodeGeneratorDevTool.swift */; };
+		DT0200000000000000000006 /* Base32ConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000006 /* Base32ConverterDevTool.swift */; };
+		DT0200000000000000000007 /* BezierPathCodeDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000007 /* BezierPathCodeDevTool.swift */; };
+		DT0200000000000000000008 /* BinaryConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000008 /* BinaryConverterDevTool.swift */; };
+		DT0200000000000000000009 /* BinaryHexConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000009 /* BinaryHexConverterDevTool.swift */; };
+		DT020000000000000000000A /* BiometricAuthSimDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000000A /* BiometricAuthSimDevTool.swift */; };
+		DT020000000000000000000B /* BundleSizeAnalyzerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000000B /* BundleSizeAnalyzerDevTool.swift */; };
+		DT020000000000000000000C /* CRONParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000000C /* CRONParserDevTool.swift */; };
+		DT020000000000000000000D /* CSRFTokenDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000000D /* CSRFTokenDevTool.swift */; };
+		DT020000000000000000000E /* CURLConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000000E /* CURLConverterDevTool.swift */; };
+		DT020000000000000000000F /* CURLGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000000F /* CURLGeneratorDevTool.swift */; };
+		DT0200000000000000000010 /* CharacterEscaperDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000010 /* CharacterEscaperDevTool.swift */; };
+		DT0200000000000000000011 /* ColorBlendingDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000011 /* ColorBlendingDevTool.swift */; };
+		DT0200000000000000000012 /* CrontabGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000012 /* CrontabGeneratorDevTool.swift */; };
+		DT0200000000000000000013 /* DeepLinkTesterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000013 /* DeepLinkTesterDevTool.swift */; };
+		DT0200000000000000000014 /* DeviceScreenSizeRefDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000014 /* DeviceScreenSizeRefDevTool.swift */; };
+		DT0200000000000000000015 /* DiffMatchPatchDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000015 /* DiffMatchPatchDevTool.swift */; };
+		DT0200000000000000000016 /* EnvVarInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000016 /* EnvVarInspectorDevTool.swift */; };
+		DT0200000000000000000017 /* EpochConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000017 /* EpochConverterDevTool.swift */; };
+		DT0200000000000000000018 /* FileHashDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000018 /* FileHashDevTool.swift */; };
+		DT0200000000000000000019 /* FontMetricDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000019 /* FontMetricDevTool.swift */; };
+		DT020000000000000000001A /* GraphQLSchemaExplorerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000001A /* GraphQLSchemaExplorerDevTool.swift */; };
+		DT020000000000000000001B /* HMACCalculatorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000001B /* HMACCalculatorDevTool.swift */; };
+		DT020000000000000000001C /* HTTPHeaderAnalyzerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000001C /* HTTPHeaderAnalyzerDevTool.swift */; };
+		DT020000000000000000001D /* HTTPStatusCodeRefDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000001D /* HTTPStatusCodeRefDevTool.swift */; };
+		DT020000000000000000001E /* INIParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000001E /* INIParserDevTool.swift */; };
+		DT020000000000000000001F /* IPSubnetCalculatorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000001F /* IPSubnetCalculatorDevTool.swift */; };
+		DT0200000000000000000020 /* IconPreviewDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000020 /* IconPreviewDevTool.swift */; };
+		DT0200000000000000000021 /* ImageAssetOptimizerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000021 /* ImageAssetOptimizerDevTool.swift */; };
+		DT0200000000000000000022 /* JSONSchemaGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000022 /* JSONSchemaGeneratorDevTool.swift */; };
+		DT0200000000000000000023 /* JSONSchemaValidatorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000023 /* JSONSchemaValidatorDevTool.swift */; };
+		DT0200000000000000000024 /* JWTBuilderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000024 /* JWTBuilderDevTool.swift */; };
+		DT0200000000000000000025 /* KeychainItemManagerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000025 /* KeychainItemManagerDevTool.swift */; };
+		DT0200000000000000000026 /* LocaleInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000026 /* LocaleInspectorDevTool.swift */; };
+		DT0200000000000000000027 /* LocalizationKeyGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000027 /* LocalizationKeyGeneratorDevTool.swift */; };
+		DT0200000000000000000028 /* MemoryLeakGuideDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000028 /* MemoryLeakGuideDevTool.swift */; };
+		DT0200000000000000000029 /* MethodTraceSimDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000029 /* MethodTraceSimDevTool.swift */; };
+		DT020000000000000000002A /* MimeTypeLookupDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000002A /* MimeTypeLookupDevTool.swift */; };
+		DT020000000000000000002B /* MorseCodeDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000002B /* MorseCodeDevTool.swift */; };
+		DT020000000000000000002C /* ObjectPropertyInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000002C /* ObjectPropertyInspectorDevTool.swift */; };
+		DT020000000000000000002D /* OctalConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000002D /* OctalConverterDevTool.swift */; };
+		DT020000000000000000002E /* PBKDF2GeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000002E /* PBKDF2GeneratorDevTool.swift */; };
+		DT020000000000000000002F /* PasswordGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000002F /* PasswordGeneratorDevTool.swift */; };
+		DT0200000000000000000030 /* PermissionTesterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000030 /* PermissionTesterDevTool.swift */; };
+		DT0200000000000000000031 /* PlaceholderDataDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000031 /* PlaceholderDataDevTool.swift */; };
+		DT0200000000000000000032 /* PlistViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000032 /* PlistViewerDevTool.swift */; };
+		DT0200000000000000000033 /* ProtobufInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000033 /* ProtobufInspectorDevTool.swift */; };
+		DT0200000000000000000034 /* ProxyConfigDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000034 /* ProxyConfigDevTool.swift */; };
+		DT0200000000000000000035 /* PunycodeConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000035 /* PunycodeConverterDevTool.swift */; };
+		DT0200000000000000000036 /* PushNotificationSimDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000036 /* PushNotificationSimDevTool.swift */; };
+		DT0200000000000000000037 /* QRCodeGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000037 /* QRCodeGeneratorDevTool.swift */; };
+		DT0200000000000000000038 /* ROT13CipherDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000038 /* ROT13CipherDevTool.swift */; };
+		DT0200000000000000000039 /* RSAGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000039 /* RSAGeneratorDevTool.swift */; };
+		DT020000000000000000003A /* ResponsiveBreakpointDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000003A /* ResponsiveBreakpointDevTool.swift */; };
+		DT020000000000000000003B /* SFSymbolAnimationDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000003B /* SFSymbolAnimationDevTool.swift */; };
+		DT020000000000000000003C /* SQLFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000003C /* SQLFormatterDevTool.swift */; };
+		DT020000000000000000003D /* SQLQueryGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000003D /* SQLQueryGeneratorDevTool.swift */; };
+		DT020000000000000000003E /* SSLCertInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000003E /* SSLCertInspectorDevTool.swift */; };
+		DT020000000000000000003F /* SecretScannerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000003F /* SecretScannerDevTool.swift */; };
+		DT0200000000000000000040 /* ShadowLayeringDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000040 /* ShadowLayeringDevTool.swift */; };
+		DT0200000000000000000041 /* SlugGeneratorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000041 /* SlugGeneratorDevTool.swift */; };
+		DT0200000000000000000042 /* SpacingCalculatorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000042 /* SpacingCalculatorDevTool.swift */; };
+		DT0200000000000000000043 /* SwiftCodeFormatterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000043 /* SwiftCodeFormatterDevTool.swift */; };
+		DT0200000000000000000044 /* SwiftUIAnimationSandboxDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000044 /* SwiftUIAnimationSandboxDevTool.swift */; };
+		DT0200000000000000000045 /* SystemSignalRefDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000045 /* SystemSignalRefDevTool.swift */; };
+		DT0200000000000000000046 /* TOMLParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000046 /* TOMLParserDevTool.swift */; };
+		DT0200000000000000000047 /* UnitConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000047 /* UnitConverterDevTool.swift */; };
+		DT0200000000000000000048 /* WordCounterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000048 /* WordCounterDevTool.swift */; };
+		DT0200000000000000000049 /* XMLToJSONConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT0100000000000000000049 /* XMLToJSONConverterDevTool.swift */; };
+		DT020000000000000000004A /* YAMLToJSONConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DT010000000000000000004A /* YAMLToJSONConverterDevTool.swift */; };
 		91EDD00757C94E1290B9C798 /* ColorConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6543C98EF1144CCAFB951E3 /* ColorConverterDevTool.swift */; };
 		412F48260334428A8AFD5FB0 /* TimezoneConverterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7101221B94664FF6A2A16415 /* TimezoneConverterDevTool.swift */; };
 		286434D0455549E996B295D6 /* APIResponseViewerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBFBC7A30FEC46858DE6A09D /* APIResponseViewerDevTool.swift */; };
@@ -1733,7 +1808,6 @@
 		DA02000000000000000000E1 /* DesignerDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01000000000000000000E1 /* DesignerDevTool.swift */; };
 		DA02000000000000000000E2 /* SearchDocsDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01000000000000000000E2 /* SearchDocsDevTool.swift */; };
 		DA02000000000000000000E3 /* DatabaseCreateDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01000000000000000000E3 /* DatabaseCreateDevTool.swift */; };
-		NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */; };
 		DG02000000000000000000000130 /* Diag_IMEIInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000130 /* Diag_IMEIInfoView.swift */; };
 		DG02000000000000000000000131 /* Diag_MDMDetectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000131 /* Diag_MDMDetectionView.swift */; };
 		DG02000000000000000000000132 /* Diag_FindMyStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000132 /* Diag_FindMyStatusView.swift */; };
@@ -3899,6 +3973,81 @@
 		25AECACC30C14716B3013901 /* PermissionInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/PermissionInspectorDevTool.swift; sourceTree = "<group>"; };
 		2208A9C0CF904CB4B32C0FBE /* JWTDecoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/JWTDecoderDevTool.swift; sourceTree = "<group>"; };
 		93C1AA20141840DF8DAC155B /* Base64EncoderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/Base64EncoderDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000000 /* AESEncryptionDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/AESEncryptionDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000001 /* AccessibilityContrastGridDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/AccessibilityContrastGridDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000002 /* AdvancedRegexDebuggerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/AdvancedRegexDebuggerDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000003 /* AppReceiptInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/AppReceiptInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000004 /* AppSandboxExplorerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/AppSandboxExplorerDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000005 /* BarcodeGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/BarcodeGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000006 /* Base32ConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/Base32ConverterDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000007 /* BezierPathCodeDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/BezierPathCodeDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000008 /* BinaryConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/BinaryConverterDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000009 /* BinaryHexConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/BinaryHexConverterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000000A /* BiometricAuthSimDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/BiometricAuthSimDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000000B /* BundleSizeAnalyzerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/BundleSizeAnalyzerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000000C /* CRONParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/CRONParserDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000000D /* CSRFTokenDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/CSRFTokenDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000000E /* CURLConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/CURLConverterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000000F /* CURLGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/CURLGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000010 /* CharacterEscaperDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/CharacterEscaperDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000011 /* ColorBlendingDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ColorBlendingDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000012 /* CrontabGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/CrontabGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000013 /* DeepLinkTesterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DeepLinkTesterDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000014 /* DeviceScreenSizeRefDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DeviceScreenSizeRefDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000015 /* DiffMatchPatchDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DiffMatchPatchDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000016 /* EnvVarInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/EnvVarInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000017 /* EpochConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/EpochConverterDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000018 /* FileHashDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/FileHashDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000019 /* FontMetricDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/FontMetricDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000001A /* GraphQLSchemaExplorerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/GraphQLSchemaExplorerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000001B /* HMACCalculatorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/HMACCalculatorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000001C /* HTTPHeaderAnalyzerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/HTTPHeaderAnalyzerDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000001D /* HTTPStatusCodeRefDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/HTTPStatusCodeRefDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000001E /* INIParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/INIParserDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000001F /* IPSubnetCalculatorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/IPSubnetCalculatorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000020 /* IconPreviewDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/IconPreviewDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000021 /* ImageAssetOptimizerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ImageAssetOptimizerDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000022 /* JSONSchemaGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/JSONSchemaGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000023 /* JSONSchemaValidatorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/JSONSchemaValidatorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000024 /* JWTBuilderDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/JWTBuilderDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000025 /* KeychainItemManagerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/KeychainItemManagerDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000026 /* LocaleInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/LocaleInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000027 /* LocalizationKeyGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/LocalizationKeyGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000028 /* MemoryLeakGuideDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/MemoryLeakGuideDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000029 /* MethodTraceSimDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/MethodTraceSimDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000002A /* MimeTypeLookupDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/MimeTypeLookupDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000002B /* MorseCodeDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/MorseCodeDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000002C /* ObjectPropertyInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ObjectPropertyInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000002D /* OctalConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/OctalConverterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000002E /* PBKDF2GeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/PBKDF2GeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000002F /* PasswordGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/PasswordGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000030 /* PermissionTesterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/PermissionTesterDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000031 /* PlaceholderDataDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/PlaceholderDataDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000032 /* PlistViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/PlistViewerDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000033 /* ProtobufInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ProtobufInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000034 /* ProxyConfigDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ProxyConfigDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000035 /* PunycodeConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/PunycodeConverterDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000036 /* PushNotificationSimDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/PushNotificationSimDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000037 /* QRCodeGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/QRCodeGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000038 /* ROT13CipherDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ROT13CipherDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000039 /* RSAGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/RSAGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000003A /* ResponsiveBreakpointDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ResponsiveBreakpointDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000003B /* SFSymbolAnimationDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SFSymbolAnimationDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000003C /* SQLFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SQLFormatterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000003D /* SQLQueryGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SQLQueryGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000003E /* SSLCertInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SSLCertInspectorDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000003F /* SecretScannerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SecretScannerDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000040 /* ShadowLayeringDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ShadowLayeringDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000041 /* SlugGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SlugGeneratorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000042 /* SpacingCalculatorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SpacingCalculatorDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000043 /* SwiftCodeFormatterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SwiftCodeFormatterDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000044 /* SwiftUIAnimationSandboxDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SwiftUIAnimationSandboxDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000045 /* SystemSignalRefDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SystemSignalRefDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000046 /* TOMLParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/TOMLParserDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000047 /* UnitConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/UnitConverterDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000048 /* WordCounterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/WordCounterDevTool.swift; sourceTree = "<group>"; };
+		DT0100000000000000000049 /* XMLToJSONConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/XMLToJSONConverterDevTool.swift; sourceTree = "<group>"; };
+		DT010000000000000000004A /* YAMLToJSONConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/YAMLToJSONConverterDevTool.swift; sourceTree = "<group>"; };
 		A6543C98EF1144CCAFB951E3 /* ColorConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ColorConverterDevTool.swift; sourceTree = "<group>"; };
 		7101221B94664FF6A2A16415 /* TimezoneConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/TimezoneConverterDevTool.swift; sourceTree = "<group>"; };
 		FBFBC7A30FEC46858DE6A09D /* APIResponseViewerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/APIResponseViewerDevTool.swift; sourceTree = "<group>"; };
@@ -3932,7 +4081,6 @@
 		DA01000000000000000000E1 /* DesignerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DesignerDevTool.swift; sourceTree = "<group>"; };
 		DA01000000000000000000E2 /* SearchDocsDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SearchDocsDevTool.swift; sourceTree = "<group>"; };
 		DA01000000000000000000E3 /* DatabaseCreateDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DatabaseCreateDevTool.swift; sourceTree = "<group>"; };
-		NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/NewDevTools.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000130 /* Diag_IMEIInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IMEIInfoView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000131 /* Diag_MDMDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MDMDetectionView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000132 /* Diag_FindMyStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_FindMyStatusView.swift; sourceTree = "<group>"; };
@@ -9446,6 +9594,81 @@
 				25AECACC30C14716B3013901 /* PermissionInspectorDevTool.swift */,
 				2208A9C0CF904CB4B32C0FBE /* JWTDecoderDevTool.swift */,
 				93C1AA20141840DF8DAC155B /* Base64EncoderDevTool.swift */,
+				DT0100000000000000000000 /* AESEncryptionDevTool.swift */,
+				DT0100000000000000000001 /* AccessibilityContrastGridDevTool.swift */,
+				DT0100000000000000000002 /* AdvancedRegexDebuggerDevTool.swift */,
+				DT0100000000000000000003 /* AppReceiptInspectorDevTool.swift */,
+				DT0100000000000000000004 /* AppSandboxExplorerDevTool.swift */,
+				DT0100000000000000000005 /* BarcodeGeneratorDevTool.swift */,
+				DT0100000000000000000006 /* Base32ConverterDevTool.swift */,
+				DT0100000000000000000007 /* BezierPathCodeDevTool.swift */,
+				DT0100000000000000000008 /* BinaryConverterDevTool.swift */,
+				DT0100000000000000000009 /* BinaryHexConverterDevTool.swift */,
+				DT010000000000000000000A /* BiometricAuthSimDevTool.swift */,
+				DT010000000000000000000B /* BundleSizeAnalyzerDevTool.swift */,
+				DT010000000000000000000C /* CRONParserDevTool.swift */,
+				DT010000000000000000000D /* CSRFTokenDevTool.swift */,
+				DT010000000000000000000E /* CURLConverterDevTool.swift */,
+				DT010000000000000000000F /* CURLGeneratorDevTool.swift */,
+				DT0100000000000000000010 /* CharacterEscaperDevTool.swift */,
+				DT0100000000000000000011 /* ColorBlendingDevTool.swift */,
+				DT0100000000000000000012 /* CrontabGeneratorDevTool.swift */,
+				DT0100000000000000000013 /* DeepLinkTesterDevTool.swift */,
+				DT0100000000000000000014 /* DeviceScreenSizeRefDevTool.swift */,
+				DT0100000000000000000015 /* DiffMatchPatchDevTool.swift */,
+				DT0100000000000000000016 /* EnvVarInspectorDevTool.swift */,
+				DT0100000000000000000017 /* EpochConverterDevTool.swift */,
+				DT0100000000000000000018 /* FileHashDevTool.swift */,
+				DT0100000000000000000019 /* FontMetricDevTool.swift */,
+				DT010000000000000000001A /* GraphQLSchemaExplorerDevTool.swift */,
+				DT010000000000000000001B /* HMACCalculatorDevTool.swift */,
+				DT010000000000000000001C /* HTTPHeaderAnalyzerDevTool.swift */,
+				DT010000000000000000001D /* HTTPStatusCodeRefDevTool.swift */,
+				DT010000000000000000001E /* INIParserDevTool.swift */,
+				DT010000000000000000001F /* IPSubnetCalculatorDevTool.swift */,
+				DT0100000000000000000020 /* IconPreviewDevTool.swift */,
+				DT0100000000000000000021 /* ImageAssetOptimizerDevTool.swift */,
+				DT0100000000000000000022 /* JSONSchemaGeneratorDevTool.swift */,
+				DT0100000000000000000023 /* JSONSchemaValidatorDevTool.swift */,
+				DT0100000000000000000024 /* JWTBuilderDevTool.swift */,
+				DT0100000000000000000025 /* KeychainItemManagerDevTool.swift */,
+				DT0100000000000000000026 /* LocaleInspectorDevTool.swift */,
+				DT0100000000000000000027 /* LocalizationKeyGeneratorDevTool.swift */,
+				DT0100000000000000000028 /* MemoryLeakGuideDevTool.swift */,
+				DT0100000000000000000029 /* MethodTraceSimDevTool.swift */,
+				DT010000000000000000002A /* MimeTypeLookupDevTool.swift */,
+				DT010000000000000000002B /* MorseCodeDevTool.swift */,
+				DT010000000000000000002C /* ObjectPropertyInspectorDevTool.swift */,
+				DT010000000000000000002D /* OctalConverterDevTool.swift */,
+				DT010000000000000000002E /* PBKDF2GeneratorDevTool.swift */,
+				DT010000000000000000002F /* PasswordGeneratorDevTool.swift */,
+				DT0100000000000000000030 /* PermissionTesterDevTool.swift */,
+				DT0100000000000000000031 /* PlaceholderDataDevTool.swift */,
+				DT0100000000000000000032 /* PlistViewerDevTool.swift */,
+				DT0100000000000000000033 /* ProtobufInspectorDevTool.swift */,
+				DT0100000000000000000034 /* ProxyConfigDevTool.swift */,
+				DT0100000000000000000035 /* PunycodeConverterDevTool.swift */,
+				DT0100000000000000000036 /* PushNotificationSimDevTool.swift */,
+				DT0100000000000000000037 /* QRCodeGeneratorDevTool.swift */,
+				DT0100000000000000000038 /* ROT13CipherDevTool.swift */,
+				DT0100000000000000000039 /* RSAGeneratorDevTool.swift */,
+				DT010000000000000000003A /* ResponsiveBreakpointDevTool.swift */,
+				DT010000000000000000003B /* SFSymbolAnimationDevTool.swift */,
+				DT010000000000000000003C /* SQLFormatterDevTool.swift */,
+				DT010000000000000000003D /* SQLQueryGeneratorDevTool.swift */,
+				DT010000000000000000003E /* SSLCertInspectorDevTool.swift */,
+				DT010000000000000000003F /* SecretScannerDevTool.swift */,
+				DT0100000000000000000040 /* ShadowLayeringDevTool.swift */,
+				DT0100000000000000000041 /* SlugGeneratorDevTool.swift */,
+				DT0100000000000000000042 /* SpacingCalculatorDevTool.swift */,
+				DT0100000000000000000043 /* SwiftCodeFormatterDevTool.swift */,
+				DT0100000000000000000044 /* SwiftUIAnimationSandboxDevTool.swift */,
+				DT0100000000000000000045 /* SystemSignalRefDevTool.swift */,
+				DT0100000000000000000046 /* TOMLParserDevTool.swift */,
+				DT0100000000000000000047 /* UnitConverterDevTool.swift */,
+				DT0100000000000000000048 /* WordCounterDevTool.swift */,
+				DT0100000000000000000049 /* XMLToJSONConverterDevTool.swift */,
+				DT010000000000000000004A /* YAMLToJSONConverterDevTool.swift */,
 				5802738C69834F1BBAAA2C66 /* DevToolSharedUtils.swift */,
 				F61B6C5F74C541E188C9AF53 /* SDKModuleInspectorDevTool.swift */,
 				1600644375C34AE78E169D60 /* SDKConfigValidatorDevTool.swift */,
@@ -9486,7 +9709,6 @@
 				DA01000000000000000000E1 /* DesignerDevTool.swift */,
 				DA01000000000000000000E2 /* SearchDocsDevTool.swift */,
 				DA01000000000000000000E3 /* DatabaseCreateDevTool.swift */,
-				NEWDT02A8B3C4D5E6F7890AB /* NewDevTools.swift */,
 );
 			path = SDK;
 			sourceTree = "<group>";
@@ -15122,6 +15344,81 @@
 				ABB00809F5814D2BACB28E80 /* PermissionInspectorDevTool.swift in Sources */,
 				096FA3D6396F4067881183B7 /* JWTDecoderDevTool.swift in Sources */,
 				713E0533E5E542B3860C049B /* Base64EncoderDevTool.swift in Sources */,
+				DT0200000000000000000000 /* AESEncryptionDevTool.swift in Sources */,
+				DT0200000000000000000001 /* AccessibilityContrastGridDevTool.swift in Sources */,
+				DT0200000000000000000002 /* AdvancedRegexDebuggerDevTool.swift in Sources */,
+				DT0200000000000000000003 /* AppReceiptInspectorDevTool.swift in Sources */,
+				DT0200000000000000000004 /* AppSandboxExplorerDevTool.swift in Sources */,
+				DT0200000000000000000005 /* BarcodeGeneratorDevTool.swift in Sources */,
+				DT0200000000000000000006 /* Base32ConverterDevTool.swift in Sources */,
+				DT0200000000000000000007 /* BezierPathCodeDevTool.swift in Sources */,
+				DT0200000000000000000008 /* BinaryConverterDevTool.swift in Sources */,
+				DT0200000000000000000009 /* BinaryHexConverterDevTool.swift in Sources */,
+				DT020000000000000000000A /* BiometricAuthSimDevTool.swift in Sources */,
+				DT020000000000000000000B /* BundleSizeAnalyzerDevTool.swift in Sources */,
+				DT020000000000000000000C /* CRONParserDevTool.swift in Sources */,
+				DT020000000000000000000D /* CSRFTokenDevTool.swift in Sources */,
+				DT020000000000000000000E /* CURLConverterDevTool.swift in Sources */,
+				DT020000000000000000000F /* CURLGeneratorDevTool.swift in Sources */,
+				DT0200000000000000000010 /* CharacterEscaperDevTool.swift in Sources */,
+				DT0200000000000000000011 /* ColorBlendingDevTool.swift in Sources */,
+				DT0200000000000000000012 /* CrontabGeneratorDevTool.swift in Sources */,
+				DT0200000000000000000013 /* DeepLinkTesterDevTool.swift in Sources */,
+				DT0200000000000000000014 /* DeviceScreenSizeRefDevTool.swift in Sources */,
+				DT0200000000000000000015 /* DiffMatchPatchDevTool.swift in Sources */,
+				DT0200000000000000000016 /* EnvVarInspectorDevTool.swift in Sources */,
+				DT0200000000000000000017 /* EpochConverterDevTool.swift in Sources */,
+				DT0200000000000000000018 /* FileHashDevTool.swift in Sources */,
+				DT0200000000000000000019 /* FontMetricDevTool.swift in Sources */,
+				DT020000000000000000001A /* GraphQLSchemaExplorerDevTool.swift in Sources */,
+				DT020000000000000000001B /* HMACCalculatorDevTool.swift in Sources */,
+				DT020000000000000000001C /* HTTPHeaderAnalyzerDevTool.swift in Sources */,
+				DT020000000000000000001D /* HTTPStatusCodeRefDevTool.swift in Sources */,
+				DT020000000000000000001E /* INIParserDevTool.swift in Sources */,
+				DT020000000000000000001F /* IPSubnetCalculatorDevTool.swift in Sources */,
+				DT0200000000000000000020 /* IconPreviewDevTool.swift in Sources */,
+				DT0200000000000000000021 /* ImageAssetOptimizerDevTool.swift in Sources */,
+				DT0200000000000000000022 /* JSONSchemaGeneratorDevTool.swift in Sources */,
+				DT0200000000000000000023 /* JSONSchemaValidatorDevTool.swift in Sources */,
+				DT0200000000000000000024 /* JWTBuilderDevTool.swift in Sources */,
+				DT0200000000000000000025 /* KeychainItemManagerDevTool.swift in Sources */,
+				DT0200000000000000000026 /* LocaleInspectorDevTool.swift in Sources */,
+				DT0200000000000000000027 /* LocalizationKeyGeneratorDevTool.swift in Sources */,
+				DT0200000000000000000028 /* MemoryLeakGuideDevTool.swift in Sources */,
+				DT0200000000000000000029 /* MethodTraceSimDevTool.swift in Sources */,
+				DT020000000000000000002A /* MimeTypeLookupDevTool.swift in Sources */,
+				DT020000000000000000002B /* MorseCodeDevTool.swift in Sources */,
+				DT020000000000000000002C /* ObjectPropertyInspectorDevTool.swift in Sources */,
+				DT020000000000000000002D /* OctalConverterDevTool.swift in Sources */,
+				DT020000000000000000002E /* PBKDF2GeneratorDevTool.swift in Sources */,
+				DT020000000000000000002F /* PasswordGeneratorDevTool.swift in Sources */,
+				DT0200000000000000000030 /* PermissionTesterDevTool.swift in Sources */,
+				DT0200000000000000000031 /* PlaceholderDataDevTool.swift in Sources */,
+				DT0200000000000000000032 /* PlistViewerDevTool.swift in Sources */,
+				DT0200000000000000000033 /* ProtobufInspectorDevTool.swift in Sources */,
+				DT0200000000000000000034 /* ProxyConfigDevTool.swift in Sources */,
+				DT0200000000000000000035 /* PunycodeConverterDevTool.swift in Sources */,
+				DT0200000000000000000036 /* PushNotificationSimDevTool.swift in Sources */,
+				DT0200000000000000000037 /* QRCodeGeneratorDevTool.swift in Sources */,
+				DT0200000000000000000038 /* ROT13CipherDevTool.swift in Sources */,
+				DT0200000000000000000039 /* RSAGeneratorDevTool.swift in Sources */,
+				DT020000000000000000003A /* ResponsiveBreakpointDevTool.swift in Sources */,
+				DT020000000000000000003B /* SFSymbolAnimationDevTool.swift in Sources */,
+				DT020000000000000000003C /* SQLFormatterDevTool.swift in Sources */,
+				DT020000000000000000003D /* SQLQueryGeneratorDevTool.swift in Sources */,
+				DT020000000000000000003E /* SSLCertInspectorDevTool.swift in Sources */,
+				DT020000000000000000003F /* SecretScannerDevTool.swift in Sources */,
+				DT0200000000000000000040 /* ShadowLayeringDevTool.swift in Sources */,
+				DT0200000000000000000041 /* SlugGeneratorDevTool.swift in Sources */,
+				DT0200000000000000000042 /* SpacingCalculatorDevTool.swift in Sources */,
+				DT0200000000000000000043 /* SwiftCodeFormatterDevTool.swift in Sources */,
+				DT0200000000000000000044 /* SwiftUIAnimationSandboxDevTool.swift in Sources */,
+				DT0200000000000000000045 /* SystemSignalRefDevTool.swift in Sources */,
+				DT0200000000000000000046 /* TOMLParserDevTool.swift in Sources */,
+				DT0200000000000000000047 /* UnitConverterDevTool.swift in Sources */,
+				DT0200000000000000000048 /* WordCounterDevTool.swift in Sources */,
+				DT0200000000000000000049 /* XMLToJSONConverterDevTool.swift in Sources */,
+				DT020000000000000000004A /* YAMLToJSONConverterDevTool.swift in Sources */,
 				FC335125304A4830BFC09FE0 /* DevToolSharedUtils.swift in Sources */,
 				4493B4F7B7264E1587EBEA36 /* SDKModuleInspectorDevTool.swift in Sources */,
 				D11E98ED67F642419A3A23FB /* SDKConfigValidatorDevTool.swift in Sources */,
@@ -15162,7 +15459,6 @@
 				DA02000000000000000000E1 /* DesignerDevTool.swift in Sources */,
 				DA02000000000000000000E2 /* SearchDocsDevTool.swift in Sources */,
 				DA02000000000000000000E3 /* DatabaseCreateDevTool.swift in Sources */,
-				NEWDT01A8B3C4D5E6F7890AB /* NewDevTools.swift in Sources */,
 				B604F1A757FCE3DB5531B5DA /* SDKActionDispatcher.swift in Sources */,
 				B5AF8078830D12650D7473B7 /* SDKDependencyResolver.swift in Sources */,
 				BEF5B9AC2F338D35A05E4DC9 /* SDKEventInjectionEngine.swift in Sources */,
