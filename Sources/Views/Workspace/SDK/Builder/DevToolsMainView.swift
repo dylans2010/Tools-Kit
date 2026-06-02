@@ -232,6 +232,71 @@ final class DevToolRegistry: ObservableObject {
         // New Tools - Performance
         register(BundleSizeAnalyzerDevTool())
 
+        // Batch 1: Data Tools
+        register(JSONToSwiftModelDevTool())
+        register(SQLFormatterDevTool())
+        register(JSONSchemaGeneratorDevTool())
+        register(LocalizationHelperDevTool())
+        register(PluralizationRulesDevTool())
+        register(CurrencyFormatterDevTool())
+        register(UnitsConverterDevTool())
+        register(CoordinateConverterDevTool())
+
+        // Batch 2: UI Design Tools
+        register(AppIconGeneratorDevTool())
+        register(SVGToSwiftUIPathDevTool())
+        register(ColorBlindnessSimulatorDevTool())
+        register(AppStoreSizesCheatSheetDevTool())
+        register(FontPreviewerDevTool())
+        register(DynamicTypePreviewerDevTool())
+        register(SafeAreaInsetsVisualizerDevTool())
+        register(DeviceResolutionCheatSheetDevTool())
+        register(SwiftUIAlignmentGuideDevTool())
+        register(ColorHarmonyGeneratorDevTool())
+        register(CSSToSwiftUIShadowDevTool())
+        register(BorderRadiusVisualizerDevTool())
+
+        // Batch 3: Networking & Security Tools
+        register(HTTPStatusCheatSheetDevTool())
+        register(RobotsTxtGeneratorDevTool())
+        register(SitemapGeneratorDevTool())
+        register(UserAgentParserDevTool())
+        register(MIMETypeLookupDevTool())
+        register(HTTPHeadersCheatSheetDevTool())
+        register(PasswordStrengthAnalyzerDevTool())
+        register(CSRGeneratorDevTool())
+        register(SSHKeyGeneratorDevTool())
+        register(PrivacyManifestGeneratorDevTool())
+        register(EntitlementsGeneratorDevTool())
+
+        // Batch 4: Automation & Performance Tools
+        register(CrontabGeneratorDevTool())
+        register(DotGitignoreGeneratorDevTool())
+        register(PodfileTemplateDevTool())
+        register(PackageSwiftTemplateDevTool())
+        register(GitHubActionsGeneratorDevTool())
+        register(GitBranchingCheatSheetDevTool())
+        register(QRCodeGeneratorDevTool())
+        register(ReadmeGeneratorDevTool())
+        register(LicenseGeneratorDevTool())
+        register(SwiftLifecycleCheatSheetDevTool())
+        register(CombineCheatSheetDevTool())
+        register(SwiftConcurrencyCheatSheetDevTool())
+        register(PDFGeneratorDevTool())
+
+        // Batch 5: Utilities & Diagnostics Tools
+        register(SemVerCalculatorDevTool())
+        register(DiffMatchPatchDevTool())
+        register(StringEscapingCheatSheetDevTool())
+        register(AppShortcutsCheatSheetDevTool())
+        register(URLQueryBuilderDevTool())
+        register(Base32ConverterDevTool())
+        register(PunycodeConverterDevTool())
+        register(ImageCompressorDevTool())
+        register(APIBenchmarkDevTool())
+        register(NetworkSpeedSimulatorDevTool())
+        register(MemoryLeakChecklistDevTool())
+
         // SDK Builder Specialized Tools
         register(SDKBuildAnalyzerDevTool())
         register(SDKAssetOptimizerDevTool())
