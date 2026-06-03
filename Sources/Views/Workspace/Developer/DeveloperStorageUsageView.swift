@@ -4,7 +4,7 @@ private class StorageService: ObservableObject {
     static let shared = StorageService()
     @Published var totalUsed: Int64 = 0
     @Published var totalAvailable: Int64 = 0
-    @Published var breakdown: [StorageCategory] = []
+    @Published private var breakdown: [StorageCategory] = []
     @Published var storageNodes: [StorageNode] = []
 
     private init() {}
@@ -22,7 +22,7 @@ private struct StorageCategory: Identifiable, Hashable {
 
 struct DeveloperStorageUsageView: View {
     @ObservedObject var appService = DeveloperAppService.shared
-    @ObservedObject var storageService = StorageService.shared
+    @ObservedObject private var storageService = StorageService.shared
     @State private var showingAddStorage = false
     @State private var selectedAppID: UUID?
 
