@@ -18,14 +18,27 @@ struct DeveloperHomeView: View {
                         ("App Builder", AnyView(AppBuilderView()), "plus.app"),
                         ("Integrations", AnyView(DeveloperIntegrationGalleryView()), "puzzlepiece"),
                         ("Remote Config", AnyView(DeveloperRemoteConfigView()), "slider.horizontal.3"),
-                        ("Project Installer", AnyView(ProjectInstallerView()), "square.and.arrow.down")
+                        ("Project Installer", AnyView(ProjectInstallerView()), "square.and.arrow.down"),
+                        ("App Lifecycle", AnyView(AppLifecycleView()), "arrow.clockwise.circle")
+                    ])
+
+                    domainGrid(title: "SDK & Plugins", icon: "puzzlepiece.extension", systems: [
+                        ("SDK Architect", AnyView(SDKProjectArchitectView()), "square.stack.3d.down.right"),
+                        ("Plugin Installer", AnyView(PluginInstallerView()), "plus.viewfinder"),
+                        ("Connectors", AnyView(ConnectorAuthRegistryView()), "link.circle")
                     ])
 
                     domainGrid(title: "Operations & Delivery", icon: "arrow.triangle.pull", systems: [
                         ("CI/CD Pipelines", AnyView(DeveloperDeploymentPipelineView()), "hammer"),
                         ("Releases", AnyView(DeveloperReleaseManagementView()), "shippingbox"),
                         ("Beta Testing", AnyView(DeveloperBetaTestingView()), "person.3.sequence"),
-                        ("Sandbox Env", AnyView(DeveloperSandboxEnvironmentView()), "square.dashed")
+                        ("Sandbox Env", AnyView(DeveloperSandboxEnvironmentView()), "square.dashed"),
+                        ("Distribution", AnyView(DistributionPipelineView()), "airplane.departure"),
+                        ("Build Store", AnyView(BuildArtifactStoreView()), "archivebox"),
+                        ("Resource Quotas", AnyView(ResourceQuotaView()), "chart.pie"),
+                        ("Config Sync", AnyView(AppConfigSyncView()), "arrow.2.squarepath"),
+                        ("Test Runner", AnyView(AutomatedTestRunnerView()), "play.rectangle"),
+                        ("Recruitment", AnyView(BetaTesterRecruitmentView()), "megaphone")
                     ])
 
                     domainGrid(title: "Observability", icon: "eye", systems: [
@@ -33,7 +46,9 @@ struct DeveloperHomeView: View {
                         ("Infrastructure", AnyView(DeveloperInfrastructureStatusView()), "cpu"),
                         ("Database", AnyView(DeveloperDatabaseManagerView()), "tablecells"),
                         ("Analytics", AnyView(AnalyticsDashboardView()), "chart.xyaxis.line"),
-                        ("Log Drains", AnyView(LogDrainConfigView()), "externaldrive.badge.plus")
+                        ("Log Drains", AnyView(LogDrainConfigView()), "externaldrive.badge.plus"),
+                        ("Structured Logs", AnyView(StructuredLogViewerView()), "doc.text.magnifyingglass"),
+                        ("Migrations", AnyView(DatabaseMigrationView()), "arrow.up.doc")
                     ])
 
                     domainGrid(title: "Security & Privacy", icon: "lock.shield", systems: [
@@ -41,7 +56,8 @@ struct DeveloperHomeView: View {
                         ("Secrets", AnyView(DeveloperSecretsManagerView()), "lock.rectangle"),
                         ("Webhooks", AnyView(WebhookManagerView()), "bolt.horizontal"),
                         ("Security Audit", AnyView(DeveloperSecurityAuditView()), "checkmark.shield"),
-                        ("Security Policies", AnyView(DeveloperSecurityPolicyView()), "shield.checkered")
+                        ("Security Policies", AnyView(DeveloperSecurityPolicyView()), "shield.checkered"),
+                        ("Vault", AnyView(EnvironmentVaultView()), "lock.square.stack")
                     ])
 
                     domainGrid(title: "Compliance & Identity", icon: "checkmark.seal", systems: [
@@ -49,7 +65,8 @@ struct DeveloperHomeView: View {
                         ("Certificates", AnyView(DeveloperAppCertificatesView()), "doc.badge.gearshape"),
                         ("Privacy Manifest", AnyView(PrivacyManifestEditorView()), "hand.raised"),
                         ("Data Policies", AnyView(DataHandlingPolicyBuilderView()), "doc.text.magnifyingglass"),
-                        ("Compliance Audit", AnyView(ComplianceChecklistView()), "checklist")
+                        ("Compliance Audit", AnyView(ComplianceChecklistView()), "checklist"),
+                        ("Dependency Scan", AnyView(DependencyScannerView()), "barcode.viewfinder")
                     ])
 
                     domainGrid(title: "Global Resources", icon: "globe", systems: [
@@ -57,7 +74,8 @@ struct DeveloperHomeView: View {
                         ("Docs Editor", AnyView(DocumentationEditorView()), "book.and.wrench"),
                         ("Marketplace", AnyView(MarketplaceListingManagerView()), "storefront"),
                         ("Organization", AnyView(OrganizationManagementView()), "building.2"),
-                        ("Doc Localization", AnyView(DocumentationLocalizationView()), "text.book.closed")
+                        ("Doc Localization", AnyView(DocumentationLocalizationView()), "text.book.closed"),
+                        ("Localize Audit", AnyView(LocalizationAuditView()), "text.magnifyingglass")
                     ])
 
                     domainGrid(title: "Insights & Performance", icon: "chart.bar.doc.horizontal", systems: [
@@ -65,7 +83,10 @@ struct DeveloperHomeView: View {
                         ("Performance", AnyView(DeveloperPerformanceMonitorView()), "gauge.with.needle"),
                         ("Network Traffic", AnyView(DeveloperNetworkTrafficView()), "wifi.router"),
                         ("Feature Flags", AnyView(DeveloperFeatureFlagView()), "flag"),
-                        ("Error Grouping", AnyView(ErrorGroupingView()), "square.grid.3x1.below.line.grid.1x2")
+                        ("Error Grouping", AnyView(ErrorGroupingView()), "square.grid.3x1.below.line.grid.1x2"),
+                        ("Traffic Inspector", AnyView(APITrafficInspectorView()), "antenna.radiowaves.left.and.right"),
+                        ("Canary Rollout", AnyView(CanaryRolloutView()), "bird"),
+                        ("Error Regression", AnyView(ErrorRegressionView()), "chart.line.uptrend.xyaxis")
                     ])
 
                     domainGrid(title: "Support & Identity", icon: "person.crop.circle", systems: [
@@ -74,7 +95,8 @@ struct DeveloperHomeView: View {
                         ("Profile", AnyView(DeveloperProfileView()), "person.crop.circle"),
                         ("Verification", AnyView(DeveloperVerificationView()), "person.badge.shield.checkmark"),
                         ("Support Tickets", AnyView(DeveloperSupportTicketView()), "questionmark.circle"),
-                        ("CLI Tokens", AnyView(CLITokenView()), "terminal")
+                        ("CLI Tokens", AnyView(CLITokenView()), "terminal"),
+                        ("Onboarding", AnyView(DeveloperOnboardingView()), "hand.wave")
                     ])
                 }
             }

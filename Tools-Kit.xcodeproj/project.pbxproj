@@ -7,6 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA02B9999999 /* StorageNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B9999999 /* StorageNode.swift */; };
+		DA02B0000000013 /* CanaryRolloutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000013 /* CanaryRolloutView.swift */; };
+		DA02B0000000012 /* PerformanceProfilingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000012 /* PerformanceProfilingView.swift */; };
+		DA02B0000000011 /* DatabaseMigrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000011 /* DatabaseMigrationView.swift */; };
+		DA02B0000000010 /* APITrafficInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000010 /* APITrafficInspectorView.swift */; };
+		DA02B000000000F /* StructuredLogViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B000000000F /* StructuredLogViewerView.swift */; };
+		DA02B000000000E /* LocalizationAuditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B000000000E /* LocalizationAuditView.swift */; };
+		DA02B000000000D /* DependencyScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B000000000D /* DependencyScannerView.swift */; };
+		DA02B000000000C /* ErrorRegressionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B000000000C /* ErrorRegressionView.swift */; };
+		DA02B000000000B /* BetaTesterRecruitmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B000000000B /* BetaTesterRecruitmentView.swift */; };
+		DA02B000000000A /* AutomatedTestRunnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B000000000A /* AutomatedTestRunnerView.swift */; };
+		DA02B0000000009 /* AppConfigSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000009 /* AppConfigSyncView.swift */; };
+		DA02B0000000008 /* ResourceQuotaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000008 /* ResourceQuotaView.swift */; };
+		DA02B0000000007 /* EnvironmentVaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000007 /* EnvironmentVaultView.swift */; };
+		DA02B0000000006 /* BuildArtifactStoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000006 /* BuildArtifactStoreView.swift */; };
+		DA02B0000000005 /* DistributionPipelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000005 /* DistributionPipelineView.swift */; };
+		DA02B0000000004 /* DeveloperOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000004 /* DeveloperOnboardingView.swift */; };
+		DA02B0000000003 /* AppLifecycleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000003 /* AppLifecycleView.swift */; };
+		DA02B0000000002 /* ConnectorAuthRegistryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000002 /* ConnectorAuthRegistryView.swift */; };
+		DA02B0000000001 /* PluginInstallerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000001 /* PluginInstallerView.swift */; };
+		DA02B0000000000 /* SDKProjectArchitectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000000 /* SDKProjectArchitectView.swift */; };
 		92E13A73A39F4878870CCFF1 /* SDKResourceAuditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4F9C14598E4858BAC1F522 /* SDKResourceAuditView.swift */; };
 		0603EBECCB2849248F4BD1D4 /* SDKGlobalSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1436207771E4304B9145E91 /* SDKGlobalSearchView.swift */; };
 		6FCAA43DB3294F3586F66864 /* SDKDependencyVisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75D52D2ECF24F66B1A2B767 /* SDKDependencyVisualizerView.swift */; };
@@ -2296,6 +2317,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DA01B9999999 /* StorageNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StorageNode.swift; path = Sources/Views/Workspace/Developer/Models/StorageNode.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000013 /* CanaryRolloutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CanaryRolloutView.swift; path = Sources/Views/Workspace/Developer/CanaryRolloutView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000012 /* PerformanceProfilingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PerformanceProfilingView.swift; path = Sources/Views/Workspace/Developer/PerformanceProfilingView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000011 /* DatabaseMigrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DatabaseMigrationView.swift; path = Sources/Views/Workspace/Developer/DatabaseMigrationView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000010 /* APITrafficInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = APITrafficInspectorView.swift; path = Sources/Views/Workspace/Developer/APITrafficInspectorView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B000000000F /* StructuredLogViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StructuredLogViewerView.swift; path = Sources/Views/Workspace/Developer/StructuredLogViewerView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B000000000E /* LocalizationAuditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocalizationAuditView.swift; path = Sources/Views/Workspace/Developer/LocalizationAuditView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B000000000D /* DependencyScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DependencyScannerView.swift; path = Sources/Views/Workspace/Developer/DependencyScannerView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B000000000C /* ErrorRegressionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorRegressionView.swift; path = Sources/Views/Workspace/Developer/ErrorRegressionView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B000000000B /* BetaTesterRecruitmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BetaTesterRecruitmentView.swift; path = Sources/Views/Workspace/Developer/BetaTesterRecruitmentView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B000000000A /* AutomatedTestRunnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AutomatedTestRunnerView.swift; path = Sources/Views/Workspace/Developer/AutomatedTestRunnerView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000009 /* AppConfigSyncView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppConfigSyncView.swift; path = Sources/Views/Workspace/Developer/AppConfigSyncView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000008 /* ResourceQuotaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ResourceQuotaView.swift; path = Sources/Views/Workspace/Developer/ResourceQuotaView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000007 /* EnvironmentVaultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EnvironmentVaultView.swift; path = Sources/Views/Workspace/Developer/EnvironmentVaultView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000006 /* BuildArtifactStoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BuildArtifactStoreView.swift; path = Sources/Views/Workspace/Developer/BuildArtifactStoreView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000005 /* DistributionPipelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DistributionPipelineView.swift; path = Sources/Views/Workspace/Developer/DistributionPipelineView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000004 /* DeveloperOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeveloperOnboardingView.swift; path = Sources/Views/Workspace/Developer/DeveloperOnboardingView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000003 /* AppLifecycleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppLifecycleView.swift; path = Sources/Views/Workspace/Developer/AppLifecycleView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000002 /* ConnectorAuthRegistryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ConnectorAuthRegistryView.swift; path = Sources/Views/Workspace/Developer/ConnectorAuthRegistryView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000001 /* PluginInstallerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PluginInstallerView.swift; path = Sources/Views/Workspace/Developer/PluginInstallerView.swift; sourceTree = SOURCE_ROOT; };
+		DA01B0000000000 /* SDKProjectArchitectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SDKProjectArchitectView.swift; path = Sources/Views/Workspace/Developer/SDKProjectArchitectView.swift; sourceTree = SOURCE_ROOT; };
 		1E4F9C14598E4858BAC1F522 /* SDKResourceAuditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Explorer/SDKResourceAuditView.swift; sourceTree = "<group>"; };
 		C1436207771E4304B9145E91 /* SDKGlobalSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Explorer/SDKGlobalSearchView.swift; sourceTree = "<group>"; };
 		E75D52D2ECF24F66B1A2B767 /* SDKDependencyVisualizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Explorer/SDKDependencyVisualizerView.swift; sourceTree = "<group>"; };
@@ -12860,6 +12902,26 @@
 		DA0000000000000000000001 /* Developer */ = {
 			isa = PBXGroup;
 			children = (
+				DA01B0000000013 /* CanaryRolloutView.swift */,
+				DA01B0000000012 /* PerformanceProfilingView.swift */,
+				DA01B0000000011 /* DatabaseMigrationView.swift */,
+				DA01B0000000010 /* APITrafficInspectorView.swift */,
+				DA01B000000000F /* StructuredLogViewerView.swift */,
+				DA01B000000000E /* LocalizationAuditView.swift */,
+				DA01B000000000D /* DependencyScannerView.swift */,
+				DA01B000000000C /* ErrorRegressionView.swift */,
+				DA01B000000000B /* BetaTesterRecruitmentView.swift */,
+				DA01B000000000A /* AutomatedTestRunnerView.swift */,
+				DA01B0000000009 /* AppConfigSyncView.swift */,
+				DA01B0000000008 /* ResourceQuotaView.swift */,
+				DA01B0000000007 /* EnvironmentVaultView.swift */,
+				DA01B0000000006 /* BuildArtifactStoreView.swift */,
+				DA01B0000000005 /* DistributionPipelineView.swift */,
+				DA01B0000000004 /* DeveloperOnboardingView.swift */,
+				DA01B0000000003 /* AppLifecycleView.swift */,
+				DA01B0000000002 /* ConnectorAuthRegistryView.swift */,
+				DA01B0000000001 /* PluginInstallerView.swift */,
+				DA01B0000000000 /* SDKProjectArchitectView.swift */,
 				DA0000000000000000000002 /* Models */,
 				DA0000000000000000000003 /* Services */,
 				DA0100000000000000000000 /* DeveloperHomeView.swift */,
@@ -12961,6 +13023,7 @@
 		DA0000000000000000000002 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				DA01B9999999 /* StorageNode.swift */,
 				DA010000000000000000003B /* APIKey.swift */,
 				DA010000000000000000003C /* AnalyticsModels.swift */,
 				DA010000000000000000003D /* DataHandlingPolicy.swift */,
@@ -13203,6 +13266,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA02B9999999 /* StorageNode.swift in Sources */,
+				DA02B0000000013 /* CanaryRolloutView.swift in Sources */,
+				DA02B0000000012 /* PerformanceProfilingView.swift in Sources */,
+				DA02B0000000011 /* DatabaseMigrationView.swift in Sources */,
+				DA02B0000000010 /* APITrafficInspectorView.swift in Sources */,
+				DA02B000000000F /* StructuredLogViewerView.swift in Sources */,
+				DA02B000000000E /* LocalizationAuditView.swift in Sources */,
+				DA02B000000000D /* DependencyScannerView.swift in Sources */,
+				DA02B000000000C /* ErrorRegressionView.swift in Sources */,
+				DA02B000000000B /* BetaTesterRecruitmentView.swift in Sources */,
+				DA02B000000000A /* AutomatedTestRunnerView.swift in Sources */,
+				DA02B0000000009 /* AppConfigSyncView.swift in Sources */,
+				DA02B0000000008 /* ResourceQuotaView.swift in Sources */,
+				DA02B0000000007 /* EnvironmentVaultView.swift in Sources */,
+				DA02B0000000006 /* BuildArtifactStoreView.swift in Sources */,
+				DA02B0000000005 /* DistributionPipelineView.swift in Sources */,
+				DA02B0000000004 /* DeveloperOnboardingView.swift in Sources */,
+				DA02B0000000003 /* AppLifecycleView.swift in Sources */,
+				DA02B0000000002 /* ConnectorAuthRegistryView.swift in Sources */,
+				DA02B0000000001 /* PluginInstallerView.swift in Sources */,
+				DA02B0000000000 /* SDKProjectArchitectView.swift in Sources */,
 				AS020000000000000000000039 /* DrawingToolCustomizer.swift in Sources */,
 				AS020000000000000000000040 /* ElementToolbar.swift in Sources */,
 				DA020000000000000000000D /* DocSectionEditor.swift in Sources */,

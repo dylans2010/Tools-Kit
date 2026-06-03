@@ -37,7 +37,11 @@ struct MarketplaceReviewFeedbackView: View {
                 if sub.status == .rejected {
                     Section("Action Required") {
                         Text("Address the blocking items above and resubmit your application for a follow-up audit.").font(.caption).foregroundStyle(.secondary)
-                        Button { /* resubmit */ } label: {
+                        Button {
+                            Task {
+                                try? await MarketplaceService.shared.resubmit(submissionID: submission.id)
+                            }
+                        } label: {
                             Text("Resubmit for Review").font(.subheadline.bold())
                         }
                     }

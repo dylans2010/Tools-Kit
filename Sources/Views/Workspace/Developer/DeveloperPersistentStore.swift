@@ -38,6 +38,29 @@ public class DeveloperPersistentStore: ObservableObject {
     @Published public var localizationKeys: [LocalizationKey]
     @Published public var securityPolicies: [SecurityPolicy]
     @Published public var infrastructureNodes: [InfrastructureNode]
+    @Published public var storageNodes: [StorageNode]
+    @Published public var scopeTemplates: [ScopeTemplate]
+    @Published public var betaTesters: [BetaTester]
+    @Published public var betaFeedback: [BetaFeedback]
+    @Published public var sdkArchitectures: [SDKProjectArchitecture]
+    @Published public var pluginPackages: [PluginPackage]
+    @Published public var connectorAuths: [ConnectorAuth]
+    @Published public var onboardingSteps: [OnboardingStep]
+    @Published public var distributionTargets: [DistributionTarget]
+    @Published public var buildArtifacts: [BuildArtifact]
+    @Published public var vaultVariables: [VaultVariable]
+    @Published public var resourceQuotas: [ResourceQuota]
+    @Published public var configInstances: [ConfigInstance]
+    @Published public var testSuites: [TestSuite]
+    @Published public var recruitmentCampaigns: [RecruitmentCampaign]
+    @Published public var errorRegressions: [ErrorRegression]
+    @Published public var dependencyVulnerabilities: [DependencyVulnerability]
+    @Published public var localeAudits: [LocaleAudit]
+    @Published public var structuredLogs: [StructuredLog]
+    @Published public var trafficRequests: [TrafficRequest]
+    @Published public var schemaMigrations: [SchemaMigration]
+    @Published public var performanceTraces: [PerformanceTrace]
+    @Published public var canaryRollouts: [CanaryRollout]
 
     private let profileKey = "dev_portal_profile"
     private let appsKey = "dev_portal_apps"
@@ -73,6 +96,29 @@ public class DeveloperPersistentStore: ObservableObject {
     private let localizationKeysKey = "dev_portal_localization_keys"
     private let securityPoliciesKey = "dev_portal_security_policies"
     private let infrastructureNodesKey = "dev_portal_infrastructure_nodes"
+    private let storageNodesKey = "dev_portal_storage_nodes"
+    private let scopeTemplatesKey = "dev_portal_scope_templates"
+    private let betaTestersKey = "dev_portal_beta_testers"
+    private let betaFeedbackKey = "dev_portal_beta_feedback"
+    private let sdkArchitecturesKey = "dev_portal_sdk_architectures"
+    private let pluginPackagesKey = "dev_portal_plugin_packages"
+    private let connectorAuthsKey = "dev_portal_connector_auths"
+    private let onboardingStepsKey = "dev_portal_onboarding_steps"
+    private let distributionTargetsKey = "dev_portal_distribution_targets"
+    private let buildArtifactsKey = "dev_portal_build_artifacts"
+    private let vaultVariablesKey = "dev_portal_vault_variables"
+    private let resourceQuotasKey = "dev_portal_resource_quotas"
+    private let configInstancesKey = "dev_portal_config_instances"
+    private let testSuitesKey = "dev_portal_test_suites"
+    private let recruitmentCampaignsKey = "dev_portal_recruitment_campaigns"
+    private let errorRegressionsKey = "dev_portal_error_regressions"
+    private let dependencyVulnerabilitiesKey = "dev_portal_dependency_vulnerabilities"
+    private let localeAuditsKey = "dev_portal_locale_audits"
+    private let structuredLogsKey = "dev_portal_structured_logs"
+    private let trafficRequestsKey = "dev_portal_traffic_requests"
+    private let schemaMigrationsKey = "dev_portal_schema_migrations"
+    private let performanceTracesKey = "dev_portal_performance_traces"
+    private let canaryRolloutsKey = "dev_portal_canary_rollouts"
 
     private init() {
         self.profile = Self.load(DeveloperProfile.self, key: profileKey) ?? DeveloperProfile()
@@ -109,6 +155,29 @@ public class DeveloperPersistentStore: ObservableObject {
         self.localizationKeys = Self.load([LocalizationKey].self, key: localizationKeysKey) ?? []
         self.securityPolicies = Self.load([SecurityPolicy].self, key: securityPoliciesKey) ?? []
         self.infrastructureNodes = Self.load([InfrastructureNode].self, key: infrastructureNodesKey) ?? []
+        self.storageNodes = Self.load([StorageNode].self, key: storageNodesKey) ?? []
+        self.scopeTemplates = Self.load([ScopeTemplate].self, key: scopeTemplatesKey) ?? []
+        self.betaTesters = Self.load([BetaTester].self, key: betaTestersKey) ?? []
+        self.betaFeedback = Self.load([BetaFeedback].self, key: betaFeedbackKey) ?? []
+        self.sdkArchitectures = Self.load([SDKProjectArchitecture].self, key: sdkArchitecturesKey) ?? []
+        self.pluginPackages = Self.load([PluginPackage].self, key: pluginPackagesKey) ?? []
+        self.connectorAuths = Self.load([ConnectorAuth].self, key: connectorAuthsKey) ?? []
+        self.onboardingSteps = Self.load([OnboardingStep].self, key: onboardingStepsKey) ?? []
+        self.distributionTargets = Self.load([DistributionTarget].self, key: distributionTargetsKey) ?? []
+        self.buildArtifacts = Self.load([BuildArtifact].self, key: buildArtifactsKey) ?? []
+        self.vaultVariables = Self.load([VaultVariable].self, key: vaultVariablesKey) ?? []
+        self.resourceQuotas = Self.load([ResourceQuota].self, key: resourceQuotasKey) ?? []
+        self.configInstances = Self.load([ConfigInstance].self, key: configInstancesKey) ?? []
+        self.testSuites = Self.load([TestSuite].self, key: testSuitesKey) ?? []
+        self.recruitmentCampaigns = Self.load([RecruitmentCampaign].self, key: recruitmentCampaignsKey) ?? []
+        self.errorRegressions = Self.load([ErrorRegression].self, key: errorRegressionsKey) ?? []
+        self.dependencyVulnerabilities = Self.load([DependencyVulnerability].self, key: dependencyVulnerabilitiesKey) ?? []
+        self.localeAudits = Self.load([LocaleAudit].self, key: localeAuditsKey) ?? []
+        self.structuredLogs = Self.load([StructuredLog].self, key: structuredLogsKey) ?? []
+        self.trafficRequests = Self.load([TrafficRequest].self, key: trafficRequestsKey) ?? []
+        self.schemaMigrations = Self.load([SchemaMigration].self, key: schemaMigrationsKey) ?? []
+        self.performanceTraces = Self.load([PerformanceTrace].self, key: performanceTracesKey) ?? []
+        self.canaryRollouts = Self.load([CanaryRollout].self, key: canaryRolloutsKey) ?? []
     }
 
     private static func load<T: Decodable>(_ type: T.Type, key: String) -> T? {
@@ -297,6 +366,358 @@ public class DeveloperPersistentStore: ObservableObject {
     public func saveInfrastructureNodes(_ newNodes: [InfrastructureNode]) {
         save(newNodes, key: infrastructureNodesKey)
         self.infrastructureNodes = newNodes
+    }
+
+    public func saveStorageNodes(_ newNodes: [StorageNode]) {
+        save(newNodes, key: storageNodesKey)
+        self.storageNodes = newNodes
+    }
+
+    public func saveScopeTemplates(_ newTemplates: [ScopeTemplate]) {
+        save(newTemplates, key: scopeTemplatesKey)
+        self.scopeTemplates = newTemplates
+    }
+
+    public func saveBetaTesters(_ newTesters: [BetaTester]) {
+        save(newTesters, key: betaTestersKey)
+        self.betaTesters = newTesters
+    }
+
+    public func saveBetaFeedback(_ newFeedback: [BetaFeedback]) {
+        save(newFeedback, key: betaFeedbackKey)
+        self.betaFeedback = newFeedback
+    }
+
+    public func saveSDKArchitectures(_ newItems: [SDKProjectArchitecture]) { save(newItems, key: sdkArchitecturesKey); self.sdkArchitectures = newItems }
+    public func savePluginPackages(_ newItems: [PluginPackage]) { save(newItems, key: pluginPackagesKey); self.pluginPackages = newItems }
+    public func saveConnectorAuths(_ newItems: [ConnectorAuth]) { save(newItems, key: connectorAuthsKey); self.connectorAuths = newItems }
+    public func saveOnboardingSteps(_ newItems: [OnboardingStep]) { save(newItems, key: onboardingStepsKey); self.onboardingSteps = newItems }
+    public func saveDistributionTargets(_ newItems: [DistributionTarget]) { save(newItems, key: distributionTargetsKey); self.distributionTargets = newItems }
+    public func saveBuildArtifacts(_ newItems: [BuildArtifact]) { save(newItems, key: buildArtifactsKey); self.buildArtifacts = newItems }
+    public func saveVaultVariables(_ newItems: [VaultVariable]) { save(newItems, key: vaultVariablesKey); self.vaultVariables = newItems }
+    public func saveResourceQuotas(_ newItems: [ResourceQuota]) { save(newItems, key: resourceQuotasKey); self.resourceQuotas = newItems }
+    public func saveConfigInstances(_ newItems: [ConfigInstance]) { save(newItems, key: configInstancesKey); self.configInstances = newItems }
+    public func saveTestSuites(_ newItems: [TestSuite]) { save(newItems, key: testSuitesKey); self.testSuites = newItems }
+    public func saveRecruitmentCampaigns(_ newItems: [RecruitmentCampaign]) { save(newItems, key: recruitmentCampaignsKey); self.recruitmentCampaigns = newItems }
+    public func saveErrorRegressions(_ newItems: [ErrorRegression]) { save(newItems, key: errorRegressionsKey); self.errorRegressions = newItems }
+    public func saveDependencyVulnerabilities(_ newItems: [DependencyVulnerability]) { save(newItems, key: dependencyVulnerabilitiesKey); self.dependencyVulnerabilities = newItems }
+    public func saveLocaleAudits(_ newItems: [LocaleAudit]) { save(newItems, key: localeAuditsKey); self.localeAudits = newItems }
+    public func saveStructuredLogs(_ newItems: [StructuredLog]) { save(newItems, key: structuredLogsKey); self.structuredLogs = newItems }
+    public func saveTrafficRequests(_ newItems: [TrafficRequest]) { save(newItems, key: trafficRequestsKey); self.trafficRequests = newItems }
+    public func saveSchemaMigrations(_ newItems: [SchemaMigration]) { save(newItems, key: schemaMigrationsKey); self.schemaMigrations = newItems }
+    public func savePerformanceTraces(_ newItems: [PerformanceTrace]) { save(newItems, key: performanceTracesKey); self.performanceTraces = newItems }
+    public func saveCanaryRollouts(_ newItems: [CanaryRollout]) { save(newItems, key: canaryRolloutsKey); self.canaryRollouts = newItems }
+}
+
+public struct BetaFeedback: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var appID: UUID
+    public var version: String
+    public var type: String // CRASH, FEEDBACK
+    public var content: String
+    public var timestamp: Date
+
+    public init(id: UUID = UUID(), appID: UUID, version: String, type: String, content: String, timestamp: Date = Date()) {
+        self.id = id
+        self.appID = appID
+        self.version = version
+        self.type = type
+        self.content = content
+        self.timestamp = timestamp
+    }
+}
+
+public struct BetaTester: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var appID: UUID
+    public var email: String
+    public var status: String // Active, Invited
+    public var joinedAt: Date
+
+    public init(id: UUID = UUID(), appID: UUID, email: String, status: String = "Active", joinedAt: Date = Date()) {
+        self.id = id
+        self.appID = appID
+        self.email = email
+        self.status = status
+        self.joinedAt = joinedAt
+    }
+}
+
+public struct SDKProjectArchitecture: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var name: String
+    public var modules: [String]
+    public var dependencies: [String]
+
+    public init(id: UUID = UUID(), name: String, modules: [String] = [], dependencies: [String] = []) {
+        self.id = id
+        self.name = name
+        self.modules = modules
+        self.dependencies = dependencies
+    }
+}
+
+public struct PluginPackage: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var name: String
+    public var description: String
+    public var version: String
+
+    public init(id: UUID = UUID(), name: String, description: String, version: String) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.version = version
+    }
+}
+
+public struct ConnectorAuth: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var service: String
+    public var account: String
+    public var status: String
+
+    public init(id: UUID = UUID(), service: String, account: String, status: String) {
+        self.id = id
+        self.service = service
+        self.account = account
+        self.status = status
+    }
+}
+
+public struct OnboardingStep: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var title: String
+    public var isCompleted: Bool
+
+    public init(id: UUID = UUID(), title: String, isCompleted: Bool = false) {
+        self.id = id
+        self.title = title
+        self.isCompleted = isCompleted
+    }
+}
+
+public struct DistributionTarget: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var name: String
+    public var type: String
+    public var status: String
+
+    public init(id: UUID = UUID(), name: String, type: String, status: String) {
+        self.id = id
+        self.name = name
+        self.type = type
+        self.status = status
+    }
+}
+
+public struct BuildArtifact: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var version: String
+    public var build: String
+    public var filename: String
+    public var size: String
+
+    public init(id: UUID = UUID(), version: String, build: String, filename: String, size: String) {
+        self.id = id
+        self.version = version
+        self.build = build
+        self.filename = filename
+        self.size = size
+    }
+}
+
+public struct VaultVariable: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var key: String
+    public var value: String
+    public var isSecret: Bool
+
+    public init(id: UUID = UUID(), key: String, value: String, isSecret: Bool = false) {
+        self.id = id
+        self.key = key
+        self.value = value
+        self.isSecret = isSecret
+    }
+}
+
+public struct ResourceQuota: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var name: String
+    public var used: Double
+    public var total: Double
+    public var unit: String
+
+    public init(id: UUID = UUID(), name: String, used: Double, total: Double, unit: String) {
+        self.id = id
+        self.name = name
+        self.used = used
+        self.total = total
+        self.unit = unit
+    }
+}
+
+public struct ConfigInstance: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var name: String
+    public var version: String
+    public var syncStatus: String
+
+    public init(id: UUID = UUID(), name: String, version: String, syncStatus: String) {
+        self.id = id
+        self.name = name
+        self.version = version
+        self.syncStatus = syncStatus
+    }
+}
+
+public struct TestSuite: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var name: String
+    public var testCount: Int
+    public var lastResult: String
+
+    public init(id: UUID = UUID(), name: String, testCount: Int, lastResult: String) {
+        self.id = id
+        self.name = name
+        self.testCount = testCount
+        self.lastResult = lastResult
+    }
+}
+
+public struct RecruitmentCampaign: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var name: String
+    public var targetCount: Int
+    public var enrolledCount: Int
+    public var status: String
+
+    public init(id: UUID = UUID(), name: String, targetCount: Int, enrolledCount: Int = 0, status: String = "Active") {
+        self.id = id
+        self.name = name
+        self.targetCount = targetCount
+        self.enrolledCount = enrolledCount
+        self.status = status
+    }
+}
+
+public struct ErrorRegression: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var errorType: String
+    public var version: String
+    public var occurrences: Int
+    public var status: String
+
+    public init(id: UUID = UUID(), errorType: String, version: String, occurrences: Int, status: String) {
+        self.id = id
+        self.errorType = errorType
+        self.version = version
+        self.occurrences = occurrences
+        self.status = status
+    }
+}
+
+public struct DependencyVulnerability: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var package: String
+    public var version: String
+    public var severity: String
+    public var advisory: String
+
+    public init(id: UUID = UUID(), package: String, version: String, severity: String, advisory: String) {
+        self.id = id
+        self.package = package
+        self.version = version
+        self.severity = severity
+        self.advisory = advisory
+    }
+}
+
+public struct LocaleAudit: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var locale: String
+    public var coverage: Double
+    public var missingKeys: Int
+
+    public init(id: UUID = UUID(), locale: String, coverage: Double, missingKeys: Int) {
+        self.id = id
+        self.locale = locale
+        self.coverage = coverage
+        self.missingKeys = missingKeys
+    }
+}
+
+public struct StructuredLog: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var level: String
+    public var category: String
+    public var message: String
+    public var timestamp: Date
+
+    public init(id: UUID = UUID(), level: String, category: String, message: String, timestamp: Date = Date()) {
+        self.id = id
+        self.level = level
+        self.category = category
+        self.message = message
+        self.timestamp = timestamp
+    }
+}
+
+public struct TrafficRequest: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var method: String
+    public var path: String
+    public var status: Int
+    public var latency: String
+
+    public init(id: UUID = UUID(), method: String, path: String, status: Int, latency: String) {
+        self.id = id
+        self.method = method
+        self.path = path
+        self.status = status
+        self.latency = latency
+    }
+}
+
+public struct SchemaMigration: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var version: String
+    public var description: String
+    public var status: String
+
+    public init(id: UUID = UUID(), version: String, description: String, status: String) {
+        self.id = id
+        self.version = version
+        self.description = description
+        self.status = status
+    }
+}
+
+public struct PerformanceTrace: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var operation: String
+    public var duration: String
+    public var impact: String
+
+    public init(id: UUID = UUID(), operation: String, duration: String, impact: String) {
+        self.id = id
+        self.operation = operation
+        self.duration = duration
+        self.impact = impact
+    }
+}
+
+public struct CanaryRollout: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var feature: String
+    public var percentage: Double
+    public var status: String
+
+    public init(id: UUID = UUID(), feature: String, percentage: Double, status: String) {
+        self.id = id
+        self.feature = feature
+        self.percentage = percentage
+        self.status = status
     }
 }
 

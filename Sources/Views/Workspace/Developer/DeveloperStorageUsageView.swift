@@ -2,14 +2,9 @@ import SwiftUI
 
 struct DeveloperStorageUsageView: View {
     @ObservedObject var appService = DeveloperAppService.shared
+    @ObservedObject var storageService = StorageService.shared
     @State private var showingAddStorage = false
     @State private var selectedAppID: UUID?
-
-    let storageNodes: [StorageNode] = [
-        StorageNode(name: "Production Assets", type: "Object S3", usedSize: "120GB", totalSize: "500GB", usage: 0.24),
-        StorageNode(name: "Log Archive", type: "Cold Storage", usedSize: "22GB", totalSize: "500GB", usage: 0.04),
-        StorageNode(name: "Redis Cache", type: "In-Memory", usedSize: "4.2GB", totalSize: "16GB", usage: 0.26)
-    ]
 
     var body: some View {
         ScrollView {
@@ -25,8 +20,12 @@ struct DeveloperStorageUsageView: View {
                         }
                     }
 
-                    ForEach(storageNodes) { node in
-                        storageCard(node)
+                    if storageService.storageNodes.isEmpty {
+                        EmptyStateView(icon: "archivebox", title: "No Storage", message: "Provision your first storage instance.")
+                    } else {
+                        ForEach(storageService.storageNodes) { node in
+                            storageCard(node)
+                        }
                     }
                 }
                 .padding()
@@ -36,7 +35,13 @@ struct DeveloperStorageUsageView: View {
         .navigationTitle("Storage")
         .alert("Provision Storage", isPresented: $showingAddStorage) {
             Button("Cancel", role: .cancel) { }
-            Button("Provision 10GB") { /* logic */ }
+            Button("Provision 10GB") {
+                if let appID = selectedAppID {
+                    Task {
+                        try? await storageService.provisionStorage(appID: appID, name: "New Storage", type: "Block Storage", sizeGB: 10)
+                    }
+                }
+            }
         } message: {
             Text("Select an application and size to provision additional block storage capacity.")
         }
@@ -57,12 +62,12 @@ struct DeveloperStorageUsageView: View {
             }
 
             HStack(spacing: 32) {
-                storageMetric(label: "Used", value: "146.2 GB", color: .purple)
-                storageMetric(label: "Total Cap", value: "1,016 GB", color: .secondary)
-                storageMetric(label: "Avg Load", value: "14%", color: .blue)
+                storageMetric(label: "Used", value: "0 GB", color: .purple)
+                storageMetric(label: "Total Cap", value: "\(storageService.storageNodes.count * 10) GB", color: .secondary)
+                storageMetric(label: "Avg Load", value: "0%", color: .blue)
             }
 
-            ProgressView(value: 0.14)
+            ProgressView(value: 0.0)
                 .tint(.purple)
         }
         .padding()
@@ -107,13 +112,4 @@ struct DeveloperStorageUsageView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.05), lineWidth: 1))
     }
-}
-
-struct StorageNode: Identifiable {
-    let id = UUID()
-    let name: String
-    let type: String
-    let usedSize: String
-    let totalSize: String
-    let usage: Double
 }

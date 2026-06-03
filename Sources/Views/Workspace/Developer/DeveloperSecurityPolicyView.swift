@@ -42,8 +42,15 @@ struct DeveloperSecurityPolicyView: View {
             }
 
             Section("Policy Management") {
-                Button { /* sync policies */ } label: { Label("Sync Global Policies", systemImage: "arrow.triangle.2.circlepath") }
-                Button { /* audit report */ } label: { Label("Generate Compliance PDF", systemImage: "doc.text.fill") }
+                Button {
+                    Task {
+                        try? await policyService.syncPolicies()
+                    }
+                } label: { Label("Sync Global Policies", systemImage: "arrow.triangle.2.circlepath") }
+                Button {
+                    // Simulating report generation
+                    let _ = DeveloperPersistentStore.shared.activities.append(DeveloperActivityEvent(type: .securityAuditPerformed, appName: "Security Report Generated"))
+                } label: { Label("Generate Compliance PDF", systemImage: "doc.text.fill") }
             }
         }
         .navigationTitle("Security Policies")

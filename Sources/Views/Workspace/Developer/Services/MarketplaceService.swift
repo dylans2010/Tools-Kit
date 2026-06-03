@@ -122,4 +122,15 @@ public class MarketplaceService: ObservableObject {
             }
         }
     }
+
+    public func resubmit(submissionID: UUID) async throws {
+        var currentSubmissions = store.submissions
+        if let index = currentSubmissions.firstIndex(where: { $0.id == submissionID }) {
+            currentSubmissions[index].status = .pendingReview
+            currentSubmissions[index].statusHistory.append(SubmissionStatusEvent(status: .pendingReview, reason: "Resubmitted by developer after addressing feedback."))
+            store.saveSubmissions(currentSubmissions)
+            let updatedSubmissions = currentSubmissions
+            await MainActor.run { self.submissions = updatedSubmissions }
+        }
+    }
 }

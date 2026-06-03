@@ -53,26 +53,28 @@ struct DeveloperBetaTestingView: View {
     private func groupsView(appID: UUID) -> some View {
         List {
             Section("Testing Groups") {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Internal QA").font(.subheadline.bold())
-                        Spacer()
-                        Text("12 Testers").font(.caption).foregroundStyle(.secondary)
+                let groups = DeveloperPersistentStore.shared.betaGroups.filter { $0.appID == appID }
+                if groups.isEmpty {
+                    Text("No testing groups defined.").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(groups) { group in
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text(group.name).font(.subheadline.bold())
+                                Spacer()
+                                Text("\(group.testerEmails.count) Testers").font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
                     }
-                    Text("Auto-provisioned for every build.").font(.caption2).foregroundStyle(.secondary)
-                }
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Public Beta").font(.subheadline.bold())
-                        Spacer()
-                        Text("248 Testers").font(.caption).foregroundStyle(.secondary)
-                    }
-                    Text("Manual enrollment via public link.").font(.caption2).foregroundStyle(.secondary)
                 }
             }
 
             Section {
-                Button { /* group creation logic */ } label: {
+                Button {
+                    var current = DeveloperPersistentStore.shared.betaGroups
+                    current.append(BetaGroup(appID: appID, name: "New Group"))
+                    DeveloperPersistentStore.shared.saveBetaGroups(current)
+                } label: {
                     Label("Create Testing Group", systemImage: "person.3.badge.plus")
                 }
             }
@@ -82,15 +84,19 @@ struct DeveloperBetaTestingView: View {
     private func testersView(appID: UUID) -> some View {
         List {
             Section("Active Testers") {
-                // In a production app, this would fetch from a BetaTesterService
-                ForEach(0..<5) { i in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text("tester\(i)@example.com").font(.subheadline.bold())
-                            Text("Active since \(Date().addingTimeInterval(-Double(i)*86400).formatted(date: .abbreviated, time: .omitted))").font(.caption2).foregroundStyle(.secondary)
+                let testers = DeveloperPersistentStore.shared.betaTesters.filter { $0.appID == appID }
+                if testers.isEmpty {
+                    Text("No beta testers invited.").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(testers) { tester in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(tester.email).font(.subheadline.bold())
+                                Text("Active since \(tester.joinedAt.formatted(date: .abbreviated, time: .omitted))").font(.caption2).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Circle().fill(.green).frame(width: 8, height: 8)
                         }
-                        Spacer()
-                        Circle().fill(.green).frame(width: 8, height: 8)
                     }
                 }
             }
@@ -106,22 +112,26 @@ struct DeveloperBetaTestingView: View {
     private func feedbackView(appID: UUID) -> some View {
         List {
             Section("Incoming Reports") {
-                ForEach(0..<3) { i in
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("v1.2.0 (4\(i))").font(.caption.bold()).foregroundStyle(.secondary)
-                            Spacer()
-                            Text(i == 0 ? "CRASH" : "FEEDBACK").font(.system(size: 8, weight: .black))
-                                .padding(.horizontal, 6).padding(.vertical, 2)
-                                .background(i == 0 ? Color.red.opacity(0.1) : Color.blue.opacity(0.1))
-                                .foregroundStyle(i == 0 ? .red : .blue)
-                                .clipShape(Capsule())
+                let feedbacks = DeveloperPersistentStore.shared.betaFeedback.filter { $0.appID == appID }
+                if feedbacks.isEmpty {
+                    Text("No feedback reports received yet.").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(feedbacks) { report in
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text(report.version).font(.caption.bold()).foregroundStyle(.secondary)
+                                Spacer()
+                                Text(report.type).font(.system(size: 8, weight: .black))
+                                    .padding(.horizontal, 6).padding(.vertical, 2)
+                                    .background(report.type == "CRASH" ? Color.red.opacity(0.1) : Color.blue.opacity(0.1))
+                                    .foregroundStyle(report.type == "CRASH" ? .red : .blue)
+                                    .clipShape(Capsule())
+                            }
+                            Text(report.content).font(.subheadline)
+                            Text("Reported by tester • \(report.timestamp.formatted(date: .abbreviated, time: .shortened))").font(.system(size: 8)).foregroundStyle(.tertiary)
                         }
-                        Text(i == 0 ? "Unexpected signal SIGABRT on startup." : "The new UI layout is much cleaner, but the font size on labels is a bit small.")
-                            .font(.subheadline)
-                        Text("Reported by tester • \(i+1)h ago").font(.system(size: 8)).foregroundStyle(.tertiary)
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
                 }
             }
         }
@@ -147,7 +157,9 @@ struct AddTesterSheet: View {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Invite") {
-                        // send invitation logic
+                        var current = DeveloperPersistentStore.shared.betaTesters
+                        current.append(BetaTester(appID: appID, email: email))
+                        DeveloperPersistentStore.shared.saveBetaTesters(current)
                         dismiss()
                     }.disabled(!email.contains("@") || !email.contains("."))
                 }
