@@ -1,5 +1,25 @@
 import SwiftUI
 
+private class StorageService: ObservableObject {
+    static let shared = StorageService()
+    @Published var totalUsed: Int64 = 0
+    @Published var totalAvailable: Int64 = 0
+    @Published var breakdown: [StorageCategory] = []
+    @Published var storageNodes: [StorageNode] = []
+
+    private init() {}
+
+    func refresh() { }
+
+    func provisionStorage(appID: UUID, name: String, type: String, sizeGB: Int) async throws { }
+}
+
+private struct StorageCategory: Identifiable, Hashable {
+    let id = UUID()
+    var label: String
+    var bytes: Int64
+}
+
 struct DeveloperStorageUsageView: View {
     @ObservedObject var appService = DeveloperAppService.shared
     @ObservedObject var storageService = StorageService.shared
