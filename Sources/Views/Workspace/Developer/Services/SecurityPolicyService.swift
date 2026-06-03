@@ -29,4 +29,13 @@ public class SecurityPolicyService: ObservableObject {
         await MainActor.run { self.policies = updatedPolicies }
     }
 
+    public func syncPolicies() async throws {
+        let defaultPolicies = [
+            SecurityPolicy(name: "SSL Enforcement", description: "All endpoints must use TLS 1.3", isCompliant: true),
+            SecurityPolicy(name: "Data Encryption", description: "At-rest encryption for all databases", isCompliant: true),
+            SecurityPolicy(name: "Access Control", description: "MFA required for administrative access", isCompliant: false)
+        ]
+        store.saveSecurityPolicies(defaultPolicies)
+        await MainActor.run { self.policies = defaultPolicies }
+    }
 }

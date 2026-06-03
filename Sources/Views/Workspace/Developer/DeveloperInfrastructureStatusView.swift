@@ -102,11 +102,16 @@ struct DeveloperInfrastructureStatusView: View {
             SectionHeader(title: "Traffic Insights", subtitle: nil, icon: "chart.bar.fill")
 
             HStack(alignment: .bottom, spacing: 4) {
-                ForEach(0..<20, id: \.self) { _ in
-                    RoundedRectangle(cornerRadius: 1)
-                        .fill(Color.blue.opacity(0.4))
-                        .frame(height: 20)
-                        .frame(maxWidth: .infinity)
+                let metrics = DeveloperPersistentStore.shared.performanceMetrics.prefix(20)
+                if metrics.isEmpty {
+                    Text("No traffic data available.").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(Array(metrics.enumerated()), id: \.offset) { _, metric in
+                        RoundedRectangle(cornerRadius: 1)
+                            .fill(Color.blue.opacity(0.4))
+                            .frame(height: CGFloat(max(5, metric.value)))
+                            .frame(maxWidth: .infinity)
+                    }
                 }
             }
             .frame(height: 40)

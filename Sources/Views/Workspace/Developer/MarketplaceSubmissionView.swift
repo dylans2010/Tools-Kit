@@ -93,7 +93,7 @@ struct MarketplaceSubmissionView: View {
             VStack(alignment: .leading, spacing: 20) {
                 SectionHeader(title: "Visual Assets", subtitle: nil, icon: nil)
 
-                submissionField(label: "Icon URL (512x512 PNG)", text: $draft.assets.iconURL, hint: "URL to your app icon")
+                submissionField(label: "Icon URL (512x512 PNG)", text: $draft.assets.iconURL, hint: "https://cdn.internal/icon.png")
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Screenshots (URLs, one per line)").font(.caption.bold()).foregroundStyle(.secondary)
@@ -162,7 +162,8 @@ struct MarketplaceSubmissionView: View {
                     reviewRow(label: "App Title", value: draft.metadata.title)
                     reviewRow(label: "Version", value: draft.technicalDetails.version)
                     reviewRow(label: "Support Email", value: draft.supportConfig.supportEmail)
-                    reviewRow(label: "Screenshots", value: "\(draft.assets.screenshotURLs.count)")
+                    let screenshots = draft.assets.screenshotURLs.filter { !$0.isEmpty }
+                    reviewRow(label: "Screenshots", value: "\(screenshots.count)")
                 }
                 .padding()
                 .background(Color.secondary.opacity(0.05))

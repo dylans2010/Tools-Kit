@@ -3,11 +3,7 @@ import SwiftUI
 struct ScopeTemplatesView: View {
     @ObservedObject var scopeService = DeveloperScopeService.shared
     @State private var showingAddTemplate = false
-    @State private var templates: [ScopeTemplate] = [
-        ScopeTemplate(name: "Basic Identity", scopeIdentifiers: ["user.read", "user.email"]),
-        ScopeTemplate(name: "Data Analytics", scopeIdentifiers: ["analytics.read", "logs.view"]),
-        ScopeTemplate(name: "System Management", scopeIdentifiers: ["system.write", "network.admin"])
-    ]
+    @State private var newTemplateName = ""
 
     var body: some View {
         ScrollView {
@@ -26,6 +22,7 @@ struct ScopeTemplatesView: View {
             }
 
             Section("Active Templates") {
+                let templates = DeveloperPersistentStore.shared.scopeTemplates
                 if templates.isEmpty {
                     EmptyStateView(icon: "square.stack", title: "No Templates", message: "Create a template to quickly apply specific sets of permissions to your projects.")
                 } else {
@@ -55,5 +52,17 @@ struct ScopeTemplatesView: View {
             .padding()
         }
         .navigationTitle("Scope Templates")
+        .alert("New Template", isPresented: $showingAddTemplate) {
+            TextField("Template Name", text: $newTemplateName)
+            Button("Cancel", role: .cancel) { }
+            Button("Create") {
+                var current = DeveloperPersistentStore.shared.scopeTemplates
+                current.append(ScopeTemplate(name: newTemplateName, scopeIdentifiers: ["identity.read"]))
+                DeveloperPersistentStore.shared.saveScopeTemplates(current)
+                newTemplateName = ""
+            }
+        } message: {
+            Text("Enter a name for the new permission set template.")
+        }
     }
 }

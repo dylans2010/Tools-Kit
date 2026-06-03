@@ -24,7 +24,7 @@ struct SandboxEnvironmentView: View {
             if isSandboxMode {
                 Section("Sandbox Configuration") {
                     HStack {
-                        Text("Mock API Server")
+                        Text("Sandbox API Server")
                         Spacer()
                         Text("https://sandbox.api.internal").font(.caption.monospaced()).foregroundStyle(.secondary)
                     }
@@ -46,7 +46,11 @@ struct SandboxEnvironmentView: View {
         }
         .navigationTitle("Runtime Environment")
         .confirmationDialog("Reset Sandbox?", isPresented: $showingReset) {
-            Button("Reset Everything", role: .destructive) { /* reset */ }
+            Button("Reset Everything", role: .destructive) {
+                DeveloperPersistentStore.shared.saveApps([])
+                DeveloperPersistentStore.shared.saveKeys([])
+                DeveloperPersistentStore.shared.saveWebhooks([])
+            }
         } message: {
             Text("This will permanently clear all data associated with your sandbox session.")
         }
