@@ -11,44 +11,104 @@ struct MarketplaceReviewFeedbackView: View {
     }
 
     var body: some View {
-        List {
-            if let sub = submission {
-                Section("Submission Status") {
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(sub.metadata.title).font(.subheadline.bold())
-                            Text("Submitted \(sub.submittedAt.formatted(date: .abbreviated, time: .omitted))").font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        statusBadge(sub.status)
-                    }
-                }
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    if let sub = submission {
+                        // Submission Status Section
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Submission Status")
+                                .font(.headline)
 
-                Section("Reviewer Notes") {
-                    if sub.reviewFeedback.isEmpty {
-                        EmptyStateView(icon: "checkmark.seal", title: "No Issues Found", message: "Your submission is currently in the queue for review.")
-                    } else {
-                        ForEach(sub.reviewFeedback) { item in
-                            feedbackRow(item)
-                        }
-                    }
-                }
-
-                if sub.status == .rejected {
-                    Section("Action Required") {
-                        Text("Address the blocking items above and resubmit your application for a follow-up audit.").font(.caption).foregroundStyle(.secondary)
-                        Button {
-                            Task {
-                                try? await MarketplaceService.shared.resubmit(submissionID: submission.id)
+                            Section {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(sub.metadata.title)
+                                            .font(.subheadline.bold())
+                                        Text("Submitted \(sub.submittedAt.formatted(date: .abbreviated, time: .omitted))")
+                                            .font(.caption)
+                                    }
+                                    Spacer()
+                                    statusBadge(sub.status)
+                                }
+                                .padding()
                             }
-                        } label: {
-                            Text("Resubmit for Review").font(.subheadline.bold())
+                        }
+
+                        Divider()
+
+                        // Reviewer Notes Section
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Reviewer Notes")
+                                .font(.headline)
+
+                            Section {
+                                if sub.reviewFeedback.isEmpty {
+                                    VStack(spacing: 20) {
+                                        Image(systemName: "checkmark.seal")
+                                            .font(.system(size: 52, weight: .light))
+                                        VStack(spacing: 6) {
+                                            Text("No Issues Found")
+                                                .font(.title3.bold())
+                                            Text("Your submission is currently in the queue for review.")
+                                                .font(.subheadline)
+                                                .multilineTextAlignment(.center)
+                                                .padding(.horizontal, 32)
+                                        }
+                                    }
+                                    .padding(.vertical, 40)
+                                } else {
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        ForEach(sub.reviewFeedback) { item in
+                                            feedbackRow(item)
+                                            if item.id != sub.reviewFeedback.last?.id {
+                                                Divider()
+                                                    .padding(.vertical, 12)
+                                            }
+                                        }
+                                    }
+                                    .padding()
+                                }
+                            }
+                        }
+
+                        if sub.status == .rejected {
+                            Divider()
+
+                            // Action Required Section
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Action Required")
+                                    .font(.headline)
+
+                                Section {
+                                    VStack(alignment: .leading, spacing: 16) {
+                                        Text("Address the blocking items above and resubmit your application for a follow-up audit.")
+                                            .font(.caption)
+
+                                        Button {
+                                            Task {
+                                                try? await MarketplaceService.shared.resubmit(submissionID: sub.id)
+                                            }
+                                        } label: {
+                                            HStack {
+                                                Spacer()
+                                                Text("Resubmit for Review")
+                                                    .font(.subheadline.bold())
+                                                Spacer()
+                                            }
+                                            .padding()
+                                        }
+                                    }
+                                    .padding()
+                                }
+                            }
                         }
                     }
                 }
+                .padding()
             }
+            .navigationTitle("Review Audit")
         }
-        .navigationTitle("Review Audit")
         .sheet(isPresented: Binding(
             get: { respondingToID != nil },
             set: { if !$0 { respondingToID = nil } }
