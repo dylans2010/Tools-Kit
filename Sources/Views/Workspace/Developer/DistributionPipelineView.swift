@@ -6,54 +6,75 @@ struct DistributionPipelineView: View {
     var body: some View {
         List {
             Section("Configured Pipelines") {
-                if store.distributionTargets.isEmpty {
-                    Text("No pipelines configured.").font(.caption).foregroundStyle(.secondary)
-                } else {
-                    ForEach(store.distributionTargets) { target in
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text(target.name).font(.subheadline.bold())
-                                Spacer()
-                                statusBadge(target.status)
-                            }
-                            Text(target.type).font(.caption).foregroundStyle(.secondary)
-
-                            HStack {
-                                Button("Deploy Now") {
-                                    var current = store.activities
-                                    current.append(DeveloperActivityEvent(type: .releaseCreated, appName: "Deployed to \(target.name)"))
-                                    store.saveActivities(current)
-                                }
-                                .font(.caption.bold())
-                                .buttonStyle(.bordered)
-                                Button("Settings") { }
-                                    .font(.caption.bold())
-                                    .buttonStyle(.bordered)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
+                pipelineList
             }
 
             Section {
-                Button {
-                    var current = store.distributionTargets
-                    current.append(DistributionTarget(name: "TestFlight", type: "Beta", status: "Pending"))
-                    store.saveDistributionTargets(current)
-                } label: {
-                    Label("Add Distribution Channel", systemImage: "plus.circle")
-                }
+                addPipelineButton
             }
         }
         .navigationTitle("Distribution")
         .onAppear {
-            if store.distributionTargets.isEmpty {
-                store.saveDistributionTargets([
-                    DistributionTarget(name: "Internal Alpha", type: "Enterprise", status: "Active"),
-                    DistributionTarget(name: "App Store", type: "Public", status: "Ready")
-                ])
+            initialSetup()
+        }
+    }
+
+    @ViewBuilder
+    private var pipelineList: some View {
+        if store.distributionTargets.isEmpty {
+            Text("No pipelines configured.").font(.caption).foregroundStyle(.secondary)
+        } else {
+            ForEach(store.distributionTargets) { target in
+                targetRow(for: target)
             }
+        }
+    }
+
+    private func targetRow(for target: DistributionTarget) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(target.name).font(.subheadline.bold())
+                Spacer()
+                statusBadge(target.status)
+            }
+            Text(target.type).font(.caption).foregroundStyle(.secondary)
+
+            HStack {
+                Button("Deploy Now") {
+                    deploy(to: target)
+                }
+                .font(.caption.bold())
+                .buttonStyle(.bordered)
+                Button("Settings") { }
+                    .font(.caption.bold())
+                    .buttonStyle(.bordered)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var addPipelineButton: some View {
+        Button {
+            var current = store.distributionTargets
+            current.append(DistributionTarget(name: "TestFlight", type: "Beta", status: "Pending"))
+            store.saveDistributionTargets(current)
+        } label: {
+            Label("Add Distribution Channel", systemImage: "plus.circle")
+        }
+    }
+
+    private func deploy(to target: DistributionTarget) {
+        var current = store.activities
+        current.append(DeveloperActivityEvent(eventType: .appUpdated, sourceAppName: "Deployed to \(target.name)"))
+        store.saveActivities(current)
+    }
+
+    private func initialSetup() {
+        if store.distributionTargets.isEmpty {
+            store.saveDistributionTargets([
+                DistributionTarget(name: "Internal Alpha", type: "Enterprise", status: "Active"),
+                DistributionTarget(name: "App Store", type: "Public", status: "Ready")
+            ])
         }
     }
 

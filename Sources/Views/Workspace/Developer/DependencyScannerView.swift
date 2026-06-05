@@ -22,7 +22,7 @@ struct DependencyScannerView: View {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             isScanning = false
                             var current = store.activities
-                            current.append(DeveloperActivityEvent(type: .securityAuditPerformed, appName: "Dependency Scan Completed"))
+                            current.append(DeveloperActivityEvent(eventType: .appUpdated, sourceAppName: "Dependency Scan Completed"))
                             store.saveActivities(current)
                         }
                     }
