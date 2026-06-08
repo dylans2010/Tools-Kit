@@ -542,7 +542,6 @@
 		AS0200000000000000000027 /* KeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000027 /* KeyboardObserver.swift */; };
 		AS0200000000000000000028 /* KeyboardGlowModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000028 /* KeyboardGlowModifier.swift */; };
 		AS0200000000000000000029 /* DualKeyboardInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000029 /* DualKeyboardInputView.swift */; };
-		AS0200000000000000000030 /* KeyboardBackdropManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000030 /* KeyboardBackdropManager.swift */; };
 		AS0200000000000000000002 /* SlideCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000002 /* SlideCanvasView.swift */; };
 		AS0200000000000000000003 /* WhiteboardsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000003 /* WhiteboardsHomeView.swift */; };
 		AS0200000000000000000004 /* WhiteboardCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000004 /* WhiteboardCanvasView.swift */; };
@@ -2305,7 +2304,6 @@
 		DA020000000000000000007D /* ResourceCLIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007D /* ResourceCLIManager.swift */; };
 		DA020000000000000000007E /* DeveloperCLIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007E /* DeveloperCLIManager.swift */; };
 		DA020000000000000000007F /* DeveloperCLIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007F /* DeveloperCLIView.swift */; };
-		 = {isa = PBXBuildFile; fileRef = ; };
 		FB0200000000000000000000 /* AIAnalysisResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000000 /* AIAnalysisResult.swift */; };
 		FB0200000000000000000001 /* AIAnalysisService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000001 /* AIAnalysisService.swift */; };
 		FB0200000000000000000002 /* DiagnosticsCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000002 /* DiagnosticsCenterView.swift */; };
@@ -3171,7 +3169,6 @@
 		AS0100000000000000000027 /* KeyboardObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObserver.swift; sourceTree = "<group>"; };
 		AS0100000000000000000028 /* KeyboardGlowModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardGlowModifier.swift; sourceTree = "<group>"; };
 		AS0100000000000000000029 /* DualKeyboardInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualKeyboardInputView.swift; sourceTree = "<group>"; };
-		AS0100000000000000000030 /* KeyboardBackdropManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardBackdropManager.swift; sourceTree = "<group>"; };
 		AS0100000000000000000002 /* SlideCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideCanvasView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000003 /* WhiteboardsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardsHomeView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000004 /* WhiteboardCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardCanvasView.swift; sourceTree = "<group>"; };
@@ -3424,6 +3421,7 @@
 		8DD5F94EC0F04247BCF4B43C /* workspace_snapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = workspace_snapshot.swift; sourceTree = "<group>"; };
 		6913648A93B54B718A248998 /* save_memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = save_memory.swift; sourceTree = "<group>"; };
 		E9EE4711716F40128E0770BE /* event_replay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = event_replay.swift; sourceTree = "<group>"; };
+		VT0100000000000000000001 /* ValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationTests.swift; sourceTree = "<group>"; };
 		GH0100000000000000000050 /* GitHubValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubValidationTests.swift; sourceTree = "<group>"; };
 		KB0100000000000000000050 /* KeyboardValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardValidationTests.swift; sourceTree = "<group>"; };
 		KB0100000000000000000001 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
@@ -3968,12 +3966,12 @@
 		SK010006 /* SkillPickerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/SkillPickerModifier.swift"; sourceTree = "<group>"; };
 		C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
 		PL010000000000000000000038 /* SDKUIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKUIComponents.swift; sourceTree = "<group>"; };
-		A00100000000000000000201 /* CustomGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/CustomGlow.swift"; sourceTree = "<group>"; };
-		A00100000000000000000202 /* HeroGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/HeroGlow.swift"; sourceTree = "<group>"; };
-		A00100000000000000000203 /* LiveTuningGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/LiveTuningGlow.swift"; sourceTree = "<group>"; };
-		A00100000000000000000204 /* MoodGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/MoodGlow.swift"; sourceTree = "<group>"; };
-		A00100000000000000000205 /* WashGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/WashGlow.swift"; sourceTree = "<group>"; };
-		A00100000000000000000206 /* AIAnimationCoreModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/AIAnimationCoreModifier.swift"; sourceTree = "<group>"; };
+		A00100000000000000000201 /* CustomGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomGlow.swift; sourceTree = "<group>"; };
+		A00100000000000000000202 /* HeroGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroGlow.swift; sourceTree = "<group>"; };
+		A00100000000000000000203 /* LiveTuningGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveTuningGlow.swift; sourceTree = "<group>"; };
+		A00100000000000000000204 /* MoodGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodGlow.swift; sourceTree = "<group>"; };
+		A00100000000000000000205 /* WashGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WashGlow.swift; sourceTree = "<group>"; };
+		A00100000000000000000206 /* AIAnimationCoreModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAnimationCoreModifier.swift; sourceTree = "<group>"; };
 		AS0100000000000000000031 /* AIGenSlidesPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Workspace/Slides/AIGenSlidesPreview.swift"; sourceTree = SOURCE_ROOT; };
 		WGE4FAEB1B3B0687077929DE /* WorkspaceGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceGraph.swift; sourceTree = "<group>"; };
 		MDC64B1890CDC5D4E894FB64 /* AgenticModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticModels.swift; sourceTree = "<group>"; };
@@ -4625,7 +4623,6 @@
 		DA010000000000000000007D /* ResourceCLIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ResourceCLIManager.swift; path = Sources/Views/Workspace/Developer/CLI/Managers/ResourceCLIManager.swift; sourceTree = SOURCE_ROOT; };
 		DA010000000000000000007E /* DeveloperCLIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeveloperCLIManager.swift; path = Sources/Views/Workspace/Developer/CLI/Managers/DeveloperCLIManager.swift; sourceTree = SOURCE_ROOT; };
 		DA010000000000000000007F /* DeveloperCLIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeveloperCLIView.swift; path = Sources/Views/Workspace/Developer/CLI/DeveloperCLIView.swift; sourceTree = SOURCE_ROOT; };
-		 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackModels.swift; sourceTree = "<group>"; };
 		FB0100000000000000000000 /* AIAnalysisResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAnalysisResult.swift; sourceTree = "<group>"; };
 		FB0100000000000000000001 /* AIAnalysisService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAnalysisService.swift; sourceTree = "<group>"; };
 		FB0100000000000000000002 /* DiagnosticsCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsCenterView.swift; sourceTree = "<group>"; };
@@ -5741,7 +5738,6 @@
 				AS0100000000000000000027 /* KeyboardObserver.swift */,
 				AS0100000000000000000028 /* KeyboardGlowModifier.swift */,
 				AS0100000000000000000029 /* DualKeyboardInputView.swift */,
-				AS0100000000000000000030 /* KeyboardBackdropManager.swift */,
 			);
 			path = Slides;
 			sourceTree = "<group>";
@@ -7292,6 +7288,7 @@
 		71D3E35B33BA454DAF05CEBC /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				VT0100000000000000000001 /* ValidationTests.swift */,
 				GH0100000000000000000050 /* GitHubValidationTests.swift */,
 				KB0100000000000000000050 /* KeyboardValidationTests.swift */,
 			);
@@ -8454,6 +8451,7 @@
 			);
 			path = "Internal Demos";
 			sourceTree = "<group>";
+		};
 		A00300000000000000000200 /* Structs */ = {
 			isa = PBXGroup;
 			children = (
@@ -8466,7 +8464,6 @@
 			);
 			path = Structs;
 			sourceTree = "<group>";
-		};
 		};
 		9D3BFD7FE51B493F849CDF84 /* Models */ = {
 			isa = PBXGroup;
@@ -8975,36 +8972,6 @@
 			children = (
 			);
 			path = DiffChecker;
-			sourceTree = "<group>";
-		};
-			isa = PBXGroup;
-			children = (
-																											);
-			path = Models;
-			sourceTree = "<group>";
-		};
-			isa = PBXGroup;
-			children = (
-							);
-			path = Services;
-			sourceTree = "<group>";
-		};
-			isa = PBXGroup;
-			children = (
-							);
-			path = Managers;
-			sourceTree = "<group>";
-		};
-			isa = PBXGroup;
-			children = (
-																	);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
-			isa = PBXGroup;
-			children = (
-																													);
-			path = Views;
 			sourceTree = "<group>";
 		};
 
@@ -10011,14 +9978,6 @@
 				628852DC88534BF189477586 /* XMLFormatterView.swift */,
 			);
 			path = XMLFormatter;
-			sourceTree = "<group>";
-		};
-		CL010000000000000000001F /* Collaboration */ = {
-			isa = PBXGroup;
-			children = (
-				2054E7AF12EB68C41BECE760 /* GitEngineService.swift */,
-			);
-			path = Collaboration;
 			sourceTree = "<group>";
 		};
 		D017FA3135814C6CA95F8E4D /* SecureFileSender */ = {
@@ -13448,7 +13407,6 @@
 				FB020000000000000000001f /* SubmissionsView.swift in Sources */,
 				FB0200000000000000000020 /* SubmissionsViewModel.swift in Sources */,
 				FB0200000000000000000021 /* SyncManager.swift in Sources */,
-				,
 																																														DA02B9999999 /* StorageNode.swift in Sources */,
 				DA02B0000000013 /* CanaryRolloutView.swift in Sources */,
 				DA02B0000000012 /* PerformanceProfilingView.swift in Sources */,
@@ -13635,78 +13593,6 @@
 				3C4BA717BB4E4B2D8FEE73D2 /* NotebookMindMapGeneratorView.swift in Sources */,
 				6A9D90D2F3D24941ADE70DEB /* NotebookFlashcardGeneratorView.swift in Sources */,
 				BF8785E0E1A648C88279E678 /* NotebookReferenceManagerView.swift in Sources */,
-				D7EA7C19718145D08B63A28D /* D7EA7C19718145D08B63A28D in sources */,
-				96DDA9BD50244EF6907E96B4 /* 96DDA9BD50244EF6907E96B4 in sources */,
-				2242FF4E64804717A66B3045 /* 2242FF4E64804717A66B3045 in sources */,
-				256D0C413C734C0183912231 /* 256D0C413C734C0183912231 in sources */,
-				D5471DF20CF9437CBC29A247 /* D5471DF20CF9437CBC29A247 in sources */,
-				09848D0E33A145C3AA5A5DFA /* 09848D0E33A145C3AA5A5DFA in sources */,
-				9AEF4042C0AF42998A3BB6E4 /* 9AEF4042C0AF42998A3BB6E4 in sources */,
-				75370F0157DD4BB486985DD6 /* 75370F0157DD4BB486985DD6 in sources */,
-				3173C6ED19C24E4BB08FA2E1 /* 3173C6ED19C24E4BB08FA2E1 in sources */,
-				D394F270664C4352B56442A8 /* D394F270664C4352B56442A8 in sources */,
-				559C5DDC43A94F75B19768CB /* 559C5DDC43A94F75B19768CB in sources */,
-				8D7D4D1C78F5437397E02482 /* 8D7D4D1C78F5437397E02482 in sources */,
-				BA247780FD8D4D6EB29472A3 /* BA247780FD8D4D6EB29472A3 in sources */,
-				412CEF7F17114D7E9D0AAE06 /* 412CEF7F17114D7E9D0AAE06 in sources */,
-				DCF477D56E4443359EE28D60 /* DCF477D56E4443359EE28D60 in sources */,
-				0D763984EBCB4A7988857995 /* 0D763984EBCB4A7988857995 in sources */,
-				2EEBB4BE26F54F9A972F64FB /* 2EEBB4BE26F54F9A972F64FB in sources */,
-				334028A30798400DB05ACC48 /* 334028A30798400DB05ACC48 in sources */,
-				4B37FC095A4F463894DE173A /* 4B37FC095A4F463894DE173A in sources */,
-				13F8A974F3E944E7BF13ED6C /* 13F8A974F3E944E7BF13ED6C in sources */,
-				836AC6046ECF41DE9B094F5B /* 836AC6046ECF41DE9B094F5B in sources */,
-				E06A88F4D7EB4C6181FFA181 /* E06A88F4D7EB4C6181FFA181 in sources */,
-				C09FA2C6B25D4C06A52321C1 /* C09FA2C6B25D4C06A52321C1 in sources */,
-				F7FEE1CE5FE541F1B41DA067 /* F7FEE1CE5FE541F1B41DA067 in sources */,
-				B77207A1EE1B4F71B1DFB460 /* new file in sources */,
-				2A5779D18DD54BC983D08873 /* new file in sources */,
-				53A3FB6522EF4EE1AD6471CB /* new file in sources */,
-				53CFE1E2169B4678A087D3AB /* new file in sources */,
-				B92BEE4FE29D4430B3A87C2C /* new file in sources */,
-				51E7D57B897D4388AD761DD5 /* new file in sources */,
-				0BF676E3EAF54BEAB97B745B /* new file in sources */,
-				898B4C6A3B2E4DC4BF2DC1F2 /* new file in sources */,
-				664139DCAFCD4087B9B64183 /* new file in sources */,
-				F5318D80D20840C9BB8F3948 /* new file in sources */,
-				F24BD7C86BDF4E0DA52EB5A1 /* new file in sources */,
-				F0E826222C6E438EA936F1E9 /* new file in sources */,
-				672D922D641E4832B8D0DF54 /* new file in sources */,
-				AF1967F6DF02459B9EA33A5C /* new file in sources */,
-				4DAB09DE95194B2C92648998 /* new file in sources */,
-				34E894BE94254F898066F6AB /* new file in sources */,
-				23AD2847E1C04EA2B81035F7 /* new file in sources */,
-				0922C37221B843528F076DC0 /* new file in sources */,
-				4730E2FC39A749FA91AE62A9 /* new file in sources */,
-				E215963A2EA44AD9BCB95E63 /* new file in sources */,
-				6676F24C28074AC7A11E1168 /* new file in sources */,
-				3E19B7BE47974E12A35B729D /* new file in sources */,
-				7C2C145F125D40348BCB5FE6 /* new file in sources */,
-				0EEC1F5EE40847B0B8B040B5 /* new file in sources */,
-				54E87B928EA1464CB3CDDAF8 /* new file */,
-				19BAF9BCBB114798A65E548B /* new file */,
-				9C9F9BF6179947A3A592A4C9 /* new file */,
-				0B44A72DB8F24D2F832C8DEB /* new file */,
-				BC9894FC9D494E25BF2C0DF6 /* new file */,
-				95740083B0AE4A7F825F5B8E /* new file */,
-				50BB058600B0460D84FF1F74 /* new file */,
-				6D5BBCDFA57545669D4BE72A /* new file */,
-				6CC1FA07893346D79C781C9D /* new file */,
-				14EFE60C48014425A0E9833D /* new file */,
-				7DAD7251EAE14F3BA8DBF3E9 /* new file */,
-				A7C85A7F930C482C9B5E2233 /* new file */,
-				10753B0BC74D41E98886D7FE /* new file */,
-				A82C4E22C09D48AA958F4DD7 /* new file */,
-				AC6888F6C71348199F543FEC /* new file */,
-				9B48F6971214463898536B2E /* new file */,
-				2C80E630BAC249BE8BCC0D1E /* new file */,
-				8F0BFB2BBBB647459F24C8E0 /* new file */,
-				EE268479D1FE4A31928BFC43 /* new file */,
-				EAFED91949CD4D77BB1365A0 /* new file */,
-				59E9644759664988A59C3B32 /* new file */,
-				86FE868870CA47A887661BF1 /* new file */,
-				ABE1727AD8AE4511A8AFC91C /* new file */,
-				8CAE619BB4A6492DB629E2E3 /* new file */,
 				GM0200000000000000000001 /* AsteroidDodgeLogic.swift in Sources */,
 				GM0200000000000000000002 /* AsteroidDodgeView.swift in Sources */,
 				GM0200000000000000000003 /* BattlefieldCommanderAssets.swift in Sources */,
