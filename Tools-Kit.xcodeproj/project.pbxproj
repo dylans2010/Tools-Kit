@@ -1333,7 +1333,7 @@
 		SV02E63D7931CCF04F3DA79B /* SecurityAppLockRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */; };
 		SV020F7D28526D764BED88E3 /* SecurityActivityLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */; };
 		TKBF0000000000000000000000 /* UnifiedDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000000 /* UnifiedDataStore.swift */; };
-		TKBF0000000000000000000001 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000001 /* SyncManager.swift */; };
+		TKBF0000000000000000000001 /* DataSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000001 /* DataSyncManager.swift */; };
 		TKBF0000000000000000000002 /* AIOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000002 /* AIOrchestrator.swift */; };
 		TKBF0000000000000000000003 /* EmbeddingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000003 /* EmbeddingService.swift */; };
 		TKBF0000000000000000000004 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000004 /* WebSocketManager.swift */; };
@@ -2337,7 +2337,7 @@
 		FB020000000000000000001e /* SubmissionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000001e /* SubmissionDetailView.swift */; };
 		FB020000000000000000001f /* SubmissionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000001f /* SubmissionsView.swift */; };
 		FB0200000000000000000020 /* SubmissionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000020 /* SubmissionsViewModel.swift */; };
-		FB0200000000000000000021 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000021 /* SyncManager.swift */; };
+		FB0200000000000000000021 /* FeedbackSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000021 /* FeedbackSyncManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3667,7 +3667,7 @@
 		PL01000000000000000000010B /* ConnectorVersioningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Versioning/ConnectorVersioningView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000010C /* ConnectorScopeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/ConnectorScopeView.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000000 /* UnifiedDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedDataStore.swift; sourceTree = "<group>"; };
-		TKRF0000000000000000000001 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000001 /* DataSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSyncManager.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000002 /* AIOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIOrchestrator.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000003 /* EmbeddingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddingService.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000004 /* WebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketManager.swift; sourceTree = "<group>"; };
@@ -4656,7 +4656,7 @@
 		FB010000000000000000001e /* SubmissionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmissionDetailView.swift; sourceTree = "<group>"; };
 		FB010000000000000000001f /* SubmissionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmissionsView.swift; sourceTree = "<group>"; };
 		FB0100000000000000000020 /* SubmissionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmissionsViewModel.swift; sourceTree = "<group>"; };
-		FB0100000000000000000021 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
+		FB0100000000000000000021 /* FeedbackSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackSyncManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -7380,7 +7380,7 @@
 			isa = PBXGroup;
 			children = (
 				TKRF0000000000000000000000 /* UnifiedDataStore.swift */,
-				TKRF0000000000000000000001 /* SyncManager.swift */,
+				TKRF0000000000000000000001 /* DataSyncManager.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -13155,7 +13155,7 @@
 			isa = PBXGroup;
 			children = (
 				FB0100000000000000000004 /* DiagnosticsManager.swift */,
-				FB0100000000000000000021 /* SyncManager.swift */,
+				FB0100000000000000000021 /* FeedbackSyncManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -13406,7 +13406,7 @@
 				FB020000000000000000001e /* SubmissionDetailView.swift in Sources */,
 				FB020000000000000000001f /* SubmissionsView.swift in Sources */,
 				FB0200000000000000000020 /* SubmissionsViewModel.swift in Sources */,
-				FB0200000000000000000021 /* SyncManager.swift in Sources */,
+				FB0200000000000000000021 /* FeedbackSyncManager.swift in Sources */,
 																																														DA02B9999999 /* StorageNode.swift in Sources */,
 				DA02B0000000013 /* CanaryRolloutView.swift in Sources */,
 				DA02B0000000012 /* PerformanceProfilingView.swift in Sources */,
@@ -14317,7 +14317,7 @@
 				PL02000000000000000000010C /* ConnectorScopeView.swift in Sources */,
 				PL020000000000000000000026 /* SDKInternalView.swift in Sources */,
 				TKBF0000000000000000000000 /* UnifiedDataStore.swift in Sources */,
-				TKBF0000000000000000000001 /* SyncManager.swift in Sources */,
+				TKBF0000000000000000000001 /* DataSyncManager.swift in Sources */,
 				TKBF0000000000000000000002 /* AIOrchestrator.swift in Sources */,
 				TKBF0000000000000000000003 /* EmbeddingService.swift in Sources */,
 				TKBF0000000000000000000004 /* WebSocketManager.swift in Sources */,
