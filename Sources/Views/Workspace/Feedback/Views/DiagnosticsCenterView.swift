@@ -1,7 +1,7 @@
 import SwiftUI
 
 public struct DiagnosticsCenterView: View {
-    @StateObject private var viewModel = DiagnosticsViewModel()
+    @StateObject private var viewModel = FeedbackDiagnosticsViewModel()
 
     public init() {}
 
