@@ -657,14 +657,6 @@
 		WS0200000000000000000045 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000045 /* WeekView.swift */; };
 		WS0200000000000000000046 /* YearView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000046 /* YearView.swift */; };
 		WS020000000000000000004F /* AISummarySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000004F /* AISummarySheet.swift */; };
-		WS0200000000000000000047 /* FeedbackModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000047 /* FeedbackModel.swift */; };
-		WS0200000000000000000048 /* FeedbackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000048 /* FeedbackService.swift */; };
-		WS0200000000000000000049 /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000049 /* FeedbackView.swift */; };
-		WS020000000000000000004A /* FeedbackSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000004A /* FeedbackSuccessView.swift */; };
-		WS020000000000000000004B /* FeedbackAdminView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000004B /* FeedbackAdminView.swift */; };
-		WS020000000000000000004C /* FeedbackRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000004C /* FeedbackRowView.swift */; };
-		WS020000000000000000004D /* FeedbackDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000004D /* FeedbackDetailView.swift */; };
-		WS020000000000000000004E /* MyFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000004E /* MyFeedbackView.swift */; };
 		ME0200000000000000000001 /* MeetingSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000001 /* MeetingSession.swift */; };
 		ME0200000000000000000002 /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000002 /* DebugLogger.swift */; };
 		ME0200000000000000000003 /* MeetingDomainModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000003 /* MeetingDomainModels.swift */; };
@@ -1026,7 +1018,6 @@
 		C3C67CE338BA480ABB151230 /* EditFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D81A79C73D034CADA4F4B676 /* EditFormView.swift */; };
 		66FCAC4BF23042ABA42F0001 /* FillOutFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9011242A9D432C9640BDEF /* FillOutFormView.swift */; };
 		5162239239E240959BBD0638 /* EventRegistrationFormTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09C00226BE5401788DF33C6 /* EventRegistrationFormTemplate.swift */; };
-		69ADEE0EFCF448E1A9B839D7 /* FeedbackFormTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6825CEB1AD34CA7B7A7386E /* FeedbackFormTemplate.swift */; };
 		90C7D7CFD9D748C6A2B5315A /* JobApplicationFormTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD647C8F2DDC4FB1AFA46EF0 /* JobApplicationFormTemplate.swift */; };
 		81A7259D12B24449AD1013CF /* FormTemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B6651F22B8D4965A3224F5D /* FormTemplatesView.swift */; };
 		86E33EB1AA4F4A6880501CFE /* FormsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36E2A06247452981FC530B /* FormsView.swift */; };
@@ -2314,6 +2305,41 @@
 		DA020000000000000000007D /* ResourceCLIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007D /* ResourceCLIManager.swift */; };
 		DA020000000000000000007E /* DeveloperCLIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007E /* DeveloperCLIManager.swift */; };
 		DA020000000000000000007F /* DeveloperCLIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA010000000000000000007F /* DeveloperCLIView.swift */; };
+		 = {isa = PBXBuildFile; fileRef = ; };
+		FB0200000000000000000000 /* AIAnalysisResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000000 /* AIAnalysisResult.swift */; };
+		FB0200000000000000000001 /* AIAnalysisService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000001 /* AIAnalysisService.swift */; };
+		FB0200000000000000000002 /* DiagnosticsCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000002 /* DiagnosticsCenterView.swift */; };
+		FB0200000000000000000003 /* DiagnosticsData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000003 /* DiagnosticsData.swift */; };
+		FB0200000000000000000004 /* DiagnosticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000004 /* DiagnosticsManager.swift */; };
+		FB0200000000000000000005 /* DiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000005 /* DiagnosticsViewModel.swift */; };
+		FB0200000000000000000006 /* FeedbackActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000006 /* FeedbackActivity.swift */; };
+		FB0200000000000000000007 /* FeedbackActivityTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000007 /* FeedbackActivityTimeline.swift */; };
+		FB0200000000000000000008 /* FeedbackAdminDebugPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000008 /* FeedbackAdminDebugPanel.swift */; };
+		FB0200000000000000000009 /* FeedbackAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000009 /* FeedbackAttachment.swift */; };
+		FB020000000000000000000a /* FeedbackCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000000a /* FeedbackCategory.swift */; };
+		FB020000000000000000000b /* FeedbackComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000000b /* FeedbackComment.swift */; };
+		FB020000000000000000000c /* FeedbackDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000000c /* FeedbackDraft.swift */; };
+		FB020000000000000000000d /* FeedbackDraftsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000000d /* FeedbackDraftsView.swift */; };
+		FB020000000000000000000e /* FeedbackInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000000e /* FeedbackInsightsView.swift */; };
+		FB020000000000000000000f /* FeedbackMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000000f /* FeedbackMainView.swift */; };
+		FB0200000000000000000010 /* FeedbackMainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000010 /* FeedbackMainViewModel.swift */; };
+		FB0200000000000000000011 /* FeedbackNews.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000011 /* FeedbackNews.swift */; };
+		FB0200000000000000000012 /* FeedbackNewsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000012 /* FeedbackNewsView.swift */; };
+		FB0200000000000000000013 /* FeedbackPriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000013 /* FeedbackPriority.swift */; };
+		FB0200000000000000000014 /* FeedbackReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000014 /* FeedbackReport.swift */; };
+		FB0200000000000000000015 /* FeedbackRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000015 /* FeedbackRequest.swift */; };
+		FB0200000000000000000016 /* FeedbackRequestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000016 /* FeedbackRequestsView.swift */; };
+		FB0200000000000000000017 /* FeedbackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000017 /* FeedbackService.swift */; };
+		FB0200000000000000000018 /* FeedbackStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000018 /* FeedbackStatus.swift */; };
+		FB0200000000000000000019 /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000019 /* InsightsViewModel.swift */; };
+		FB020000000000000000001a /* NewsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000001a /* NewsViewModel.swift */; };
+		FB020000000000000000001b /* ReporterFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000001b /* ReporterFeedbackView.swift */; };
+		FB020000000000000000001c /* ReporterFeedbackViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000001c /* ReporterFeedbackViewModel.swift */; };
+		FB020000000000000000001d /* RequestsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000001d /* RequestsViewModel.swift */; };
+		FB020000000000000000001e /* SubmissionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000001e /* SubmissionDetailView.swift */; };
+		FB020000000000000000001f /* SubmissionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000001f /* SubmissionsView.swift */; };
+		FB0200000000000000000020 /* SubmissionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000020 /* SubmissionsViewModel.swift */; };
+		FB0200000000000000000021 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000021 /* SyncManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3002,7 +3028,6 @@
 		D81A79C73D034CADA4F4B676 /* EditFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditFormView.swift; sourceTree = "<group>"; };
 		0A9011242A9D432C9640BDEF /* FillOutFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FillOutFormView.swift; sourceTree = "<group>"; };
 		B09C00226BE5401788DF33C6 /* EventRegistrationFormTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventRegistrationFormTemplate.swift; sourceTree = "<group>"; };
-		A6825CEB1AD34CA7B7A7386E /* FeedbackFormTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackFormTemplate.swift; sourceTree = "<group>"; };
 		AD647C8F2DDC4FB1AFA46EF0 /* JobApplicationFormTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobApplicationFormTemplate.swift; sourceTree = "<group>"; };
 		1B6651F22B8D4965A3224F5D /* FormTemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormTemplatesView.swift; sourceTree = "<group>"; };
 		1D36E2A06247452981FC530B /* FormsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormsView.swift; sourceTree = "<group>"; };
@@ -3261,14 +3286,6 @@
 		WS0100000000000000000045 /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekView.swift; sourceTree = "<group>"; };
 		WS0100000000000000000046 /* YearView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearView.swift; sourceTree = "<group>"; };
 		WS010000000000000000004F /* AISummarySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISummarySheet.swift; sourceTree = "<group>"; };
-		WS0100000000000000000047 /* FeedbackModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackModel.swift; sourceTree = "<group>"; };
-		WS0100000000000000000048 /* FeedbackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackService.swift; sourceTree = "<group>"; };
-		WS0100000000000000000049 /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
-		WS010000000000000000004A /* FeedbackSuccessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackSuccessView.swift; sourceTree = "<group>"; };
-		WS010000000000000000004B /* FeedbackAdminView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackAdminView.swift; sourceTree = "<group>"; };
-		WS010000000000000000004C /* FeedbackRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackRowView.swift; sourceTree = "<group>"; };
-		WS010000000000000000004D /* FeedbackDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackDetailView.swift; sourceTree = "<group>"; };
-		WS010000000000000000004E /* MyFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyFeedbackView.swift; sourceTree = "<group>"; };
 		ME0100000000000000000001 /* MeetingSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingSession.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000002 /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DebugLogger.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000003 /* MeetingDomainModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingDomainModels.swift"; sourceTree = "<group>"; };
@@ -4608,6 +4625,41 @@
 		DA010000000000000000007D /* ResourceCLIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ResourceCLIManager.swift; path = Sources/Views/Workspace/Developer/CLI/Managers/ResourceCLIManager.swift; sourceTree = SOURCE_ROOT; };
 		DA010000000000000000007E /* DeveloperCLIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeveloperCLIManager.swift; path = Sources/Views/Workspace/Developer/CLI/Managers/DeveloperCLIManager.swift; sourceTree = SOURCE_ROOT; };
 		DA010000000000000000007F /* DeveloperCLIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeveloperCLIView.swift; path = Sources/Views/Workspace/Developer/CLI/DeveloperCLIView.swift; sourceTree = SOURCE_ROOT; };
+		 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackModels.swift; sourceTree = "<group>"; };
+		FB0100000000000000000000 /* AIAnalysisResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAnalysisResult.swift; sourceTree = "<group>"; };
+		FB0100000000000000000001 /* AIAnalysisService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAnalysisService.swift; sourceTree = "<group>"; };
+		FB0100000000000000000002 /* DiagnosticsCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsCenterView.swift; sourceTree = "<group>"; };
+		FB0100000000000000000003 /* DiagnosticsData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsData.swift; sourceTree = "<group>"; };
+		FB0100000000000000000004 /* DiagnosticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsManager.swift; sourceTree = "<group>"; };
+		FB0100000000000000000005 /* DiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsViewModel.swift; sourceTree = "<group>"; };
+		FB0100000000000000000006 /* FeedbackActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackActivity.swift; sourceTree = "<group>"; };
+		FB0100000000000000000007 /* FeedbackActivityTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackActivityTimeline.swift; sourceTree = "<group>"; };
+		FB0100000000000000000008 /* FeedbackAdminDebugPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackAdminDebugPanel.swift; sourceTree = "<group>"; };
+		FB0100000000000000000009 /* FeedbackAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackAttachment.swift; sourceTree = "<group>"; };
+		FB010000000000000000000a /* FeedbackCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackCategory.swift; sourceTree = "<group>"; };
+		FB010000000000000000000b /* FeedbackComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackComment.swift; sourceTree = "<group>"; };
+		FB010000000000000000000c /* FeedbackDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackDraft.swift; sourceTree = "<group>"; };
+		FB010000000000000000000d /* FeedbackDraftsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackDraftsView.swift; sourceTree = "<group>"; };
+		FB010000000000000000000e /* FeedbackInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackInsightsView.swift; sourceTree = "<group>"; };
+		FB010000000000000000000f /* FeedbackMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackMainView.swift; sourceTree = "<group>"; };
+		FB0100000000000000000010 /* FeedbackMainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackMainViewModel.swift; sourceTree = "<group>"; };
+		FB0100000000000000000011 /* FeedbackNews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackNews.swift; sourceTree = "<group>"; };
+		FB0100000000000000000012 /* FeedbackNewsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackNewsView.swift; sourceTree = "<group>"; };
+		FB0100000000000000000013 /* FeedbackPriority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPriority.swift; sourceTree = "<group>"; };
+		FB0100000000000000000014 /* FeedbackReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackReport.swift; sourceTree = "<group>"; };
+		FB0100000000000000000015 /* FeedbackRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackRequest.swift; sourceTree = "<group>"; };
+		FB0100000000000000000016 /* FeedbackRequestsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackRequestsView.swift; sourceTree = "<group>"; };
+		FB0100000000000000000017 /* FeedbackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackService.swift; sourceTree = "<group>"; };
+		FB0100000000000000000018 /* FeedbackStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackStatus.swift; sourceTree = "<group>"; };
+		FB0100000000000000000019 /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
+		FB010000000000000000001a /* NewsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsViewModel.swift; sourceTree = "<group>"; };
+		FB010000000000000000001b /* ReporterFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReporterFeedbackView.swift; sourceTree = "<group>"; };
+		FB010000000000000000001c /* ReporterFeedbackViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReporterFeedbackViewModel.swift; sourceTree = "<group>"; };
+		FB010000000000000000001d /* RequestsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestsViewModel.swift; sourceTree = "<group>"; };
+		FB010000000000000000001e /* SubmissionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmissionDetailView.swift; sourceTree = "<group>"; };
+		FB010000000000000000001f /* SubmissionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmissionsView.swift; sourceTree = "<group>"; };
+		FB0100000000000000000020 /* SubmissionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmissionsViewModel.swift; sourceTree = "<group>"; };
+		FB0100000000000000000021 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -6722,7 +6774,6 @@
 		5AF99128D3F74BD78895F001 /* FormTemplates */ = {
 			isa = PBXGroup;
 			children = (
-				A6825CEB1AD34CA7B7A7386E /* FeedbackFormTemplate.swift */,
 				AD647C8F2DDC4FB1AFA46EF0 /* JobApplicationFormTemplate.swift */,
 				B09C00226BE5401788DF33C6 /* EventRegistrationFormTemplate.swift */,
 				B1C2D3E4F5A6478899AA0001 /* BugReportFormTemplate.swift */,
@@ -8926,19 +8977,37 @@
 			path = DiffChecker;
 			sourceTree = "<group>";
 		};
-		AD54BB2BF7AD4834ACC3741B /* Feedback */ = {
 			isa = PBXGroup;
 			children = (
-				WS0100000000000000000049 /* FeedbackView.swift */,
-				WS010000000000000000004A /* FeedbackSuccessView.swift */,
-				WS010000000000000000004B /* FeedbackAdminView.swift */,
-				WS010000000000000000004C /* FeedbackRowView.swift */,
-				WS010000000000000000004D /* FeedbackDetailView.swift */,
-				WS010000000000000000004E /* MyFeedbackView.swift */,
-			);
-			path = Feedback;
+																											);
+			path = Models;
 			sourceTree = "<group>";
 		};
+			isa = PBXGroup;
+			children = (
+							);
+			path = Services;
+			sourceTree = "<group>";
+		};
+			isa = PBXGroup;
+			children = (
+							);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+			isa = PBXGroup;
+			children = (
+																	);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+			isa = PBXGroup;
+			children = (
+																													);
+			path = Views;
+			sourceTree = "<group>";
+		};
+
 		AE2A6786FF6A442393BCF7CC /* Collaboration */ = {
 			isa = PBXGroup;
 			children = (
@@ -10921,8 +10990,6 @@
 		F062B1D1507B4D52B30CB1C7 /* Feedback */ = {
 			isa = PBXGroup;
 			children = (
-				WS0100000000000000000047 /* FeedbackModel.swift */,
-				WS0100000000000000000048 /* FeedbackService.swift */,
 			);
 			path = Feedback;
 			sourceTree = "<group>";
@@ -13097,6 +13164,87 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		FB0000000000000000000000 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				FB0100000000000000000000 /* AIAnalysisResult.swift */,
+				FB0100000000000000000003 /* DiagnosticsData.swift */,
+				FB0100000000000000000006 /* FeedbackActivity.swift */,
+				FB0100000000000000000009 /* FeedbackAttachment.swift */,
+				FB010000000000000000000a /* FeedbackCategory.swift */,
+				FB010000000000000000000b /* FeedbackComment.swift */,
+				FB010000000000000000000c /* FeedbackDraft.swift */,
+				FB0100000000000000000011 /* FeedbackNews.swift */,
+				FB0100000000000000000013 /* FeedbackPriority.swift */,
+				FB0100000000000000000014 /* FeedbackReport.swift */,
+				FB0100000000000000000015 /* FeedbackRequest.swift */,
+				FB0100000000000000000018 /* FeedbackStatus.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		FB0000000000000000000001 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				FB0100000000000000000001 /* AIAnalysisService.swift */,
+				FB0100000000000000000017 /* FeedbackService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		FB0000000000000000000002 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				FB0100000000000000000004 /* DiagnosticsManager.swift */,
+				FB0100000000000000000021 /* SyncManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		FB0000000000000000000003 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				FB0100000000000000000005 /* DiagnosticsViewModel.swift */,
+				FB0100000000000000000010 /* FeedbackMainViewModel.swift */,
+				FB0100000000000000000019 /* InsightsViewModel.swift */,
+				FB010000000000000000001a /* NewsViewModel.swift */,
+				FB010000000000000000001c /* ReporterFeedbackViewModel.swift */,
+				FB010000000000000000001d /* RequestsViewModel.swift */,
+				FB0100000000000000000020 /* SubmissionsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		FB0000000000000000000004 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				FB0100000000000000000002 /* DiagnosticsCenterView.swift */,
+				FB0100000000000000000007 /* FeedbackActivityTimeline.swift */,
+				FB0100000000000000000008 /* FeedbackAdminDebugPanel.swift */,
+				FB010000000000000000000d /* FeedbackDraftsView.swift */,
+				FB010000000000000000000e /* FeedbackInsightsView.swift */,
+				FB010000000000000000000f /* FeedbackMainView.swift */,
+				FB0100000000000000000012 /* FeedbackNewsView.swift */,
+				FB0100000000000000000016 /* FeedbackRequestsView.swift */,
+				FB010000000000000000001b /* ReporterFeedbackView.swift */,
+				FB010000000000000000001e /* SubmissionDetailView.swift */,
+				FB010000000000000000001f /* SubmissionsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AD54BB2BF7AD4834ACC3741B /* Feedback */ = {
+			isa = PBXGroup;
+			children = (
+				FB0000000000000000000000 /* Models */,
+				FB0000000000000000000001 /* Services */,
+				FB0000000000000000000002 /* Managers */,
+				FB0000000000000000000003 /* ViewModels */,
+				FB0000000000000000000004 /* Views */,
+			);
+			path = Sources/Views/Workspace/Feedback;
+			sourceTree = SOURCE_ROOT;
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -13223,7 +13371,7 @@
 				isa = PBXResourcesBuildPhase;
 				buildActionMask = 2147483647;
 				files = (
-					B1C2D3E4F5A60708090A0D05 /* Config.plist in Resources */,
+																															B1C2D3E4F5A60708090A0D05 /* Config.plist in Resources */,
 					SDKD2000000000000000003 /* SDK_AI_System.md in Resources */,
 					A913A8000000000000000001 /* AgentPersonaSystem.md in Resources */,
 					EX0200000000000000000006 /* MCPServers.json in Resources */,
@@ -13266,7 +13414,42 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DA02B9999999 /* StorageNode.swift in Sources */,
+				FB0200000000000000000000 /* AIAnalysisResult.swift in Sources */,
+				FB0200000000000000000001 /* AIAnalysisService.swift in Sources */,
+				FB0200000000000000000002 /* DiagnosticsCenterView.swift in Sources */,
+				FB0200000000000000000003 /* DiagnosticsData.swift in Sources */,
+				FB0200000000000000000004 /* DiagnosticsManager.swift in Sources */,
+				FB0200000000000000000005 /* DiagnosticsViewModel.swift in Sources */,
+				FB0200000000000000000006 /* FeedbackActivity.swift in Sources */,
+				FB0200000000000000000007 /* FeedbackActivityTimeline.swift in Sources */,
+				FB0200000000000000000008 /* FeedbackAdminDebugPanel.swift in Sources */,
+				FB0200000000000000000009 /* FeedbackAttachment.swift in Sources */,
+				FB020000000000000000000a /* FeedbackCategory.swift in Sources */,
+				FB020000000000000000000b /* FeedbackComment.swift in Sources */,
+				FB020000000000000000000c /* FeedbackDraft.swift in Sources */,
+				FB020000000000000000000d /* FeedbackDraftsView.swift in Sources */,
+				FB020000000000000000000e /* FeedbackInsightsView.swift in Sources */,
+				FB020000000000000000000f /* FeedbackMainView.swift in Sources */,
+				FB0200000000000000000010 /* FeedbackMainViewModel.swift in Sources */,
+				FB0200000000000000000011 /* FeedbackNews.swift in Sources */,
+				FB0200000000000000000012 /* FeedbackNewsView.swift in Sources */,
+				FB0200000000000000000013 /* FeedbackPriority.swift in Sources */,
+				FB0200000000000000000014 /* FeedbackReport.swift in Sources */,
+				FB0200000000000000000015 /* FeedbackRequest.swift in Sources */,
+				FB0200000000000000000016 /* FeedbackRequestsView.swift in Sources */,
+				FB0200000000000000000017 /* FeedbackService.swift in Sources */,
+				FB0200000000000000000018 /* FeedbackStatus.swift in Sources */,
+				FB0200000000000000000019 /* InsightsViewModel.swift in Sources */,
+				FB020000000000000000001a /* NewsViewModel.swift in Sources */,
+				FB020000000000000000001b /* ReporterFeedbackView.swift in Sources */,
+				FB020000000000000000001c /* ReporterFeedbackViewModel.swift in Sources */,
+				FB020000000000000000001d /* RequestsViewModel.swift in Sources */,
+				FB020000000000000000001e /* SubmissionDetailView.swift in Sources */,
+				FB020000000000000000001f /* SubmissionsView.swift in Sources */,
+				FB0200000000000000000020 /* SubmissionsViewModel.swift in Sources */,
+				FB0200000000000000000021 /* SyncManager.swift in Sources */,
+				,
+																																														DA02B9999999 /* StorageNode.swift in Sources */,
 				DA02B0000000013 /* CanaryRolloutView.swift in Sources */,
 				DA02B0000000012 /* PerformanceProfilingView.swift in Sources */,
 				DA02B0000000011 /* DatabaseMigrationView.swift in Sources */,
@@ -14861,7 +15044,6 @@
 				C3C67CE338BA480ABB151230 /* EditFormView.swift in Sources */,
 				66FCAC4BF23042ABA42F0001 /* FillOutFormView.swift in Sources */,
 				5162239239E240959BBD0638 /* EventRegistrationFormTemplate.swift in Sources */,
-				69ADEE0EFCF448E1A9B839D7 /* FeedbackFormTemplate.swift in Sources */,
 				90C7D7CFD9D748C6A2B5315A /* JobApplicationFormTemplate.swift in Sources */,
 				81A7259D12B24449AD1013CF /* FormTemplatesView.swift in Sources */,
 				86E33EB1AA4F4A6880501CFE /* FormsView.swift in Sources */,
@@ -15089,14 +15271,6 @@
 				WS0200000000000000000045 /* WeekView.swift in Sources */,
 				WS0200000000000000000046 /* YearView.swift in Sources */,
 				WS020000000000000000004F /* AISummarySheet.swift in Sources */,
-				WS0200000000000000000047 /* FeedbackModel.swift in Sources */,
-				WS0200000000000000000048 /* FeedbackService.swift in Sources */,
-				WS0200000000000000000049 /* FeedbackView.swift in Sources */,
-				WS020000000000000000004A /* FeedbackSuccessView.swift in Sources */,
-				WS020000000000000000004B /* FeedbackAdminView.swift in Sources */,
-				WS020000000000000000004C /* FeedbackRowView.swift in Sources */,
-				WS020000000000000000004D /* FeedbackDetailView.swift in Sources */,
-				WS020000000000000000004E /* MyFeedbackView.swift in Sources */,
 				ME0200000000000000000001 /* MeetingSession.swift in Sources */,
 				ME0200000000000000000002 /* DebugLogger.swift in Sources */,
 				ME0200000000000000000003 /* MeetingDomainModels.swift in Sources */,
