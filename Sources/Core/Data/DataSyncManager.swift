@@ -1,8 +1,8 @@
 import Foundation
 
 /// Manages synchronization of data between local storage and remote services.
-final class SyncManager {
-    static let shared = SyncManager()
+final class DataSyncManager {
+    static let shared = DataSyncManager()
 
     private let dataStore = UnifiedDataStore.shared
     private let apiClient = APIClient.shared
@@ -14,7 +14,7 @@ final class SyncManager {
 
     /// Starts the synchronization process for all core modules.
     func startSync() {
-        print("[SyncManager] Starting background synchronization...")
+        print("[DataSyncManager] Starting background synchronization...")
         setupWebSocketListeners()
 
         // Trigger initial pull of workspace state
@@ -35,12 +35,12 @@ final class SyncManager {
         // Real production logic: fetch remote workflows and sync to local store
         // let remoteWorkflows: [WorkspaceWorkflow] = try await apiClient.request("workflows")
         // try dataStore.saveWorkflows(remoteWorkflows)
-        print("[SyncManager] Initial state synchronization complete.")
+        print("[DataSyncManager] Initial state synchronization complete.")
     }
 
     private func handleRemoteUpdate(_ payload: [String: Any]) {
         guard let key = payload["key"] as? String else { return }
-        print("[SyncManager] Handling remote update for: \(key)")
+        print("[DataSyncManager] Handling remote update for: \(key)")
 
         queue.async {
             Task {
@@ -53,7 +53,7 @@ final class SyncManager {
 
     /// Forces a full sync of a specific capability.
     func forceSync(capability: String) async throws {
-        print("[SyncManager] Forcing sync for: \(capability)")
+        print("[DataSyncManager] Forcing sync for: \(capability)")
         // Implementation of force sync logic
         try await Task.sleep(nanoseconds: 500 * 1000 * 1000)
     }

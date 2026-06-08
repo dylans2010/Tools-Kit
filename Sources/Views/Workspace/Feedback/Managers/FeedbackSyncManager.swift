@@ -1,8 +1,8 @@
 import Foundation
 import Network
 
-public final class SyncManager {
-    public static let shared = SyncManager()
+public final class FeedbackSyncManager {
+    public static let shared = FeedbackSyncManager()
 
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "com.toolskit.sync.manager")
