@@ -167,6 +167,10 @@ struct AIChatSettingsView: View {
                     }
 
                     Section {
+                NavigationLink(destination: FeedbackMainView()) {
+                    Label("Feedback & Support", systemImage: "heart.text.square.fill")
+                        .foregroundColor(.pink)
+                }
                         aboutSectionContent
                     } header: {
                         Label("About", systemImage: "info.circle.fill")
