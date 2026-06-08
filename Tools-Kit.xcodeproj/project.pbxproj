@@ -2309,7 +2309,7 @@
 		FB0200000000000000000002 /* DiagnosticsCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000002 /* DiagnosticsCenterView.swift */; };
 		FB0200000000000000000003 /* DiagnosticsData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000003 /* DiagnosticsData.swift */; };
 		FB0200000000000000000004 /* DiagnosticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000004 /* DiagnosticsManager.swift */; };
-		FB0200000000000000000005 /* DiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000005 /* DiagnosticsViewModel.swift */; };
+		FB0200000000000000000005 /* FeedbackDiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000005 /* FeedbackDiagnosticsViewModel.swift */; };
 		FB0200000000000000000006 /* FeedbackActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000006 /* FeedbackActivity.swift */; };
 		FB0200000000000000000007 /* FeedbackActivityTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000007 /* FeedbackActivityTimeline.swift */; };
 		FB0200000000000000000008 /* FeedbackAdminDebugPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000008 /* FeedbackAdminDebugPanel.swift */; };
@@ -4628,7 +4628,7 @@
 		FB0100000000000000000002 /* DiagnosticsCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsCenterView.swift; sourceTree = "<group>"; };
 		FB0100000000000000000003 /* DiagnosticsData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsData.swift; sourceTree = "<group>"; };
 		FB0100000000000000000004 /* DiagnosticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsManager.swift; sourceTree = "<group>"; };
-		FB0100000000000000000005 /* DiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsViewModel.swift; sourceTree = "<group>"; };
+		FB0100000000000000000005 /* FeedbackDiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackDiagnosticsViewModel.swift; sourceTree = "<group>"; };
 		FB0100000000000000000006 /* FeedbackActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackActivity.swift; sourceTree = "<group>"; };
 		FB0100000000000000000007 /* FeedbackActivityTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackActivityTimeline.swift; sourceTree = "<group>"; };
 		FB0100000000000000000008 /* FeedbackAdminDebugPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackAdminDebugPanel.swift; sourceTree = "<group>"; };
@@ -13163,7 +13163,7 @@
 		FB0000000000000000000003 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				FB0100000000000000000005 /* DiagnosticsViewModel.swift */,
+				FB0100000000000000000005 /* FeedbackDiagnosticsViewModel.swift */,
 				FB0100000000000000000010 /* FeedbackMainViewModel.swift */,
 				FB0100000000000000000019 /* InsightsViewModel.swift */,
 				FB010000000000000000001a /* NewsViewModel.swift */,
@@ -13378,7 +13378,7 @@
 				FB0200000000000000000002 /* DiagnosticsCenterView.swift in Sources */,
 				FB0200000000000000000003 /* DiagnosticsData.swift in Sources */,
 				FB0200000000000000000004 /* DiagnosticsManager.swift in Sources */,
-				FB0200000000000000000005 /* DiagnosticsViewModel.swift in Sources */,
+				FB0200000000000000000005 /* FeedbackDiagnosticsViewModel.swift in Sources */,
 				FB0200000000000000000006 /* FeedbackActivity.swift in Sources */,
 				FB0200000000000000000007 /* FeedbackActivityTimeline.swift in Sources */,
 				FB0200000000000000000008 /* FeedbackAdminDebugPanel.swift in Sources */,

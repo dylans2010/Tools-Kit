@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 @MainActor
-public final class DiagnosticsViewModel: ObservableObject {
+public final class FeedbackDiagnosticsViewModel: ObservableObject {
     @Published public var diagnostics: DiagnosticsData?
     @Published public var isCapturing = false
 
