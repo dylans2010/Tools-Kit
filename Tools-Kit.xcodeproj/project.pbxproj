@@ -108,6 +108,7 @@
 		DG02000000000000000000000054 /* Diag_VolumeRampView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000054 /* Diag_VolumeRampView.swift */; };
 		DG02000000000000000000000055 /* Diag_WiFiStrengthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000055 /* Diag_WiFiStrengthView.swift */; };
 		DG02000000000000000000000056 /* DiagnosticsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000056 /* DiagnosticsHomeView.swift */; };
+		DG020000000000000000000000AD /* AudioDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000000AD /* AudioDebugView.swift */; };
 		DG02000000000000000000000057 /* DiagnosticsModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000057 /* DiagnosticsModeManager.swift */; };
 		DG020000000000000000000251 /* DiagnosticsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG010000000000000000000251 /* DiagnosticsSettingsView.swift */; };
 		DG02000000000000000000000058 /* DiagnosticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000058 /* DiagnosticsService.swift */; };
@@ -2444,6 +2445,7 @@
 		DG01000000000000000000000054 /* Diag_VolumeRampView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_VolumeRampView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000055 /* Diag_WiFiStrengthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_WiFiStrengthView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000056 /* DiagnosticsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsHomeView.swift; sourceTree = "<group>"; };
+		DG010000000000000000000000AD /* AudioDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDebugView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000057 /* DiagnosticsModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsModeManager.swift; sourceTree = "<group>"; };
 		DG010000000000000000000251 /* DiagnosticsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsSettingsView.swift; sourceTree = "<group>"; };
 		DG01000000000000000000000058 /* DiagnosticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsService.swift; sourceTree = "<group>"; };
@@ -4723,6 +4725,7 @@
 				DG01000000000000000000000054 /* Diag_VolumeRampView.swift */,
 				DG01000000000000000000000055 /* Diag_WiFiStrengthView.swift */,
 				DG01000000000000000000000056 /* DiagnosticsHomeView.swift */,
+				DG010000000000000000000000AD /* AudioDebugView.swift */,
 				DG01000000000000000000000057 /* DiagnosticsModeManager.swift */,
 				DG010000000000000000000251 /* DiagnosticsSettingsView.swift */,
 				DG01000000000000000000000058 /* DiagnosticsService.swift */,
@@ -13857,6 +13860,7 @@
 				DG02000000000000000000000054 /* Diag_VolumeRampView.swift in Sources */,
 				DG02000000000000000000000055 /* Diag_WiFiStrengthView.swift in Sources */,
 				DG02000000000000000000000056 /* DiagnosticsHomeView.swift in Sources */,
+				DG020000000000000000000000AD /* AudioDebugView.swift in Sources */,
 				DG02000000000000000000000057 /* DiagnosticsModeManager.swift in Sources */,
 				DG020000000000000000000251 /* DiagnosticsSettingsView.swift in Sources */,
 				DG02000000000000000000000058 /* DiagnosticsService.swift in Sources */,
