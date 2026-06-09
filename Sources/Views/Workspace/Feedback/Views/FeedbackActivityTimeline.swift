@@ -7,7 +7,7 @@ public struct FeedbackActivityTimeline: View {
         self.activities = activities
     }
 
-    public body: some View {
+    public var body: some View {
         if activities.isEmpty {
             Text("No recent activity.")
                 .foregroundColor(.secondary)

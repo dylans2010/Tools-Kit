@@ -6,7 +6,7 @@ public struct FeedbackMainView: View {
 
     public init() {}
 
-    public body: some View {
+    public var body: some View {
         NavigationStack {
             List {
                 Section {

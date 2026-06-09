@@ -5,7 +5,7 @@ public struct FeedbackAdminDebugPanel: View {
 
     public init() {}
 
-    public body: some View {
+    public var body: some View {
         List {
             Section("Diagnostics Override") {
                 Button("Force Diagnostics Capture") {

@@ -5,7 +5,7 @@ public struct FeedbackNewsView: View {
 
     public init() {}
 
-    public body: some View {
+    public var body: some View {
         List {
             ForEach(viewModel.newsItems) { item in
                 VStack(alignment: .leading, spacing: 8) {

@@ -46,7 +46,7 @@ struct SubmissionDetailView: View {
                     }
 
                     HStack {
-                        TextField("Add a comment...", text: )
+                        TextField("Add a comment...", text: $newComment)
                             .textFieldStyle(.roundedBorder)
                         Button("Send") {
                             // Logic to send comment
