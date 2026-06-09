@@ -6,6 +6,7 @@ import Speech
 class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
     @Published var transcription: String = ""
     @Published var isRecording: Bool = false
+    @Published var audioLevel: Float = 0.0
     @Published var permissionStatus: SFSpeechRecognizerAuthorizationStatus = .notDetermined
     @Published var micPermission: Bool = false
 
@@ -134,6 +135,24 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
         let recordingFormat = inputNode.outputFormat(forBus: 0)
         inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { (buffer, when) in
             self.recognitionRequest?.append(buffer)
+
+            // Calculate audio level
+            guard let channelData = buffer.floatChannelData else { return }
+            let channelDataValue = channelData.pointee
+            let channelDataArray = stride(from: 0, to: Int(buffer.frameLength), by: buffer.stride)
+
+            var rms: Float = 0
+            for i in channelDataArray {
+                rms += channelDataValue[i] * channelDataValue[i]
+            }
+            rms = sqrt(rms / Float(buffer.frameLength))
+
+            let avgPower = 20 * log10(rms)
+            let meterLevel = self.scaledPower(power: avgPower)
+
+            Task { @MainActor in
+                self.audioLevel = meterLevel
+            }
         }
 
         audioEngine.prepare()
@@ -497,5 +516,16 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
     func getSessionIntelligence() -> [SmartSuggestion] {
         // Return suggestions based on unfinished tasks or recent history
         return suggestions
+    }
+
+    private func scaledPower(power: Float) -> Float {
+        guard power.isFinite else { return 0.0 }
+        if power < -60.0 {
+            return 0.0
+        } else if power >= 0.0 {
+            return 1.0
+        } else {
+            return (abs(-60.0) - abs(power)) / abs(-60.0)
+        }
     }
 }
