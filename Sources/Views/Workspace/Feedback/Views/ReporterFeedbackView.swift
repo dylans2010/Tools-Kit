@@ -101,7 +101,7 @@ public struct ReporterFeedbackView: View {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
                 ForEach(FeedbackCategory.allCases) { category in
                     Button {
-                        viewModel.report.category = category
+                        viewModel.updateCategory(category)
                     } label: {
                         VStack {
                             Image(systemName: category.icon)
@@ -172,7 +172,57 @@ public struct ReporterFeedbackView: View {
                         .frame(width: 30)
                 }
             }
+
+            Divider()
+
+            ForEach(viewModel.report.category.questions) { question in
+                dynamicQuestionRow(question)
+            }
         }
+    }
+
+    private func dynamicQuestionRow(_ question: FeedbackQuestion) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(question.title)
+                    .font(.headline)
+                if question.isRequired {
+                    Text("*")
+                        .foregroundColor(.red)
+                }
+            }
+
+            switch question.type {
+            case .text:
+                TextField(question.placeholder ?? "", text: dynamicBinding(for: question.id))
+                    .textFieldStyle(.roundedBorder)
+            case .longText:
+                TextEditor(text: dynamicBinding(for: question.id))
+                    .frame(height: 80)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
+            case .toggle:
+                Toggle("", isOn: Binding(
+                    get: { (viewModel.report.dynamicAnswers[question.id] ?? "false") == "true" },
+                    set: { viewModel.report.dynamicAnswers[question.id] = $0 ? "true" : "false" }
+                ))
+                .labelsHidden()
+            case .singleChoice:
+                Picker("", selection: dynamicBinding(for: question.id)) {
+                    Text("Select one").tag("")
+                    ForEach(question.options ?? [], id: \.self) { option in
+                        Text(option).tag(option)
+                    }
+                }
+                .pickerStyle(.menu)
+            }
+        }
+    }
+
+    private func dynamicBinding(for id: String) -> Binding<String> {
+        Binding(
+            get: { viewModel.report.dynamicAnswers[id] ?? "" },
+            set: { viewModel.report.dynamicAnswers[id] = $0 }
+        )
     }
 
     private var stepSmartAttachments: some View {
@@ -184,15 +234,50 @@ public struct ReporterFeedbackView: View {
                 .foregroundColor(.secondary)
 
             HStack(spacing: 15) {
-                AttachmentButton(icon: "photo", label: "Image")
-                AttachmentButton(icon: "record.circle", label: "Recording")
-                AttachmentButton(icon: "doc", label: "File")
+                AttachmentButton(icon: "photo", label: "Image") {
+                    addMockAttachment(name: "screenshot.png", type: .image)
+                }
+                AttachmentButton(icon: "record.circle", label: "Recording") {
+                    addMockAttachment(name: "screen_recording.mov", type: .video)
+                }
+                AttachmentButton(icon: "doc", label: "File") {
+                    addMockAttachment(name: "diagnostic_log.txt", type: .file)
+                }
             }
 
             if !viewModel.report.attachments.isEmpty {
-                // List attachments
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(viewModel.report.attachments) { attachment in
+                        HStack {
+                            Image(systemName: attachment.type == .image ? "photo" : attachment.type == .video ? "video" : "doc")
+                            Text(attachment.name)
+                                .font(.subheadline)
+                            Spacer()
+                            Button {
+                                viewModel.report.attachments.removeAll(where: { $0.id == attachment.id })
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        .padding(8)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(8)
+                    }
+                }
             }
         }
+    }
+
+    private func addMockAttachment(name: String, type: FeedbackAttachment.AttachmentType) {
+        let newAttachment = FeedbackAttachment(
+            id: UUID(),
+            name: name,
+            type: type,
+            url: nil,
+            localPath: "/mock/path/\(name)"
+        )
+        viewModel.report.attachments.append(newAttachment)
     }
 
     private var stepDiagnosticsCapture: some View {
@@ -301,6 +386,21 @@ public struct ReporterFeedbackView: View {
                         .cornerRadius(4)
                 }
                 .font(.caption)
+
+                if !viewModel.report.dynamicAnswers.isEmpty {
+                    Divider()
+                    VStack(alignment: .leading, spacing: 5) {
+                        ForEach(viewModel.report.category.questions) { question in
+                            if let answer = viewModel.report.dynamicAnswers[question.id], !answer.isEmpty {
+                                HStack {
+                                    Text(question.title + ":").bold()
+                                    Text(answer)
+                                }
+                                .font(.caption)
+                            }
+                        }
+                    }
+                }
             }
             .padding()
             .background(Color.gray.opacity(0.1))
@@ -312,9 +412,10 @@ public struct ReporterFeedbackView: View {
 private struct AttachmentButton: View {
     let icon: String
     let label: String
+    let action: () -> Void
 
     var body: some View {
-        Button {} label: {
+        Button(action: action) {
             VStack {
                 Image(systemName: icon)
                     .font(.title)
@@ -326,6 +427,7 @@ private struct AttachmentButton: View {
             .background(Color.gray.opacity(0.1))
             .cornerRadius(10)
         }
+        .buttonStyle(.plain)
     }
 }
 

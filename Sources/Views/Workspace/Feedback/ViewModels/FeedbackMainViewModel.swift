@@ -6,6 +6,7 @@ public final class FeedbackMainViewModel: ObservableObject {
     @Published public var recentActivity: [FeedbackActivity] = []
     @Published public var news: [FeedbackNews] = []
     @Published public var requests: [FeedbackRequest] = []
+    @Published public var submissions: [FeedbackReport] = []
     @Published public var drafts: [FeedbackReport] = []
     @Published public var isLoading = false
 
@@ -21,6 +22,7 @@ public final class FeedbackMainViewModel: ObservableObject {
 
         // Fetch submissions to populate activity and drafts
         if let reports = try? await FeedbackService.shared.fetchReports() {
+            submissions = reports
             recentActivity = reports.flatMap { $0.history }.sorted(by: { $0.timestamp > $1.timestamp }).prefix(10).map { $0 }
             drafts = reports.filter { $0.status == .draft }.sorted(by: { $0.updatedAt > $1.updatedAt })
         }

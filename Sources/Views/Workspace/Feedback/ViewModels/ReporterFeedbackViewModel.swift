@@ -16,7 +16,22 @@ public final class ReporterFeedbackViewModel: ObservableObject {
     public init(initialCategory: FeedbackCategory? = nil) {
         if let category = initialCategory {
             report.category = category
+            initializeDynamicAnswers()
         }
+    }
+
+    public func updateCategory(_ category: FeedbackCategory) {
+        report.category = category
+        initializeDynamicAnswers()
+    }
+
+    private func initializeDynamicAnswers() {
+        // We preserve existing answers if IDs match, but clean up others
+        var newAnswers: [String: String] = [:]
+        for question in report.category.questions {
+            newAnswers[question.id] = report.dynamicAnswers[question.id] ?? ""
+        }
+        report.dynamicAnswers = newAnswers
     }
 
     public func nextStep() {

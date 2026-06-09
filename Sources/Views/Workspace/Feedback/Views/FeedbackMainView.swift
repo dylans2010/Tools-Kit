@@ -21,6 +21,15 @@ public struct FeedbackMainView: View {
                     FeedbackActivityTimeline(activities: viewModel.recentActivity)
                 }
 
+                Section("Impact") {
+                    HStack(spacing: 20) {
+                        ImpactStat(title: "Reports", value: "\(viewModel.submissions.count)", color: .blue)
+                        ImpactStat(title: "Resolved", value: "\(viewModel.submissions.filter { $0.status == .resolved }.count)", color: .green)
+                        ImpactStat(title: "Requests", value: "\(viewModel.requests.count)", color: .orange)
+                    }
+                    .padding(.vertical, 8)
+                }
+
                 Section("Dashboard") {
                     NavigationLink(destination: FeedbackInsightsView()) {
                         Label("Insights & Analytics", systemImage: "chart.bar.xaxis")
@@ -60,5 +69,26 @@ public struct FeedbackMainView: View {
                 await viewModel.refresh()
             }
         }
+    }
+}
+
+private struct ImpactStat: View {
+    let title: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        VStack {
+            Text(value)
+                .font(.title3.bold())
+                .foregroundColor(color)
+            Text(title)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .background(color.opacity(0.1))
+        .cornerRadius(10)
     }
 }

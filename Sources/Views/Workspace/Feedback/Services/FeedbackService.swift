@@ -74,6 +74,7 @@ public final class FeedbackService {
     // MARK: - Local Persistence (Mocking Backend)
 
     private let reportsKey = "com.toolskit.feedback.reports"
+    private let requestsKey = "com.toolskit.feedback.requests"
 
     private func saveReportLocally(_ report: FeedbackReport) {
         var reports = getLocalReports()
@@ -109,9 +110,21 @@ public final class FeedbackService {
     }
 
     public func fetchRequests() async -> [FeedbackRequest] {
-        return [
-            FeedbackRequest(id: UUID(), title: "Dark Mode for Music", description: "Allow users to toggle dark mode specifically for the music player.", votes: 42, hasVoted: false, category: .music, status: "Planned"),
-            FeedbackRequest(id: UUID(), title: "Offline AI Chat", description: "Support for basic local models when offline.", votes: 156, hasVoted: true, category: .aiChat, status: "Under Review")
-        ]
+        guard let data = UserDefaults.standard.data(forKey: requestsKey),
+              let requests = try? jsonDecoder.decode([FeedbackRequest].self, from: data) else {
+            return [
+                FeedbackRequest(id: UUID(), title: "Dark Mode for Music", description: "Allow users to toggle dark mode specifically for the music player.", votes: 42, hasVoted: false, category: .music, status: "Planned"),
+                FeedbackRequest(id: UUID(), title: "Offline AI Chat", description: "Support for basic local models when offline.", votes: 156, hasVoted: true, category: .aiChat, status: "Under Review")
+            ]
+        }
+        return requests
+    }
+
+    public func submitFeatureRequest(_ request: FeedbackRequest) async throws {
+        var requests = await fetchRequests()
+        requests.append(request)
+        if let data = try? jsonEncoder.encode(requests) {
+            UserDefaults.standard.set(data, forKey: requestsKey)
+        }
     }
 }

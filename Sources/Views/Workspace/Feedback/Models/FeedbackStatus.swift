@@ -1,9 +1,24 @@
 import SwiftUI
 
-public enum FeedbackStatus: String, CaseIterable, Identifiable, Codable {
+public enum FeedbackStatus: String, CaseIterable, Identifiable, Codable, Comparable {
     case draft, submitted, triaged, inProgress, resolved, closed
 
     public var id: String { rawValue }
+
+    private var sortOrder: Int {
+        switch self {
+        case .draft: return 0
+        case .submitted: return 1
+        case .triaged: return 2
+        case .inProgress: return 3
+        case .resolved: return 4
+        case .closed: return 5
+        }
+    }
+
+    public static func < (lhs: FeedbackStatus, rhs: FeedbackStatus) -> Bool {
+        lhs.sortOrder < rhs.sortOrder
+    }
 
     public var displayName: String {
         switch self {

@@ -6,6 +6,14 @@ public final class SubmissionsViewModel: ObservableObject {
     @Published public var reports: [FeedbackReport] = []
     @Published public var isLoading = false
     @Published public var filter: FeedbackStatus?
+    @Published public var searchText = ""
+    @Published public var sortOrder: SortOption = .date
+
+    public enum SortOption: String, CaseIterable, Identifiable {
+        case date, priority, status
+        public var id: String { rawValue }
+        public var displayName: String { rawValue.capitalized }
+    }
 
     public init() {}
 
@@ -31,7 +39,29 @@ public final class SubmissionsViewModel: ObservableObject {
     }
 
     public var filteredReports: [FeedbackReport] {
-        guard let filter = filter else { return reports }
-        return reports.filter { $0.status == filter }
+        var result = reports
+
+        if let filter = filter {
+            result = result.filter { $0.status == filter }
+        }
+
+        if !searchText.isEmpty {
+            result = result.filter {
+                $0.summary.localizedCaseInsensitiveContains(searchText) ||
+                $0.description.localizedCaseInsensitiveContains(searchText) ||
+                $0.category.displayName.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+
+        switch sortOrder {
+        case .date:
+            result.sort { $0.updatedAt > $1.updatedAt }
+        case .priority:
+            result.sort { $0.priority > $1.priority }
+        case .status:
+            result.sort { $0.status < $1.status }
+        }
+
+        return result
     }
 }
