@@ -5,10 +5,10 @@ public struct SubmissionsView: View {
 
     public init() {}
 
-    public body: some View {
+    public var body: some View {
         List {
             Section {
-                Picker("Status Filter", selection: .filter) {
+                Picker("Status Filter", selection: $viewModel.filter) {
                     Text("All").tag(Optional<FeedbackStatus>.none)
                     ForEach(FeedbackStatus.allCases) { status in
                         Text(status.displayName).tag(Optional(status))

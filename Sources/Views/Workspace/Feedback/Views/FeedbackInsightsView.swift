@@ -6,12 +6,12 @@ public struct FeedbackInsightsView: View {
 
     public init() {}
 
-    public body: some View {
+    public var body: some View {
         ScrollView {
             VStack(spacing: 20) {
                 HStack(spacing: 15) {
-                    InsightCard(title: "Total Reports", value: "\(submissionsVM.reports.count)", icon: "doc.text.fill", color: .blue)
-                    InsightCard(title: "Resolved", value: "\(submissionsVM.reports.filter { $0.status == .resolved }.count)", icon: "checkmark.circle.fill", color: .green)
+                    InsightCard(insight: WeatherInsight(title: "Total Reports", description: "\(submissionsVM.reports.count)", type: .generic))
+                    InsightCard(insight: WeatherInsight(title: "Resolved", description: "\(submissionsVM.reports.filter { $0.status == .resolved }.count)", type: .generic))
                 }
 
                 VStack(alignment: .leading, spacing: 15) {
@@ -71,34 +71,5 @@ public struct FeedbackInsightsView: View {
             await submissionsVM.fetchReports()
             viewModel.calculateInsights(from: submissionsVM.reports)
         }
-    }
-}
-
-private struct InsightCard: View {
-    let title: String
-    let value: String
-    let icon: String
-    let color: Color
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Image(systemName: icon)
-                Spacer()
-            }
-            .font(.title2)
-            .foregroundColor(color)
-
-            Text(value)
-                .font(.title.bold())
-
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(color.opacity(0.1))
-        .cornerRadius(12)
     }
 }

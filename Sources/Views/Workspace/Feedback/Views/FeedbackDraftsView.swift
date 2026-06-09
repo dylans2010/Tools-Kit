@@ -8,7 +8,7 @@ public struct FeedbackDraftsView: View {
         self.drafts = drafts
     }
 
-    public body: some View {
+    public var body: some View {
         List {
             if drafts.isEmpty {
                 Text("No drafts saved.")

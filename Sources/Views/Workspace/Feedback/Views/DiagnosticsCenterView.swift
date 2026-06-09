@@ -5,7 +5,7 @@ public struct DiagnosticsCenterView: View {
 
     public init() {}
 
-    public body: some View {
+    public var body: some View {
         List {
             Section("Device & OS") {
                 if let diagnostics = viewModel.diagnostics {

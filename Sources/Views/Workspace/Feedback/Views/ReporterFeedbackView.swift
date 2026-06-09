@@ -8,7 +8,7 @@ public struct ReporterFeedbackView: View {
         _viewModel = StateObject(wrappedValue: ReporterFeedbackViewModel(initialCategory: category))
     }
 
-    public body: some View {
+    public var body: some View {
         VStack {
             progressHeader
 
