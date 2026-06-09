@@ -263,15 +263,13 @@ public struct ReporterFeedbackView: View {
                             .foregroundColor(.secondary)
                     }
 
-                    FlowLayout(spacing: 8) {
-                        ForEach(analysis.suggestedTags, id: \.self) { tag in
-                            Text(tag)
-                                .font(.caption)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 5)
-                                .background(Color.blue.opacity(0.1))
-                                .cornerRadius(20)
-                        }
+                    FlowLayout(analysis.suggestedTags, spacing: 8) { tag in
+                        Text(tag)
+                            .font(.caption)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color.blue.opacity(0.1))
+                            .cornerRadius(20)
                     }
                 }
             }
@@ -345,45 +343,3 @@ private struct DiagnosticRow: View {
     }
 }
 
-private struct FlowLayout: Layout {
-    var spacing: CGFloat
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let result = layout(proposal: proposal, subviews: subviews)
-        return result.size
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let _ = layout(proposal: proposal, subviews: subviews, bounds: bounds)
-    }
-
-    private func layout(proposal: ProposedViewSize, subviews: Subviews, bounds: CGRect? = nil) -> (size: CGSize, positions: [CGPoint]) {
-        var size = CGSize.zero
-        var positions: [CGPoint] = []
-
-        let width = proposal.width ?? .infinity
-        var currentPoint = CGPoint(x: bounds?.minX ?? 0, y: bounds?.minY ?? 0)
-        var rowHeight: CGFloat = 0
-
-        for subview in subviews {
-            let subviewSize = subview.sizeThatFits(.unspecified)
-
-            if currentPoint.x + subviewSize.width > (bounds?.minX ?? 0) + width {
-                currentPoint.x = bounds?.minX ?? 0
-                currentPoint.y += rowHeight + spacing
-                rowHeight = 0
-            }
-
-            if let _ = bounds {
-                positions.append(currentPoint)
-            }
-
-            rowHeight = max(rowHeight, subviewSize.height)
-            currentPoint.x += subviewSize.width + spacing
-            size.width = max(size.width, currentPoint.x)
-            size.height = max(size.height, currentPoint.y + subviewSize.height)
-        }
-
-        return (size, positions)
-    }
-}

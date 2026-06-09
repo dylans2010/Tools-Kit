@@ -10,11 +10,11 @@ struct SubmissionDetailView: View {
             VStack(alignment: .leading, spacing: 20) {
                 header
 
-                SectionHeader(title: "Details")
+                SectionHeader(title: "Details", subtitle: "", icon: "")
                 Text(report.description)
 
                 if !report.reproductionSteps.isEmpty {
-                    SectionHeader(title: "Reproduction Steps")
+                    SectionHeader(title: "Reproduction Steps", subtitle: "", icon: "")
                     ForEach(Array(report.reproductionSteps.enumerated()), id: \.offset) { index, step in
                         HStack(alignment: .top) {
                             Text("\(index + 1).")
@@ -24,7 +24,7 @@ struct SubmissionDetailView: View {
                     }
                 }
 
-                SectionHeader(title: "History")
+                SectionHeader(title: "History", subtitle: "", icon: "")
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(report.history) { activity in
                         HStack {
@@ -39,7 +39,7 @@ struct SubmissionDetailView: View {
                     }
                 }
 
-                SectionHeader(title: "Thread")
+                SectionHeader(title: "Thread", subtitle: "", icon: "")
                 VStack(spacing: 15) {
                     ForEach(report.comments) { comment in
                         CommentBubble(comment: comment)
@@ -89,14 +89,6 @@ struct SubmissionDetailView: View {
     }
 }
 
-struct SectionHeader: View {
-    let title: String
-    var body: some View {
-        Text(title)
-            .font(.headline)
-            .padding(.top, 10)
-    }
-}
 
 struct StatusBadge: View {
     let status: FeedbackStatus
