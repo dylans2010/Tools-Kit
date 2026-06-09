@@ -2,6 +2,7 @@ import SwiftUI
 import Aurora
 import Speech
 import AVFoundation
+import AudioToolbox
 
 struct PersonaHomeView: View {
     @ObservedObject private var manager = PersonaManager.shared
@@ -118,56 +119,100 @@ struct PersonaUserSpeak: View {
     @Binding var query: String
     var onFinished: () -> Void
     @Environment(\.dismiss) var dismiss
+    @State private var hasTriggeredTalkChime = false
 
     var body: some View {
-        VStack(spacing: 30) {
-            Text(speechManager.isRecording ? "Listening..." : "Voice Capture")
-                .font(.title2.bold())
+        ZStack {
+            AuroraGlow(.subtle).palette(.appleIntelligence).ignoresSafeArea()
 
-            ZStack {
-                Circle()
-                    .fill(Color.blue.opacity(0.1))
-                    .frame(width: 120, height: 120)
+            VStack(spacing: 30) {
+                VStack(spacing: 8) {
+                    Text(speechManager.isRecording ? "Listening..." : "Voice Capture")
+                        .font(.system(.title2, design: .rounded).bold())
 
-                Image(systemName: speechManager.isRecording ? "mic.fill" : "mic.slash.fill")
-                    .font(.system(size: 40))
-                    .foregroundStyle(.blue)
-                    .scaleEffect(speechManager.isRecording ? 1.2 : 1.0)
-                    .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: speechManager.isRecording)
-            }
-
-            ScrollView {
-                Text(speechManager.transcription.isEmpty ? "Speak now..." : speechManager.transcription)
-                    .font(.body)
-                    .multilineTextAlignment(.center)
-                    .padding()
-            }
-            .frame(maxWidth: .infinity, maxHeight: 150)
-            .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-
-            HStack(spacing: 20) {
-                Button("Cancel") {
-                    speechManager.stopRecording()
-                    dismiss()
+                    if speechManager.isRecording {
+                        Text("Persona is listening to your voice")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
-                .buttonStyle(.bordered)
 
-                Button("Send") {
-                    query = speechManager.transcription
-                    speechManager.stopRecording()
-                    onFinished()
-                    dismiss()
+                ZStack {
+                    Circle()
+                        .fill(LinearGradient(colors: [.blue.opacity(0.2), .purple.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(width: 140, height: 140)
+                        .blur(radius: 20)
+
+                    DynamicWaveformView(audioLevel: speechManager.audioLevel)
+                        .frame(width: 120, height: 80)
+
+                    Image(systemName: "mic.fill")
+                        .font(.system(size: 30))
+                        .foregroundStyle(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom))
+                        .offset(y: -50)
+                        .opacity(speechManager.isRecording ? 1 : 0.5)
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(speechManager.transcription.isEmpty)
+                .padding(.vertical, 20)
+
+                ScrollView {
+                    Text(speechManager.transcription.isEmpty ? "Speak now..." : speechManager.transcription)
+                        .font(.system(.body, design: .rounded))
+                        .multilineTextAlignment(.center)
+                        .padding()
+                }
+                .frame(maxWidth: .infinity, maxHeight: 150)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
+                .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.white.opacity(0.1), lineWidth: 1))
+
+                HStack(spacing: 20) {
+                    Button {
+                        playChime(soundID: 1050)
+                        speechManager.stopRecording()
+                        dismiss()
+                    } label: {
+                        Text("Cancel")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 12)
+                            .background(.ultraThinMaterial, in: Capsule())
+                    }
+
+                    Button {
+                        playChime(soundID: 1111)
+                        query = speechManager.transcription
+                        speechManager.stopRecording()
+                        onFinished()
+                        dismiss()
+                    } label: {
+                        Text("Send")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 40)
+                            .padding(.vertical, 12)
+                            .background(
+                                LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing),
+                                in: Capsule()
+                            )
+                    }
+                    .disabled(speechManager.transcription.isEmpty)
+                    .opacity(speechManager.transcription.isEmpty ? 0.6 : 1.0)
+                }
+            }
+            .padding(30)
+        }
+        .onChange(of: speechManager.transcription) { _, newValue in
+            if !newValue.isEmpty && !hasTriggeredTalkChime {
+                playChime(soundID: 1113)
+                hasTriggeredTalkChime = true
             }
         }
-        .padding(40)
         .onAppear {
             speechManager.checkPermissions()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 do {
                     try speechManager.startRecording()
+                    playChime(soundID: 1110)
                 } catch {
                     print("Failed to start recording: \(error)")
                 }
@@ -176,6 +221,34 @@ struct PersonaUserSpeak: View {
         .onDisappear {
             speechManager.stopRecording()
         }
+    }
+
+    private func playChime(soundID: SystemSoundID) {
+        AudioServicesPlaySystemSound(soundID)
+    }
+}
+
+struct DynamicWaveformView: View {
+    let audioLevel: Float
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(0..<12) { i in
+                Capsule()
+                    .fill(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom))
+                    .frame(width: 4, height: barHeight(for: i))
+                    .animation(.interactiveSpring(response: 0.3, dampingFraction: 0.6), value: audioLevel)
+            }
+        }
+    }
+
+    private func barHeight(for index: Int) -> CGFloat {
+        let baseHeight: CGFloat = 6
+        let multiplier: CGFloat = 80
+        // Add some randomness and vary based on index to look more "natural"
+        let variation = CGFloat.random(in: 0.7...1.3)
+        let indexWeight = 1.0 - abs(CGFloat(index - 6) / 6.0) // Center bars are taller
+        return max(baseHeight, CGFloat(audioLevel) * multiplier * variation * indexWeight)
     }
 }
 
