@@ -2338,6 +2338,8 @@
 		FB020000000000000000001f /* SubmissionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB010000000000000000001f /* SubmissionsView.swift */; };
 		FB0200000000000000000020 /* SubmissionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000020 /* SubmissionsViewModel.swift */; };
 		FB0200000000000000000021 /* FeedbackSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000021 /* FeedbackSyncManager.swift */; };
+		FB0200000000000000000022 /* FeedbackQuestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000022 /* FeedbackQuestion.swift */; };
+		FB0200000000000000000023 /* CreateRequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000023 /* CreateRequestView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -4657,6 +4659,8 @@
 		FB010000000000000000001f /* SubmissionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmissionsView.swift; sourceTree = "<group>"; };
 		FB0100000000000000000020 /* SubmissionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmissionsViewModel.swift; sourceTree = "<group>"; };
 		FB0100000000000000000021 /* FeedbackSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackSyncManager.swift; sourceTree = "<group>"; };
+		FB0100000000000000000022 /* FeedbackQuestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackQuestion.swift; sourceTree = "<group>"; };
+		FB0100000000000000000023 /* CreateRequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateRequestView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -13138,6 +13142,7 @@
 				FB0100000000000000000014 /* FeedbackReport.swift */,
 				FB0100000000000000000015 /* FeedbackRequest.swift */,
 				FB0100000000000000000018 /* FeedbackStatus.swift */,
+				FB0100000000000000000022 /* FeedbackQuestion.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -13188,6 +13193,7 @@
 				FB010000000000000000001b /* ReporterFeedbackView.swift */,
 				FB010000000000000000001e /* SubmissionDetailView.swift */,
 				FB010000000000000000001f /* SubmissionsView.swift */,
+				FB0100000000000000000023 /* CreateRequestView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -13407,6 +13413,8 @@
 				FB020000000000000000001f /* SubmissionsView.swift in Sources */,
 				FB0200000000000000000020 /* SubmissionsViewModel.swift in Sources */,
 				FB0200000000000000000021 /* FeedbackSyncManager.swift in Sources */,
+				FB0200000000000000000022 /* FeedbackQuestion.swift in Sources */,
+				FB0200000000000000000023 /* CreateRequestView.swift in Sources */,
 																																														DA02B9999999 /* StorageNode.swift in Sources */,
 				DA02B0000000013 /* CanaryRolloutView.swift in Sources */,
 				DA02B0000000012 /* PerformanceProfilingView.swift in Sources */,

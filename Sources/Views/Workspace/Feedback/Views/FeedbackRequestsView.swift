@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct FeedbackRequestsView: View {
     @StateObject private var viewModel = RequestsViewModel()
+    @State private var showingCreateRequest = false
 
     public init() {}
 
@@ -50,6 +51,18 @@ public struct FeedbackRequestsView: View {
             }
         }
         .navigationTitle("Feature Requests")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showingCreateRequest = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $showingCreateRequest) {
+            CreateRequestView()
+        }
         .task {
             await viewModel.fetchRequests()
         }

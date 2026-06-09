@@ -8,13 +8,24 @@ public struct SubmissionsView: View {
     public var body: some View {
         List {
             Section {
-                Picker("Status Filter", selection: $viewModel.filter) {
-                    Text("All").tag(Optional<FeedbackStatus>.none)
-                    ForEach(FeedbackStatus.allCases) { status in
-                        Text(status.displayName).tag(Optional(status))
+                HStack {
+                    Picker("Status", selection: $viewModel.filter) {
+                        Text("All Status").tag(Optional<FeedbackStatus>.none)
+                        ForEach(FeedbackStatus.allCases) { status in
+                            Text(status.displayName).tag(Optional(status))
+                        }
                     }
+                    .pickerStyle(.menu)
+
+                    Spacer()
+
+                    Picker("Sort", selection: $viewModel.sortOrder) {
+                        ForEach(SubmissionsViewModel.SortOption.allCases) { option in
+                            Text(option.displayName).tag(option)
+                        }
+                    }
+                    .pickerStyle(.menu)
                 }
-                .pickerStyle(.menu)
             }
 
             if viewModel.filteredReports.isEmpty {
@@ -52,6 +63,7 @@ public struct SubmissionsView: View {
             }
         }
         .navigationTitle("Submissions")
+        .searchable(text: $viewModel.searchText, prompt: "Search reports...")
         .refreshable {
             await viewModel.fetchReports()
         }

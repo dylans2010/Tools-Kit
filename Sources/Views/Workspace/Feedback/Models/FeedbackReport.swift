@@ -10,6 +10,7 @@ public struct FeedbackReport: Identifiable, Codable {
     public var expectedBehavior: String?
     public var actualBehavior: String?
     public var reproductionSteps: [String]
+    public var dynamicAnswers: [String: String]
     public var frequency: String?
     public var impactScore: Int // 1-10
     public var tags: [String]
@@ -31,6 +32,7 @@ public struct FeedbackReport: Identifiable, Codable {
         self.summary = ""
         self.description = ""
         self.reproductionSteps = []
+        self.dynamicAnswers = [:]
         self.impactScore = 5
         self.tags = []
         self.createdAt = Date()
