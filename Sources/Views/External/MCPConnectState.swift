@@ -78,7 +78,7 @@ struct MCPConnectStateDetail: View {
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
-                        StatusBadge(status: invocation.status)
+                        MCPStatusBadge(status: invocation.status)
                     }
                     .padding(.bottom, 10)
 
@@ -161,7 +161,7 @@ struct MCPConnectStateList: View {
 
 // MARK: - Local Helpers
 
-private struct StatusBadge: View {
+private struct MCPStatusBadge: View {
     let status: MCPInvocationStatus
 
     var body: some View {

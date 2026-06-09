@@ -57,3 +57,42 @@ struct FormTemplatesView: View {
         .toolbar { Button("Close") { dismiss() } }
     }
 }
+
+private struct FeedbackFormTemplate: Identifiable, Hashable {
+    let id = UUID()
+    var title: String
+    var description: String
+    var fields: [String]
+    var category: String
+    init(title: String, description: String = "",
+         fields: [String] = [], category: String = "") {
+        self.title = title
+        self.description = description
+        self.fields = fields
+        self.category = category
+    }
+
+    static func build() -> FormDocument {
+        let questions = [
+            FormQuestion(title: "How satisfied are you with our service?", type: .ratingScale, options: ["1", "5"], required: true),
+            FormQuestion(title: "What did you like most?", type: .textInput, required: false),
+            FormQuestion(title: "What can we improve?", type: .textInput, required: false),
+            FormQuestion(title: "Would you recommend us to a friend?", type: .multipleChoice, options: ["Yes", "No", "Maybe"], required: true)
+        ]
+
+        return FormDocument(
+            name: "Customer Feedback",
+            description: "Capture sentiment, ratings, and comments.",
+            questions: questions,
+            accentHexColor: "007AFF",
+            backgroundHexColor: "F2F2F7",
+            manifest: FormManifest.compose(
+                creatorName: "Template",
+                questions: questions,
+                privacyNote: "Feedback is used to improve our services.",
+                templateName: "Customer Feedback",
+                tags: ["feedback", "customer", "satisfaction"]
+            )
+        )
+    }
+}

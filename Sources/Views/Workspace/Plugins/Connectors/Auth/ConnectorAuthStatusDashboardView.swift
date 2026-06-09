@@ -34,7 +34,7 @@ struct ConnectorAuthStatusDashboardView: View {
                             HStack {
                                 Text(connector.name).font(.subheadline.bold())
                                 Spacer()
-                                StatusBadge(isConnected: connector.isConnected)
+                                ConnectorAuthStatusBadge(isConnected: connector.isConnected)
                             }
 
                             if connector.isConnected {
@@ -56,7 +56,7 @@ struct ConnectorAuthStatusDashboardView: View {
     }
 }
 
-private struct StatusBadge: View {
+private struct ConnectorAuthStatusBadge: View {
     let isConnected: Bool
 
     var body: some View {
