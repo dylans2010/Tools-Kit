@@ -51,11 +51,7 @@ final class PersonaManager: ObservableObject {
         defer { isThinking = false }
 
         // 1. Capture state needed for background processing
-        let creativity = config.creativity
-        let formality = config.formality
-        let humor = config.humor
-        let temperature = config.temperature
-        let maxTokens = config.maxTokens
+        let cfg = config
         let mcpEnabled = config.mcpToolsEnabled
         let historySuffix = chatHistory.suffix(10).map { "\($0.role): \($0.content)" }.joined(separator: "\n")
         let basePrompt = agentSystemPrompt
@@ -66,15 +62,39 @@ final class PersonaManager: ObservableObject {
             let mcpContext = mcpEnabled ? await MainActor.run { MCPPersonaBridge().connectedServersContext() } : "No MCP servers connected."
 
             var prompt = basePrompt
-            prompt = prompt.replacingOccurrences(of: "{{creativity}}", with: String(format: "%.1f", creativity))
-            prompt = prompt.replacingOccurrences(of: "{{formality}}", with: String(format: "%.1f", formality))
-            prompt = prompt.replacingOccurrences(of: "{{humor}}", with: String(format: "%.1f", humor))
-            prompt = prompt.replacingOccurrences(of: "{{temperature}}", with: String(format: "%.1f", temperature))
-            prompt = prompt.replacingOccurrences(of: "{{maxTokens}}", with: "\(maxTokens)")
+            prompt = prompt.replacingOccurrences(of: "{{creativity}}", with: String(format: "%.1f", cfg.creativity))
+            prompt = prompt.replacingOccurrences(of: "{{formality}}", with: String(format: "%.1f", cfg.formality))
+            prompt = prompt.replacingOccurrences(of: "{{humor}}", with: String(format: "%.1f", cfg.humor))
+            prompt = prompt.replacingOccurrences(of: "{{temperature}}", with: String(format: "%.1f", cfg.temperature))
+            prompt = prompt.replacingOccurrences(of: "{{maxTokens}}", with: "\(cfg.maxTokens)")
             prompt = prompt.replacingOccurrences(of: "{{workspace_context}}", with: workspaceContextJSON)
             prompt = prompt.replacingOccurrences(of: "{{mcp_context}}", with: mcpContext)
             prompt = prompt.replacingOccurrences(of: "{{chat_history}}", with: historySuffix)
             prompt = prompt.replacingOccurrences(of: "{{user_query}}", with: query)
+
+            // Add new settings to the prompt
+            let additionalSettings = """
+
+            Additional Persona Settings:
+            - Conciseness: \(String(format: "%.1f", cfg.conciseness))
+            - Detail Level: \(String(format: "%.1f", cfg.detailLevel))
+            - Empathy: \(String(format: "%.1f", cfg.empathy))
+            - Proactivity: \(String(format: "%.1f", cfg.proactivity))
+            - Reasoning Depth: \(String(format: "%.1f", cfg.reasoningDepth))
+            - Response Style: \(cfg.responseStyle)
+            - Preferred Language: \(cfg.language)
+            - Use Emojis: \(cfg.useEmoji)
+            - Use Markdown: \(cfg.useMarkdown)
+            - Include Sources: \(cfg.includeSources)
+            - Coding Style: \(cfg.codingStyle)
+            - Show Internal Thinking: \(cfg.showThinking)
+            - Presence Penalty: \(cfg.presencePenalty)
+            - Frequency Penalty: \(cfg.frequencyPenalty)
+            - Top P: \(cfg.topP)
+            - Strict Compliance: \(cfg.strictCompliance)
+            - Search Engine: \(cfg.searchEngine)
+            """
+            prompt += additionalSettings
 
             return prompt
         }.value

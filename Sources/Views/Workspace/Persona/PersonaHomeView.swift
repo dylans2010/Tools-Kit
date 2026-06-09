@@ -1,5 +1,7 @@
 import SwiftUI
 import Aurora
+import Speech
+import AVFoundation
 
 struct PersonaHomeView: View {
     @ObservedObject private var manager = PersonaManager.shared
@@ -14,7 +16,7 @@ struct PersonaHomeView: View {
     @State private var showingFullScreenMCP = false
 
     enum PersonaHomeModal: Identifiable {
-        case chats, settings, discovery, actions, exportOptions
+        case chats, settings, discovery, actions, exportOptions, voice
         case shareSheet(data: Data, filename: String)
         var id: String {
             switch self {
@@ -23,6 +25,7 @@ struct PersonaHomeView: View {
             case .discovery: return "discovery"
             case .actions: return "actions"
             case .exportOptions: return "exportOptions"
+            case .voice: return "voice"
             case .shareSheet: return "shareSheet"
             }
         }
@@ -40,6 +43,7 @@ struct PersonaHomeView: View {
                 onOpenDiscovery: { activeModal = .discovery },
                 onOpenChats: { activeModal = .chats },
                 onOpenActions: { activeModal = .actions },
+                onOpenVoice: { activeModal = .voice },
                 onConfirm: handleConfirmation(_:)
             )
         }
@@ -67,7 +71,9 @@ struct PersonaHomeView: View {
                     manager.chatHistory = thread.messages
                 },
                 activeModal: $activeModal,
-                showingFullScreenMCP: $showingFullScreenMCP
+                showingFullScreenMCP: $showingFullScreenMCP,
+                query: $query,
+                onVoiceFinished: { sendMessage() }
             )
         }
         .fullScreenCover(isPresented: $showingFullScreenMCP) {
@@ -82,7 +88,7 @@ struct PersonaHomeView: View {
         }
     }
 
-    private func sendMessage() {
+    func sendMessage() {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         query = ""
@@ -101,6 +107,74 @@ struct PersonaHomeView: View {
             }
             pendingAction = nil
             pendingIntent = nil
+        }
+    }
+}
+
+// MARK: - Voice Input View
+
+struct PersonaUserSpeak: View {
+    @StateObject var speechManager = SpeechManager()
+    @Binding var query: String
+    var onFinished: () -> Void
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        VStack(spacing: 30) {
+            Text(speechManager.isRecording ? "Listening..." : "Voice Capture")
+                .font(.title2.bold())
+
+            ZStack {
+                Circle()
+                    .fill(Color.blue.opacity(0.1))
+                    .frame(width: 120, height: 120)
+
+                Image(systemName: speechManager.isRecording ? "mic.fill" : "mic.slash.fill")
+                    .font(.system(size: 40))
+                    .foregroundStyle(.blue)
+                    .scaleEffect(speechManager.isRecording ? 1.2 : 1.0)
+                    .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: speechManager.isRecording)
+            }
+
+            ScrollView {
+                Text(speechManager.transcription.isEmpty ? "Speak now..." : speechManager.transcription)
+                    .font(.body)
+                    .multilineTextAlignment(.center)
+                    .padding()
+            }
+            .frame(maxWidth: .infinity, maxHeight: 150)
+            .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+
+            HStack(spacing: 20) {
+                Button("Cancel") {
+                    speechManager.stopRecording()
+                    dismiss()
+                }
+                .buttonStyle(.bordered)
+
+                Button("Send") {
+                    query = speechManager.transcription
+                    speechManager.stopRecording()
+                    onFinished()
+                    dismiss()
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(speechManager.transcription.isEmpty)
+            }
+        }
+        .padding(40)
+        .onAppear {
+            speechManager.checkPermissions()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                do {
+                    try speechManager.startRecording()
+                } catch {
+                    print("Failed to start recording: \(error)")
+                }
+            }
+        }
+        .onDisappear {
+            speechManager.stopRecording()
         }
     }
 }
@@ -130,6 +204,7 @@ private struct PersonaHomeNavigationContent: View {
     let onOpenDiscovery: () -> Void
     let onOpenChats: () -> Void
     let onOpenActions: () -> Void
+    let onOpenVoice: () -> Void
     let onConfirm: (Bool) -> Void
 
     var body: some View {
@@ -138,27 +213,60 @@ private struct PersonaHomeNavigationContent: View {
 
             VStack(spacing: 0) {
                 ScrollViewReader { proxy in
-                    List {
-                        if chatHistory.isEmpty {
-                            PersonaEmptyStateView(onDiscoverPrompts: onOpenDiscovery)
-                                .listRowBackground(Color.clear).listRowSeparator(.hidden)
-                        } else {
-                            ForEach(chatHistory) { msg in
-                                PersonaChatBubble(message: msg).id(msg.id)
+                    ZStack(alignment: .bottomTrailing) {
+                        List {
+                            if chatHistory.isEmpty {
+                                PersonaEmptyStateView(onDiscoverPrompts: onOpenDiscovery)
+                                    .listRowBackground(Color.clear).listRowSeparator(.hidden)
+                            } else {
+                                ForEach(chatHistory) { msg in
+                                    PersonaChatBubble(message: msg).id(msg.id)
+                                        .listRowBackground(Color.clear).listRowSeparator(.hidden)
+                                }
+                            }
+
+                            MCPConnectStateList(invocations: MCPManager.shared.activeInvocations)
+                                .listRowBackground(Color.clear).listRowSeparator(.hidden).id("mcp-list")
+
+                            if isThinking {
+                                ThinkingIndicator().id("thinking")
                                     .listRowBackground(Color.clear).listRowSeparator(.hidden)
                             }
                         }
+                        .listStyle(.plain)
 
-                        MCPConnectStateList(invocations: MCPManager.shared.activeInvocations)
-                            .listRowBackground(Color.clear).listRowSeparator(.hidden).id("mcp-list")
-
-                        if isThinking {
-                            ThinkingIndicator().id("thinking")
-                                .listRowBackground(Color.clear).listRowSeparator(.hidden)
+                        if !chatHistory.isEmpty {
+                            Button(action: {
+                                withAnimation {
+                                    if let id = chatHistory.last?.id {
+                                        proxy.scrollTo(id, anchor: .bottom)
+                                    }
+                                }
+                            }) {
+                                Image(systemName: "chevron.down.circle.fill")
+                                    .font(.system(size: 32))
+                                    .foregroundStyle(.blue)
+                                    .background(Circle().fill(.background))
+                                    .shadow(radius: 2)
+                            }
+                            .padding(.trailing, 20)
+                            .padding(.bottom, 20)
                         }
                     }
-                    .listStyle(.plain)
-                    .onChange(of: chatHistory.count) { _, _ in withAnimation { if let id = chatHistory.last?.id { proxy.scrollTo(id, anchor: .bottom) } } }
+                    .onChange(of: chatHistory.count) { _, _ in
+                        withAnimation {
+                            if let id = chatHistory.last?.id {
+                                proxy.scrollTo(id, anchor: .bottom)
+                            }
+                        }
+                    }
+                    .onChange(of: isThinking) { _, newValue in
+                        if newValue {
+                            withAnimation {
+                                proxy.scrollTo("thinking", anchor: .bottom)
+                            }
+                        }
+                    }
                 }
 
                 Spacer(minLength: 100)
@@ -173,7 +281,7 @@ private struct PersonaHomeNavigationContent: View {
             VStack(spacing: 0) {
                 Divider()
                 HStack(spacing: 12) {
-                    Button(action: {}) { Image(systemName: "mic.fill").font(.title3).foregroundStyle(.secondary) }
+                    Button(action: onOpenVoice) { Image(systemName: "mic.fill").font(.title3).foregroundStyle(.secondary) }
                     TextField("Message Persona...", text: $query, axis: .vertical)
                         .padding(.vertical, 8).lineLimit(1...5)
 
@@ -220,17 +328,54 @@ struct TuningSheetView: View {
                     tuningSlider(label: "Creativity", value: $manager.config.creativity)
                     tuningSlider(label: "Formality", value: $manager.config.formality)
                     tuningSlider(label: "Humor", value: $manager.config.humor)
+                    tuningSlider(label: "Conciseness", value: $manager.config.conciseness)
+                    tuningSlider(label: "Detail Level", value: $manager.config.detailLevel)
+                    tuningSlider(label: "Empathy", value: $manager.config.empathy)
+                    tuningSlider(label: "Proactivity", value: $manager.config.proactivity)
+                    tuningSlider(label: "Reasoning Depth", value: $manager.config.reasoningDepth)
                 }
                 Section("Advanced Parameters") {
                     tuningSlider(label: "Temperature", value: $manager.config.temperature)
+                    tuningSlider(label: "Top P", value: $manager.config.topP)
+                    tuningSlider(label: "Frequency Penalty", value: $manager.config.frequencyPenalty)
+                    tuningSlider(label: "Presence Penalty", value: $manager.config.presencePenalty)
+
                     VStack(alignment: .leading) {
-                        HStack {
-                            Text("Max Tokens")
-                            Spacer()
-                            Text("\(manager.config.maxTokens)")
-                        }
+                        HStack { Text("Max Tokens"); Spacer(); Text("\(manager.config.maxTokens)") }
                         Slider(value: Binding(get: { Double(manager.config.maxTokens) }, set: { manager.config.maxTokens = Int($0) }), in: 256...4096, step: 128)
                     }
+                    VStack(alignment: .leading) {
+                        HStack { Text("Context Window"); Spacer(); Text("\(manager.config.contextWindow)") }
+                        Slider(value: Binding(get: { Double(manager.config.contextWindow) }, set: { manager.config.contextWindow = Int($0) }), in: 1024...32768, step: 1024)
+                    }
+                }
+                Section("Style & Language") {
+                    Picker("Language", selection: $manager.config.language) {
+                        Text("English").tag("English")
+                        Text("Spanish").tag("Spanish")
+                        Text("French").tag("French")
+                        Text("German").tag("German")
+                        Text("Chinese").tag("Chinese")
+                    }
+                    Picker("Response Style", selection: $manager.config.responseStyle) {
+                        Text("Balanced").tag("Balanced")
+                        Text("Creative").tag("Creative")
+                        Text("Precise").tag("Precise")
+                    }
+                    Picker("Coding Style", selection: $manager.config.codingStyle) {
+                        Text("Standard").tag("Standard")
+                        Text("Functional").tag("Functional")
+                        Text("OOP").tag("OOP")
+                    }
+                    Picker("Search Engine", selection: $manager.config.searchEngine) {
+                        Text("Google").tag("Google")
+                        Text("Bing").tag("Bing")
+                        Text("DuckDuckGo").tag("DuckDuckGo")
+                    }
+                }
+                Section("Voice Settings") {
+                    tuningSlider(label: "Pitch", value: $manager.config.voicePitch)
+                    tuningSlider(label: "Speed", value: $manager.config.voiceSpeed)
                 }
                 Section("Behavior Toggles") {
                     Toggle("Agent Mode", isOn: $manager.agentModeEnabled)
@@ -238,6 +383,17 @@ struct TuningSheetView: View {
                     Toggle("Web Search", isOn: $manager.config.webSearchEnabled)
                     Toggle("Memory Enabled", isOn: $manager.config.memoryEnabled)
                     Toggle("MCP Tools Enabled", isOn: $manager.config.mcpToolsEnabled)
+                    Toggle("Use Emojis", isOn: $manager.config.useEmoji)
+                    Toggle("Use Markdown", isOn: $manager.config.useMarkdown)
+                    Toggle("Include Sources", isOn: $manager.config.includeSources)
+                    Toggle("Auto Correct", isOn: $manager.config.autoCorrect)
+                    Toggle("Show Thinking", isOn: $manager.config.showThinking)
+                    Toggle("Summarize Context", isOn: $manager.config.summarizeContext)
+                    Toggle("Enable Images", isOn: $manager.config.enableImages)
+                    Toggle("Enable Audio", isOn: $manager.config.enableAudio)
+                    Toggle("Strict Compliance", isOn: $manager.config.strictCompliance)
+                    Toggle("Model Fallback", isOn: $manager.config.modelFallback)
+                    Toggle("Developer Mode", isOn: $manager.config.developerMode)
                 }
                 Section("MCP Servers") {
                     Button {
@@ -285,6 +441,8 @@ private struct PersonaHomeModalContent: View {
     let onThreadSelection: (PersonaChatThread) -> Void
     @Binding var activeModal: PersonaHomeView.PersonaHomeModal?
     @Binding var showingFullScreenMCP: Bool
+    @Binding var query: String
+    let onVoiceFinished: () -> Void
 
     var body: some View {
         Group {
@@ -293,6 +451,7 @@ private struct PersonaHomeModalContent: View {
             case .discovery: PromptDiscoveryView(onSelect: onPromptSelection).presentationDetents([.medium])
             case .chats: PersonaChatHistorySheet(threads: $manager.chatThreads, onContinue: onThreadSelection)
             case .actions: PersonaAgentActionGalleryView().presentationDetents([.medium, .large])
+            case .voice: PersonaUserSpeak(query: $query, onFinished: onVoiceFinished).presentationDetents([.medium])
             case .exportOptions: PersonaExportOptionsView(messages: manager.chatHistory, persona: manager.config, agentMode: manager.agentModeEnabled) { d, f in activeModal = .shareSheet(data: d, filename: f) }
             case .shareSheet(let d, let f): ShareSheet(activityItems: [writeTemp(d, f)])
             }
