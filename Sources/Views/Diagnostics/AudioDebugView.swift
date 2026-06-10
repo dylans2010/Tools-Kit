@@ -1,62 +1,154 @@
 import SwiftUI
 import AudioToolbox
 
-struct AudioDebugView: View {
-    @State private var isPlayingAll = false
-    @State private var currentSoundIndex = 0
-    @State private var playbackTimer: Timer?
-    @State private var searchText = ""
+/// ViewModel to handle sound data and playback logic, preventing UI freezes
+/// by pre-calculating sound IDs and moving logic out of the View's body.
+@MainActor
+class AudioDebugViewModel: ObservableObject {
+    @Published var isPlayingAll = false
+    @Published var currentSoundIndex = 0
+    @Published var searchText = ""
 
-    let soundCategories: [SoundCategory] = [
-        .init(name: "System Alerts", range: 1000...1016),
-        .init(name: "UI Feedback", range: 1020...1036),
-        .init(name: "Haptics & Taps", range: 1050...1059),
-        .init(name: "Siri & Dictation", range: 1100...1118),
-        .init(name: "Mail & Messages", range: 1200...1211),
-        .init(name: "Calendar & Reminders", range: 1254...1259),
-        .init(name: "Photos & Camera", range: 1300...1315),
-        .init(name: "Lock & Keyboard", range: 1320...1336),
-        .init(name: "Modern UI", range: 1350...1351),
-        .init(name: "Legacy Alerts", ids: [4095, 1000, 1001, 1002, 1003, 1004, 1005, 1007, 1008, 1009, 1010, 1016])
-    ]
+    private var playbackTimer: Timer?
 
-    var allSounds: [SystemSoundID] {
-        soundCategories.flatMap { $0.allIDs }
+    let categories: [AudioSoundCategory]
+    let allSounds: [SystemSoundID]
+
+    init() {
+        // Define all available system sound ranges and specific IDs
+        let rawCategories: [AudioSoundCategoryData] = [
+            .init(name: "System Alerts", range: 1000...1016),
+            .init(name: "UI Feedback", range: 1020...1036),
+            .init(name: "Haptics & Taps", range: 1050...1059),
+            .init(name: "Keyboard & Type", range: 1070...1075),
+            .init(name: "Siri & Dictation", range: 1100...1118),
+            .init(name: "Payments & Wallet", range: 1150...1154),
+            .init(name: "Mail & Messages", range: 1200...1211),
+            .init(name: "Calendar & Reminders", range: 1254...1259),
+            .init(name: "Photos & Camera", range: 1300...1315),
+            .init(name: "Lock & Keyboard", range: 1320...1336),
+            .init(name: "Modern UI", range: 1350...1351),
+            .init(name: "System Sounds (1352-1400)", range: 1352...1400),
+            .init(name: "System Sounds (1401-1500)", range: 1401...1500),
+            .init(name: "System Sounds (1501-1600)", range: 1501...1600),
+            .init(name: "System Sounds (1601-1700)", range: 1601...1700),
+            .init(name: "System Sounds (1701-1800)", range: 1701...1800),
+            .init(name: "System Sounds (1801-1900)", range: 1801...1900),
+            .init(name: "System Sounds (1901-2000)", range: 1901...2000),
+            .init(name: "Vibration & Special", ids: [4095, 1352]) // 4095 is Vibrate
+        ]
+
+        // Pre-calculate all arrays to avoid expensive operations during view rendering
+        self.categories = rawCategories.map { data in
+            AudioSoundCategory(name: data.name, allIDs: data.resolve())
+        }
+        self.allSounds = self.categories.flatMap { $0.allIDs }
     }
 
-    var filteredCategories: [SoundCategory] {
+    var filteredCategories: [AudioSoundCategory] {
         if searchText.isEmpty {
-            return soundCategories
+            return categories
         } else {
-            return soundCategories.compactMap { category in
+            return categories.compactMap { category in
                 let filteredIDs = category.allIDs.filter { String($0).contains(searchText) }
-                return filteredIDs.isEmpty ? nil : SoundCategory(name: category.name, ids: filteredIDs)
+                return filteredIDs.isEmpty ? nil : AudioSoundCategory(name: category.name, allIDs: filteredIDs)
             }
         }
     }
+
+    func playAll() {
+        isPlayingAll = true
+        currentSoundIndex = 0
+        playNextSound()
+    }
+
+    func stopPlayAll() {
+        isPlayingAll = false
+        playbackTimer?.invalidate()
+        playbackTimer = nil
+    }
+
+    private func playNextSound() {
+        guard isPlayingAll, currentSoundIndex < allSounds.count else {
+            stopPlayAll()
+            return
+        }
+
+        let id = allSounds[currentSoundIndex]
+        AudioServicesPlaySystemSound(id)
+
+        playbackTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { [weak self] _ in
+            Task { @MainActor in
+                guard let self = self else { return }
+                if self.isPlayingAll {
+                    self.currentSoundIndex += 1
+                    self.playNextSound()
+                }
+            }
+        }
+    }
+}
+
+/// Internal helper for raw sound category data
+struct AudioSoundCategoryData {
+    let name: String
+    let range: ClosedRange<SystemSoundID>?
+    let ids: [SystemSoundID]?
+
+    init(name: String, range: ClosedRange<SystemSoundID>) {
+        self.name = name
+        self.range = range
+        self.ids = nil
+    }
+
+    init(name: String, ids: [SystemSoundID]) {
+        self.name = name
+        self.range = nil
+        self.ids = ids
+    }
+
+    func resolve() -> [SystemSoundID] {
+        if let range = range {
+            return Array(range)
+        } else if let ids = ids {
+            return ids
+        }
+        return []
+    }
+}
+
+/// Final processed sound category used by the view
+struct AudioSoundCategory: Identifiable {
+    var id: String { name }
+    let name: String
+    let allIDs: [SystemSoundID]
+}
+
+struct AudioDebugView: View {
+    @StateObject private var viewModel = AudioDebugViewModel()
 
     var body: some View {
         List {
             Section {
                 VStack(spacing: 12) {
-                    Button(action: isPlayingAll ? stopPlayAll : playAll) {
+                    Button(action: viewModel.isPlayingAll ? viewModel.stopPlayAll : viewModel.playAll) {
                         HStack {
-                            Image(systemName: isPlayingAll ? "stop.fill" : "play.fill")
-                            Text(isPlayingAll ? "Stop Sequence" : "Play All Sequence")
+                            Image(systemName: viewModel.isPlayingAll ? "stop.fill" : "play.fill")
+                            Text(viewModel.isPlayingAll ? "Stop Sequence" : "Play All Sequence")
                         }
                         .fontWeight(.bold)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
-                        .background(isPlayingAll ? Color.red.opacity(0.1) : Color.blue.opacity(0.1))
+                        .background(viewModel.isPlayingAll ? Color.red.opacity(0.1) : Color.blue.opacity(0.1))
                         .cornerRadius(10)
                     }
                     .buttonStyle(.plain)
-                    .foregroundColor(isPlayingAll ? .red : .blue)
+                    .foregroundColor(viewModel.isPlayingAll ? .red : .blue)
 
-                    if isPlayingAll {
-                        ProgressView(value: Double(currentSoundIndex), total: Double(allSounds.count))
+                    if viewModel.isPlayingAll {
+                        ProgressView(value: Double(viewModel.currentSoundIndex), total: Double(viewModel.allSounds.count))
                             .tint(.blue)
-                        Text("Playing: \(allSounds[currentSoundIndex]) (\(currentSoundIndex + 1)/\(allSounds.count))")
+                        Text("Playing: \(viewModel.allSounds[viewModel.currentSoundIndex]) (\(viewModel.currentSoundIndex + 1)/\(viewModel.allSounds.count))")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -66,7 +158,7 @@ struct AudioDebugView: View {
                 Text("Controls")
             }
 
-            ForEach(filteredCategories, id: \.name) { category in
+            ForEach(viewModel.filteredCategories) { category in
                 Section(header: Text(category.name)) {
                     ForEach(category.allIDs, id: \.self) { id in
                         HStack {
@@ -92,67 +184,11 @@ struct AudioDebugView: View {
                 }
             }
         }
-        .searchable(text: $searchText, prompt: "Search Sound ID")
+        .searchable(text: $viewModel.searchText, prompt: "Search Sound ID")
         .navigationTitle("Audio Debugger")
         .navigationBarTitleDisplayMode(.large)
         .onDisappear {
-            stopPlayAll()
+            viewModel.stopPlayAll()
         }
-    }
-
-    private func playAll() {
-        isPlayingAll = true
-        currentSoundIndex = 0
-        playNextSound()
-    }
-
-    private func stopPlayAll() {
-        isPlayingAll = false
-        playbackTimer?.invalidate()
-        playbackTimer = nil
-    }
-
-    private func playNextSound() {
-        guard isPlayingAll, currentSoundIndex < allSounds.count else {
-            stopPlayAll()
-            return
-        }
-
-        let id = allSounds[currentSoundIndex]
-        AudioServicesPlaySystemSound(id)
-
-        playbackTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
-            DispatchQueue.main.async {
-                currentSoundIndex += 1
-                playNextSound()
-            }
-        }
-    }
-}
-
-struct SoundCategory {
-    let name: String
-    let range: ClosedRange<SystemSoundID>?
-    let ids: [SystemSoundID]?
-
-    init(name: String, range: ClosedRange<SystemSoundID>) {
-        self.name = name
-        self.range = range
-        self.ids = nil
-    }
-
-    init(name: String, ids: [SystemSoundID]) {
-        self.name = name
-        self.range = nil
-        self.ids = ids
-    }
-
-    var allIDs: [SystemSoundID] {
-        if let range = range {
-            return Array(range)
-        } else if let ids = ids {
-            return ids
-        }
-        return []
     }
 }
