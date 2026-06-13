@@ -898,6 +898,8 @@
 		CC11DD22EE33FF44AA55BB05 /* MistralProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC05 /* MistralProvider.swift */; };
 		CC11DD22EE33FF44AA55BB06 /* OpenAIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC06 /* OpenAIProvider.swift */; };
 		CC11DD22EE33FF44AA55BB07 /* OpenRouterProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC07 /* OpenRouterProvider.swift */; };
+		LM0200000000000000000001 /* LocalModelsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000001 /* LocalModelsProvider.swift */; };
+		LM0200000000000000000002 /* SetupLocalModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000002 /* SetupLocalModelsView.swift */; };
 		B1C2D3E4F5A60708090A0D11 /* AIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C01 /* AIService.swift */; };
 		B1C2D3E4F5A60708090A0D02 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C02 /* CameraService.swift */; };
 		B1C2D3E4F5A60708090A0D03 /* VisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C03 /* VisionService.swift */; };
@@ -2975,6 +2977,8 @@
 		DD11EE22FF33AA44BB55CC05 /* MistralProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistralProvider.swift; sourceTree = "<group>"; };
 		DD11EE22FF33AA44BB55CC06 /* OpenAIProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIProvider.swift; sourceTree = "<group>"; };
 		DD11EE22FF33AA44BB55CC07 /* OpenRouterProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterProvider.swift; sourceTree = "<group>"; };
+		LM0100000000000000000001 /* LocalModelsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalModelsProvider.swift; sourceTree = "<group>"; };
+		LM0100000000000000000002 /* SetupLocalModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupLocalModelsView.swift; sourceTree = "<group>"; };
 		064CB13BC205411B91EAA752 /* MapsToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsToolView.swift; sourceTree = "<group>"; };
 		09E6435EECFF4FD6B31B4C0B /* MapsToolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsToolViewModel.swift; sourceTree = "<group>"; };
 		CCFF0BDC48A74ACABA6CE6DD /* ObjectDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionView.swift; sourceTree = "<group>"; };
@@ -6144,9 +6148,18 @@
 			path = CurrencyConverter;
 			sourceTree = "<group>";
 		};
+		LM0300000000000000000002 /* LocalModels */ = {
+			isa = PBXGroup;
+			children = (
+				LM0100000000000000000002 /* SetupLocalModelsView.swift */,
+			);
+			path = LocalModels;
+			sourceTree = "<group>";
+		};
 		3AD525638774459989605A9A /* AIChat */ = {
 			isa = PBXGroup;
 			children = (
+				LM0300000000000000000002 /* LocalModels */,
 				2613768EBF12072C6C0D2706 /* AIChatSettingsView.swift */,
 				6662160AA2024E9FBEA29A4C /* AIChatToolView.swift */,
 				AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */,
@@ -10596,9 +10609,18 @@
 			path = AIChat;
 			sourceTree = "<group>";
 		};
+		LM0300000000000000000001 /* LocalModels */ = {
+			isa = PBXGroup;
+			children = (
+				LM0100000000000000000001 /* LocalModelsProvider.swift */,
+			);
+			path = LocalModels;
+			sourceTree = "<group>";
+		};
 		E10000000000000000000005 /* Providers */ = {
 			isa = PBXGroup;
 			children = (
+				LM0300000000000000000001 /* LocalModels */,
 				928AD5D50EF44D6B87CD4F37 /* ProviderModelFetchSupport.swift */,
 				AI0100000000000000000005 /* JulesProvider.swift */,
 				DD11EE22FF33AA44BB55CC03 /* AnthropicProvider.swift */,
@@ -13383,6 +13405,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB0200000000000000000000 /* AIAnalysisResult.swift in Sources */,
+				LM0200000000000000000001 /* LocalModelsProvider.swift in Sources */,
+				LM0200000000000000000002 /* SetupLocalModelsView.swift in Sources */,
 				FB0200000000000000000001 /* AIAnalysisService.swift in Sources */,
 				FB0200000000000000000002 /* DiagnosticsCenterView.swift in Sources */,
 				FB0200000000000000000003 /* DiagnosticsData.swift in Sources */,
