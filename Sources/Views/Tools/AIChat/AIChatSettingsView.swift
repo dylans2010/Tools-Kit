@@ -234,11 +234,18 @@ struct AIChatSettingsView: View {
                         }
                     }
 
-                    APIKeyRowView(
-                        providerID: provider.id,
-                        providerName: provider.name,
-                        placeholder: provider.apiKeyPlaceholder
-                    )
+                    if provider.id == "local_models" {
+                        NavigationLink(destination: SetupLocalModelsView()) {
+                            Label("Configure Local Models", systemImage: "gearshape.fill")
+                                .foregroundColor(.blue)
+                        }
+                    } else {
+                        APIKeyRowView(
+                            providerID: provider.id,
+                            providerName: provider.name,
+                            placeholder: provider.apiKeyPlaceholder
+                        )
+                    }
                 }
                 .padding()
                 .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))

@@ -14,6 +14,7 @@ final class AIProviderRegistry {
             AnthropicProvider(),
             GeminiProvider(),
             MistralProvider(),
+            LocalModelsProvider(),
         ]
     }
 
