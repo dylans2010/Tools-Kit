@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 /// Represents the current state of the bridge connection.
-public enum BridgeConnectionState: String, Codable, Equatable {
+public enum BridgeConnectionState: Codable, Equatable {
     case disconnected
     case connecting
     case connected
