@@ -7,6 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BR02000000000001 /* BridgeChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000001 /* BridgeChatView.swift */; };
+		BR02000000000002 /* BridgeHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000002 /* BridgeHomeView.swift */; };
+		BR02000000000003 /* BridgePairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000003 /* BridgePairingView.swift */; };
+		BR02000000000004 /* BridgePlatformSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000004 /* BridgePlatformSelectorView.swift */; };
+		BR02000000000005 /* BridgeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000005 /* BridgeSettingsView.swift */; };
+		BR02000000000006 /* BridgeTroubleshootingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000006 /* BridgeTroubleshootingView.swift */; };
+		BR02000000000007 /* BridgeCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000007 /* BridgeCommand.swift */; };
+		BR02000000000008 /* BridgeConnectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000008 /* BridgeConnectionState.swift */; };
+		BR02000000000009 /* BridgeDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000009 /* BridgeDevice.swift */; };
+		BR02000000000010 /* BridgeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000010 /* BridgeError.swift */; };
+		BR02000000000011 /* BridgeMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000011 /* BridgeMessage.swift */; };
+		BR02000000000012 /* BridgePlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000012 /* BridgePlatform.swift */; };
+		BR02000000000013 /* BridgeSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000013 /* BridgeSession.swift */; };
+		BR02000000000014 /* BridgeConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000014 /* BridgeConnectionManager.swift */; };
+		BR02000000000015 /* BridgePlatformResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000015 /* BridgePlatformResolver.swift */; };
+		BR02000000000016 /* BridgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000016 /* BridgeService.swift */; };
+		BR02000000000017 /* BridgeSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000017 /* BridgeSessionManager.swift */; };
+		BR02000000000018 /* BridgeWebSocketClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000018 /* BridgeWebSocketClient.swift */; };
 		DA02B9999999 /* StorageNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B9999999 /* StorageNode.swift */; };
 		DA02B0000000013 /* CanaryRolloutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000013 /* CanaryRolloutView.swift */; };
 		DA02B0000000012 /* PerformanceProfilingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA01B0000000012 /* PerformanceProfilingView.swift */; };
@@ -2346,6 +2364,24 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BR01000000000001 /* BridgeChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/BridgeChatView.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000002 /* BridgeHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/BridgeHomeView.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000003 /* BridgePairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/BridgePairingView.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000004 /* BridgePlatformSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/BridgePlatformSelectorView.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000005 /* BridgeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/BridgeSettingsView.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000006 /* BridgeTroubleshootingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/BridgeTroubleshootingView.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000007 /* BridgeCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Models/BridgeCommand.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000008 /* BridgeConnectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Models/BridgeConnectionState.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000009 /* BridgeDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Models/BridgeDevice.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000010 /* BridgeError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Models/BridgeError.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000011 /* BridgeMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Models/BridgeMessage.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000012 /* BridgePlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Models/BridgePlatform.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000013 /* BridgeSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Models/BridgeSession.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000014 /* BridgeConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Services/BridgeConnectionManager.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000015 /* BridgePlatformResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Services/BridgePlatformResolver.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000016 /* BridgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Services/BridgeService.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000017 /* BridgeSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Services/BridgeSessionManager.swift; sourceTree = SOURCE_ROOT; };
+		BR01000000000018 /* BridgeWebSocketClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Services/BridgeWebSocketClient.swift; sourceTree = SOURCE_ROOT; };
 		DA01B9999999 /* StorageNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StorageNode.swift; path = Sources/Views/Workspace/Developer/Models/StorageNode.swift; sourceTree = SOURCE_ROOT; };
 		DA01B0000000013 /* CanaryRolloutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CanaryRolloutView.swift; path = Sources/Views/Workspace/Developer/CanaryRolloutView.swift; sourceTree = SOURCE_ROOT; };
 		DA01B0000000012 /* PerformanceProfilingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PerformanceProfilingView.swift; path = Sources/Views/Workspace/Developer/PerformanceProfilingView.swift; sourceTree = SOURCE_ROOT; };
@@ -5435,9 +5471,51 @@
 			path = FileIntegrity;
 			sourceTree = "<group>";
 		};
+		BR00000000000001 /* Bridging */ = {
+			isa = PBXGroup;
+			children = (
+				BR00000000000002 /* Models */,
+				BR00000000000003 /* Services */,
+				BR01000000000001 /* BridgeChatView.swift */,
+				BR01000000000002 /* BridgeHomeView.swift */,
+				BR01000000000003 /* BridgePairingView.swift */,
+				BR01000000000004 /* BridgePlatformSelectorView.swift */,
+				BR01000000000005 /* BridgeSettingsView.swift */,
+				BR01000000000006 /* BridgeTroubleshootingView.swift */,
+			);
+			path = Bridging;
+			sourceTree = "<group>";
+		};
+		BR00000000000002 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				BR01000000000007 /* BridgeCommand.swift */,
+				BR01000000000008 /* BridgeConnectionState.swift */,
+				BR01000000000009 /* BridgeDevice.swift */,
+				BR01000000000010 /* BridgeError.swift */,
+				BR01000000000011 /* BridgeMessage.swift */,
+				BR01000000000012 /* BridgePlatform.swift */,
+				BR01000000000013 /* BridgeSession.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		BR00000000000003 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				BR01000000000014 /* BridgeConnectionManager.swift */,
+				BR01000000000015 /* BridgePlatformResolver.swift */,
+				BR01000000000016 /* BridgeService.swift */,
+				BR01000000000017 /* BridgeSessionManager.swift */,
+				BR01000000000018 /* BridgeWebSocketClient.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		1987FFD9C7B9ABE77AB250E2 /* Workspace */ = {
 			isa = PBXGroup;
 			children = (
+				BR00000000000001 /* Bridging */,
 				DA0000000000000000000001 /* Developer */,
 				AV7CB96B980CB75590CFDFC6 /* Agentic */,
 				1F52E52BA0DF497BA662A7C8 /* Persona */,
@@ -13404,6 +13482,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BR02000000000001 /* BridgeChatView.swift in Sources */,
+				BR02000000000002 /* BridgeHomeView.swift in Sources */,
+				BR02000000000003 /* BridgePairingView.swift in Sources */,
+				BR02000000000004 /* BridgePlatformSelectorView.swift in Sources */,
+				BR02000000000005 /* BridgeSettingsView.swift in Sources */,
+				BR02000000000006 /* BridgeTroubleshootingView.swift in Sources */,
+				BR02000000000007 /* BridgeCommand.swift in Sources */,
+				BR02000000000008 /* BridgeConnectionState.swift in Sources */,
+				BR02000000000009 /* BridgeDevice.swift in Sources */,
+				BR02000000000010 /* BridgeError.swift in Sources */,
+				BR02000000000011 /* BridgeMessage.swift in Sources */,
+				BR02000000000012 /* BridgePlatform.swift in Sources */,
+				BR02000000000013 /* BridgeSession.swift in Sources */,
+				BR02000000000014 /* BridgeConnectionManager.swift in Sources */,
+				BR02000000000015 /* BridgePlatformResolver.swift in Sources */,
+				BR02000000000016 /* BridgeService.swift in Sources */,
+				BR02000000000017 /* BridgeSessionManager.swift in Sources */,
+				BR02000000000018 /* BridgeWebSocketClient.swift in Sources */,
 				FB0200000000000000000000 /* AIAnalysisResult.swift in Sources */,
 				LM0200000000000000000001 /* LocalModelsProvider.swift in Sources */,
 				LM0200000000000000000002 /* SetupLocalModelsView.swift in Sources */,
