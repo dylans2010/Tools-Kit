@@ -634,6 +634,7 @@ struct AIChatSettingsView: View {
 
     private var developerToolsSectionContent: some View {
         Group {
+            NavigationLink("Device Bridge") { BridgeHomeView() }
             NavigationLink("Audio Debugger") { AudioDebugView() }
             NavigationLink("SiriGlowCore UI Playground") { SiriCoreUIView() }
             NavigationLink("Model Config") { modelConfigSheet }
