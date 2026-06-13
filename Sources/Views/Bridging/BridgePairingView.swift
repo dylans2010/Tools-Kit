@@ -18,6 +18,19 @@ struct BridgePairingView: View {
         var id: String { rawValue }
     }
 
+    private var isFormValid: Bool {
+        if deviceName.isEmpty { return false }
+
+        switch pairingMethod {
+        case .qr:
+            return false // QR scanner not implemented in this UI
+        case .code:
+            return pairingCode.count == 6
+        case .manual:
+            return !hostURL.isEmpty && !port.isEmpty
+        }
+    }
+
     var body: some View {
         Form {
             Section {
@@ -100,19 +113,6 @@ struct BridgePairingView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 20)
-    }
-
-    private var isFormValid: some View {
-        if deviceName.isEmpty { return false }
-
-        switch pairingMethod {
-        case .qr:
-            return false // QR scanner not implemented in this UI
-        case .code:
-            return pairingCode.count == 6
-        case .manual:
-            return !hostURL.isEmpty && !port.isEmpty
-        }
     }
 
     private func validateAndPair() {
