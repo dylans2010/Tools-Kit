@@ -25,6 +25,23 @@ struct PromptChain: Codable, Identifiable {
     var steps: [String]
 }
 
+struct LocalModelConfig: Codable, Identifiable, Equatable {
+    var id = UUID()
+    var name: String = "My Local Model"
+    var baseURL: String = "http://localhost:11434/v1"
+    var modelName: String = "llama3"
+    var apiKey: String = ""
+    var customHeaders: [String: String] = [:]
+    var timeout: Double = 30.0
+
+    var temperature: Double = 0.7
+    var maxTokens: Int = 2048
+    var topP: Double = 1.0
+    var frequencyPenalty: Double = 0.0
+    var presencePenalty: Double = 0.0
+    var isStreamingEnabled: Bool = true
+}
+
 struct AIChatSettings: Codable {
     var selectedProviderID: String = "openrouter"
     var aiModelSource: AIModelSource = .appModel
@@ -53,6 +70,10 @@ struct AIChatSettings: Codable {
     var autoInjectContext: Bool = false
     var includeConversationHistory: Bool = true
     var dynamicRoutingEnabled: Bool = false
+
+    // Local Models
+    var localConfigs: [LocalModelConfig] = []
+    var selectedLocalConfigID: UUID? = nil
 
     // Prompt Tools
     var promptVariables: [PromptVariable] = []
