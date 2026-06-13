@@ -18,7 +18,11 @@ class AIService {
     // MARK: - Current provider helpers
 
     private var currentProviderID: String {
-        settingsManager.settings.selectedProviderID
+        // If a local model is set as default, it takes precedence
+        if settingsManager.settings.selectedLocalConfigID != nil {
+            return "local_models"
+        }
+        return settingsManager.settings.selectedProviderID
     }
 
     private var currentProvider: (any AIProvider)? {

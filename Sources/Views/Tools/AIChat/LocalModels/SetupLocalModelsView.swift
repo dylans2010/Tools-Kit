@@ -9,9 +9,15 @@ struct SetupLocalModelsView: View {
         List {
             Section {
                 if settingsManager.settings.localConfigs.isEmpty {
-                    Text("No local model configurations found.")
-                        .foregroundColor(.secondary)
-                        .padding(.vertical, 8)
+                    VStack(spacing: 12) {
+                        Image(systemName: "server.rack")
+                            .font(.system(size: 40))
+                            .foregroundColor(.secondary)
+                        Text("No local model configurations found.")
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 24)
                 } else {
                     ForEach(settingsManager.settings.localConfigs) { config in
                         configRow(config)
@@ -19,9 +25,9 @@ struct SetupLocalModelsView: View {
                     .onDelete(perform: deleteConfigs)
                 }
             } header: {
-                Text("Configurations")
-            } footer: {
-                Text("Swipe left to delete a configuration.")
+                SectionHeader(title: "Environments", subtitle: "Manage your local AI setups", icon: "server.rack")
+                    .listRowInsets(EdgeInsets())
+                    .padding(.bottom, 8)
             }
 
             Section {
@@ -29,8 +35,10 @@ struct SetupLocalModelsView: View {
                     configToEdit = LocalModelConfig()
                     showingAddSheet = true
                 } label: {
-                    Label("Add Local Model", systemImage: "plus.circle.fill")
+                    Label("Add New Local Model", systemImage: "plus.circle.fill")
+                        .font(.headline)
                 }
+                .padding(.vertical, 4)
             }
         }
         .navigationTitle("Local Models")
@@ -47,14 +55,23 @@ struct SetupLocalModelsView: View {
         Button {
             configToEdit = config
         } label: {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 16) {
+                ZStack {
+                    Circle()
+                        .fill(settingsManager.settings.selectedLocalConfigID == config.id ? Color.blue.opacity(0.1) : Color.gray.opacity(0.1))
+                        .frame(width: 40, height: 40)
+                    Image(systemName: "desktopcomputer")
+                        .foregroundColor(settingsManager.settings.selectedLocalConfigID == config.id ? .blue : .primary)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
                     Text(config.name)
                         .font(.headline)
                         .foregroundColor(.primary)
                     Text(config.baseURL)
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .lineLimit(1)
                 }
 
                 Spacer()
@@ -62,8 +79,14 @@ struct SetupLocalModelsView: View {
                 if settingsManager.settings.selectedLocalConfigID == config.id {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.blue)
+                        .font(.title3)
+                } else {
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
             }
+            .padding(.vertical, 4)
         }
     }
 
@@ -76,6 +99,7 @@ struct SetupLocalModelsView: View {
 
         if settingsManager.settings.selectedLocalConfigID == nil {
             settingsManager.settings.selectedLocalConfigID = config.id
+            settingsManager.settings.selectedProviderID = "local_models"
         }
     }
 
@@ -84,6 +108,9 @@ struct SetupLocalModelsView: View {
         if let selectedID = settingsManager.settings.selectedLocalConfigID,
            !settingsManager.settings.localConfigs.contains(where: { $0.id == selectedID }) {
             settingsManager.settings.selectedLocalConfigID = settingsManager.settings.localConfigs.first?.id
+            if settingsManager.settings.selectedLocalConfigID == nil && settingsManager.settings.selectedProviderID == "local_models" {
+                settingsManager.settings.selectedProviderID = "openrouter" // Fallback
+            }
         }
     }
 }
@@ -97,126 +124,295 @@ struct EditLocalModelConfigView: View {
     @State private var testResult: Result<String, Error>?
     @State private var newHeaderKey = ""
     @State private var newHeaderValue = ""
+    @State private var newStopSequence = ""
 
     var body: some View {
         Form {
-            Section("General") {
-                TextField("Configuration Name", text: $config.name)
-                TextField("Base URL", text: $config.baseURL)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-                TextField("Model Name", text: $config.modelName)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-                SecureField("API Key (Optional)", text: $config.apiKey)
-            }
+            Group {
+                Section {
+                    settingRow(icon: "tag.fill", label: "Name") {
+                        TextField("Configuration Name", text: $config.name)
+                    }
+                    settingRow(icon: "link", label: "Base URL") {
+                        TextField("http://localhost:11434/v1", text: $config.baseURL)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                    }
+                    settingRow(icon: "cpu", label: "Model") {
+                        TextField("llama3", text: $config.modelName)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                    }
+                    settingRow(icon: "key.fill", label: "API Key") {
+                        SecureField("Optional", text: $config.apiKey)
+                    }
+                    settingRow(icon: "timer", label: "Timeout") {
+                        Stepper("\(Int(config.timeout))s", value: $config.timeout, in: 5...600, step: 5)
+                    }
+                } header: {
+                    SectionHeader(title: "General", subtitle: "Basic connection settings", icon: "gearshape.fill")
+                        .listRowInsets(EdgeInsets())
+                }
 
-            Section("Custom Headers") {
-                ForEach(config.customHeaders.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                    HStack {
-                        Text(key).font(.caption.bold())
-                        Spacer()
-                        Text(value).font(.caption).foregroundColor(.secondary)
-                        Button(role: .destructive) {
-                            config.customHeaders.removeValue(forKey: key)
-                        } label: {
-                            Image(systemName: "minus.circle.fill")
+                Section {
+                    settingSlider(label: "Temperature", value: $config.temperature, range: 0...2, step: 0.1, icon: "thermometer.medium", specifier: "%.1f")
+
+                    settingRow(icon: "text.quote", label: "Max Tokens") {
+                        Stepper("\(config.maxTokens)", value: $config.maxTokens, in: 128...128000, step: 128)
+                    }
+
+                    settingSlider(label: "Top-P", value: $config.topP, range: 0...1, step: 0.05, icon: "target", specifier: "%.2f")
+                    settingSlider(label: "Frequency Penalty", value: $config.frequencyPenalty, range: -2...2, step: 0.1, icon: "wave.3.right", specifier: "%.1f")
+                    settingSlider(label: "Presence Penalty", value: $config.presencePenalty, range: -2...2, step: 0.1, icon: "person.fill.viewfinder", specifier: "%.1f")
+
+                    Toggle(isOn: $config.isStreamingEnabled) {
+                        Label("Enable Streaming", systemImage: "antenna.radiowaves.left.and.right")
+                    }
+                } header: {
+                    SectionHeader(title: "Core Parameters", subtitle: "Inference engine behavior", icon: "slider.horizontal.3")
+                        .listRowInsets(EdgeInsets())
+                }
+
+                Section {
+                    settingRow(icon: "number", label: "Seed") {
+                        TextField("0", value: $config.seed, formatter: NumberFormatter())
+                            .multilineTextAlignment(.trailing)
+                            .keyboardType(.numberPad)
+                    }
+
+                    settingRow(icon: "list.number", label: "Top-K") {
+                        Stepper("\(config.topK)", value: $config.topK, in: 0...100, step: 1)
+                    }
+
+                    settingSlider(label: "Min-P", value: $config.minP, range: 0...1, step: 0.01, icon: "arrow.down.to.line", specifier: "%.2f")
+                    settingSlider(label: "Typical-P", value: $config.typicalP, range: 0...1, step: 0.05, icon: "chart.line.uptrend.xyaxis", specifier: "%.2f")
+                    settingSlider(label: "TFS-Z", value: $config.tfsZ, range: 0...2, step: 0.05, icon: "skew", specifier: "%.2f")
+                } header: {
+                    SectionHeader(title: "Advanced Sampling", subtitle: "Fine-tune token selection", icon: "opticaldisc")
+                        .listRowInsets(EdgeInsets())
+                }
+
+                Section {
+                    settingSlider(label: "Repeat Penalty", value: $config.repeatPenalty, range: 0...2, step: 0.05, icon: "repeat.circle", specifier: "%.2f")
+                    settingRow(icon: "clock.arrow.circlepath", label: "Last N") {
+                        Stepper("\(config.repeatLastN)", value: $config.repeatLastN, in: 0...2048, step: 8)
+                    }
+                } header: {
+                    SectionHeader(title: "Repetition", subtitle: "Prevent loop behaviors", icon: "repeat")
+                        .listRowInsets(EdgeInsets())
+                }
+
+                Section {
+                    settingRow(icon: "tuningfork", label: "Mode") {
+                        Picker("", selection: $config.mirostat) {
+                            Text("Disabled").tag(0)
+                            Text("Mirostat 1.0").tag(1)
+                            Text("Mirostat 2.0").tag(2)
                         }
-                        .buttonStyle(.borderless)
                     }
-                }
-
-                VStack(spacing: 8) {
-                    HStack {
-                        TextField("Key", text: $newHeaderKey)
-                            .textFieldStyle(.roundedBorder)
-                            .font(.caption)
-                        TextField("Value", text: $newHeaderValue)
-                            .textFieldStyle(.roundedBorder)
-                            .font(.caption)
+                    if config.mirostat != 0 {
+                        settingSlider(label: "Mirostat Tau", value: $config.mirostatTau, range: 0...10, step: 0.1, icon: "t.circle", specifier: "%.1f")
+                        settingSlider(label: "Mirostat Eta", value: $config.mirostatEta, range: 0...1, step: 0.01, icon: "e.circle", specifier: "%.2f")
                     }
-                    Button("Add Header") {
-                        guard !newHeaderKey.isEmpty && !newHeaderValue.isEmpty else { return }
-                        config.customHeaders[newHeaderKey] = newHeaderValue
-                        newHeaderKey = ""
-                        newHeaderValue = ""
+                } header: {
+                    SectionHeader(title: "Mirostat", subtitle: "Adaptive sampling control", icon: "waveform.path.ecg")
+                        .listRowInsets(EdgeInsets())
+                }
+
+                Section {
+                    settingRow(icon: "memorychip", label: "Batch Size") {
+                        Stepper("\(config.batchSize)", value: $config.batchSize, in: 1...4096, step: 64)
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .disabled(newHeaderKey.isEmpty || newHeaderValue.isEmpty)
-                }
-                .padding(.top, 4)
-            }
+                    settingRow(icon: "arrow.left.and.right.square", label: "Context") {
+                        Stepper("\(config.contextLength)", value: $config.contextLength, in: 512...128000, step: 512)
+                    }
+                    settingRow(icon: "bolt.fill", label: "GPU Layers") {
+                        Stepper("\(config.numGpu)", value: $config.numGpu, in: 0...128, step: 1)
+                    }
+                    settingRow(icon: "cpu.fill", label: "Threads") {
+                        Stepper("\(config.numThread)", value: $config.numThread, in: 1...64, step: 1)
+                    }
 
-            Section("Model Parameters") {
-                HStack {
-                    Text("Temperature: \(config.temperature, specifier: "%.1f")")
-                    Spacer()
-                    Slider(value: $config.temperature, in: 0...2, step: 0.1)
-                        .frame(width: 150)
-                }
-
-                Stepper("Max Tokens: \(config.maxTokens)", value: $config.maxTokens, in: 128...128000, step: 128)
-
-                HStack {
-                    Text("Top-P: \(config.topP, specifier: "%.2f")")
-                    Spacer()
-                    Slider(value: $config.topP, in: 0...1, step: 0.05)
-                        .frame(width: 150)
-                }
-
-                HStack {
-                    Text("Frequency Penalty: \(config.frequencyPenalty, specifier: "%.1f")")
-                    Spacer()
-                    Slider(value: $config.frequencyPenalty, in: -2...2, step: 0.1)
-                        .frame(width: 150)
-                }
-
-                HStack {
-                    Text("Presence Penalty: \(config.presencePenalty, specifier: "%.1f")")
-                    Spacer()
-                    Slider(value: $config.presencePenalty, in: -2...2, step: 0.1)
-                        .frame(width: 150)
+                    Toggle(isOn: $config.lowVRAM) {
+                        Label("Low VRAM Mode", systemImage: "minus.square.fill")
+                    }
+                    Toggle(isOn: $config.useMLock) {
+                        Label("Use MLock", systemImage: "lock.fill")
+                    }
+                    Toggle(isOn: $config.useMMap) {
+                        Label("Use MMap", systemImage: "map.fill")
+                    }
+                    Toggle(isOn: $config.f16KV) {
+                        Label("F16 KV Cache", systemImage: "memorychip.fill")
+                    }
+                    Toggle(isOn: $config.logitsAll) {
+                        Label("Logits All", systemImage: "list.dash")
+                    }
+                    Toggle(isOn: $config.vocabOnly) {
+                        Label("Vocab Only", systemImage: "character.book.closed")
+                    }
+                } header: {
+                    SectionHeader(title: "Performance", subtitle: "System resource allocation", icon: "cpu")
+                        .listRowInsets(EdgeInsets())
                 }
 
-                Stepper("Timeout: \(Int(config.timeout))s", value: $config.timeout, in: 5...300, step: 5)
-            }
+                Section {
+                    settingRow(icon: "list.bullet.indent", label: "Logprobs") {
+                        Stepper("\(config.logprobs)", value: $config.logprobs, in: 0...20, step: 1)
+                    }
 
-            Section("Testing") {
-                Button {
-                    testConnection()
-                } label: {
-                    HStack {
-                        if testingConnection {
-                            ProgressView().padding(.trailing, 8)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Stop Sequences", systemImage: "hand.raised.fill")
+                            .font(.caption.bold())
+                            .foregroundColor(.secondary)
+
+                        FlowLayout(config.stopSequences, spacing: 8) { seq in
+                            HStack(spacing: 4) {
+                                Text(seq).font(.caption)
+                                Button {
+                                    config.stopSequences.removeAll { $0 == seq }
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.caption2)
+                                }
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.blue.opacity(0.1))
+                            .cornerRadius(8)
                         }
-                        Text("Test Connection")
-                    }
-                }
-                .disabled(testingConnection || config.baseURL.isEmpty)
 
-                if let result = testResult {
-                    switch result {
-                    case .success(let message):
-                        Label(message, systemImage: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                            .font(.caption)
-                    case .failure(let error):
-                        Label(error.localizedDescription, systemImage: "exclamationmark.triangle.fill")
-                            .foregroundColor(.red)
-                            .font(.caption)
+                        HStack {
+                            TextField("Add stop sequence...", text: $newStopSequence)
+                                .textFieldStyle(.roundedBorder)
+                                .font(.caption)
+                            Button {
+                                guard !newStopSequence.isEmpty else { return }
+                                config.stopSequences.append(newStopSequence)
+                                newStopSequence = ""
+                            } label: {
+                                Image(systemName: "plus.circle.fill")
+                            }
+                            .disabled(newStopSequence.isEmpty)
+                        }
                     }
+                } header: {
+                    SectionHeader(title: "Interaction", subtitle: "Response formatting", icon: "bubble.left.and.bubble.right")
+                        .listRowInsets(EdgeInsets())
                 }
-            }
 
-            Section {
-                Button("Set as Default") {
-                    AIChatSettingsManager.shared.settings.selectedLocalConfigID = config.id
+                Section {
+                    ForEach(config.customHeaders.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+                        HStack {
+                            Text(key).font(.caption.bold())
+                            Spacer()
+                            Text(value).font(.caption).foregroundColor(.secondary)
+                            Button(role: .destructive) {
+                                config.customHeaders.removeValue(forKey: key)
+                            } label: {
+                                Image(systemName: "minus.circle.fill")
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
+
+                    VStack(spacing: 8) {
+                        HStack {
+                            TextField("Key", text: $newHeaderKey)
+                                .textFieldStyle(.roundedBorder)
+                                .font(.caption)
+                            TextField("Value", text: $newHeaderValue)
+                                .textFieldStyle(.roundedBorder)
+                                .font(.caption)
+                        }
+                        Button("Add Header") {
+                            guard !newHeaderKey.isEmpty && !newHeaderValue.isEmpty else { return }
+                            config.customHeaders[newHeaderKey] = newHeaderValue
+                            newHeaderKey = ""
+                            newHeaderValue = ""
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .disabled(newHeaderKey.isEmpty || newHeaderValue.isEmpty)
+                    }
+                    .padding(.top, 4)
+                } header: {
+                    SectionHeader(title: "Custom Headers", subtitle: "Additional HTTP headers", icon: "line.3.horizontal.decrease.circle")
+                        .listRowInsets(EdgeInsets())
                 }
-                .disabled(AIChatSettingsManager.shared.settings.selectedLocalConfigID == config.id)
+
+                Section {
+                    Button {
+                        testConnection()
+                    } label: {
+                        HStack {
+                            if testingConnection {
+                                ProgressView().padding(.trailing, 8)
+                            }
+                            Label("Run Connection Audit", systemImage: "network")
+                                .bold()
+                        }
+                    }
+                    .disabled(testingConnection || config.baseURL.isEmpty)
+
+                    if let result = testResult {
+                        switch result {
+                        case .success(let message):
+                            HStack {
+                                Image(systemName: "checkmark.seal.fill")
+                                    .foregroundColor(.green)
+                                Text(message)
+                                    .font(.caption)
+                                    .foregroundColor(.green)
+                            }
+                            .padding(10)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.green.opacity(0.1))
+                            .cornerRadius(10)
+                        case .failure(let error):
+                            HStack(alignment: .top) {
+                                Image(systemName: "exclamationmark.octagon.fill")
+                                    .foregroundColor(.red)
+                                Text(error.localizedDescription)
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                            }
+                            .padding(10)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.red.opacity(0.1))
+                            .cornerRadius(10)
+                        }
+                    }
+                } header: {
+                    SectionHeader(title: "Diagnostics", subtitle: "Verify server availability", icon: "waveform.path.ecg")
+                        .listRowInsets(EdgeInsets())
+                }
+
+                Section {
+                    Button {
+                        AIChatSettingsManager.shared.settings.selectedLocalConfigID = config.id
+                        AIChatSettingsManager.shared.settings.selectedProviderID = "local_models"
+                    } label: {
+                        HStack {
+                            Spacer()
+                            if AIChatSettingsManager.shared.settings.selectedLocalConfigID == config.id &&
+                               AIChatSettingsManager.shared.settings.selectedProviderID == "local_models" {
+                                Label("Currently Default Environment", systemImage: "star.fill")
+                                    .foregroundColor(.orange)
+                                    .bold()
+                            } else {
+                                Text("Set as Default Environment")
+                                    .bold()
+                                    .foregroundColor(.blue)
+                            }
+                            Spacer()
+                        }
+                    }
+                    .disabled(config.name.isEmpty || config.baseURL.isEmpty || config.modelName.isEmpty)
+                }
             }
         }
-        .navigationTitle(config.name.isEmpty ? "New Local Model" : config.name)
+        .navigationTitle(config.name.isEmpty ? "New Environment" : config.name)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") { dismiss() }
@@ -227,7 +423,28 @@ struct EditLocalModelConfigView: View {
                     dismiss()
                 }
                 .disabled(config.name.isEmpty || config.baseURL.isEmpty)
+                .bold()
             }
+        }
+    }
+
+    private func settingRow<Content: View>(icon: String, label: String, @ViewBuilder content: () -> Content) -> some View {
+        HStack {
+            Image(systemName: icon).foregroundColor(.blue).frame(width: 24)
+            Text(label)
+            Spacer()
+            content()
+        }
+    }
+
+    private func settingSlider(label: String, value: Binding<Double>, range: ClosedRange<Double>, step: Double, icon: String, specifier: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Image(systemName: icon).foregroundColor(.blue).frame(width: 24)
+                Text("\(label): \(value.wrappedValue, specifier: specifier)")
+                Spacer()
+            }
+            Slider(value: value, in: range, step: step)
         }
     }
 
@@ -238,13 +455,19 @@ struct EditLocalModelConfigView: View {
         Task {
             do {
                 // Determine test endpoint
-                let testPath = config.baseURL.contains("/v1") ? "/models" : "/api/tags"
-                let cleanBase = config.baseURL
-                    .replacingOccurrences(of: "/chat/completions", with: "")
-                    .replacingOccurrences(of: "/v1", with: "")
+                let isV1 = config.baseURL.contains("/v1")
+                let testPath = isV1 ? "/models" : "/api/tags"
 
-                guard let url = URL(string: cleanBase + (config.baseURL.contains("/v1") ? "/v1" : "") + testPath) else {
-                    throw NSError(domain: "LocalModels", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid Test URL"])
+                var cleanBase = config.baseURL
+                    .replacingOccurrences(of: "/chat/completions", with: "")
+
+                if isV1 {
+                    cleanBase = cleanBase.replacingOccurrences(of: "/v1", with: "")
+                }
+
+                let urlString = cleanBase + (isV1 ? "/v1" : "") + testPath
+                guard let url = URL(string: urlString) else {
+                    throw NSError(domain: "LocalModels", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid Test URL: \(urlString)"])
                 }
 
                 var request = URLRequest(url: url)
@@ -262,7 +485,7 @@ struct EditLocalModelConfigView: View {
                 }
 
                 await MainActor.run {
-                    self.testResult = .success("Connection successful! Found models.")
+                    self.testResult = .success("Connection successful! Server is reachable and responded.")
                     self.testingConnection = false
                 }
             } catch {

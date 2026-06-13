@@ -40,6 +40,81 @@ struct LocalModelConfig: Codable, Identifiable, Equatable {
     var frequencyPenalty: Double = 0.0
     var presencePenalty: Double = 0.0
     var isStreamingEnabled: Bool = true
+
+    // New Advanced Parameters
+    var seed: Int = 0
+    var topK: Int = 40
+    var minP: Double = 0.05
+    var typicalP: Double = 1.0
+    var tfsZ: Double = 1.0
+    var repeatPenalty: Double = 1.1
+    var repeatLastN: Int = 64
+    var mirostat: Int = 0
+    var mirostatTau: Double = 5.0
+    var mirostatEta: Double = 0.1
+    var numGpu: Int = 0
+    var numThread: Int = 8
+    var useMLock: Bool = false
+    var useMMap: Bool = true
+    var stopSequences: [String] = []
+    var logprobs: Int = 0
+    var batchSize: Int = 512
+    var contextLength: Int = 2048
+    var lowVRAM: Bool = false
+    var f16KV: Bool = true
+    var logitsAll: Bool = false
+    var vocabOnly: Bool = false
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, baseURL, modelName, apiKey, customHeaders, timeout
+        case temperature, maxTokens, topP, frequencyPenalty, presencePenalty, isStreamingEnabled
+        case seed, topK, minP, typicalP, tfsZ, repeatPenalty, repeatLastN
+        case mirostat, mirostatTau, mirostatEta, numGpu, numThread, useMLock, useMMap
+        case stopSequences, logprobs, batchSize, contextLength, lowVRAM, f16KV, logitsAll, vocabOnly
+    }
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        name = try container.decodeIfPresent(String.self, forKey: .name) ?? "My Local Model"
+        baseURL = try container.decodeIfPresent(String.self, forKey: .baseURL) ?? "http://localhost:11434/v1"
+        modelName = try container.decodeIfPresent(String.self, forKey: .modelName) ?? "llama3"
+        apiKey = try container.decodeIfPresent(String.self, forKey: .apiKey) ?? ""
+        customHeaders = try container.decodeIfPresent([String: String].self, forKey: .customHeaders) ?? [:]
+        timeout = try container.decodeIfPresent(Double.self, forKey: .timeout) ?? 30.0
+
+        temperature = try container.decodeIfPresent(Double.self, forKey: .temperature) ?? 0.7
+        maxTokens = try container.decodeIfPresent(Int.self, forKey: .maxTokens) ?? 2048
+        topP = try container.decodeIfPresent(Double.self, forKey: .topP) ?? 1.0
+        frequencyPenalty = try container.decodeIfPresent(Double.self, forKey: .frequencyPenalty) ?? 0.0
+        presencePenalty = try container.decodeIfPresent(Double.self, forKey: .presencePenalty) ?? 0.0
+        isStreamingEnabled = try container.decodeIfPresent(Bool.self, forKey: .isStreamingEnabled) ?? true
+
+        seed = try container.decodeIfPresent(Int.self, forKey: .seed) ?? 0
+        topK = try container.decodeIfPresent(Int.self, forKey: .topK) ?? 40
+        minP = try container.decodeIfPresent(Double.self, forKey: .minP) ?? 0.05
+        typicalP = try container.decodeIfPresent(Double.self, forKey: .typicalP) ?? 1.0
+        tfsZ = try container.decodeIfPresent(Double.self, forKey: .tfsZ) ?? 1.0
+        repeatPenalty = try container.decodeIfPresent(Double.self, forKey: .repeatPenalty) ?? 1.1
+        repeatLastN = try container.decodeIfPresent(Int.self, forKey: .repeatLastN) ?? 64
+        mirostat = try container.decodeIfPresent(Int.self, forKey: .mirostat) ?? 0
+        mirostatTau = try container.decodeIfPresent(Double.self, forKey: .mirostatTau) ?? 5.0
+        mirostatEta = try container.decodeIfPresent(Double.self, forKey: .mirostatEta) ?? 0.1
+        numGpu = try container.decodeIfPresent(Int.self, forKey: .numGpu) ?? 0
+        numThread = try container.decodeIfPresent(Int.self, forKey: .numThread) ?? 8
+        useMLock = try container.decodeIfPresent(Bool.self, forKey: .useMLock) ?? false
+        useMMap = try container.decodeIfPresent(Bool.self, forKey: .useMMap) ?? true
+        stopSequences = try container.decodeIfPresent([String].self, forKey: .stopSequences) ?? []
+        logprobs = try container.decodeIfPresent(Int.self, forKey: .logprobs) ?? 0
+        batchSize = try container.decodeIfPresent(Int.self, forKey: .batchSize) ?? 512
+        contextLength = try container.decodeIfPresent(Int.self, forKey: .contextLength) ?? 2048
+        lowVRAM = try container.decodeIfPresent(Bool.self, forKey: .lowVRAM) ?? false
+        f16KV = try container.decodeIfPresent(Bool.self, forKey: .f16KV) ?? true
+        logitsAll = try container.decodeIfPresent(Bool.self, forKey: .logitsAll) ?? false
+        vocabOnly = try container.decodeIfPresent(Bool.self, forKey: .vocabOnly) ?? false
+    }
 }
 
 struct AIChatSettings: Codable {

@@ -145,7 +145,39 @@ final class LocalModelsProvider: AIProvider {
             "top_p": config.topP,
             "frequency_penalty": config.frequencyPenalty,
             "presence_penalty": config.presencePenalty,
-            "stream": false // Disable streaming for compatibility with performRequest (standard dataTask)
+            "stream": false, // Disable streaming for compatibility with performRequest (standard dataTask)
+
+            // Advanced Sampling
+            "seed": config.seed,
+            "top_k": config.topK,
+            "min_p": config.minP,
+            "typical_p": config.typicalP,
+            "tfs_z": config.tfsZ,
+
+            // Penalties
+            "repeat_penalty": config.repeatPenalty,
+            "repeat_last_n": config.repeatLastN,
+
+            // Mirostat
+            "mirostat": config.mirostat,
+            "mirostat_tau": config.mirostatTau,
+            "mirostat_eta": config.mirostatEta,
+
+            // Performance & System
+            "num_gpu": config.numGpu,
+            "num_thread": config.numThread,
+            "use_mlock": config.useMLock,
+            "use_mmap": config.useMMap,
+            "batch_size": config.batchSize,
+            "context_length": config.contextLength,
+            "low_vram": config.lowVRAM,
+            "f16_kv": config.f16KV,
+            "logits_all": config.logitsAll,
+            "vocab_only": config.vocabOnly,
+
+            // Interaction
+            "stop": config.stopSequences,
+            "logprobs": config.logprobs
         ]
 
         // If the call provided a specific model ID, override

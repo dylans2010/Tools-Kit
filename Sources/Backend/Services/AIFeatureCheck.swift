@@ -60,6 +60,11 @@ final class AIFeatureCheck: ObservableObject {
     func authorizeRequest(providerID: String) async throws -> AIAuthorization {
         refresh()
 
+        // Handle Local Models which don't require an API key or count towards limits
+        if providerID == "local_models" {
+            return AIAuthorization(apiKey: "", mode: .ownKey)
+        }
+
         switch settingsManager.settings.aiModelSource {
         case .ownKey:
             guard let key = keyManager.getKey(for: providerID), !key.isEmpty else {
