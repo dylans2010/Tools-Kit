@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct BridgeHomeView: View {
+    @StateObject private var tkClient = TKBridgeClient.shared
     @StateObject private var connectionManager = BridgeConnectionManager.shared
     @StateObject private var sessionManager = BridgeSessionManager.shared
     @State private var showingPairing = false
@@ -9,9 +10,15 @@ struct BridgeHomeView: View {
     var body: some View {
         List {
             Section {
+                tkConnectionStatusCard
+            } header: {
+                Text("Distributed Connection (TKBridge)")
+            }
+
+            Section {
                 connectionStatusCard
             } header: {
-                Text("Connection Status")
+                Text("Legacy Connection Status")
             }
 
             Section {
@@ -78,6 +85,77 @@ struct BridgeHomeView: View {
             NavigationStack {
                 BridgeSettingsView()
             }
+        }
+    }
+
+    private var tkConnectionStatusCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Circle()
+                    .fill(tkStatusColor)
+                    .frame(width: 12, height: 12)
+
+                Text(tkStatusText)
+                    .font(.headline)
+
+                Spacer()
+            }
+
+            if case .connected(let device) = tkClient.state {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Image(systemName: "desktopcomputer")
+                        Text(device.name)
+                        Text("•")
+                        Text(device.os)
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Hostname: \(device.hostname)")
+                        Text("IP: \(device.ip)")
+                        Text("OS Version: \(device.version)")
+                        Text("Architecture: \(device.architecture)")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                }
+            } else if case .failed(let message) = tkClient.state {
+                Text(message)
+                    .font(.caption)
+                    .foregroundColor(.red)
+            }
+
+            if tkClient.state == .disconnected {
+                Button("Install tkbridge host") {
+                    // Logic to show install instructions
+                }
+                .font(.caption)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var tkStatusColor: Color {
+        switch tkClient.state {
+        case .connected: return .green
+        case .discovering, .pairing, .reconnecting: return .orange
+        case .failed: return .red
+        case .disconnected: return .gray
+        case .hostFound: return .blue
+        }
+    }
+
+    private var tkStatusText: String {
+        switch tkClient.state {
+        case .connected: return "Connected"
+        case .discovering: return "Discovering..."
+        case .pairing: return "Pairing..."
+        case .reconnecting: return "Reconnecting..."
+        case .failed: return "Connection Failed"
+        case .disconnected: return "Disconnected"
+        case .hostFound(let ip): return "Host Found: \(ip)"
         }
     }
 
