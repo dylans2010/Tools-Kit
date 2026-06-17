@@ -93,6 +93,22 @@ struct BridgePairingView: View {
                 .disabled(isValidating || !isFormValid)
             }
         }
+        .onReceive(TKBridgeClient.shared.$state) { state in
+            switch state {
+            case .connected:
+                isValidating = false
+                dismiss()
+            case .failed(let msg):
+                isValidating = false
+                self.error = msg
+            case .hostFound(let ip, let code):
+                self.hostURL = ip
+                self.pairingCode = code
+                self.pairingMethod = .code
+            default:
+                break
+            }
+        }
         .navigationTitle("Pair New Device")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -119,6 +135,11 @@ struct BridgePairingView: View {
         isValidating = true
         error = nil
 
+        if pairingMethod == .code {
+            TKBridgeClient.shared.pair(host: hostURL, code: pairingCode)
+            return
+        }
+
         Task {
             let finalURL: String
             let finalPort: Int
@@ -128,13 +149,7 @@ struct BridgePairingView: View {
                 finalURL = hostURL
                 finalPort = Int(port) ?? 8080
             case .code:
-                // In a real system, this would resolve the code via a discovery service
-                // For now, we only support manual entry as discovery is not implemented.
-                await MainActor.run {
-                    self.error = "Pairing via code requires a discovery service which is currently unavailable. Please use Manual Entry."
-                    self.isValidating = false
-                }
-                return
+                return // Handled above
             case .qr:
                 await MainActor.run {
                     self.error = "QR Scanner is not available in this build."

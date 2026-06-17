@@ -14,6 +14,7 @@
 		BR02000000000005 /* BridgeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000005 /* BridgeSettingsView.swift */; };
 		BR02000000000006 /* BridgeTroubleshootingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000006 /* BridgeTroubleshootingView.swift */; };
 		BR02000000000007 /* BridgeCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000007 /* BridgeCommand.swift */; };
+		TB02000000000001 /* TKBridgeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = TB01000000000001 /* TKBridgeClient.swift */; };
 		BR02000000000008 /* BridgeConnectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000008 /* BridgeConnectionState.swift */; };
 		BR02000000000009 /* BridgeDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000009 /* BridgeDevice.swift */; };
 		BR02000000000010 /* BridgeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000010 /* BridgeError.swift */; };
@@ -2371,6 +2372,7 @@
 		BR01000000000005 /* BridgeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/BridgeSettingsView.swift; sourceTree = SOURCE_ROOT; };
 		BR01000000000006 /* BridgeTroubleshootingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/BridgeTroubleshootingView.swift; sourceTree = SOURCE_ROOT; };
 		BR01000000000007 /* BridgeCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Models/BridgeCommand.swift; sourceTree = SOURCE_ROOT; };
+		TB01000000000001 /* TKBridgeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/TKBridge/TKBridgeClient.swift; sourceTree = SOURCE_ROOT; };
 		BR01000000000008 /* BridgeConnectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Models/BridgeConnectionState.swift; sourceTree = SOURCE_ROOT; };
 		BR01000000000009 /* BridgeDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Models/BridgeDevice.swift; sourceTree = SOURCE_ROOT; };
 		BR01000000000010 /* BridgeError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Models/BridgeError.swift; sourceTree = SOURCE_ROOT; };
@@ -2382,6 +2384,14 @@
 		BR01000000000016 /* BridgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Services/BridgeService.swift; sourceTree = SOURCE_ROOT; };
 		BR01000000000017 /* BridgeSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Services/BridgeSessionManager.swift; sourceTree = SOURCE_ROOT; };
 		BR01000000000018 /* BridgeWebSocketClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Bridging/Services/BridgeWebSocketClient.swift; sourceTree = SOURCE_ROOT; };
+		TB00000000000001 /* TKBridge */ = {
+			isa = PBXGroup;
+			children = (
+				TB01000000000001 /* TKBridgeClient.swift */,
+			);
+			path = Sources/Views/Bridging/TKBridge;
+			sourceTree = SOURCE_ROOT;
+		};
 		DA01B9999999 /* StorageNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StorageNode.swift; path = Sources/Views/Workspace/Developer/Models/StorageNode.swift; sourceTree = SOURCE_ROOT; };
 		DA01B0000000013 /* CanaryRolloutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CanaryRolloutView.swift; path = Sources/Views/Workspace/Developer/CanaryRolloutView.swift; sourceTree = SOURCE_ROOT; };
 		DA01B0000000012 /* PerformanceProfilingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PerformanceProfilingView.swift; path = Sources/Views/Workspace/Developer/PerformanceProfilingView.swift; sourceTree = SOURCE_ROOT; };
@@ -5474,6 +5484,7 @@
 		BR00000000000001 /* Bridging */ = {
 			isa = PBXGroup;
 			children = (
+				TB00000000000001 /* TKBridge */,
 				BR00000000000002 /* Models */,
 				BR00000000000003 /* Services */,
 				BR01000000000001 /* BridgeChatView.swift */,
@@ -13482,6 +13493,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				TB02000000000001 /* TKBridgeClient.swift in Sources */,
 				BR02000000000001 /* BridgeChatView.swift in Sources */,
 				BR02000000000002 /* BridgeHomeView.swift in Sources */,
 				BR02000000000003 /* BridgePairingView.swift in Sources */,
