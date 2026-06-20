@@ -99,8 +99,17 @@ final class SystemAgentToolRouter {
     }
 
     private static func loadToolMetadata(registry: AgentSystemTools) -> [ToolMetadata] {
-        let directory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-            .appendingPathComponent("Sources/Backend/Agent/SystemTools")
+        let directory: URL
+        if let bundleURL = Bundle.main.url(forResource: "SystemTools", withExtension: nil) {
+            directory = bundleURL
+        } else {
+            directory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+                .appendingPathComponent("Sources/Backend/Agent/SystemTools")
+        }
+
+        guard FileManager.default.fileExists(atPath: directory.path) else {
+            return []
+        }
 
         let files = ((try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)) ?? [])
             .filter { $0.pathExtension == "swift" }

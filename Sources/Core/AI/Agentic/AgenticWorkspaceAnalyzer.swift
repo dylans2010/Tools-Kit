@@ -18,8 +18,8 @@ final class AgenticWorkspaceAnalyzer: @unchecked Sendable {
         let sourcesURL = resolveSourcesDirectory()
 
         guard fileManager.fileExists(atPath: sourcesURL.path) else {
-            logger.error("Sources directory not found at: \(sourcesURL.path)")
-            throw AnalyzerError.sourcesNotFound(sourcesURL.path)
+            logger.warning("Sources directory not found at: \(sourcesURL.path). Proceeding with empty workspace graph.")
+            return WorkspaceGraph(scannedAt: Date())
         }
 
         let fileEntries = try scanDirectoryRecursively(at: sourcesURL)
@@ -101,7 +101,13 @@ final class AgenticWorkspaceAnalyzer: @unchecked Sendable {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
 
-        return projectRoot.appendingPathComponent("Sources")
+        let sourcesURL = projectRoot.appendingPathComponent("Sources")
+
+        if !fileManager.fileExists(atPath: sourcesURL.path) {
+            logger.warning("Sources directory does not exist at expected path: \(sourcesURL.path)")
+        }
+
+        return sourcesURL
     }
 
     private struct FileEntry {

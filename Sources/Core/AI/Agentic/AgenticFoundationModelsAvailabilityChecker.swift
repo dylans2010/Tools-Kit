@@ -30,7 +30,7 @@ final class AgenticFoundationModelsAvailabilityChecker: Sendable {
                 isFrameworkAvailable: false,
                 isRuntimeAvailable: false,
                 isSessionReady: false,
-                diagnosticMessage: "FoundationModels framework is not available on this platform. Requires iOS 26.0+ / macOS 26.0+."
+                diagnosticMessage: "FoundationModels framework is not available on this platform. Requires iOS 17.0+ / macOS 14.0+."
             )
             logger.warning("Framework not available")
             return status
@@ -71,7 +71,7 @@ final class AgenticFoundationModelsAvailabilityChecker: Sendable {
 
     private func checkRuntimeAvailability() async -> Bool {
         #if canImport(FoundationModels)
-        guard #available(iOS 26.0, macOS 26.0, *) else {
+        guard #available(iOS 17.0, macOS 14.0, *) else {
             return false
         }
         do {
@@ -86,7 +86,7 @@ final class AgenticFoundationModelsAvailabilityChecker: Sendable {
 
     private func checkSessionReadiness() async -> Bool {
         #if canImport(FoundationModels)
-        guard #available(iOS 26.0, macOS 26.0, *) else {
+        guard #available(iOS 17.0, macOS 14.0, *) else {
             return false
         }
         do {

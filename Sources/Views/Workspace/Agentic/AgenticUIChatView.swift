@@ -123,7 +123,7 @@ struct AgenticUIChatView: View {
                 }
                 .padding()
             }
-            .onChange(of: chatMessages.count) { _ in
+            .onChange(of: chatMessages.count) { oldValue, newValue in
                 if let last = chatMessages.last {
                     withAnimation {
                         proxy.scrollTo(last.id, anchor: .bottom)

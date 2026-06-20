@@ -32,24 +32,19 @@ final class AgenticCoreSessionManager: ObservableObject {
 
         let status = await availabilityChecker.checkFullAvailability()
 
-        guard status.isFrameworkAvailable else {
-            addDiagnostic(level: .error, message: "Foundation Models framework not available", component: "SessionManager")
-            throw SessionError.frameworkUnavailable
-        }
-
         #if canImport(FoundationModels)
-        if #available(iOS 26.0, macOS 26.0, *) {
-            return try await streamWithFoundationModels(prompt: prompt, systemContext: systemContext, tools: tools)
-        } else {
-            throw SessionError.platformUnsupported
+        if status.isFrameworkAvailable && status.isRuntimeAvailable {
+            if #available(iOS 17.0, macOS 14.0, *) {
+                return try await streamWithFoundationModels(prompt: prompt, systemContext: systemContext, tools: tools)
+            }
         }
-        #else
-        throw SessionError.frameworkUnavailable
         #endif
+
+        return try await streamWithAIService(prompt: prompt, systemContext: systemContext, tools: tools)
     }
 
     #if canImport(FoundationModels)
-    @available(iOS 26.0, macOS 26.0, *)
+    @available(iOS 17.0, macOS 14.0, *)
     private func streamWithFoundationModels(prompt: String, systemContext: String, tools: [AgenticToolDefinition]) async throws -> String {
         addDiagnostic(level: .info, message: "Initializing LanguageModelSession", component: "SessionManager")
 
@@ -85,6 +80,49 @@ final class AgenticCoreSessionManager: ObservableObject {
         return fullResponse
     }
     #endif
+
+    private func streamWithAIService(prompt: String, systemContext: String, tools: [AgenticToolDefinition]) async throws -> String {
+        addDiagnostic(level: .info, message: "Foundation Models unavailable, falling back to AIService", component: "SessionManager")
+
+        let toolContext = formatToolContext(tools: tools)
+        let fullSystemPrompt = """
+        \(systemContext)
+
+        Available workspace tools:
+        \(toolContext)
+        """
+
+        let fullPrompt = """
+        User request: \(prompt)
+
+        Analyze the workspace and respond with reasoning and any tool actions needed.
+        """
+
+        let response = try await AIService.shared.processText(
+            prompt: fullPrompt,
+            systemPrompt: fullSystemPrompt
+        )
+
+        // Simulate streaming for UI consistency
+        let words = response.components(separatedBy: " ")
+        var accumulated = ""
+
+        for (index, word) in words.enumerated() {
+            let space = index == 0 ? "" : " "
+            let delta = space + word
+            accumulated += delta
+
+            let token = AgenticStreamToken(content: delta, tokenType: classifyToken(delta))
+            tokens.append(token)
+            currentResponse = accumulated
+
+            // Minimal delay to simulate streaming feel
+            try? await Task.sleep(nanoseconds: 10_000_000) // 10ms
+        }
+
+        addDiagnostic(level: .success, message: "AIService fallback completed", component: "SessionManager")
+        return response
+    }
 
     // MARK: - Execution Tracking
 
@@ -172,7 +210,7 @@ final class AgenticCoreSessionManager: ObservableObject {
             case .frameworkUnavailable:
                 return "FoundationModels framework is not available on this device."
             case .platformUnsupported:
-                return "This platform version does not support Foundation Models. iOS 26.0+ or macOS 26.0+ required."
+                return "This platform version does not support Foundation Models. iOS 17.0+ or macOS 14.0+ required."
             case .sessionInitFailed(let reason):
                 return "Failed to initialize language model session: \(reason)"
             case .streamFailed(let reason):

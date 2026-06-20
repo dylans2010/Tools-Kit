@@ -281,19 +281,19 @@ final class AgenticToolExecutor: ObservableObject {
         let intent = parameters["intent"] ?? ""
 
         #if canImport(FoundationModels)
-        if #available(iOS 26.0, macOS 26.0, *) {
+        if #available(iOS 17.0, macOS 14.0, *) {
             return try await generateWithFoundationModels(intent: intent, tool: tool)
         }
         #endif
 
         return AgenticToolOutputFallback(
-            summary: "Code generation requires Foundation Models runtime (iOS 26.0+ / macOS 26.0+)",
+            summary: "Code generation requires Foundation Models runtime (iOS 17.0+ / macOS 14.0+)",
             metadata: ["status": "unavailable"]
         )
     }
 
     #if canImport(FoundationModels)
-    @available(iOS 26.0, macOS 26.0, *)
+    @available(iOS 17.0, macOS 14.0, *)
     private func generateWithFoundationModels(intent: String, tool: AgenticToolDefinition) async throws -> AgenticToolOutputFallback {
         let session = LanguageModelSession()
 

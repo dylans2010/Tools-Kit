@@ -56,14 +56,11 @@ final class AgenticCoreOrchestrator: ObservableObject {
         let status = await availabilityChecker.checkFullAvailability()
         availabilityStatus = status
 
-        guard status.isFrameworkAvailable else {
-            logEvent(phase: "Availability Check", message: status.diagnosticMessage, status: .failed)
-            state = .error
-            finalResponse = "Foundation Models is not available: \(status.diagnosticMessage)"
-            return
+        if status.isFrameworkAvailable {
+            logEvent(phase: "Availability Check", message: "Foundation Models framework available", status: .completed)
+        } else {
+            logEvent(phase: "Availability Check", message: "Foundation Models framework not available, will use hybrid fallback", status: .skipped)
         }
-
-        logEvent(phase: "Availability Check", message: "Framework available: \(status.isFrameworkAvailable), Runtime: \(status.isRuntimeAvailable)", status: .completed)
 
         // Step 2: Analyze workspace
         state = .analyzingWorkspace
