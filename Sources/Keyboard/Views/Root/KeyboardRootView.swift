@@ -27,7 +27,7 @@ struct KeyboardRootView: View {
                 .frame(height: 200)
                 .background(Color(uiColor: .systemGray6))
         }
-        .onChange(of: proxyManager.currentText) { newValue in
+        .onChange(of: proxyManager.currentText) { oldValue, newValue in
             state.currentText = newValue
             updateIntelligence()
         }

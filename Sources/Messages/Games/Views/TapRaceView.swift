@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 struct TapRaceView: View {
     @State var state: TapRaceState

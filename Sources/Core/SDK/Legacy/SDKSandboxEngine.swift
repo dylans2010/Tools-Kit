@@ -102,7 +102,7 @@ public final class SDKSandboxEngine {
         // Meet Module
         let meet = JSValue(object: [:], in: context)
         let startMeeting: @convention(block) (String) -> [String: Any] = { title in
-            var result: [String: Any] = ["status": "starting"]
+            let result: [String: Any] = ["status": "starting"]
             Task {
                 do {
                     let meetingID = try await WorkspaceAPI.shared.meet.startMeeting(title: title)

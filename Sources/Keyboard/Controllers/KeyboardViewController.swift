@@ -47,7 +47,7 @@ class KeyboardViewController: UIInputViewController {
 
     override func textDidChange(_ textInput: UITextInput?) {
         // The app has just changed the document's contents, the document context has been updated.
-        proxyManager?.syncSnapshot { [weak self] text in
+        proxyManager?.syncSnapshot { text in
             // Handle snapshot update in RootView if needed via published property
         }
     }
