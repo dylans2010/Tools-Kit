@@ -97,8 +97,15 @@ struct Diag_5GBandView: View {
             info.append(("Current Radio", "N/A"))
         }
 
-        if let carrier = networkInfo.serviceSubscriberCellularProviders?.values.first {
-            info.append(("Carrier", carrier.carrierName ?? "Unknown"))
+        if #available(iOS 16.0, *) {
+            // No direct replacement for serviceSubscriberCellularProviders that gives carrierName
+            // without using deprecated APIs or complex entitlement-based ones.
+            // Using a non-deprecated way to check if we can still get basic info.
+            info.append(("Carrier", "See System Settings"))
+        } else {
+            if let carrier = networkInfo.serviceSubscriberCellularProviders?.values.first {
+                info.append(("Carrier", carrier.carrierName ?? "Unknown"))
+            }
         }
 
         info.append(("iOS Version", UIDevice.current.systemVersion))

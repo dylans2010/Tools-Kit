@@ -9,7 +9,7 @@ public final class SDKNoSandboxOverrideController {
 
     public func executeUnrestricted(_ sourceCode: String) async throws {
         Task { @MainActor in
-            await SDKLogStore.shared.log("NoSandboxOverride: ACTIVATING DIRECT WORKSPACE ACCESS.", source: "SDKNoSandboxOverrideController", level: .warning)
+            SDKLogStore.shared.log("NoSandboxOverride: ACTIVATING DIRECT WORKSPACE ACCESS.", source: "SDKNoSandboxOverrideController", level: .warning)
         }
 
         // This activates the high-power pipeline

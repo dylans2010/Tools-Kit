@@ -8,7 +8,7 @@ class GameEngine {
     private init() {}
 
     func processMove<T: GameProtocol>(game: T, action: String, session: MSSession?, summary: String) -> MSMessage {
-        var mutableGame = game
+        let mutableGame = game
         let newState = mutableGame.makeMove(action: action)
 
         guard let data = JSONCoder.encode(newState) else {

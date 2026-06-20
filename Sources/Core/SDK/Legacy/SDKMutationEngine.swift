@@ -19,7 +19,7 @@ public final class SDKMutationEngine {
         try await dispatcher.dispatch(systemAction, context: context)
 
         Task { @MainActor in
-            await SDKLogStore.shared.log("Mutation executed: \(action)", source: "SDKMutationEngine", level: .info)
+            SDKLogStore.shared.log("Mutation executed: \(action)", source: "SDKMutationEngine", level: .info)
         }
     }
 }

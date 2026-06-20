@@ -18,7 +18,7 @@ public final class SDKEventInjectionEngine {
 
         PluginEventBus.shared.emit(event)
         Task { @MainActor in
-            await SDKLogStore.shared.log("Broadcasted SDK event: \(action)", source: "SDKEventInjectionEngine", level: .info)
+            SDKLogStore.shared.log("Broadcasted SDK event: \(action)", source: "SDKEventInjectionEngine", level: .info)
         }
     }
 }

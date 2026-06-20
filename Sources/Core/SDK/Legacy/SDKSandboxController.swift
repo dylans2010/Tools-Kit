@@ -9,7 +9,7 @@ public final class SDKSandboxController {
     public func execute(_ sourceCode: String, context: SDKExecutionContext) async throws {
         // Enforces sandbox constraints: restricted API access, no direct filesystem, etc.
         Task { @MainActor in
-            await SDKLogStore.shared.log("SandboxController: Executing in restricted mode.", source: "SDKSandboxController", level: .info)
+            SDKLogStore.shared.log("SandboxController: Executing in restricted mode.", source: "SDKSandboxController", level: .info)
         }
 
         // Use SDKExecutionKernel for coordinated execution

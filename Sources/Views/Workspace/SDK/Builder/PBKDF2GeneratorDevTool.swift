@@ -43,8 +43,6 @@ struct PBKDF2GeneratorView: View {
     }
 
     private func derive() {
-        let passwordData = password.data(using: .utf8)!
-        let saltData = salt.data(using: .utf8)!
         var derivedKeyData = Data(count: 32) // 256 bits
         let derivedKeyCount = derivedKeyData.count
 
