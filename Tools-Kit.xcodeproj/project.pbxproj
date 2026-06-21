@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3B11CCCBA7D2AECBB54D268C /* PersonalizedVoiceExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17788B86B9E924CFCCAE4D0 /* PersonalizedVoiceExperience.swift */; };
 		0001F0832037938D40776723 /* AgentToolResultCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643750A4D819D6E6CB623690 /* AgentToolResultCache.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		008580EC96F3EB7A63395DC9 /* AgentConfigurationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412F9451340C6E936945A3CF /* AgentConfigurationValidator.swift */; };
@@ -2366,7 +2367,6 @@
 		RV020001 /* SpeechModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010001 /* SpeechModels.swift */; };
 		RV020002 /* SpeechMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010002 /* SpeechMainView.swift */; };
 		RV020003 /* SpeechSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010003 /* SpeechSettingsView.swift */; };
-		RV020015 /* PersonalizedVoiceExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010015 /* PersonalizedVoiceExperience.swift */; };
 		RV020004 /* SpeechSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010004 /* SpeechSetupView.swift */; };
 		RV020005 /* AISpeechTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010005 /* AISpeechTool.swift */; };
 		RV020006 /* SpeechKeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010006 /* SpeechKeychainManager.swift */; };
@@ -2396,6 +2396,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B17788B86B9E924CFCCAE4D0 /* PersonalizedVoiceExperience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalizedVoiceExperience.swift; sourceTree = "<group>"; };
 		00C0E15FEF0E12A7A901E440 /* AgentDemoTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDemoTimeline.swift; sourceTree = "<group>"; };
 		00CA85AC8F214CE79F467511 /* UUIDGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UUIDGeneratorView.swift; sourceTree = "<group>"; };
 		011E855AF0F14D94AB4E22BE /* PDFToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFToolsView.swift; sourceTree = "<group>"; };
@@ -4738,7 +4739,6 @@
 		RV010001 /* SpeechModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechModels.swift; sourceTree = "<group>"; };
 		RV010002 /* SpeechMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechMainView.swift; sourceTree = "<group>"; };
 		RV010003 /* SpeechSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSettingsView.swift; sourceTree = "<group>"; };
-		RV010015 /* PersonalizedVoiceExperience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalizedVoiceExperience.swift; sourceTree = "<group>"; };
 		RV010004 /* SpeechSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSetupView.swift; sourceTree = "<group>"; };
 		RV010005 /* AISpeechTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISpeechTool.swift; sourceTree = "<group>"; };
 		RV010006 /* SpeechKeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechKeychainManager.swift; sourceTree = "<group>"; };
@@ -11876,8 +11876,8 @@
 			children = (
 				RV010002 /* SpeechMainView.swift */,
 				RV010003 /* SpeechSettingsView.swift */,
-				RV010015 /* PersonalizedVoiceExperience.swift */,
 				RV010004 /* SpeechSetupView.swift */,
+				B17788B86B9E924CFCCAE4D0 /* PersonalizedVoiceExperience.swift */,
 				RV010005 /* AISpeechTool.swift */,
 			);
 			path = Views;
@@ -12069,10 +12069,10 @@
 				RV020001 /* SpeechModels.swift in Sources */,
 				RV020002 /* SpeechMainView.swift in Sources */,
 				RV020003 /* SpeechSettingsView.swift in Sources */,
-				RV020015 /* PersonalizedVoiceExperience.swift in Sources */,
 				RV020004 /* SpeechSetupView.swift in Sources */,
 				RV020005 /* AISpeechTool.swift in Sources */,
 				RV020006 /* SpeechKeychainManager.swift in Sources */,
+				3B11CCCBA7D2AECBB54D268C /* PersonalizedVoiceExperience.swift in Sources */,
 				RV020007 /* ElevenLabsService.swift in Sources */,
 				RV020008 /* TTSService.swift in Sources */,
 				RV020009 /* SpeechSessionManager.swift in Sources */,
