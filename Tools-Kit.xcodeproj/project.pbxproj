@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0001F0832037938D40776723 /* AgentToolResultCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643750A4D819D6E6CB623690 /* AgentToolResultCache.swift */; };
+		FB000001 /* FoundationModelsSystem.md in Resources */ = {isa = PBXBuildFile; fileRef = FB000002 /* FoundationModelsSystem.md */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		008580EC96F3EB7A63395DC9 /* AgentConfigurationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412F9451340C6E936945A3CF /* AgentConfigurationValidator.swift */; };
 		00940BDABFF94E26B5A919CD /* branch_switch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F7340F43454195884F0413 /* branch_switch.swift */; };
@@ -2657,6 +2658,7 @@
 		637B4943AE2D404097B93977 /* Builder/ThreadInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ThreadInspectorDevTool.swift; sourceTree = "<group>"; };
 		63935A4E10C64913964D9DC4 /* update_memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = update_memory.swift; sourceTree = "<group>"; };
 		643750A4D819D6E6CB623690 /* AgentToolResultCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolResultCache.swift; sourceTree = "<group>"; };
+		FB000002 /* FoundationModelsSystem.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = FoundationModelsSystem.md; sourceTree = "<group>"; };
 		645DFCFABAC545B7AFD0C88B /* SmartAutofillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartAutofillView.swift; sourceTree = "<group>"; };
 		6482ABD7CAA1424BBECD13E3 /* Sources/Views/Workspace/Plugins/Analytics/PluginPerformanceProfilerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Analytics/PluginPerformanceProfilerView.swift; sourceTree = "<group>"; };
 		64A88A7CA8B64675B4AFE539 /* Builder/YAMLParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/YAMLParserDevTool.swift; sourceTree = "<group>"; };
@@ -5946,6 +5948,7 @@
 				C0868AACFB79BD669CB45DAB /* AgentPromptInjector.swift */,
 				EB7E62598E2622918CB5329A /* AgentPromptTemplate.swift */,
 				FBAFFC1E92FBF00D9D751465 /* AgentSystemPrompt.swift */,
+				FB000002 /* FoundationModelsSystem.md */,
 			);
 			path = Prompts;
 			sourceTree = "<group>";
@@ -12053,6 +12056,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB000001 /* FoundationModelsSystem.md in Resources */,
 				RV020018 /* SpeechSystem.md in Resources */,
 				B1C2D3E4F5A60708090A0D05 /* Config.plist in Resources */,
 				SDKD2000000000000000003 /* SDK_AI_System.md in Resources */,

@@ -51,39 +51,13 @@ actor SystemAgent {
 
         do {
             try await transition(to: .thinking)
-            for _ in 0..<maxToolIterations {
-                let responseText = try await requestModelResponse()
-                let parsed = parseAgentEnvelope(from: responseText)
+            let responseText = try await requestModelResponse()
 
-                if let toolCall = parsed.toolCall {
-                    try await transition(to: .executingTool(name: toolCall.name))
-                    let callMessage = SystemAgentMessage(
-                        role: .toolCall(name: toolCall.name, input: toolCall.input.mapValues(AnyCodable.init)),
-                        content: "⚙ Running: \(toolCall.name)"
-                    )
-                    appendToHistory(callMessage)
-
-                    let toolResult = try await toolRouter.route(toolName: toolCall.name, input: toolCall.input)
-                    appendToHistory(SystemAgentMessage(
-                        role: .toolResult(toolName: toolCall.name, result: toolResult),
-                        content: toolResult
-                    ))
-                    try await transition(to: .thinking)
-                    continue
-                }
-
-                if let finalText = parsed.finalText?.trimmingCharacters(in: .whitespacesAndNewlines), !finalText.isEmpty {
-                    try await transition(to: .responding)
-                    let assistant = SystemAgentMessage(role: .assistant, content: finalText)
-                    appendToHistory(assistant)
-                    try await transition(to: .completed)
-                    return assistant
-                }
-
-                throw SystemAgentError.emptyResponse
-            }
-
-            throw SystemAgentError.maxToolIterationsReached(limit: maxToolIterations, message: "Agent reached maximum tool call iterations without producing a final response")
+            try await transition(to: .responding)
+            let assistant = SystemAgentMessage(role: .assistant, content: responseText)
+            appendToHistory(assistant)
+            try await transition(to: .completed)
+            return assistant
         } catch let error as SystemAgentError {
             appendToHistory(SystemAgentMessage(role: .failed(message: error.localizedDescription), content: error.localizedDescription))
             try await transition(to: .failed(error))
@@ -150,25 +124,20 @@ actor SystemAgent {
     }
 
     private func buildSystemPromptWithTools() -> String {
-        let definitions = toolRouter.toolDefinitions.compactMap { tool -> String? in
-            guard let schemaObject = try? JSONSerialization.data(
-                withJSONObject: tool.inputSchema.mapValues(\.value),
-                options: [.sortedKeys]
-            ), let schema = String(data: schemaObject, encoding: .utf8) else {
-                return nil
-            }
-            return "- \(tool.name): \(tool.description)\n  schema: \(schema)"
-        }.joined(separator: "\n")
+        var baseInstructions = ""
+        if let url = Bundle.main.url(forResource: "FoundationModelsSystem", withExtension: "md"),
+           let content = try? String(contentsOf: url) {
+            baseInstructions = content
+        } else {
+            baseInstructions = "You are a helpful AI assistant powered by Foundation Models."
+        }
+
+        let skillsPrompt = AIService.SkillsManager.shared.activeSkillsPrompt()
 
         return """
-        You are a system agent with access to the following tools. When you need to use a tool, respond ONLY with a JSON object in this exact format and nothing else:
-        {"tool":"<tool_name>","input":{"<param>":"<value>"}}
+        \(baseInstructions)
 
-        When you have enough information to answer without a tool, respond with:
-        {"final":"<assistant_text>"}
-
-        Available tools:
-        \(definitions)
+        \(skillsPrompt)
         """
     }
 

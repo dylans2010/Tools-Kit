@@ -47,7 +47,7 @@ final class AgenticCoreOrchestrator: ObservableObject {
         finalResponse = ""
         orchestrationLog = []
 
-        logger.info("Starting orchestration loop for prompt: \(prompt)")
+        logger.info("Starting foundation model chat session for prompt: \(prompt)")
 
         // Step 1: Check Foundation Models availability
         state = .checkingAvailability
@@ -63,44 +63,12 @@ final class AgenticCoreOrchestrator: ObservableObject {
             return
         }
 
-        logEvent(phase: "Availability Check", message: "Framework available: \(status.isFrameworkAvailable), Runtime: \(status.isRuntimeAvailable)", status: .completed)
+        logEvent(phase: "Availability Check", message: "Framework available: \(status.isFrameworkAvailable)", status: .completed)
 
-        // Step 2: Analyze workspace
-        state = .analyzingWorkspace
-        logEvent(phase: "Workspace Analysis", message: "Scanning workspace directory structure", status: .started)
+        // Step 2: Build system context
+        let systemContext = buildSystemContext(graph: WorkspaceGraph(modules: [], featureDomains: [], relationships: []), tools: [])
 
-        do {
-            let graph = try await analyzer.analyzeWorkspace()
-            workspaceGraph = graph
-            logEvent(
-                phase: "Workspace Analysis",
-                message: "Found \(graph.modules.count) modules, \(graph.totalFileCount) files, \(graph.featureDomains.count) domains",
-                status: .completed
-            )
-        } catch {
-            logEvent(phase: "Workspace Analysis", message: "Analysis failed: \(error.localizedDescription)", status: .failed)
-            state = .error
-            finalResponse = "Workspace analysis failed: \(error.localizedDescription)"
-            return
-        }
-
-        // Step 3: Generate dynamic tools
-        state = .generatingTools
-        logEvent(phase: "Tool Generation", message: "Generating tools from workspace graph", status: .started)
-
-        guard let graph = workspaceGraph else {
-            logEvent(phase: "Tool Generation", message: "No workspace graph available", status: .failed)
-            state = .error
-            return
-        }
-
-        let tools = await toolRegistry.generateTools(from: graph)
-        logEvent(phase: "Tool Generation", message: "Generated \(tools.count) dynamic tools", status: .completed)
-
-        // Step 4: Build system context
-        let systemContext = buildSystemContext(graph: graph, tools: tools)
-
-        // Step 5: Stream AI response
+        // Step 3: Stream AI response
         state = .streaming
         logEvent(phase: "AI Streaming", message: "Starting Foundation Models streaming session", status: .started)
 
@@ -108,68 +76,13 @@ final class AgenticCoreOrchestrator: ObservableObject {
             let response = try await sessionManager.streamResponse(
                 prompt: prompt,
                 systemContext: systemContext,
-                tools: tools
+                tools: []
             )
 
-            logEvent(phase: "AI Streaming", message: "Stream completed with \(sessionManager.tokens.count) tokens", status: .completed)
-
-            // Step 6: Parse and execute tool actions from response
-            let toolActions = parseToolActions(from: response)
-
-            if !toolActions.isEmpty {
-                state = .executingTool
-                logEvent(phase: "Tool Execution", message: "Executing \(toolActions.count) tool actions", status: .started)
-
-                var toolOutputs: [String] = []
-                for action in toolActions {
-                    if let toolDef = toolRegistry.toolDefinition(named: action.toolName) {
-                        let stepID = sessionManager.recordStep(
-                            action: "Execute \(action.toolName)",
-                            toolName: action.toolName,
-                            input: action.parameters.description
-                        )
-
-                        do {
-                            let output = try await toolExecutor.execute(tool: toolDef, parameters: action.parameters)
-                            toolOutputs.append("\(action.toolName): \(output.summary)")
-                            sessionManager.completeStep(id: stepID, output: output.summary, success: true)
-                        } catch {
-                            toolOutputs.append("\(action.toolName): Error - \(error.localizedDescription)")
-                            sessionManager.completeStep(id: stepID, output: error.localizedDescription, success: false)
-                        }
-                    }
-                }
-
-                logEvent(phase: "Tool Execution", message: "Completed \(toolActions.count) tool actions", status: .completed)
-
-                // Step 7: Feed tool outputs back if we have Foundation Models
-                if status.isRuntimeAvailable && !toolOutputs.isEmpty {
-                    let followUpPrompt = """
-                    Tool execution results:
-                    \(toolOutputs.joined(separator: "\n"))
-
-                    Based on these results, provide a final summary for the user's original request: \(prompt)
-                    """
-
-                    do {
-                        let followUp = try await sessionManager.streamResponse(
-                            prompt: followUpPrompt,
-                            systemContext: systemContext,
-                            tools: tools
-                        )
-                        finalResponse = followUp
-                    } catch {
-                        finalResponse = response + "\n\nTool Results:\n" + toolOutputs.joined(separator: "\n")
-                    }
-                } else {
-                    finalResponse = response + "\n\nTool Results:\n" + toolOutputs.joined(separator: "\n")
-                }
-            } else {
-                finalResponse = response
-            }
-
+            logEvent(phase: "AI Streaming", message: "Stream completed", status: .completed)
+            finalResponse = response
             state = .completed
-            logEvent(phase: "Orchestration", message: "Orchestration loop complete", status: .completed)
+            logEvent(phase: "Chat", message: "Response received successfully", status: .completed)
 
         } catch {
             logEvent(phase: "AI Streaming", message: "Streaming failed: \(error.localizedDescription)", status: .failed)
@@ -186,43 +99,22 @@ final class AgenticCoreOrchestrator: ObservableObject {
     // MARK: - System Context
 
     private func buildSystemContext(graph: WorkspaceGraph, tools: [AgenticToolDefinition]) -> String {
-        let capabilities = analyzer.detectExistingCapabilities(from: graph)
-        let missing = analyzer.detectMissingCapabilities(from: graph)
+        var baseInstructions = ""
+        if let url = Bundle.main.url(forResource: "FoundationModelsSystem", withExtension: "md"),
+           let content = try? String(contentsOf: url) {
+            baseInstructions = content
+        } else {
+            baseInstructions = "You are a helpful AI assistant powered by Foundation Models."
+        }
 
-        let moduleList = graph.modules.prefix(20).map { module in
-            "  - \(module.name) [\(module.domain)]: \(module.files.count) files, \(module.declarations.count) declarations (\(module.capabilities.joined(separator: ", ")))"
-        }.joined(separator: "\n")
-
-        let toolList = tools.prefix(20).map { tool in
-            "  - \(tool.name): \(tool.description)"
-        }.joined(separator: "\n")
+        let skillsPrompt = AIService.SkillsManager.shared.activeSkillsPrompt()
 
         return """
-        You are an Agentic Runtime System operating within the Tools-Kit workspace.
-        You have analyzed the actual project structure and generated tools dynamically.
+        \(baseInstructions)
 
-        WORKSPACE ARCHITECTURE:
-        Modules (\(graph.modules.count) total):
-        \(moduleList)
+        \(skillsPrompt)
 
-        Feature Domains: \(graph.featureDomains.joined(separator: ", "))
-        Relationships: \(graph.relationships.count) inter-module dependencies
-
-        EXISTING CAPABILITIES:
-        \(capabilities.map { "  - \($0.key): \($0.value.joined(separator: ", "))" }.joined(separator: "\n"))
-
-        IDENTIFIED GAPS:
-        \(missing.isEmpty ? "  None detected" : missing.map { "  - \($0)" }.joined(separator: "\n"))
-
-        AVAILABLE TOOLS (\(tools.count)):
-        \(toolList)
-
-        RULES:
-        - Only use tools that correspond to real workspace capabilities
-        - Base all analysis on the actual scanned workspace data
-        - Use streaming to emit reasoning and actions progressively
-        - When executing tools, pass real parameters derived from workspace state
-        - Report findings accurately based on real project structure
+        You are currently in a workspace-aware chat session. While you can answer questions about the environment, your primary role is a helpful conversationalist.
         """
     }
 

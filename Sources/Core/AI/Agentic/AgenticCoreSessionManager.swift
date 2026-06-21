@@ -55,14 +55,8 @@ final class AgenticCoreSessionManager: ObservableObject {
 
         let session = LanguageModelSession(instructions: systemContext)
 
-        let toolContext = formatToolContext(tools: tools)
         let fullPrompt = """
-        Available workspace tools:
-        \(toolContext)
-
         User request: \(prompt)
-
-        Analyze the workspace and respond with reasoning and any tool actions needed.
         """
 
         addDiagnostic(level: .info, message: "Starting token stream", component: "SessionManager")
