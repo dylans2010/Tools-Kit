@@ -439,7 +439,7 @@ struct SpeechNotesView: View {
         }
     }
 
-    private func summarySection(_ analysis: SpeechAnalysis) -> some View {
+    private func summarySection(_ analysis: NotebookSpeechAnalysis) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Label("Summary", systemImage: "text.alignleft")
@@ -465,7 +465,7 @@ struct SpeechNotesView: View {
         .padding(.horizontal)
     }
 
-    private func keyPointsSection(_ analysis: SpeechAnalysis) -> some View {
+    private func keyPointsSection(_ analysis: NotebookSpeechAnalysis) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Key Points", systemImage: "list.bullet")
                 .font(.headline)
@@ -484,7 +484,7 @@ struct SpeechNotesView: View {
         .padding(.horizontal)
     }
 
-    private func insightsSection(_ analysis: SpeechAnalysis) -> some View {
+    private func insightsSection(_ analysis: NotebookSpeechAnalysis) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Insights", systemImage: "lightbulb")
                 .font(.headline)
@@ -661,7 +661,7 @@ struct SpeechNotesView: View {
     private func saveCurrentRecording() {
         guard !speechManager.transcription.isEmpty, let url = speechManager.currentRecordingURL else { return }
 
-        let recording = SpeechRecording(
+        let recording = NotebookSpeechRecording(
             title: recordingTitle,
             duration: speechManager.playbackDuration,
             audioFilename: url.lastPathComponent,
@@ -677,7 +677,7 @@ struct SpeechNotesView: View {
         historyStore.saveRecording(recording)
     }
 
-    private func loadRecording(_ recording: SpeechRecording) {
+    private func loadRecording(_ recording: NotebookSpeechRecording) {
         recordingTitle = recording.title
         speechManager.transcription = recording.analysis?.fullTranscript ?? ""
         speechManager.transcriptSegments = recording.transcriptSegments
@@ -697,7 +697,7 @@ struct SpeechNotesView: View {
 }
 
 struct HighlightCard: View {
-    let highlight: SpeechHighlight
+    let highlight: NotebookSpeechHighlight
     var onTap: () -> Void
 
     var body: some View {
@@ -791,7 +791,7 @@ struct HighlightCard: View {
 }
 
 struct InsightView: View {
-    let insight: SpeechInsight
+    let insight: NotebookSpeechInsight
 
     var body: some View {
         HStack(spacing: 12) {

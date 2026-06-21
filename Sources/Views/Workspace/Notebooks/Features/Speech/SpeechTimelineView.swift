@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SpeechTimelineView: View {
-    let topics: [SpeechTopic]
+    let topics: [NotebookSpeechTopic]
     let currentProgress: TimeInterval
     let duration: TimeInterval
     var onSeek: (TimeInterval) -> Void
@@ -49,7 +49,7 @@ struct SpeechTimelineView: View {
         }
     }
 
-    private func isCurrentTopic(_ topic: SpeechTopic) -> Bool {
+    private func isCurrentTopic(_ topic: NotebookSpeechTopic) -> Bool {
         currentProgress >= topic.startTime && currentProgress < topic.endTime
     }
 

@@ -4,7 +4,7 @@ import Foundation
 final class SpeechHistoryStore: ObservableObject {
     static let shared = SpeechHistoryStore()
 
-    @Published var recordings: [SpeechRecording] = []
+    @Published var recordings: [NotebookSpeechRecording] = []
 
     private let storageKey = "speech_recordings_history"
     private let fileManager = FileManager.default
@@ -13,7 +13,7 @@ final class SpeechHistoryStore: ObservableObject {
         loadRecordings()
     }
 
-    func saveRecording(_ recording: SpeechRecording) {
+    func saveRecording(_ recording: NotebookSpeechRecording) {
         if let index = recordings.firstIndex(where: { $0.id == recording.id }) {
             recordings[index] = recording
         } else {
@@ -22,7 +22,7 @@ final class SpeechHistoryStore: ObservableObject {
         persist()
     }
 
-    func deleteRecording(_ recording: SpeechRecording) {
+    func deleteRecording(_ recording: NotebookSpeechRecording) {
         // Delete audio file
         let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let fileURL = documentsPath.appendingPathComponent(recording.audioFilename)
@@ -40,12 +40,12 @@ final class SpeechHistoryStore: ObservableObject {
 
     private func loadRecordings() {
         if let data = UserDefaults.standard.data(forKey: storageKey),
-           let decoded = try? JSONDecoder().decode([SpeechRecording].self, from: data) {
+           let decoded = try? JSONDecoder().decode([NotebookSpeechRecording].self, from: data) {
             self.recordings = decoded.sorted(by: { $0.date > $1.date })
         }
     }
 
-    func search(query: String) -> [SpeechRecording] {
+    func search(query: String) -> [NotebookSpeechRecording] {
         if query.isEmpty { return recordings }
         return recordings.filter {
             $0.title.localizedCaseInsensitiveContains(query) ||
@@ -58,7 +58,7 @@ final class SpeechHistoryStore: ObservableObject {
 
     // MARK: - Advanced Capabilities
 
-    func compareAndMerge(recordingIds: [UUID]) async -> SpeechAnalysis? {
+    func compareAndMerge(recordingIds: [UUID]) async -> NotebookSpeechAnalysis? {
         let selected = recordings.filter { recordingIds.contains($0.id) }
         guard selected.count > 1 else { return nil }
 
@@ -82,7 +82,7 @@ final class SpeechHistoryStore: ObservableObject {
             """
             let jsonString = try await AIService.shared.generateStructuredJSON(prompt: prompt, jsonSchema: schema)
             if let data = jsonString.data(using: .utf8) {
-                return try JSONDecoder().decode(SpeechAnalysis.self, from: data)
+                return try JSONDecoder().decode(NotebookSpeechAnalysis.self, from: data)
             }
         } catch {
             print("Compare and merge error: \(error)")

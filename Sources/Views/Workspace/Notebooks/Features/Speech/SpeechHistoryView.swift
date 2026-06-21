@@ -5,7 +5,7 @@ struct SpeechHistoryView: View {
     @StateObject private var historyStore = SpeechHistoryStore.shared
     @State private var searchText = ""
 
-    var onSelect: (SpeechRecording) -> Void
+    var onSelect: (NotebookSpeechRecording) -> Void
 
     var body: some View {
         NavigationStack {

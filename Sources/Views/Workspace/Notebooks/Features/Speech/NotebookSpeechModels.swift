@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-enum SpeechAIAction: String, CaseIterable, Identifiable {
+enum NotebookSpeechAIAction: String, CaseIterable, Identifiable {
     case summarize = "Summarize"
     case keyPoints = "Key Points"
     case actionItems = "Action Items"
@@ -21,7 +21,7 @@ enum SpeechAIAction: String, CaseIterable, Identifiable {
     }
 }
 
-struct SpeechTranscriptSegment: Codable, Identifiable, Hashable {
+struct NotebookSpeechTranscriptSegment: Codable, Identifiable, Hashable {
     let id: UUID
     let startTime: TimeInterval
     let endTime: TimeInterval
@@ -35,7 +35,7 @@ struct SpeechTranscriptSegment: Codable, Identifiable, Hashable {
     }
 }
 
-struct SpeechTopic: Codable, Identifiable, Hashable {
+struct NotebookSpeechTopic: Codable, Identifiable, Hashable {
     let id: UUID
     let title: String
     let startTime: TimeInterval
@@ -49,7 +49,7 @@ struct SpeechTopic: Codable, Identifiable, Hashable {
     }
 }
 
-struct SpeechHighlight: Codable, Identifiable, Hashable {
+struct NotebookSpeechHighlight: Codable, Identifiable, Hashable {
     let id: UUID
     let title: String
     let summary: String
@@ -69,7 +69,7 @@ struct SpeechHighlight: Codable, Identifiable, Hashable {
     }
 }
 
-struct SpeechInsight: Codable, Identifiable, Hashable {
+struct NotebookSpeechInsight: Codable, Identifiable, Hashable {
     let id: UUID
     let text: String
     let type: String // "Topic", "Sentiment", "Intent"
@@ -85,7 +85,7 @@ struct SpeechInsight: Codable, Identifiable, Hashable {
     }
 }
 
-struct SmartSuggestion: Codable, Identifiable, Hashable {
+struct NotebookSmartSuggestion: Codable, Identifiable, Hashable {
     let id: UUID
     let text: String
     let action: String
@@ -99,15 +99,15 @@ struct SmartSuggestion: Codable, Identifiable, Hashable {
     }
 }
 
-struct SpeechVersion: Codable, Identifiable, Hashable {
+struct NotebookSpeechVersion: Codable, Identifiable, Hashable {
     let id: UUID
     let name: String
     let date: Date
     let transcript: String
-    let analysis: SpeechAnalysis?
+    let analysis: NotebookSpeechAnalysis?
     let parentId: UUID?
 
-    init(id: UUID = UUID(), name: String, date: Date = Date(), transcript: String, analysis: SpeechAnalysis? = nil, parentId: UUID? = nil) {
+    init(id: UUID = UUID(), name: String, date: Date = Date(), transcript: String, analysis: NotebookSpeechAnalysis? = nil, parentId: UUID? = nil) {
         self.id = id
         self.name = name
         self.date = date
@@ -117,7 +117,7 @@ struct SpeechVersion: Codable, Identifiable, Hashable {
     }
 }
 
-struct ContextMemoryPin: Codable, Identifiable, Hashable {
+struct NotebookContextMemoryPin: Codable, Identifiable, Hashable {
     let id: UUID
     let content: String
     let type: String // "Transcript", "Insight", "Chat"
@@ -131,7 +131,7 @@ struct ContextMemoryPin: Codable, Identifiable, Hashable {
     }
 }
 
-struct SpeechTag: Codable, Identifiable, Hashable {
+struct NotebookSpeechTag: Codable, Identifiable, Hashable {
     let id: UUID
     let name: String
     let colorHex: String
@@ -143,7 +143,7 @@ struct SpeechTag: Codable, Identifiable, Hashable {
     }
 }
 
-struct PromptExecutionRecord: Codable, Identifiable, Hashable {
+struct NotebookPromptExecutionRecord: Codable, Identifiable, Hashable {
     let id: UUID
     let prompt: String
     let date: Date
@@ -157,15 +157,15 @@ struct PromptExecutionRecord: Codable, Identifiable, Hashable {
     }
 }
 
-struct SpeechAnalysis: Codable, Hashable, Equatable {
+struct NotebookSpeechAnalysis: Codable, Hashable, Equatable {
     var summary: String
     var keyPoints: [String]
     var actionItems: [String]
-    var topics: [SpeechTopic]
+    var topics: [NotebookSpeechTopic]
     var fullTranscript: String
-    var insights: [SpeechInsight]
-    var highlights: [SpeechHighlight]
-    var suggestions: [SmartSuggestion]
+    var insights: [NotebookSpeechInsight]
+    var highlights: [NotebookSpeechHighlight]
+    var suggestions: [NotebookSmartSuggestion]
     var sentiment: String
     var intentClassification: String
     var priorityScore: Int
@@ -173,11 +173,11 @@ struct SpeechAnalysis: Codable, Hashable, Equatable {
     init(summary: String = "",
          keyPoints: [String] = [],
          actionItems: [String] = [],
-         topics: [SpeechTopic] = [],
+         topics: [NotebookSpeechTopic] = [],
          fullTranscript: String = "",
-         insights: [SpeechInsight] = [],
-         highlights: [SpeechHighlight] = [],
-         suggestions: [SmartSuggestion] = [],
+         insights: [NotebookSpeechInsight] = [],
+         highlights: [NotebookSpeechHighlight] = [],
+         suggestions: [NotebookSmartSuggestion] = [],
          sentiment: String = "Neutral",
          intentClassification: String = "Unknown",
          priorityScore: Int = 0) {
@@ -195,32 +195,32 @@ struct SpeechAnalysis: Codable, Hashable, Equatable {
     }
 }
 
-struct SpeechRecording: Codable, Identifiable {
+struct NotebookSpeechRecording: Codable, Identifiable {
     let id: UUID
     var title: String
     let date: Date
     var duration: TimeInterval
     var audioFilename: String
-    var transcriptSegments: [SpeechTranscriptSegment]
-    var analysis: SpeechAnalysis?
+    var transcriptSegments: [NotebookSpeechTranscriptSegment]
+    var analysis: NotebookSpeechAnalysis?
     var chatHistory: [ChatMessage]
-    var tags: [SpeechTag]
-    var versions: [SpeechVersion]
-    var pins: [ContextMemoryPin]
-    var executionHistory: [PromptExecutionRecord]
+    var tags: [NotebookSpeechTag]
+    var versions: [NotebookSpeechVersion]
+    var pins: [NotebookContextMemoryPin]
+    var executionHistory: [NotebookPromptExecutionRecord]
 
     init(id: UUID = UUID(),
          title: String,
          date: Date = Date(),
          duration: TimeInterval = 0,
          audioFilename: String,
-         transcriptSegments: [SpeechTranscriptSegment] = [],
-         analysis: SpeechAnalysis? = nil,
+         transcriptSegments: [NotebookSpeechTranscriptSegment] = [],
+         analysis: NotebookSpeechAnalysis? = nil,
          chatHistory: [ChatMessage] = [],
-         tags: [SpeechTag] = [],
-         versions: [SpeechVersion] = [],
-         pins: [ContextMemoryPin] = [],
-         executionHistory: [PromptExecutionRecord] = []) {
+         tags: [NotebookSpeechTag] = [],
+         versions: [NotebookSpeechVersion] = [],
+         pins: [NotebookContextMemoryPin] = [],
+         executionHistory: [NotebookPromptExecutionRecord] = []) {
         self.id = id
         self.title = title
         self.date = date
@@ -236,7 +236,7 @@ struct SpeechRecording: Codable, Identifiable {
     }
 }
 
-struct SpeechPresetPrompt: Identifiable, Codable {
+struct NotebookSpeechPresetPrompt: Identifiable, Codable {
     let id: UUID
     let title: String
     let prompt: String

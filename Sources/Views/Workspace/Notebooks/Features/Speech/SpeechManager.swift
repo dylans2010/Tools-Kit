@@ -19,21 +19,21 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
     @Published var isFillerSkippingEnabled: Bool = false
 
     // Transcription segments
-    @Published var transcriptSegments: [SpeechTranscriptSegment] = []
+    @Published var transcriptSegments: [NotebookSpeechTranscriptSegment] = []
 
     // AI State
-    @Published var analysis: SpeechAnalysis?
+    @Published var analysis: NotebookSpeechAnalysis?
     @Published var chatHistory: [ChatMessage] = []
     @Published var isProcessingAI: Bool = false
     @Published var isLiveEnhancing: Bool = false
 
     // Advanced Intelligence State
     @Published var currentVersion: UUID?
-    @Published var versions: [SpeechVersion] = []
-    @Published var pins: [ContextMemoryPin] = []
-    @Published var tags: [SpeechTag] = []
-    @Published var executionHistory: [PromptExecutionRecord] = []
-    @Published var suggestions: [SmartSuggestion] = []
+    @Published var versions: [NotebookSpeechVersion] = []
+    @Published var pins: [NotebookContextMemoryPin] = []
+    @Published var tags: [NotebookSpeechTag] = []
+    @Published var executionHistory: [NotebookPromptExecutionRecord] = []
+    @Published var suggestions: [NotebookSmartSuggestion] = []
 
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -118,7 +118,7 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
                 Task { @MainActor in
                     self.transcription = result.bestTranscription.formattedString
                     self.transcriptSegments = result.bestTranscription.segments.map { segment in
-                        SpeechTranscriptSegment(
+                        NotebookSpeechTranscriptSegment(
                             startTime: segment.timestamp,
                             endTime: segment.timestamp + segment.duration,
                             text: segment.substring
@@ -347,7 +347,7 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
         do {
             let jsonString = try await AIService.shared.generateStructuredJSON(prompt: prompt, jsonSchema: schema)
             if let data = jsonString.data(using: String.Encoding.utf8) {
-                let decoded = try JSONDecoder().decode(SpeechAnalysis.self, from: data)
+                let decoded = try JSONDecoder().decode(NotebookSpeechAnalysis.self, from: data)
                 self.analysis = decoded
                 self.analysis?.fullTranscript = transcription
                 self.suggestions = decoded.suggestions
@@ -423,7 +423,7 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
             chatHistory.append(aiMessage)
 
             // Record execution
-            executionHistory.append(PromptExecutionRecord(prompt: text, response: response))
+            executionHistory.append(NotebookPromptExecutionRecord(prompt: text, response: response))
         } catch {
             print("AI Chat error: \(error)")
         }
@@ -453,7 +453,7 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
         do {
             let result = try await AIService.shared.processMessages(messages: [ChatMessage(role: "user", content: prompt)], model: nil)
             // Add to suggestions
-            let suggestion = SmartSuggestion(text: "Unanswered Questions detected", action: "Review unanswered questions: \(result)", category: "Follow-up")
+            let suggestion = NotebookSmartSuggestion(text: "Unanswered Questions detected", action: "Review unanswered questions: \(result)", category: "Follow-up")
             self.suggestions.append(suggestion)
         } catch {
             print("Incomplete ideas detection error: \(error)")
@@ -475,7 +475,7 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
             """
             let jsonString = try await AIService.shared.generateStructuredJSON(prompt: prompt, jsonSchema: schema)
             if let data = jsonString.data(using: .utf8) {
-                let decoded = try JSONDecoder().decode([String: [SmartSuggestion]].self, from: data)
+                let decoded = try JSONDecoder().decode([String: [NotebookSmartSuggestion]].self, from: data)
                 if let newSuggestions = decoded["suggestions"] {
                     self.suggestions.append(contentsOf: newSuggestions)
                 }
@@ -486,12 +486,12 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
     }
 
     func saveVersion(name: String) {
-        let version = SpeechVersion(name: name, transcript: transcription, analysis: analysis, parentId: currentVersion)
+        let version = NotebookSpeechVersion(name: name, transcript: transcription, analysis: analysis, parentId: currentVersion)
         versions.append(version)
         currentVersion = version.id
     }
 
-    func restoreVersion(_ version: SpeechVersion) {
+    func restoreVersion(_ version: NotebookSpeechVersion) {
         transcription = version.transcript
         analysis = version.analysis
         currentVersion = version.id
@@ -499,21 +499,21 @@ class SpeechManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
 
     func branchVersion(name: String, from versionId: UUID) {
         if let parent = versions.first(where: { $0.id == versionId }) {
-            let branchedVersion = SpeechVersion(name: name, transcript: parent.transcript, analysis: parent.analysis, parentId: versionId)
+            let branchedVersion = NotebookSpeechVersion(name: name, transcript: parent.transcript, analysis: parent.analysis, parentId: versionId)
             versions.append(branchedVersion)
             currentVersion = branchedVersion.id
         }
     }
 
     func pinItem(content: String, type: String) {
-        pins.append(ContextMemoryPin(content: content, type: type))
+        pins.append(NotebookContextMemoryPin(content: content, type: type))
     }
 
-    func applySuggestion(_ suggestion: SmartSuggestion) async {
+    func applySuggestion(_ suggestion: NotebookSmartSuggestion) async {
         await sendMessage(suggestion.action)
     }
 
-    func getSessionIntelligence() -> [SmartSuggestion] {
+    func getSessionIntelligence() -> [NotebookSmartSuggestion] {
         // Return suggestions based on unfinished tasks or recent history
         return suggestions
     }

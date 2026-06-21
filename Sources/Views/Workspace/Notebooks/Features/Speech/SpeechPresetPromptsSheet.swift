@@ -3,7 +3,7 @@ import SwiftUI
 struct SpeechPresetPromptsSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var searchText = ""
-    @State private var prompts: [SpeechPresetPrompt] = SpeechPresetPrompts.all
+    @State private var prompts: [NotebookSpeechPresetPrompt] = SpeechPresetPrompts.all
     @State private var showingCustomBuilder = false
     @State private var customTitle = ""
     @State private var customPrompt = ""
@@ -105,7 +105,7 @@ struct SpeechPresetPromptsSheet: View {
         }
     }
 
-    private func promptRow(_ prompt: SpeechPresetPrompt) -> some View {
+    private func promptRow(_ prompt: NotebookSpeechPresetPrompt) -> some View {
         Button {
             onSelect(prompt.prompt)
             dismiss()
@@ -151,7 +151,7 @@ struct SpeechPresetPromptsSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        let newPrompt = SpeechPresetPrompt(title: customTitle, prompt: customPrompt, category: customCategory)
+                        let newPrompt = NotebookSpeechPresetPrompt(title: customTitle, prompt: customPrompt, category: customCategory)
                         prompts.insert(newPrompt, at: 0)
                         showingCustomBuilder = false
                         customTitle = ""
@@ -163,7 +163,7 @@ struct SpeechPresetPromptsSheet: View {
         }
     }
 
-    private func getRotatedPrompts(for categoryPrompts: [SpeechPresetPrompt]) -> [SpeechPresetPrompt] {
+    private func getRotatedPrompts(for categoryPrompts: [NotebookSpeechPresetPrompt]) -> [NotebookSpeechPresetPrompt] {
         let seededPrompts = categoryPrompts.sorted { $0.id.uuidString < $1.id.uuidString }
         if seededPrompts.count <= 5 {
             return seededPrompts
@@ -172,7 +172,7 @@ struct SpeechPresetPromptsSheet: View {
         return Array(seededPrompts.shuffled().prefix(5))
     }
 
-    var filteredPrompts: [SpeechPresetPrompt] {
+    var filteredPrompts: [NotebookSpeechPresetPrompt] {
         if searchText.isEmpty {
             return prompts
         }
