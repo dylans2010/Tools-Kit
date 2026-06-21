@@ -37,17 +37,36 @@ class CloudVisionService: ObservableObject {
 
     func saveKey(_ key: String, for provider: VisionProvider) -> Bool {
         let account = "\(provider.rawValue)_api_key"
-        guard let data = key.data(using: .utf8) else { return false }
+        guard let data = key.data(using: .utf8) else {
+            SDKLogStore.shared.log("Failed to convert API key to data", source: "CloudVisionService", level: .error)
+            return false
+        }
 
-        let query: [String: Any] = [
+        let deleteQuery: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: account
+        ]
+
+        let status = SecItemDelete(deleteQuery as CFDictionary)
+        if status != errSecSuccess && status != errSecItemNotFound {
+            SDKLogStore.shared.log("Keychain delete failed with status: \(status)", source: "CloudVisionService", level: .error)
+        }
+
+        let addQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: keychainService,
             kSecAttrAccount as String: account,
-            kSecValueData as String: data
+            kSecValueData as String: data,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
         ]
 
-        SecItemDelete(query as CFDictionary)
-        return SecItemAdd(query as CFDictionary, nil) == errSecSuccess
+        let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
+        if addStatus != errSecSuccess {
+            SDKLogStore.shared.log("Keychain add failed with status: \(addStatus)", source: "CloudVisionService", level: .error)
+        }
+
+        return addStatus == errSecSuccess
     }
 
     func getKey(for provider: VisionProvider) -> String? {
@@ -65,6 +84,8 @@ class CloudVisionService: ObservableObject {
 
         if status == errSecSuccess, let data = dataTypeRef as? Data {
             return String(data: data, encoding: .utf8)
+        } else if status != errSecItemNotFound {
+            SDKLogStore.shared.log("Keychain query failed for \(provider.rawValue) with status: \(status)", source: "CloudVisionService", level: .error)
         }
         return nil
     }

@@ -204,15 +204,20 @@ struct SpeechSettingsView: View {
             // MARK: - How It Works
             Section(header: Text("New Voice Features Guide")) {
                 VStack(alignment: .leading, spacing: 12) {
-                    InfoRow(icon: "hand.tap.fill", title: "Interrupt AI", description: "Press & hold the button while the AI is speaking to stop it and start your new request immediately.")
+                    InfoRow(icon: "hand.tap.fill", title: "Interrupt AI", description: "Press & hold while the AI is speaking to pivot the conversation immediately.")
 
-                    InfoRow(icon: "arrow.up.circle.fill", title: "Detailed Mode", description: "Slide the mic button upwards to ask the AI for a more in-depth and comprehensive response.")
+                    InfoRow(icon: "arrow.up.circle.fill", title: "Detailed & Creative", description: "Slide up for detailed mode, or far up for creative mode to unlock poetic and imaginative responses.")
 
-                    InfoRow(icon: "arrow.down.circle.fill", title: "Concise Mode", description: "Slide the mic button downwards to get a short, brief, and to-the-point answer.")
+                    InfoRow(icon: "arrow.down.circle.fill", title: "Concise & Academic", description: "Slide down for concise mode, or far down for academic mode for rigorous, formal analysis.")
 
-                    InfoRow(icon: "timer", title: "Extended Listening", description: "Hold the button for 3 seconds to let the AI know you have a lot to say and it should wait longer before responding.")
+                    HStack(spacing: 12) {
+                        InfoRow(icon: "arrow.left.circle.fill", title: "Discovery", description: "Slide left to explore new topics.")
+                        InfoRow(icon: "arrow.right.circle.fill", title: "Translator", description: "Slide right for linguistic help.")
+                    }
 
-                    InfoRow(icon: "brain.head.profile", title: "Intelligent Sending", description: "The AI now automatically detects when you're done speaking and sends the request without needing a button tap.")
+                    InfoRow(icon: "timer", title: "Extended Listening", description: "Hold the button for 3 seconds to speak for longer without interruption.")
+
+                    InfoRow(icon: "brain.head.profile", title: "Intelligent Sensing", description: "Automatic silence detection sends your request when you stop talking.")
                 }
                 .padding(.vertical, 4)
             }
