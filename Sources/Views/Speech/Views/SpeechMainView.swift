@@ -188,31 +188,32 @@ struct VoiceModeFullScreen: View {
                     Spacer().frame(width: 12)
 
                     // Status indicator
-                VStack(alignment: .trailing, spacing: 4) {
-                    HStack(spacing: 6) {
-                        Circle()
-                            .fill(statusColor)
-                            .frame(width: 8, height: 8)
-                            .shadow(color: statusColor, radius: 4)
+                    // Status indicator
+                    VStack(alignment: .trailing, spacing: 4) {
+                        HStack(spacing: 6) {
+                            Circle()
+                                .fill(statusColor)
+                                .frame(width: 8, height: 8)
+                                .shadow(color: statusColor, radius: 4)
 
-                        Text(sessionManager.speechState == .idle ? "READY" : sessionManager.speechState.statusText.uppercased())
-                            .font(.caption2.bold())
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(20)
+                            Text(sessionManager.speechState == .idle ? "READY" : sessionManager.speechState.statusText.uppercased())
+                                .font(.caption2.bold())
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(20)
 
-                    if let feature = activeFeature {
-                        Text(feature.rawValue.replacingOccurrences(of: "_", with: " ").uppercased())
-                            .font(.system(size: 8, weight: .black))
-                            .foregroundColor(.accentColor)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 2)
-                            .background(Color.accentColor.opacity(0.2))
-                            .cornerRadius(4)
-                    }
+                        if let feature = activeFeature {
+                            Text(feature.rawValue.replacingOccurrences(of: "_", with: " ").uppercased())
+                                .font(.system(size: 8, weight: .black))
+                                .foregroundColor(.accentColor)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 2)
+                                .background(Color.accentColor.opacity(0.2))
+                                .cornerRadius(4)
+                        }
                     }
                 }
                 .padding(.horizontal)
@@ -290,7 +291,7 @@ struct VoiceModeFullScreen: View {
                     }
                     .frame(width: 180)
                 }
-                .foregroundColor(.accentColor)
+                .foregroundColor(Color.accentColor)
 
                 Circle()
                     .fill(.ultraThinMaterial)
@@ -373,9 +374,7 @@ struct VoiceModeFullScreen: View {
                     .foregroundColor(.white.opacity(0.4))
                     .padding(.bottom, 30)
             }
-        .onChange(of: sessionManager.audioLevel) { _ in
-        }
-    }
+        .onChange(of: sessionManager.audioLevel) { _ in }
     }
 
     func handlePressStart() {
@@ -458,6 +457,7 @@ struct VoiceModeFullScreen: View {
         withAnimation {
             sessionManager.mode = mode
         }
+    }
     }
 }
 
@@ -587,7 +587,6 @@ struct WaveformBars: View {
                         width: 4,
                         height: barHeight(for: index)
                     )
-                    .animation(.easeInOut(duration: 0.1), value: level)
             }
         }
     }
@@ -612,52 +611,54 @@ struct SpeechMessageBubble: View {
     let message: SpeechMessage
 
     var body: some View {
-        if message.isSpokenOnly {
-            EmptyView()
-        } else {
-            HStack {
-                if message.role == .user { Spacer() }
+        Group {
+            if message.isSpokenOnly {
+                EmptyView()
+            } else {
+                HStack {
+                    if message.role == .user { Spacer() }
 
-                VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
-                if message.role == .system {
-                    // System/error messages
-                    Text(message.content)
-                        .font(.caption)
-                        .foregroundColor(.orange)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color.orange.opacity(0.1))
-                        .cornerRadius(12)
-                } else {
-                    HStack(alignment: .bottom) {
-                        if message.role == .assistant {
-                            Button(action: {
-                                Task {
-                                    await SpeechSessionManager.shared.speak(text: message.content)
+                    VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
+                        if message.role == .system {
+                            // System/error messages
+                            Text(message.content)
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(Color.orange.opacity(0.1))
+                                .cornerRadius(12)
+                        } else {
+                            HStack(alignment: .bottom) {
+                                if message.role == .assistant {
+                                    Button(action: {
+                                        Task {
+                                            await SpeechSessionManager.shared.speak(text: message.content)
+                                        }
+                                    }) {
+                                        Image(systemName: "speaker.wave.2.fill")
+                                            .font(.caption)
+                                            .foregroundColor(.accentColor)
+                                    }
+                                    .padding(.bottom, 10)
                                 }
-                            }) {
-                                Image(systemName: "speaker.wave.2.fill")
-                                    .font(.caption)
-                                    .foregroundColor(.accentColor)
-                            }
-                            .padding(.bottom, 10)
-                        }
 
-                        Text(message.content)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .background(message.role == .user ? Color.accentColor : Color(.systemGray5))
-                            .foregroundColor(message.role == .user ? .white : .primary)
-                            .cornerRadius(18)
+                                Text(message.content)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 10)
+                                    .background(message.role == .user ? Color.accentColor : Color(.systemGray5))
+                                    .foregroundColor(message.role == .user ? .white : .primary)
+                                    .cornerRadius(18)
+                            }
+
+                            Text(message.timestamp, style: .time)
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
                     }
 
-                    Text(message.timestamp, style: .time)
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+                    if message.role == .assistant || message.role == .system { Spacer() }
                 }
-            }
-
-                if message.role == .assistant || message.role == .system { Spacer() }
             }
         }
     }
@@ -674,6 +675,7 @@ struct AudioLevelIndicator: View {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(Color.accentColor.opacity(Double(level) > Double(index) / 10.0 ? 1.0 : 0.2))
                     .frame(width: 6, height: 10 + (20 * CGFloat(sin(Double(index) * 0.5 + Date().timeIntervalSince1970 * 5))))
+                    .transaction { $0.animation = nil }
             }
         }
     }
