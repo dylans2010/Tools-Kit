@@ -14,10 +14,12 @@ public struct SDKLogEntry: Identifiable, Codable, Hashable {
     public let level: LogLevel
     public let message: String
     public let source: String?
+    public let errorCode: Int?
     public init(id: UUID = UUID(), timestamp: Date = Date(),
-                level: LogLevel, message: String, source: String? = nil) {
+                level: LogLevel, message: String, source: String? = nil, errorCode: Int? = nil) {
         self.id = id; self.timestamp = timestamp
         self.level = level; self.message = message; self.source = source
+        self.errorCode = errorCode
     }
 }
 
@@ -25,8 +27,8 @@ public class SDKLogStore: ObservableObject {
     public static let shared = SDKLogStore()
     @Published public var entries: [SDKLogEntry] = []
     private init() {}
-    public func log(_ message: String, source: String? = nil, level: LogLevel = .info) {
-        let entry = SDKLogEntry(level: level, message: message, source: source)
+    public func log(_ message: String, source: String? = nil, level: LogLevel = .info, errorCode: Int? = nil) {
+        let entry = SDKLogEntry(level: level, message: message, source: source, errorCode: errorCode)
         DispatchQueue.main.async { self.entries.append(entry) }
     }
 

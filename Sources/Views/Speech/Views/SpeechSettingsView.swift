@@ -10,6 +10,7 @@ struct SpeechSettingsView: View {
     @State private var savedAlertMessage = ""
     @State private var elevenLabsVoices: [ElevenLabsVoice] = []
     @State private var isLoadingVoices = false
+    @State private var showLogs = false
 
     var body: some View {
         Form {
@@ -66,7 +67,11 @@ struct SpeechSettingsView: View {
 
                     Button(action: {
                         Task {
-                            try? await ttsService.speak(text: "This is a sample of the selected Apple voice.")
+                            try? await ttsService.speakWithProvider(
+                                text: "This is a sample of the selected Apple voice.",
+                                provider: .apple,
+                                voiceID: ttsService.selectedAppleVoiceID
+                            )
                         }
                     }) {
                         Label("Play Sample", systemImage: "play.circle")
@@ -113,7 +118,11 @@ struct SpeechSettingsView: View {
 
                     Button(action: {
                         Task {
-                            try? await ttsService.speak(text: "This is a sample of the selected Eleven Labs voice.")
+                            try? await ttsService.speakWithProvider(
+                                text: "This is a sample of the selected Eleven Labs voice.",
+                                provider: .elevenLabs,
+                                voiceID: ttsService.selectedElevenLabsVoiceID
+                            )
                         }
                     }) {
                         Label("Play Sample", systemImage: "play.circle")
@@ -206,6 +215,16 @@ struct SpeechSettingsView: View {
             }
         }
         .navigationTitle("Speech Settings")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { showLogs = true }) {
+                    Image(systemName: "list.bullet.rectangle.portrait")
+                }
+            }
+        }
+        .sheet(isPresented: $showLogs) {
+            NSpeechLoggerView()
+        }
         .onAppear {
             apiKey = SpeechKeychainManager.shared.getKey() ?? ""
             visionApiKey = visionService.getKey(for: visionService.selectedProvider) ?? ""

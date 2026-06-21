@@ -219,6 +219,24 @@ class TTSService: ObservableObject {
         try await currentService.speak(text: text)
     }
 
+    func speakWithProvider(text: String, provider: TTSProvider, voiceID: String?) async throws {
+        let service: TTSServiceProtocol
+        if provider == .elevenLabs {
+            let elevenService = ElevenLabsTTSService()
+            elevenService.voiceID = voiceID
+            elevenService.pace = pace
+            elevenService.expressiveness = expressiveness
+            service = elevenService
+        } else {
+            let appleService = AppleTTSService()
+            appleService.voiceID = voiceID
+            appleService.pace = pace
+            appleService.expressiveness = expressiveness
+            service = appleService
+        }
+        try await service.speak(text: text)
+    }
+
     func stop() {
         currentService.stop()
     }
