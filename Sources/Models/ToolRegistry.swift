@@ -118,6 +118,7 @@ class ToolRegistry: ObservableObject {
             ReminderGeneratorTool(),
             SchemaGeneratorTool(),
             ProjectsTool(),
+            AISpeechTool(),
 
             // Network Tools
             DoHTool(),

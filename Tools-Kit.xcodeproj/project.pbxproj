@@ -2363,6 +2363,15 @@
 		WT1C4BF8EBB28B8B53DA65BA /* WorkspaceAITools.swift in Sources */ = {isa = PBXBuildFile; fileRef = WT2150AD8D36DF890EC9A009 /* WorkspaceAITools.swift */; };
 		XM0200000000000000000001 /* MCPModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = XM0100000000000000000001 /* MCPModels.swift */; };
 		ZF0000000000000000000003 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = ZF0000000000000000000002 /* ZIPFoundation */; };
+		RV020001 /* SpeechModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010001 /* SpeechModels.swift */; };
+		RV020002 /* SpeechMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010002 /* SpeechMainView.swift */; };
+		RV020003 /* SpeechSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010003 /* SpeechSettingsView.swift */; };
+		RV020004 /* SpeechSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010004 /* SpeechSetupView.swift */; };
+		RV020005 /* AISpeechTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010005 /* AISpeechTool.swift */; };
+		RV020006 /* SpeechKeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010006 /* SpeechKeychainManager.swift */; };
+		RV020007 /* ElevenLabsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010007 /* ElevenLabsService.swift */; };
+		RV020008 /* TTSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010008 /* TTSService.swift */; };
+		RV020009 /* SpeechSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010009 /* SpeechSessionManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -4720,6 +4729,15 @@
 		WS01CEDE12EC1A3C4B62BE89 /* PersonaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaManager.swift; sourceTree = "<group>"; };
 		WT2150AD8D36DF890EC9A009 /* WorkspaceAITools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAITools.swift; sourceTree = "<group>"; };
 		XM0100000000000000000001 /* MCPModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MCPModels.swift; path = Sources/Views/External/MCPModels.swift; sourceTree = SOURCE_ROOT; };
+		RV010001 /* SpeechModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/SpeechModels.swift; sourceTree = "<group>"; };
+		RV010002 /* SpeechMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SpeechMainView.swift; sourceTree = "<group>"; };
+		RV010003 /* SpeechSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SpeechSettingsView.swift; sourceTree = "<group>"; };
+		RV010004 /* SpeechSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SpeechSetupView.swift; sourceTree = "<group>"; };
+		RV010005 /* AISpeechTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/AISpeechTool.swift; sourceTree = "<group>"; };
+		RV010006 /* SpeechKeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SpeechKeychainManager.swift; sourceTree = "<group>"; };
+		RV010007 /* ElevenLabsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ElevenLabsService.swift; sourceTree = "<group>"; };
+		RV010008 /* TTSService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/TTSService.swift; sourceTree = "<group>"; };
+		RV010009 /* SpeechSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Managers/SpeechSessionManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -5707,6 +5725,7 @@
 		4A2CB0E156D82F6EAA22B391 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				RV030001 /* Speech */,
 				DG03000000000000000000001 /* Diagnostics */,
 				0303CEB3629B1574C8C70B31 /* Security */,
 				1987FFD9C7B9ABE77AB250E2 /* Workspace */,
@@ -11820,6 +11839,54 @@
 			path = Sources/Views/Bridging/TKBridge;
 			sourceTree = SOURCE_ROOT;
 		};
+		RV030001 /* Speech */ = {
+			isa = PBXGroup;
+			children = (
+				RV030002 /* Models */,
+				RV030003 /* Views */,
+				RV030004 /* Services */,
+				RV030005 /* Managers */,
+			);
+			path = Sources/Views/Speech;
+			sourceTree = "<group>";
+		};
+		RV030002 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				RV010001 /* SpeechModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		RV030003 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				RV010002 /* SpeechMainView.swift */,
+				RV010003 /* SpeechSettingsView.swift */,
+				RV010004 /* SpeechSetupView.swift */,
+				RV010005 /* AISpeechTool.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		RV030004 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				RV010006 /* SpeechKeychainManager.swift */,
+				RV010007 /* ElevenLabsService.swift */,
+				RV010008 /* TTSService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		RV030005 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				RV010009 /* SpeechSessionManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -11973,6 +12040,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				RV020001 /* SpeechModels.swift in Sources */,
+				RV020002 /* SpeechMainView.swift in Sources */,
+				RV020003 /* SpeechSettingsView.swift in Sources */,
+				RV020004 /* SpeechSetupView.swift in Sources */,
+				RV020005 /* AISpeechTool.swift in Sources */,
+				RV020006 /* SpeechKeychainManager.swift in Sources */,
+				RV020007 /* ElevenLabsService.swift in Sources */,
+				RV020008 /* TTSService.swift in Sources */,
+				RV020009 /* SpeechSessionManager.swift in Sources */,
 				TB02000000000001 /* Sources/Views/Bridging/TKBridge/TKBridgeClient.swift in Sources */,
 				BR02000000000001 /* Sources/Views/Bridging/BridgeChatView.swift in Sources */,
 				BR02000000000002 /* Sources/Views/Bridging/BridgeHomeView.swift in Sources */,
