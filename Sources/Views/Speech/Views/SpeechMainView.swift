@@ -375,6 +375,7 @@ struct VoiceModeFullScreen: View {
                     .padding(.bottom, 30)
             }
         .onChange(of: sessionManager.audioLevel) { _ in }
+        }
     }
 
     func handlePressStart() {
@@ -457,7 +458,6 @@ struct VoiceModeFullScreen: View {
         withAnimation {
             sessionManager.mode = mode
         }
-    }
     }
 }
 
