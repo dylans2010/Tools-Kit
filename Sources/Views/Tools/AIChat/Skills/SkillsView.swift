@@ -21,9 +21,19 @@ struct SkillsView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(skill.name)
                                     .font(.headline)
-                                Text(skill.createdAt.formatted(date: .abbreviated, time: .omitted))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                                HStack(spacing: 8) {
+                                    Text(skill.category)
+                                        .font(.caption2.bold())
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.blue.opacity(0.1), in: Capsule())
+                                    Text("v\(skill.version)")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                    Text(skill.createdAt.formatted(date: .abbreviated, time: .omitted))
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                }
                             }
                             Spacer()
                             Toggle("", isOn: $skill.isActive)

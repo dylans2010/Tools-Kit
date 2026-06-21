@@ -60,6 +60,13 @@ struct ContentView: View {
         guard !hasRestoredSession else { return }
         hasRestoredSession = true
 
+        // Bypass sign-in flow if Bundle ID matches
+        if Bundle.main.bundleIdentifier == "FuncSignInBypass" {
+            isAuthenticated = true
+            isCheckingSession = false
+            return
+        }
+
         do {
             _ = try await AppwriteService.account.get()
             isAuthenticated = true

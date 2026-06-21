@@ -46,26 +46,14 @@ struct AgenticUIChatView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
 
-            Text("Agentic Runtime")
+            Text("Foundation Models")
                 .font(.title2.weight(.semibold))
 
-            Text("Ask anything about your workspace. The system will analyze your project structure, generate tools dynamically, and stream responses using Foundation Models.")
+            Text("A powerful AI assistant ready to help with your workspace and general tasks. Powered by state-of-the-art Foundation Models and your custom skills.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
-
-            if let graph = orchestrator.workspaceGraph {
-                VStack(spacing: 4) {
-                    Text("\(graph.modules.count) modules analyzed")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text("\(graph.featureDomains.count) feature domains detected")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.top, 8)
-            }
 
             suggestedPrompts
 
@@ -206,11 +194,8 @@ struct AgenticUIChatView: View {
 
     private var streamingStatusText: String {
         switch orchestrator.state {
-        case .checkingAvailability: return "Checking Foundation Models..."
-        case .analyzingWorkspace: return "Analyzing workspace..."
-        case .generatingTools: return "Generating tools..."
-        case .streaming: return "Streaming response..."
-        case .executingTool: return "Executing tools..."
+        case .checkingAvailability: return "Waking up Foundation Models..."
+        case .streaming: return "AI is typing..."
         default: return "Processing..."
         }
     }

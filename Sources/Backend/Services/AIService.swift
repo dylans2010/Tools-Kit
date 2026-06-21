@@ -54,8 +54,8 @@ class AIService {
             }.sorted(by: { $0.createdAt > $1.createdAt })
         }
 
-        func addSkill(name: String, content: String) {
-            let skill = Skill(name: name, content: content)
+        func addSkill(name: String, content: String, category: String = "General", version: String = "1.0.0", priority: Int = 1) {
+            let skill = Skill(name: name, content: content, category: category, version: version, priority: priority)
             saveSkill(skill)
             loadSkills()
         }

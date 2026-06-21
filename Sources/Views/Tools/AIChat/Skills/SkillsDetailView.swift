@@ -9,6 +9,19 @@ struct SkillsDetailView: View {
         Form {
             Section("Details") {
                 TextField("Name", text: $skill.name)
+                HStack {
+                    Text("Category")
+                    Spacer()
+                    TextField("Category", text: $skill.category)
+                        .multilineTextAlignment(.trailing)
+                }
+                HStack {
+                    Text("Version")
+                    Spacer()
+                    TextField("Version", text: $skill.version)
+                        .multilineTextAlignment(.trailing)
+                }
+                Stepper("Priority: \(skill.priority)", value: $skill.priority, in: 1...10)
                 Toggle("Active", isOn: $skill.isActive)
             }
 
