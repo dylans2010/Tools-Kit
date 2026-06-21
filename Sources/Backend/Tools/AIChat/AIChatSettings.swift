@@ -121,6 +121,7 @@ struct AIChatSettings: Codable {
     var selectedProviderID: String = "openrouter"
     var aiModelSource: AIModelSource = .appModel
     var modelID: String = ""
+    var selectedAFMModelID: String = "AFM 3 Core"
     var systemPrompt: String = ""
     var useCustomPersonality: Bool = false
     var personalityName: String = ""
