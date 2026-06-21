@@ -13,8 +13,13 @@ class SpeechSessionManager: NSObject, ObservableObject {
     @Published var isSpeaking: Bool = false
     @Published var currentTranscription: String = ""
     @Published var audioLevel: Float = 0.0
-    @Published var mode: SpeechSessionMode = .voice
+    @Published var mode: SpeechSessionMode = .voice {
+        didSet {
+            handleModeChange()
+        }
+    }
 
+    let cameraManager = CameraManager()
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
@@ -25,6 +30,27 @@ class SpeechSessionManager: NSObject, ObservableObject {
     private override init() {
         super.init()
         setupAudioSession()
+        setupVisionCallback()
+    }
+
+    private func setupVisionCallback() {
+        cameraManager.onFrameCaptured = { [weak self] buffer in
+            Task { @MainActor in
+                await self?.processVisionFrame(buffer)
+            }
+        }
+    }
+
+    private func handleModeChange() {
+        if mode == .vision {
+            cameraManager.start()
+        } else {
+            cameraManager.stop()
+        }
+
+        if mode == .text {
+            stopRecording()
+        }
     }
 
     private func setupAudioSession() {
@@ -172,9 +198,27 @@ class SpeechSessionManager: NSObject, ObservableObject {
         }
     }
 
+    private func processVisionFrame(_ buffer: CMSampleBuffer) async {
+        guard mode == .vision, !isProcessing, !VisionService.shared.isProcessing else { return }
+
+        guard let imageData = FrameProcessor.process(buffer) else { return }
+
+        do {
+            let response = try await VisionService.shared.analyzeFrame(imageData, history: messages)
+            if !response.isEmpty {
+                let assistantMessage = SpeechMessage(role: .assistant, content: response)
+                messages.append(assistantMessage)
+                await speak(text: response)
+            }
+        } catch {
+            print("Vision Error: \(error)")
+        }
+    }
+
     func resetSession() {
         messages = []
         stopRecording()
+        cameraManager.stop()
         TTSService.shared.stop()
         isSpeaking = false
         isProcessing = false

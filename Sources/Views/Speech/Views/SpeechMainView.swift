@@ -2,12 +2,45 @@ import SwiftUI
 
 struct SpeechMainView: View {
     @StateObject private var sessionManager = SpeechSessionManager.shared
+    @StateObject private var visionService = VisionService.shared
     @State private var textInput: String = ""
     @FocusState private var isTextFieldFocused: Bool
 
     var body: some View {
+        ZStack {
+            if sessionManager.mode == .vision {
+                VisionCameraOverlay(session: sessionManager.cameraManager.session)
+                    .transition(.opacity)
+            }
+
+            VStack(spacing: 0) {
+                // Message List
+                mainContent
+                    .background(sessionManager.mode == .vision ? Color.clear : Color(.systemBackground))
+
+                // Input Area
+                inputArea
+            }
+        }
+        .navigationTitle("AI Speech")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink(destination: SpeechSettingsView()) {
+                    Image(systemName: "gear")
+                }
+            }
+
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Reset") {
+                    sessionManager.resetSession()
+                }
+            }
+        }
+    }
+
+    private var mainContent: some View {
         VStack(spacing: 0) {
-            // Message List
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(spacing: 16) {
@@ -36,7 +69,7 @@ struct SpeechMainView: View {
             }
 
             // Audio Level / Transcription Area
-            if sessionManager.isRecording {
+            if sessionManager.isRecording && sessionManager.mode != .vision {
                 VStack(spacing: 8) {
                     AudioLevelIndicator(level: sessionManager.audioLevel)
                         .frame(height: 40)
@@ -50,70 +83,75 @@ struct SpeechMainView: View {
                 .padding(.vertical)
                 .background(Color(.systemBackground).shadow(radius: 2))
             }
+        }
+    }
 
-            // Input Area
-            HStack(spacing: 12) {
-                // Mode Toggle
+    private var inputArea: some View {
+        HStack(spacing: 12) {
+            // Mode Toggle
+            Menu {
+                Button(action: { setMode(.voice) }) {
+                    Label("Voice Mode", systemImage: "mic.fill")
+                }
+                Button(action: { setMode(.text) }) {
+                    Label("Text Mode", systemImage: "keyboard")
+                }
+                Button(action: { setMode(.vision) }) {
+                    Label("Vision Mode", systemImage: "eye.fill")
+                }
+            } label: {
+                Image(systemName: modeIcon)
+                    .font(.title2)
+                    .foregroundColor(.accentColor)
+                    .frame(width: 44, height: 44)
+            }
+
+            if sessionManager.mode == .text {
+                TextField("Type a message...", text: $textInput)
+                    .textFieldStyle(.roundedBorder)
+                    .focused($isTextFieldFocused)
+                    .onSubmit {
+                        sendMessage()
+                    }
+
+                Button(action: sendMessage) {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.title)
+                }
+                .disabled(textInput.isEmpty)
+            } else {
                 Button(action: {
-                    withAnimation {
-                        sessionManager.mode = sessionManager.mode == .voice ? .text : .voice
-                        if sessionManager.mode == .text {
-                            sessionManager.stopRecording()
-                        }
+                    if sessionManager.isRecording {
+                        sessionManager.stopRecording()
+                    } else {
+                        try? sessionManager.startRecording()
                     }
                 }) {
-                    Image(systemName: sessionManager.mode == .voice ? "mic.fill" : "keyboard")
-                        .font(.title2)
-                        .foregroundColor(.accentColor)
-                }
-
-                if sessionManager.mode == .text {
-                    TextField("Type a message...", text: $textInput)
-                        .textFieldStyle(.roundedBorder)
-                        .focused($isTextFieldFocused)
-                        .onSubmit {
-                            sendMessage()
-                        }
-
-                    Button(action: sendMessage) {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.title)
-                    }
-                    .disabled(textInput.isEmpty)
-                } else {
-                    Button(action: {
-                        if sessionManager.isRecording {
-                            sessionManager.stopRecording()
-                        } else {
-                            try? sessionManager.startRecording()
-                        }
-                    }) {
-                        Text(sessionManager.isRecording ? "Stop Recording" : "Tap to Speak")
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(sessionManager.isRecording ? Color.red : Color.accentColor)
-                            .foregroundColor(.white)
-                            .cornerRadius(20)
-                    }
+                    Text(sessionManager.isRecording ? "Stop Recording" : "Tap to Speak")
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(sessionManager.isRecording ? Color.red : Color.accentColor)
+                        .foregroundColor(.white)
+                        .cornerRadius(20)
                 }
             }
-            .padding()
-            .background(Color(.secondarySystemBackground))
         }
-        .navigationTitle("AI Speech")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: SpeechSettingsView()) {
-                    Image(systemName: "gear")
-                }
-            }
+        .padding()
+        .background(sessionManager.mode == .vision ? Color.black.opacity(0.3) : Color(.secondarySystemBackground))
+        .background(.ultraThinMaterial)
+    }
 
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button("Reset") {
-                    sessionManager.resetSession()
-                }
-            }
+    private var modeIcon: String {
+        switch sessionManager.mode {
+        case .voice: return "mic.fill"
+        case .text: return "keyboard"
+        case .vision: return "eye.fill"
+        }
+    }
+
+    private func setMode(_ mode: SpeechSessionMode) {
+        withAnimation {
+            sessionManager.mode = mode
         }
     }
 
