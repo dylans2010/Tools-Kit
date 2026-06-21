@@ -4,6 +4,7 @@ import AVFoundation
 struct VisionCameraOverlay: View {
     let session: AVCaptureSession
     @StateObject private var visionService = CloudVisionService.shared
+    @StateObject private var sessionManager = SpeechSessionManager.shared
 
     var body: some View {
         ZStack {
@@ -22,6 +23,20 @@ struct VisionCameraOverlay: View {
                 HStack {
                     VisionStatusBadge(isProcessing: visionService.isProcessing)
                     Spacer()
+                    
+                    // Pause / Resume Toggle
+                    Button(action: {
+                        sessionManager.cameraManager.togglePause()
+                    }) {
+                        Image(systemName: sessionManager.cameraManager.isPaused ? "play.fill" : "pause.fill")
+                            .font(.title2)
+                            .padding(12)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
+                            .foregroundColor(sessionManager.cameraManager.isPaused ? .green : .orange)
+                    }
+                    
+                    // Switch Camera Button
                     Button(action: {
                         SpeechSessionManager.shared.cameraManager.switchCamera()
                     }) {
@@ -35,6 +50,19 @@ struct VisionCameraOverlay: View {
                 .padding()
 
                 Spacer()
+                
+                // Subtitles for AI response
+                if let lastAssistant = sessionManager.messages.last(where: { $0.role == .assistant }) {
+                    Text(lastAssistant.content)
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                        .background(Color.black.opacity(0.6))
+                        .cornerRadius(12)
+                        .padding(.horizontal)
+                        .padding(.bottom, 20)
+                }
 
                 if visionService.isProcessing {
                     VStack(spacing: 12) {
@@ -49,6 +77,20 @@ struct VisionCameraOverlay: View {
                     .background(.ultraThinMaterial)
                     .cornerRadius(15)
                     .padding(.bottom, 100)
+                } else {
+                    // Tap to analyze button
+                    Button(action: {
+                        sessionManager.cameraManager.captureImmediateFrame()
+                    }) {
+                        Text("Tap to Analyze")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 12)
+                            .background(Color.accentColor.opacity(0.8))
+                            .clipShape(Capsule())
+                    }
+                    .padding(.bottom, 40)
                 }
             }
         }

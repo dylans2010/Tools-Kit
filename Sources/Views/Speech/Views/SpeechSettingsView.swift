@@ -42,6 +42,18 @@ struct SpeechSettingsView: View {
                 .pickerStyle(.inline)
             }
 
+            // MARK: - Voice Customization
+            Section {
+                NavigationLink(destination: PersonalizedVoiceExperience()) {
+                    HStack {
+                        Image(systemName: "waveform")
+                            .foregroundColor(.accentColor)
+                        Text("Customize Voice")
+                            .font(.headline)
+                    }
+                }
+            }
+
             if ttsService.provider == .apple {
                 Section(header: Text("Apple Voice Selection")) {
                     Picker("Voice", selection: $ttsService.selectedAppleVoiceID) {

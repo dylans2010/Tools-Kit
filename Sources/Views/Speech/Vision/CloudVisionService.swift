@@ -15,6 +15,7 @@ class CloudVisionService: ObservableObject {
 
     private let keychainService = "com.tools-kit.vision"
     private var inFlightRequest: Bool = false
+    private var lastFrameHash: Int?
 
     private init() {
         loadSettings()
@@ -68,12 +69,18 @@ class CloudVisionService: ObservableObject {
     }
 
     func analyzeFrame(_ imageData: Data, history: [SpeechMessage]) async throws -> String {
-        let prompt = "Describe what you see in this image concisely in 1-2 sentences. Be specific and natural, as if you're telling a friend what you're looking at."
+        let prompt = "Describe what you see in this image concisely in 1-2 sentences. Be specific and natural, as if you're telling a friend what you're looking at. Focus heavily on context derived from the recent conversation."
         return try await analyzeFrameWithPrompt(imageData, prompt: prompt, history: history)
     }
 
     func analyzeFrameWithPrompt(_ imageData: Data, prompt: String, history: [SpeechMessage]) async throws -> String {
         guard !inFlightRequest else { return "" }
+        
+        let currentHash = imageData.hashValue
+        if let last = lastFrameHash, last == currentHash {
+            // Frame is visually identical or completely redundant
+            return "" // Signal to discard or reuse
+        }
 
         inFlightRequest = true
         isProcessing = true
@@ -82,12 +89,39 @@ class CloudVisionService: ObservableObject {
             isProcessing = false
         }
 
-        guard let apiKey = getKey(for: selectedProvider) else {
+        let providerToTryFirst = selectedProvider
+        var response = ""
+
+        do {
+            response = try await performRequest(for: providerToTryFirst, imageData: imageData, prompt: prompt, history: history)
+        } catch {
+            print("Vision Service: Primary provider \(providerToTryFirst.rawValue) failed with error: \(error)")
+            // Fallback
+            let fallbackProvider: VisionProvider = providerToTryFirst == .openai ? .gemini : .openai
+            print("Vision Service: Attempting fallback to \(fallbackProvider.rawValue)...")
+            do {
+                response = try await performRequest(for: fallbackProvider, imageData: imageData, prompt: prompt, history: history)
+            } catch {
+                print("Vision Service: Fallback provider \(fallbackProvider.rawValue) also failed.")
+                throw error
+            }
+        }
+        
+        guard !response.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw VisionError.apiError("Empty response received")
+        }
+        
+        lastFrameHash = currentHash
+        return response
+    }
+    
+    private func performRequest(for provider: VisionProvider, imageData: Data, prompt: String, history: [SpeechMessage]) async throws -> String {
+        guard let apiKey = getKey(for: provider) else {
             throw VisionError.missingAPIKey
         }
-
+        
         return try await withRetry {
-            switch self.selectedProvider {
+            switch provider {
             case .openai:
                 return try await self.performOpenAIRequest(imageData: imageData, prompt: prompt, apiKey: apiKey, history: history)
             case .gemini:

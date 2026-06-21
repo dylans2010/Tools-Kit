@@ -6,13 +6,17 @@ import UIKit
 class CameraManager: NSObject, ObservableObject {
     @Published var session = AVCaptureSession()
     @Published var isRunning = false
+    @Published var isPaused = false
 
     private var videoOutput = AVCaptureVideoDataOutput()
     private var videoDeviceInput: AVCaptureDeviceInput?
     private let sessionQueue = DispatchQueue(label: "com.tools-kit.vision.camera-queue")
 
     private var lastFrameTime: TimeInterval = 0
-    private let frameThrottle: TimeInterval = 1.0 // 1 fps
+    private var currentThrottle: TimeInterval = 1.0 // 1 fps base
+    
+    // For adaptive throttling
+    private var lastProcessStartTime: TimeInterval = 0
 
     var onFrameCaptured: ((CMSampleBuffer) -> Void)?
 
@@ -96,13 +100,38 @@ class CameraManager: NSObject, ObservableObject {
             self.session.commitConfiguration()
         }
     }
+    
+    func captureImmediateFrame() {
+        // Temporarily clear the throttle to allow the very next frame through
+        sessionQueue.async {
+            self.lastFrameTime = 0
+        }
+    }
+    
+    func togglePause() {
+        DispatchQueue.main.async {
+            self.isPaused.toggle()
+        }
+    }
+    
+    func reportProcessingComplete(duration: TimeInterval) {
+        sessionQueue.async {
+            // Adaptive throttling: If processing takes longer than the base throttle, increase it.
+            // Decay it slowly back to 1.0 if processing is fast.
+            let targetThrottle = max(1.0, duration + 0.2) // Give 200ms breathing room
+            self.currentThrottle = (self.currentThrottle * 0.7) + (targetThrottle * 0.3)
+        }
+    }
 }
 
 extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        guard !isPaused else { return }
+        
         let currentTime = CACurrentMediaTime()
-        if currentTime - lastFrameTime >= frameThrottle {
+        if currentTime - lastFrameTime >= currentThrottle {
             lastFrameTime = currentTime
+            lastProcessStartTime = currentTime
             onFrameCaptured?(sampleBuffer)
         }
     }

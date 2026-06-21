@@ -2366,6 +2366,7 @@
 		RV020001 /* SpeechModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010001 /* SpeechModels.swift */; };
 		RV020002 /* SpeechMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010002 /* SpeechMainView.swift */; };
 		RV020003 /* SpeechSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010003 /* SpeechSettingsView.swift */; };
+		RV020015 /* PersonalizedVoiceExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010015 /* PersonalizedVoiceExperience.swift */; };
 		RV020004 /* SpeechSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010004 /* SpeechSetupView.swift */; };
 		RV020005 /* AISpeechTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010005 /* AISpeechTool.swift */; };
 		RV020006 /* SpeechKeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010006 /* SpeechKeychainManager.swift */; };
@@ -4737,6 +4738,7 @@
 		RV010001 /* SpeechModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechModels.swift; sourceTree = "<group>"; };
 		RV010002 /* SpeechMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechMainView.swift; sourceTree = "<group>"; };
 		RV010003 /* SpeechSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSettingsView.swift; sourceTree = "<group>"; };
+		RV010015 /* PersonalizedVoiceExperience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalizedVoiceExperience.swift; sourceTree = "<group>"; };
 		RV010004 /* SpeechSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSetupView.swift; sourceTree = "<group>"; };
 		RV010005 /* AISpeechTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISpeechTool.swift; sourceTree = "<group>"; };
 		RV010006 /* SpeechKeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechKeychainManager.swift; sourceTree = "<group>"; };
@@ -11874,6 +11876,7 @@
 			children = (
 				RV010002 /* SpeechMainView.swift */,
 				RV010003 /* SpeechSettingsView.swift */,
+				RV010015 /* PersonalizedVoiceExperience.swift */,
 				RV010004 /* SpeechSetupView.swift */,
 				RV010005 /* AISpeechTool.swift */,
 			);
@@ -12066,6 +12069,7 @@
 				RV020001 /* SpeechModels.swift in Sources */,
 				RV020002 /* SpeechMainView.swift in Sources */,
 				RV020003 /* SpeechSettingsView.swift in Sources */,
+				RV020015 /* PersonalizedVoiceExperience.swift in Sources */,
 				RV020004 /* SpeechSetupView.swift in Sources */,
 				RV020005 /* AISpeechTool.swift in Sources */,
 				RV020006 /* SpeechKeychainManager.swift in Sources */,

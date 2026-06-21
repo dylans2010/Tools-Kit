@@ -43,8 +43,9 @@ class SpeechSessionManager: NSObject, ObservableObject {
             // Process the frame on a background-safe path, then hop to MainActor
             let frameData = FrameProcessor.process(buffer)
             Task { @MainActor in
-                self?.latestFrameData = frameData
-                await self?.processVisionFrame(buffer)
+                guard let data = frameData else { return }
+                self?.latestFrameData = data
+                await self?.processVisionFrame(data)
             }
         }
     }
@@ -186,19 +187,24 @@ class SpeechSessionManager: NSObject, ObservableObject {
 
     // MARK: - Vision Frame Processing
 
-    private func processVisionFrame(_ buffer: CMSampleBuffer) async {
+    private func processVisionFrame(_ imageData: Data) async {
         guard mode == .vision, !isProcessing, !CloudVisionService.shared.isProcessing else { return }
 
-        guard let imageData = FrameProcessor.process(buffer) else { return }
-
+        let startTime = CACurrentMediaTime()
         do {
             let response = try await CloudVisionService.shared.analyzeFrame(imageData, history: messages)
+            let duration = CACurrentMediaTime() - startTime
+            cameraManager.reportProcessingComplete(duration: duration)
+            
             if !response.isEmpty {
                 let assistantMessage = SpeechMessage(role: .assistant, content: response)
                 messages.append(assistantMessage)
                 await speak(text: response)
             }
         } catch {
+            let duration = CACurrentMediaTime() - startTime
+            cameraManager.reportProcessingComplete(duration: duration)
+            
             // Log vision errors but don't spam — only show if it's a config issue
             if case VisionError.missingAPIKey = error {
                 handleError(SpeechError.missingAPIKey("Vision Provider"))
