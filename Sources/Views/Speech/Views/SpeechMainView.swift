@@ -8,21 +8,29 @@ struct SpeechMainView: View {
 
     var body: some View {
         ZStack {
-            if sessionManager.mode == .vision {
-                VisionCameraOverlay(session: sessionManager.cameraManager.session)
+            if sessionManager.mode == .voice {
+                // Full-screen immersive voice mode
+                VoiceModeFullScreen(sessionManager: sessionManager)
                     .transition(.opacity)
-            }
+            } else {
+                // Text and Vision modes with chat UI
+                ZStack {
+                    if sessionManager.mode == .vision {
+                        VisionCameraOverlay(session: sessionManager.cameraManager.session)
+                            .transition(.opacity)
+                    }
 
-            VStack(spacing: 0) {
-                // Message List
-                mainContent
-                    .background(sessionManager.mode == .vision ? Color.clear : Color(.systemBackground))
+                    VStack(spacing: 0) {
+                        mainContent
+                            .background(sessionManager.mode == .vision ? Color.clear : Color(.systemBackground))
 
-                // Input Area
-                inputArea
+                        // Input Area
+                        inputArea
+                    }
+                }
             }
         }
-        .navigationTitle("AI Speech")
+        .navigationTitle(sessionManager.mode == .voice ? "" : "AI Speech")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -69,7 +77,7 @@ struct SpeechMainView: View {
             }
 
             // Audio Level / Transcription Area
-            if sessionManager.isRecording && sessionManager.mode != .vision {
+            if sessionManager.isRecording && sessionManager.mode != .voice {
                 VStack(spacing: 8) {
                     AudioLevelIndicator(level: sessionManager.audioLevel)
                         .frame(height: 40)
@@ -118,8 +126,23 @@ struct SpeechMainView: View {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.title)
                 }
-                .disabled(textInput.isEmpty)
-            } else {
+                .disabled(textInput.isEmpty || sessionManager.isProcessing)
+            } else if sessionManager.mode == .vision {
+                // Vision mode: text input for questions about what AI sees
+                TextField("Ask about what you see...", text: $textInput)
+                    .textFieldStyle(.roundedBorder)
+                    .focused($isTextFieldFocused)
+                    .onSubmit {
+                        sendVisionQuestion()
+                    }
+
+                Button(action: sendVisionQuestion) {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.title)
+                }
+                .disabled(textInput.isEmpty || sessionManager.isProcessing)
+
+                // Also allow voice recording in vision mode
                 Button(action: {
                     if sessionManager.isRecording {
                         sessionManager.stopRecording()
@@ -127,12 +150,9 @@ struct SpeechMainView: View {
                         try? sessionManager.startRecording()
                     }
                 }) {
-                    Text(sessionManager.isRecording ? "Stop Recording" : "Tap to Speak")
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(sessionManager.isRecording ? Color.red : Color.accentColor)
-                        .foregroundColor(.white)
-                        .cornerRadius(20)
+                    Image(systemName: sessionManager.isRecording ? "stop.circle.fill" : "mic.circle.fill")
+                        .font(.title)
+                        .foregroundColor(sessionManager.isRecording ? .red : .accentColor)
                 }
             }
         }
@@ -156,11 +176,299 @@ struct SpeechMainView: View {
     }
 
     private func sendMessage() {
+        guard !textInput.isEmpty else { return }
         sessionManager.sendTextMessage(textInput)
         textInput = ""
         isTextFieldFocused = false
     }
+
+    private func sendVisionQuestion() {
+        guard !textInput.isEmpty else { return }
+        sessionManager.sendVisionQuestion(textInput)
+        textInput = ""
+        isTextFieldFocused = false
+    }
 }
+
+// MARK: - Full-Screen Voice Mode
+
+struct VoiceModeFullScreen: View {
+    @ObservedObject var sessionManager: SpeechSessionManager
+    @State private var pulseScale: CGFloat = 1.0
+    @State private var wavePhase: Double = 0
+
+    var body: some View {
+        ZStack {
+            // Background gradient
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(hue: 0.62, saturation: 0.35, brightness: 0.12),
+                    Color(hue: 0.68, saturation: 0.45, brightness: 0.18),
+                    Color(hue: 0.62, saturation: 0.35, brightness: 0.12)
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Top bar with mode switcher
+                HStack {
+                    Menu {
+                        Button(action: { setMode(.voice) }) {
+                            Label("Voice Mode", systemImage: "mic.fill")
+                        }
+                        Button(action: { setMode(.text) }) {
+                            Label("Text Mode", systemImage: "keyboard")
+                        }
+                        Button(action: { setMode(.vision) }) {
+                            Label("Vision Mode", systemImage: "eye.fill")
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "mic.fill")
+                                .font(.caption)
+                            Text("VOICE")
+                                .font(.caption.bold())
+                        }
+                        .foregroundColor(.white.opacity(0.7))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(20)
+                    }
+
+                    Spacer()
+
+                    // Status indicator
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(statusColor)
+                            .frame(width: 8, height: 8)
+                            .shadow(color: statusColor, radius: 4)
+
+                        Text(sessionManager.speechState == .idle ? "READY" : sessionManager.speechState.statusText.uppercased())
+                            .font(.caption2.bold())
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(.ultraThinMaterial)
+                    .cornerRadius(20)
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+
+                Spacer()
+
+                // Central orb / waveform
+                ZStack {
+                    // Outer pulse ring
+                    Circle()
+                        .stroke(statusColor.opacity(0.15), lineWidth: 2)
+                        .frame(width: 220, height: 220)
+                        .scaleEffect(pulseScale)
+
+                    Circle()
+                        .stroke(statusColor.opacity(0.1), lineWidth: 1)
+                        .frame(width: 260, height: 260)
+                        .scaleEffect(pulseScale * 0.95)
+
+                    // Main orb
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                gradient: Gradient(colors: [
+                                    statusColor.opacity(0.6),
+                                    statusColor.opacity(0.2),
+                                    Color.clear
+                                ]),
+                                center: .center,
+                                startRadius: 20,
+                                endRadius: 90
+                            )
+                        )
+                        .frame(width: 180, height: 180)
+                        .scaleEffect(sessionManager.speechState.isActive ? 1.0 + CGFloat(sessionManager.audioLevel) * 0.4 : 1.0)
+                        .animation(.easeInOut(duration: 0.15), value: sessionManager.audioLevel)
+
+                    // Inner glow
+                    Circle()
+                        .fill(statusColor.opacity(0.8))
+                        .frame(width: 60, height: 60)
+                        .blur(radius: 10)
+
+                    // Waveform bars (visible when active)
+                    if sessionManager.speechState.isActive {
+                        WaveformBars(level: sessionManager.audioLevel, color: statusColor)
+                            .frame(width: 120, height: 40)
+                    }
+
+                    // Status icon
+                    if !sessionManager.speechState.isActive {
+                        Image(systemName: statusIcon)
+                            .font(.system(size: 40, weight: .light))
+                            .foregroundColor(.white.opacity(0.9))
+                    }
+                }
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                        pulseScale = 1.1
+                    }
+                }
+
+                Spacer()
+
+                // Status text
+                VStack(spacing: 8) {
+                    Text(sessionManager.speechState.statusText)
+                        .font(.headline)
+                        .foregroundColor(.white.opacity(0.9))
+
+                    if sessionManager.isRecording && !sessionManager.currentTranscription.isEmpty {
+                        Text(sessionManager.currentTranscription)
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.6))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 40)
+                            .lineLimit(3)
+                    }
+
+                    // Last AI response (brief)
+                    if let lastAssistant = sessionManager.messages.last(where: { $0.role == .assistant }) {
+                        Text(lastAssistant.content)
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.4))
+                            .lineLimit(2)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 40)
+                            .padding(.top, 4)
+                    }
+                }
+
+                Spacer()
+                    .frame(height: 40)
+
+                // Main action button
+                Button(action: {
+                    if sessionManager.isRecording {
+                        sessionManager.stopRecording()
+                    } else if sessionManager.isSpeaking {
+                        TTSService.shared.stop()
+                    } else {
+                        try? sessionManager.startRecording()
+                    }
+                }) {
+                    ZStack {
+                        Circle()
+                            .fill(.ultraThinMaterial)
+                            .frame(width: 80, height: 80)
+
+                        Circle()
+                            .stroke(sessionManager.isRecording ? Color.red : statusColor, lineWidth: 3)
+                            .frame(width: 80, height: 80)
+
+                        Image(systemName: actionButtonIcon)
+                            .font(.system(size: 28, weight: .medium))
+                            .foregroundColor(sessionManager.isRecording ? .red : .white)
+                    }
+                }
+                .disabled(sessionManager.isProcessing)
+                .padding(.bottom, 20)
+
+                // Hint text
+                Text(actionHintText)
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.4))
+                    .padding(.bottom, 30)
+            }
+        }
+    }
+
+    private var statusColor: Color {
+        switch sessionManager.speechState {
+        case .idle: return .cyan
+        case .listening: return .green
+        case .processing: return .orange
+        case .speaking: return .blue
+        case .error: return .red
+        }
+    }
+
+    private var statusIcon: String {
+        switch sessionManager.speechState {
+        case .idle: return "mic.fill"
+        case .listening: return "waveform"
+        case .processing: return "brain"
+        case .speaking: return "speaker.wave.2.fill"
+        case .error: return "exclamationmark.triangle"
+        }
+    }
+
+    private var actionButtonIcon: String {
+        if sessionManager.isRecording {
+            return "stop.fill"
+        } else if sessionManager.isSpeaking {
+            return "speaker.slash.fill"
+        } else {
+            return "mic.fill"
+        }
+    }
+
+    private var actionHintText: String {
+        if sessionManager.isRecording {
+            return "Tap to stop recording"
+        } else if sessionManager.isSpeaking {
+            return "Tap to stop speaking"
+        } else if sessionManager.isProcessing {
+            return "Processing your request..."
+        } else {
+            return "Tap the microphone to start"
+        }
+    }
+
+    private func setMode(_ mode: SpeechSessionMode) {
+        withAnimation {
+            sessionManager.mode = mode
+        }
+    }
+}
+
+// MARK: - Waveform Bars for Voice Mode
+
+struct WaveformBars: View {
+    let level: Float
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 3) {
+            ForEach(0..<12, id: \.self) { index in
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(color.opacity(0.8))
+                    .frame(
+                        width: 4,
+                        height: barHeight(for: index)
+                    )
+                    .animation(.easeInOut(duration: 0.1), value: level)
+            }
+        }
+    }
+
+    private func barHeight(for index: Int) -> CGFloat {
+        let baseHeight: CGFloat = 4
+        let maxAdditional: CGFloat = 32
+        let normalizedLevel = CGFloat(level)
+
+        // Create a wave pattern with the audio level
+        let phase = Double(index) * 0.5
+        let wave = sin(phase + Date().timeIntervalSince1970 * 3) * 0.5 + 0.5
+        let audioInfluence = normalizedLevel * CGFloat(wave) * maxAdditional
+
+        return baseHeight + audioInfluence
+    }
+}
+
+// MARK: - Message Bubble
 
 struct SpeechMessageBubble: View {
     let message: SpeechMessage
@@ -170,44 +478,57 @@ struct SpeechMessageBubble: View {
             if message.role == .user { Spacer() }
 
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
-                HStack(alignment: .bottom) {
-                    if message.role == .assistant {
-                        Button(action: {
-                            Task {
-                                await SpeechSessionManager.shared.speak(text: message.content)
+                if message.role == .system {
+                    // System/error messages
+                    Text(message.content)
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.orange.opacity(0.1))
+                        .cornerRadius(12)
+                } else {
+                    HStack(alignment: .bottom) {
+                        if message.role == .assistant {
+                            Button(action: {
+                                Task {
+                                    await SpeechSessionManager.shared.speak(text: message.content)
+                                }
+                            }) {
+                                Image(systemName: "speaker.wave.2.fill")
+                                    .font(.caption)
+                                    .foregroundColor(.accentColor)
                             }
-                        }) {
-                            Image(systemName: "speaker.wave.2.fill")
-                                .font(.caption)
-                                .foregroundColor(.accentColor)
+                            .padding(.bottom, 10)
                         }
-                        .padding(.bottom, 10)
+
+                        Text(message.content)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(message.role == .user ? Color.accentColor : Color(.systemGray5))
+                            .foregroundColor(message.role == .user ? .white : .primary)
+                            .cornerRadius(18)
                     }
 
-                    Text(message.content)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .background(message.role == .user ? Color.accentColor : Color(.systemGray5))
-                        .foregroundColor(message.role == .user ? .white : .primary)
-                        .cornerRadius(18)
+                    Text(message.timestamp, style: .time)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
                 }
-
-                Text(message.timestamp, style: .time)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
             }
 
-            if message.role == .assistant { Spacer() }
+            if message.role == .assistant || message.role == .system { Spacer() }
         }
     }
 }
+
+// MARK: - Audio Level Indicator
 
 struct AudioLevelIndicator: View {
     let level: Float
 
     var body: some View {
         HStack(spacing: 4) {
-            ForEach(0..<10) { index in
+            ForEach(0..<10, id: \.self) { index in
                 RoundedRectangle(cornerRadius: 2)
                     .fill(Color.accentColor.opacity(Double(level) > Double(index) / 10.0 ? 1.0 : 0.2))
                     .frame(width: 6, height: 10 + (20 * CGFloat(sin(Double(index) * 0.5 + Date().timeIntervalSince1970 * 5))))
@@ -216,12 +537,14 @@ struct AudioLevelIndicator: View {
     }
 }
 
+// MARK: - Typing Indicator
+
 struct TypingIndicator: View {
     @State private var dotOffset: CGFloat = 0
 
     var body: some View {
         HStack(spacing: 4) {
-            ForEach(0..<3) { index in
+            ForEach(0..<3, id: \.self) { index in
                 Circle()
                     .fill(Color.accentColor)
                     .frame(width: 6, height: 6)

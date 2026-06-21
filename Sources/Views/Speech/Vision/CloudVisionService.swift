@@ -68,6 +68,11 @@ class CloudVisionService: ObservableObject {
     }
 
     func analyzeFrame(_ imageData: Data, history: [SpeechMessage]) async throws -> String {
+        let prompt = "Describe what you see in this image concisely in 1-2 sentences. Be specific and natural, as if you're telling a friend what you're looking at."
+        return try await analyzeFrameWithPrompt(imageData, prompt: prompt, history: history)
+    }
+
+    func analyzeFrameWithPrompt(_ imageData: Data, prompt: String, history: [SpeechMessage]) async throws -> String {
         guard !inFlightRequest else { return "" }
 
         inFlightRequest = true
@@ -80,8 +85,6 @@ class CloudVisionService: ObservableObject {
         guard let apiKey = getKey(for: selectedProvider) else {
             throw VisionError.missingAPIKey
         }
-
-        let prompt = "What do you see in this image? Provide a concise description that fits a conversation context."
 
         return try await withRetry {
             switch self.selectedProvider {
@@ -142,7 +145,9 @@ class CloudVisionService: ObservableObject {
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw VisionError.apiError("OpenAI API error")
+            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+            let body = String(data: data, encoding: .utf8) ?? "No response body"
+            throw VisionError.apiError("OpenAI API error (status \(statusCode)): \(body)")
         }
 
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
@@ -180,7 +185,9 @@ class CloudVisionService: ObservableObject {
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw VisionError.apiError("Gemini API error")
+            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+            let body = String(data: data, encoding: .utf8) ?? "No response body"
+            throw VisionError.apiError("Gemini API error (status \(statusCode)): \(body)")
         }
 
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
