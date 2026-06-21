@@ -3,6 +3,7 @@ import AVFoundation
 
 struct SpeechSettingsView: View {
     @ObservedObject var ttsService = TTSService.shared
+    @StateObject var sessionManager = SpeechSessionManager.shared
     @StateObject var visionService = CloudVisionService.shared
     @State private var apiKey: String = ""
     @State private var visionApiKey: String = ""
@@ -30,6 +31,12 @@ struct SpeechSettingsView: View {
                     }
                 }
                 .padding(.vertical, 4)
+            }
+
+            // MARK: - Interaction Settings
+            Section(header: Text("Interaction Settings")) {
+                Toggle("Continue Listening On Background", isOn: $sessionManager.continueListeningInBackground)
+                    .help("Keep the microphone active when the app is in the background.")
             }
 
             // MARK: - TTS Provider
@@ -195,13 +202,17 @@ struct SpeechSettingsView: View {
             }
 
             // MARK: - How It Works
-            Section(header: Text("How It Works")) {
-                VStack(alignment: .leading, spacing: 10) {
-                    InfoRow(icon: "mic.fill", title: "Voice Mode", description: "Speak → AI responds → ElevenLabs reads the response aloud. Requires: AI provider (main settings) + ElevenLabs API key.")
+            Section(header: Text("New Voice Features Guide")) {
+                VStack(alignment: .leading, spacing: 12) {
+                    InfoRow(icon: "hand.tap.fill", title: "Interrupt AI", description: "Press & hold the button while the AI is speaking to stop it and start your new request immediately.")
 
-                    InfoRow(icon: "keyboard", title: "Text Mode", description: "Type messages → AI responds in text. Requires: AI provider (main settings).")
+                    InfoRow(icon: "arrow.up.circle.fill", title: "Detailed Mode", description: "Slide the mic button upwards to ask the AI for a more in-depth and comprehensive response.")
 
-                    InfoRow(icon: "eye.fill", title: "Vision Mode", description: "Camera captures frames → AI describes what it sees. Requires: Vision API key (OpenAI or Gemini).")
+                    InfoRow(icon: "arrow.down.circle.fill", title: "Concise Mode", description: "Slide the mic button downwards to get a short, brief, and to-the-point answer.")
+
+                    InfoRow(icon: "timer", title: "Extended Listening", description: "Hold the button for 3 seconds to let the AI know you have a lot to say and it should wait longer before responding.")
+
+                    InfoRow(icon: "brain.head.profile", title: "Intelligent Sending", description: "The AI now automatically detects when you're done speaking and sends the request without needing a button tap.")
                 }
                 .padding(.vertical, 4)
             }
