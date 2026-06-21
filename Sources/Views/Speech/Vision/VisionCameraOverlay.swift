@@ -20,7 +20,7 @@ struct VisionCameraOverlay: View {
 
             VStack {
                 HStack {
-                    StatusBadge(isProcessing: visionService.isProcessing)
+                    VisionStatusBadge(isProcessing: visionService.isProcessing)
                     Spacer()
                     Button(action: {
                         SpeechSessionManager.shared.cameraManager.switchCamera()
@@ -55,7 +55,7 @@ struct VisionCameraOverlay: View {
     }
 }
 
-struct StatusBadge: View {
+struct VisionStatusBadge: View {
     let isProcessing: Bool
 
     var body: some View {
