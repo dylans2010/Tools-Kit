@@ -77,7 +77,7 @@ struct SpeechTranscriptView: View {
                 }
             }
             .sheet(isPresented: $showHistory) {
-                SpeechHistoryView()
+                SpeechHistorySheetView()
             }
         }
     }
@@ -98,7 +98,7 @@ struct TranscriptBubble: View {
             if message.role == .user { Spacer() }
 
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
-                if let markdown = try? AttributedString(markdown: message.content, options: .init(allowsExtendedAttributes: true, interpretedSyntax: .full, failurePolicy: .returnPartiallyParsedAttributedString)) {
+                if let markdown = try? AttributedString(markdown: message.content, options: .init(allowsExtendedAttributes: true, interpretedSyntax: .full, failurePolicy: .returnPartiallyParsedIfPossible)) {
                     Text(markdown)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
@@ -125,7 +125,7 @@ struct TranscriptBubble: View {
     }
 }
 
-struct SpeechHistoryView: View {
+struct SpeechHistorySheetView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var historyManager = SpeechHistoryManager.shared
     @State private var editingSessionID: UUID?

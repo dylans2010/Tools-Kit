@@ -2,6 +2,7 @@ import Foundation
 import AVFoundation
 import Speech
 import Combine
+import UIKit
 
 @MainActor
 class SpeechSessionManager: NSObject, ObservableObject {

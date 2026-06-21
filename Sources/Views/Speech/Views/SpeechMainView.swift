@@ -327,9 +327,9 @@ struct VoiceModeFullScreen: View {
 
                         // Execute based on final drag position
                         if dragOffset < -50 {
-                            sessionManager.startRecordingWithFeature(.detailedMode)
+                            try? sessionManager.startRecordingWithFeature(.detailedMode)
                         } else if dragOffset > 50 {
-                            sessionManager.startRecordingWithFeature(.conciseMode)
+                            try? sessionManager.startRecordingWithFeature(.conciseMode)
                         } else {
                             // Normal tap behavior if not a significant drag
                             if abs(dragOffset) < 10 {
@@ -352,12 +352,12 @@ struct VoiceModeFullScreen: View {
                     .foregroundColor(.white.opacity(0.4))
                     .padding(.bottom, 30)
             }
-        .onChange(of: sessionManager.audioLevel) { level in
-             // Automated level-based feedback if needed
+        .onChange(of: sessionManager.audioLevel) { _ in
         }
     }
+    }
 
-    private func handlePressStart() {
+    func handlePressStart() {
         if sessionManager.isSpeaking {
             withAnimation {
                 showInterruptionUI = true
@@ -389,8 +389,6 @@ struct VoiceModeFullScreen: View {
             try? sessionManager.startRecording()
         }
         activeFeature = nil
-    }
-        }
     }
 
     private var statusColor: Color {
@@ -441,6 +439,7 @@ struct VoiceModeFullScreen: View {
         }
     }
 }
+
 
 // MARK: - Waveform Bars for Voice Mode
 
