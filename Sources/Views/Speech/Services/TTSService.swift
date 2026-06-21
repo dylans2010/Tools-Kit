@@ -87,16 +87,19 @@ class TTSService: ObservableObject {
         let provider = TTSProvider(rawValue: savedProvider) ?? .apple
         self.provider = provider
 
-        self.selectedAppleVoiceID = UserDefaults.standard.string(forKey: "selected_apple_voice_id")
-        self.selectedElevenLabsVoiceID = UserDefaults.standard.string(forKey: "selected_eleven_labs_voice_id")
+        let appleVoice = UserDefaults.standard.string(forKey: "selected_apple_voice_id")
+        self.selectedAppleVoiceID = appleVoice
+        
+        let elevenLabsVoice = UserDefaults.standard.string(forKey: "selected_eleven_labs_voice_id")
+        self.selectedElevenLabsVoiceID = elevenLabsVoice
 
         if provider == .elevenLabs {
             let service = ElevenLabsTTSService()
-            service.voiceID = selectedElevenLabsVoiceID
+            service.voiceID = elevenLabsVoice
             self.currentService = service
         } else {
             let service = AppleTTSService()
-            service.voiceID = selectedAppleVoiceID
+            service.voiceID = appleVoice
             self.currentService = service
         }
     }
