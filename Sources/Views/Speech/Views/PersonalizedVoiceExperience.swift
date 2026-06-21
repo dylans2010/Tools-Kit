@@ -255,7 +255,8 @@ struct PersonalizedVoiceExperience: View {
                     .cornerRadius(14)
             }
             .padding(.horizontal, 24)
-            .padding(.bottom, 24 + (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.windows.first?.safeAreaInsets.bottom ?? 0)
+            .padding(.bottom, 24)
+            .safeAreaPadding(.bottom)
         }
         .ignoresSafeArea(.all, edges: .bottom)
     }

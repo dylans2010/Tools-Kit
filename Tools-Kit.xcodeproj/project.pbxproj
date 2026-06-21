@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3B11CCCBA7D2AECBB54D268C /* PersonalizedVoiceExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17788B86B9E924CFCCAE4D0 /* PersonalizedVoiceExperience.swift */; };
 		0001F0832037938D40776723 /* AgentToolResultCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643750A4D819D6E6CB623690 /* AgentToolResultCache.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		008580EC96F3EB7A63395DC9 /* AgentConfigurationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412F9451340C6E936945A3CF /* AgentConfigurationValidator.swift */; };
@@ -154,6 +153,7 @@
 		39BDFC31FA2844F48B8D5D76 /* Builder/CSVParserDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F741DB42E174FDAA365A743 /* Builder/CSVParserDevTool.swift */; };
 		39DA0853F2664BFCB925696A /* MailSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436F75E6A3244A9DA49E6704 /* MailSearchView.swift */; };
 		3ACD485C621F41389BE35DB5 /* Builder/TypographyScaleDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7702CF69F348E4BC0B7488 /* Builder/TypographyScaleDevTool.swift */; };
+		3B11CCCBA7D2AECBB54D268C /* PersonalizedVoiceExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17788B86B9E924CFCCAE4D0 /* PersonalizedVoiceExperience.swift */; };
 		3BEED8D4CE29494D805D8A8F /* SDKExecutionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A87BE1C659F46ADB1FD423A /* SDKExecutionEngine.swift */; };
 		3BF18E5A1F194973AF48AB75 /* JWTDecoderBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C5D9B83277E49378D71C1F2 /* JWTDecoderBackend.swift */; };
 		3C4BA717BB4E4B2D8FEE73D2 /* Sources/Views/Workspace/Notebooks/Features/NotebookMindMapGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6563FC84C724428A42E34ED /* Sources/Views/Workspace/Notebooks/Features/NotebookMindMapGeneratorView.swift */; };
@@ -1450,6 +1450,7 @@
 		FC8CA3A02FE6467900CBBA86 /* SwiftMCP in Frameworks */ = {isa = PBXBuildFile; productRef = E8A1C3D5F7094B2D8E6A0C15 /* SwiftMCP */; };
 		FC8CA3A12FE6467900CBBA86 /* Aurora in Frameworks */ = {isa = PBXBuildFile; productRef = AU0200000000000000000001 /* Aurora */; };
 		FC8CA3A22FE6467900CBBA86 /* Aurora in Frameworks */ = {isa = PBXBuildFile; productRef = AU0200000000000000000001 /* Aurora */; };
+		FC8E948A2FE7CF960041A2E2 /* NSpeechLoggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8E94892FE7CF950041A2E2 /* NSpeechLoggerView.swift */; };
 		FC9161E6F50E480D81CB8E06 /* Builder/OSVersionInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90600279236049AB979A8D8B /* Builder/OSVersionInspectorDevTool.swift */; };
 		FCDCE575A6CBBCB1A1ADD026 /* AgentSystemPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBAFFC1E92FBF00D9D751465 /* AgentSystemPrompt.swift */; };
 		FD1B82035D684DA78F035222 /* summarize_memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B4B64C5BE6B41368B54FDDE /* summarize_memory.swift */; };
@@ -2091,6 +2092,20 @@
 		RD020000000000000000000A /* MusicSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD010000000000000000000A /* MusicSearchView.swift */; };
 		RP0200000000000000000001 /* RepoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RP0100000000000000000001 /* RepoListView.swift */; };
 		RP0200000000000000000002 /* RepoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RP0100000000000000000002 /* RepoDetailView.swift */; };
+		RV020001 /* SpeechModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010001 /* SpeechModels.swift */; };
+		RV020002 /* SpeechMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010002 /* SpeechMainView.swift */; };
+		RV020003 /* SpeechSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010003 /* SpeechSettingsView.swift */; };
+		RV020004 /* SpeechSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010004 /* SpeechSetupView.swift */; };
+		RV020005 /* AISpeechTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010005 /* AISpeechTool.swift */; };
+		RV020006 /* SpeechKeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010006 /* SpeechKeychainManager.swift */; };
+		RV020007 /* ElevenLabsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010007 /* ElevenLabsService.swift */; };
+		RV020008 /* TTSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010008 /* TTSService.swift */; };
+		RV020009 /* SpeechSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010009 /* SpeechSessionManager.swift */; };
+		RV020010 /* AVFoundationCameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010010 /* AVFoundationCameraPreview.swift */; };
+		RV020011 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010011 /* CameraManager.swift */; };
+		RV020012 /* FrameProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010012 /* FrameProcessor.swift */; };
+		RV020013 /* CloudVisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010013 /* CloudVisionService.swift */; };
+		RV020014 /* VisionCameraOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010014 /* VisionCameraOverlay.swift */; };
 		SC0200000000000000000001 /* SecurityModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000001 /* SecurityModels.swift */; };
 		SC0200000000000000000002 /* EncryptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000002 /* EncryptionService.swift */; };
 		SC0200000000000000000003 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000003 /* AuthService.swift */; };
@@ -2364,20 +2379,6 @@
 		WT1C4BF8EBB28B8B53DA65BA /* WorkspaceAITools.swift in Sources */ = {isa = PBXBuildFile; fileRef = WT2150AD8D36DF890EC9A009 /* WorkspaceAITools.swift */; };
 		XM0200000000000000000001 /* MCPModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = XM0100000000000000000001 /* MCPModels.swift */; };
 		ZF0000000000000000000003 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = ZF0000000000000000000002 /* ZIPFoundation */; };
-		RV020001 /* SpeechModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010001 /* SpeechModels.swift */; };
-		RV020002 /* SpeechMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010002 /* SpeechMainView.swift */; };
-		RV020003 /* SpeechSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010003 /* SpeechSettingsView.swift */; };
-		RV020004 /* SpeechSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010004 /* SpeechSetupView.swift */; };
-		RV020005 /* AISpeechTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010005 /* AISpeechTool.swift */; };
-		RV020006 /* SpeechKeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010006 /* SpeechKeychainManager.swift */; };
-		RV020007 /* ElevenLabsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010007 /* ElevenLabsService.swift */; };
-		RV020008 /* TTSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010008 /* TTSService.swift */; };
-		RV020009 /* SpeechSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010009 /* SpeechSessionManager.swift */; };
-		RV020010 /* AVFoundationCameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010010 /* AVFoundationCameraPreview.swift */; };
-		RV020011 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010011 /* CameraManager.swift */; };
-		RV020012 /* FrameProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010012 /* FrameProcessor.swift */; };
-		RV020013 /* CloudVisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010013 /* CloudVisionService.swift */; };
-		RV020014 /* VisionCameraOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010014 /* VisionCameraOverlay.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -2396,7 +2397,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B17788B86B9E924CFCCAE4D0 /* PersonalizedVoiceExperience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalizedVoiceExperience.swift; sourceTree = "<group>"; };
 		00C0E15FEF0E12A7A901E440 /* AgentDemoTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDemoTimeline.swift; sourceTree = "<group>"; };
 		00CA85AC8F214CE79F467511 /* UUIDGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UUIDGeneratorView.swift; sourceTree = "<group>"; };
 		011E855AF0F14D94AB4E22BE /* PDFToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFToolsView.swift; sourceTree = "<group>"; };
@@ -2967,6 +2967,7 @@
 		B00175F6922510F79BFDE2CE /* SDKCancellationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKCancellationManager.swift; sourceTree = "<group>"; };
 		B09C00226BE5401788DF33C6 /* EventRegistrationFormTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventRegistrationFormTemplate.swift; sourceTree = "<group>"; };
 		B0D28B6E1645410F8BBB519B /* Builder/UUIDGeneratorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/UUIDGeneratorDevTool.swift; sourceTree = "<group>"; };
+		B17788B86B9E924CFCCAE4D0 /* PersonalizedVoiceExperience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalizedVoiceExperience.swift; sourceTree = "<group>"; };
 		B188E5E5C02945B3A4CF6189 /* MetadataRemoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataRemoverView.swift; sourceTree = "<group>"; };
 		B1ABEF1CC5614B57A749E486 /* NATOView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NATOView.swift; sourceTree = "<group>"; };
 		B1C2D3E4F5A60708090A0C01 /* AIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIService.swift; sourceTree = "<group>"; };
@@ -3823,6 +3824,7 @@
 		FC070B5F75920EA18A92A970 /* AgenticFoundationModelsAvailabilityChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticFoundationModelsAvailabilityChecker.swift; sourceTree = "<group>"; };
 		FC19D120C5EA0581ADFE87AC /* BatteryAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryAnalyticsView.swift; sourceTree = "<group>"; };
 		FC2449F47F6946C6836E42F7 /* MetadataRemoverBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataRemoverBackend.swift; sourceTree = "<group>"; };
+		FC8E94892FE7CF950041A2E2 /* NSpeechLoggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSpeechLoggerView.swift; sourceTree = "<group>"; };
 		FCAB33AF454749D08BE4DB43 /* abort_task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = abort_task.swift; sourceTree = "<group>"; };
 		FCB887820F444B5F996E3A45 /* LogViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerView.swift; sourceTree = "<group>"; };
 		FD02A9EA505D413A96021DD2 /* RatingQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingQuestionView.swift; sourceTree = "<group>"; };
@@ -4462,6 +4464,20 @@
 		RD010000000000000000000A /* MusicSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSearchView.swift; sourceTree = "<group>"; };
 		RP0100000000000000000001 /* RepoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoListView.swift; sourceTree = "<group>"; };
 		RP0100000000000000000002 /* RepoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoDetailView.swift; sourceTree = "<group>"; };
+		RV010001 /* SpeechModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechModels.swift; sourceTree = "<group>"; };
+		RV010002 /* SpeechMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechMainView.swift; sourceTree = "<group>"; };
+		RV010003 /* SpeechSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSettingsView.swift; sourceTree = "<group>"; };
+		RV010004 /* SpeechSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSetupView.swift; sourceTree = "<group>"; };
+		RV010005 /* AISpeechTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISpeechTool.swift; sourceTree = "<group>"; };
+		RV010006 /* SpeechKeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechKeychainManager.swift; sourceTree = "<group>"; };
+		RV010007 /* ElevenLabsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevenLabsService.swift; sourceTree = "<group>"; };
+		RV010008 /* TTSService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSService.swift; sourceTree = "<group>"; };
+		RV010009 /* SpeechSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSessionManager.swift; sourceTree = "<group>"; };
+		RV010010 /* AVFoundationCameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVFoundationCameraPreview.swift; sourceTree = "<group>"; };
+		RV010011 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
+		RV010012 /* FrameProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameProcessor.swift; sourceTree = "<group>"; };
+		RV010013 /* CloudVisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudVisionService.swift; sourceTree = "<group>"; };
+		RV010014 /* VisionCameraOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionCameraOverlay.swift; sourceTree = "<group>"; };
 		SC0100000000000000000001 /* SecurityModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityModels.swift; sourceTree = "<group>"; };
 		SC0100000000000000000002 /* EncryptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionService.swift; sourceTree = "<group>"; };
 		SC0100000000000000000003 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
@@ -4736,20 +4752,6 @@
 		WS01CEDE12EC1A3C4B62BE89 /* PersonaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaManager.swift; sourceTree = "<group>"; };
 		WT2150AD8D36DF890EC9A009 /* WorkspaceAITools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAITools.swift; sourceTree = "<group>"; };
 		XM0100000000000000000001 /* MCPModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MCPModels.swift; path = Sources/Views/External/MCPModels.swift; sourceTree = SOURCE_ROOT; };
-		RV010001 /* SpeechModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechModels.swift; sourceTree = "<group>"; };
-		RV010002 /* SpeechMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechMainView.swift; sourceTree = "<group>"; };
-		RV010003 /* SpeechSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSettingsView.swift; sourceTree = "<group>"; };
-		RV010004 /* SpeechSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSetupView.swift; sourceTree = "<group>"; };
-		RV010005 /* AISpeechTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISpeechTool.swift; sourceTree = "<group>"; };
-		RV010006 /* SpeechKeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechKeychainManager.swift; sourceTree = "<group>"; };
-		RV010007 /* ElevenLabsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevenLabsService.swift; sourceTree = "<group>"; };
-		RV010008 /* TTSService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSService.swift; sourceTree = "<group>"; };
-		RV010009 /* SpeechSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSessionManager.swift; sourceTree = "<group>"; };
-		RV010010 /* AVFoundationCameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVFoundationCameraPreview.swift; sourceTree = "<group>"; };
-		RV010011 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
-		RV010012 /* FrameProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameProcessor.swift; sourceTree = "<group>"; };
-		RV010013 /* CloudVisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudVisionService.swift; sourceTree = "<group>"; };
-		RV010014 /* VisionCameraOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionCameraOverlay.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -11717,6 +11719,69 @@
 			path = Changelog;
 			sourceTree = "<group>";
 		};
+		RV030001 /* Speech */ = {
+			isa = PBXGroup;
+			children = (
+				RV030002 /* Models */,
+				RV030003 /* Views */,
+				RV030004 /* Services */,
+				RV030005 /* Managers */,
+				RV030006 /* Vision */,
+			);
+			path = Speech;
+			sourceTree = "<group>";
+		};
+		RV030002 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				RV010001 /* SpeechModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		RV030003 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				FC8E94892FE7CF950041A2E2 /* NSpeechLoggerView.swift */,
+				RV010002 /* SpeechMainView.swift */,
+				RV010003 /* SpeechSettingsView.swift */,
+				RV010004 /* SpeechSetupView.swift */,
+				B17788B86B9E924CFCCAE4D0 /* PersonalizedVoiceExperience.swift */,
+				RV010005 /* AISpeechTool.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		RV030004 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				RV010006 /* SpeechKeychainManager.swift */,
+				RV010007 /* ElevenLabsService.swift */,
+				RV010008 /* TTSService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		RV030005 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				RV010009 /* SpeechSessionManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		RV030006 /* Vision */ = {
+			isa = PBXGroup;
+			children = (
+				RV010010 /* AVFoundationCameraPreview.swift */,
+				RV010011 /* CameraManager.swift */,
+				RV010012 /* FrameProcessor.swift */,
+				RV010013 /* CloudVisionService.swift */,
+				RV010014 /* VisionCameraOverlay.swift */,
+			);
+			path = Vision;
+			sourceTree = "<group>";
+		};
 		SD3000000000000000000001 /* Kernel */ = {
 			isa = PBXGroup;
 			children = (
@@ -11850,68 +11915,6 @@
 			);
 			path = Sources/Views/Bridging/TKBridge;
 			sourceTree = SOURCE_ROOT;
-		};
-		RV030001 /* Speech */ = {
-			isa = PBXGroup;
-			children = (
-				RV030002 /* Models */,
-				RV030003 /* Views */,
-				RV030004 /* Services */,
-				RV030005 /* Managers */,
-				RV030006 /* Vision */,
-			);
-			path = Speech;
-			sourceTree = "<group>";
-		};
-		RV030002 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				RV010001 /* SpeechModels.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		RV030003 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				RV010002 /* SpeechMainView.swift */,
-				RV010003 /* SpeechSettingsView.swift */,
-				RV010004 /* SpeechSetupView.swift */,
-				B17788B86B9E924CFCCAE4D0 /* PersonalizedVoiceExperience.swift */,
-				RV010005 /* AISpeechTool.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		RV030004 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				RV010006 /* SpeechKeychainManager.swift */,
-				RV010007 /* ElevenLabsService.swift */,
-				RV010008 /* TTSService.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		RV030005 /* Managers */ = {
-			isa = PBXGroup;
-			children = (
-				RV010009 /* SpeechSessionManager.swift */,
-			);
-			path = Managers;
-			sourceTree = "<group>";
-		};
-		RV030006 /* Vision */ = {
-			isa = PBXGroup;
-			children = (
-				RV010010 /* AVFoundationCameraPreview.swift */,
-				RV010011 /* CameraManager.swift */,
-				RV010012 /* FrameProcessor.swift */,
-				RV010013 /* CloudVisionService.swift */,
-				RV010014 /* VisionCameraOverlay.swift */,
-			);
-			path = Vision;
-			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
@@ -12066,6 +12069,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC8E948A2FE7CF960041A2E2 /* NSpeechLoggerView.swift in Sources */,
 				RV020001 /* SpeechModels.swift in Sources */,
 				RV020002 /* SpeechMainView.swift in Sources */,
 				RV020003 /* SpeechSettingsView.swift in Sources */,

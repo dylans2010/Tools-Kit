@@ -5,16 +5,16 @@ struct NSpeechLoggerView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 12) {
                     if logStore.entries.isEmpty {
-                        Text("No logs available")
+                        Text("No Logs Available")
                             .foregroundColor(.secondary)
                             .padding()
                     } else {
-                        ForEach(logStore.entries) { entry in
-                            LogEntryRow(entry: entry)
+                        ForEach(logStore.entries, id: \.id) { entry in
+                            SpeechLogEntryRow(entry: entry)
                             Divider()
                         }
                     }
@@ -40,19 +40,21 @@ struct NSpeechLoggerView: View {
     }
 }
 
-struct LogEntryRow: View {
+/// Marked `private` so this can never collide with another `LogEntryRow`
+/// type elsewhere in the module (e.g. the MCP traffic log view).
+private struct SpeechLogEntryRow: View {
     let entry: SDKLogEntry
 
-    private var dateFormatter: DateFormatter {
+    private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss.SSS"
         return formatter
-    }
+    }()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text(dateFormatter.string(from: entry.timestamp))
+                Text(Self.dateFormatter.string(from: entry.timestamp))
                     .font(.caption2.monospaced())
                     .foregroundColor(.secondary)
 
@@ -92,4 +94,18 @@ struct LogEntryRow: View {
 
 #Preview {
     NSpeechLoggerView()
+        .onAppear {
+            if SDKLogStore.shared.entries.isEmpty {
+                SDKLogStore.shared.entries = [
+                    SDKLogEntry(
+                        id: UUID(),
+                        timestamp: Date(),
+                        level: .info,
+                        message: "Preview Log Entry",
+                        source: "Preview",
+                        errorCode: nil
+                    )
+                ]
+            }
+        }
 }
