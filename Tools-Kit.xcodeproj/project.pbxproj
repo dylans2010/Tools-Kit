@@ -1764,6 +1764,35 @@
 		KB02OPENRT00000000000001 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */; };
 		LM0200000000000000000001 /* LocalModelsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000001 /* LocalModelsProvider.swift */; };
 		LM0200000000000000000002 /* SetupLocalModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000002 /* SetupLocalModelsView.swift */; };
+LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000100 /* LMLinkKeychainService.swift */; };
+		LM0200000000000000000101 /* LMLinkAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000101 /* LMLinkAuthManager.swift */; };
+		LM0200000000000000000102 /* LMRequestSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000102 /* LMRequestSigner.swift */; };
+		LM0200000000000000000103 /* LMNetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000103 /* LMNetworkClient.swift */; };
+		LM0200000000000000000104 /* LMDeviceDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000104 /* LMDeviceDiscoveryService.swift */; };
+		LM0200000000000000000105 /* LMDeviceMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000105 /* LMDeviceMonitorService.swift */; };
+		LM0200000000000000000106 /* LMDeviceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000106 /* LMDeviceModel.swift */; };
+		LM0200000000000000000107 /* LMConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000107 /* LMConnectionManager.swift */; };
+		LM0200000000000000000200 /* LMDeviceRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000200 /* LMDeviceRowView.swift */; };
+		LM0200000000000000000201 /* LMLinkAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000201 /* LMLinkAccountView.swift */; };
+		LM0200000000000000000202 /* LMLinkConnectionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000202 /* LMLinkConnectionStatusView.swift */; };
+		LM0200000000000000000203 /* LMLinkDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000203 /* LMLinkDashboardView.swift */; };
+		LM0200000000000000000204 /* LMLinkDeviceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000204 /* LMLinkDeviceDetailView.swift */; };
+		LM0200000000000000000205 /* LMLinkDevicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000205 /* LMLinkDevicesView.swift */; };
+		LM0200000000000000000206 /* LMLinkMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000206 /* LMLinkMainView.swift */; };
+		LM0200000000000000000207 /* LMLinkModelDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000207 /* LMLinkModelDetailView.swift */; };
+		LM0200000000000000000208 /* LMLinkModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000208 /* LMLinkModelsView.swift */; };
+		LM0200000000000000000209 /* LMLinkSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000209 /* LMLinkSettingsView.swift */; };
+		LM0200000000000000000210 /* LMModelRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000210 /* LMModelRowView.swift */; };
+		LM0200000000000000000300 /* AFMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000300 /* AFMService.swift */; };
+		LM0200000000000000000301 /* AFMModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000301 /* AFMModelManager.swift */; };
+		LM0200000000000000000302 /* AFMTaskRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000302 /* AFMTaskRouter.swift */; };
+		LM0200000000000000000303 /* AFMSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000303 /* AFMSessionManager.swift */; };
+		LM0200000000000000000400 /* AFMDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000400 /* AFMDashboardView.swift */; };
+		LM0200000000000000000401 /* AFMMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000401 /* AFMMainView.swift */; };
+		LM0200000000000000000402 /* AFMModelSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000402 /* AFMModelSelectionView.swift */; };
+		LM0200000000000000000403 /* AFMResponseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000403 /* AFMResponseView.swift */; };
+		LM0200000000000000000404 /* AFMSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000404 /* AFMSettingsView.swift */; };
+		LM0200000000000000000405 /* AFMTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000405 /* AFMTaskView.swift */; };
 		MC01000000000000000000B1 /* ModelConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MC01000000000000000000A1 /* ModelConfigManager.swift */; };
 		MDC32FA79B1B70105A53ED19 /* AgenticModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = MDC64B1890CDC5D4E894FB64 /* AgenticModels.swift */; };
 		ME0200000000000000000001 /* MeetingSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000001 /* MeetingSession.swift */; };
@@ -4139,6 +4168,35 @@
 		KB0100000000000000000099 /* KeyboardExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KeyboardExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		LM0100000000000000000001 /* LocalModelsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalModelsProvider.swift; sourceTree = "<group>"; };
 		LM0100000000000000000002 /* SetupLocalModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupLocalModelsView.swift; sourceTree = "<group>"; };
+LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkKeychainService.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000101 /* LMLinkAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkAuthManager.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000102 /* LMRequestSigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMRequestSigner.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000103 /* LMNetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMNetworkClient.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000104 /* LMDeviceDiscoveryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMDeviceDiscoveryService.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000105 /* LMDeviceMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMDeviceMonitorService.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000106 /* LMDeviceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMDeviceModel.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000107 /* LMConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMConnectionManager.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000200 /* LMDeviceRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMDeviceRowView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000201 /* LMLinkAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkAccountView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000202 /* LMLinkConnectionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkConnectionStatusView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000203 /* LMLinkDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkDashboardView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000204 /* LMLinkDeviceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkDeviceDetailView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000205 /* LMLinkDevicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkDevicesView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000206 /* LMLinkMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkMainView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000207 /* LMLinkModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkModelDetailView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000208 /* LMLinkModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkModelsView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000209 /* LMLinkSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkSettingsView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000210 /* LMModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMModelRowView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000300 /* AFMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMService.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000301 /* AFMModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMModelManager.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000302 /* AFMTaskRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMTaskRouter.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000303 /* AFMSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMSessionManager.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000400 /* AFMDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMDashboardView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000401 /* AFMMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMMainView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000402 /* AFMModelSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMModelSelectionView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000403 /* AFMResponseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMResponseView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000404 /* AFMSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMSettingsView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000405 /* AFMTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMTaskView.swift"; sourceTree = "<group>"; };
 		MA0100000000000000000001 /* MailAutomationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailAutomationEngine.swift; sourceTree = "<group>"; };
 		MC01000000000000000000A1 /* ModelConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelConfigManager.swift; sourceTree = "<group>"; };
 		MDC64B1890CDC5D4E894FB64 /* AgenticModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticModels.swift; sourceTree = "<group>"; };
@@ -11319,10 +11377,71 @@
 			path = LocalModels;
 			sourceTree = "<group>";
 		};
+				LM0300000000000000000200 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				LM0100000000000000000200 /* LMDeviceRowView.swift */,
+				LM0100000000000000000201 /* LMLinkAccountView.swift */,
+				LM0100000000000000000202 /* LMLinkConnectionStatusView.swift */,
+				LM0100000000000000000203 /* LMLinkDashboardView.swift */,
+				LM0100000000000000000204 /* LMLinkDeviceDetailView.swift */,
+				LM0100000000000000000205 /* LMLinkDevicesView.swift */,
+				LM0100000000000000000206 /* LMLinkMainView.swift */,
+				LM0100000000000000000207 /* LMLinkModelDetailView.swift */,
+				LM0100000000000000000208 /* LMLinkModelsView.swift */,
+				LM0100000000000000000209 /* LMLinkSettingsView.swift */,
+				LM0100000000000000000210 /* LMModelRowView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		LM0300000000000000000100 /* LM Link */ = {
+			isa = PBXGroup;
+			children = (
+				LM0300000000000000000200 /* Views */,
+				LM0100000000000000000100 /* LMLinkKeychainService.swift */,
+				LM0100000000000000000101 /* LMLinkAuthManager.swift */,
+				LM0100000000000000000102 /* LMRequestSigner.swift */,
+				LM0100000000000000000103 /* LMNetworkClient.swift */,
+				LM0100000000000000000104 /* LMDeviceDiscoveryService.swift */,
+				LM0100000000000000000105 /* LMDeviceMonitorService.swift */,
+				LM0100000000000000000106 /* LMDeviceModel.swift */,
+				LM0100000000000000000107 /* LMConnectionManager.swift */,
+			);
+			path = "LM Link";
+			sourceTree = "<group>";
+		};
+		LM0300000000000000000400 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				LM0100000000000000000400 /* AFMDashboardView.swift */,
+				LM0100000000000000000401 /* AFMMainView.swift */,
+				LM0100000000000000000402 /* AFMModelSelectionView.swift */,
+				LM0100000000000000000403 /* AFMResponseView.swift */,
+				LM0100000000000000000404 /* AFMSettingsView.swift */,
+				LM0100000000000000000405 /* AFMTaskView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		LM0300000000000000000300 /* AFM */ = {
+			isa = PBXGroup;
+			children = (
+				LM0300000000000000000400 /* Views */,
+				LM0100000000000000000300 /* AFMService.swift */,
+				LM0100000000000000000301 /* AFMModelManager.swift */,
+				LM0100000000000000000302 /* AFMTaskRouter.swift */,
+				LM0100000000000000000303 /* AFMSessionManager.swift */,
+			);
+			path = AFM;
+			sourceTree = "<group>";
+		};
 		LM0300000000000000000002 /* LocalModels */ = {
 			isa = PBXGroup;
 			children = (
 				LM0100000000000000000002 /* SetupLocalModelsView.swift */,
+				LM0300000000000000000100 /* LM Link */,
+				LM0300000000000000000300 /* AFM */,
 			);
 			path = LocalModels;
 			sourceTree = "<group>";
@@ -12127,6 +12246,35 @@
 				FB0200000000000000000000 /* AIAnalysisResult.swift in Sources */,
 				LM0200000000000000000001 /* LocalModelsProvider.swift in Sources */,
 				LM0200000000000000000002 /* SetupLocalModelsView.swift in Sources */,
+				LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */,
+				LM0200000000000000000101 /* LMLinkAuthManager.swift in Sources */,
+				LM0200000000000000000102 /* LMRequestSigner.swift in Sources */,
+				LM0200000000000000000103 /* LMNetworkClient.swift in Sources */,
+				LM0200000000000000000104 /* LMDeviceDiscoveryService.swift in Sources */,
+				LM0200000000000000000105 /* LMDeviceMonitorService.swift in Sources */,
+				LM0200000000000000000106 /* LMDeviceModel.swift in Sources */,
+				LM0200000000000000000107 /* LMConnectionManager.swift in Sources */,
+				LM0200000000000000000200 /* LMDeviceRowView.swift in Sources */,
+				LM0200000000000000000201 /* LMLinkAccountView.swift in Sources */,
+				LM0200000000000000000202 /* LMLinkConnectionStatusView.swift in Sources */,
+				LM0200000000000000000203 /* LMLinkDashboardView.swift in Sources */,
+				LM0200000000000000000204 /* LMLinkDeviceDetailView.swift in Sources */,
+				LM0200000000000000000205 /* LMLinkDevicesView.swift in Sources */,
+				LM0200000000000000000206 /* LMLinkMainView.swift in Sources */,
+				LM0200000000000000000207 /* LMLinkModelDetailView.swift in Sources */,
+				LM0200000000000000000208 /* LMLinkModelsView.swift in Sources */,
+				LM0200000000000000000209 /* LMLinkSettingsView.swift in Sources */,
+				LM0200000000000000000210 /* LMModelRowView.swift in Sources */,
+				LM0200000000000000000300 /* AFMService.swift in Sources */,
+				LM0200000000000000000301 /* AFMModelManager.swift in Sources */,
+				LM0200000000000000000302 /* AFMTaskRouter.swift in Sources */,
+				LM0200000000000000000303 /* AFMSessionManager.swift in Sources */,
+				LM0200000000000000000400 /* AFMDashboardView.swift in Sources */,
+				LM0200000000000000000401 /* AFMMainView.swift in Sources */,
+				LM0200000000000000000402 /* AFMModelSelectionView.swift in Sources */,
+				LM0200000000000000000403 /* AFMResponseView.swift in Sources */,
+				LM0200000000000000000404 /* AFMSettingsView.swift in Sources */,
+				LM0200000000000000000405 /* AFMTaskView.swift in Sources */,
 				FB0200000000000000000001 /* AIAnalysisService.swift in Sources */,
 				FB0200000000000000000002 /* DiagnosticsCenterView.swift in Sources */,
 				FB0200000000000000000003 /* DiagnosticsData.swift in Sources */,

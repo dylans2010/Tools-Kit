@@ -7,6 +7,13 @@ enum AIError: Error {
     case unknownProvider(String)
 }
 
+enum AIProviderType: String, CaseIterable {
+    case openRouter = "openrouter"
+    case lmStudio = "lmstudio"
+    case appleFoundationModels = "afm"
+    case localModels = "local_models"
+}
+
 class AIService {
     static let shared = AIService()
 
@@ -212,6 +219,18 @@ class AIService {
     @MainActor
     func processText(prompt: String, systemPrompt: String = "", model: String? = nil) async throws -> String {
         let finalSystemPrompt = await buildComprehensiveSystemPrompt(taskSpecific: systemPrompt)
+
+        // Dynamic Routing based on selected provider
+        let selectedProvider = settingsManager.settings.selectedProviderID
+
+        if selectedProvider == "lmstudio" {
+            SDKLogStore.shared.log("Routing to LM Studio via LM Link", source: "AIService", level: .info)
+            return try await LMConnectionManager.shared.sendChatRequest(prompt: prompt, systemPrompt: finalSystemPrompt)
+        } else if selectedProvider == "afm" {
+            SDKLogStore.shared.log("Routing to Apple Foundation Models", source: "AIService", level: .info)
+            return try await AFMService.shared.generateResponse(prompt: prompt, systemPrompt: finalSystemPrompt)
+        }
+
         let messages = [
             ChatMessage(role: "system", content: finalSystemPrompt),
             ChatMessage(role: "user", content: prompt)

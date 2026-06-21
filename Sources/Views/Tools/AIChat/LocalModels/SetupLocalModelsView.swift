@@ -31,11 +31,27 @@ struct SetupLocalModelsView: View {
             }
 
             Section {
+                NavigationLink(destination: LMLinkMainView()) {
+                    Label("LM Studio (LM Link)", systemImage: "link.badge.plus")
+                        .font(.headline)
+                }
+
+                NavigationLink(destination: AFMMainView()) {
+                    Label("Apple Foundation Models", systemImage: "apple.logo")
+                        .font(.headline)
+                }
+            } header: {
+                SectionHeader(title: "Unified Local AI", subtitle: "Connect to LM Studio or native AFM", icon: "sparkles")
+                    .listRowInsets(EdgeInsets())
+                    .padding(.bottom, 8)
+            }
+
+            Section {
                 Button {
                     configToEdit = LocalModelConfig()
                     showingAddSheet = true
                 } label: {
-                    Label("Add New Local Model", systemImage: "plus.circle.fill")
+                    Label("Add Manual Local Model", systemImage: "plus.circle.fill")
                         .font(.headline)
                 }
                 .padding(.vertical, 4)
