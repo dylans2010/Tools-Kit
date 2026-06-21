@@ -3,7 +3,7 @@ import AVFoundation
 
 struct SpeechSettingsView: View {
     @ObservedObject var ttsService = TTSService.shared
-    @StateObject var visionService = VisionService.shared
+    @StateObject var visionService = CloudVisionService.shared
     @State private var apiKey: String = ""
     @State private var visionApiKey: String = ""
     @State private var showSavedAlert = false

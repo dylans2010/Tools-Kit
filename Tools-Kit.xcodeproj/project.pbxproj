@@ -2375,7 +2375,7 @@
 		RV020010 /* AVFoundationCameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010010 /* AVFoundationCameraPreview.swift */; };
 		RV020011 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010011 /* CameraManager.swift */; };
 		RV020012 /* FrameProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010012 /* FrameProcessor.swift */; };
-		RV020013 /* VisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010013 /* VisionService.swift */; };
+		RV020013 /* CloudVisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010013 /* CloudVisionService.swift */; };
 		RV020014 /* VisionCameraOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010014 /* VisionCameraOverlay.swift */; };
 /* End PBXBuildFile section */
 
@@ -4746,7 +4746,7 @@
 		RV010010 /* AVFoundationCameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVFoundationCameraPreview.swift; sourceTree = "<group>"; };
 		RV010011 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
 		RV010012 /* FrameProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameProcessor.swift; sourceTree = "<group>"; };
-		RV010013 /* VisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionService.swift; sourceTree = "<group>"; };
+		RV010013 /* CloudVisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudVisionService.swift; sourceTree = "<group>"; };
 		RV010014 /* VisionCameraOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionCameraOverlay.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -11904,7 +11904,7 @@
 				RV010010 /* AVFoundationCameraPreview.swift */,
 				RV010011 /* CameraManager.swift */,
 				RV010012 /* FrameProcessor.swift */,
-				RV010013 /* VisionService.swift */,
+				RV010013 /* CloudVisionService.swift */,
 				RV010014 /* VisionCameraOverlay.swift */,
 			);
 			path = Vision;
@@ -12075,7 +12075,7 @@
 				RV020010 /* AVFoundationCameraPreview.swift in Sources */,
 				RV020011 /* CameraManager.swift in Sources */,
 				RV020012 /* FrameProcessor.swift in Sources */,
-				RV020013 /* VisionService.swift in Sources */,
+				RV020013 /* CloudVisionService.swift in Sources */,
 				RV020014 /* VisionCameraOverlay.swift in Sources */,
 				TB02000000000001 /* Sources/Views/Bridging/TKBridge/TKBridgeClient.swift in Sources */,
 				BR02000000000001 /* Sources/Views/Bridging/BridgeChatView.swift in Sources */,

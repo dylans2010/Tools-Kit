@@ -3,7 +3,7 @@ import AVFoundation
 
 struct VisionCameraOverlay: View {
     let session: AVCaptureSession
-    @StateObject private var visionService = VisionService.shared
+    @StateObject private var visionService = CloudVisionService.shared
 
     var body: some View {
         ZStack {

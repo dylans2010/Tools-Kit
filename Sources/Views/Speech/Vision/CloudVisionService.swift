@@ -1,8 +1,8 @@
 import Foundation
 
 @MainActor
-class VisionService: ObservableObject {
-    static let shared = VisionService()
+class CloudVisionService: ObservableObject {
+    static let shared = CloudVisionService()
 
     @Published var selectedProvider: VisionProvider = .openai
     @Published var selectedModel: String = "gpt-4o"

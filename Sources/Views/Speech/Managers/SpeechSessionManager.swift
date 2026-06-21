@@ -199,12 +199,12 @@ class SpeechSessionManager: NSObject, ObservableObject {
     }
 
     private func processVisionFrame(_ buffer: CMSampleBuffer) async {
-        guard mode == .vision, !isProcessing, !VisionService.shared.isProcessing else { return }
+        guard mode == .vision, !isProcessing, !CloudVisionService.shared.isProcessing else { return }
 
         guard let imageData = FrameProcessor.process(buffer) else { return }
 
         do {
-            let response = try await VisionService.shared.analyzeFrame(imageData, history: messages)
+            let response = try await CloudVisionService.shared.analyzeFrame(imageData, history: messages)
             if !response.isEmpty {
                 let assistantMessage = SpeechMessage(role: .assistant, content: response)
                 messages.append(assistantMessage)

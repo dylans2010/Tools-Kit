@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SpeechMainView: View {
     @StateObject private var sessionManager = SpeechSessionManager.shared
-    @StateObject private var visionService = VisionService.shared
+    @StateObject private var visionService = CloudVisionService.shared
     @State private var textInput: String = ""
     @FocusState private var isTextFieldFocused: Bool
 
