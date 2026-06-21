@@ -166,10 +166,14 @@ class CloudVisionService: ObservableObject {
     }
 
     private func performOpenAIRequest(imageData: Data, prompt: String, apiKey: String, history: [SpeechMessage]) async throws -> String {
+        guard !imageData.isEmpty else {
+            throw VisionError.apiError("Image data is empty")
+        }
+
         // Validation: Ensure valid base64
         let base64Image = imageData.base64EncodedString()
         guard !base64Image.isEmpty else {
-            throw VisionError.apiError("Invalid image data")
+            throw VisionError.apiError("Failed to encode image to Base64")
         }
 
         let url = URL(string: "https://api.openai.com/v1/chat/completions")!
@@ -196,10 +200,13 @@ class CloudVisionService: ObservableObject {
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw VisionError.apiError("No response from OpenAI")
+        }
+
+        if httpResponse.statusCode != 200 {
             let body = String(data: data, encoding: .utf8) ?? "No response body"
-            throw VisionError.apiError("OpenAI API error (status \(statusCode)): \(body)")
+            throw VisionError.apiError("OpenAI API error (\(httpResponse.statusCode)): \(body)")
         }
 
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
@@ -255,7 +262,16 @@ class CloudVisionService: ObservableObject {
     }
 }
 
-enum VisionError: Error {
+enum VisionError: LocalizedError {
     case missingAPIKey
     case apiError(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .missingAPIKey:
+            return "Vision API Key is missing. Please check your settings."
+        case .apiError(let message):
+            return message
+        }
+    }
 }

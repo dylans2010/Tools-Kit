@@ -25,6 +25,7 @@ class SpeechSessionManager: NSObject, ObservableObject {
             handleModeChange()
         }
     }
+    @Published var currentSessionID: UUID = UUID()
 
     let cameraManager = CameraManager()
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
@@ -34,6 +35,7 @@ class SpeechSessionManager: NSObject, ObservableObject {
 
     /// Stores the latest captured frame data for vision+voice queries
     private var latestFrameData: Data?
+    private var levelTimer: Timer?
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -71,6 +73,15 @@ class SpeechSessionManager: NSObject, ObservableObject {
     private func setupAudioSession() {
         let audioSession = AVAudioSession.sharedInstance()
         try? audioSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
+
+        // Ensure TTS is synced with settings
+        syncWithSettings()
+    }
+
+    private func syncWithSettings() {
+        // This ensures the singleton instances are reading their latest saved states
+        // CloudVisionService and TTSService already have self-loading logic in their init,
+        // but we can trigger any re-sync if needed here.
     }
 
     // MARK: - Recording
@@ -172,6 +183,15 @@ class SpeechSessionManager: NSObject, ObservableObject {
 
             // Call AIService — this is the main AI backend
             let response = try await AIService.shared.processMessages(messages: aiMessages)
+
+            // Save to history
+            let currentSession = SpeechHistorySession(
+                id: currentSessionID,
+                title: messages.first?.content.prefix(30).description ?? "New Conversation",
+                createdAt: Date(), // This will be overwritten if updating existing, or use a separate field
+                messages: messages
+            )
+            SpeechHistoryManager.shared.saveSession(currentSession)
 
             guard !response.isEmpty else {
                 throw SpeechError.aiServiceError("Received empty response from AI")
@@ -286,12 +306,14 @@ class SpeechSessionManager: NSObject, ObservableObject {
 
         isSpeaking = true
         speechState = .speaking
+        startLevelTimer()
         do {
             try await TTSService.shared.speak(text: text)
         } catch {
             print("TTS Error: \(error)")
         }
         isSpeaking = false
+        stopLevelTimer()
 
         // Auto-resume recording if in voice mode
         if mode == .voice && !isRecording {
@@ -406,6 +428,24 @@ class SpeechSessionManager: NSObject, ObservableObject {
             return 1.0
         } else {
             return (abs(-60.0) - abs(power)) / abs(-60.0)
+        }
+    }
+
+    private func startLevelTimer() {
+        levelTimer?.invalidate()
+        levelTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self = self, self.isSpeaking else { return }
+                self.audioLevel = TTSService.shared.currentLevel
+            }
+        }
+    }
+
+    private func stopLevelTimer() {
+        levelTimer?.invalidate()
+        levelTimer = nil
+        Task { @MainActor in
+            self.audioLevel = 0
         }
     }
 

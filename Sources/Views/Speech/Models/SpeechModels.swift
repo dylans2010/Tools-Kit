@@ -45,9 +45,8 @@ enum SpeechRole: String, Codable {
     case system
 }
 
-enum SpeechSessionMode {
+enum SpeechSessionMode: String, Codable {
     case voice
-    case text
     case vision
 }
 
