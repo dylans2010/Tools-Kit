@@ -99,6 +99,7 @@ class WorkspaceNavConfig: ObservableObject {
         WorkspaceNavItem(id: "whiteboards", label: "Whiteboards", icon: "scribble.variable", section: "Creation", isVisible: true),
 
         WorkspaceNavItem(id: "agentic", label: "Agentic System", icon: "sparkles", section: "Collaboration", isVisible: true),
+        WorkspaceNavItem(id: "speech", label: "Speech", icon: "waveform", section: "Collaboration", isVisible: true),
         WorkspaceNavItem(id: "persona", label: "Persona", icon: "brain.head.profile", section: "Collaboration", isVisible: true),
         WorkspaceNavItem(id: "collaboration", label: "Collaboration", icon: "person.2", section: "Collaboration", isVisible: true),
         WorkspaceNavItem(id: "meetings", label: "Meetings", icon: "video", section: "Collaboration", isVisible: true),
@@ -284,6 +285,8 @@ struct WorkspaceHomeView: View {
             NavigationLink { WhiteboardsHomeView() } label: { Label(item.label, systemImage: item.icon) }
         case "agentic":
             NavigationLink { AgenticUIHomeView() } label: { Label(item.label, systemImage: item.icon) }
+        case "speech":
+            NavigationLink { SpeechMainView() } label: { Label(item.label, systemImage: item.icon) }
         case "persona":
             NavigationLink { PersonaHomeView() } label: { Label(item.label, systemImage: item.icon) }
         case "collaboration":
