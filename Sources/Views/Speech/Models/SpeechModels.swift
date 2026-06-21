@@ -39,4 +39,12 @@ enum SpeechRole: String, Codable {
 enum SpeechSessionMode {
     case voice
     case text
+    case vision
+}
+
+enum VisionProvider: String, CaseIterable, Identifiable, Codable {
+    case openai = "OpenAI"
+    case gemini = "Google Gemini"
+
+    var id: String { self.rawValue }
 }

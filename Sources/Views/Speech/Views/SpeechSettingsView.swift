@@ -3,7 +3,9 @@ import AVFoundation
 
 struct SpeechSettingsView: View {
     @ObservedObject var ttsService = TTSService.shared
+    @StateObject var visionService = VisionService.shared
     @State private var apiKey: String = ""
+    @State private var visionApiKey: String = ""
     @State private var showSavedAlert = false
     @State private var elevenLabsVoices: [ElevenLabsVoice] = []
     @State private var isLoadingVoices = false
@@ -58,19 +60,50 @@ struct SpeechSettingsView: View {
                 }
             }
 
+            Section(header: Text("Vision Configuration")) {
+                Picker("Vision Provider", selection: $visionService.selectedProvider) {
+                    ForEach(VisionProvider.allCases) { provider in
+                        Text(provider.rawValue).tag(provider)
+                    }
+                }
+                .onChange(of: visionService.selectedProvider) { _ in
+                    visionApiKey = visionService.getKey(for: visionService.selectedProvider) ?? ""
+                    visionService.saveSettings()
+                }
+
+                Picker("Vision Model", selection: $visionService.selectedModel) {
+                    ForEach(visionService.availableModels[visionService.selectedProvider] ?? [], id: \.self) { model in
+                        Text(model).tag(model)
+                    }
+                }
+                .onChange(of: visionService.selectedModel) { _ in
+                    visionService.saveSettings()
+                }
+
+                SecureField("Vision API Key", text: $visionApiKey)
+
+                Button("Save Vision API Key") {
+                    if visionService.saveKey(visionApiKey, for: visionService.selectedProvider) {
+                        showSavedAlert = true
+                    }
+                }
+                .disabled(visionApiKey.isEmpty)
+            }
+
             Section {
                 Button(role: .destructive, action: {
                     SpeechKeychainManager.shared.deleteKey()
                     apiKey = ""
                     elevenLabsVoices = []
                 }) {
-                    Text("Clear API Key")
+                    Text("Clear TTS API Key")
                 }
             }
         }
         .navigationTitle("Speech Settings")
         .onAppear {
             apiKey = SpeechKeychainManager.shared.getKey() ?? ""
+            visionApiKey = visionService.getKey(for: visionService.selectedProvider) ?? ""
             if !apiKey.isEmpty {
                 loadElevenLabsVoices()
             }

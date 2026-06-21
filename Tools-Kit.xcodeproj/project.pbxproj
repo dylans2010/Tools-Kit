@@ -2372,6 +2372,11 @@
 		RV020007 /* ElevenLabsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010007 /* ElevenLabsService.swift */; };
 		RV020008 /* TTSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010008 /* TTSService.swift */; };
 		RV020009 /* SpeechSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010009 /* SpeechSessionManager.swift */; };
+		RV020010 /* AVFoundationCameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010010 /* AVFoundationCameraPreview.swift */; };
+		RV020011 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010011 /* CameraManager.swift */; };
+		RV020012 /* FrameProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010012 /* FrameProcessor.swift */; };
+		RV020013 /* VisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010013 /* VisionService.swift */; };
+		RV020014 /* VisionCameraOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010014 /* VisionCameraOverlay.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -4738,6 +4743,11 @@
 		RV010007 /* ElevenLabsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ElevenLabsService.swift; sourceTree = "<group>"; };
 		RV010008 /* TTSService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/TTSService.swift; sourceTree = "<group>"; };
 		RV010009 /* SpeechSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Managers/SpeechSessionManager.swift; sourceTree = "<group>"; };
+		RV010010 /* AVFoundationCameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vision/AVFoundationCameraPreview.swift; sourceTree = "<group>"; };
+		RV010011 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vision/CameraManager.swift; sourceTree = "<group>"; };
+		RV010012 /* FrameProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vision/FrameProcessor.swift; sourceTree = "<group>"; };
+		RV010013 /* VisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vision/VisionService.swift; sourceTree = "<group>"; };
+		RV010014 /* VisionCameraOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vision/VisionCameraOverlay.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -11846,6 +11856,7 @@
 				RV030003 /* Views */,
 				RV030004 /* Services */,
 				RV030005 /* Managers */,
+				RV030006 /* Vision */,
 			);
 			path = Sources/Views/Speech;
 			sourceTree = "<group>";
@@ -11885,6 +11896,18 @@
 				RV010009 /* SpeechSessionManager.swift */,
 			);
 			path = Managers;
+			sourceTree = "<group>";
+		};
+		RV030006 /* Vision */ = {
+			isa = PBXGroup;
+			children = (
+				RV010010 /* AVFoundationCameraPreview.swift */,
+				RV010011 /* CameraManager.swift */,
+				RV010012 /* FrameProcessor.swift */,
+				RV010013 /* VisionService.swift */,
+				RV010014 /* VisionCameraOverlay.swift */,
+			);
+			path = Vision;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -12049,6 +12072,11 @@
 				RV020007 /* ElevenLabsService.swift in Sources */,
 				RV020008 /* TTSService.swift in Sources */,
 				RV020009 /* SpeechSessionManager.swift in Sources */,
+				RV020010 /* AVFoundationCameraPreview.swift in Sources */,
+				RV020011 /* CameraManager.swift in Sources */,
+				RV020012 /* FrameProcessor.swift in Sources */,
+				RV020013 /* VisionService.swift in Sources */,
+				RV020014 /* VisionCameraOverlay.swift in Sources */,
 				TB02000000000001 /* Sources/Views/Bridging/TKBridge/TKBridgeClient.swift in Sources */,
 				BR02000000000001 /* Sources/Views/Bridging/BridgeChatView.swift in Sources */,
 				BR02000000000002 /* Sources/Views/Bridging/BridgeHomeView.swift in Sources */,
