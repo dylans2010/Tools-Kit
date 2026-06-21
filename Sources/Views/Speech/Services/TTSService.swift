@@ -8,6 +8,7 @@ protocol TTSServiceProtocol {
     // Customization support
     var pace: Float { get set }
     var expressiveness: Float { get set }
+    var currentLevel: Float { get }
 }
 
 class AppleTTSService: NSObject, TTSServiceProtocol, AVSpeechSynthesizerDelegate {
@@ -19,6 +20,13 @@ class AppleTTSService: NSObject, TTSServiceProtocol, AVSpeechSynthesizerDelegate
     
     // Expressiveness maps to pitchMultiplier (0.5 to 2.0, default 1.0)
     var expressiveness: Float = 1.0
+
+    var currentLevel: Float {
+        guard synthesizer.isSpeaking else { return 0 }
+        // Apple TTS doesn't provide metering, so we simulate a pulsing waveform
+        let phase = Float(Date().timeIntervalSince1970 * 10)
+        return 0.3 + 0.4 * abs(sin(phase))
+    }
 
     private var continuation: CheckedContinuation<Void, Error>?
 
@@ -82,6 +90,14 @@ class ElevenLabsTTSService: NSObject, TTSServiceProtocol, AVAudioPlayerDelegate 
     var pace: Float = 0.5 // similarityBoost
     var expressiveness: Float = 0.5 // stability
 
+    var currentLevel: Float {
+        guard let player = audioPlayer, player.isPlaying else { return 0 }
+        player.updateMeters()
+        let average = player.averagePower(forChannel: 0)
+        // Convert from dB to 0.0-1.0 range
+        return max(0, (average + 60) / 60)
+    }
+
     private var continuation: CheckedContinuation<Void, Error>?
 
     func speak(text: String) async throws {
@@ -98,6 +114,7 @@ class ElevenLabsTTSService: NSObject, TTSServiceProtocol, AVAudioPlayerDelegate 
             self.continuation = continuation
             do {
                 let player = try AVAudioPlayer(data: data)
+                player.isMeteringEnabled = true
                 audioPlayer = player
                 player.delegate = self
                 if !player.play() {
@@ -174,6 +191,10 @@ class TTSService: ObservableObject {
             UserDefaults.standard.set(expressiveness, forKey: "selected_voice_expressiveness")
             currentService.expressiveness = expressiveness
         }
+    }
+
+    var currentLevel: Float {
+        currentService.currentLevel
     }
 
     private var currentService: TTSServiceProtocol

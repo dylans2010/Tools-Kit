@@ -4,33 +4,29 @@ struct SpeechMainView: View {
     @StateObject private var sessionManager = SpeechSessionManager.shared
     @StateObject private var visionService = CloudVisionService.shared
     @State private var textInput: String = ""
+    @State private var showTranscript = false
     @FocusState private var isTextFieldFocused: Bool
 
     var body: some View {
         ZStack {
             if sessionManager.mode == .voice {
-                // Full-screen immersive voice mode
-                VoiceModeFullScreen(sessionManager: sessionManager)
+                VoiceModeFullScreen(sessionManager: sessionManager, showTranscript: $showTranscript)
                     .transition(.opacity)
             } else {
-                // Text and Vision modes with chat UI
                 ZStack {
-                    if sessionManager.mode == .vision {
-                        VisionCameraOverlay(session: sessionManager.cameraManager.session)
-                            .transition(.opacity)
-                    }
+                    VisionCameraOverlay(session: sessionManager.cameraManager.session)
+                        .transition(.opacity)
 
                     VStack(spacing: 0) {
                         mainContent
-                            .background(sessionManager.mode == .vision ? Color.clear : Color(.systemBackground))
+                            .background(Color.clear)
 
-                        // Input Area
                         inputArea
                     }
                 }
             }
         }
-        .navigationTitle(sessionManager.mode == .voice ? "" : "AI Speech")
+        .navigationTitle(sessionManager.mode == .voice ? "" : "Vision Mode")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -45,128 +41,81 @@ struct SpeechMainView: View {
                 }
             }
         }
+        .sheet(isPresented: $showTranscript) {
+            SpeechTranscriptView()
+        }
     }
 
     private var mainContent: some View {
         VStack(spacing: 0) {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(spacing: 16) {
-                        ForEach(sessionManager.messages) { message in
-                            SpeechMessageBubble(message: message)
-                                .id(message.id)
-                        }
+            Spacer()
 
-                        if sessionManager.isProcessing {
-                            HStack {
-                                TypingIndicator()
-                                    .padding(.horizontal)
-                                Spacer()
-                            }
-                        }
-                    }
-                    .padding()
-                }
-                .onChange(of: sessionManager.messages) { _ in
-                    if let lastMessage = sessionManager.messages.last {
-                        withAnimation {
-                            proxy.scrollTo(lastMessage.id, anchor: .bottom)
-                        }
-                    }
-                }
-            }
-
-            // Audio Level / Transcription Area
-            if sessionManager.isRecording && sessionManager.mode != .voice {
-                VStack(spacing: 8) {
+            if sessionManager.isRecording {
+                VStack(spacing: 12) {
                     AudioLevelIndicator(level: sessionManager.audioLevel)
-                        .frame(height: 40)
+                        .frame(height: 50)
 
                     Text(sessionManager.currentTranscription.isEmpty ? "Listening..." : sessionManager.currentTranscription)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .font(.headline)
+                        .foregroundColor(.white)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal)
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(12)
                 }
-                .padding(.vertical)
-                .background(Color(.systemBackground).shadow(radius: 2))
+                .padding()
             }
         }
     }
 
     private var inputArea: some View {
-        HStack(spacing: 12) {
-            // Mode Toggle
-            Menu {
-                Button(action: { setMode(.voice) }) {
-                    Label("Voice Mode", systemImage: "mic.fill")
+        HStack(spacing: 20) {
+            Button(action: { setMode(.voice) }) {
+                VStack {
+                    Image(systemName: "mic.fill")
+                        .font(.title2)
+                    Text("Voice")
+                        .font(.caption2)
                 }
-                Button(action: { setMode(.text) }) {
-                    Label("Text Mode", systemImage: "keyboard")
-                }
-                Button(action: { setMode(.vision) }) {
-                    Label("Vision Mode", systemImage: "eye.fill")
-                }
-            } label: {
-                Image(systemName: modeIcon)
-                    .font(.title2)
-                    .foregroundColor(.accentColor)
-                    .frame(width: 44, height: 44)
+                .foregroundColor(sessionManager.mode == .voice ? .accentColor : .white)
             }
 
-            if sessionManager.mode == .text {
-                TextField("Type a message...", text: $textInput)
-                    .textFieldStyle(.roundedBorder)
-                    .focused($isTextFieldFocused)
-                    .onSubmit {
-                        sendMessage()
-                    }
+            Spacer()
 
-                Button(action: sendMessage) {
-                    Image(systemName: "arrow.up.circle.fill")
-                        .font(.title)
+            Button(action: {
+                if sessionManager.isRecording {
+                    sessionManager.stopRecording()
+                } else {
+                    try? sessionManager.startRecording()
                 }
-                .disabled(textInput.isEmpty || sessionManager.isProcessing)
-            } else if sessionManager.mode == .vision {
-                // Vision mode: text input for questions about what AI sees
-                TextField("Ask about what you see...", text: $textInput)
-                    .textFieldStyle(.roundedBorder)
-                    .focused($isTextFieldFocused)
-                    .onSubmit {
-                        sendVisionQuestion()
-                    }
+            }) {
+                ZStack {
+                    Circle()
+                        .fill(sessionManager.isRecording ? Color.red : Color.accentColor)
+                        .frame(width: 64, height: 64)
 
-                Button(action: sendVisionQuestion) {
-                    Image(systemName: "arrow.up.circle.fill")
+                    Image(systemName: sessionManager.isRecording ? "stop.fill" : "mic.fill")
                         .font(.title)
+                        .foregroundColor(.white)
                 }
-                .disabled(textInput.isEmpty || sessionManager.isProcessing)
+            }
+            .shadow(radius: 4)
 
-                // Also allow voice recording in vision mode
-                Button(action: {
-                    if sessionManager.isRecording {
-                        sessionManager.stopRecording()
-                    } else {
-                        try? sessionManager.startRecording()
-                    }
-                }) {
-                    Image(systemName: sessionManager.isRecording ? "stop.circle.fill" : "mic.circle.fill")
-                        .font(.title)
-                        .foregroundColor(sessionManager.isRecording ? .red : .accentColor)
+            Spacer()
+
+            Button(action: { showTranscript = true }) {
+                VStack {
+                    Image(systemName: "bubble.left.and.bubble.right.fill")
+                        .font(.title2)
+                    Text("Chat")
+                        .font(.caption2)
                 }
+                .foregroundColor(.white)
             }
         }
-        .padding()
-        .background(sessionManager.mode == .vision ? Color.black.opacity(0.3) : Color(.secondarySystemBackground))
+        .padding(.horizontal, 40)
+        .padding(.vertical, 20)
         .background(.ultraThinMaterial)
-    }
-
-    private var modeIcon: String {
-        switch sessionManager.mode {
-        case .voice: return "mic.fill"
-        case .text: return "keyboard"
-        case .vision: return "eye.fill"
-        }
     }
 
     private func setMode(_ mode: SpeechSessionMode) {
@@ -174,26 +123,13 @@ struct SpeechMainView: View {
             sessionManager.mode = mode
         }
     }
-
-    private func sendMessage() {
-        guard !textInput.isEmpty else { return }
-        sessionManager.sendTextMessage(textInput)
-        textInput = ""
-        isTextFieldFocused = false
-    }
-
-    private func sendVisionQuestion() {
-        guard !textInput.isEmpty else { return }
-        sessionManager.sendVisionQuestion(textInput)
-        textInput = ""
-        isTextFieldFocused = false
-    }
 }
 
 // MARK: - Full-Screen Voice Mode
 
 struct VoiceModeFullScreen: View {
     @ObservedObject var sessionManager: SpeechSessionManager
+    @Binding var showTranscript: Bool
 
     var body: some View {
         ZStack {
@@ -216,9 +152,6 @@ struct VoiceModeFullScreen: View {
                         Button(action: { setMode(.voice) }) {
                             Label("Voice Mode", systemImage: "mic.fill")
                         }
-                        Button(action: { setMode(.text) }) {
-                            Label("Text Mode", systemImage: "keyboard")
-                        }
                         Button(action: { setMode(.vision) }) {
                             Label("Vision Mode", systemImage: "eye.fill")
                         }
@@ -237,6 +170,16 @@ struct VoiceModeFullScreen: View {
                     }
 
                     Spacer()
+
+                    Button(action: { showTranscript = true }) {
+                        Image(systemName: "bubble.left.and.bubble.right.fill")
+                            .foregroundColor(.white.opacity(0.7))
+                            .padding(8)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
+                    }
+
+                    Spacer().frame(width: 12)
 
                     // Status indicator
                     HStack(spacing: 6) {
