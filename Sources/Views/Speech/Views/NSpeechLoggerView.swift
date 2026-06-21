@@ -25,10 +25,22 @@ struct NSpeechLoggerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Clear") {
-                        logStore.clear()
+                    HStack {
+                        Button("Clear") {
+                            logStore.clear()
+                        }
+                        .foregroundColor(.red)
+
+                        Button {
+                            copyLogsToClipboard()
+                        } label: {
+                            Image(systemName: "doc.on.doc")
+                        }
+
+                        ShareLink(item: exportLogsAsJSON(), preview: SharePreview("NSpeechLogs.json")) {
+                            Image(systemName: "square.and.arrow.up")
+                        }
                     }
-                    .foregroundColor(.red)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
@@ -37,6 +49,22 @@ struct NSpeechLoggerView: View {
                 }
             }
         }
+    }
+
+    private func copyLogsToClipboard() {
+        let logText = logStore.entries.map { "[\($0.timestamp)] [\($0.level.rawValue.uppercased())] [\($0.source ?? "Unknown")] \($0.message)" }.joined(separator: "\n")
+        UIPasteboard.general.string = logText
+    }
+
+    private func exportLogsAsJSON() -> URL {
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("NSpeechLogs.json")
+        do {
+            let data = try JSONEncoder().encode(logStore.entries)
+            try data.write(to: fileURL)
+        } catch {
+            print("Failed to export logs: \(error)")
+        }
+        return fileURL
     }
 }
 

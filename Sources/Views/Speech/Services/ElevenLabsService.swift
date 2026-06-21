@@ -15,6 +15,10 @@ class ElevenLabsService {
     private init() {}
 
     func generateSpeech(text: String, voiceID: String = "21m00Tcm4TlvDq8ikWAM", stability: Float = 0.5, similarityBoost: Float = 0.5) async throws -> Data {
+        // Enforce strict clamping 0.0 - 1.0 to prevent 422 errors
+        let clampedStability = min(max(stability, 0.0), 1.0)
+        let clampedSimilarity = min(max(similarityBoost, 0.0), 1.0)
+
         guard let apiKey = SpeechKeychainManager.shared.getKey() else {
             throw ElevenLabsError.missingAPIKey
         }
@@ -34,14 +38,15 @@ class ElevenLabsService {
             "text": text,
             "model_id": "eleven_flash_v2_5",
             "voice_settings": [
-                "stability": stability,
-                "similarity_boost": similarityBoost
+                "stability": clampedStability,
+                "similarity_boost": clampedSimilarity
             ]
         ]
 
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        SDKLogStore.shared.log("ElevenLabs TTS Request: \(text.prefix(50))...", source: "ElevenLabsService", level: .info)
+        let payloadString = String(data: request.httpBody ?? Data(), encoding: .utf8) ?? "No payload"
+        SDKLogStore.shared.log("ElevenLabs TTS Request: \(text.prefix(50))... | Payload: \(payloadString)", source: "ElevenLabsService", level: .info)
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
