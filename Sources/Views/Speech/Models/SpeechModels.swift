@@ -20,13 +20,22 @@ struct SpeechMessage: Identifiable, Codable, Equatable {
     let content: String
     let timestamp: Date
     let audioURL: URL?
+    let isSpokenOnly: Bool
 
-    init(id: UUID = UUID(), role: SpeechRole, content: String, timestamp: Date = Date(), audioURL: URL? = nil) {
+    init(
+        id: UUID = UUID(),
+        role: SpeechRole,
+        content: String,
+        timestamp: Date = Date(),
+        audioURL: URL? = nil,
+        isSpokenOnly: Bool = false
+    ) {
         self.id = id
         self.role = role
         self.content = content
         self.timestamp = timestamp
         self.audioURL = audioURL
+        self.isSpokenOnly = isSpokenOnly
     }
 }
 

@@ -16,6 +16,7 @@ class CloudVisionService: ObservableObject {
     private let keychainService = "com.tools-kit.vision"
     private var inFlightRequest: Bool = false
     private var lastFrameHash: Int?
+    private var lastRequestTime: Date?
 
     private init() {
         loadSettings()
@@ -69,13 +70,23 @@ class CloudVisionService: ObservableObject {
     }
 
     func analyzeFrame(_ imageData: Data, history: [SpeechMessage]) async throws -> String {
-        let prompt = "Describe what you see in this image concisely in 1-2 sentences. Be specific and natural, as if you're telling a friend what you're looking at. Focus heavily on context derived from the recent conversation."
+        let prompt = """
+        Perform a detailed analysis of this image. Identify all key objects, read any visible text (OCR),
+        and describe the scene's layout and atmosphere concisely.
+        Focus heavily on providing specific details that might be relevant to the recent conversation.
+        Be natural and conversational in your description.
+        """
         return try await analyzeFrameWithPrompt(imageData, prompt: prompt, history: history)
     }
 
     func analyzeFrameWithPrompt(_ imageData: Data, prompt: String, history: [SpeechMessage]) async throws -> String {
         guard !inFlightRequest else { return "" }
         
+        // Stabilize automated requests with a minimum interval
+        if let lastTime = lastRequestTime, Date().timeIntervalSince(lastTime) < 2.0 {
+            return ""
+        }
+
         let currentHash = imageData.hashValue
         if let last = lastFrameHash, last == currentHash {
             // Frame is visually identical or completely redundant
@@ -84,6 +95,7 @@ class CloudVisionService: ObservableObject {
 
         inFlightRequest = true
         isProcessing = true
+        lastRequestTime = Date()
         defer {
             inFlightRequest = false
             isProcessing = false
@@ -172,7 +184,7 @@ class CloudVisionService: ObservableObject {
         let body: [String: Any] = [
             "model": "gpt-4o",
             "messages": messages,
-            "max_tokens": 300
+            "max_tokens": 500
         ]
 
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
@@ -214,7 +226,12 @@ class CloudVisionService: ObservableObject {
             ]
         ])
 
-        let body: [String: Any] = ["contents": contents]
+        let body: [String: Any] = [
+            "contents": contents,
+            "generationConfig": [
+                "maxOutputTokens": 500
+            ]
+        ]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (data, response) = try await URLSession.shared.data(for: request)

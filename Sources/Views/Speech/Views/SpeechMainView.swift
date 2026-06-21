@@ -464,10 +464,13 @@ struct SpeechMessageBubble: View {
     let message: SpeechMessage
 
     var body: some View {
-        HStack {
-            if message.role == .user { Spacer() }
+        if message.isSpokenOnly {
+            EmptyView()
+        } else {
+            HStack {
+                if message.role == .user { Spacer() }
 
-            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
+                VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
                 if message.role == .system {
                     // System/error messages
                     Text(message.content)
@@ -506,7 +509,8 @@ struct SpeechMessageBubble: View {
                 }
             }
 
-            if message.role == .assistant || message.role == .system { Spacer() }
+                if message.role == .assistant || message.role == .system { Spacer() }
+            }
         }
     }
 }
