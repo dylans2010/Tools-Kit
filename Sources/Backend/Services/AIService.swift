@@ -249,25 +249,33 @@ class AIService {
         }
 
         var response: String
-        if attachments.isEmpty {
-            response = try await provider.send(messages: messages, model: modelToUse, apiKey: apiKey)
-        } else if provider.supportsVision(model: modelToUse) {
-            response = try await provider.sendWithAttachments(messages: messages, attachments: attachments, model: modelToUse, apiKey: apiKey)
-        } else {
-            // Model does not support vision — fall back to text descriptions for image attachments
-            var fallbackMessages = messages
-            var imageDescriptions: [String] = []
-            for att in attachments {
-                if att.mimeType.hasPrefix("image/") {
-                    imageDescriptions.append("[Attached image: \(att.fileName) (type: \(att.mimeType)) — vision not supported by current model, image cannot be displayed]")
+        SDKLogStore.shared.log("AI Request: \(modelToUse) (Provider: \(provider.id))", source: "AIService", level: .info)
+
+        do {
+            if attachments.isEmpty {
+                response = try await provider.send(messages: messages, model: modelToUse, apiKey: apiKey)
+            } else if provider.supportsVision(model: modelToUse) {
+                response = try await provider.sendWithAttachments(messages: messages, attachments: attachments, model: modelToUse, apiKey: apiKey)
+            } else {
+                // Model does not support vision — fall back to text descriptions for image attachments
+                var fallbackMessages = messages
+                var imageDescriptions: [String] = []
+                for att in attachments {
+                    if att.mimeType.hasPrefix("image/") {
+                        imageDescriptions.append("[Attached image: \(att.fileName) (type: \(att.mimeType)) — vision not supported by current model, image cannot be displayed]")
+                    }
                 }
+                if !imageDescriptions.isEmpty, !fallbackMessages.isEmpty {
+                    let lastIdx = fallbackMessages.count - 1
+                    let appendedContent = fallbackMessages[lastIdx].content + "\n\n" + imageDescriptions.joined(separator: "\n")
+                    fallbackMessages[lastIdx] = ChatMessage(role: fallbackMessages[lastIdx].role, content: appendedContent)
+                }
+                response = try await provider.send(messages: fallbackMessages, model: modelToUse, apiKey: apiKey)
             }
-            if !imageDescriptions.isEmpty, !fallbackMessages.isEmpty {
-                let lastIdx = fallbackMessages.count - 1
-                let appendedContent = fallbackMessages[lastIdx].content + "\n\n" + imageDescriptions.joined(separator: "\n")
-                fallbackMessages[lastIdx] = ChatMessage(role: fallbackMessages[lastIdx].role, content: appendedContent)
-            }
-            response = try await provider.send(messages: fallbackMessages, model: modelToUse, apiKey: apiKey)
+            SDKLogStore.shared.log("AI Response Success: \(response.prefix(50))...", source: "AIService", level: .info)
+        } catch {
+            SDKLogStore.shared.log("AI Error: \(error.localizedDescription)", source: "AIService", level: .error)
+            throw error
         }
 
         // Handle tool calls in response (pattern [SEARCH: query])

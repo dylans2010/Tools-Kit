@@ -104,16 +104,22 @@ class CloudVisionService: ObservableObject {
         let providerToTryFirst = selectedProvider
         var response = ""
 
+        SDKLogStore.shared.log("Vision Analysis Request (\(providerToTryFirst.rawValue))", source: "CloudVisionService", level: .info)
         do {
             response = try await performRequest(for: providerToTryFirst, imageData: imageData, prompt: prompt, history: history)
+            SDKLogStore.shared.log("Vision Analysis Success (\(providerToTryFirst.rawValue))", source: "CloudVisionService", level: .info)
         } catch {
+            SDKLogStore.shared.log("Vision Analysis Failed (\(providerToTryFirst.rawValue)): \(error.localizedDescription)", source: "CloudVisionService", level: .warning)
             print("Vision Service: Primary provider \(providerToTryFirst.rawValue) failed with error: \(error)")
             // Fallback
             let fallbackProvider: VisionProvider = providerToTryFirst == .openai ? .gemini : .openai
+            SDKLogStore.shared.log("Vision Analysis Fallback to \(fallbackProvider.rawValue)", source: "CloudVisionService", level: .info)
             print("Vision Service: Attempting fallback to \(fallbackProvider.rawValue)...")
             do {
                 response = try await performRequest(for: fallbackProvider, imageData: imageData, prompt: prompt, history: history)
+                SDKLogStore.shared.log("Vision Analysis Success (\(fallbackProvider.rawValue))", source: "CloudVisionService", level: .info)
             } catch {
+                SDKLogStore.shared.log("Vision Analysis Failed (\(fallbackProvider.rawValue)): \(error.localizedDescription)", source: "CloudVisionService", level: .error)
                 print("Vision Service: Fallback provider \(fallbackProvider.rawValue) also failed.")
                 throw error
             }

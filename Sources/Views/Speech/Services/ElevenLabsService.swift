@@ -27,11 +27,12 @@ class ElevenLabsService {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("audio/mpeg", forHTTPHeaderField: "Accept")
         request.setValue(apiKey, forHTTPHeaderField: "xi-api-key")
 
         let body: [String: Any] = [
             "text": text,
-            "model_id": "eleven_monolingual_v1",
+            "model_id": "eleven_flash_v2_5",
             "voice_settings": [
                 "stability": stability,
                 "similarity_boost": similarityBoost
@@ -40,17 +41,22 @@ class ElevenLabsService {
 
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
+        SDKLogStore.shared.log("ElevenLabs TTS Request: \(text.prefix(50))...", source: "ElevenLabsService", level: .info)
+
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
+            SDKLogStore.shared.log("ElevenLabs TTS: Invalid Response", source: "ElevenLabsService", level: .error)
             throw ElevenLabsError.invalidResponse
         }
 
         guard (200...299).contains(httpResponse.statusCode) else {
             let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
+            SDKLogStore.shared.log("ElevenLabs TTS Error: \(errorMsg)", source: "ElevenLabsService", level: .error, errorCode: httpResponse.statusCode)
             throw ElevenLabsError.networkError("Status: \(httpResponse.statusCode), \(errorMsg)")
         }
 
+        SDKLogStore.shared.log("ElevenLabs TTS Success (200 OK)", source: "ElevenLabsService", level: .info)
         return data
     }
 
