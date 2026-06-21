@@ -334,16 +334,6 @@ struct VoiceModeFullScreen: View {
                             .lineLimit(3)
                     }
 
-                    // Last AI response (brief)
-                    if let lastAssistant = sessionManager.messages.last(where: { $0.role == .assistant }) {
-                        Text(lastAssistant.content)
-                            .font(.caption)
-                            .foregroundColor(.white.opacity(0.4))
-                            .lineLimit(2)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 40)
-                            .padding(.top, 4)
-                    }
                 }
 
                 Spacer()

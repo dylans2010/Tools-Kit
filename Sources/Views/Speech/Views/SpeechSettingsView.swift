@@ -63,6 +63,14 @@ struct SpeechSettingsView: View {
                                 .tag(String?.some(voice.identifier))
                         }
                     }
+
+                    Button(action: {
+                        Task {
+                            try? await ttsService.speak(text: "This is a sample of the selected Apple voice.")
+                        }
+                    }) {
+                        Label("Play Sample", systemImage: "play.circle")
+                    }
                 }
             }
 
@@ -101,6 +109,14 @@ struct SpeechSettingsView: View {
                         ForEach(elevenLabsVoices) { voice in
                             Text(voice.name).tag(String?.some(voice.voice_id))
                         }
+                    }
+
+                    Button(action: {
+                        Task {
+                            try? await ttsService.speak(text: "This is a sample of the selected Eleven Labs voice.")
+                        }
+                    }) {
+                        Label("Play Sample", systemImage: "play.circle")
                     }
                 } else if isLoadingVoices {
                     HStack {
@@ -152,15 +168,6 @@ struct SpeechSettingsView: View {
                 }
                 .onChange(of: visionService.selectedProvider) { _ in
                     visionApiKey = visionService.getKey(for: visionService.selectedProvider) ?? ""
-                    visionService.saveSettings()
-                }
-
-                Picker("Vision Model", selection: $visionService.selectedModel) {
-                    ForEach(visionService.availableModels[visionService.selectedProvider] ?? [], id: \.self) { model in
-                        Text(model).tag(model)
-                    }
-                }
-                .onChange(of: visionService.selectedModel) { _ in
                     visionService.saveSettings()
                 }
 

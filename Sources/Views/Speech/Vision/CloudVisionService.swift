@@ -9,8 +9,8 @@ class CloudVisionService: ObservableObject {
     @Published var isProcessing: Bool = false
 
     let availableModels: [VisionProvider: [String]] = [
-        .openai: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
-        .gemini: ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-2.0-flash-exp"]
+        .openai: ["gpt-4o"],
+        .gemini: ["gemini-1.5-pro"]
     ]
 
     private let keychainService = "com.tools-kit.vision"
@@ -170,7 +170,7 @@ class CloudVisionService: ObservableObject {
         messages.append(["role": "user", "content": userContent])
 
         let body: [String: Any] = [
-            "model": selectedModel,
+            "model": "gpt-4o",
             "messages": messages,
             "max_tokens": 300
         ]
@@ -191,7 +191,7 @@ class CloudVisionService: ObservableObject {
     }
 
     private func performGeminiRequest(imageData: Data, prompt: String, apiKey: String, history: [SpeechMessage]) async throws -> String {
-        let url = URL(string: "https://generativelanguage.googleapis.com/v1beta/models/\(selectedModel):generateContent?key=\(apiKey)")!
+        let url = URL(string: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=\(apiKey)")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
