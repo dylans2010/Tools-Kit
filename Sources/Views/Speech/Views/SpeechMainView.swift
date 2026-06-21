@@ -131,7 +131,7 @@ struct VoiceModeFullScreen: View {
     @ObservedObject var sessionManager: SpeechSessionManager
     @Binding var showTranscript: Bool
 
-    @State private var dragOffset: CGFloat = 0
+    @State private var dragOffset: CGSize = .zero
     @State private var isLongPressing = false
     @State private var showInterruptionUI = false
     @State private var activeFeature: SpeechInteractionFeature?
@@ -265,17 +265,32 @@ struct VoiceModeFullScreen: View {
             // Main action button with advanced gestures
             ZStack {
                 // Visual feedback for slide
-                if dragOffset != 0 {
+                if dragOffset != .zero {
+                    // Vertical feedback
                     VStack {
-                        Image(systemName: "chevron.up")
-                            .opacity(dragOffset < -20 ? 1 : 0.3)
+                        Image(systemName: "chevron.up.circle.fill")
+                            .font(.title2)
+                            .opacity(dragOffset.height < -100 ? 1 : (dragOffset.height < -30 ? 0.5 : 0.1))
                         Spacer()
-                        Image(systemName: "chevron.down")
-                            .opacity(dragOffset > 20 ? 1 : 0.3)
+                        Image(systemName: "chevron.down.circle.fill")
+                            .font(.title2)
+                            .opacity(dragOffset.height > 100 ? 1 : (dragOffset.height > 30 ? 0.5 : 0.1))
                     }
-                    .frame(height: 140)
-                    .foregroundColor(.white.opacity(0.5))
+                    .frame(height: 180)
+
+                    // Horizontal feedback
+                    HStack {
+                        Image(systemName: "chevron.left.circle.fill")
+                            .font(.title2)
+                            .opacity(dragOffset.width < -50 ? 1 : 0.1)
+                        Spacer()
+                        Image(systemName: "chevron.right.circle.fill")
+                            .font(.title2)
+                            .opacity(dragOffset.width > 50 ? 1 : 0.1)
                     }
+                    .frame(width: 180)
+                }
+                .foregroundColor(.accentColor)
 
                 Circle()
                     .fill(.ultraThinMaterial)
@@ -307,38 +322,44 @@ struct VoiceModeFullScreen: View {
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { value in
-                        dragOffset = value.translation.height
+                        dragOffset = value.translation
                         if !isLongPressing {
                             isLongPressing = true
                             handlePressStart()
                         }
 
                         // Handle sliding parameters
-                        if dragOffset < -50 {
+                        if dragOffset.height < -100 {
+                            activeFeature = .creativeMode
+                        } else if dragOffset.height < -40 {
                             activeFeature = .detailedMode
-                        } else if dragOffset > 50 {
+                        } else if dragOffset.height > 100 {
+                            activeFeature = .academicMode
+                        } else if dragOffset.height > 40 {
                             activeFeature = .conciseMode
+                        } else if dragOffset.width < -50 {
+                            activeFeature = .discoveryMode
+                        } else if dragOffset.width > 50 {
+                            activeFeature = .translatorMode
                         } else {
-                            // Reset if returned to center during drag
+                            activeFeature = nil
                         }
                     }
                     .onEnded { value in
                         handlePressEnd()
 
                         // Execute based on final drag position
-                        if dragOffset < -50 {
-                            try? sessionManager.startRecordingWithFeature(.detailedMode)
-                        } else if dragOffset > 50 {
-                            try? sessionManager.startRecordingWithFeature(.conciseMode)
+                        if let feature = activeFeature {
+                            try? sessionManager.startRecordingWithFeature(feature)
                         } else {
                             // Normal tap behavior if not a significant drag
-                            if abs(dragOffset) < 10 {
+                            if abs(dragOffset.height) < 10 && abs(dragOffset.width) < 10 {
                                 handleTap()
                             }
                         }
 
                         withAnimation {
-                            dragOffset = 0
+                            dragOffset = .zero
                             isLongPressing = false
                             showInterruptionUI = false
                         }
@@ -369,7 +390,7 @@ struct VoiceModeFullScreen: View {
 
         // Start 3s timer for extended listening
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-            if isLongPressing && abs(dragOffset) < 20 {
+            if isLongPressing && abs(dragOffset.height) < 20 && abs(dragOffset.width) < 20 {
                 activeFeature = .extendedListening
                 // Haptic feedback could go here
             }

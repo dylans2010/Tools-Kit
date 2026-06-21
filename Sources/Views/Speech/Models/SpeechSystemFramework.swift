@@ -9,6 +9,10 @@ public enum SpeechInteractionFeature: String, Codable, CaseIterable {
     case detailedMode = "detailed_mode"
     case conciseMode = "concise_mode"
     case extendedListening = "extended_listening"
+    case discoveryMode = "discovery_mode"
+    case translatorMode = "translator_mode"
+    case creativeMode = "creative_mode"
+    case academicMode = "academic_mode"
 }
 
 /// A structure that holds the current interaction context to be sent to the AI
