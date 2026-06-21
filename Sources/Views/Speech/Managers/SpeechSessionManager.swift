@@ -13,10 +13,15 @@ class SpeechSessionManager: NSObject, ObservableObject {
     @Published var isSpeaking: Bool = false
     @Published var currentTranscription: String = ""
     @Published var audioLevel: Float = 0.0
-    @Published var speechState: SpeechState = .idle
+    @Published var speechState: SpeechState = .idle {
+        didSet {
+            SDKLogStore.shared.log("Speech State changed to \(speechState.statusText)", source: "SpeechSessionManager", level: .info)
+        }
+    }
     @Published var errorMessage: String?
     @Published var mode: SpeechSessionMode = .voice {
         didSet {
+            SDKLogStore.shared.log("Speech Mode changed to \(mode)", source: "SpeechSessionManager", level: .info)
             handleModeChange()
         }
     }
@@ -73,6 +78,8 @@ class SpeechSessionManager: NSObject, ObservableObject {
     func startRecording() throws {
         guard !isRecording else { return }
 
+        SDKLogStore.shared.log("Starting recording...", source: "SpeechSessionManager", level: .info)
+
         // Stop any current speech
         TTSService.shared.stop()
         isSpeaking = false
@@ -116,6 +123,7 @@ class SpeechSessionManager: NSObject, ObservableObject {
 
     func stopRecording() {
         guard isRecording else { return }
+        SDKLogStore.shared.log("Stopping recording. Transcription: \(currentTranscription)", source: "SpeechSessionManager", level: .info)
         stopRecordingProcess()
 
         if !currentTranscription.isEmpty {
@@ -274,6 +282,8 @@ class SpeechSessionManager: NSObject, ObservableObject {
             return
         }
 
+        SDKLogStore.shared.log("Speaking: \(text.prefix(50))...", source: "SpeechSessionManager", level: .info)
+
         isSpeaking = true
         speechState = .speaking
         do {
@@ -299,6 +309,23 @@ class SpeechSessionManager: NSObject, ObservableObject {
     // MARK: - Error Handling
 
     private func handleError(_ error: Error) {
+        // If it's a TTS failure and fallback is disabled, reveal the text message
+        if TTSService.shared.provider == .elevenLabs && !TTSService.shared.useSystemFallback {
+            for i in 0..<messages.count {
+                if messages[i].role == .assistant && messages[i].isSpokenOnly {
+                    let updated = SpeechMessage(
+                        id: messages[i].id,
+                        role: .assistant,
+                        content: messages[i].content,
+                        timestamp: messages[i].timestamp,
+                        audioURL: messages[i].audioURL,
+                        isSpokenOnly: false
+                    )
+                    messages[i] = updated
+                }
+            }
+        }
+
         let speechError: SpeechError
         if let se = error as? SpeechError {
             speechError = se

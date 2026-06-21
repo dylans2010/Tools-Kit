@@ -194,8 +194,6 @@ struct SpeechMainView: View {
 
 struct VoiceModeFullScreen: View {
     @ObservedObject var sessionManager: SpeechSessionManager
-    @State private var pulseScale: CGFloat = 1.0
-    @State private var wavePhase: Double = 0
 
     var body: some View {
         ZStack {
@@ -261,61 +259,9 @@ struct VoiceModeFullScreen: View {
 
                 Spacer()
 
-                // Central orb / waveform
-                ZStack {
-                    // Outer pulse ring
-                    Circle()
-                        .stroke(statusColor.opacity(0.15), lineWidth: 2)
-                        .frame(width: 220, height: 220)
-                        .scaleEffect(pulseScale)
-
-                    Circle()
-                        .stroke(statusColor.opacity(0.1), lineWidth: 1)
-                        .frame(width: 260, height: 260)
-                        .scaleEffect(pulseScale * 0.95)
-
-                    // Main orb
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                gradient: Gradient(colors: [
-                                    statusColor.opacity(0.6),
-                                    statusColor.opacity(0.2),
-                                    Color.clear
-                                ]),
-                                center: .center,
-                                startRadius: 20,
-                                endRadius: 90
-                            )
-                        )
-                        .frame(width: 180, height: 180)
-                        .scaleEffect(sessionManager.speechState.isActive ? 1.0 + CGFloat(sessionManager.audioLevel) * 0.4 : 1.0)
-                        .animation(.easeInOut(duration: 0.15), value: sessionManager.audioLevel)
-
-                    // Inner glow
-                    Circle()
-                        .fill(statusColor.opacity(0.8))
-                        .frame(width: 60, height: 60)
-                        .blur(radius: 10)
-
-                    // Waveform bars (visible when active)
-                    if sessionManager.speechState.isActive {
-                        WaveformBars(level: sessionManager.audioLevel, color: statusColor)
-                            .frame(width: 120, height: 40)
-                    }
-
-                    // Status icon
-                    if !sessionManager.speechState.isActive {
-                        Image(systemName: statusIcon)
-                            .font(.system(size: 40, weight: .light))
-                            .foregroundColor(.white.opacity(0.9))
-                    }
-                }
-                .onAppear {
-                    withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
-                        pulseScale = 1.1
-                    }
-                }
+                // Central dynamic orb
+                DynamicOrbView(state: sessionManager.speechState, audioLevel: sessionManager.audioLevel)
+                    .frame(width: 300, height: 300)
 
                 Spacer()
 
@@ -425,6 +371,116 @@ struct VoiceModeFullScreen: View {
 }
 
 // MARK: - Waveform Bars for Voice Mode
+
+// MARK: - Dynamic Orb View
+
+struct DynamicOrbView: View {
+    let state: SpeechState
+    let audioLevel: Float
+
+    @State private var rotation: Double = 0
+    @State private var pulse: CGFloat = 1.0
+
+    var body: some View {
+        ZStack {
+            // Outer Gloom/Bloom
+            Circle()
+                .fill(
+                    RadialGradient(
+                        gradient: Gradient(colors: [primaryColor.opacity(0.4), .clear]),
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: 150
+                    )
+                )
+                .scaleEffect(pulse * (1.0 + CGFloat(audioLevel) * 0.2))
+
+            // Rotating iridescence
+            ZStack {
+                ForEach(0..<3) { i in
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [primaryColor, secondaryColor, .cyan],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 200, height: 200)
+                        .offset(x: 20)
+                        .rotationEffect(.degrees(Double(i) * 120 + rotation))
+                        .opacity(0.3)
+                        .blendMode(.screen)
+                }
+            }
+            .blur(radius: 20)
+
+            // Core
+            Circle()
+                .fill(
+                    RadialGradient(
+                        gradient: Gradient(colors: [.white, primaryColor.opacity(0.8)]),
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: 60
+                    )
+                )
+                .frame(width: 100, height: 100)
+                .shadow(color: primaryColor, radius: 20)
+                .scaleEffect(state == .speaking ? 1.0 + CGFloat(audioLevel) * 0.5 : 1.0)
+
+            // Detail Ring
+            Circle()
+                .stroke(primaryColor.opacity(0.5), lineWidth: 1)
+                .frame(width: 220, height: 220)
+                .scaleEffect(pulse)
+
+            // State Icon (Subtle overlay)
+            Image(systemName: statusIcon)
+                .font(.system(size: 30, weight: .light))
+                .foregroundColor(.white.opacity(0.6))
+                .scaleEffect(pulse)
+        }
+        .onAppear {
+            withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
+                rotation = 360
+            }
+            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                pulse = 1.1
+            }
+        }
+    }
+
+    private var primaryColor: Color {
+        switch state {
+        case .idle: return .blue
+        case .listening: return .cyan
+        case .processing: return .indigo
+        case .speaking: return .blue
+        case .error: return .red
+        }
+    }
+
+    private var secondaryColor: Color {
+        switch state {
+        case .idle: return .cyan
+        case .listening: return .green
+        case .processing: return .purple
+        case .speaking: return .cyan
+        case .error: return .orange
+        }
+    }
+
+    private var statusIcon: String {
+        switch state {
+        case .idle: return "mic.fill"
+        case .listening: return "waveform"
+        case .processing: return "brain"
+        case .speaking: return "speaker.wave.2.fill"
+        case .error: return "exclamationmark.triangle"
+        }
+    }
+}
 
 struct WaveformBars: View {
     let level: Float

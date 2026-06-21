@@ -6,8 +6,14 @@ import UIKit
 final class VoicePersonalizationViewModel {
     var selectedVoice: String = "American"
     var selectedColorIndex: Int = 0
-    var pace: Double = 0.5
-    var expressivity: Double = 0.5
+    var pace: Double {
+        get { Double(TTSService.shared.pace) }
+        set { TTSService.shared.pace = Float(newValue) }
+    }
+    var expressivity: Double {
+        get { Double(TTSService.shared.expressiveness) }
+        set { TTSService.shared.expressiveness = Float(newValue) }
+    }
     
     private let lightImpact = UIImpactFeedbackGenerator(style: .light)
     private let mediumImpact = UIImpactFeedbackGenerator(style: .medium)
@@ -19,6 +25,12 @@ final class VoicePersonalizationViewModel {
         mediumImpact.prepare()
         heavyImpact.prepare()
         selectionFeedback.prepare()
+
+        // Sync initial state if needed
+        let savedPace = UserDefaults.standard.object(forKey: "selected_voice_pace") as? Float ?? 0.5
+        let savedExpr = UserDefaults.standard.object(forKey: "selected_voice_expressiveness") as? Float ?? 1.0
+        TTSService.shared.pace = savedPace
+        TTSService.shared.expressiveness = savedExpr
     }
 
     func triggerHaptic(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
@@ -126,8 +138,12 @@ struct PersonalizedVoiceExperience: View {
     }
     
     private var siriOrb: some View {
-        SiriOrbView()
-            .frame(width: 340, height: 340)
+        SiriOrbView(
+            accentColor: swatchColors[viewModel.selectedColorIndex],
+            pace: viewModel.pace,
+            expressivity: viewModel.expressivity
+        )
+        .frame(width: 340, height: 340)
     }
     
     private var voiceRow: some View {
@@ -204,11 +220,11 @@ struct PersonalizedVoiceExperience: View {
                 .foregroundColor(.white)
                 .font(.system(size: 17))
 
-            CustomSlider(value: $viewModel.pace, accentColor: .green, onIncrement: {
-                viewModel.triggerSelectionHaptic()
-            }, onReleased: {
-                viewModel.triggerHaptic(.light)
-            })
+            Slider(value: $viewModel.pace, in: 0...1)
+                .tint(swatchColors[viewModel.selectedColorIndex])
+                .onChange(of: viewModel.pace) { _, _ in
+                    viewModel.triggerSelectionHaptic()
+                }
         }
     }
     
@@ -218,11 +234,11 @@ struct PersonalizedVoiceExperience: View {
                 .foregroundColor(.white)
                 .font(.system(size: 17))
 
-            CustomSlider(value: $viewModel.expressivity, accentColor: .green, onIncrement: {
-                viewModel.triggerSelectionHaptic()
-            }, onReleased: {
-                viewModel.triggerHaptic(.light)
-            })
+            Slider(value: $viewModel.expressivity, in: 0...1)
+                .tint(swatchColors[viewModel.selectedColorIndex])
+                .onChange(of: viewModel.expressivity) { _, _ in
+                    viewModel.triggerSelectionHaptic()
+                }
         }
     }
     
@@ -263,13 +279,18 @@ struct PersonalizedVoiceExperience: View {
 }
 
 struct SiriOrbView: View {
+    let accentColor: Color
+    let pace: Double
+    let expressivity: Double
+
     @State private var isAnimating = false
+    @State private var rotation: Double = 0
     
     var body: some View {
         ZStack {
             // Outer soft glow
             RadialGradient(
-                gradient: Gradient(colors: [.white.opacity(0.3), .black]),
+                gradient: Gradient(colors: [accentColor.opacity(0.3), .black]),
                 center: .center,
                 startRadius: 0,
                 endRadius: 170
@@ -283,14 +304,14 @@ struct SiriOrbView: View {
                     Circle()
                         .fill(
                             AngularGradient(
-                                gradient: Gradient(colors: [.pink, .cyan, .yellow, .purple, .pink]),
+                                gradient: Gradient(colors: [accentColor, .cyan, .white, .blue, accentColor]),
                                 center: .center
                             )
                         )
                         .frame(width: 180, height: 180)
-                        .opacity(0.15)
+                        .opacity(0.15 + (expressivity * 0.1))
                         .offset(x: 40)
-                        .rotationEffect(.degrees(Double(i) * 60))
+                        .rotationEffect(.degrees(Double(i) * 60 + rotation))
                 }
             }
             .blur(radius: 15)
@@ -298,8 +319,8 @@ struct SiriOrbView: View {
             // Inner core
             Circle()
                 .fill(.white)
-                .frame(width: 95, height: 95)
-                .shadow(color: .white, radius: 30)
+                .frame(width: 95 + CGFloat(pace * 10), height: 95 + CGFloat(pace * 10))
+                .shadow(color: accentColor, radius: 20 + CGFloat(expressivity * 20))
 
             // Optional sparkle texture overlay
             Canvas { context, size in
@@ -308,7 +329,7 @@ struct SiriOrbView: View {
                     let y = CGFloat.random(in: 0...size.height)
                     let rect = CGRect(x: x, y: y, width: 1.5, height: 1.5)
                     let path = Path(ellipseIn: rect)
-                    context.fill(path, with: .color(.white.opacity(0.3)))
+                    context.fill(path, with: .color(.white.opacity(0.3 + (expressivity * 0.4))))
                 }
             }
             .frame(width: 280, height: 280)
@@ -320,58 +341,13 @@ struct SiriOrbView: View {
             withAnimation(.easeInOut(duration: 4).repeatForever(autoreverses: true)) {
                 isAnimating = true
             }
-        }
-    }
-}
-
-struct CustomSlider: View {
-    @Binding var value: Double
-    var accentColor: Color
-    var onIncrement: () -> Void
-    var onReleased: () -> Void
-
-    @State private var lastReportedValue: Double = 0
-
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .leading) {
-                // Track
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(Color.white.opacity(0.2))
-                    .frame(height: 4)
-
-                // Progress
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(accentColor)
-                    .frame(width: geometry.size.width * CGFloat(value), height: 4)
-
-                // Thumb
-                Circle()
-                    .fill(.white)
-                    .frame(width: 24, height: 24)
-                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-                    .offset(x: geometry.size.width * CGFloat(value) - 12)
-                    .gesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { gesture in
-                                let newValue = min(max(0, Double(gesture.location.x / geometry.size.width)), 1.0)
-                                value = newValue
-
-                                // Haptic every 5%
-                                if abs(value - lastReportedValue) >= 0.05 {
-                                    onIncrement()
-                                    lastReportedValue = value
-                                }
-                            }
-                            .onEnded { _ in
-                                onReleased()
-                            }
-                    )
+            withAnimation(.linear(duration: 20).repeatForever(autoreverses: false)) {
+                rotation = 360
             }
         }
-        .frame(height: 24)
     }
 }
+
 
 #Preview {
     PersonalizedVoiceExperience()

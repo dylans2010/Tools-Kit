@@ -128,6 +128,7 @@ class TTSService: ObservableObject {
 
     @Published var provider: TTSProvider = .apple {
         didSet {
+            SDKLogStore.shared.log("TTS Provider changed to \(provider.rawValue)", source: "TTSService", level: .info)
             UserDefaults.standard.set(provider.rawValue, forKey: "selected_tts_provider")
             updateCurrentService()
         }
@@ -150,9 +151,17 @@ class TTSService: ObservableObject {
             }
         }
     }
+
+    @Published var useSystemFallback: Bool {
+        didSet {
+            UserDefaults.standard.set(useSystemFallback, forKey: "use_system_tts_fallback")
+        }
+    }
     
     @Published var pace: Float {
         didSet {
+            let clamped = min(max(pace, 0.0), 1.0)
+            if pace != clamped { pace = clamped }
             UserDefaults.standard.set(pace, forKey: "selected_voice_pace")
             currentService.pace = pace
         }
@@ -160,6 +169,8 @@ class TTSService: ObservableObject {
     
     @Published var expressiveness: Float {
         didSet {
+            let clamped = min(max(expressiveness, 0.0), 1.0)
+            if expressiveness != clamped { expressiveness = clamped }
             UserDefaults.standard.set(expressiveness, forKey: "selected_voice_expressiveness")
             currentService.expressiveness = expressiveness
         }
@@ -183,6 +194,8 @@ class TTSService: ObservableObject {
         
         let savedExpressiveness = UserDefaults.standard.object(forKey: "selected_voice_expressiveness") as? Float ?? 1.0
         self.expressiveness = savedExpressiveness
+
+        self.useSystemFallback = UserDefaults.standard.bool(forKey: "use_system_tts_fallback")
 
         if provider == .elevenLabs {
             let service = ElevenLabsTTSService()
@@ -216,7 +229,20 @@ class TTSService: ObservableObject {
     }
 
     func speak(text: String) async throws {
-        try await currentService.speak(text: text)
+        do {
+            try await currentService.speak(text: text)
+        } catch {
+            if provider == .elevenLabs && useSystemFallback {
+                SDKLogStore.shared.log("ElevenLabs failed, falling back to Apple TTS", source: "TTSService", level: .warning)
+                let fallbackService = AppleTTSService()
+                fallbackService.voiceID = selectedAppleVoiceID
+                fallbackService.pace = pace
+                fallbackService.expressiveness = expressiveness
+                try await fallbackService.speak(text: text)
+            } else {
+                throw error
+            }
+        }
     }
 
     func speakWithProvider(text: String, provider: TTSProvider, voiceID: String?) async throws {
@@ -234,7 +260,21 @@ class TTSService: ObservableObject {
             appleService.expressiveness = expressiveness
             service = appleService
         }
-        try await service.speak(text: text)
+
+        do {
+            try await service.speak(text: text)
+        } catch {
+            if provider == .elevenLabs && useSystemFallback {
+                SDKLogStore.shared.log("ElevenLabs failed, falling back to Apple TTS", source: "TTSService", level: .warning)
+                let fallbackService = AppleTTSService()
+                fallbackService.voiceID = selectedAppleVoiceID
+                fallbackService.pace = pace
+                fallbackService.expressiveness = expressiveness
+                try await fallbackService.speak(text: text)
+            } else {
+                throw error
+            }
+        }
     }
 
     func stop() {

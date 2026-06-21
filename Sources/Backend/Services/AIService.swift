@@ -272,7 +272,7 @@ class AIService {
                 }
                 response = try await provider.send(messages: fallbackMessages, model: modelToUse, apiKey: apiKey)
             }
-            SDKLogStore.shared.log("AI Response Success: \(response.prefix(50))...", source: "AIService", level: .info)
+            SDKLogStore.shared.log("AI Response Success: \(response)", source: "AIService", level: .info)
         } catch {
             SDKLogStore.shared.log("AI Error: \(error.localizedDescription)", source: "AIService", level: .error)
             throw error

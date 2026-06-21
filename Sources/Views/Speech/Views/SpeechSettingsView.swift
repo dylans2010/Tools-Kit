@@ -41,6 +41,9 @@ struct SpeechSettingsView: View {
                     }
                 }
                 .pickerStyle(.inline)
+
+                Toggle("Use System TTS as Fallback", isOn: $ttsService.useSystemFallback)
+                    .help("If ElevenLabs fails, automatically fall back to Apple's system text-to-speech.")
             }
 
             // MARK: - Voice Customization
