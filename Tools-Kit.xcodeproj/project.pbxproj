@@ -2108,6 +2108,8 @@
 		RV020014 /* VisionCameraOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010014 /* VisionCameraOverlay.swift */; };
 		RV020015 /* SpeechTranscriptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010015 /* SpeechTranscriptView.swift */; };
 		RV020016 /* SpeechHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010016 /* SpeechHistoryManager.swift */; };
+		RV020017 /* SpeechSystemFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV010017 /* SpeechSystemFramework.swift */; };
+		RV020018 /* SpeechSystem.md in Resources */ = {isa = PBXBuildFile; fileRef = RV010018 /* SpeechSystem.md */; };
 		SC0200000000000000000001 /* SecurityModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000001 /* SecurityModels.swift */; };
 		SC0200000000000000000002 /* EncryptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000002 /* EncryptionService.swift */; };
 		SC0200000000000000000003 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000003 /* AuthService.swift */; };
@@ -4482,6 +4484,8 @@
 		RV010014 /* VisionCameraOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionCameraOverlay.swift; sourceTree = "<group>"; };
 		RV010015 /* SpeechTranscriptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechTranscriptView.swift; sourceTree = "<group>"; };
 		RV010016 /* SpeechHistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechHistoryManager.swift; sourceTree = "<group>"; };
+		RV010017 /* SpeechSystemFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSystemFramework.swift; sourceTree = "<group>"; };
+		RV010018 /* SpeechSystem.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = SpeechSystem.md; sourceTree = "<group>"; };
 		SC0100000000000000000001 /* SecurityModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityModels.swift; sourceTree = "<group>"; };
 		SC0100000000000000000002 /* EncryptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionService.swift; sourceTree = "<group>"; };
 		SC0100000000000000000003 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
@@ -11726,6 +11730,7 @@
 		RV030001 /* Speech */ = {
 			isa = PBXGroup;
 			children = (
+				RV010018 /* SpeechSystem.md */,
 				RV030002 /* Models */,
 				RV030003 /* Views */,
 				RV030004 /* Services */,
@@ -11738,6 +11743,7 @@
 		RV030002 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				RV010017 /* SpeechSystemFramework.swift */,
 				RV010001 /* SpeechModels.swift */,
 			);
 			path = Models;
@@ -12047,6 +12053,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				RV020018 /* SpeechSystem.md in Resources */,
 				B1C2D3E4F5A60708090A0D05 /* Config.plist in Resources */,
 				SDKD2000000000000000003 /* SDK_AI_System.md in Resources */,
 				A913A8000000000000000001 /* AgentPersonaSystem.md in Resources */,
@@ -12093,6 +12100,7 @@
 				RV020014 /* VisionCameraOverlay.swift in Sources */,
 				RV020015 /* SpeechTranscriptView.swift in Sources */,
 				RV020016 /* SpeechHistoryManager.swift in Sources */,
+				RV020017 /* SpeechSystemFramework.swift in Sources */,
 				TB02000000000001 /* Sources/Views/Bridging/TKBridge/TKBridgeClient.swift in Sources */,
 				BR02000000000001 /* Sources/Views/Bridging/BridgeChatView.swift in Sources */,
 				BR02000000000002 /* Sources/Views/Bridging/BridgeHomeView.swift in Sources */,

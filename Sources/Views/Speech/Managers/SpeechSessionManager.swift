@@ -26,6 +26,12 @@ class SpeechSessionManager: NSObject, ObservableObject {
         }
     }
     @Published var currentSessionID: UUID = UUID()
+    private var currentRecordingFeature: SpeechInteractionFeature?
+    @Published var continueListeningInBackground: Bool = false {
+        didSet {
+            UserDefaults.standard.set(continueListeningInBackground, forKey: "continue_listening_in_background")
+        }
+    }
 
     let cameraManager = CameraManager()
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
@@ -41,8 +47,24 @@ class SpeechSessionManager: NSObject, ObservableObject {
 
     private override init() {
         super.init()
+        self.continueListeningInBackground = UserDefaults.standard.bool(forKey: "continue_listening_in_background")
         setupAudioSession()
         setupVisionCallback()
+        setupBackgroundObservers()
+    }
+
+    private func setupBackgroundObservers() {
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
+            guard let self = self else { return }
+            if !self.continueListeningInBackground && self.isRecording {
+                self.stopRecording()
+            }
+        }
+
+        NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { [weak self] _ in
+            guard let self = self else { return }
+            // Optional: Auto-resume if needed, or just stay paused
+        }
     }
 
     private func setupVisionCallback() {
@@ -87,9 +109,14 @@ class SpeechSessionManager: NSObject, ObservableObject {
     // MARK: - Recording
 
     func startRecording() throws {
+        try startRecordingWithFeature(nil)
+    }
+
+    func startRecordingWithFeature(_ feature: SpeechInteractionFeature?) throws {
         guard !isRecording else { return }
 
-        SDKLogStore.shared.log("Starting recording...", source: "SpeechSessionManager", level: .info)
+        SDKLogStore.shared.log("Starting recording with feature: \(feature?.rawValue ?? "none")...", source: "SpeechSessionManager", level: .info)
+        currentRecordingFeature = feature
 
         // Stop any current speech
         TTSService.shared.stop()
@@ -135,12 +162,13 @@ class SpeechSessionManager: NSObject, ObservableObject {
     func stopRecording() {
         guard isRecording else { return }
         SDKLogStore.shared.log("Stopping recording. Transcription: \(currentTranscription)", source: "SpeechSessionManager", level: .info)
+        let feature = currentRecordingFeature
         stopRecordingProcess()
 
         if !currentTranscription.isEmpty {
             let transcription = currentTranscription
             Task {
-                await processUserMessage(transcription)
+                await processUserMessage(transcription, feature: feature)
             }
         } else {
             speechState = .idle
@@ -155,6 +183,7 @@ class SpeechSessionManager: NSObject, ObservableObject {
         recognitionTask?.cancel()
         recognitionTask = nil
         isRecording = false
+        currentRecordingFeature = nil
     }
 
     // MARK: - Send Text Message
@@ -162,14 +191,16 @@ class SpeechSessionManager: NSObject, ObservableObject {
     func sendTextMessage(_ text: String) {
         guard !text.isEmpty else { return }
         Task {
-            await processUserMessage(text)
+            await processUserMessage(text, feature: .textInput)
         }
     }
 
     // MARK: - Core Message Processing
 
-    private func processUserMessage(_ text: String) async {
+    private func processUserMessage(_ text: String, feature: SpeechInteractionFeature? = nil) async {
         let isVoiceMode = mode == .voice
+        let inputType: SpeechInputType = (feature == .textInput) ? .text : .speech
+
         let userMessage = SpeechMessage(role: .user, content: text, isSpokenOnly: isVoiceMode)
         messages.append(userMessage)
 
@@ -178,8 +209,25 @@ class SpeechSessionManager: NSObject, ObservableObject {
         errorMessage = nil
 
         do {
+            // Incorporate SpeechSystem.md instructions and interaction context
+            let systemInstructions = SpeechSystemInstructions.instructions
+
+            var features: Set<SpeechInteractionFeature> = []
+            if let f = feature { features.insert(f) }
+            if continueListeningInBackground { features.insert(.backgroundListening) }
+            if inputType == .speech { features.insert(.speechInput) }
+
+            let context = SpeechSystemContext(
+                activeFeatures: features,
+                isInterrupted: feature == .interruptionTrigger,
+                inputType: inputType
+            )
+
+            let contextString = "\n\nInteraction Context: \(String(describing: context))"
+
             // Build ChatMessage array for AIService
-            let aiMessages = messages.map { ChatMessage(role: $0.role.rawValue, content: $0.content) }
+            var aiMessages = [ChatMessage(role: "system", content: systemInstructions + contextString)]
+            aiMessages.append(contentsOf: messages.map { ChatMessage(role: $0.role.rawValue, content: $0.content) })
 
             // Call AIService — this is the main AI backend
             let response = try await AIService.shared.processMessages(messages: aiMessages)

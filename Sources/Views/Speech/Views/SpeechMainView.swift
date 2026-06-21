@@ -131,6 +131,12 @@ struct VoiceModeFullScreen: View {
     @ObservedObject var sessionManager: SpeechSessionManager
     @Binding var showTranscript: Bool
 
+    @State private var dragOffset: CGFloat = 0
+    @State private var isLongPressing = false
+    @State private var showInterruptionUI = false
+    @State private var activeFeature: SpeechInteractionFeature?
+    @State private var intelligentModel = IntelligentSpeechModel()
+
     var body: some View {
         ZStack {
             // Background gradient
@@ -182,6 +188,7 @@ struct VoiceModeFullScreen: View {
                     Spacer().frame(width: 12)
 
                     // Status indicator
+                VStack(alignment: .trailing, spacing: 4) {
                     HStack(spacing: 6) {
                         Circle()
                             .fill(statusColor)
@@ -196,6 +203,17 @@ struct VoiceModeFullScreen: View {
                     .padding(.vertical, 5)
                     .background(.ultraThinMaterial)
                     .cornerRadius(20)
+
+                    if let feature = activeFeature {
+                        Text(feature.rawValue.replacingOccurrences(of: "_", with: " ").uppercased())
+                            .font(.system(size: 8, weight: .black))
+                            .foregroundColor(.accentColor)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Color.accentColor.opacity(0.2))
+                            .cornerRadius(4)
+                    }
+                    }
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
@@ -203,8 +221,25 @@ struct VoiceModeFullScreen: View {
                 Spacer()
 
                 // Central dynamic orb
+            ZStack {
                 DynamicOrbView(state: sessionManager.speechState, audioLevel: sessionManager.audioLevel)
                     .frame(width: 300, height: 300)
+
+                if showInterruptionUI {
+                    VStack {
+                        Image(systemName: "waveform.and.mic")
+                            .font(.system(size: 40))
+                            .foregroundColor(.white)
+                        Text("INTERRUPTING")
+                            .font(.caption.bold())
+                            .foregroundColor(.white)
+                    }
+                    .padding(20)
+                    .background(Color.red.opacity(0.6))
+                    .clipShape(Circle())
+                    .transition(.scale.combined(with: .opacity))
+                }
+            }
 
                 Spacer()
 
@@ -222,37 +257,93 @@ struct VoiceModeFullScreen: View {
                             .padding(.horizontal, 40)
                             .lineLimit(3)
                     }
-
                 }
 
                 Spacer()
                     .frame(height: 40)
 
-                // Main action button
-                Button(action: {
-                    if sessionManager.isRecording {
-                        sessionManager.stopRecording()
-                    } else if sessionManager.isSpeaking {
-                        TTSService.shared.stop()
-                    } else {
-                        try? sessionManager.startRecording()
+            // Main action button with advanced gestures
+            ZStack {
+                // Visual feedback for slide
+                if dragOffset != 0 {
+                    VStack {
+                        Image(systemName: "chevron.up")
+                            .opacity(dragOffset < -20 ? 1 : 0.3)
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .opacity(dragOffset > 20 ? 1 : 0.3)
                     }
-                }) {
-                    ZStack {
-                        Circle()
-                            .fill(.ultraThinMaterial)
-                            .frame(width: 80, height: 80)
+                    .frame(height: 140)
+                    .foregroundColor(.white.opacity(0.5))
+                    }
 
-                        Circle()
-                            .stroke(sessionManager.isRecording ? Color.red : statusColor, lineWidth: 3)
-                            .frame(width: 80, height: 80)
+                Circle()
+                    .fill(.ultraThinMaterial)
+                    .frame(width: 80, height: 80)
 
-                        Image(systemName: actionButtonIcon)
-                            .font(.system(size: 28, weight: .medium))
-                            .foregroundColor(sessionManager.isRecording ? .red : .white)
+                Circle()
+                    .stroke(sessionManager.isRecording ? Color.red : statusColor, lineWidth: 3)
+                    .frame(width: 80, height: 80)
+                    .scaleEffect(isLongPressing ? 1.2 : 1.0)
+
+                Image(systemName: actionButtonIcon)
+                    .font(.system(size: 28, weight: .medium))
+                    .foregroundColor(sessionManager.isRecording ? .red : .white)
+                }
+            .overlay(
+                // Intelligent Model connection
+                Color.clear.onReceive(Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()) { _ in
+                    if sessionManager.isRecording {
+                        intelligentModel.update(level: sessionManager.audioLevel) {
+                            if !sessionManager.currentTranscription.isEmpty {
+                                sessionManager.stopRecording()
+                            }
+                        }
+                    } else {
+                        intelligentModel.reset()
                     }
                 }
-                .disabled(sessionManager.isProcessing)
+            )
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { value in
+                        dragOffset = value.translation.height
+                        if !isLongPressing {
+                            isLongPressing = true
+                            handlePressStart()
+                        }
+
+                        // Handle sliding parameters
+                        if dragOffset < -50 {
+                            activeFeature = .detailedMode
+                        } else if dragOffset > 50 {
+                            activeFeature = .conciseMode
+                        } else {
+                            // Reset if returned to center during drag
+                        }
+                    }
+                    .onEnded { value in
+                        handlePressEnd()
+
+                        // Execute based on final drag position
+                        if dragOffset < -50 {
+                            sessionManager.startRecordingWithFeature(.detailedMode)
+                        } else if dragOffset > 50 {
+                            sessionManager.startRecordingWithFeature(.conciseMode)
+                        } else {
+                            // Normal tap behavior if not a significant drag
+                            if abs(dragOffset) < 10 {
+                                handleTap()
+                            }
+                        }
+
+                        withAnimation {
+                            dragOffset = 0
+                            isLongPressing = false
+                            showInterruptionUI = false
+                        }
+                    }
+            )
                 .padding(.bottom, 20)
 
                 // Hint text
@@ -261,6 +352,44 @@ struct VoiceModeFullScreen: View {
                     .foregroundColor(.white.opacity(0.4))
                     .padding(.bottom, 30)
             }
+        .onChange(of: sessionManager.audioLevel) { level in
+             // Automated level-based feedback if needed
+        }
+    }
+
+    private func handlePressStart() {
+        if sessionManager.isSpeaking {
+            withAnimation {
+                showInterruptionUI = true
+                activeFeature = .interruptionTrigger
+            }
+            TTSService.shared.stop()
+            try? sessionManager.startRecordingWithFeature(.interruptionTrigger)
+        }
+
+        // Start 3s timer for extended listening
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            if isLongPressing && abs(dragOffset) < 20 {
+                activeFeature = .extendedListening
+                // Haptic feedback could go here
+            }
+        }
+    }
+
+    private func handlePressEnd() {
+        // Feature was already set or will be handled by onEnded
+    }
+
+    private func handleTap() {
+        if sessionManager.isRecording {
+            sessionManager.stopRecording()
+        } else if sessionManager.isSpeaking {
+            TTSService.shared.stop()
+        } else {
+            try? sessionManager.startRecording()
+        }
+        activeFeature = nil
+    }
         }
     }
 
@@ -527,6 +656,32 @@ struct AudioLevelIndicator: View {
                     .frame(width: 6, height: 10 + (20 * CGFloat(sin(Double(index) * 0.5 + Date().timeIntervalSince1970 * 5))))
             }
         }
+    }
+}
+
+// MARK: - Intelligent Speech Model
+
+struct IntelligentSpeechModel {
+    private var silenceTimer: Timer?
+    private let silenceThreshold: TimeInterval = 1.5
+
+    mutating func update(level: Float, onSilence: @escaping () -> Void) {
+        // If level is low, user might be done
+        if level < 0.15 {
+            if silenceTimer == nil {
+                silenceTimer = Timer.scheduledTimer(withTimeInterval: silenceThreshold, repeats: false) { _ in
+                    onSilence()
+                }
+            }
+        } else {
+            silenceTimer?.invalidate()
+            silenceTimer = nil
+        }
+    }
+
+    mutating func reset() {
+        silenceTimer?.invalidate()
+        silenceTimer = nil
     }
 }
 
