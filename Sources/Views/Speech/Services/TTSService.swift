@@ -20,30 +20,59 @@ class AppleTTSService: NSObject, TTSServiceProtocol, AVSpeechSynthesizerDelegate
     // Expressiveness maps to pitchMultiplier (0.5 to 2.0, default 1.0)
     var expressiveness: Float = 1.0
 
+    private var continuation: CheckedContinuation<Void, Error>?
+
     override init() {
         super.init()
         synthesizer.delegate = self
     }
 
     func speak(text: String) async throws {
-        let utterance = AVSpeechUtterance(string: text)
-        if let voiceID = voiceID {
-            utterance.voice = AVSpeechSynthesisVoice(identifier: voiceID)
-        } else {
-            utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-        }
-        utterance.rate = pace
-        utterance.pitchMultiplier = expressiveness
+        stop()
 
-        synthesizer.speak(utterance)
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            self.continuation = continuation
+
+            let utterance = AVSpeechUtterance(string: text)
+            if let voiceID = voiceID {
+                utterance.voice = AVSpeechSynthesisVoice(identifier: voiceID)
+            } else {
+                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+            }
+            utterance.rate = pace
+            utterance.pitchMultiplier = expressiveness
+
+            synthesizer.speak(utterance)
+
+            // Safety check: if it's not speaking after a small delay, resume to avoid hang
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                guard let self = self else { return }
+                if !self.synthesizer.isSpeaking && self.continuation != nil {
+                    self.continuation?.resume(returning: ())
+                    self.continuation = nil
+                }
+            }
+        }
     }
 
     func stop() {
         synthesizer.stopSpeaking(at: .immediate)
+        continuation?.resume(returning: ())
+        continuation = nil
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        continuation?.resume(returning: ())
+        continuation = nil
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        continuation?.resume(returning: ())
+        continuation = nil
     }
 }
 
-class ElevenLabsTTSService: TTSServiceProtocol {
+class ElevenLabsTTSService: NSObject, TTSServiceProtocol, AVAudioPlayerDelegate {
     private var audioPlayer: AVAudioPlayer?
     var voiceID: String?
     
@@ -53,24 +82,44 @@ class ElevenLabsTTSService: TTSServiceProtocol {
     var pace: Float = 0.5 // similarityBoost
     var expressiveness: Float = 0.5 // stability
 
+    private var continuation: CheckedContinuation<Void, Error>?
+
     func speak(text: String) async throws {
+        stop()
+
         let data = try await ElevenLabsService.shared.generateSpeech(
             text: text,
             voiceID: voiceID ?? "21m00Tcm4TlvDq8ikWAM",
             stability: expressiveness,
             similarityBoost: pace
         )
-        audioPlayer = try AVAudioPlayer(data: data)
-        audioPlayer?.play()
 
-        // Wait for playback to finish
-        while audioPlayer?.isPlaying == true {
-            try await Task.sleep(nanoseconds: 100_000_000)
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            self.continuation = continuation
+            do {
+                let player = try AVAudioPlayer(data: data)
+                audioPlayer = player
+                player.delegate = self
+                if !player.play() {
+                    continuation.resume(returning: ())
+                    self.continuation = nil
+                }
+            } catch {
+                continuation.resume(throwing: error)
+                self.continuation = nil
+            }
         }
     }
 
     func stop() {
         audioPlayer?.stop()
+        continuation?.resume(returning: ())
+        continuation = nil
+    }
+
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        continuation?.resume(returning: ())
+        continuation = nil
     }
 }
 

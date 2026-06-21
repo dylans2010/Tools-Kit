@@ -150,7 +150,8 @@ class SpeechSessionManager: NSObject, ObservableObject {
     // MARK: - Core Message Processing
 
     private func processUserMessage(_ text: String) async {
-        let userMessage = SpeechMessage(role: .user, content: text)
+        let isVoiceMode = mode == .voice
+        let userMessage = SpeechMessage(role: .user, content: text, isSpokenOnly: isVoiceMode)
         messages.append(userMessage)
 
         isProcessing = true
@@ -168,13 +169,17 @@ class SpeechSessionManager: NSObject, ObservableObject {
                 throw SpeechError.aiServiceError("Received empty response from AI")
             }
 
-            let assistantMessage = SpeechMessage(role: .assistant, content: response)
+            let assistantMessage = SpeechMessage(
+                role: .assistant,
+                content: response,
+                isSpokenOnly: isVoiceMode
+            )
             messages.append(assistantMessage)
 
             isProcessing = false
 
-            // In voice mode, speak the response via TTS (ElevenLabs or Apple)
-            if mode == .voice || mode == .vision {
+            // In voice mode or vision mode, speak the response via TTS
+            if isVoiceMode || mode == .vision {
                 await speak(text: response)
             } else {
                 speechState = .idle
@@ -197,7 +202,11 @@ class SpeechSessionManager: NSObject, ObservableObject {
             cameraManager.reportProcessingComplete(duration: duration)
             
             if !response.isEmpty {
-                let assistantMessage = SpeechMessage(role: .assistant, content: response)
+                let assistantMessage = SpeechMessage(
+                    role: .assistant,
+                    content: response,
+                    isSpokenOnly: false // Automated vision frames are always visible in vision mode
+                )
                 messages.append(assistantMessage)
                 await speak(text: response)
             }
@@ -241,7 +250,11 @@ class SpeechSessionManager: NSObject, ObservableObject {
                     throw SpeechError.visionError("Empty response from vision service")
                 }
 
-                let assistantMessage = SpeechMessage(role: .assistant, content: response)
+                let assistantMessage = SpeechMessage(
+                    role: .assistant,
+                    content: response,
+                    isSpokenOnly: false // Vision mode questions are always visible
+                )
                 messages.append(assistantMessage)
 
                 isProcessing = false
@@ -256,14 +269,17 @@ class SpeechSessionManager: NSObject, ObservableObject {
     // MARK: - TTS (Text-to-Speech via ElevenLabs or Apple)
 
     func speak(text: String) async {
+        guard !text.isEmpty else {
+            speechState = .idle
+            return
+        }
+
         isSpeaking = true
         speechState = .speaking
         do {
             try await TTSService.shared.speak(text: text)
         } catch {
             print("TTS Error: \(error)")
-            // Don't escalate TTS errors to the user in voice mode —
-            // the response is already in the chat as text
         }
         isSpeaking = false
 
@@ -308,18 +324,7 @@ class SpeechSessionManager: NSObject, ObservableObject {
             speechState = .error(speechError.spokenMessage)
             errorMessage = speechError.spokenMessage
             Task {
-                // Try to speak the error using Apple TTS (fallback, more reliable)
-                let utterance = AVSpeechUtterance(string: speechError.spokenMessage)
-                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                utterance.rate = AVSpeechUtteranceDefaultSpeechRate
-                let synthesizer = AVSpeechSynthesizer()
-                synthesizer.speak(utterance)
-
-                // Wait a moment then reset state
-                try? await Task.sleep(nanoseconds: 3_000_000_000)
-                if case .error = speechState {
-                    speechState = .idle
-                }
+                await speak(text: speechError.spokenMessage)
             }
         } else {
             // In text/vision mode, show the error as a system message
