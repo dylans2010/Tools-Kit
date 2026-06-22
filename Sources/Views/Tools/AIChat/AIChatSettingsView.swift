@@ -560,7 +560,8 @@ struct AIChatSettingsView: View {
 
             if let termsURL = URL(string: "https://toolskit.io/terms") {
                 Link(destination: termsURL) {
-                Label("Terms of Service", systemImage: "doc.text")
+                    Label("Terms of Service", systemImage: "doc.text")
+                }
             }
         }
     }

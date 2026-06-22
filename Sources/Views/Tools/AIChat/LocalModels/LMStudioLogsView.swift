@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct LMStudioLogsView: View {
-    @StateObject private var logStore = SDKLogStore.shared
+    private let logStore = SDKLogStore.shared
     @Environment(\.dismiss) private var dismiss
     @State private var filter: LogLevel? = nil
 
-    var filteredLogs: [SDKLogStore.LogEntry] {
-        let localLogs = logStore.logs.filter {
-            $0.source.contains("LM") || $0.source.contains("AI") || $0.source.contains("Local")
+    var filteredLogs: [SDKLogEntry] {
+        let localLogs = Array(logStore.entries).filter {
+            String(describing: $0.source).contains("LM") || String(describing: $0.source).contains("AI") || String(describing: $0.source).contains("Local")
         }
         if let filter = filter {
             return localLogs.filter { $0.level == filter }
@@ -36,10 +36,10 @@ struct LMStudioLogsView: View {
                         .padding()
                 }
             } else {
-                ForEach(filteredLogs) { log in
+                ForEach(filteredLogs, id: \.id) { log in
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
-                            Text(log.source)
+                            Text(String(describing: log.source))
                                 .font(.caption2.bold())
                                 .foregroundColor(.blue)
                             Spacer()
