@@ -404,16 +404,14 @@ class SpeechSessionManager: NSObject, ObservableObject {
             switch ae {
             case .missingAPIKey:
                 speechError = .missingAIProvider
-            case .unknownProvider(let p):
+            case .unknownProvider:
                 speechError = .missingAIProvider
             case .networkError(let msg):
                 speechError = .aiServiceError(msg)
             case .invalidResponse:
                 speechError = .aiServiceError("Invalid response from AI service")
             case .noProviderSelected:
-                <#code#>
-            case .noProviderSelected:
-                <#code#>
+                speechError = .missingAIProvider
             }
         } else {
             speechError = .aiServiceError(error.localizedDescription)
