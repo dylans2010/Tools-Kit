@@ -402,14 +402,14 @@ class SpeechSessionManager: NSObject, ObservableObject {
             speechError = se
         } else if let ae = error as? AIError {
             switch ae {
-            case .missingAPIKey:
+            case .noProviderSelected, .noModelSelected, .missingAPIKey, .unknownProvider, .deviceOffline, .invalidEndpoint:
                 speechError = .missingAIProvider
-            case .unknownProvider(let p):
-                speechError = .missingAIProvider
-            case .networkError(let msg):
+            case .networkError(let msg), .requestFailed(let msg):
                 speechError = .aiServiceError(msg)
             case .invalidResponse:
                 speechError = .aiServiceError("Invalid response from AI service")
+            case .decodingFailed:
+                speechError = .aiServiceError("Failed to process AI response")
             }
         } else {
             speechError = .aiServiceError(error.localizedDescription)
