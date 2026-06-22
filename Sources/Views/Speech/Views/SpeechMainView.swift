@@ -291,8 +291,7 @@ struct VoiceModeFullScreen: View {
                     }
                     .frame(width: 180)
                 }
-                .foregroundStyle(Color.accentColor)
-
+                
                 Circle()
                     .fill(.ultraThinMaterial)
                     .frame(width: 80, height: 80)

@@ -410,6 +410,10 @@ class SpeechSessionManager: NSObject, ObservableObject {
                 speechError = .aiServiceError(msg)
             case .invalidResponse:
                 speechError = .aiServiceError("Invalid response from AI service")
+            case .noProviderSelected:
+                <#code#>
+            case .noProviderSelected:
+                <#code#>
             }
         } else {
             speechError = .aiServiceError(error.localizedDescription)
