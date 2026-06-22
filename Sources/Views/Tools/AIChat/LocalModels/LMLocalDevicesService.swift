@@ -2,6 +2,21 @@ import Foundation
 import Network
 import Darwin
 
+enum DiscoveryMethod: String, CaseIterable, Identifiable {
+    case wifi = "WiFi"
+    case lan = "LAN"
+    case ip = "Manual IP"
+    var id: String { rawValue }
+
+    var icon: String {
+        switch self {
+        case .wifi: return "wifi"
+        case .lan: return "network"
+        case .ip: return "m.circle.fill"
+        }
+    }
+}
+
 enum ConnectionType: String, Codable, CaseIterable {
     case lan
     case wifi
@@ -59,10 +74,10 @@ class LMLocalDevicesService: ObservableObject {
         }
     }
 
-    func performFullScan() async {
+    func performFullScan(method: DiscoveryMethod = .lan, manualIP: String? = nil) async {
         guard !isScanning else { return }
         isScanning = true
-        SDKLogStore.shared.log("LMLocalDevicesService: Starting full discovery scan", source: "LMLocalDevicesService", level: .info)
+        SDKLogStore.shared.log("LMLocalDevicesService: Starting discovery scan with method: \(method.rawValue)", source: "LMLocalDevicesService", level: .info)
 
         defer {
             isScanning = false
@@ -70,11 +85,19 @@ class LMLocalDevicesService: ObservableObject {
         }
 
         await withTaskGroup(of: Void.self) { group in
-            // 1. Localhost
-            group.addTask { await self.probeLocalhost() }
-
-            // 2. Subnet
-            group.addTask { await self.scanLocalSubnet() }
+            switch method {
+            case .wifi:
+                group.addTask { await self.probeLocalhost() }
+            case .lan:
+                group.addTask { await self.probeLocalhost() }
+                group.addTask { await self.scanLocalSubnet() }
+            case .ip:
+                if let ip = manualIP, !ip.isEmpty {
+                    for port in defaultPorts {
+                        group.addTask { await self.addManualIP(ip, port: port) }
+                    }
+                }
+            }
         }
 
         SDKLogStore.shared.log("LMLocalDevicesService: Discovery scan complete. Found \(discoveredDevices.count) devices.", source: "LMLocalDevicesService", level: .info)

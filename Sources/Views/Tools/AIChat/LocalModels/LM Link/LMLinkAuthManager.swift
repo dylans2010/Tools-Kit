@@ -82,16 +82,31 @@ final class LMLinkAuthManager: ObservableObject {
     }
 
     func handleCallback(url: URL) async {
-        guard case .awaitingCallback = state else {
-            LMLinkLogger.deeplink.info("Ignoring duplicate callback — state is not awaitingCallback")
-            return
+        let result = LMLinkCallbackParser.parse(url: url)
+
+        // Handle Cold-start or unexpected state transitions
+        if case .awaitingCallback = state {
+            // Normal flow
+        } else {
+            // Check if this is a valid callback for a key we generated
+            if case .success(_, let keyId, _) = result {
+                do {
+                    _ = try LMLinkKeyPairService.loadPrivateKey(for: keyId)
+                    LMLinkLogger.deeplink.info("Processing callback for known keyId: \(keyId) despite state: \(String(describing: self.state))")
+                } catch {
+                    LMLinkLogger.deeplink.error("Ignoring callback for unknown keyId: \(keyId)")
+                    return
+                }
+            } else {
+                LMLinkLogger.deeplink.info("Ignoring duplicate or invalid callback — state is not awaitingCallback")
+                return
+            }
         }
 
         cancelTimeoutTimer()
         state = .awaitingCallback
         LMLinkLogger.deeplink.info("Handling callback URL: \(url.host ?? "nil", privacy: .public)")
 
-        let result = LMLinkCallbackParser.parse(url: url)
         switch result {
         case .success(let credential, let keyId, let userId):
             let ping = await validator.ping()

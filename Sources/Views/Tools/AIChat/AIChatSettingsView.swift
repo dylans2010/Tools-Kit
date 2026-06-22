@@ -27,6 +27,7 @@ struct AIChatSettingsView: View {
     @State private var unsplashSecretKey = APIKeyManager.shared.unsplashSecretKey ?? ""
     @State private var unsplashAppID = APIKeyManager.shared.unsplashApplicationID ?? ""
     @StateObject private var modelConfig = ModelConfigManager.shared
+    @StateObject private var connectionManager = LMConnectionManager.shared
     @AppStorage("agentEnabled") private var agentEnabled = false
     @AppStorage("agentDebugModeEnabled") private var debugModeEnabled = false
     @AppStorage("selectedAgentType") private var selectedAgentType = AgentType.jules.rawValue
@@ -288,7 +289,37 @@ struct AIChatSettingsView: View {
 
     private var modelSectionContent: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if ["local_models", "afm", "lmstudio"].contains(selectedProviderID) {
+            if settings.aiModelSource == .local {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Local Model Configuration")
+                        .font(.caption.bold())
+                        .foregroundColor(.secondary)
+
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(connectionManager.selectedModel?.id ?? "No model selected")
+                                .font(.headline)
+                            if let device = connectionManager.selectedDevice {
+                                Text("Running on \(device.ipAddress):\(device.port)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        Spacer()
+                        Image(systemName: "desktopcomputer")
+                            .foregroundColor(.blue)
+                    }
+                    .padding()
+                    .background(Color.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+
+                    NavigationLink(destination: LMDeviceFallbackView()) {
+                        Label("Change Local Device", systemImage: "arrow.triangle.2.circlepath")
+                            .font(.subheadline)
+                    }
+                    .padding(.top, 4)
+                }
+                .padding(.vertical, 4)
+            } else if ["local_models", "afm", "lmstudio"].contains(selectedProviderID) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Current AI Model:")
                         .font(.caption.bold())

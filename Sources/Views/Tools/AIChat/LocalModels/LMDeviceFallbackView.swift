@@ -4,21 +4,41 @@ struct LMDeviceFallbackView: View {
     @StateObject private var discoveryService = LMLocalDevicesService.shared
     @StateObject private var connectionManager = LMConnectionManager.shared
     @Environment(\.dismiss) private var dismiss
+    @State private var selectedMethod: DiscoveryMethod = .lan
+    @State private var manualIP: String = ""
 
     var body: some View {
         List {
             Section {
-                Button(action: {
-                    Task {
-                        await discoveryService.performFullScan()
+                NavigationLink(destination: LMLinkMainView()) {
+                    Label("LM Link Account", systemImage: "person.crop.circle.badge.checkmark")
+                        .foregroundColor(.blue)
+                }
+            }
+
+            Section {
+                Picker("Discovery Method", selection: $selectedMethod) {
+                    ForEach(DiscoveryMethod.allCases) { method in
+                        Label(method.rawValue, systemImage: method.icon).tag(method)
                     }
+                }
+                .pickerStyle(.menu)
+
+                methodInfoView
+            } header: {
+                Text("Connection Method")
+            }
+
+            Section {
+                Button(action: {
+                    performScan()
                 }) {
                     HStack {
                         if discoveryService.isScanning {
                             ProgressView()
                                 .padding(.trailing, 8)
                         }
-                        Label(discoveryService.isScanning ? "Scanning LAN..." : "Refresh Devices", systemImage: "arrow.clockwise")
+                        Label(discoveryService.isScanning ? "Scanning..." : "Search for Devices", systemImage: "magnifyingglass")
                             .font(.headline)
                     }
                 }
@@ -41,6 +61,73 @@ struct LMDeviceFallbackView: View {
         }
         .navigationTitle("Device Discovery")
         .navigationBarTitleDisplayMode(.inline)
+        .refreshable {
+            await performScan()
+        }
+    }
+
+    @ViewBuilder
+    private var methodInfoView: some View {
+        switch selectedMethod {
+        case .wifi:
+            WiFiMethodView()
+        case .lan:
+            LANMethodView()
+        case .ip:
+            IPMethodView(ip: $manualIP)
+        }
+    }
+
+    private func performScan() {
+        Task {
+            await discoveryService.performFullScan(method: selectedMethod, manualIP: selectedMethod == .ip ? manualIP : nil)
+        }
+    }
+}
+
+struct WiFiMethodView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Proximity Search")
+                .font(.subheadline.bold())
+            Text("Scans for LM Studio instances running on this device or nearby nodes with common ports (1234, 11434, 8080).")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+struct LANMethodView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Subnet Scan")
+                .font(.subheadline.bold())
+            Text("Deep scan of your local network subnet. This is the most thorough way to find any compatible model server on your network.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+struct IPMethodView: View {
+    @Binding var ip: String
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Direct Connection")
+                .font(.subheadline.bold())
+            Text("Enter the static IP address of your LM Studio host if discovery fails.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            TextField("192.168.1.XX", text: $ip)
+                .textFieldStyle(.roundedBorder)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+                .keyboardType(.decimalPad)
+        }
+        .padding(.vertical, 4)
     }
 }
 
