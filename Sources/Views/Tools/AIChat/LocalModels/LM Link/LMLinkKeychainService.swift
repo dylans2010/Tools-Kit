@@ -1,116 +1,75 @@
 import Foundation
-import CryptoKit
+import Security
 
-class LMLinkKeychainService {
-    static let shared = LMLinkKeychainService()
-
+final class LMLinkKeychainService {
     private let service = "com.toolskit.lmlink"
-    private let privateKeyAccount = "lmlink.privateKey"
+    private let credentialAccount = "lmlink.credential"
     private let keyIdAccount = "lmlink.keyId"
-    private let usernameAccount = "lmlink.username"
-    private let isLinkedAccount = "lmlink.isLinked"
+    private let userIdAccount = "lmlink.userId"
 
-    func savePrivateKey(_ key: Curve25519.Signing.PrivateKey) throws {
-        let data = key.rawRepresentation
-        try saveToKeychain(data: data, account: privateKeyAccount)
-    }
-
-    func getPrivateKey() throws -> Curve25519.Signing.PrivateKey? {
-        guard let data = try fetchFromKeychain(account: privateKeyAccount) else {
-            return nil
-        }
-        return try Curve25519.Signing.PrivateKey(rawRepresentation: data)
-    }
-
-    func saveKeyId(_ keyId: String) throws {
-        guard let data = keyId.data(using: .utf8) else { return }
-        try saveToKeychain(data: data, account: keyIdAccount)
-    }
-
-    func getKeyId() -> String? {
-        guard let data = try? fetchFromKeychain(account: keyIdAccount) else {
-            return nil
-        }
-        return String(data: data, encoding: .utf8)
-    }
-
-    func saveUsername(_ username: String) throws {
-        guard let data = username.data(using: .utf8) else { return }
-        try saveToKeychain(data: data, account: usernameAccount)
-    }
-
-    func getUsername() -> String? {
-        guard let data = try? fetchFromKeychain(account: usernameAccount) else {
-            return nil
-        }
-        return String(data: data, encoding: .utf8)
-    }
-
-    func saveIsLinked(_ isLinked: Bool) throws {
-        let data = isLinked ? Data([1]) : Data([0])
-        try saveToKeychain(data: data, account: isLinkedAccount)
-    }
-
-    func getIsLinked() -> Bool {
-        guard let data = try? fetchFromKeychain(account: isLinkedAccount) else {
-            return false
-        }
-        return data.first == 1
-    }
-
-    func deleteKeys() {
-        deleteFromKeychain(account: privateKeyAccount)
-        deleteFromKeychain(account: keyIdAccount)
-        deleteFromKeychain(account: usernameAccount)
-        deleteFromKeychain(account: isLinkedAccount)
-    }
-
-    private func saveToKeychain(data: Data, account: String) throws {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account,
-            kSecValueData as String: data,
-            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
+    func save(credential: String, keyId: String, userId: String) -> Result<Void, LMLinkAuthError> {
+        let items = [
+            (credentialAccount, credential),
+            (keyIdAccount, keyId),
+            (userIdAccount, userId)
         ]
 
-        SecItemDelete(query as CFDictionary)
-        let status = SecItemAdd(query as CFDictionary, nil)
+        for (account, value) in items {
+            guard let data = value.data(using: .utf8) else { continue }
+            let query: [String: Any] = [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrService as String: service,
+                kSecAttrAccount as String: account,
+                kSecValueData as String: data,
+                kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
+            ]
 
-        if status != errSecSuccess {
-            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status), userInfo: nil)
+            SecItemDelete(query as CFDictionary)
+            let status = SecItemAdd(query as CFDictionary, nil)
+
+            if status != errSecSuccess {
+                LMLinkLogger.keychain.error("Keychain save failed for \(account): \(status)")
+                return .failure(.keychainFailure("OSStatus \(status)"))
+            }
         }
+
+        return .success(())
     }
 
-    private func fetchFromKeychain(account: String) throws -> Data? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account,
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne
-        ]
-
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-
-        if status == errSecItemNotFound {
-            return nil
+    func load() -> Result<(credential: String, keyId: String, userId: String), LMLinkAuthError> {
+        func fetch(account: String) -> String? {
+            let query: [String: Any] = [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrService as String: service,
+                kSecAttrAccount as String: account,
+                kSecReturnData as String: true,
+                kSecMatchLimit as String: kSecMatchLimitOne
+            ]
+            var result: AnyObject?
+            let status = SecItemCopyMatching(query as CFDictionary, &result)
+            guard status == errSecSuccess, let data = result as? Data else { return nil }
+            return String(data: data, encoding: .utf8)
         }
 
-        if status != errSecSuccess {
-            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status), userInfo: nil)
+        guard let credential = fetch(account: credentialAccount),
+              let keyId = fetch(account: keyIdAccount),
+              let userId = fetch(account: userIdAccount) else {
+            return .failure(.keychainFailure("Incomplete session data"))
         }
 
-        return result as? Data
+        return .success((credential, keyId, userId))
     }
 
-    private func deleteFromKeychain(account: String) {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account
-        ]
-        SecItemDelete(query as CFDictionary)
+    func clear() -> Result<Void, LMLinkAuthError> {
+        let accounts = [credentialAccount, keyIdAccount, userIdAccount]
+        for account in accounts {
+            let query: [String: Any] = [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrService as String: service,
+                kSecAttrAccount as String: account
+            ]
+            SecItemDelete(query as CFDictionary)
+        }
+        return .success(())
     }
 }

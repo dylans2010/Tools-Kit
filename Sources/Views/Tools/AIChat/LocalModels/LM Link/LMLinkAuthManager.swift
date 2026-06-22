@@ -1,109 +1,166 @@
 import Foundation
-import CryptoKit
-import SafariServices
+import UIKit
 
 @MainActor
-class LMLinkAuthManager: ObservableObject {
+final class LMLinkAuthManager: ObservableObject {
     static let shared = LMLinkAuthManager()
+    @Published private(set) var state: LMLinkAuthState = .idle
 
-    @Published var keyId: String?
-    @Published var username: String?
-    @Published var devices: [LMDevice] = []
-    @Published var isScanning = false
-    @Published var lastError: AIError?
-    @Published var lastSyncTimestamp: Date?
+    private let keychain = LMLinkKeychainService()
+    private let validator = LMLinkAPIValidator()
+    private var pendingKeyId: String?
+    private var timeoutTask: Task<Void, Never>?
 
-    var isLinked: Bool {
-        return keychain.getIsLinked()
-    }
+    private init() {}
 
-    private let keychain = LMLinkKeychainService.shared
-
-    init() {
-        self.keyId = keychain.getKeyId()
-        self.username = keychain.getUsername()
-    }
-
-    func initiateLink() {
-        let privateKey = Curve25519.Signing.PrivateKey()
-        let publicKey = privateKey.publicKey
-        let publicKeyBase64 = publicKey.rawRepresentation.base64EncodedString()
-        let id = UUID().uuidString
+    func beginAuthorization() async {
+        guard state == .idle || (if case .error = state { true } else { false }) else { return }
+        state = .authorizing
 
         do {
-            try keychain.savePrivateKey(privateKey)
-            try keychain.saveKeyId(id)
+            let (keyId, publicKeyBase64) = try LMLinkKeyPairService.generateKeyPair()
+            pendingKeyId = keyId
 
-            var components = URLComponents(string: "https://lmstudio.ai/authentication-request")!
-            components.queryItems = [
-                URLQueryItem(name: "keyId", value: id),
-                URLQueryItem(name: "publicKey", value: publicKeyBase64),
-                URLQueryItem(name: "feature", value: "lmlink"),
-                URLQueryItem(name: "returnTo", value: "toolskit://lm-callback"),
-                URLQueryItem(name: "clientKind", value: "ios"),
-                URLQueryItem(name: "clientVersion", value: "1.0")
+            var components = URLComponents(string: "https://lmstudio.ai/authentication-request")
+            components?.queryItems = [
+                URLQueryItem(name: "keyId",         value: keyId),
+                URLQueryItem(name: "publicKey",     value: publicKeyBase64),
+                URLQueryItem(name: "feature",       value: "lmlink"),
+                URLQueryItem(name: "returnTo",      value: "toolskit://lm-callback"),
+                URLQueryItem(name: "clientKind",    value: "ios"),
+                URLQueryItem(name: "clientVersion", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
             ]
-
-            if let url = components.url {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            guard let authURL = components?.url else {
+                state = .error(.browserOpenFailed)
+                return
             }
 
-            self.keyId = id
-            // Linking status will be verified after redirect or upon success
+            LMLinkLogger.auth.info("Opening auth URL for keyId: \(keyId, privacy: .private(mask: .hash))")
+
+            let opened = await UIApplication.shared.open(authURL)
+            if opened {
+                state = .awaitingCallback
+                startTimeoutTimer()
+            } else {
+                state = .error(.browserOpenFailed)
+                LMLinkLogger.auth.error("Failed to open auth URL — browser returned false")
+            }
         } catch {
-            print("LM Link Error: Failed to generate or save keys - \(error)")
+            LMLinkLogger.auth.error("Key pair generation failed: \(error.localizedDescription, privacy: .public)")
+            state = .error(.keyPairGenerationFailed)
         }
     }
 
-    func handleCallback(url: URL) {
-        guard url.scheme == "toolskit" && url.host == "lm-callback" else { return }
+    func handleCallback(url: URL) async {
+        guard case .awaitingCallback = state else {
+            LMLinkLogger.deeplink.info("Ignoring duplicate callback — state is not awaitingCallback")
+            return
+        }
 
-        Task { @MainActor in
-            SDKLogStore.shared.log("LM Link: Authenticated via callback event", source: "LMLinkAuthManager", level: .info)
-            do {
-                try keychain.saveIsLinked(true)
-                self.objectWillChange.send()
-                try? await fetchAccountDevices()
-            } catch {
-                SDKLogStore.shared.log("LM Link: Failed to persist linked state - \(error)", source: "LMLinkAuthManager", level: .error)
+        cancelTimeoutTimer()
+        state = .awaitingCallback
+        LMLinkLogger.deeplink.info("Handling callback URL: \(url.host ?? "nil", privacy: .public)")
+
+        let result = LMLinkCallbackParser.parse(url: url)
+        switch result {
+        case .success(let credential, let keyId, let userId):
+            let ping = await validator.ping()
+
+            let isReachable: Bool
+            let modelCount: Int
+
+            switch ping {
+            case .reachable(let count):
+                isReachable = true
+                modelCount = count
+            case .unreachable:
+                isReachable = false
+                modelCount = 0
+            }
+
+            let session = LMLinkSession(
+                keyId: keyId,
+                credential: credential,
+                userId: userId,
+                connectedAt: Date(),
+                localServerReachable: isReachable,
+                localModelCount: modelCount
+            )
+            let saveResult = keychain.save(credential: credential, keyId: keyId, userId: userId)
+            if case .failure(let err) = saveResult {
+                state = .error(err)
+                return
+            }
+            state = .connected(session: session)
+            LMLinkLogger.auth.info("Auth complete. User: \(userId, privacy: .private(mask: .hash))")
+
+        case .cancelled:
+            state = .error(.cancelled)
+        case .denied:
+            state = .error(.denied)
+        case .error(let reason):
+            LMLinkLogger.deeplink.error("Callback error param: \(reason, privacy: .public)")
+            state = .error(.malformedCallback)
+        case .malformed:
+            state = .error(.malformedCallback)
+        }
+    }
+
+    func restoreSession() async {
+        switch keychain.load() {
+        case .success(let (credential, keyId, userId)):
+            let ping = await validator.ping()
+            let isReachable: Bool
+            let modelCount: Int
+
+            switch ping {
+            case .reachable(let count):
+                isReachable = true
+                modelCount = count
+            case .unreachable:
+                isReachable = false
+                modelCount = 0
+            }
+
+            let session = LMLinkSession(
+                keyId: keyId, credential: credential, userId: userId,
+                connectedAt: Date(),
+                localServerReachable: isReachable,
+                localModelCount: modelCount
+            )
+            state = .connected(session: session)
+            LMLinkLogger.auth.info("Session restored from Keychain")
+        case .failure:
+            state = .idle
+        }
+    }
+
+    func disconnect() {
+        cancelTimeoutTimer()
+        if case .connected(let session) = state {
+            LMLinkKeyPairService.deleteKeyPair(for: session.keyId)
+        }
+        _ = keychain.clear()
+        state = .idle
+        LMLinkLogger.auth.info("User disconnected")
+    }
+
+    private func startTimeoutTimer() {
+        timeoutTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 120 * 1_000_000_000)
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                if case .awaitingCallback = self?.state {
+                    self?.state = .error(.timeout)
+                    self?.pendingKeyId = nil
+                    LMLinkLogger.auth.error("Auth timed out after 120 seconds")
+                }
             }
         }
     }
 
-    func fetchAccountDevices() async throws -> [LMDevice] {
-        isScanning = true
-        defer { isScanning = false }
-
-        SDKLogStore.shared.log("LM Link: Orchestrating device discovery and validation", source: "LMLinkAuthManager", level: .info)
-
-        // 1. Resolve cached device graph (if we had persistent storage beyond DiscoveryService memory)
-        // For now, we rely on DiscoveryService's logic
-
-        // 2. Trigger discovery service
-        let discovery = LMDeviceDiscoveryService.shared
-        await discovery.performFullScan()
-
-        // 3. Update local state with validated devices
-        self.devices = discovery.discoveredDevices
-        self.lastSyncTimestamp = Date()
-
-        // 4. Update username if available from identity (not available in this protocol yet, so we keep Keychain value)
-        self.username = keychain.getUsername()
-
-        return self.devices
-    }
-
-    func refreshStatus() async {
-        self.keyId = keychain.getKeyId()
-        self.username = keychain.getUsername()
-        try? await fetchAccountDevices()
-    }
-
-    func unlink() {
-        SDKLogStore.shared.log("LM Link: Unlinking account and purging local state", source: "LMLinkAuthManager", level: .info)
-        keychain.deleteKeys()
-        self.keyId = nil
-        self.devices = []
-        self.objectWillChange.send()
+    private func cancelTimeoutTimer() {
+        timeoutTask?.cancel()
+        timeoutTask = nil
     }
 }
