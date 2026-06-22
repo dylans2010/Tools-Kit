@@ -240,9 +240,9 @@ struct AIChatSettingsView: View {
                         }
                     }
 
-                    if provider.id == "local_models" {
+                    if provider.id == "local_models" || provider.id == "lmstudio" {
                         NavigationLink(destination: SetupLocalModelsView()) {
-                            Label("Configure Local Models", systemImage: "gearshape.fill")
+                            Label("Configure Local System", systemImage: "gearshape.fill")
                                 .foregroundColor(.blue)
                         }
                     } else {
@@ -552,11 +552,14 @@ struct AIChatSettingsView: View {
                 Label("Changelog", systemImage: "list.bullet.rectangle")
             }
 
-            Link(destination: URL(string: "https://toolskit.io/privacy")!) {
-                Label("Privacy Policy", systemImage: "hand.raised")
+            if let privacyURL = URL(string: "https://toolskit.io/privacy") {
+                Link(destination: privacyURL) {
+                    Label("Privacy Policy", systemImage: "hand.raised")
+                }
             }
 
-            Link(destination: URL(string: "https://toolskit.io/terms")!) {
+            if let termsURL = URL(string: "https://toolskit.io/terms") {
+                Link(destination: termsURL) {
                 Label("Terms of Service", systemImage: "doc.text")
             }
         }
@@ -652,6 +655,7 @@ struct AIChatSettingsView: View {
 
     private var developerToolsSectionContent: some View {
         Group {
+            NavigationLink("Local Logs") { LMStudioLogsView() }
             NavigationLink("Device Bridge") { BridgeHomeView() }
             NavigationLink("Audio Debugger") { AudioDebugView() }
             NavigationLink("SiriGlowCore UI Playground") { SiriCoreUIView() }

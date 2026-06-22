@@ -215,6 +215,81 @@ class AIService {
         return substituteVariables(in: finalPrompt)
     }
 
+    // MARK: - Local AI Service (Unified)
+
+    struct AILocalService {
+        static func sendRequest(prompt: String, systemPrompt: String) async throws -> String {
+            let settings = AIChatSettingsManager.shared.settings
+
+            // Priority 1: Check for a selected manual configuration
+            if let configID = settings.selectedLocalConfigID,
+               let config = settings.localConfigs.first(where: { $0.id == configID }) {
+                return try await sendToCustomEndpoint(prompt: prompt, systemPrompt: systemPrompt, config: config)
+            }
+
+            // Priority 2: Use LMConnectionManager (LM Studio / Discovered Devices)
+            return try await LMConnectionManager.shared.sendChatRequest(prompt: prompt, systemPrompt: systemPrompt)
+        }
+
+        private static func sendToCustomEndpoint(prompt: String, systemPrompt: String, config: LocalModelConfig) async throws -> String {
+            guard let url = URL(string: "\(config.baseURL)/chat/completions") else {
+                throw AIError.invalidEndpoint
+            }
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.timeoutInterval = config.timeout
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+            if !config.apiKey.isEmpty {
+                request.setValue("Bearer \(config.apiKey)", forHTTPHeaderField: "Authorization")
+            }
+
+            for (key, value) in config.customHeaders {
+                request.setValue(value, forHTTPHeaderField: key)
+            }
+
+            var messages: [[String: String]] = []
+            if !systemPrompt.isEmpty {
+                messages.append(["role": "system", "content": systemPrompt])
+            }
+            messages.append(["role": "user", "content": prompt])
+
+            let payload: [String: Any] = [
+                "model": config.modelName,
+                "messages": messages,
+                "temperature": config.temperature,
+                "max_tokens": config.maxTokens,
+                "stream": false
+            ]
+
+            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+
+            SDKLogStore.shared.log("AILocalService: Sending request to \(url.absoluteString)", source: "AIService", level: .info)
+
+            let (data, response) = try await URLSession.shared.data(for: request)
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw AIError.invalidResponse
+            }
+
+            if !(200...299).contains(httpResponse.statusCode) {
+                let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
+                SDKLogStore.shared.log("AILocalService: Request failed (\(httpResponse.statusCode)) for \(url.absoluteString). Auth Header Present: \(request.allHTTPHeaderFields?["Authorization"] != nil). Response: \(errorBody)", source: "AIService", level: .error)
+                throw AIError.requestFailed("Server returned \(httpResponse.statusCode): \(errorBody)")
+            }
+
+            let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+            let choices = json?["choices"] as? [[String: Any]]
+            let message = choices?.first?["message"] as? [String: Any]
+
+            guard let content = message?["content"] as? String else {
+                throw AIError.decodingFailed
+            }
+
+            return content
+        }
+    }
+
     private func substituteVariables(in text: String) -> String {
         var result = text
         let s = settingsManager.settings
@@ -261,7 +336,9 @@ class AIService {
             }
 
             // Phase 10: Strict reachability check
-            let url = URL(string: "\(device.baseURL)/v1/models")!
+            guard let url = URL(string: "\(device.baseURL)/v1/models") else {
+                throw AIError.invalidEndpoint
+            }
             var request = URLRequest(url: url)
             request.timeoutInterval = 3.0
 
@@ -298,13 +375,13 @@ class AIService {
         switch selectedProvider {
         case "lmstudio":
             SDKLogStore.shared.log("Routing to LM Studio via LM Link", source: "AIService", level: .info)
-            return try await LMConnectionManager.shared.sendChatRequest(prompt: prompt, systemPrompt: finalSystemPrompt)
+            return try await AILocalService.sendRequest(prompt: prompt, systemPrompt: finalSystemPrompt)
         case "afm":
             SDKLogStore.shared.log("Routing to Apple Foundation Models", source: "AIService", level: .info)
             return try await AFMService.shared.generateResponse(prompt: prompt, systemPrompt: finalSystemPrompt)
         case "local_models":
-            SDKLogStore.shared.log("Routing to Local Model (Manual)", source: "AIService", level: .info)
-            // Fall through to processMessages for standardized manual local model handling
+            SDKLogStore.shared.log("Routing to Local Model System", source: "AIService", level: .info)
+            return try await AILocalService.sendRequest(prompt: prompt, systemPrompt: finalSystemPrompt)
         default:
             break
         }
@@ -694,7 +771,7 @@ class AIService {
         let urlString = "https://www.googleapis.com/customsearch/v1?q=\(encodedQuery)&key=\(apiKey)&cx=\(cx)&num=5"
         guard let url = URL(string: urlString) else { throw AIError.networkError("Invalid Search URL") }
 
-        let request = URLRequest(url: url)
+        var request = URLRequest(url: url)
         let (data, response): (Data, URLResponse) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw AIError.networkError("Search API returned status \((response as? HTTPURLResponse)?.statusCode ?? -1)")
@@ -834,7 +911,9 @@ class AIService {
         let authorization = try await featureCheck.authorizeRequest(providerID: "openrouter")
         let apiKey = authorization.apiKey
 
-        let url = URL(string: "https://openrouter.ai/api/v1/chat/completions")!
+        guard let url = URL(string: "https://openrouter.ai/api/v1/chat/completions") else {
+            throw AIError.invalidEndpoint
+        }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -940,9 +1019,9 @@ class AIService {
 
         do {
             try content.write(to: fileURL, atomically: true, encoding: .utf8)
-            print("Successfully saved design document to \(fileURL.path)")
+            SDKLogStore.shared.log("Successfully saved design document to \(fileURL.path)", source: "AIService", level: .info)
         } catch {
-            print("Failed to save design document: \(error)")
+            SDKLogStore.shared.log("Failed to save design document: \(error)", source: "AIService", level: .error)
         }
     }
 }

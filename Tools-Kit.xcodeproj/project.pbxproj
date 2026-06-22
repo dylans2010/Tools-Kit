@@ -1764,6 +1764,10 @@
 		KB02OPENRT00000000000001 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */; };
 		LM0200000000000000000001 /* LocalModelsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000001 /* LocalModelsProvider.swift */; };
 		LM0200000000000000000002 /* SetupLocalModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000002 /* SetupLocalModelsView.swift */; };
+		LM0200000000000000000003 /* LMLocalDevicesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000003 /* LMLocalDevicesService.swift */; };
+		LM0200000000000000000004 /* LMDeviceFallbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000004 /* LMDeviceFallbackView.swift */; };
+		LM0200000000000000000005 /* AdvancedLocalModelsConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000005 /* AdvancedLocalModelsConfigView.swift */; };
+		LM0200000000000000000006 /* LMStudioLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000006 /* LMStudioLogsView.swift */; };
 LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000100 /* LMLinkKeychainService.swift */; };
 		LM0200000000000000000101 /* LMLinkAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000101 /* LMLinkAuthManager.swift */; };
 		LM0200000000000000000103 /* LMNetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000103 /* LMNetworkClient.swift */; };
@@ -4174,6 +4178,10 @@ LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = P
 		KB0100000000000000000099 /* KeyboardExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KeyboardExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		LM0100000000000000000001 /* LocalModelsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalModelsProvider.swift; sourceTree = "<group>"; };
 		LM0100000000000000000002 /* SetupLocalModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupLocalModelsView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000003 /* LMLocalDevicesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLocalDevicesService.swift; sourceTree = "<group>"; };
+		LM0100000000000000000004 /* LMDeviceFallbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMDeviceFallbackView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000005 /* AdvancedLocalModelsConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedLocalModelsConfigView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000006 /* LMStudioLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMStudioLogsView.swift; sourceTree = "<group>"; };
 LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkKeychainService.swift"; sourceTree = "<group>"; };
 		LM0100000000000000000101 /* LMLinkAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkAuthManager.swift"; sourceTree = "<group>"; };
 		LM0100000000000000000103 /* LMNetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMNetworkClient.swift"; sourceTree = "<group>"; };
@@ -11458,6 +11466,10 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 			isa = PBXGroup;
 			children = (
 				LM0100000000000000000002 /* SetupLocalModelsView.swift */,
+				LM0100000000000000000003 /* LMLocalDevicesService.swift */,
+				LM0100000000000000000004 /* LMDeviceFallbackView.swift */,
+				LM0100000000000000000005 /* AdvancedLocalModelsConfigView.swift */,
+				LM0100000000000000000006 /* LMStudioLogsView.swift */,
 				LM0300000000000000000100 /* LM Link */,
 				LM0300000000000000000300 /* AFM */,
 			);
@@ -12264,6 +12276,10 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 				FB0200000000000000000000 /* AIAnalysisResult.swift in Sources */,
 				LM0200000000000000000001 /* LocalModelsProvider.swift in Sources */,
 				LM0200000000000000000002 /* SetupLocalModelsView.swift in Sources */,
+				LM0200000000000000000003 /* LMLocalDevicesService.swift in Sources */,
+				LM0200000000000000000004 /* LMDeviceFallbackView.swift in Sources */,
+				LM0200000000000000000005 /* AdvancedLocalModelsConfigView.swift in Sources */,
+				LM0200000000000000000006 /* LMStudioLogsView.swift in Sources */,
 				LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */,
 				LM0200000000000000000101 /* LMLinkAuthManager.swift in Sources */,
 				LM0200000000000000000102 /* LMRequestSigner.swift in Sources */,
