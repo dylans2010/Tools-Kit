@@ -291,7 +291,7 @@ struct VoiceModeFullScreen: View {
                     }
                     .frame(width: 180)
                 }
-                .foregroundColor(Color.accentColor)
+                .foregroundStyle(Color.accentColor)
 
                 Circle()
                     .fill(.ultraThinMaterial)
@@ -374,7 +374,7 @@ struct VoiceModeFullScreen: View {
                     .foregroundColor(.white.opacity(0.4))
                     .padding(.bottom, 30)
             }
-        .onChange(of: sessionManager.audioLevel) { _ in }
+        .onChange(of: sessionManager.audioLevel) { _, _ in }
         }
     }
 

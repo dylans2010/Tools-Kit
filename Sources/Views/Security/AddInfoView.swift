@@ -73,7 +73,7 @@ struct AddInfoView: View {
                 Text("File")
             }
         case .totp:
-            Section { TextField("Issuer", text: $totpIssuer); TextField("Account", text: $totpAccount); TextField("Secret", text: $totpSecret).autocapitalization(.none); LabeledContent("Live Code") { Text(totpCode).font(.system(.title3, design: .monospaced).bold()).foregroundStyle(.blue) } } header: {
+            Section { TextField("Issuer", text: $totpIssuer); TextField("Account", text: $totpAccount); TextField("Secret", text: $totpSecret).autocapitalization(.none); LabeledContent(content: { Text(totpCode).font(.system(.title3, design: .monospaced).bold()).foregroundStyle(.blue) }, label: { Text("Live Code") }) } header: {
                 Text("Authenticator")
             }
         }

@@ -47,9 +47,11 @@ struct SDKDeploymentView: View {
                 Section {
                     Label("Successfully Deployed!", systemImage: "checkmark.circle.fill")
                         .foregroundStyle(.green)
-                    LabeledContent("Identifier") {
+                    LabeledContent(content: {
                         Text(plugin.identifier).font(.caption.monospaced())
-                    }
+                    }, label: {
+                        Text("Identifier")
+                    })
                 } header: {
                     Label("Active Deployment", systemImage: "antenna.radiowaves.left.and.right")
                 }

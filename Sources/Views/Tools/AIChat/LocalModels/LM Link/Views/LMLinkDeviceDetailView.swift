@@ -7,10 +7,10 @@ struct LMLinkDeviceDetailView: View {
     var body: some View {
         List {
             Section(header: Text("Device Info")) {
-                LabeledContent("Name", value: device.name)
-                LabeledContent("IP Address", value: device.ipAddress)
-                LabeledContent("Port", value: "\(device.port)")
-                LabeledContent("Status", value: device.status.rawValue.capitalized)
+                LMLinkLabeledContent("Name", value: device.name)
+                LMLinkLabeledContent("IP Address", value: device.ipAddress)
+                LMLinkLabeledContent("Port", value: "\(device.port)")
+                LMLinkLabeledContent("Status", value: device.status.rawValue.capitalized)
                     .foregroundColor(device.status == .online ? .green : .red)
             }
 
@@ -44,7 +44,7 @@ struct LMLinkDeviceDetailView: View {
     }
 }
 
-struct LabeledContent: View {
+struct LMLinkLabeledContent: View {
     let label: String
     let value: String
 
