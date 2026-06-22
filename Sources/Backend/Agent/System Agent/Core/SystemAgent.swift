@@ -87,7 +87,7 @@ actor SystemAgent {
         let prompt = buildLoopPrompt(from: transcript)
         let response = try await aiService.processText(
             prompt: prompt,
-            systemPrompt: buildSystemPromptWithTools(),
+            systemPrompt: await buildSystemPromptWithTools(),
             model: nil
         )
         guard !response.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -123,7 +123,7 @@ actor SystemAgent {
         historyContinuation?.yield(history)
     }
 
-    private func buildSystemPromptWithTools() -> String {
+    private func buildSystemPromptWithTools() async -> String {
         var baseInstructions = ""
         if let url = Bundle.main.url(forResource: "FoundationModelsSystem", withExtension: "md"),
            let content = try? String(contentsOf: url) {
@@ -132,7 +132,9 @@ actor SystemAgent {
             baseInstructions = "You are a helpful AI assistant powered by Foundation Models."
         }
 
-        let skillsPrompt = AIService.SkillsManager.shared.activeSkillsPrompt()
+        let skillsPrompt = await MainActor.run {
+            AIService.SkillsManager.shared.activeSkillsPrompt()
+        }
 
         return """
         \(baseInstructions)

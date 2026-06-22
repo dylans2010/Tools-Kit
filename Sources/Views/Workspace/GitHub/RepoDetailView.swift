@@ -53,23 +53,25 @@ struct RepoDetailView: View {
             }
 
             Section {
-                LabeledContent {
+                HStack {
+                    Label("Stars", systemImage: "star")
+                    Spacer()
                     Text("\(repository.stargazersCount)")
                         .font(.headline)
-                } label: {
-                    Label("Stars", systemImage: "star")
                 }
-                LabeledContent {
+
+                HStack {
+                    Label("Forks", systemImage: "arrow.triangle.branch")
+                    Spacer()
                     Text("\(repository.forksCount)")
                         .font(.headline)
-                } label: {
-                    Label("Forks", systemImage: "arrow.triangle.branch")
                 }
-                LabeledContent {
+
+                HStack {
+                    Label("Watchers", systemImage: "eye")
+                    Spacer()
                     Text("\(repository.watchersCount)")
                         .font(.headline)
-                } label: {
-                    Label("Watchers", systemImage: "eye")
                 }
             } header: {
                 Text("Statistics")

@@ -28,8 +28,13 @@ struct EncryptionToolView: View {
 
                 if viewModel.keySource == .password {
                     SecureField("Password", text: $viewModel.password)
-                    LabeledContent("Key Derivation", value: "HKDF-SHA256")
-                        .font(.caption)
+                    HStack {
+                        Text("Key Derivation")
+                        Spacer()
+                        Text("HKDF-SHA256")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 } else if viewModel.keySource == .base64 {
                     TextField("Base64 Key", text: $viewModel.key)
                         .font(.system(.caption, design: .monospaced))
@@ -118,7 +123,9 @@ struct EncryptionToolView: View {
 
             Section(header: Text("Key Info")) {
                 if !viewModel.activeKeyBase64.isEmpty {
-                    LabeledContent("Active Key (Base64)") {
+                    HStack {
+                        Text("Active Key (Base64)")
+                        Spacer()
                         Text(viewModel.activeKeyBase64)
                             .font(.caption2.monospaced())
                             .lineLimit(1)
@@ -145,8 +152,8 @@ class EncryptionToolViewModel: ObservableObject {
     @Published var key = ""
     @Published var keySizeBits = 256
 
-    var keySize: SymmetricKeySize {
-        keySizeBits == 128 ? .bits128 : .bits256
+    private var keyByteSize: Int {
+        keySizeBits / 8
     }
     @Published var algorithm = EncryptAlgorithm.aesGCM
     @Published var input = "Sensitive data"
@@ -155,7 +162,7 @@ class EncryptionToolViewModel: ObservableObject {
     @Published var activeKeyBase64 = ""
 
     func generateKey() {
-        let newKey = SymmetricKey(size: keySize)
+        let newKey = SymmetricKey(size: keySizeBits == 128 ? .bits128 : .bits256)
         key = newKey.withUnsafeBytes { Data($0).base64EncodedString() }
         keySource = .base64
         activeKeyBase64 = key
@@ -167,7 +174,9 @@ class EncryptionToolViewModel: ObservableObject {
             guard let passData = password.data(using: .utf8), !password.isEmpty else { return nil }
             let derived = HKDF<SHA256>.deriveKey(
                 inputKeyMaterial: SymmetricKey(data: passData),
-                outputByteCount: keySize.bitCount == 256 ? 32 : 16
+                salt: Data(),
+                info: Data(),
+                outputByteCount: keyByteSize
             )
             activeKeyBase64 = derived.withUnsafeBytes { Data($0).base64EncodedString() }
             return derived
@@ -177,7 +186,7 @@ class EncryptionToolViewModel: ObservableObject {
             activeKeyBase64 = key
             return symKey
         case .generated:
-            let newKey = SymmetricKey(size: keySize)
+            let newKey = SymmetricKey(size: keySizeBits == 128 ? .bits128 : .bits256)
             activeKeyBase64 = newKey.withUnsafeBytes { Data($0).base64EncodedString() }
             return newKey
         }

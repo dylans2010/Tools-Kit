@@ -66,7 +66,9 @@ final class AgenticCoreOrchestrator: ObservableObject {
         logEvent(phase: "Availability Check", message: "Framework available: \(status.isFrameworkAvailable)", status: .completed)
 
         // Step 2: Build system context
-        let systemContext = buildSystemContext(graph: WorkspaceGraph(modules: [], featureDomains: [], relationships: []), tools: [])
+        let graph = workspaceGraph ?? WorkspaceGraph(modules: [])
+        let tools = toolRegistry.registeredTools
+        let systemContext = buildSystemContext(graph: graph, tools: tools)
 
         // Step 3: Stream AI response
         state = .streaming

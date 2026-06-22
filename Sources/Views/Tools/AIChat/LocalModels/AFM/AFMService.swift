@@ -11,7 +11,7 @@ class AFMService: ObservableObject {
     @Published var availabilityMessage = "Checking availability..."
 
     #if canImport(FoundationModels)
-    private var activeSession: LanguageModelSession?
+    private var activeSession: Any?
     #endif
 
     init() {
@@ -20,17 +20,12 @@ class AFMService: ObservableObject {
 
     func checkAvailability() {
         #if canImport(FoundationModels)
-        let model = SystemLanguageModel.default
-        switch model.availability {
-        case .available:
+        if #available(iOS 26.0, *) {
             self.isAvailable = true
             self.availabilityMessage = "Apple Foundation Models are available and ready."
-        case .unavailable(let reason):
+        } else {
             self.isAvailable = false
-            self.availabilityMessage = "AFM Unavailable: \(reason)"
-        @unknown default:
-            self.isAvailable = false
-            self.availabilityMessage = "AFM status unknown."
+            self.availabilityMessage = "Requires iOS 26 or newer."
         }
         #else
         self.isAvailable = false
@@ -40,16 +35,20 @@ class AFMService: ObservableObject {
 
     func generateResponse(prompt: String, systemPrompt: String = "") async throws -> String {
         #if canImport(FoundationModels)
+        guard #available(iOS 26.0, *) else {
+            throw NSError(domain: "AFMService", code: 502, userInfo: [NSLocalizedDescriptionKey: "Requires iOS 26 or newer"])
+        }
         let selectedModelID = AIChatSettingsManager.shared.settings.selectedAFMModelID
 
-        if activeSession == nil {
-            let instructions = systemPrompt.isEmpty ? "You are a helpful assistant." : systemPrompt
-            // In a real environment, we'd select the model variant here if supported by the API
-            activeSession = LanguageModelSession(instructions: instructions)
-        }
+        var session: LanguageModelSession
 
-        guard let session = activeSession else {
-            throw NSError(domain: "AFMService", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to initialize session"])
+        if let existing = activeSession as? LanguageModelSession {
+            session = existing
+        } else {
+            let instructions = systemPrompt.isEmpty ? "You are a helpful assistant." : systemPrompt
+            let newSession = LanguageModelSession(instructions: instructions)
+            activeSession = newSession
+            session = newSession
         }
 
         let response = try await session.respond(to: prompt)
@@ -61,7 +60,9 @@ class AFMService: ObservableObject {
 
     func resetSession() {
         #if canImport(FoundationModels)
-        activeSession = nil
+        if #available(iOS 26.0, *) {
+            activeSession = nil
+        }
         #endif
     }
 }
