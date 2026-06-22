@@ -11,6 +11,16 @@ struct LMLinkDashboardView: View {
                 LMLinkConnectionStatusView()
                     .padding(.top)
 
+                if authManager.isScanning {
+                    HStack {
+                        ProgressView()
+                            .padding(.trailing, 8)
+                        Text("Refreshing network state...")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
                 // Quick Info Grid
                 HStack(spacing: 15) {
                     InfoCard(title: "Status", value: authManager.isLinked ? "Linked" : "Unlinked", icon: "link", color: authManager.isLinked ? .green : .red)

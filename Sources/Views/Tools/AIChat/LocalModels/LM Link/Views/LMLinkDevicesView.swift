@@ -4,7 +4,6 @@ struct LMLinkDevicesView: View {
     @ObservedObject private var discoveryService = LMDeviceDiscoveryService.shared
     @StateObject private var connectionManager = LMConnectionManager.shared
     @StateObject private var authManager = LMLinkAuthManager.shared
-    @State private var showingManualAdd = false
 
     var body: some View {
         Group {
@@ -40,7 +39,7 @@ struct LMLinkDevicesView: View {
             } else {
                 List {
                     Section {
-                        if discoveryService.discoveredDevices.isEmpty {
+                        if discoveryService.isScanning && discoveryService.discoveredDevices.isEmpty {
                             HStack {
                                 ProgressView()
                                     .padding(.trailing, 8)
@@ -48,6 +47,11 @@ struct LMLinkDevicesView: View {
                                     .foregroundColor(.secondary)
                             }
                             .padding(.vertical, 8)
+                        } else if discoveryService.discoveredDevices.isEmpty {
+                            Text("No devices found. Ensure LM Studio is running with LM Link enabled.")
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+                                .padding(.vertical, 8)
                         } else {
                             ForEach(discoveryService.discoveredDevices) { device in
                                 NavigationLink(destination: LMLinkDeviceDetailView(device: device)) {
@@ -61,33 +65,15 @@ struct LMLinkDevicesView: View {
                 }
                 .listStyle(InsetGroupedListStyle())
                 .refreshable {
-                    discoveryService.stopDiscovery()
-                    discoveryService.startDiscovery()
+                    await discoveryService.performFullScan()
                 }
             }
         }
         .navigationTitle("Devices")
         .onAppear {
-            if authManager.isLinked {
-                discoveryService.startDiscovery()
+            Task {
+                await discoveryService.performFullScan()
             }
-        }
-        .onDisappear {
-            discoveryService.stopDiscovery()
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                if authManager.isLinked {
-                    Button(action: {
-                        showingManualAdd = true
-                    }) {
-                        Label("Add Device", systemImage: "plus")
-                    }
-                }
-            }
-        }
-        .sheet(isPresented: $showingManualAdd) {
-            ManualDeviceAddView(discoveryService: discoveryService)
         }
     }
 }

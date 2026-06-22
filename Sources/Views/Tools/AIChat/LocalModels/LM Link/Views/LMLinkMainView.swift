@@ -31,5 +31,17 @@ struct LMLinkMainView: View {
             }
         }
         .navigationTitle("LM Link")
+        .overlay {
+            if authManager.isScanning && authManager.devices.isEmpty {
+                VStack {
+                    ProgressView()
+                    Text("Initializing LM Link...")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color(.systemBackground).opacity(0.8))
+            }
+        }
     }
 }

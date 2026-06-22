@@ -6,16 +6,24 @@ import SafariServices
 class LMLinkAuthManager: ObservableObject {
     static let shared = LMLinkAuthManager()
 
-    @Published var isLinked = false
     @Published var keyId: String?
     @Published var username: String?
+    @Published var devices: [LMDevice] = []
+    @Published var isScanning = false
+    @Published var lastError: AIError?
+    @Published var lastSyncTimestamp: Date?
+
+    var isLinked: Bool {
+        let hasKeys = keyId != nil && (try? keychain.getPrivateKey()) != nil
+        let hasValidatedDevices = devices.contains(where: { $0.status == .online })
+        return hasKeys && hasValidatedDevices
+    }
 
     private let keychain = LMLinkKeychainService.shared
 
     init() {
         self.keyId = keychain.getKeyId()
         self.username = keychain.getUsername()
-        self.isLinked = keyId != nil && (try? keychain.getPrivateKey()) != nil
     }
 
     func initiateLink() {
@@ -52,34 +60,46 @@ class LMLinkAuthManager: ObservableObject {
     func handleCallback(url: URL) {
         guard url.scheme == "toolskit" && url.host == "lm-callback" else { return }
 
-        // In a real scenario, we might validate a token from the URL
-        // For this implementation, the presence of the callback from LM Studio confirms the link
         Task { @MainActor in
-            self.isLinked = true
             // keyId is already set during initiateLink
             SDKLogStore.shared.log("LM Link authenticated via callback", source: "LMLinkAuthManager", level: .info)
+            try? await fetchAccountDevices()
         }
     }
 
-    func confirmLink() {
-        self.isLinked = true
-        // Set a mock username for now upon successful link
-        let mockUsername = "LM Studio User"
-        try? keychain.saveUsername(mockUsername)
-        self.username = mockUsername
+    func fetchAccountDevices() async throws -> [LMDevice] {
+        isScanning = true
+        defer { isScanning = false }
+
+        SDKLogStore.shared.log("LM Link: Orchestrating device discovery and validation", source: "LMLinkAuthManager", level: .info)
+
+        // 1. Resolve cached device graph (if we had persistent storage beyond DiscoveryService memory)
+        // For now, we rely on DiscoveryService's logic
+
+        // 2. Trigger discovery service
+        let discovery = LMDeviceDiscoveryService.shared
+        await discovery.performFullScan()
+
+        // 3. Update local state with validated devices
+        self.devices = discovery.discoveredDevices
+        self.lastSyncTimestamp = Date()
+
+        // 4. Update username if available from identity (not available in this protocol yet, so we keep Keychain value)
+        self.username = keychain.getUsername()
+
+        return self.devices
     }
 
     func refreshStatus() async {
-        // Simulate a network check for status updates
-        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1s delay
         self.keyId = keychain.getKeyId()
         self.username = keychain.getUsername()
-        self.isLinked = keyId != nil && (try? keychain.getPrivateKey()) != nil
+        try? await fetchAccountDevices()
     }
 
     func unlink() {
+        SDKLogStore.shared.log("LM Link: Unlinking account and purging local state", source: "LMLinkAuthManager", level: .info)
         keychain.deleteKeys()
         self.keyId = nil
-        self.isLinked = false
+        self.devices = []
     }
 }

@@ -5,21 +5,19 @@ struct LMLinkAccountView: View {
 
     var body: some View {
         List {
-            if let username = authManager.username {
-                Section(header: Text("Account")) {
-                    HStack {
-                        Image(systemName: "person.crop.circle.fill")
-                            .foregroundColor(.blue)
-                        VStack(alignment: .leading) {
-                            Text(username)
-                                .font(.headline)
-                            Text("LM Studio Account")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+            Section(header: Text("Account")) {
+                HStack {
+                    Image(systemName: "person.crop.circle.fill")
+                        .foregroundColor(.blue)
+                    VStack(alignment: .leading) {
+                        Text(authManager.username ?? "Not available")
+                            .font(.headline)
+                        Text("LM Studio Account")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
-                    .padding(.vertical, 4)
                 }
+                .padding(.vertical, 4)
             }
 
             Section(header: Text("Connection Status")) {
