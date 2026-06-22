@@ -33,12 +33,22 @@ struct LMModel: Identifiable, Codable, Hashable {
     let name: String
     let architecture: String?
     let contextLength: Int?
+    var fileSize: String?
+    var quantization: String?
+    var author: String?
+    var license: String?
+    var releaseDate: String?
 
-    init(id: String, name: String? = nil, architecture: String? = nil, contextLength: Int? = nil) {
+    init(id: String, name: String? = nil, architecture: String? = nil, contextLength: Int? = nil, fileSize: String? = nil, quantization: String? = nil, author: String? = nil, license: String? = nil, releaseDate: String? = nil) {
         self.id = id
         self.name = name ?? id
         self.architecture = architecture
         self.contextLength = contextLength
+        self.fileSize = fileSize
+        self.quantization = quantization
+        self.author = author
+        self.license = license
+        self.releaseDate = releaseDate
     }
 }
 

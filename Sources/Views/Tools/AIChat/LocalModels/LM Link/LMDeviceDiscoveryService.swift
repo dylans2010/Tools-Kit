@@ -3,6 +3,7 @@ import Network
 import Darwin
 
 class LMDeviceDiscoveryService: NSObject, ObservableObject, NetServiceBrowserDelegate, NetServiceDelegate {
+    static let shared = LMDeviceDiscoveryService()
     @Published var discoveredDevices: [LMDevice] = []
 
     private var browser: NetServiceBrowser?
@@ -17,6 +18,7 @@ class LMDeviceDiscoveryService: NSObject, ObservableObject, NetServiceBrowserDel
         // Also trigger LAN scan
         Task {
             await scanLocalNetwork()
+            await fetchAccountDevices()
         }
     }
 
@@ -108,6 +110,28 @@ class LMDeviceDiscoveryService: NSObject, ObservableObject, NetServiceBrowserDel
             freeifaddrs(ifaddr)
         }
         return address
+    }
+
+    func manualAddDevice(ip: String, port: Int) async {
+        await probeDevice(ip: ip, port: port, name: "Manual Device (\(ip))")
+    }
+
+    private func fetchAccountDevices() async {
+        // Mocking an API call that returns devices linked to the user's account
+        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5s delay
+
+        let accountDevices = [
+            LMDevice(id: "account-macbook-pro", name: "MacBook Pro (Office)", ipAddress: "192.168.1.15", port: 1234, status: .online, lastSeen: Date()),
+            LMDevice(id: "account-gaming-pc", name: "Gaming Rig (Home)", ipAddress: "10.0.0.42", port: 1234, status: .offline, lastSeen: Date().addingTimeInterval(-3600))
+        ]
+
+        await MainActor.run {
+            for device in accountDevices {
+                if !discoveredDevices.contains(where: { $0.id == device.id }) {
+                    discoveredDevices.append(device)
+                }
+            }
+        }
     }
 
     private func probeDevice(ip: String, port: Int, name: String) async {

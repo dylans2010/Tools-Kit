@@ -1,9 +1,10 @@
 import SwiftUI
 
 struct LMLinkDevicesView: View {
-    @StateObject private var discoveryService = LMDeviceDiscoveryService()
+    @ObservedObject private var discoveryService = LMDeviceDiscoveryService.shared
     @StateObject private var connectionManager = LMConnectionManager.shared
     @StateObject private var authManager = LMLinkAuthManager.shared
+    @State private var showingManualAdd = false
 
     var body: some View {
         Group {
@@ -78,13 +79,15 @@ struct LMLinkDevicesView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 if authManager.isLinked {
                     Button(action: {
-                        discoveryService.stopDiscovery()
-                        discoveryService.startDiscovery()
+                        showingManualAdd = true
                     }) {
                         Label("Add Device", systemImage: "plus")
                     }
                 }
             }
+        }
+        .sheet(isPresented: $showingManualAdd) {
+            ManualDeviceAddView(discoveryService: discoveryService)
         }
     }
 }

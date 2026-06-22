@@ -150,6 +150,7 @@ struct AIChatSettings: Codable {
     // Local Models
     var localConfigs: [LocalModelConfig] = []
     var selectedLocalConfigID: UUID? = nil
+    var lmStudioUsername: String? = nil
 
     // Prompt Tools
     var promptVariables: [PromptVariable] = []
