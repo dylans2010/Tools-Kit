@@ -29,7 +29,7 @@ class LMConnectionManager: ObservableObject {
         }
 
         // Verify reachability before sending request
-        if !await checkDeviceReachability(device) {
+        if !(await checkDeviceReachability(device)) {
             throw AIError.deviceOffline
         }
 
