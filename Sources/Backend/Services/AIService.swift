@@ -254,7 +254,20 @@ class AIService {
             guard let device = LMConnectionManager.shared.selectedDevice else {
                 throw AIError.deviceOffline
             }
-            // Check connectivity could be added here if needed, but LM Studio often doesn't have a specific isOnline flag beyond discovery
+
+            // Phase 10: Strict reachability check
+            let url = URL(string: "\(device.baseURL)/v1/models")!
+            var request = URLRequest(url: url)
+            request.timeoutInterval = 3.0
+
+            do {
+                let (_, response) = try await URLSession.shared.data(for: request)
+                guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                    throw AIError.deviceOffline
+                }
+            } catch {
+                throw AIError.deviceOffline
+            }
         }
 
         if providerID == "afm" {
@@ -271,23 +284,24 @@ class AIService {
     func processText(prompt: String, systemPrompt: String = "", model: String? = nil) async throws -> String {
         let finalSystemPrompt = await buildComprehensiveSystemPrompt(taskSpecific: systemPrompt)
 
-        // Dynamic Routing based on selected provider
+        // Phase 10: Policy-driven routing
         let selectedProvider = settingsManager.settings.selectedProviderID
-        // Ensure we always pull the latest modelID from settings if not explicitly provided
         let modelToUse = model ?? settingsManager.settings.modelID
 
         try await validateRequest(providerID: selectedProvider, modelID: modelToUse)
 
-        if selectedProvider == "lmstudio" {
+        switch selectedProvider {
+        case "lmstudio":
             SDKLogStore.shared.log("Routing to LM Studio via LM Link", source: "AIService", level: .info)
             return try await LMConnectionManager.shared.sendChatRequest(prompt: prompt, systemPrompt: finalSystemPrompt)
-        } else if selectedProvider == "afm" {
+        case "afm":
             SDKLogStore.shared.log("Routing to Apple Foundation Models", source: "AIService", level: .info)
             return try await AFMService.shared.generateResponse(prompt: prompt, systemPrompt: finalSystemPrompt)
-        } else if selectedProvider == "local_models" {
-            // Local Models (Manual) are currently handled by processMessages if not explicitly routed
-            // But for consistency, we could route them here or through the registry
+        case "local_models":
             SDKLogStore.shared.log("Routing to Local Model (Manual)", source: "AIService", level: .info)
+            // Fall through to processMessages for standardized manual local model handling
+        default:
+            break
         }
 
         let messages = [
