@@ -202,6 +202,7 @@ struct AIChatSettings: Codable {
 enum AIModelSource: String, Codable, CaseIterable {
     case appModel = "App Model"
     case ownKey = "My API Key"
+    case local = "Local Model"
 }
 
 enum ResponseTone: String, Codable, CaseIterable {

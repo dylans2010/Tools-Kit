@@ -218,20 +218,17 @@ class AIService {
     // MARK: - Local AI Service (Unified)
 
     struct AILocalService {
-        static func sendRequest(prompt: String, systemPrompt: String) async throws -> String {
+        static func sendRequest(messages: [ChatMessage], config: LocalModelConfig? = nil) async throws -> String {
             let settings = AIChatSettingsManager.shared.settings
 
-            // Priority 1: Check for a selected manual configuration
-            if let configID = settings.selectedLocalConfigID,
-               let config = settings.localConfigs.first(where: { $0.id == configID }) {
-                return try await sendToCustomEndpoint(prompt: prompt, systemPrompt: systemPrompt, config: config)
+            if let config = config ?? (settings.selectedLocalConfigID != nil ? settings.localConfigs.first(where: { $0.id == settings.selectedLocalConfigID }) : nil) {
+                return try await sendToCustomEndpoint(messages: messages, config: config)
             }
 
-            // Priority 2: Use LMConnectionManager (LM Studio / Discovered Devices)
-            return try await LMConnectionManager.shared.sendChatRequest(prompt: prompt, systemPrompt: systemPrompt)
+            return try await LMConnectionManager.shared.sendChatRequest(messages: messages)
         }
 
-        private static func sendToCustomEndpoint(prompt: String, systemPrompt: String, config: LocalModelConfig) async throws -> String {
+        private static func sendToCustomEndpoint(messages: [ChatMessage], config: LocalModelConfig) async throws -> String {
             guard let url = URL(string: "\(config.baseURL)/chat/completions") else {
                 throw AIError.invalidEndpoint
             }
@@ -248,15 +245,11 @@ class AIService {
                 request.setValue(value, forHTTPHeaderField: key)
             }
 
-            var messages: [[String: String]] = []
-            if !systemPrompt.isEmpty {
-                messages.append(["role": "system", "content": systemPrompt])
-            }
-            messages.append(["role": "user", "content": prompt])
+            let payloadMessages = messages.map { ["role": $0.role, "content": $0.content] }
 
             let payload: [String: Any] = [
                 "model": config.modelName,
-                "messages": messages,
+                "messages": payloadMessages,
                 "temperature": config.temperature,
                 "max_tokens": config.maxTokens,
                 "stream": false
@@ -366,6 +359,15 @@ class AIService {
     func processText(prompt: String, systemPrompt: String = "", model: String? = nil) async throws -> String {
         let finalSystemPrompt = await buildComprehensiveSystemPrompt(taskSpecific: systemPrompt)
 
+        let messages = [
+            ChatMessage(role: "system", content: finalSystemPrompt),
+            ChatMessage(role: "user", content: prompt)
+        ]
+
+        if settingsManager.settings.aiModelSource == .local {
+            return try await AILocalService.sendRequest(messages: messages)
+        }
+
         // Phase 10: Policy-driven routing
         let selectedProvider = settingsManager.settings.selectedProviderID
         let modelToUse = model ?? settingsManager.settings.modelID
@@ -375,13 +377,13 @@ class AIService {
         switch selectedProvider {
         case "lmstudio":
             SDKLogStore.shared.log("Routing to LM Studio via LM Link", source: "AIService", level: .info)
-            return try await AILocalService.sendRequest(prompt: prompt, systemPrompt: finalSystemPrompt)
+            return try await AILocalService.sendRequest(messages: messages)
         case "afm":
             SDKLogStore.shared.log("Routing to Apple Foundation Models", source: "AIService", level: .info)
             return try await AFMService.shared.generateResponse(prompt: prompt, systemPrompt: finalSystemPrompt)
         case "local_models":
             SDKLogStore.shared.log("Routing to Local Model System", source: "AIService", level: .info)
-            return try await AILocalService.sendRequest(prompt: prompt, systemPrompt: finalSystemPrompt)
+            return try await AILocalService.sendRequest(messages: messages)
         default:
             break
         }
@@ -395,6 +397,10 @@ class AIService {
 
     @MainActor
     func processMessages(messages: [ChatMessage], attachments: [ChatAttachment] = [], model: String? = nil) async throws -> String {
+        if settingsManager.settings.aiModelSource == .local {
+            return try await AILocalService.sendRequest(messages: messages)
+        }
+
         guard let provider = currentProvider else {
             throw AIError.unknownProvider(currentProviderID)
         }

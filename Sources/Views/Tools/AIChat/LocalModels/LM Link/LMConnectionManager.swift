@@ -22,7 +22,7 @@ class LMConnectionManager: ObservableObject {
         self.selectedModel = model
     }
 
-    func sendChatRequest(prompt: String, systemPrompt: String = "") async throws -> String {
+    func sendChatRequest(messages: [ChatMessage]) async throws -> String {
         // STRICT VALIDATION BEFORE EXECUTION
         guard let device = selectedDevice else {
             throw AIError.deviceOffline
@@ -43,15 +43,11 @@ class LMConnectionManager: ObservableObject {
 
         SDKLogStore.shared.log("LMConnectionManager: Sending request to \(url.absoluteString) for model \(model.id)", source: "LMConnectionManager", level: .info)
 
-        var messages: [[String: String]] = []
-        if !systemPrompt.isEmpty {
-            messages.append(["role": "system", "content": systemPrompt])
-        }
-        messages.append(["role": "user", "content": prompt])
+        let payloadMessages = messages.map { ["role": $0.role, "content": $0.content] }
 
         let payload: [String: Any] = [
             "model": model.id,
-            "messages": messages,
+            "messages": payloadMessages,
             "temperature": 0.7,
             "stream": false
         ]
