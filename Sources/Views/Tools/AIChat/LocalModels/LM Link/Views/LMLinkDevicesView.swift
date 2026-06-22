@@ -53,7 +53,7 @@ struct LMLinkDevicesView: View {
                                 .font(.subheadline)
                                 .padding(.vertical, 8)
                         } else {
-                            ForEach(discoveryService.discoveredDevices) { device in
+                            ForEach(discoveryService.discoveredDevices.filter { $0.status == .online }) { device in
                                 NavigationLink(destination: LMLinkDeviceDetailView(device: device)) {
                                     LMDeviceRowView(device: device)
                                 }

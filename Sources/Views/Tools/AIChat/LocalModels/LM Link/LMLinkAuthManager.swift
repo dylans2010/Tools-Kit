@@ -14,9 +14,7 @@ class LMLinkAuthManager: ObservableObject {
     @Published var lastSyncTimestamp: Date?
 
     var isLinked: Bool {
-        let hasKeys = keyId != nil && (try? keychain.getPrivateKey()) != nil
-        let hasValidatedDevices = devices.contains(where: { $0.status == .online })
-        return hasKeys && hasValidatedDevices
+        return keychain.getIsLinked()
     }
 
     private let keychain = LMLinkKeychainService.shared
@@ -61,9 +59,14 @@ class LMLinkAuthManager: ObservableObject {
         guard url.scheme == "toolskit" && url.host == "lm-callback" else { return }
 
         Task { @MainActor in
-            // keyId is already set during initiateLink
-            SDKLogStore.shared.log("LM Link authenticated via callback", source: "LMLinkAuthManager", level: .info)
-            try? await fetchAccountDevices()
+            SDKLogStore.shared.log("LM Link: Authenticated via callback event", source: "LMLinkAuthManager", level: .info)
+            do {
+                try keychain.saveIsLinked(true)
+                self.objectWillChange.send()
+                try? await fetchAccountDevices()
+            } catch {
+                SDKLogStore.shared.log("LM Link: Failed to persist linked state - \(error)", source: "LMLinkAuthManager", level: .error)
+            }
         }
     }
 
@@ -101,5 +104,6 @@ class LMLinkAuthManager: ObservableObject {
         keychain.deleteKeys()
         self.keyId = nil
         self.devices = []
+        self.objectWillChange.send()
     }
 }

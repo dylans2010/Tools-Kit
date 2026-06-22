@@ -50,7 +50,7 @@ struct LMLinkSettingsView: View {
                         Section("Interface") {
                             LabeledContent("Local IP", value: localIP)
                             LabeledContent("Subnet Mask", value: subnetMask)
-                            LabeledContent("mDNS Status", value: "Active")
+                            LabeledContent("Discovery Mode", value: "Subnet Enumeration")
                         }
 
                         Section("Active Connection") {

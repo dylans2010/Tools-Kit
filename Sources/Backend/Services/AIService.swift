@@ -251,6 +251,11 @@ class AIService {
         guard !modelID.isEmpty else { throw AIError.noModelSelected }
 
         if providerID == "lmstudio" {
+            // Event-driven validation: LM Link MUST be linked via callback event
+            guard LMLinkAuthManager.shared.isLinked else {
+                throw AIError.requestFailed("LM Link not authenticated. Please link your account in settings.")
+            }
+
             guard let device = LMConnectionManager.shared.selectedDevice else {
                 throw AIError.deviceOffline
             }

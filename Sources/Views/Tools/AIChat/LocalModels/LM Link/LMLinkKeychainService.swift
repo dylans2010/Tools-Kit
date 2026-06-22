@@ -8,6 +8,7 @@ class LMLinkKeychainService {
     private let privateKeyAccount = "lmlink.privateKey"
     private let keyIdAccount = "lmlink.keyId"
     private let usernameAccount = "lmlink.username"
+    private let isLinkedAccount = "lmlink.isLinked"
 
     func savePrivateKey(_ key: Curve25519.Signing.PrivateKey) throws {
         let data = key.rawRepresentation
@@ -45,10 +46,23 @@ class LMLinkKeychainService {
         return String(data: data, encoding: .utf8)
     }
 
+    func saveIsLinked(_ isLinked: Bool) throws {
+        let data = isLinked ? Data([1]) : Data([0])
+        try saveToKeychain(data: data, account: isLinkedAccount)
+    }
+
+    func getIsLinked() -> Bool {
+        guard let data = try? fetchFromKeychain(account: isLinkedAccount) else {
+            return false
+        }
+        return data.first == 1
+    }
+
     func deleteKeys() {
         deleteFromKeychain(account: privateKeyAccount)
         deleteFromKeychain(account: keyIdAccount)
         deleteFromKeychain(account: usernameAccount)
+        deleteFromKeychain(account: isLinkedAccount)
     }
 
     private func saveToKeychain(data: Data, account: String) throws {
