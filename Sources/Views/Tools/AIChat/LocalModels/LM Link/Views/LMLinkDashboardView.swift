@@ -11,7 +11,7 @@ struct LMLinkDashboardView: View {
                 LMLinkConnectionStatusView()
                     .padding(.top)
 
-                if authManager.isScanning {
+                if authManager.state == .scanning {
                     HStack {
                         ProgressView()
                             .padding(.trailing, 8)

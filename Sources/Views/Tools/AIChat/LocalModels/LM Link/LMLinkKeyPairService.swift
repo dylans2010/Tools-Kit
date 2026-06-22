@@ -21,7 +21,8 @@ final class LMLinkKeyPairService {
             kSecAttrKeySizeInBits as String: 256,
             kSecPrivateKeyAttrs as String: [
                 kSecAttrIsPermanent as String: true,
-                kSecAttrApplicationTag as String: tag
+                kSecAttrApplicationTag as String: tag,
+                kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
             ]
         ]
         var error: Unmanaged<CFError>?
@@ -49,24 +50,35 @@ final class LMLinkKeyPairService {
             kSecClass as String: kSecClassKey,
             kSecAttrApplicationTag as String: tag,
             kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom,
+            kSecAttrKeyClass as String: kSecAttrKeyClassPrivate,
+            kSecMatchLimit as String: kSecMatchLimitOne,
             kSecReturnRef as String: true
         ]
         var result: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
-        guard status == errSecSuccess, let key = result as? SecKey else {
+        guard status == errSecSuccess, let keyRef = result else {
             LMLinkLogger.keypair.error("Private key not found for keyId: \(keyId, privacy: .private(mask: .hash))")
             throw KeyPairError.notFound
         }
-        return key
+        return keyRef as! SecKey
     }
 
     static func deleteKeyPair(for keyId: String) {
         guard let tag = "com.toolskit.lmlink.\(keyId)".data(using: .utf8) else { return }
         let query: [String: Any] = [
             kSecClass as String: kSecClassKey,
-            kSecAttrApplicationTag as String: tag
+            kSecAttrApplicationTag as String: tag,
+            kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom,
+            kSecAttrKeyClass as String: kSecAttrKeyClassPrivate
         ]
         let status = SecItemDelete(query as CFDictionary)
+        let publicQuery: [String: Any] = [
+            kSecClass as String: kSecClassKey,
+            kSecAttrApplicationTag as String: tag,
+            kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom,
+            kSecAttrKeyClass as String: kSecAttrKeyClassPublic
+        ]
+        _ = SecItemDelete(publicQuery as CFDictionary)
         LMLinkLogger.keypair.info("Key pair deleted for keyId (status: \(status, privacy: .public))")
     }
 }

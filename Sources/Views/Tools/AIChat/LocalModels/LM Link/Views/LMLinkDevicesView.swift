@@ -7,7 +7,7 @@ struct LMLinkDevicesView: View {
 
     var body: some View {
         Group {
-            if !authManager.isLinked {
+            if !authManager.$isConnected.wrappedValue {
                 VStack(spacing: 20) {
                     Image(systemName: "link.badge.plus")
                         .font(.system(size: 60))

@@ -14,7 +14,10 @@ final class LMLinkAuthManager: ObservableObject {
     private init() {}
 
     func beginAuthorization() async {
-        guard state == .idle || (if case .error = state { true } else { false }) else { return }
+        guard state == .idle || {
+            if case .error = state { return true }
+            return false
+        }() else { return }
         state = .authorizing
 
         do {
