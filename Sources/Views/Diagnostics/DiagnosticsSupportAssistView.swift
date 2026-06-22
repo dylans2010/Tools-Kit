@@ -377,7 +377,7 @@ struct DiagnosticsSupportAssistView: View {
                         emptyStateView
                     }
 
-                    ForEach(viewModel.messages) { message in
+                    ForEach(viewModel.messages, id: \.id) { message in
                         MessageBubbleView(message: message) {
                             viewModel.regenerateLastResponse()
                         }
@@ -679,7 +679,7 @@ struct WebSearchResultsSheet: View {
                     if results.isEmpty {
                         ContentUnavailableView("No Results", systemImage: "magnifyingglass", description: Text("No web results were found for this query."))
                     } else {
-                        ForEach(results) { result in
+                        ForEach(results, id: \.id) { result in
                             VStack(alignment: .leading, spacing: 6) {
                                 Text(result.title)
                                     .font(.subheadline.weight(.semibold))
@@ -839,7 +839,7 @@ struct DiagnosticPresetPromptsSheet: View {
         NavigationStack {
             List {
                 Section {
-                    ForEach(displayedPrompts) { item in
+                    ForEach(displayedPrompts, id: \.id) { item in
                         Button {
                             onSelect(item.prompt)
                             dismiss()

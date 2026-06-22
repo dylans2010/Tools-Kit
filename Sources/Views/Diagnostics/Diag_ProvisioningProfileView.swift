@@ -34,7 +34,7 @@ struct Diag_ProvisioningProfileView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
                 } else {
-                    ForEach(profiles) { profile in
+                    ForEach(profiles, id: \.id) { profile in
                         HStack {
                             Image(systemName: profile.icon)
                                 .foregroundStyle(profile.color)

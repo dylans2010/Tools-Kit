@@ -26,7 +26,7 @@ struct Diag_BluetoothScannerView: View {
                     Text(scanner.isScanning ? "Scanning for devices..." : "No devices found")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(scanner.discoveredDevices) { device in
+                    ForEach(scanner.discoveredDevices, id: \.id) { device in
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(device.name)

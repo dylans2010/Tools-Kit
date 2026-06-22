@@ -55,7 +55,7 @@ struct Diag_CrashLogView: View {
 
             if !collector.recentEvents.isEmpty {
                 Section("Recent Events") {
-                    ForEach(collector.recentEvents) { event in
+                    ForEach(collector.recentEvents, id: \.id) { event in
                         HStack {
                             Image(systemName: event.icon)
                                 .foregroundStyle(event.color)

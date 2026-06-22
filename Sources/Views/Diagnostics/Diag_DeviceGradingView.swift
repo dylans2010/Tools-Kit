@@ -64,7 +64,7 @@ struct Diag_DeviceGradingView: View {
 
             if !gradeResults.isEmpty {
                 Section("Component Scores") {
-                    ForEach(gradeResults) { cat in
+                    ForEach(gradeResults, id: \.id) { cat in
                         HStack {
                             Image(systemName: cat.icon)
                                 .foregroundStyle(cat.status.color)

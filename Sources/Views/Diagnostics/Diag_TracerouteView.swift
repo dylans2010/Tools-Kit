@@ -50,7 +50,7 @@ struct Diag_TracerouteView: View {
 
             if !hops.isEmpty {
                 Section("Route (\(hops.count) hops)") {
-                    ForEach(hops) { hop in
+                    ForEach(hops, id: \.id) { hop in
                         HStack {
                             Text("\(hop.hopNumber)")
                                 .font(.caption.monospacedDigit())

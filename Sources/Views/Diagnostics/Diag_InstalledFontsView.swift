@@ -39,7 +39,7 @@ struct Diag_InstalledFontsView: View {
             }
 
             Section("Families (\(filteredFamilies.count))") {
-                ForEach(filteredFamilies) { family in
+                ForEach(filteredFamilies, id: \.id) { family in
                     DisclosureGroup {
                         ForEach(family.fonts, id: \.self) { fontName in
                             VStack(alignment: .leading, spacing: 4) {

@@ -86,7 +86,7 @@ struct DiagnosticReportsView: View {
                         }
                     }
 
-                    ForEach(filteredCurrentItems) { item in
+                    ForEach(filteredCurrentItems, id: \.id) { item in
                         reportItemRow(item)
                     }
                 }
@@ -109,7 +109,7 @@ struct DiagnosticReportsView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 20)
                 } else {
-                    ForEach(reportManager.reports) { report in
+                    ForEach(reportManager.reports, id: \.id) { report in
                         NavigationLink {
                             DiagnosticReportDetailView(report: report)
                         } label: {
@@ -282,7 +282,7 @@ struct DiagnosticReportDetailView: View {
             }
 
             Section("Results (\(report.items.count))") {
-                ForEach(report.items) { item in
+                ForEach(report.items, id: \.id) { item in
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
                             Image(systemName: item.status.icon)

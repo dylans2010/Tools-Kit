@@ -130,7 +130,7 @@ struct Diag_IMEIBatchCheckerView: View {
                                 }
                                 .padding()
 
-                                ForEach(results) { entry in
+                                ForEach(results, id: \.id) { entry in
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack {
                                             Image(systemName: entry.isValid ? "checkmark.circle.fill" : "xmark.circle.fill")

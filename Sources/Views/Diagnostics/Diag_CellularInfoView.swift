@@ -37,7 +37,7 @@ struct Diag_CellularInfoView: View {
             }
 
             if !carriers.isEmpty {
-                ForEach(carriers) { carrier in
+                ForEach(carriers, id: \.id) { carrier in
                     Section("Carrier: \(carrier.name)") {
                         LabeledContent("Name") { Text(carrier.name) }
                         LabeledContent("Country") { Text(carrier.country) }

@@ -19,75 +19,101 @@ struct Diag_ThreadCountView: View {
 
     var body: some View {
         Form {
-            Section("Thread Summary") {
-                HStack(spacing: 20) {
-                    VStack {
-                        Text("\(threadCount)")
-                            .font(.system(size: 36, weight: .bold, design: .monospaced))
-                            .foregroundStyle(.blue)
-                        Text("Active Threads")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
+            summarySection
+            systemInfoSection
+            threadDetailsSection
+            historySection
+            actionsSection
+        }
+        .navigationTitle("Thread Count")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear { refreshThreads(); startMonitoring() }
+        .onDisappear { stopMonitoring() }
+    }
 
-                    VStack {
-                        Text("\(peakThreads)")
-                            .font(.system(size: 36, weight: .bold, design: .monospaced))
-                            .foregroundStyle(.orange)
-                        Text("Peak")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
+    private var summarySection: some View {
+        Section("Thread Summary") {
+            HStack(spacing: 20) {
+                VStack {
+                    Text("\(threadCount)")
+                        .font(.system(size: 36, weight: .bold, design: .monospaced))
+                        .foregroundStyle(.blue)
+                    Text("Active Threads")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
-                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+
+                VStack {
+                    Text("\(peakThreads)")
+                        .font(.system(size: 36, weight: .bold, design: .monospaced))
+                        .foregroundStyle(.orange)
+                    Text("Peak")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
             }
+            .padding(.vertical, 8)
+        }
+    }
 
-            Section("System Info") {
-                LabeledContent("CPU Cores") {
-                    Text("\(ProcessInfo.processInfo.processorCount)")
-                }
-                LabeledContent("Active Cores") {
-                    Text("\(ProcessInfo.processInfo.activeProcessorCount)")
-                }
-                LabeledContent("Main Thread") {
-                    Text(Thread.isMainThread ? "Current" : "Background")
-                        .foregroundStyle(.green)
-                }
-                LabeledContent("QoS Class") {
-                    Text(qosLabel)
-                }
+    private var systemInfoSection: some View {
+        Section("System Info") {
+            LabeledContent("CPU Cores") {
+                Text("\(ProcessInfo.processInfo.processorCount)")
             }
+            LabeledContent("Active Cores") {
+                Text("\(ProcessInfo.processInfo.activeProcessorCount)")
+            }
+            LabeledContent("Main Thread") {
+                Text(Thread.isMainThread ? "Current" : "Background")
+                    .foregroundStyle(.green)
+            }
+            LabeledContent("QoS Class") {
+                Text(qosLabel)
+            }
+        }
+    }
 
+    private var threadDetailsSection: some View {
+        Group {
             if !threadDetails.isEmpty {
                 Section("Thread Details") {
-                    ForEach(threadDetails) { detail in
-                        HStack {
-                            Text("#\(detail.index)")
-                                .font(.caption.monospacedDigit())
-                                .frame(width: 30, alignment: .leading)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(detail.state)
-                                    .font(.caption)
-                                Text(String(format: "CPU: %.1f%%", detail.cpuUsage))
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            VStack(alignment: .trailing, spacing: 2) {
-                                Text(String(format: "U: %.2fs", detail.userTime))
-                                    .font(.caption2.monospacedDigit())
-                                    .foregroundStyle(.blue)
-                                Text(String(format: "S: %.2fs", detail.systemTime))
-                                    .font(.caption2.monospacedDigit())
-                                    .foregroundStyle(.orange)
-                            }
-                        }
+                    ForEach(threadDetails, id: \.id) { detail in
+                        threadRow(detail)
                     }
                 }
             }
+        }
+    }
 
+    private func threadRow(_ detail: ThreadDetail) -> some View {
+        HStack {
+            Text("#\(detail.index)")
+                .font(.caption.monospacedDigit())
+                .frame(width: 30, alignment: .leading)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(detail.state)
+                    .font(.caption)
+                Text(String(format: "CPU: %.1f%%", detail.cpuUsage))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(String(format: "U: %.2fs", detail.userTime))
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(.blue)
+                Text(String(format: "S: %.2fs", detail.systemTime))
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(.orange)
+            }
+        }
+    }
+
+    private var historySection: some View {
+        Group {
             if !history.isEmpty {
                 Section("History") {
                     ForEach(Array(history.suffix(10).enumerated()), id: \.offset) { _, entry in
@@ -102,22 +128,20 @@ struct Diag_ThreadCountView: View {
                     }
                 }
             }
+        }
+    }
 
-            Section {
-                Button {
-                    if isMonitoring { stopMonitoring() } else { startMonitoring() }
-                } label: {
-                    HStack {
-                        Image(systemName: isMonitoring ? "stop.circle.fill" : "play.circle.fill")
-                        Text(isMonitoring ? "Stop Monitoring" : "Start Monitoring")
-                    }
+    private var actionsSection: some View {
+        Section {
+            Button {
+                if isMonitoring { stopMonitoring() } else { startMonitoring() }
+            } label: {
+                HStack {
+                    Image(systemName: isMonitoring ? "stop.circle.fill" : "play.circle.fill")
+                    Text(isMonitoring ? "Stop Monitoring" : "Start Monitoring")
                 }
             }
         }
-        .navigationTitle("Thread Count")
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear { refreshThreads(); startMonitoring() }
-        .onDisappear { stopMonitoring() }
     }
 
     private var qosLabel: String {

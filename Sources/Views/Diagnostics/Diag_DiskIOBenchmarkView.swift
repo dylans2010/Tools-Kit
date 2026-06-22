@@ -92,7 +92,7 @@ struct Diag_DiskIOBenchmarkView: View {
 
             if !results.isEmpty {
                 Section("History") {
-                    ForEach(results) { result in
+                    ForEach(results, id: \.id) { result in
                         HStack {
                             Text(result.timestamp, style: .time)
                                 .font(.caption.monospacedDigit())

@@ -83,7 +83,7 @@ struct Diag_PreRepairChecklistView: View {
             let categories = Array(Set(checkItems.map { $0.category })).sorted()
             ForEach(categories, id: \.self) { category in
                 Section(category) {
-                    ForEach(checkItems.filter { $0.category == category }) { item in
+                    ForEach(checkItems.filter { $0.category == category }, id: \.id) { item in
                         HStack {
                             Image(systemName: item.status.icon)
                                 .foregroundStyle(item.status.color)

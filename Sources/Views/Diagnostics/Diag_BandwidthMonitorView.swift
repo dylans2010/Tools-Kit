@@ -74,7 +74,7 @@ struct Diag_BandwidthMonitorView: View {
 
             if !samples.isEmpty {
                 Section("Recent Activity (\(samples.count) samples)") {
-                    ForEach(samples.suffix(10)) { sample in
+                    ForEach(samples.suffix(10), id: \.id) { sample in
                         HStack {
                             Text(sample.timestamp, style: .time)
                                 .font(.caption.monospacedDigit())

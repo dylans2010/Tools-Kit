@@ -79,7 +79,7 @@ struct Diag_PingToolView: View {
 
             if !results.isEmpty {
                 Section("Results") {
-                    ForEach(results) { result in
+                    ForEach(results, id: \.id) { result in
                         HStack {
                             Image(systemName: result.success ? "checkmark.circle.fill" : "xmark.circle.fill")
                                 .foregroundStyle(result.success ? .green : .red)

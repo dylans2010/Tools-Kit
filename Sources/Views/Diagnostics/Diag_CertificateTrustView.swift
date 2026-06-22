@@ -47,7 +47,7 @@ struct Diag_CertificateTrustView: View {
 
             if !certificates.isEmpty {
                 Section("Keychain Certificates (\(certificates.count))") {
-                    ForEach(certificates) { cert in
+                    ForEach(certificates, id: \.id) { cert in
                         HStack {
                             Image(systemName: cert.isTrusted ? "checkmark.seal.fill" : "xmark.seal.fill")
                                 .foregroundStyle(cert.isTrusted ? .green : .red)

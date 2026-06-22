@@ -67,6 +67,7 @@ enum DiagnosticCategory: String, CaseIterable, Identifiable {
     }
 }
 
+@MainActor
 final class DiagnosticsViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var selectedCategory: DiagnosticCategory?

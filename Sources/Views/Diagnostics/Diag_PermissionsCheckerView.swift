@@ -15,7 +15,7 @@ struct Diag_PermissionsCheckerView: View {
                         checkPermissions()
                     }
                 } else {
-                    ForEach(permissions) { perm in
+                    ForEach(permissions, id: \.id) { perm in
                         HStack {
                             Image(systemName: perm.icon)
                                 .foregroundStyle(color(for: perm.status))

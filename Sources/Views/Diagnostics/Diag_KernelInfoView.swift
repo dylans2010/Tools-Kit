@@ -47,7 +47,7 @@ struct Diag_KernelInfoView: View {
             }
 
             Section("System Parameters") {
-                ForEach(sysctlInfo) { entry in
+                ForEach(sysctlInfo, id: \.id) { entry in
                     LabeledContent(entry.key) {
                         Text(entry.value)
                             .font(.caption.monospaced())

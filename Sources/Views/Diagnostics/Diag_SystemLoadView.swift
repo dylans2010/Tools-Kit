@@ -68,7 +68,7 @@ struct Diag_SystemLoadView: View {
 
             if !loadHistory.isEmpty {
                 Section("History (\(loadHistory.count) samples)") {
-                    ForEach(loadHistory.suffix(10)) { sample in
+                    ForEach(loadHistory.suffix(10), id: \.id) { sample in
                         HStack {
                             Text(sample.timestamp, style: .time)
                                 .font(.caption.monospacedDigit())

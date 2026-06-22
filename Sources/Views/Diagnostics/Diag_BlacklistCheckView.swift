@@ -158,7 +158,7 @@ struct Diag_BlacklistCheckView: View {
 
                 if !batchResults.isEmpty {
                     Section("Batch Results (\(batchResults.count))") {
-                        ForEach(batchResults) { entry in
+                        ForEach(batchResults, id: \.id) { entry in
                             HStack {
                                 Image(systemName: entry.status.icon)
                                     .foregroundStyle(entry.status.color)
@@ -177,7 +177,7 @@ struct Diag_BlacklistCheckView: View {
 
             if !checkHistory.isEmpty {
                 Section("Check History") {
-                    ForEach(checkHistory) { entry in
+                    ForEach(checkHistory, id: \.id) { entry in
                         HStack {
                             Image(systemName: entry.status.icon)
                                 .foregroundStyle(entry.status.color)

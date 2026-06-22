@@ -47,7 +47,7 @@ struct Diag_ConfigProfileAuditView: View {
 
             if !profiles.isEmpty {
                 Section("Detected Profiles (\(profiles.count))") {
-                    ForEach(profiles) { profile in
+                    ForEach(profiles, id: \.id) { profile in
                         HStack {
                             Image(systemName: profile.icon)
                                 .foregroundStyle(profile.color)

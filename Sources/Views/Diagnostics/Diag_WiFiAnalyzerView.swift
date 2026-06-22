@@ -66,7 +66,7 @@ struct Diag_WiFiAnalyzerView: View {
 
             if !connectionHistory.isEmpty {
                 Section("Events") {
-                    ForEach(connectionHistory.suffix(10)) { event in
+                    ForEach(connectionHistory.suffix(10), id: \.id) { event in
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(event.event)

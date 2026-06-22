@@ -11,7 +11,7 @@ struct Diag_PrivacyReportView: View {
     var body: some View {
         List {
             Section("Recent Access") {
-                ForEach(privacyEntries) { entry in
+                ForEach(privacyEntries, id: \.id) { entry in
                     HStack {
                         VStack(alignment: .leading) {
                             Text(entry.app)
