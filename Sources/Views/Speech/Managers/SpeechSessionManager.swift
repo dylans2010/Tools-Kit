@@ -397,7 +397,7 @@ class SpeechSessionManager: NSObject, ObservableObject {
             }
         }
 
-        let speechError: SpeechError
+        var speechError: SpeechError
         if let se = error as? SpeechError {
             speechError = se
         } else if let ae = error as? AIError {
@@ -412,6 +412,17 @@ class SpeechSessionManager: NSObject, ObservableObject {
                 speechError = .aiServiceError("Invalid response from AI service")
             case .noProviderSelected:
                 speechError = .missingAIProvider
+            case .noModelSelected:
+                speechError = .aiServiceError("No AI model selected. Please choose a model in settings.")
+            // --- Additional cases inserted here ---
+            case .deviceOffline:
+                speechError = .aiServiceError("Device is offline. Check your internet connection.")
+            case .invalidEndpoint:
+                speechError = .aiServiceError("Invalid API endpoint configuration.")
+            case .requestFailed(let msg):
+                speechError = .aiServiceError(msg)
+            case .decodingFailed:
+                speechError = .aiServiceError("Failed to decode response from AI service.")
             }
         } else {
             speechError = .aiServiceError(error.localizedDescription)
