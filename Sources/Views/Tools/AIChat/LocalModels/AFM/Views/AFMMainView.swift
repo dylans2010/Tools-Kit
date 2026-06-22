@@ -1,29 +1,47 @@
 import SwiftUI
 
 struct AFMMainView: View {
-    @State private var selectedTab = 0
+    @State private var path = NavigationPath()
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            AFMDashboardView()
-                .tabItem {
-                    Label("Dashboard", systemImage: "sparkles")
+        NavigationStack(path: $path) {
+            List {
+                Section {
+                    NavigationLink(value: AFMRoute.dashboard) {
+                        Label("Dashboard", systemImage: "sparkles")
+                    }
+                    NavigationLink(value: AFMRoute.tasks) {
+                        Label("Tasks", systemImage: "list.bullet.clipboard")
+                    }
+                } header: {
+                    Text("Overview")
                 }
-                .tag(0)
 
-            AFMTaskView()
-                .tabItem {
-                    Label("Tasks", systemImage: "list.bullet.clipboard")
+                Section {
+                    NavigationLink(value: AFMRoute.settings) {
+                        Label("Settings", systemImage: "gearshape")
+                    }
+                } header: {
+                    Text("Preferences")
                 }
-                .tag(1)
-
-            AFMSettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gearshape")
+            }
+            .navigationTitle("AFM")
+            .navigationDestination(for: AFMRoute.self) { route in
+                switch route {
+                case .dashboard:
+                    AFMDashboardView()
+                case .tasks:
+                    AFMTaskView()
+                case .settings:
+                    AFMSettingsView()
                 }
-                .tag(2)
+            }
         }
-        .navigationTitle("Apple Foundation Models")
-        .navigationBarTitleDisplayMode(.inline)
     }
+}
+
+enum AFMRoute: Hashable {
+    case dashboard
+    case tasks
+    case settings
 }

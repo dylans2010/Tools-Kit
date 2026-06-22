@@ -1,16 +1,47 @@
 import Foundation
 
-enum AIError: Error {
+enum AIError: LocalizedError {
+    case noProviderSelected
+    case noModelSelected
+    case deviceOffline
+    case invalidEndpoint
+    case requestFailed(String)
+    case decodingFailed
     case missingAPIKey
     case networkError(String)
     case invalidResponse
     case unknownProvider(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .noProviderSelected:
+            return "No AI provider has been selected. Please choose a provider in settings."
+        case .noModelSelected:
+            return "No AI model has been selected. Please choose a model in settings."
+        case .deviceOffline:
+            return "The selected device is offline. Ensure LM Studio or your local server is running."
+        case .invalidEndpoint:
+            return "The provider endpoint is invalid. Check your connection settings."
+        case .requestFailed(let message):
+            return "AI Request Failed: \(message)"
+        case .decodingFailed:
+            return "Failed to process the AI response. The format may be unexpected."
+        case .missingAPIKey:
+            return "Missing API Key for the selected provider."
+        case .networkError(let message):
+            return "Network Error: \(message)"
+        case .invalidResponse:
+            return "The server returned an invalid response."
+        case .unknownProvider(let provider):
+            return "Unknown AI provider: \(provider)"
+        }
+    }
 }
 
 enum AIProviderType: String, CaseIterable {
     case openRouter = "openrouter"
     case lmStudio = "lmstudio"
-    case appleFoundationModels = "afm"
+    case afm = "afm"
     case localModels = "local_models"
 }
 
@@ -25,10 +56,6 @@ class AIService {
     // MARK: - Current provider helpers
 
     private var currentProviderID: String {
-        // If a local model is set as default, it takes precedence
-        if settingsManager.settings.selectedLocalConfigID != nil {
-            return "local_models"
-        }
         return settingsManager.settings.selectedProviderID
     }
 
@@ -214,6 +241,30 @@ class AIService {
         return result
     }
 
+    // MARK: - Validation Layer
+
+    @MainActor
+    private func validateRequest(providerID: String, modelID: String) async throws {
+        SDKLogStore.shared.log("Validating AI Request - Provider: \(providerID), Model: \(modelID)", source: "AIService", level: .info)
+
+        guard !providerID.isEmpty else { throw AIError.noProviderSelected }
+        guard !modelID.isEmpty else { throw AIError.noModelSelected }
+
+        if providerID == "lmstudio" {
+            guard let device = LMConnectionManager.shared.selectedDevice else {
+                throw AIError.deviceOffline
+            }
+            // Check connectivity could be added here if needed, but LM Studio often doesn't have a specific isOnline flag beyond discovery
+        }
+
+        if providerID == "afm" {
+            let available = AFMModelManager.shared.availableModels
+            if !available.contains(modelID) {
+                throw AIError.requestFailed("Model \(modelID) is not available on this device.")
+            }
+        }
+    }
+
     // MARK: - Public API
 
     @MainActor
@@ -222,6 +273,9 @@ class AIService {
 
         // Dynamic Routing based on selected provider
         let selectedProvider = settingsManager.settings.selectedProviderID
+        let modelToUse = model ?? settingsManager.settings.modelID
+
+        try await validateRequest(providerID: selectedProvider, modelID: modelToUse)
 
         if selectedProvider == "lmstudio" {
             SDKLogStore.shared.log("Routing to LM Studio via LM Link", source: "AIService", level: .info)
@@ -229,6 +283,10 @@ class AIService {
         } else if selectedProvider == "afm" {
             SDKLogStore.shared.log("Routing to Apple Foundation Models", source: "AIService", level: .info)
             return try await AFMService.shared.generateResponse(prompt: prompt, systemPrompt: finalSystemPrompt)
+        } else if selectedProvider == "local_models" {
+            // Local Models (Manual) are currently handled by processMessages if not explicitly routed
+            // But for consistency, we could route them here or through the registry
+            SDKLogStore.shared.log("Routing to Local Model (Manual)", source: "AIService", level: .info)
         }
 
         let messages = [
@@ -243,6 +301,11 @@ class AIService {
         guard let provider = currentProvider else {
             throw AIError.unknownProvider(currentProviderID)
         }
+
+        var modelToUse = model ?? settingsManager.settings.modelID
+
+        try await validateRequest(providerID: currentProviderID, modelID: modelToUse)
+
         let authorization = try await featureCheck.authorizeRequest(providerID: currentProviderID)
         let apiKey = authorization.apiKey
 
@@ -252,7 +315,6 @@ class AIService {
             return try await router.execute(messages: messages, attachments: attachments)
         }
 
-        var modelToUse = model ?? settingsManager.settings.modelID
         if modelToUse.isEmpty {
             await modelCatalog.loadModels(for: provider.id)
             let availableModels = await MainActor.run { modelCatalog.models(for: provider.id) }
@@ -931,4 +993,3 @@ struct DynamicAIModelRouting {
         throw AIError.networkError("All available free models exhausted. Last error: \(lastError?.localizedDescription ?? "Unknown")")
     }
 }
-
