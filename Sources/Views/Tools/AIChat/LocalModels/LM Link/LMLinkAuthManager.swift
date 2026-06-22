@@ -8,11 +8,13 @@ class LMLinkAuthManager: ObservableObject {
 
     @Published var isLinked = false
     @Published var keyId: String?
+    @Published var username: String?
 
     private let keychain = LMLinkKeychainService.shared
 
     init() {
         self.keyId = keychain.getKeyId()
+        self.username = keychain.getUsername()
         self.isLinked = keyId != nil && (try? keychain.getPrivateKey()) != nil
     }
 
@@ -61,6 +63,18 @@ class LMLinkAuthManager: ObservableObject {
 
     func confirmLink() {
         self.isLinked = true
+        // Set a mock username for now upon successful link
+        let mockUsername = "LM Studio User"
+        try? keychain.saveUsername(mockUsername)
+        self.username = mockUsername
+    }
+
+    func refreshStatus() async {
+        // Simulate a network check for status updates
+        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1s delay
+        self.keyId = keychain.getKeyId()
+        self.username = keychain.getUsername()
+        self.isLinked = keyId != nil && (try? keychain.getPrivateKey()) != nil
     }
 
     func unlink() {

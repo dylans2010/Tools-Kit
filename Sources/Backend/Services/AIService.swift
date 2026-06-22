@@ -273,6 +273,7 @@ class AIService {
 
         // Dynamic Routing based on selected provider
         let selectedProvider = settingsManager.settings.selectedProviderID
+        // Ensure we always pull the latest modelID from settings if not explicitly provided
         let modelToUse = model ?? settingsManager.settings.modelID
 
         try await validateRequest(providerID: selectedProvider, modelID: modelToUse)
@@ -302,6 +303,7 @@ class AIService {
             throw AIError.unknownProvider(currentProviderID)
         }
 
+        // Ensure we always pull the latest modelID from settings if not explicitly provided
         var modelToUse = model ?? settingsManager.settings.modelID
 
         try await validateRequest(providerID: currentProviderID, modelID: modelToUse)

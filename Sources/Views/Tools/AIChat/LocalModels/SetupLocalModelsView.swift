@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SetupLocalModelsView: View {
     @ObservedObject var settingsManager = AIChatSettingsManager.shared
+    @AppStorage("aichat_model_id") private var modelID = ""
     @State private var showingAddSheet = false
     @State private var showingDefaultSheet = false
     @State private var configToEdit: LocalModelConfig?
@@ -16,7 +17,7 @@ struct SetupLocalModelsView: View {
                         Label("Set Default Model", systemImage: "star.fill")
                             .font(.headline)
                         Spacer()
-                        Text(settingsManager.settings.modelID.isEmpty ? "None" : settingsManager.settings.modelID)
+                        Text(modelID.isEmpty ? "None" : modelID)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Image(systemName: "chevron.right")
@@ -160,6 +161,8 @@ struct SetupLocalModelsView: View {
 struct LocalModelsByDefault: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var settingsManager = AIChatSettingsManager.shared
+    @AppStorage("aichat_selected_provider") private var selectedProviderID = "openrouter"
+    @AppStorage("aichat_model_id") private var modelID = ""
     @StateObject private var afmManager = AFMModelManager.shared
     @StateObject private var lmConnection = LMConnectionManager.shared
 
@@ -177,7 +180,7 @@ struct LocalModelsByDefault: View {
                                 Text(config.modelName)
                                     .font(.caption)
                                     .foregroundColor(.secondary)
-                                if settingsManager.settings.selectedLocalConfigID == config.id && settingsManager.settings.selectedProviderID == "local_models" {
+                                if settingsManager.settings.selectedLocalConfigID == config.id && selectedProviderID == "local_models" {
                                     Image(systemName: "checkmark")
                                         .foregroundColor(.blue)
                                 }
@@ -197,7 +200,7 @@ struct LocalModelsByDefault: View {
                             HStack {
                                 Label(model, systemImage: "apple.logo")
                                 Spacer()
-                                if settingsManager.settings.selectedAFMModelID == model && settingsManager.settings.selectedProviderID == "afm" {
+                                if settingsManager.settings.selectedAFMModelID == model && selectedProviderID == "afm" {
                                     Image(systemName: "checkmark")
                                         .foregroundColor(.blue)
                                 }
@@ -218,7 +221,7 @@ struct LocalModelsByDefault: View {
                                 HStack {
                                     Label(model.name, systemImage: "link")
                                     Spacer()
-                                    if settingsManager.settings.modelID == model.id && settingsManager.settings.selectedProviderID == "lmstudio" {
+                                    if modelID == model.id && selectedProviderID == "lmstudio" {
                                         Image(systemName: "checkmark")
                                             .foregroundColor(.blue)
                                     }
@@ -251,21 +254,27 @@ struct LocalModelsByDefault: View {
     }
 
     private func selectManualModel(_ config: LocalModelConfig) {
+        selectedProviderID = "local_models"
         settingsManager.settings.selectedProviderID = "local_models"
         settingsManager.settings.selectedLocalConfigID = config.id
+        modelID = config.modelName
         settingsManager.settings.modelID = config.modelName
         dismiss()
     }
 
     private func selectAFMModel(_ modelID: String) {
+        selectedProviderID = "afm"
         settingsManager.settings.selectedProviderID = "afm"
         settingsManager.settings.selectedAFMModelID = modelID
+        self.modelID = modelID
         settingsManager.settings.modelID = modelID
         dismiss()
     }
 
     private func selectLMStudioModel(_ model: LMModel, device: LMDevice) {
+        selectedProviderID = "lmstudio"
         settingsManager.settings.selectedProviderID = "lmstudio"
+        modelID = model.id
         settingsManager.settings.modelID = model.id
         lmConnection.selectDevice(device)
         lmConnection.selectModel(model)
@@ -275,6 +284,7 @@ struct LocalModelsByDefault: View {
 
 struct EditLocalModelConfigView: View {
     @Environment(\.dismiss) private var dismiss
+    @AppStorage("aichat_selected_provider") private var selectedProviderID = "openrouter"
     @State var config: LocalModelConfig
     var onSave: (LocalModelConfig) -> Void
 
@@ -549,12 +559,13 @@ struct EditLocalModelConfigView: View {
                 Section {
                     Button {
                         AIChatSettingsManager.shared.settings.selectedLocalConfigID = config.id
+                        selectedProviderID = "local_models"
                         AIChatSettingsManager.shared.settings.selectedProviderID = "local_models"
                     } label: {
                         HStack {
                             Spacer()
                             if AIChatSettingsManager.shared.settings.selectedLocalConfigID == config.id &&
-                               AIChatSettingsManager.shared.settings.selectedProviderID == "local_models" {
+                               selectedProviderID == "local_models" {
                                 Label("Currently Default Environment", systemImage: "star.fill")
                                     .foregroundColor(.orange)
                                     .bold()

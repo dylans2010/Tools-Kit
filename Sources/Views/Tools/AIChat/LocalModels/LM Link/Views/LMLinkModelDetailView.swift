@@ -14,12 +14,13 @@ struct LMLinkModelDetailView: View {
             Section(header: Text("Model Metadata")) {
                 LabeledContent("ID", value: model.id)
                 LabeledContent("Name", value: model.name)
-                if let arch = model.architecture {
-                    LabeledContent("Architecture", value: arch)
-                }
-                if let ctx = model.contextLength {
-                    LabeledContent("Context Length", value: "\(ctx)")
-                }
+                LabeledContent("Architecture", value: model.architecture ?? "N/A")
+                LabeledContent("Context Length", value: model.contextLength != nil ? "\(model.contextLength!)" : "N/A")
+                LabeledContent("File Size", value: model.fileSize ?? "N/A")
+                LabeledContent("Quantization", value: model.quantization ?? "N/A")
+                LabeledContent("Author", value: model.author ?? "N/A")
+                LabeledContent("License", value: model.license ?? "N/A")
+                LabeledContent("Release Date", value: model.releaseDate ?? "N/A")
             }
 
             Section(header: Text("Test Model")) {

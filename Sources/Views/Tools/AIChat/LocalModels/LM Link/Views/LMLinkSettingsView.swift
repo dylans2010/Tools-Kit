@@ -10,6 +10,8 @@ struct LMLinkSettingsView: View {
 
     @State private var localIP: String = "Detecting..."
     @State private var subnetMask: String = "Detecting..."
+    @State private var manualIP: String = ""
+    @State private var manualPort: String = "1234"
 
     var body: some View {
         List {
@@ -42,6 +44,25 @@ struct LMLinkSettingsView: View {
                 }
             } header: {
                 Text("Account Status")
+            }
+
+            Section {
+                TextField("Computer IP", text: $manualIP)
+                    .keyboardType(.decimalPad)
+                TextField("Port", text: $manualPort)
+                    .keyboardType(.numberPad)
+
+                Button("Connect to IP") {
+                    if let portInt = Int(manualPort) {
+                        let discovery = LMDeviceDiscoveryService.shared
+                        Task {
+                            await discovery.manualAddDevice(ip: manualIP, port: portInt)
+                        }
+                    }
+                }
+                .disabled(manualIP.isEmpty || manualPort.isEmpty)
+            } header: {
+                Text("Manual Connection")
             }
 
             Section {

@@ -30,12 +30,14 @@ struct AIChatSettingsView: View {
     @AppStorage("agentEnabled") private var agentEnabled = false
     @AppStorage("agentDebugModeEnabled") private var debugModeEnabled = false
     @AppStorage("selectedAgentType") private var selectedAgentType = AgentType.jules.rawValue
+    @AppStorage("aichat_selected_provider") private var selectedProviderID = "openrouter"
+    @AppStorage("aichat_model_id") private var modelID = ""
     @State private var currentAppMode: AppMode = .dashboard
 
     private let registry = AIProviderRegistry.shared
 
     var selectedProvider: (any AIProvider)? {
-        registry.provider(for: settings.selectedProviderID)
+        registry.provider(for: selectedProviderID)
     }
 
     var body: some View {
@@ -189,8 +191,12 @@ struct AIChatSettingsView: View {
             .onChange(of: workspaceMode.isWorkspaceModeEnabled) { _, _ in currentAppMode = resolveCurrentMode() }
             .onChange(of: diagnosticsMode.isDiagnosticsModeEnabled) { _, _ in currentAppMode = resolveCurrentMode() }
             .onChange(of: gamesMode.isGamesModeEnabled) { _, _ in currentAppMode = resolveCurrentMode() }
-            .onChange(of: settings.selectedProviderID) { _, _ in
+            .onChange(of: selectedProviderID) { _, newValue in
+                settings.selectedProviderID = newValue
                 Task { await loadProviderModels(force: false) }
+            }
+            .onChange(of: modelID) { _, newValue in
+                settings.modelID = newValue
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
@@ -204,9 +210,9 @@ struct AIChatSettingsView: View {
                     ForEach(registry.providers, id: \.id) { provider in
                         ProviderChip(
                             provider: provider,
-                            isSelected: settings.selectedProviderID == provider.id
+                            isSelected: selectedProviderID == provider.id
                         ) {
-                            settings.selectedProviderID = provider.id
+                            selectedProviderID = provider.id
                             Task { await loadProviderModels(force: true) }
                         }
                     }
@@ -282,43 +288,55 @@ struct AIChatSettingsView: View {
 
     private var modelSectionContent: some View {
         VStack(alignment: .leading, spacing: 12) {
-            let availableModels = modelCatalog.models(for: settings.selectedProviderID)
-            if !availableModels.isEmpty {
-                Picker("Active Model", selection: $settings.modelID) {
-                    ForEach(availableModels) { model in
-                        HStack {
-                            Text(model.name)
-                            if model.supportsVision {
-                                Image(systemName: "eye.fill").foregroundColor(.blue).font(.caption)
+            if ["local_models", "afm", "lmstudio"].contains(selectedProviderID) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Current AI Model:")
+                        .font(.caption.bold())
+                        .foregroundColor(.secondary)
+                    Text(modelID.isEmpty ? "No model selected" : modelID)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                }
+                .padding(.vertical, 4)
+            } else {
+                let availableModels = modelCatalog.models(for: selectedProviderID)
+                if !availableModels.isEmpty {
+                    Picker("Active Model", selection: $modelID) {
+                        ForEach(availableModels) { model in
+                            HStack {
+                                Text(model.name)
+                                if model.supportsVision {
+                                    Image(systemName: "eye.fill").foregroundColor(.blue).font(.caption)
+                                }
                             }
+                            .tag(model.id)
                         }
-                        .tag(model.id)
+                    }
+                    .pickerStyle(.navigationLink)
+                } else {
+                    HStack {
+                        ProgressView().padding(.trailing, 8)
+                        Text("Fetching Models...")
+                            .foregroundColor(.secondary)
                     }
                 }
-                .pickerStyle(.navigationLink)
-            } else {
-                HStack {
-                    ProgressView().padding(.trailing, 8)
-                    Text("Fetching Models...")
+
+                Divider()
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Models")
+                        .font(.caption.bold())
+                    TextField("Model ID or Endpoint", text: $modelID)
+                        .textFieldStyle(.roundedBorder)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+
+                    Text("This model will be used by all AI powered features inside ToolsKit.")
+                        .font(.caption2)
                         .foregroundColor(.secondary)
                 }
+                .padding(.top, 4)
             }
-
-            Divider()
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Models")
-                    .font(.caption.bold())
-                TextField("Model ID or Endpoint", text: $settings.modelID)
-                    .textFieldStyle(.roundedBorder)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-
-                Text("This model will be used by all AI powered features inside ToolsKit.")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-            .padding(.top, 4)
 
             if settings.selectedProviderID == "openrouter" {
                 VStack(alignment: .leading, spacing: 12) {
@@ -664,12 +682,12 @@ struct AIChatSettingsView: View {
     }
 
     private func loadProviderModels(force: Bool) async {
-        let providerID = settings.selectedProviderID
+        let providerID = selectedProviderID
         await modelCatalog.loadModels(for: providerID, force: force)
         let models = await MainActor.run { modelCatalog.models(for: providerID) }
         await MainActor.run {
-            if !models.contains(where: { $0.id == settings.modelID }) {
-                settings.modelID = models.first?.id ?? ""
+            if !models.contains(where: { $0.id == modelID }) {
+                modelID = models.first?.id ?? ""
             }
         }
     }
