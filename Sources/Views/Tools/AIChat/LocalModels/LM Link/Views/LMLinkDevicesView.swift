@@ -2,12 +2,12 @@ import SwiftUI
 
 struct LMLinkDevicesView: View {
     @ObservedObject private var discoveryService = LMDeviceDiscoveryService.shared
-    @StateObject private var connectionManager = LMConnectionManager.shared
-    @StateObject private var authManager = LMLinkAuthManager.shared
+    @ObservedObject private var connectionManager = LMConnectionManager.shared
+    @ObservedObject private var authManager = LMLinkAuthManager.shared
 
     var body: some View {
         Group {
-            if !authManager.$isConnected.wrappedValue {
+            if !authManager.isConnected {
                 VStack(spacing: 20) {
                     Image(systemName: "link.badge.plus")
                         .font(.system(size: 60))
