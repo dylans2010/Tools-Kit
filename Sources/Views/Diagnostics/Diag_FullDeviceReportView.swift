@@ -16,76 +16,93 @@ struct Diag_FullDeviceReportView: View {
     }
 
     var body: some View {
-        Form {
-            Section("Comprehensive Device Report") {
-                VStack(spacing: 8) {
-                    Image(systemName: "doc.richtext.fill")
-                        .font(.system(size: 44))
-                        .foregroundStyle(.blue)
-                    Text("Full Device Diagnostic Report")
-                        .font(.headline)
-                    Text("Generate a complete report of all device hardware and software status for repair documentation")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
-            }
+        List {
+            headerSection
 
             if !reportGenerated {
-                Section {
-                    Button {
-                        generateReport()
-                    } label: {
-                        HStack {
-                            if isGenerating {
-                                ProgressView().scaleEffect(0.8)
-                            } else {
-                                Image(systemName: "doc.badge.plus")
-                            }
-                            Text("Generate Full Report")
-                        }
-                    }
-                    .disabled(isGenerating)
-                }
+                generationSection
             }
 
-            ForEach(reportSections) { section in
-                Section(section.title) {
-                    ForEach(section.items, id: \.0) { item in
-                        LabeledContent(item.0) {
-                            Text(item.1)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .textSelection(.enabled)
-                        }
-                    }
-                }
-            }
+            resultsSection
 
             if reportGenerated {
-                Section {
-                    ShareLink(item: exportText) {
-                        HStack {
-                            Image(systemName: "square.and.arrow.up")
-                            Text("Export Report")
-                        }
-                    }
+                actionsSection
+            }
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Full Device Report")
+        .navigationBarTitleDisplayMode(.inline)
+    }
 
-                    Button {
-                        generateReport()
-                    } label: {
-                        HStack {
-                            Image(systemName: "arrow.clockwise")
-                            Text("Regenerate Report")
-                        }
+    private var headerSection: some View {
+        Section("Comprehensive Device Report") {
+            VStack(spacing: 8) {
+                Image(systemName: "doc.richtext.fill")
+                    .font(.system(size: 44))
+                    .foregroundStyle(.blue)
+                Text("Full Device Diagnostic Report")
+                    .font(.headline)
+                Text("Generate a complete report of all device hardware and software status for repair documentation")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+        }
+    }
+
+    private var generationSection: some View {
+        Section {
+            Button {
+                generateReport()
+            } label: {
+                HStack {
+                    if isGenerating {
+                        ProgressView().scaleEffect(0.8)
+                    } else {
+                        Image(systemName: "doc.badge.plus")
+                    }
+                    Text("Generate Full Report")
+                }
+            }
+            .disabled(isGenerating)
+        }
+    }
+
+    private var resultsSection: some View {
+        ForEach(reportSections) { section in
+            Section(section.title) {
+                ForEach(section.items, id: \.0) { item in
+                    LabeledContent(item.0) {
+                        Text(item.1)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .textSelection(.enabled)
                     }
                 }
             }
         }
-        .navigationTitle("Full Device Report")
-        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var actionsSection: some View {
+        Section {
+            ShareLink(item: exportText) {
+                HStack {
+                    Image(systemName: "square.and.arrow.up")
+                    Text("Export Report")
+                }
+            }
+
+            Button {
+                generateReport()
+            } label: {
+                HStack {
+                    Image(systemName: "arrow.clockwise")
+                    Text("Regenerate Report")
+                }
+            }
+        }
     }
 
     private func generateReport() {

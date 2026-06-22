@@ -19,7 +19,7 @@ struct Diag_BatteryReplacementCheckView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("Battery Replacement Detection") {
                 VStack(spacing: 12) {
                     Image(systemName: overallStatus == .original ? "battery.100" : overallStatus == .replaced ? "exclamationmark.triangle.fill" : "questionmark.circle.fill")
@@ -107,6 +107,7 @@ struct Diag_BatteryReplacementCheckView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Battery Replacement")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

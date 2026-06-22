@@ -17,7 +17,7 @@ struct Diag_WarrantyCheckView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("Warranty & AppleCare Check") {
                 VStack(spacing: 8) {
                     Image(systemName: "checkmark.seal.fill")
@@ -172,6 +172,7 @@ struct Diag_WarrantyCheckView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Warranty Check")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { estimateDeviceAge() }

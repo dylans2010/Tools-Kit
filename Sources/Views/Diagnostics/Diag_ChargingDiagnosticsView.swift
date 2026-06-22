@@ -9,7 +9,7 @@ struct Diag_ChargingDiagnosticsView: View {
     @State private var chargeRate: String = "Waiting..."
 
     var body: some View {
-        Form {
+        List {
             Section("Charging Port Diagnostics") {
                 VStack(spacing: 12) {
                     Image(systemName: chargingIcon)
@@ -75,6 +75,7 @@ struct Diag_ChargingDiagnosticsView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Charging Diagnostics")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

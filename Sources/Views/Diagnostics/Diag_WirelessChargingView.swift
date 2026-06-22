@@ -8,7 +8,7 @@ struct Diag_WirelessChargingView: View {
     @State private var timer: Timer?
 
     var body: some View {
-        Form {
+        List {
             Section("Wireless Charging Test") {
                 VStack(spacing: 12) {
                     Image(systemName: chargingIcon)
@@ -94,6 +94,7 @@ struct Diag_WirelessChargingView: View {
                 .padding(.vertical, 4)
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Wireless Charging")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

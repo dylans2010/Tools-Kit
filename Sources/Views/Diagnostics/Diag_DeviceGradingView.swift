@@ -31,7 +31,7 @@ struct Diag_DeviceGradingView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("Device Grade") {
                 VStack(spacing: 12) {
                     ZStack {
@@ -117,6 +117,7 @@ struct Diag_DeviceGradingView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Device Grading")
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -17,7 +17,7 @@ struct Diag_StolenDeviceCheckView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("Stolen Device Check") {
                 VStack(spacing: 8) {
                     Image(systemName: "shield.checkered")
@@ -148,6 +148,7 @@ struct Diag_StolenDeviceCheckView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Stolen Device Check")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { runLocalChecks() }

@@ -7,7 +7,7 @@ struct Diag_UWBChipView: View {
     @State private var chipDetails: [(String, String)] = []
 
     var body: some View {
-        Form {
+        List {
             Section("Ultra Wideband (UWB) Chip") {
                 VStack(spacing: 12) {
                     Image(systemName: isSupported ? "dot.radiowaves.left.and.right" : "dot.radiowaves.right")
@@ -73,6 +73,7 @@ struct Diag_UWBChipView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("UWB Chip")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { checkUWB() }

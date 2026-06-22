@@ -42,7 +42,7 @@ struct Diag_CarrierLockView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("Carrier Lock Status") {
                 VStack(spacing: 12) {
                     Image(systemName: lockStatus.icon)
@@ -200,6 +200,7 @@ struct Diag_CarrierLockView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Carrier Lock")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { detectLockStatus() }

@@ -8,7 +8,7 @@ struct Diag_ForceTouchTestView: View {
     @State private var forceHistory: [CGFloat] = []
 
     var body: some View {
-        Form {
+        List {
             Section("3D Touch / Haptic Touch") {
                 VStack(spacing: 12) {
                     Image(systemName: "hand.point.up.left.fill")
@@ -62,6 +62,7 @@ struct Diag_ForceTouchTestView: View {
                 .padding(.vertical, 4)
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Force Touch Test")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { checkCapability() }

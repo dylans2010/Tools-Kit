@@ -11,7 +11,7 @@ struct Diag_FaceIDDiagnosticsView: View {
     @State private var frontCameraDetails: [(String, String)] = []
 
     var body: some View {
-        Form {
+        List {
             Section("Face ID Status") {
                 VStack(spacing: 12) {
                     Image(systemName: faceIDAvailable ? "faceid" : "faceid")
@@ -100,6 +100,7 @@ struct Diag_FaceIDDiagnosticsView: View {
                 .padding(.vertical, 4)
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Face ID Diagnostics")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { checkFaceID() }

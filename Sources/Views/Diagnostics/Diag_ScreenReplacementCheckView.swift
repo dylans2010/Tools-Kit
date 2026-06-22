@@ -18,7 +18,7 @@ struct Diag_ScreenReplacementCheckView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("Screen Replacement Detection") {
                 VStack(spacing: 12) {
                     Image(systemName: overallStatus == .original ? "display" : overallStatus == .replaced ? "exclamationmark.triangle.fill" : "questionmark.circle.fill")
@@ -73,6 +73,7 @@ struct Diag_ScreenReplacementCheckView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Screen Replacement")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { analyzeScreen() }

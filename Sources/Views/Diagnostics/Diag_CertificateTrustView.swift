@@ -15,7 +15,7 @@ struct Diag_CertificateTrustView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("Certificate Trust Store") {
                 VStack(spacing: 8) {
                     Image(systemName: "lock.doc.fill")
@@ -94,6 +94,7 @@ struct Diag_CertificateTrustView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Certificate Trust")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { scanCertificates() }

@@ -28,7 +28,7 @@ struct Diag_DeviceAuthenticityView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("Device Authenticity") {
                 VStack(spacing: 12) {
                     Image(systemName: overallGenuine.icon)
@@ -72,6 +72,7 @@ struct Diag_DeviceAuthenticityView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Device Authenticity")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { runVerification() }
