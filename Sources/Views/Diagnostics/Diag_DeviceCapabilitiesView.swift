@@ -27,49 +27,65 @@ struct Diag_DeviceCapabilitiesView: View {
 
     var body: some View {
         Form {
-            ForEach(capabilities) { group in
-                Section {
-                    ForEach(group.items) { item in
-                        HStack {
-                            Image(systemName: item.available ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                .foregroundStyle(item.available ? .green : .red)
-                                .font(.body)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(item.name)
-                                    .font(.subheadline)
-                                if let detail = item.detail {
-                                    Text(detail)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                        }
-                    }
-                } header: {
-                    HStack {
-                        Image(systemName: group.icon)
-                        Text(group.name)
-                    }
-                }
-            }
-
-            Section("Summary") {
-                let total = capabilities.flatMap(\.items).count
-                let available = capabilities.flatMap(\.items).filter(\.available).count
-                LabeledContent("Total Capabilities") { Text("\(total)") }
-                LabeledContent("Available") {
-                    Text("\(available)")
-                        .foregroundStyle(.green)
-                }
-                LabeledContent("Not Available") {
-                    Text("\(total - available)")
-                        .foregroundStyle(.red)
-                }
-            }
+            capabilitiesList
+            summarySection
         }
         .navigationTitle("Device Capabilities")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { loadCapabilities() }
+    }
+
+    private var capabilitiesList: some View {
+        ForEach(capabilities, id: \.id) { group in
+            Section {
+                ForEach(group.items, id: \.id) { item in
+                    capabilityRow(item)
+                }
+            } header: {
+                groupHeader(group)
+            }
+        }
+    }
+
+    private func capabilityRow(_ item: CapabilityItem) -> some View {
+        HStack {
+            Image(systemName: item.available ? "checkmark.circle.fill" : "xmark.circle.fill")
+                .foregroundStyle(item.available ? .green : .red)
+                .font(.body)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.name)
+                    .font(.subheadline)
+                if let detail = item.detail {
+                    Text(detail)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private func groupHeader(_ group: CapabilityGroup) -> some View {
+        HStack {
+            Image(systemName: group.icon)
+            Text(group.name)
+        }
+    }
+
+    private var summarySection: some View {
+        Section("Summary") {
+            let items = capabilities.flatMap(\.items)
+            let total = items.count
+            let available = items.filter(\.available).count
+            LabeledContent("Total Capabilities") { Text("\(total)") }
+            LabeledContent("Available") {
+                Text("\(available)")
+                    .foregroundStyle(.green)
+            }
+            LabeledContent("Not Available") {
+                Text("\(total - available)")
+                    .foregroundStyle(.red)
+            }
+        }
     }
 
     private func loadCapabilities() {

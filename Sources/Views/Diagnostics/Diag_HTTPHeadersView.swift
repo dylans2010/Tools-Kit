@@ -64,7 +64,7 @@ struct Diag_HTTPHeadersView: View {
 
             if !requestHeaders.isEmpty {
                 Section("Request Headers (\(requestHeaders.count))") {
-                    ForEach(requestHeaders) { header in
+                    ForEach(requestHeaders, id: \.id) { header in
                         VStack(alignment: .leading, spacing: 2) {
                             Text(header.key)
                                 .font(.caption.weight(.medium))
@@ -81,7 +81,7 @@ struct Diag_HTTPHeadersView: View {
 
             if !responseHeaders.isEmpty {
                 Section("Response Headers (\(responseHeaders.count))") {
-                    ForEach(responseHeaders) { header in
+                    ForEach(responseHeaders, id: \.id) { header in
                         VStack(alignment: .leading, spacing: 2) {
                             Text(header.key)
                                 .font(.caption.weight(.medium))

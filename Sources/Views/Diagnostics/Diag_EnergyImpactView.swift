@@ -116,7 +116,7 @@ struct Diag_EnergyImpactView: View {
 
             if !history.isEmpty {
                 Section("History") {
-                    ForEach(history.suffix(10)) { sample in
+                    ForEach(history.suffix(10), id: \.id) { sample in
                         HStack {
                             Circle()
                                 .fill(sample.level.color)

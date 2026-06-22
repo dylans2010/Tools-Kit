@@ -80,7 +80,7 @@ struct Diag_ProximityStressView: View {
 
             if !events.isEmpty {
                 Section("Recent Events") {
-                    ForEach(events.prefix(15)) { event in
+                    ForEach(events.prefix(15), id: \.id) { event in
                         HStack {
                             Image(systemName: event.state ? "circle.fill" : "circle")
                                 .foregroundStyle(event.state ? .green : .gray)

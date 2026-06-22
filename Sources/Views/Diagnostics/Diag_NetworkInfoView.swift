@@ -56,7 +56,7 @@ struct Diag_NetworkInfoView: View {
                     Text("No interfaces detected")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(interfaces) { iface in
+                    ForEach(interfaces, id: \.id) { iface in
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
                                 Text(iface.name)

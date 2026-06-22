@@ -37,7 +37,7 @@ struct Diag_CrashLogAnalyzerView: View {
 
             if !crashLogs.isEmpty {
                 Section("Found Logs (\(crashLogs.count))") {
-                    ForEach(crashLogs.prefix(50)) { log in
+                    ForEach(crashLogs.prefix(50), id: \.id) { log in
                         VStack(alignment: .leading, spacing: 2) {
                             HStack {
                                 Image(systemName: log.type == "crash" ? "exclamationmark.circle.fill" : "doc.text.fill")

@@ -5,6 +5,7 @@ import CoreMotion
 import CoreHaptics
 import Network
 
+@MainActor
 final class DiagnosticsService: ObservableObject {
     static let shared = DiagnosticsService()
 

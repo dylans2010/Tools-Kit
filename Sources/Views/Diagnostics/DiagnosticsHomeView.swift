@@ -65,7 +65,7 @@ struct DiagnosticsHomeView: View {
                     }
                 }
 
-                ForEach(DiagnosticCategory.allCases) { category in
+                ForEach(DiagnosticCategory.allCases, id: \.id) { category in
                     DiagnosticsCategoryChip(
                         title: category.rawValue,
                         icon: category.icon,
@@ -84,7 +84,7 @@ struct DiagnosticsHomeView: View {
     private var toolsList: some View {
         ForEach(viewModel.toolsByCategory, id: \.0) { category, tools in
             Section {
-                ForEach(tools) { tool in
+                ForEach(tools, id: \.id) { tool in
                     NavigationLink(destination: diagnosticDestination(for: tool)) {
                         HStack(spacing: 16) {
                             ZStack {

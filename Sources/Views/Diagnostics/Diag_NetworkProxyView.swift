@@ -40,7 +40,7 @@ struct Diag_NetworkProxyView: View {
                     Text("No proxy configuration detected")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(proxySettings) { proxy in
+                    ForEach(proxySettings, id: \.id) { proxy in
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(proxy.type)

@@ -100,7 +100,7 @@ struct Diag_VibrationMotorView: View {
 
             if !testResults.isEmpty {
                 Section("Diagnostic Results") {
-                    ForEach(testResults) { result in
+                    ForEach(testResults, id: \.id) { result in
                         HStack {
                             Image(systemName: result.passed ? "checkmark.circle.fill" : "xmark.circle.fill")
                                 .foregroundStyle(result.passed ? .green : .red)

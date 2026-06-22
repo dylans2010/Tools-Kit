@@ -84,7 +84,7 @@ struct Diag_FrameDropView: View {
 
             if !history.isEmpty {
                 Section("Recent (\(history.count) samples)") {
-                    ForEach(history.suffix(15)) { sample in
+                    ForEach(history.suffix(15), id: \.id) { sample in
                         HStack {
                             Circle()
                                 .fill(sample.dropped ? Color.red : Color.green)

@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 final class DiagnosticsModeManager: ObservableObject {
     static let shared = DiagnosticsModeManager()
 

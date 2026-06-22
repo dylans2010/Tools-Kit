@@ -31,7 +31,7 @@ struct DiagnosticChatHistory: View {
                         description: Text("Your diagnostic chat sessions will appear here.")
                     )
                 } else {
-                    ForEach(filteredSessions) { session in
+                    ForEach(filteredSessions, id: \.id) { session in
                         Button {
                             onSelectSession(session)
                             dismiss()

@@ -11,47 +11,60 @@ struct Diag_AccelerometerView: View {
 
     var body: some View {
         Form {
-            Section("Accelerometer Data") {
-                VStack(spacing: 12) {
-                    AxisRow(label: "X", value: x, color: .red)
-                    AxisRow(label: "Y", value: y, color: .green)
-                    AxisRow(label: "Z", value: z, color: .blue)
-                }
-                .padding(.vertical, 4)
-            }
-
-            Section("Live Graph") {
-                Canvas { context, size in
-                    drawGraph(context: context, size: size)
-                }
-                .frame(height: 150)
-            }
-
-            Section("Sensor Status") {
-                LabeledContent("Available") {
-                    Text(service.isAccelerometerAvailable ? "Yes" : "No")
-                        .foregroundStyle(service.isAccelerometerAvailable ? .green : .red)
-                }
-                LabeledContent("G-Force") {
-                    Text("\(sqrt(x*x + y*y + z*z), specifier: "%.2f") G")
-                        .monospacedDigit()
-                }
-            }
-
-            Section {
-                Button {
-                    if isActive { stopSensor() } else { startSensor() }
-                } label: {
-                    HStack {
-                        Image(systemName: isActive ? "stop.circle.fill" : "play.circle.fill")
-                        Text(isActive ? "Stop" : "Start Accelerometer")
-                    }
-                }
-            }
+            accelerometerDataSection
+            liveGraphSection
+            sensorStatusSection
+            actionsSection
         }
         .navigationTitle("Accelerometer")
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear { stopSensor() }
+    }
+
+    private var accelerometerDataSection: some View {
+        Section("Accelerometer Data") {
+            VStack(spacing: 12) {
+                AxisRow(label: "X", value: x, color: .red)
+                AxisRow(label: "Y", value: y, color: .green)
+                AxisRow(label: "Z", value: z, color: .blue)
+            }
+            .padding(.vertical, 4)
+        }
+    }
+
+    private var liveGraphSection: some View {
+        Section("Live Graph") {
+            Canvas { context, size in
+                drawGraph(context: context, size: size)
+            }
+            .frame(height: 150)
+        }
+    }
+
+    private var sensorStatusSection: some View {
+        Section("Sensor Status") {
+            LabeledContent("Available") {
+                Text(service.isAccelerometerAvailable ? "Yes" : "No")
+                    .foregroundStyle(service.isAccelerometerAvailable ? .green : .red)
+            }
+            LabeledContent("G-Force") {
+                Text("\(sqrt(x*x + y*y + z*z), specifier: "%.2f") G")
+                    .monospacedDigit()
+            }
+        }
+    }
+
+    private var actionsSection: some View {
+        Section {
+            Button {
+                if isActive { stopSensor() } else { startSensor() }
+            } label: {
+                HStack {
+                    Image(systemName: isActive ? "stop.circle.fill" : "play.circle.fill")
+                    Text(isActive ? "Stop" : "Start Accelerometer")
+                }
+            }
+        }
     }
 
     private func startSensor() {

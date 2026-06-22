@@ -96,7 +96,7 @@ struct Diag_TimeSyncView: View {
 
             if !checkHistory.isEmpty {
                 Section("Check History") {
-                    ForEach(checkHistory) { check in
+                    ForEach(checkHistory, id: \.id) { check in
                         HStack {
                             Image(systemName: check.success ? "checkmark.circle.fill" : "xmark.circle.fill")
                                 .foregroundStyle(check.success ? .green : .red)

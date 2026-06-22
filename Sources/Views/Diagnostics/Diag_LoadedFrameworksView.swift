@@ -40,7 +40,7 @@ struct Diag_LoadedFrameworksView: View {
             Section("Frameworks (\(filteredFrameworks.count))") {
                 TextField("Search frameworks...", text: $searchText)
 
-                ForEach(filteredFrameworks.prefix(100)) { fw in
+                ForEach(filteredFrameworks.prefix(100), id: \.id) { fw in
                     VStack(alignment: .leading, spacing: 2) {
                         HStack {
                             Image(systemName: fw.isSystem ? "building.columns.fill" : "shippingbox.fill")

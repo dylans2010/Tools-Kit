@@ -61,7 +61,7 @@ struct Diag_KeychainDiagView: View {
 
             if !testResults.isEmpty {
                 Section("Diagnostic Tests") {
-                    ForEach(testResults) { test in
+                    ForEach(testResults, id: \.id) { test in
                         HStack {
                             Image(systemName: test.passed ? "checkmark.circle.fill" : "xmark.circle.fill")
                                 .foregroundStyle(test.passed ? .green : .red)

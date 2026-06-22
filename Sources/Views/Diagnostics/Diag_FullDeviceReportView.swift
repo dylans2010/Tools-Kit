@@ -17,21 +17,38 @@ struct Diag_FullDeviceReportView: View {
 
     var body: some View {
         List {
-            headerSection
-
-            if !reportGenerated {
-                generationSection
-            }
-
-            resultsSection
-
-            if reportGenerated {
-                actionsSection
-            }
+            reportHeaderSection
+            reportGenerationSection
+            reportResultsSection
+            reportActionsSection
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Full Device Report")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var reportHeaderSection: some View {
+        headerSection
+    }
+
+    private var reportGenerationSection: some View {
+        Group {
+            if !reportGenerated {
+                generationSection
+            }
+        }
+    }
+
+    private var reportResultsSection: some View {
+        resultsSection
+    }
+
+    private var reportActionsSection: some View {
+        Group {
+            if reportGenerated {
+                actionsSection
+            }
+        }
     }
 
     private var headerSection: some View {
@@ -71,7 +88,7 @@ struct Diag_FullDeviceReportView: View {
     }
 
     private var resultsSection: some View {
-        ForEach(reportSections) { section in
+        ForEach(reportSections, id: \.id) { section in
             Section(section.title) {
                 ForEach(section.items, id: \.0) { item in
                     LabeledContent(item.0) {

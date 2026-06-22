@@ -60,7 +60,7 @@ struct Diag_ZoomRangeView: View {
             }
 
             Section("Cameras") {
-                ForEach(cameras) { camera in
+                ForEach(cameras, id: \.id) { camera in
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
                             Text(camera.name)

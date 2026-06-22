@@ -30,7 +30,7 @@ struct Diag_SIMInfoView: View {
                 .padding(.vertical, 8)
             }
 
-            ForEach(simSlots) { slot in
+            ForEach(simSlots, id: \.id) { slot in
                 Section("SIM Slot: \(slot.slotName)") {
                     LabeledContent("Carrier") { Text(slot.carrierName) }
                     LabeledContent("Country") { Text(slot.isoCountry.uppercased()) }

@@ -86,7 +86,7 @@ struct Diag_GlassBreakDetectView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(events.prefix(20)) { event in
+                    ForEach(events.prefix(20), id: \.id) { event in
                         HStack {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundStyle(.red)

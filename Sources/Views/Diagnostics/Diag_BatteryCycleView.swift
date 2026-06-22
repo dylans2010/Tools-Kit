@@ -88,7 +88,7 @@ struct Diag_BatteryCycleView: View {
 
             if !samples.isEmpty {
                 Section("Battery History (\(samples.count) samples)") {
-                    ForEach(samples.suffix(15)) { sample in
+                    ForEach(samples.suffix(15), id: \.id) { sample in
                         HStack {
                             Text(sample.timestamp, style: .time)
                                 .font(.caption.monospacedDigit())

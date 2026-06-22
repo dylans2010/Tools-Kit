@@ -37,7 +37,7 @@ struct Diag_NetworkInterfacesView: View {
                     Text("No WiFi interface")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(wifi) { iface in
+                    ForEach(wifi, id: \.id) { iface in
                         interfaceRow(iface)
                     }
                 }
@@ -49,7 +49,7 @@ struct Diag_NetworkInterfacesView: View {
                     Text("No cellular interface")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(cellular) { iface in
+                    ForEach(cellular, id: \.id) { iface in
                         interfaceRow(iface)
                     }
                 }
@@ -61,7 +61,7 @@ struct Diag_NetworkInterfacesView: View {
                     Text("No VPN interfaces")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(vpn) { iface in
+                    ForEach(vpn, id: \.id) { iface in
                         interfaceRow(iface)
                     }
                 }
@@ -69,7 +69,7 @@ struct Diag_NetworkInterfacesView: View {
 
             Section("Loopback & Other") {
                 let other = interfaces.filter { $0.name.hasPrefix("lo") || (!$0.name.hasPrefix("en") && !$0.name.hasPrefix("pdp") && !$0.name.hasPrefix("utun") && !$0.name.hasPrefix("ipsec")) }
-                ForEach(other) { iface in
+                ForEach(other, id: \.id) { iface in
                     interfaceRow(iface)
                 }
             }

@@ -46,7 +46,7 @@ struct Diag_DNSLookupView: View {
 
             if !results.isEmpty {
                 Section("Results (\(String(format: "%.0fms", lookupTime * 1000)))") {
-                    ForEach(results) { result in
+                    ForEach(results, id: \.id) { result in
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(result.address)

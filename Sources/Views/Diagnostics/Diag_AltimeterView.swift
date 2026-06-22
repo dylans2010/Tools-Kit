@@ -82,7 +82,7 @@ struct Diag_AltimeterView: View {
 
             if !history.isEmpty {
                 Section("Recent Readings") {
-                    ForEach(history.suffix(10)) { sample in
+                    ForEach(history.suffix(10), id: \.id) { sample in
                         HStack {
                             Text(sample.timestamp, style: .time)
                                 .font(.caption.monospacedDigit())

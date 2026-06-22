@@ -158,7 +158,7 @@ struct AudioDebugView: View {
                 Text("Controls")
             }
 
-            ForEach(viewModel.filteredCategories) { category in
+            ForEach(viewModel.filteredCategories, id: \.id) { category in
                 Section(header: Text(category.name)) {
                     ForEach(category.allIDs, id: \.self) { id in
                         HStack {

@@ -72,7 +72,7 @@ struct Diag_PortScannerView: View {
 
             if !results.isEmpty {
                 Section("Open Ports (\(results.filter { $0.status == .open }.count))") {
-                    ForEach(results.filter { $0.status == .open }) { result in
+                    ForEach(results.filter { $0.status == .open }, id: \.id) { result in
                         HStack {
                             Text("\(result.port)")
                                 .font(.system(.body, design: .monospaced))

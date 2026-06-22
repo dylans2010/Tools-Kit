@@ -80,7 +80,7 @@ struct Diag_SystemLogView: View {
                     Text("No log entries found")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(filteredLogs.prefix(50)) { entry in
+                    ForEach(filteredLogs.prefix(50), id: \.id) { entry in
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
                                 Circle()

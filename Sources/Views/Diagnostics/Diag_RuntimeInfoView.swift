@@ -76,7 +76,7 @@ struct Diag_RuntimeInfoView: View {
                         Text("\(loadedLibraries.filter { !$0.isSystem }.count)")
                     }
 
-                    ForEach(filteredLibraries.prefix(30)) { lib in
+                    ForEach(filteredLibraries.prefix(30), id: \.id) { lib in
                         VStack(alignment: .leading, spacing: 2) {
                             Text(lib.name)
                                 .font(.caption.weight(.medium))
@@ -97,7 +97,7 @@ struct Diag_RuntimeInfoView: View {
 
             if !environmentVars.isEmpty {
                 Section("Environment (\(environmentVars.count) vars)") {
-                    ForEach(environmentVars.prefix(20)) { entry in
+                    ForEach(environmentVars.prefix(20), id: \.id) { entry in
                         VStack(alignment: .leading, spacing: 2) {
                             Text(entry.key)
                                 .font(.caption.weight(.medium))

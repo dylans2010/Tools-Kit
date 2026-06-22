@@ -115,7 +115,7 @@ struct Diag_SocketTestView: View {
 
             if !connectionHistory.isEmpty {
                 Section("History") {
-                    ForEach(connectionHistory) { entry in
+                    ForEach(connectionHistory, id: \.id) { entry in
                         HStack {
                             Image(systemName: entry.success ? "checkmark.circle.fill" : "xmark.circle.fill")
                                 .foregroundStyle(entry.success ? .green : .red)

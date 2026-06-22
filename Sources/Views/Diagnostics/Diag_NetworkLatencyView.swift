@@ -22,7 +22,7 @@ struct Diag_NetworkLatencyView: View {
                     Text("No results yet")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(results) { result in
+                    ForEach(results, id: \.id) { result in
                         HStack {
                             Circle()
                                 .fill(result.success ? Color.green : Color.red)
