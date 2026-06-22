@@ -24,6 +24,15 @@
 				<string>com.googleusercontent.apps.127870730797-8rnpb3le5n3j34ur7uvsfma75592nr07</string>
 				<string>com.ToolsKit.microsoft</string>
 				<string>com.ToolsKit.yahoo</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>lmlink-callback</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
 				<string>toolskit</string>
 			</array>
 		</dict>

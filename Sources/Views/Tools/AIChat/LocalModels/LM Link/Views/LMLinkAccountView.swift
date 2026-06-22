@@ -8,10 +8,11 @@ struct LMLinkAccountView: View {
             Section(header: Text("Account")) {
                 HStack {
                     Image(systemName: "person.crop.circle.fill")
-                        .foregroundColor(.blue)
+                        .foregroundColor(authManager.isLinked ? .blue : .secondary)
                     VStack(alignment: .leading) {
-                        Text(authManager.username ?? "Not available")
+                        Text(authManager.isLinked ? (authManager.username ?? "Identity Verified") : "Not available")
                             .font(.headline)
+                            .foregroundColor(authManager.isLinked ? .primary : .secondary)
                         Text("LM Studio Account")
                             .font(.caption)
                             .foregroundColor(.secondary)

@@ -12,9 +12,12 @@ struct LMLinkMainView: View {
                 NavigationLink(destination: LMLinkDevicesView()) {
                     Label("Devices", systemImage: "desktopcomputer")
                 }
+                .disabled(!authManager.isLinked)
+
                 NavigationLink(destination: LMLinkModelsView()) {
                     Label("Models", systemImage: "cpu")
                 }
+                .disabled(!authManager.isLinked)
             } header: {
                 Text("Main")
             }
