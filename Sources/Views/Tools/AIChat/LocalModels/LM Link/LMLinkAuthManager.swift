@@ -4,7 +4,28 @@ import UIKit
 @MainActor
 final class LMLinkAuthManager: ObservableObject {
     static let shared = LMLinkAuthManager()
-    @Published private(set) var state: LMLinkAuthState = .idle
+    @Published private(set) var state: LMLinkAuthState = .idle {
+        didSet {
+            let connected: Bool
+            if case .connected = state {
+                connected = true
+            } else {
+                connected = false
+            }
+            isConnected = connected
+            isLinked = connected
+        }
+    }
+
+    @Published var isConnected: Bool = false
+    @Published var isLinked: Bool = false
+
+    var keyId: String? {
+        if case .connected(let session) = state {
+            return session.keyId
+        }
+        return nil
+    }
 
     private let keychain = LMLinkKeychainService()
     private let validator = LMLinkAPIValidator()
@@ -12,6 +33,12 @@ final class LMLinkAuthManager: ObservableObject {
     private var timeoutTask: Task<Void, Never>?
 
     private init() {}
+
+    func initiateLink() {
+        Task {
+            await beginAuthorization()
+        }
+    }
 
     func beginAuthorization() async {
         guard state == .idle || {
@@ -136,6 +163,10 @@ final class LMLinkAuthManager: ObservableObject {
         case .failure:
             state = .idle
         }
+    }
+
+    func unlink() {
+        disconnect()
     }
 
     func disconnect() {

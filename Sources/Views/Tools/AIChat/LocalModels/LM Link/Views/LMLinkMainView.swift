@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct LMLinkMainView: View {
-    @StateObject private var authManager = LMLinkAuthManager.shared
+    @ObservedObject private var authManager = LMLinkAuthManager.shared
+    @ObservedObject private var discoveryService = LMDeviceDiscoveryService.shared
 
     var body: some View {
         List {
@@ -35,7 +36,7 @@ struct LMLinkMainView: View {
         }
         .navigationTitle("LM Link")
         .overlay {
-            if authManager.isScanning && authManager.devices.isEmpty {
+            if discoveryService.isScanning && discoveryService.discoveredDevices.isEmpty {
                 VStack {
                     ProgressView()
                     Text("Initializing LM Link...")

@@ -5,8 +5,8 @@ struct LMLinkSettingsView: View {
     @AppStorage("lmlink_refresh_interval") private var refreshInterval: Double = 15.0
     @AppStorage("lmlink_auto_scan") private var autoScan = true
 
-    @StateObject private var authManager = LMLinkAuthManager.shared
-    @StateObject private var connectionManager = LMConnectionManager.shared
+    @ObservedObject private var authManager = LMLinkAuthManager.shared
+    @ObservedObject private var connectionManager = LMConnectionManager.shared
 
     @State private var localIP: String = "Detecting..."
     @State private var subnetMask: String = "Detecting..."

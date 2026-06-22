@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct LMLinkDashboardView: View {
-    @StateObject private var connectionManager = LMConnectionManager.shared
-    @StateObject private var authManager = LMLinkAuthManager.shared
+    @ObservedObject private var connectionManager = LMConnectionManager.shared
+    @ObservedObject private var authManager = LMLinkAuthManager.shared
+    @ObservedObject private var discoveryService = LMDeviceDiscoveryService.shared
 
     var body: some View {
         ScrollView {
@@ -11,7 +12,7 @@ struct LMLinkDashboardView: View {
                 LMLinkConnectionStatusView()
                     .padding(.top)
 
-                if authManager.state == .scanning {
+                if discoveryService.isScanning {
                     HStack {
                         ProgressView()
                             .padding(.trailing, 8)
