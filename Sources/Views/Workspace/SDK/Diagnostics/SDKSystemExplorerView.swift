@@ -76,9 +76,11 @@ struct APIExplorerDetail: View {
                 ForEach(methods, id: \.self) { Text($0).font(.caption.monospaced()) }
             }
             Section(header: Text("Live Stats")) {
-                LabeledContent("Object Count") {
+                LabeledContent(content: {
                     Text("\(count)").monospaced().bold().foregroundStyle(Color.accentColor)
-                }
+                }, label: {
+                    Text("Object Count")
+                })
             }
         }
         .navigationTitle("\(module) Explorer")

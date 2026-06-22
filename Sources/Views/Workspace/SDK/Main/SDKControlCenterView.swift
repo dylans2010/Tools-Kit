@@ -26,14 +26,14 @@ struct SDKControlCenterView: View {
 
     private var healthSection: some View {
         Section {
-            LabeledContent {
+            LabeledContent(content: {
                 let healthPercent = computeHealthPercent()
                 Text("\(healthPercent)%")
                     .font(.headline.monospaced())
                     .foregroundStyle(healthPercent > 90 ? Color.green : Color.orange)
-            } label: {
+            }, label: {
                 Label("System Health", systemImage: "heart.text.square")
-            }
+            })
 
             HealthRow(label: "Connectors", healthy: backgroundEngine.systemHealth.connectorReachability)
             HealthRow(label: "Plugins", healthy: backgroundEngine.systemHealth.pluginSandboxStatus)
@@ -88,11 +88,13 @@ struct SDKControlCenterView: View {
 
     private var syncSection: some View {
         Section {
-            LabeledContent("Status") {
+            LabeledContent(content: {
                 Label(realtimeSync.isConnected ? "Connected" : "Idle",
                       systemImage: realtimeSync.isConnected ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash")
                     .foregroundStyle(realtimeSync.isConnected ? Color.green : Color.secondary)
-            }
+            }, label: {
+                Text("Status")
+            })
 
             if !realtimeSync.activeChannels.isEmpty {
                 ForEach(Array(realtimeSync.activeChannels).sorted(), id: \.self) { channel in
@@ -112,10 +114,12 @@ struct SDKControlCenterView: View {
                 Text("No Connectors Registered").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(connectorManager.connectors, id: \.id) { connector in
-                    LabeledContent(connector.name) {
+                    LabeledContent(content: {
                         Text(connector.status.rawValue.capitalized)
                             .foregroundStyle(connector.status == .connected ? Color.green : Color.secondary)
-                    }
+                    }, label: {
+                        Text(connector.name)
+                    })
                 }
             }
         } header: {
@@ -163,9 +167,11 @@ private struct HealthRow: View {
     let healthy: Bool
 
     var body: some View {
-        LabeledContent(label) {
+        LabeledContent(content: {
             Image(systemName: healthy ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
                 .foregroundStyle(healthy ? Color.green : Color.red)
-        }
+        }, label: {
+            Text(label)
+        })
     }
 }

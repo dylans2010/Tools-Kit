@@ -72,8 +72,8 @@ struct VaultItemDetailView: View {
                         Text(item.note)
                     }
                 }
-                LabeledContent("Created", value: item.createdAt, format: .dateTime)
-                LabeledContent("Updated", value: item.updatedAt, format: .dateTime)
+                LabeledContent("Created", value: item.createdAt.formatted())
+                LabeledContent("Updated", value: item.updatedAt.formatted())
             } header: {
                 Text("Details")
             }
@@ -262,7 +262,7 @@ struct DocumentInfoSection: View {
         Section {
             LabeledContent("Type", value: doc.documentType)
             if let expiry = doc.expirationDate {
-                LabeledContent("Expires", value: expiry, format: Date.FormatStyle(date: .abbreviated, time: .omitted))
+                LabeledContent("Expires", value: expiry.formatted(date: .abbreviated, time: .omitted))
             }
             Text("No preview available for this document type")
                 .font(.caption)
