@@ -30,7 +30,7 @@ struct Diag_WaterDamageCheckView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("Water Damage Assessment") {
                 VStack(spacing: 12) {
                     Image(systemName: overallRisk == .clear ? "drop.degreesign.slash.fill" : overallRisk == .warning || overallRisk == .detected ? "drop.fill" : "questionmark.circle.fill")
@@ -105,6 +105,7 @@ struct Diag_WaterDamageCheckView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Water Damage Check")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { runWaterDamageChecks() }

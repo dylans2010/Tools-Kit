@@ -25,7 +25,7 @@ struct Diag_iCloudLockView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("iCloud Activation Lock") {
                 VStack(spacing: 12) {
                     Image(systemName: overallStatus == .locked ? "icloud.fill" : overallStatus == .clear ? "checkmark.icloud.fill" : "icloud.slash")
@@ -162,6 +162,7 @@ struct Diag_iCloudLockView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("iCloud Lock Status")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { runLocalChecks() }

@@ -8,7 +8,7 @@ struct Diag_BatteryTemperatureView: View {
     @State private var timer: Timer?
 
     var body: some View {
-        Form {
+        List {
             Section("Thermal Status") {
                 VStack(spacing: 12) {
                     Image(systemName: thermalIcon)
@@ -84,6 +84,7 @@ struct Diag_BatteryTemperatureView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Battery Temperature")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

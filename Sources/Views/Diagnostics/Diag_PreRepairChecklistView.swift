@@ -44,7 +44,7 @@ struct Diag_PreRepairChecklistView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("Pre-Repair Diagnostic Checklist") {
                 VStack(spacing: 8) {
                     ZStack {
@@ -126,6 +126,7 @@ struct Diag_PreRepairChecklistView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Pre-Repair Checklist")
         .navigationBarTitleDisplayMode(.inline)
     }

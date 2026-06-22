@@ -16,7 +16,7 @@ struct Diag_ConfigProfileAuditView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("Configuration Profile Audit") {
                 VStack(spacing: 8) {
                     Image(systemName: "doc.badge.gearshape")
@@ -108,6 +108,7 @@ struct Diag_ConfigProfileAuditView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Config Profile Audit")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { scanProfiles() }

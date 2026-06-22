@@ -16,7 +16,7 @@ struct Diag_ProvisioningProfileView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("Provisioning Profiles") {
                 if isLoading {
                     ProgressView("Scanning profiles...")
@@ -107,6 +107,7 @@ struct Diag_ProvisioningProfileView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Provisioning Profiles")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { scanProfiles() }

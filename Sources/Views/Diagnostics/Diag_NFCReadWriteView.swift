@@ -5,7 +5,7 @@ struct Diag_NFCReadWriteView: View {
     @StateObject private var nfcManager = NFCDiagManager()
 
     var body: some View {
-        Form {
+        List {
             Section("NFC Read/Write Test") {
                 VStack(spacing: 12) {
                     Image(systemName: nfcManager.isSupported ? "wave.3.right.circle.fill" : "wave.3.right.circle")
@@ -100,6 +100,7 @@ struct Diag_NFCReadWriteView: View {
                 .padding(.vertical, 4)
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("NFC Read/Write")
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -46,7 +46,7 @@ struct Diag_BlacklistCheckView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section("IMEI Blacklist Check") {
                 VStack(spacing: 8) {
                     Image(systemName: "shield.lefthalf.filled")
@@ -226,6 +226,7 @@ struct Diag_BlacklistCheckView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Blacklist Check")
         .navigationBarTitleDisplayMode(.inline)
     }
