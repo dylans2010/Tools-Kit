@@ -14,7 +14,9 @@ class LMConnectionManager: ObservableObject {
 
     func selectDevice(_ device: LMDevice) {
         self.selectedDevice = device
-        self.selectedModel = device.models.first
+        if let firstModel = device.models.first {
+            self.selectedModel = firstModel
+        }
     }
 
     func selectModel(_ model: LMModel) {
@@ -23,11 +25,11 @@ class LMConnectionManager: ObservableObject {
 
     func sendChatRequest(prompt: String, systemPrompt: String = "") async throws -> String {
         guard let device = selectedDevice else {
-            throw NSError(domain: "LMConnectionManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "No device selected"])
+            throw AIError.deviceOffline
         }
 
         guard let model = selectedModel else {
-            throw NSError(domain: "LMConnectionManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "No model selected"])
+            throw AIError.noModelSelected
         }
 
         let url = URL(string: "\(device.baseURL)/v1/chat/completions")!
@@ -47,22 +49,35 @@ class LMConnectionManager: ObservableObject {
 
         let body = try JSONSerialization.data(withJSONObject: payload)
 
-        let (data, response) = try await client.postRaw(url, body: body)
+        // Implement simple retry logic
+        var lastErr: Error?
+        for attempt in 1...2 {
+            do {
+                let (data, response) = try await client.postRaw(url, body: body, timeout: 30.0)
 
-        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-            let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
-            throw NSError(domain: "LMConnectionManager", code: (response as? HTTPURLResponse)?.statusCode ?? 500, userInfo: [NSLocalizedDescriptionKey: errorMsg])
+                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                    let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
+                    throw AIError.requestFailed(errorMsg)
+                }
+
+                let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+                let choices = json?["choices"] as? [[String: Any]]
+                let message = choices?.first?["message"] as? [String: Any]
+
+                guard let content = message?["content"] as? String else {
+                    throw AIError.decodingFailed
+                }
+
+                return content
+            } catch {
+                lastErr = error
+                if attempt < 2 {
+                    try? await Task.sleep(nanoseconds: 1_000_000_000) // 1s wait before retry
+                }
+            }
         }
 
-        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        let choices = json?["choices"] as? [[String: Any]]
-        let message = choices?.first?["message"] as? [String: Any]
-
-        guard let content = message?["content"] as? String else {
-            throw NSError(domain: "LMConnectionManager", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])
-        }
-
-        return content
+        throw lastErr ?? AIError.requestFailed("All attempts failed")
     }
 
     func fetchModelsForSelectedDevice() async {
@@ -71,9 +86,18 @@ class LMConnectionManager: ObservableObject {
         let url = URL(string: "\(device.baseURL)/v1/models")!
         do {
             let response: LMModelsResponse = try await client.request(url)
-            self.selectedDevice?.models = response.data.map { LMModel(id: $0.id) }
+            let models = response.data.map { LMModel(id: $0.id) }
+
+            await MainActor.run {
+                self.selectedDevice?.models = models
+                if self.selectedModel == nil, let first = models.first {
+                    self.selectedModel = first
+                }
+            }
         } catch {
-            self.lastError = "Failed to fetch models: \(error.localizedDescription)"
+            await MainActor.run {
+                self.lastError = "Failed to fetch models: \(error.localizedDescription)"
+            }
         }
     }
 }

@@ -3,10 +3,33 @@ import SwiftUI
 struct SetupLocalModelsView: View {
     @ObservedObject var settingsManager = AIChatSettingsManager.shared
     @State private var showingAddSheet = false
+    @State private var showingDefaultSheet = false
     @State private var configToEdit: LocalModelConfig?
 
     var body: some View {
         List {
+            Section {
+                Button {
+                    showingDefaultSheet = true
+                } label: {
+                    HStack {
+                        Label("Set Default Model", systemImage: "star.fill")
+                            .font(.headline)
+                        Spacer()
+                        Text(settingsManager.settings.modelID.isEmpty ? "None" : settingsManager.settings.modelID)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            } header: {
+                SectionHeader(title: "Primary Model", subtitle: "Configure your default local AI", icon: "sparkles")
+                    .listRowInsets(EdgeInsets())
+                    .padding(.bottom, 8)
+            }
+
             Section {
                 if settingsManager.settings.localConfigs.isEmpty {
                     VStack(spacing: 12) {
@@ -25,7 +48,7 @@ struct SetupLocalModelsView: View {
                     .onDelete(perform: deleteConfigs)
                 }
             } header: {
-                SectionHeader(title: "Environments", subtitle: "Manage your local AI setups", icon: "server.rack")
+                SectionHeader(title: "Environments", subtitle: "Manage your manual local setups", icon: "server.rack")
                     .listRowInsets(EdgeInsets())
                     .padding(.bottom, 8)
             }
@@ -64,6 +87,9 @@ struct SetupLocalModelsView: View {
                     saveConfig(updatedConfig)
                 }
             }
+        }
+        .sheet(isPresented: $showingDefaultSheet) {
+            LocalModelsByDefault()
         }
     }
 
@@ -128,6 +154,122 @@ struct SetupLocalModelsView: View {
                 settingsManager.settings.selectedProviderID = "openrouter" // Fallback
             }
         }
+    }
+}
+
+struct LocalModelsByDefault: View {
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject var settingsManager = AIChatSettingsManager.shared
+    @StateObject private var afmManager = AFMModelManager.shared
+    @StateObject private var lmConnection = LMConnectionManager.shared
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    ForEach(settingsManager.settings.localConfigs) { config in
+                        Button {
+                            selectManualModel(config)
+                        } label: {
+                            HStack {
+                                Label(config.name, systemImage: "desktopcomputer")
+                                Spacer()
+                                Text(config.modelName)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                if settingsManager.settings.selectedLocalConfigID == config.id && settingsManager.settings.selectedProviderID == "local_models" {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                        }
+                        .foregroundColor(.primary)
+                    }
+                } header: {
+                    Text("Manual Local Models")
+                }
+
+                Section {
+                    ForEach(afmManager.availableModels, id: \.self) { model in
+                        Button {
+                            selectAFMModel(model)
+                        } label: {
+                            HStack {
+                                Label(model, systemImage: "apple.logo")
+                                Spacer()
+                                if settingsManager.settings.selectedAFMModelID == model && settingsManager.settings.selectedProviderID == "afm" {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                        }
+                        .foregroundColor(.primary)
+                    }
+                } header: {
+                    Text("Apple Foundation Models")
+                }
+
+                Section {
+                    if let device = lmConnection.selectedDevice {
+                        ForEach(device.models) { model in
+                            Button {
+                                selectLMStudioModel(model, device: device)
+                            } label: {
+                                HStack {
+                                    Label(model.name, systemImage: "link")
+                                    Spacer()
+                                    if settingsManager.settings.modelID == model.id && settingsManager.settings.selectedProviderID == "lmstudio" {
+                                        Image(systemName: "checkmark")
+                                            .foregroundColor(.blue)
+                                    }
+                                }
+                            }
+                            .foregroundColor(.primary)
+                        }
+                    } else {
+                        Text("No LM Studio device selected.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                } header: {
+                    Text("LM Studio (via \(lmConnection.selectedDevice?.name ?? "No Device")")
+                }
+            }
+            .navigationTitle("Default Model")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+            .onAppear {
+                Task {
+                    await lmConnection.fetchModelsForSelectedDevice()
+                }
+            }
+        }
+    }
+
+    private func selectManualModel(_ config: LocalModelConfig) {
+        settingsManager.settings.selectedProviderID = "local_models"
+        settingsManager.settings.selectedLocalConfigID = config.id
+        settingsManager.settings.modelID = config.modelName
+        dismiss()
+    }
+
+    private func selectAFMModel(_ modelID: String) {
+        settingsManager.settings.selectedProviderID = "afm"
+        settingsManager.settings.selectedAFMModelID = modelID
+        settingsManager.settings.modelID = modelID
+        dismiss()
+    }
+
+    private func selectLMStudioModel(_ model: LMModel, device: LMDevice) {
+        settingsManager.settings.selectedProviderID = "lmstudio"
+        settingsManager.settings.modelID = model.id
+        lmConnection.selectDevice(device)
+        lmConnection.selectModel(model)
+        dismiss()
     }
 }
 

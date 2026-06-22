@@ -2,41 +2,59 @@ import SwiftUI
 
 struct LMLinkMainView: View {
     @StateObject private var authManager = LMLinkAuthManager.shared
-    @State private var selectedTab = 0
+    @State private var path = NavigationPath()
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            LMLinkDashboardView()
-                .tabItem {
-                    Label("Dashboard", systemImage: "house.fill")
+        NavigationStack(path: $path) {
+            List {
+                Section {
+                    NavigationLink(value: LMLinkRoute.dashboard) {
+                        Label("Dashboard", systemImage: "house.fill")
+                    }
+                    NavigationLink(value: LMLinkRoute.devices) {
+                        Label("Devices", systemImage: "desktopcomputer")
+                    }
+                    NavigationLink(value: LMLinkRoute.models) {
+                        Label("Models", systemImage: "cpu")
+                    }
+                } header: {
+                    Text("Main")
                 }
-                .tag(0)
 
-            LMLinkDevicesView()
-                .tabItem {
-                    Label("Devices", systemImage: "desktopcomputer")
+                Section {
+                    NavigationLink(value: LMLinkRoute.account) {
+                        Label("Account", systemImage: "person.crop.circle")
+                    }
+                    NavigationLink(value: LMLinkRoute.settings) {
+                        Label("Settings", systemImage: "gearshape")
+                    }
+                } header: {
+                    Text("Preferences")
                 }
-                .tag(1)
-
-            LMLinkModelsView()
-                .tabItem {
-                    Label("Models", systemImage: "cpu")
+            }
+            .navigationTitle("LM Link")
+            .navigationDestination(for: LMLinkRoute.self) { route in
+                switch route {
+                case .dashboard:
+                    LMLinkDashboardView()
+                case .devices:
+                    LMLinkDevicesView()
+                case .models:
+                    LMLinkModelsView()
+                case .account:
+                    LMLinkAccountView()
+                case .settings:
+                    LMLinkSettingsView()
                 }
-                .tag(2)
-
-            LMLinkAccountView()
-                .tabItem {
-                    Label("Account", systemImage: "person.crop.circle")
-                }
-                .tag(3)
-
-            LMLinkSettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gearshape")
-                }
-                .tag(4)
+            }
         }
-        .navigationTitle("LM Link")
-        .navigationBarTitleDisplayMode(.inline)
     }
+}
+
+enum LMLinkRoute: Hashable {
+    case dashboard
+    case devices
+    case models
+    case account
+    case settings
 }

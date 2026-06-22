@@ -7,6 +7,11 @@ struct ToolsKitApp: App {
         WindowGroup {
             ContentView()
                 .registerOAuthHandler()
+                .onOpenURL { url in
+                    if url.scheme == "toolskit" && url.host == "lm-callback" {
+                        LMLinkAuthManager.shared.handleCallback(url: url)
+                    }
+                }
         }
     }
 }
