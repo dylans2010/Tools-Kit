@@ -37,7 +37,11 @@ class LMConnectionManager: ObservableObject {
             throw AIError.noModelSelected
         }
 
-        let url = URL(string: "\(device.baseURL)/v1/chat/completions")!
+        guard let url = URL(string: "\(device.baseURL)/v1/chat/completions") else {
+            throw AIError.invalidEndpoint
+        }
+
+        SDKLogStore.shared.log("LMConnectionManager: Sending request to \(url.absoluteString) for model \(model.id)", source: "LMConnectionManager", level: .info)
 
         var messages: [[String: String]] = []
         if !systemPrompt.isEmpty {
@@ -60,8 +64,13 @@ class LMConnectionManager: ObservableObject {
             do {
                 let (data, response) = try await client.postRaw(url, body: body, timeout: 30.0)
 
-                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw AIError.invalidResponse
+                }
+
+                if !(200...299).contains(httpResponse.statusCode) {
                     let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
+                    SDKLogStore.shared.log("LMConnectionManager: Request failed (\(httpResponse.statusCode)) for \(url.absoluteString). Response: \(errorMsg)", source: "LMConnectionManager", level: .error)
                     throw AIError.requestFailed(errorMsg)
                 }
 
@@ -88,7 +97,7 @@ class LMConnectionManager: ObservableObject {
     func fetchModelsForSelectedDevice() async {
         guard let device = selectedDevice else { return }
 
-        let url = URL(string: "\(device.baseURL)/v1/models")!
+        guard let url = URL(string: "\(device.baseURL)/v1/models") else { return }
         do {
             let response: LMModelsResponse = try await client.request(url, timeout: 5.0)
 
@@ -115,7 +124,7 @@ class LMConnectionManager: ObservableObject {
     }
 
     private func checkDeviceReachability(_ device: LMDevice) async -> Bool {
-        let url = URL(string: "\(device.baseURL)/v1/models")!
+        guard let url = URL(string: "\(device.baseURL)/v1/models") else { return false }
         do {
             let _: LMModelsResponse = try await client.request(url, timeout: 2.0)
             return true
