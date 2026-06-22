@@ -1766,13 +1766,20 @@
 		LM0200000000000000000002 /* SetupLocalModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000002 /* SetupLocalModelsView.swift */; };
 LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000100 /* LMLinkKeychainService.swift */; };
 		LM0200000000000000000101 /* LMLinkAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000101 /* LMLinkAuthManager.swift */; };
-		LM0200000000000000000102 /* LMRequestSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000102 /* LMRequestSigner.swift */; };
 		LM0200000000000000000103 /* LMNetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000103 /* LMNetworkClient.swift */; };
 		LM0200000000000000000104 /* LMDeviceDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000104 /* LMDeviceDiscoveryService.swift */; };
 		LM0200000000000000000106 /* LMDeviceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000106 /* LMDeviceModel.swift */; };
 		LM0200000000000000000107 /* LMConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000107 /* LMConnectionManager.swift */; };
 		LM0200000000000000000200 /* LMDeviceRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000200 /* LMDeviceRowView.swift */; };
 		LM0200000000000000000201 /* LMLinkAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000201 /* LMLinkAccountView.swift */; };
+		LM0200000000000000000102 /* LMRequestSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000102 /* LMRequestSigner.swift */; };
+		LM0200000000000000000108 /* LMLinkAuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000108 /* LMLinkAuthState.swift */; };
+		LM0200000000000000000109 /* LMLinkLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000109 /* LMLinkLogger.swift */; };
+		LM020000000000000000010A /* LMLinkCallbackParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM010000000000000000010A /* LMLinkCallbackParser.swift */; };
+		LM020000000000000000010B /* LMLinkKeyPairService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM010000000000000000010B /* LMLinkKeyPairService.swift */; };
+		LM020000000000000000010C /* LMLinkAPIValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM010000000000000000010C /* LMLinkAPIValidator.swift */; };
+		LM020000000000000000010D /* AppDeepLinkRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM010000000000000000010D /* AppDeepLinkRouter.swift */; };
+		LM020000000000000000010E /* LMLinkViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM010000000000000000010E /* LMLinkViewModel.swift */; };
 		LM0200000000000000000202 /* LMLinkConnectionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000202 /* LMLinkConnectionStatusView.swift */; };
 		LM0200000000000000000203 /* LMLinkDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000203 /* LMLinkDashboardView.swift */; };
 		LM0200000000000000000204 /* LMLinkDeviceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000204 /* LMLinkDeviceDetailView.swift */; };
@@ -4169,13 +4176,20 @@ LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = P
 		LM0100000000000000000002 /* SetupLocalModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupLocalModelsView.swift; sourceTree = "<group>"; };
 LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkKeychainService.swift"; sourceTree = "<group>"; };
 		LM0100000000000000000101 /* LMLinkAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkAuthManager.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000102 /* LMRequestSigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMRequestSigner.swift"; sourceTree = "<group>"; };
 		LM0100000000000000000103 /* LMNetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMNetworkClient.swift"; sourceTree = "<group>"; };
 		LM0100000000000000000104 /* LMDeviceDiscoveryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMDeviceDiscoveryService.swift"; sourceTree = "<group>"; };
 		LM0100000000000000000106 /* LMDeviceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMDeviceModel.swift"; sourceTree = "<group>"; };
 		LM0100000000000000000107 /* LMConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMConnectionManager.swift"; sourceTree = "<group>"; };
 		LM0100000000000000000200 /* LMDeviceRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMDeviceRowView.swift"; sourceTree = "<group>"; };
 		LM0100000000000000000201 /* LMLinkAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkAccountView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000102 /* LMRequestSigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMRequestSigner.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000108 /* LMLinkAuthState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkAuthState.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000109 /* LMLinkLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkLogger.swift"; sourceTree = "<group>"; };
+		LM010000000000000000010A /* LMLinkCallbackParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkCallbackParser.swift"; sourceTree = "<group>"; };
+		LM010000000000000000010B /* LMLinkKeyPairService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkKeyPairService.swift"; sourceTree = "<group>"; };
+		LM010000000000000000010C /* LMLinkAPIValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkAPIValidator.swift"; sourceTree = "<group>"; };
+		LM010000000000000000010D /* AppDeepLinkRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDeepLinkRouter.swift"; sourceTree = "<group>"; };
+		LM010000000000000000010E /* LMLinkViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkViewModel.swift"; sourceTree = "<group>"; };
 		LM0100000000000000000202 /* LMLinkConnectionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkConnectionStatusView.swift"; sourceTree = "<group>"; };
 		LM0100000000000000000203 /* LMLinkDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkDashboardView.swift"; sourceTree = "<group>"; };
 		LM0100000000000000000204 /* LMLinkDeviceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkDeviceDetailView.swift"; sourceTree = "<group>"; };
@@ -11404,6 +11418,13 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 				LM0100000000000000000104 /* LMDeviceDiscoveryService.swift */,
 				LM0100000000000000000106 /* LMDeviceModel.swift */,
 				LM0100000000000000000107 /* LMConnectionManager.swift */,
+				LM0100000000000000000108 /* LMLinkAuthState.swift */,
+				LM0100000000000000000109 /* LMLinkLogger.swift */,
+				LM010000000000000000010A /* LMLinkCallbackParser.swift */,
+				LM010000000000000000010B /* LMLinkKeyPairService.swift */,
+				LM010000000000000000010C /* LMLinkAPIValidator.swift */,
+				LM010000000000000000010D /* AppDeepLinkRouter.swift */,
+				LM010000000000000000010E /* LMLinkViewModel.swift */,
 			);
 			path = "LM Link";
 			sourceTree = "<group>";
@@ -12248,6 +12269,13 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 				LM0200000000000000000102 /* LMRequestSigner.swift in Sources */,
 				LM0200000000000000000103 /* LMNetworkClient.swift in Sources */,
 				LM0200000000000000000104 /* LMDeviceDiscoveryService.swift in Sources */,
+				LM0200000000000000000108 /* LMLinkAuthState.swift in Sources */,
+				LM0200000000000000000109 /* LMLinkLogger.swift in Sources */,
+				LM020000000000000000010A /* LMLinkCallbackParser.swift in Sources */,
+				LM020000000000000000010B /* LMLinkKeyPairService.swift in Sources */,
+				LM020000000000000000010C /* LMLinkAPIValidator.swift in Sources */,
+				LM020000000000000000010D /* AppDeepLinkRouter.swift in Sources */,
+				LM020000000000000000010E /* LMLinkViewModel.swift in Sources */,
 				LM0200000000000000000106 /* LMDeviceModel.swift in Sources */,
 				LM0200000000000000000107 /* LMConnectionManager.swift in Sources */,
 				LM0200000000000000000200 /* LMDeviceRowView.swift in Sources */,

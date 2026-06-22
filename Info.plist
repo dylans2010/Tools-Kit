@@ -30,7 +30,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>lmlink-callback</string>
+			<string>com.toolskit.lmlink</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>toolskit</string>

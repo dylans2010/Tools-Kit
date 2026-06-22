@@ -8,9 +8,10 @@ struct ToolsKitApp: App {
             ContentView()
                 .registerOAuthHandler()
                 .onOpenURL { url in
-                    if url.scheme == "toolskit" && url.host == "lm-callback" {
-                        LMLinkAuthManager.shared.handleCallback(url: url)
-                    }
+                    AppDeepLinkRouter.shared.handle(url)
+                }
+                .task {
+                    await LMLinkAuthManager.shared.restoreSession()
                 }
         }
     }
