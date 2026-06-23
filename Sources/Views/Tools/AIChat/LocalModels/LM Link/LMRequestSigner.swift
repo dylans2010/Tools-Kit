@@ -11,9 +11,9 @@ class LMRequestSigner {
         // Use Ed25519 message-based signing algorithm supported by SecKey
         let algorithm: SecKeyAlgorithm
         if #available(iOS 15.0, macOS 12.0, *) {
-            algorithm = "com.apple.security.ed25519-signature-message" as CFString
+            algorithm = "com.apple.security.ed25519-signature-message" as! SecKeyAlgorithm
         } else {
-            algorithm = "com.apple.security.eddsa-signature-message" as CFString
+            algorithm = "com.apple.security.eddsa-signature-message" as! SecKeyAlgorithm
         }
 
         guard let signature = SecKeyCreateSignature(privateKey, algorithm, payload as CFData, &error) as Data? else {
