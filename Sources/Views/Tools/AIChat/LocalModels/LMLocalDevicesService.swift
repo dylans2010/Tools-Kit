@@ -110,9 +110,16 @@ class LMLocalDevicesService: ObservableObject {
     }
 
     private func probeLocalhost() async {
+        // On real iOS devices, probing 127.0.0.1 (localhost) is generally restricted
+        // by the sandbox and doesn't reach the desktop host. Probing is skipped
+        // on physical devices to avoid unnecessary sandbox violations.
+        #if targetEnvironment(simulator)
         for port in defaultPorts {
             await probeDevice(ip: "127.0.0.1", port: port, type: .local)
         }
+        #else
+        SDKLogStore.shared.log("LMLocalDevicesService: Skipping localhost probe on physical device", source: "LMLocalDevicesService", level: .info)
+        #endif
     }
 
     private func scanLocalSubnet() async {

@@ -6,7 +6,7 @@ actor LMLinkAPIValidator {
         case unreachable
     }
 
-    func ping(serverURL: URL = URL(string: "http://localhost:1234")!) async -> PingResult {
+    func ping(serverURL: URL) async -> PingResult {
         let endpoint = serverURL.appendingPathComponent("v1/models")
         var request = URLRequest(url: endpoint, timeoutInterval: 5)
         request.httpMethod = "GET"
