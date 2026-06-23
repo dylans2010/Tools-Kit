@@ -1,5 +1,6 @@
 import Foundation
 import Security
+import CryptoKit
 
 class LMRequestSigner {
     private let keychain = LMLinkKeychainService()
@@ -7,21 +8,13 @@ class LMRequestSigner {
     func sign(payload: Data, keyId: String) throws -> String? {
         let privateKey = try LMLinkKeyPairService.loadPrivateKey(for: keyId)
 
-        var error: Unmanaged<CFError>?
-        // Use Ed25519 message-based signing algorithm supported by SecKey
-        let algorithm: SecKeyAlgorithm
-        if #available(iOS 15.0, macOS 12.0, *) {
-            algorithm = "com.apple.security.ed25519-signature-message" as! SecKeyAlgorithm
-        } else {
-            algorithm = "com.apple.security.eddsa-signature-message" as! SecKeyAlgorithm
-        }
-
-        guard let signature = SecKeyCreateSignature(privateKey, algorithm, payload as CFData, &error) as Data? else {
-            LMLinkLogger.keypair.error("Ed25519 Signing failed: \(error.debugDescription, privacy: .public)")
+        do {
+            let signature = try privateKey.signature(for: payload)
+            return signature.base64EncodedString()
+        } catch {
+            LMLinkLogger.keypair.error("Ed25519 Signing failed via CryptoKit: \(error.localizedDescription, privacy: .public)")
             return nil
         }
-
-        return signature.base64EncodedString()
     }
 
     func addSignatureHeaders(to request: inout URLRequest, payload: Data) throws {
