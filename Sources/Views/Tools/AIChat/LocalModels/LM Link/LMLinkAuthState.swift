@@ -10,6 +10,7 @@ enum LMLinkAuthState: Equatable {
 
 struct LMLinkSession: Equatable, Sendable {
     let keyId: String
+    let publicKey: String
     let credential: String
     let userId: String
     let connectedAt: Date
