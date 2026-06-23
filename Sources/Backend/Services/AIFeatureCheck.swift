@@ -81,6 +81,9 @@ final class AIFeatureCheck: ObservableObject {
             let key = try await productionAPIKey()
             incrementRequestCount()
             return AIAuthorization(apiKey: key, mode: .appModel)
+
+        case .local:
+            return AIAuthorization(apiKey: "", mode: .ownKey)
         }
     }
 
