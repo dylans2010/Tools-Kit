@@ -388,10 +388,6 @@ class AIService {
             break
         }
 
-        let messages = [
-            ChatMessage(role: "system", content: finalSystemPrompt),
-            ChatMessage(role: "user", content: prompt)
-        ]
         return try await processMessages(messages: messages, model: model)
     }
 
@@ -1099,3 +1095,4 @@ struct DynamicAIModelRouting {
         throw AIError.networkError("All available free models exhausted. Last error: \(lastError?.localizedDescription ?? "Unknown")")
     }
 }
+
