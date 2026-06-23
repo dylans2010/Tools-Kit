@@ -57,17 +57,16 @@ final class LMLinkAuthManager: NSObject, ObservableObject {
         state = .authorizing
 
         do {
-            SDKLogStore.shared.log("LM Link: Starting authorization flow", source: "LMLinkAuthManager", level: .info)
+            SDKLogStore.shared.log("LM Link: [INIT] Starting authorization flow", source: "LMLinkAuthManager", level: .info)
             let (keyId, publicKeyBase64) = try LMLinkKeyPairService.generateKeyPair()
             pendingKeyId = keyId
             pendingPublicKey = publicKeyBase64
-            SDKLogStore.shared.log("LM Link: Key pair generated. keyId: \(keyId)", source: "LMLinkAuthManager", level: .info)
+            SDKLogStore.shared.log("LM Link: [KEYGEN] Key pair generated. keyId: \(keyId), publicKey: \(publicKeyBase64)", source: "LMLinkAuthManager", level: .info)
 
             var components = URLComponents(string: "https://lmstudio.ai/authentication-request")
             components?.queryItems = [
                 URLQueryItem(name: "keyId",         value: keyId),
                 URLQueryItem(name: "publicKey",     value: publicKeyBase64),
-                URLQueryItem(name: "feature",       value: "lmlink"),
                 URLQueryItem(name: "returnTo",      value: "toolskit://lm-callback"),
                 URLQueryItem(name: "clientKind",    value: "ios"),
                 URLQueryItem(name: "clientVersion", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
@@ -75,13 +74,13 @@ final class LMLinkAuthManager: NSObject, ObservableObject {
 
             guard let authURL = components?.url else {
                 LMLinkLogger.auth.error("Failed to construct authentication URL")
-                SDKLogStore.shared.log("LM Link: Failed to construct authentication URL", source: "LMLinkAuthManager", level: .error)
+                SDKLogStore.shared.log("LM Link: [ERROR] Failed to construct authentication URL", source: "LMLinkAuthManager", level: .error)
                 state = .error(.browserOpenFailed)
                 return
             }
 
             LMLinkLogger.auth.info("Opening external Safari. URL: \(authURL.absoluteString, privacy: .private(mask: .hash))")
-            SDKLogStore.shared.log("LM Link: Opening external Safari for URL: \(authURL.absoluteString)", source: "LMLinkAuthManager", level: .info)
+            SDKLogStore.shared.log("LM Link: [REDIRECT] Opening external Safari for URL: \(authURL.absoluteString)", source: "LMLinkAuthManager", level: .info)
 
             // MANDATORY: Use UIApplication.shared.open to launch external Safari
             // Using withCheckedContinuation to bridge the completion-handler-based API to async/await
@@ -93,13 +92,13 @@ final class LMLinkAuthManager: NSObject, ObservableObject {
 
             if success {
                 LMLinkLogger.auth.info("External Safari opened successfully")
-                SDKLogStore.shared.log("LM Link: External Safari opened", source: "LMLinkAuthManager", level: .info)
+                SDKLogStore.shared.log("LM Link: [SUCCESS] External Safari opened successfully", source: "LMLinkAuthManager", level: .info)
                 state = .awaitingCallback
                 startTimeoutTimer()
             } else {
                 state = .error(.browserOpenFailed)
                 LMLinkLogger.auth.error("Failed to open external Safari")
-                SDKLogStore.shared.log("LM Link: Failed to open external Safari", source: "LMLinkAuthManager", level: .error)
+                SDKLogStore.shared.log("LM Link: [ERROR] Failed to open external Safari", source: "LMLinkAuthManager", level: .error)
             }
         } catch {
             LMLinkLogger.auth.error("Key pair generation failed: \(error.localizedDescription, privacy: .public)")
@@ -218,24 +217,24 @@ final class LMLinkAuthManager: NSObject, ObservableObject {
 
     private func finalizeLink(credential: String, keyId: String, publicKey: String, userId: String) async {
         LMLinkLogger.auth.info("Finalizing link for keyId: \(keyId, privacy: .private(mask: .hash))")
-        SDKLogStore.shared.log("LM Link: [CONFIRMATION] Starting registration for keyId: \(keyId)", source: "LMLinkAuthManager", level: .info)
+        SDKLogStore.shared.log("LM Link: [CONFIRMATION] Starting registration for keyId: \(keyId), publicKey length: \(publicKey.count)", source: "LMLinkAuthManager", level: .info)
 
         // Ensure consistency between generated and received keys
         if let pending = pendingKeyId, pending != keyId {
-            SDKLogStore.shared.log("LM Link: WARNING - keyId mismatch. Pending: \(pending), Callback: \(keyId). Using Callback ID.", source: "LMLinkAuthManager", level: .warning)
+            SDKLogStore.shared.log("LM Link: [WARNING] keyId mismatch. Pending: \(pending), Callback: \(keyId). Using Callback ID.", source: "LMLinkAuthManager", level: .warning)
         }
 
         let finalPublicKey = publicKey.isEmpty ? (pendingPublicKey ?? "") : publicKey
         if finalPublicKey.isEmpty {
             LMLinkLogger.auth.error("No public key available for session")
-            SDKLogStore.shared.log("LM Link: [FAILURE] No public key available for session", source: "LMLinkAuthManager", level: .error)
+            SDKLogStore.shared.log("LM Link: [FAILURE] No public key available for session. pendingPublicKey exists: \(pendingPublicKey != nil)", source: "LMLinkAuthManager", level: .error)
             state = .error(.malformedCallback)
             return
         }
 
         guard let confirmURL = URL(string: "https://lmstudio.ai/authentication-confirm") else {
             LMLinkLogger.auth.error("Failed to construct confirmation URL")
-            SDKLogStore.shared.log("LM Link: Failed to construct confirmation URL", source: "LMLinkAuthManager", level: .error)
+            SDKLogStore.shared.log("LM Link: [ERROR] Failed to construct confirmation URL", source: "LMLinkAuthManager", level: .error)
             state = .error(.malformedCallback)
             return
         }
@@ -247,6 +246,7 @@ final class LMLinkAuthManager: NSObject, ObservableObject {
 
         let body: [String: String] = [
             "keyId": keyId,
+            "publicKey": finalPublicKey,
             "credential": credential,
             "userId": userId,
             "platform": "ios"
@@ -260,14 +260,15 @@ final class LMLinkAuthManager: NSObject, ObservableObject {
             return
         }
 
-        SDKLogStore.shared.log("LM Link: [CONFIRMATION] Sending POST confirmation to: \(confirmURL.absoluteString) for device registration", source: "LMLinkAuthManager", level: .info)
+        SDKLogStore.shared.log("LM Link: [CONFIRMATION] Sending POST to: \(confirmURL.absoluteString) with keyId: \(keyId)", source: "LMLinkAuthManager", level: .info)
 
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
 
             if let httpResponse = response as? HTTPURLResponse {
                 LMLinkLogger.auth.info("Confirmation response status: \(httpResponse.statusCode, privacy: .public)")
-                SDKLogStore.shared.log("LM Link: [CONFIRMATION] Response status: \(httpResponse.statusCode)", source: "LMLinkAuthManager", level: .info)
+                let responseBody = String(data: data, encoding: .utf8) ?? "no body"
+                SDKLogStore.shared.log("LM Link: [CONFIRMATION] Response status: \(httpResponse.statusCode), body: \(responseBody)", source: "LMLinkAuthManager", level: .info)
 
                 if (200...299).contains(httpResponse.statusCode) {
                     LMLinkLogger.auth.info("Device successfully registered with LM Studio")
