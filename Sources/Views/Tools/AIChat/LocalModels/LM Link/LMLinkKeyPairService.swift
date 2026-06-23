@@ -36,10 +36,10 @@ final class LMLinkKeyPairService {
             throw KeyPairError.storageFailed(status)
         }
 
-        let publicKeyData = privateKey.publicKey.rawRepresentation
+        let publicKeyData = privateKey.publicKey.x963Representation
         let base64 = publicKeyData.base64EncodedString()
 
-        LMLinkLogger.keypair.info("P-256 key pair generated via CryptoKit. keyId: \(keyId, privacy: .private(mask: .hash))")
+        LMLinkLogger.keypair.info("P-256 key pair generated via CryptoKit using x963Representation (65 bytes). keyId: \(keyId, privacy: .private(mask: .hash))")
 
         return (keyId: keyId, publicKeyBase64: base64)
     }

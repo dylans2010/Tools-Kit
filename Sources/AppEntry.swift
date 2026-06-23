@@ -15,6 +15,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 class SceneDelegate: NSObject, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         guard let url = URLContexts.first?.url else { return }
+        SDKLogStore.shared.log("LM Link: [SCENE] SceneDelegate received URL: \(url.absoluteString)", source: "SceneDelegate", level: .info)
         LMLinkLogger.deeplink.info("SceneDelegate received URL: \(url.absoluteString, privacy: .private(mask: .hash))")
         Task { @MainActor in
             AppDeepLinkRouter.shared.handle(url)
@@ -31,6 +32,7 @@ struct ToolsKitApp: App {
             ContentView()
                 .registerOAuthHandler()
                 .onOpenURL { url in
+                    SDKLogStore.shared.log("LM Link: [SWIFTUI] onOpenURL received URL: \(url.absoluteString)", source: "ToolsKitApp", level: .info)
                     LMLinkLogger.deeplink.info("SwiftUI .onOpenURL received URL: \(url.absoluteString, privacy: .private(mask: .hash))")
                     AppDeepLinkRouter.shared.handle(url)
                 }

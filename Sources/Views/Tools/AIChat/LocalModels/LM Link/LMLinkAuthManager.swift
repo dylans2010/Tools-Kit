@@ -64,13 +64,16 @@ final class LMLinkAuthManager: NSObject, ObservableObject {
             SDKLogStore.shared.log("LM Link: [KEYGEN] Key pair generated. keyId: \(keyId), publicKey: \(publicKeyBase64)", source: "LMLinkAuthManager", level: .info)
 
             var components = URLComponents(string: "https://lmstudio.ai/authentication-request")
-            components?.queryItems = [
+            let queryItems = [
                 URLQueryItem(name: "keyId",         value: keyId),
                 URLQueryItem(name: "publicKey",     value: publicKeyBase64),
                 URLQueryItem(name: "returnTo",      value: "toolskit://lm-callback"),
                 URLQueryItem(name: "clientKind",    value: "ios"),
                 URLQueryItem(name: "clientVersion", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
             ]
+            components?.queryItems = queryItems
+
+            SDKLogStore.shared.log("LM Link: [REDIRECT] URL Construction. keyId: \(keyId), publicKey: \(publicKeyBase64), returnTo: toolskit://lm-callback", source: "LMLinkAuthManager", level: .info)
 
             guard let authURL = components?.url else {
                 LMLinkLogger.auth.error("Failed to construct authentication URL")
@@ -109,6 +112,12 @@ final class LMLinkAuthManager: NSObject, ObservableObject {
     func handleCallback(url: URL) async {
         SDKLogStore.shared.log("LM Link: [RECEPTION] Deep Link Callback URL: \(url.absoluteString)", source: "LMLinkAuthManager", level: .info)
         LMLinkLogger.deeplink.info("LM Link: [RECEPTION] Handling callback URL: \(url.absoluteString, privacy: .private(mask: .hash))")
+
+        // Extra debug info
+        if let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            let queryDetails = components.queryItems?.map { "\($0.name)=\($0.value ?? "nil")" }.joined(separator: ", ") ?? "no query"
+            SDKLogStore.shared.log("LM Link: [RECEPTION] Parsed components: host=\(components.host ?? "nil"), query=\(queryDetails)", source: "LMLinkAuthManager", level: .debug)
+        }
 
         let result = LMLinkCallbackParser.parse(url: url)
 
@@ -251,6 +260,8 @@ final class LMLinkAuthManager: NSObject, ObservableObject {
             "userId": userId,
             "platform": "ios"
         ]
+
+        SDKLogStore.shared.log("LM Link: [CONFIRMATION] Request body: \(body)", source: "LMLinkAuthManager", level: .debug)
 
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
