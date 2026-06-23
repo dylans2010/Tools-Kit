@@ -19,7 +19,7 @@ struct CreateNotebookView: View {
                 }
 
                 Section("Icon") {
-                    NavigationLink(destination: SFSymbolPicker(selectedIcon: $selectedIcon)) {
+                    NavigationLink(destination: SFSymbolPicker()) {
                         HStack {
                             Text("Select Icon")
                             Spacer()

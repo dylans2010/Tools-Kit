@@ -1,13 +1,21 @@
 import SwiftUI
+import SymbolPicker
 
 struct SFSymbolPicker: View {
-    @Binding var selectedIcon: String
+    @State private var iconPickerPresented = false
+    @State private var icon = "pencil"
 
     var body: some View {
-        List {
-            Text("SFSymbolPicker Placeholder")
-            Text("Selected Icon: \(selectedIcon)")
+        Button {
+            iconPickerPresented = true
+        } label: {
+            HStack {
+                Image(systemName: icon)
+                Text(icon)
+            }
         }
-        .navigationTitle("Select Icon")
+        .sheet(isPresented: $iconPickerPresented) {
+            SymbolPicker(symbol: $icon)
+        }
     }
 }

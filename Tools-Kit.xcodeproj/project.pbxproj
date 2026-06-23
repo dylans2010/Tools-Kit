@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0001F0832037938D40776723 /* AgentToolResultCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643750A4D819D6E6CB623690 /* AgentToolResultCache.swift */; };
-		FB000001 /* FoundationModelsSystem.md in Resources */ = {isa = PBXBuildFile; fileRef = FB000002 /* FoundationModelsSystem.md */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		008580EC96F3EB7A63395DC9 /* AgentConfigurationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412F9451340C6E936945A3CF /* AgentConfigurationValidator.swift */; };
 		00940BDABFF94E26B5A919CD /* branch_switch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F7340F43454195884F0413 /* branch_switch.swift */; };
@@ -477,7 +476,6 @@
 		AA11BB22CC33DD44EE55FF04 /* FileImporterRepresentableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */; };
 		AA11BB22CC33DD44EE55FF05 /* AIChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */; };
 		AA11BB22CC33DD44EE55FF06 /* AIChatMemoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */; };
-		SF0200000000000000000001 /* SFSymbolPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = SF0100000000000000000001 /* SFSymbolPicker.swift */; };
 		AA9F0279B4BEED0AC8111C3A /* AgentCodeLanguageDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01AC08F24D517F68A828494C /* AgentCodeLanguageDetector.swift */; };
 		AAAAF107572CB595BFED4CF4 /* SDKMigrationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E9EC74C78EF3E548EA53BD /* SDKMigrationManager.swift */; };
 		AAF5C810315D4C1488F582E1 /* load_memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF30730A939437A8A79A888 /* load_memory.swift */; };
@@ -1406,6 +1404,7 @@
 		FAD26B7B6535492AB9F8C803 /* LocalFileConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEAE48E3D14202BF990AB8 /* LocalFileConnector.swift */; };
 		FADCF8E52BB34034979B5CCA /* TextRewriterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7136C881982494A913D1859 /* TextRewriterView.swift */; };
 		FAF5DC94BD24403EB3049436 /* SliderOptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F983F4EB6B654B2D867A8129 /* SliderOptionManager.swift */; };
+		FB000001 /* FoundationModelsSystem.md in Resources */ = {isa = PBXBuildFile; fileRef = FB000002 /* FoundationModelsSystem.md */; };
 		FB0200000000000000000000 /* AIAnalysisResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000000 /* AIAnalysisResult.swift */; };
 		FB0200000000000000000001 /* AIAnalysisService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000001 /* AIAnalysisService.swift */; };
 		FB0200000000000000000002 /* DiagnosticsCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0100000000000000000002 /* DiagnosticsCenterView.swift */; };
@@ -1445,6 +1444,7 @@
 		FC0200000000000000000001 /* FilterChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0100000000000000000001 /* FilterChip.swift */; };
 		FC02ACD1C6531D397EF356AF /* AgenticFoundationModelsAvailabilityChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC070B5F75920EA18A92A970 /* AgenticFoundationModelsAvailabilityChecker.swift */; };
 		FC335125304A4830BFC09FE0 /* Builder/DevToolSharedUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5802738C69834F1BBAAA2C66 /* Builder/DevToolSharedUtils.swift */; };
+		FC55D3C52FEB3B7300B2FE83 /* SymbolPicker in Frameworks */ = {isa = PBXBuildFile; productRef = FC55D3C42FEB3B7300B2FE83 /* SymbolPicker */; };
 		FC8CA39C2FE6467900CBBA86 /* MailCore2 in Frameworks */ = {isa = PBXBuildFile; productRef = MC0200000000000000000001 /* MailCore2 */; };
 		FC8CA39D2FE6467900CBBA86 /* Appwrite in Frameworks */ = {isa = PBXBuildFile; productRef = AW0200000000000000000001 /* Appwrite */; };
 		FC8CA39E2FE6467900CBBA86 /* Daily in Frameworks */ = {isa = PBXBuildFile; productRef = DY0200000000000000000001 /* Daily */; };
@@ -1769,15 +1769,13 @@
 		LM0200000000000000000004 /* LMDeviceFallbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000004 /* LMDeviceFallbackView.swift */; };
 		LM0200000000000000000005 /* AdvancedLocalModelsConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000005 /* AdvancedLocalModelsConfigView.swift */; };
 		LM0200000000000000000006 /* LMStudioLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000006 /* LMStudioLogsView.swift */; };
-LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000100 /* LMLinkKeychainService.swift */; };
+		LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000100 /* LMLinkKeychainService.swift */; };
 		LM0200000000000000000101 /* LMLinkAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000101 /* LMLinkAuthManager.swift */; };
+		LM0200000000000000000102 /* LMRequestSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000102 /* LMRequestSigner.swift */; };
 		LM0200000000000000000103 /* LMNetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000103 /* LMNetworkClient.swift */; };
 		LM0200000000000000000104 /* LMDeviceDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000104 /* LMDeviceDiscoveryService.swift */; };
 		LM0200000000000000000106 /* LMDeviceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000106 /* LMDeviceModel.swift */; };
 		LM0200000000000000000107 /* LMConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000107 /* LMConnectionManager.swift */; };
-		LM0200000000000000000200 /* LMDeviceRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000200 /* LMDeviceRowView.swift */; };
-		LM0200000000000000000201 /* LMLinkAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000201 /* LMLinkAccountView.swift */; };
-		LM0200000000000000000102 /* LMRequestSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000102 /* LMRequestSigner.swift */; };
 		LM0200000000000000000108 /* LMLinkAuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000108 /* LMLinkAuthState.swift */; };
 		LM0200000000000000000109 /* LMLinkLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000109 /* LMLinkLogger.swift */; };
 		LM020000000000000000010A /* LMLinkCallbackParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM010000000000000000010A /* LMLinkCallbackParser.swift */; };
@@ -1785,6 +1783,8 @@ LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = P
 		LM020000000000000000010C /* LMLinkAPIValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM010000000000000000010C /* LMLinkAPIValidator.swift */; };
 		LM020000000000000000010D /* AppDeepLinkRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM010000000000000000010D /* AppDeepLinkRouter.swift */; };
 		LM020000000000000000010E /* LMLinkViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM010000000000000000010E /* LMLinkViewModel.swift */; };
+		LM0200000000000000000200 /* LMDeviceRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000200 /* LMDeviceRowView.swift */; };
+		LM0200000000000000000201 /* LMLinkAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000201 /* LMLinkAccountView.swift */; };
 		LM0200000000000000000202 /* LMLinkConnectionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000202 /* LMLinkConnectionStatusView.swift */; };
 		LM0200000000000000000203 /* LMLinkDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000203 /* LMLinkDashboardView.swift */; };
 		LM0200000000000000000204 /* LMLinkDeviceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000204 /* LMLinkDeviceDetailView.swift */; };
@@ -2209,6 +2209,7 @@ LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = P
 		SDKD2000000000000000001 /* Docs/SDKAIContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDKD1000000000000000001 /* Docs/SDKAIContextProvider.swift */; };
 		SDKD2000000000000000002 /* Docs/SDKMarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDKD1000000000000000002 /* Docs/SDKMarkdownView.swift */; };
 		SDKD2000000000000000003 /* SDK_AI_System.md in Resources */ = {isa = PBXBuildFile; fileRef = SDKD1000000000000000003 /* SDK_AI_System.md */; };
+		SF0200000000000000000001 /* SFSymbolPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = SF0100000000000000000001 /* SFSymbolPicker.swift */; };
 		SG0200000000000000000001 /* WordSuggestionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = SG0100000000000000000001 /* WordSuggestionsViewModel.swift */; };
 		SG0200000000000000000002 /* WordSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SG0100000000000000000002 /* WordSuggestionsView.swift */; };
 		SK020001 /* Sources/Models/Skill.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010001 /* Sources/Models/Skill.swift */; };
@@ -2698,7 +2699,6 @@ LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = P
 		637B4943AE2D404097B93977 /* Builder/ThreadInspectorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/ThreadInspectorDevTool.swift; sourceTree = "<group>"; };
 		63935A4E10C64913964D9DC4 /* update_memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = update_memory.swift; sourceTree = "<group>"; };
 		643750A4D819D6E6CB623690 /* AgentToolResultCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolResultCache.swift; sourceTree = "<group>"; };
-		FB000002 /* FoundationModelsSystem.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = FoundationModelsSystem.md; sourceTree = "<group>"; };
 		645DFCFABAC545B7AFD0C88B /* SmartAutofillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartAutofillView.swift; sourceTree = "<group>"; };
 		6482ABD7CAA1424BBECD13E3 /* Sources/Views/Workspace/Plugins/Analytics/PluginPerformanceProfilerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Analytics/PluginPerformanceProfilerView.swift; sourceTree = "<group>"; };
 		64A88A7CA8B64675B4AFE539 /* Builder/YAMLParserDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/YAMLParserDevTool.swift; sourceTree = "<group>"; };
@@ -2918,7 +2918,6 @@ LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = P
 		AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileImporterRepresentableView.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatViewModel.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatMemoryStore.swift; sourceTree = "<group>"; };
-		SF0100000000000000000001 /* SFSymbolPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSymbolPicker.swift; sourceTree = "<group>"; };
 		ABCD1234567890ABCDEF0100 /* Main/PresetConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/PresetConnectorsView.swift; sourceTree = "<group>"; };
 		AC0100000000000000000001 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		AC28589723B0B1D7FC48CF86 /* AgentBundleValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentBundleValidator.swift; sourceTree = "<group>"; };
@@ -3826,6 +3825,7 @@ LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = P
 		FA11000000000000000000A0 /* PersonaChatExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaChatExporter.swift; sourceTree = "<group>"; };
 		FAD5D82E91A64626B8BC2973 /* EmailGeneratorBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailGeneratorBackend.swift; sourceTree = "<group>"; };
 		FAE72CB2484B4F979B8155E6 /* ToolVisibilitySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolVisibilitySettingsView.swift; sourceTree = "<group>"; };
+		FB000002 /* FoundationModelsSystem.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = FoundationModelsSystem.md; sourceTree = "<group>"; };
 		FB0100000000000000000000 /* AIAnalysisResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAnalysisResult.swift; sourceTree = "<group>"; };
 		FB0100000000000000000001 /* AIAnalysisService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAnalysisService.swift; sourceTree = "<group>"; };
 		FB0100000000000000000002 /* DiagnosticsCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsCenterView.swift; sourceTree = "<group>"; };
@@ -4184,41 +4184,41 @@ LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = P
 		LM0100000000000000000004 /* LMDeviceFallbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMDeviceFallbackView.swift; sourceTree = "<group>"; };
 		LM0100000000000000000005 /* AdvancedLocalModelsConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedLocalModelsConfigView.swift; sourceTree = "<group>"; };
 		LM0100000000000000000006 /* LMStudioLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMStudioLogsView.swift; sourceTree = "<group>"; };
-LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkKeychainService.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000101 /* LMLinkAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkAuthManager.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000103 /* LMNetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMNetworkClient.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000104 /* LMDeviceDiscoveryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMDeviceDiscoveryService.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000106 /* LMDeviceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMDeviceModel.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000107 /* LMConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMConnectionManager.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000200 /* LMDeviceRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMDeviceRowView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000201 /* LMLinkAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkAccountView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000102 /* LMRequestSigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMRequestSigner.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000108 /* LMLinkAuthState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkAuthState.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000109 /* LMLinkLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkLogger.swift"; sourceTree = "<group>"; };
-		LM010000000000000000010A /* LMLinkCallbackParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkCallbackParser.swift"; sourceTree = "<group>"; };
-		LM010000000000000000010B /* LMLinkKeyPairService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkKeyPairService.swift"; sourceTree = "<group>"; };
-		LM010000000000000000010C /* LMLinkAPIValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkAPIValidator.swift"; sourceTree = "<group>"; };
-		LM010000000000000000010D /* AppDeepLinkRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDeepLinkRouter.swift"; sourceTree = "<group>"; };
-		LM010000000000000000010E /* LMLinkViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkViewModel.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000202 /* LMLinkConnectionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkConnectionStatusView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000203 /* LMLinkDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkDashboardView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000204 /* LMLinkDeviceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkDeviceDetailView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000205 /* LMLinkDevicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkDevicesView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000206 /* LMLinkMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkMainView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000207 /* LMLinkModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkModelDetailView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000208 /* LMLinkModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkModelsView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000209 /* LMLinkSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMLinkSettingsView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000210 /* LMModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LMModelRowView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000300 /* AFMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMService.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000301 /* AFMModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMModelManager.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000302 /* AFMTaskRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMTaskRouter.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000303 /* AFMSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMSessionManager.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000400 /* AFMDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMDashboardView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000401 /* AFMMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMMainView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000402 /* AFMModelSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMModelSelectionView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000403 /* AFMResponseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMResponseView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000404 /* AFMSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMSettingsView.swift"; sourceTree = "<group>"; };
-		LM0100000000000000000405 /* AFMTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AFMTaskView.swift"; sourceTree = "<group>"; };
+		LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkKeychainService.swift; sourceTree = "<group>"; };
+		LM0100000000000000000101 /* LMLinkAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkAuthManager.swift; sourceTree = "<group>"; };
+		LM0100000000000000000102 /* LMRequestSigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMRequestSigner.swift; sourceTree = "<group>"; };
+		LM0100000000000000000103 /* LMNetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMNetworkClient.swift; sourceTree = "<group>"; };
+		LM0100000000000000000104 /* LMDeviceDiscoveryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMDeviceDiscoveryService.swift; sourceTree = "<group>"; };
+		LM0100000000000000000106 /* LMDeviceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMDeviceModel.swift; sourceTree = "<group>"; };
+		LM0100000000000000000107 /* LMConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMConnectionManager.swift; sourceTree = "<group>"; };
+		LM0100000000000000000108 /* LMLinkAuthState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkAuthState.swift; sourceTree = "<group>"; };
+		LM0100000000000000000109 /* LMLinkLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkLogger.swift; sourceTree = "<group>"; };
+		LM010000000000000000010A /* LMLinkCallbackParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkCallbackParser.swift; sourceTree = "<group>"; };
+		LM010000000000000000010B /* LMLinkKeyPairService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkKeyPairService.swift; sourceTree = "<group>"; };
+		LM010000000000000000010C /* LMLinkAPIValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkAPIValidator.swift; sourceTree = "<group>"; };
+		LM010000000000000000010D /* AppDeepLinkRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDeepLinkRouter.swift; sourceTree = "<group>"; };
+		LM010000000000000000010E /* LMLinkViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkViewModel.swift; sourceTree = "<group>"; };
+		LM0100000000000000000200 /* LMDeviceRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMDeviceRowView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000201 /* LMLinkAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkAccountView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000202 /* LMLinkConnectionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkConnectionStatusView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000203 /* LMLinkDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkDashboardView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000204 /* LMLinkDeviceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkDeviceDetailView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000205 /* LMLinkDevicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkDevicesView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000206 /* LMLinkMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkMainView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000207 /* LMLinkModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkModelDetailView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000208 /* LMLinkModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkModelsView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000209 /* LMLinkSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkSettingsView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000210 /* LMModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMModelRowView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000300 /* AFMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFMService.swift; sourceTree = "<group>"; };
+		LM0100000000000000000301 /* AFMModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFMModelManager.swift; sourceTree = "<group>"; };
+		LM0100000000000000000302 /* AFMTaskRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFMTaskRouter.swift; sourceTree = "<group>"; };
+		LM0100000000000000000303 /* AFMSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFMSessionManager.swift; sourceTree = "<group>"; };
+		LM0100000000000000000400 /* AFMDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFMDashboardView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000401 /* AFMMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFMMainView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000402 /* AFMModelSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFMModelSelectionView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000403 /* AFMResponseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFMResponseView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000404 /* AFMSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFMSettingsView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000405 /* AFMTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFMTaskView.swift; sourceTree = "<group>"; };
 		MA0100000000000000000001 /* MailAutomationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailAutomationEngine.swift; sourceTree = "<group>"; };
 		MC01000000000000000000A1 /* ModelConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelConfigManager.swift; sourceTree = "<group>"; };
 		MDC64B1890CDC5D4E894FB64 /* AgenticModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticModels.swift; sourceTree = "<group>"; };
@@ -4626,6 +4626,7 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 		SDKD1000000000000000001 /* Docs/SDKAIContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Docs/SDKAIContextProvider.swift; sourceTree = "<group>"; };
 		SDKD1000000000000000002 /* Docs/SDKMarkdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Docs/SDKMarkdownView.swift; sourceTree = "<group>"; };
 		SDKD1000000000000000003 /* SDK_AI_System.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SDK_AI_System.md; sourceTree = "<group>"; };
+		SF0100000000000000000001 /* SFSymbolPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSymbolPicker.swift; sourceTree = "<group>"; };
 		SG0100000000000000000001 /* WordSuggestionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSuggestionsViewModel.swift; sourceTree = "<group>"; };
 		SG0100000000000000000002 /* WordSuggestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSuggestionsView.swift; sourceTree = "<group>"; };
 		SK010001 /* Sources/Models/Skill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Models/Skill.swift; sourceTree = "<group>"; };
@@ -4866,6 +4867,7 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 			buildActionMask = 2147483647;
 			files = (
 				FC8CA3A02FE6467900CBBA86 /* SwiftMCP in Frameworks */,
+				FC55D3C52FEB3B7300B2FE83 /* SymbolPicker in Frameworks */,
 				FC8CA39F2FE6467900CBBA86 /* Aurora in Frameworks */,
 				FC8CA39E2FE6467900CBBA86 /* Daily in Frameworks */,
 				FC8CA39D2FE6467900CBBA86 /* Appwrite in Frameworks */,
@@ -8806,6 +8808,7 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 				KB0300000000000000000000 /* Sources/Keyboard */,
 				MS01D8F6E8B59DA1CCE7ABA8 /* Sources/Messages */,
 				FC8CA3A32FE6467900CBBA86 /* Recovered References */,
+				FC55D3C32FEB3B7300B2FE83 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -10251,6 +10254,13 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 			path = Integrations;
 			sourceTree = "<group>";
 		};
+		FC55D3C32FEB3B7300B2FE83 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		FC8CA3A32FE6467900CBBA86 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -11400,22 +11410,18 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 			path = LocalModels;
 			sourceTree = "<group>";
 		};
-				LM0300000000000000000200 /* Views */ = {
+		LM0300000000000000000002 /* LocalModels */ = {
 			isa = PBXGroup;
 			children = (
-				LM0100000000000000000200 /* LMDeviceRowView.swift */,
-				LM0100000000000000000201 /* LMLinkAccountView.swift */,
-				LM0100000000000000000202 /* LMLinkConnectionStatusView.swift */,
-				LM0100000000000000000203 /* LMLinkDashboardView.swift */,
-				LM0100000000000000000204 /* LMLinkDeviceDetailView.swift */,
-				LM0100000000000000000205 /* LMLinkDevicesView.swift */,
-				LM0100000000000000000206 /* LMLinkMainView.swift */,
-				LM0100000000000000000207 /* LMLinkModelDetailView.swift */,
-				LM0100000000000000000208 /* LMLinkModelsView.swift */,
-				LM0100000000000000000209 /* LMLinkSettingsView.swift */,
-				LM0100000000000000000210 /* LMModelRowView.swift */,
+				LM0100000000000000000002 /* SetupLocalModelsView.swift */,
+				LM0100000000000000000003 /* LMLocalDevicesService.swift */,
+				LM0100000000000000000004 /* LMDeviceFallbackView.swift */,
+				LM0100000000000000000005 /* AdvancedLocalModelsConfigView.swift */,
+				LM0100000000000000000006 /* LMStudioLogsView.swift */,
+				LM0300000000000000000100 /* LM Link */,
+				LM0300000000000000000300 /* AFM */,
 			);
-			path = Views;
+			path = LocalModels;
 			sourceTree = "<group>";
 		};
 		LM0300000000000000000100 /* LM Link */ = {
@@ -11440,15 +11446,20 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 			path = "LM Link";
 			sourceTree = "<group>";
 		};
-		LM0300000000000000000400 /* Views */ = {
+		LM0300000000000000000200 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				LM0100000000000000000400 /* AFMDashboardView.swift */,
-				LM0100000000000000000401 /* AFMMainView.swift */,
-				LM0100000000000000000402 /* AFMModelSelectionView.swift */,
-				LM0100000000000000000403 /* AFMResponseView.swift */,
-				LM0100000000000000000404 /* AFMSettingsView.swift */,
-				LM0100000000000000000405 /* AFMTaskView.swift */,
+				LM0100000000000000000200 /* LMDeviceRowView.swift */,
+				LM0100000000000000000201 /* LMLinkAccountView.swift */,
+				LM0100000000000000000202 /* LMLinkConnectionStatusView.swift */,
+				LM0100000000000000000203 /* LMLinkDashboardView.swift */,
+				LM0100000000000000000204 /* LMLinkDeviceDetailView.swift */,
+				LM0100000000000000000205 /* LMLinkDevicesView.swift */,
+				LM0100000000000000000206 /* LMLinkMainView.swift */,
+				LM0100000000000000000207 /* LMLinkModelDetailView.swift */,
+				LM0100000000000000000208 /* LMLinkModelsView.swift */,
+				LM0100000000000000000209 /* LMLinkSettingsView.swift */,
+				LM0100000000000000000210 /* LMModelRowView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -11465,18 +11476,17 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 			path = AFM;
 			sourceTree = "<group>";
 		};
-		LM0300000000000000000002 /* LocalModels */ = {
+		LM0300000000000000000400 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				LM0100000000000000000002 /* SetupLocalModelsView.swift */,
-				LM0100000000000000000003 /* LMLocalDevicesService.swift */,
-				LM0100000000000000000004 /* LMDeviceFallbackView.swift */,
-				LM0100000000000000000005 /* AdvancedLocalModelsConfigView.swift */,
-				LM0100000000000000000006 /* LMStudioLogsView.swift */,
-				LM0300000000000000000100 /* LM Link */,
-				LM0300000000000000000300 /* AFM */,
+				LM0100000000000000000400 /* AFMDashboardView.swift */,
+				LM0100000000000000000401 /* AFMMainView.swift */,
+				LM0100000000000000000402 /* AFMModelSelectionView.swift */,
+				LM0100000000000000000403 /* AFMResponseView.swift */,
+				LM0100000000000000000404 /* AFMSettingsView.swift */,
+				LM0100000000000000000405 /* AFMTaskView.swift */,
 			);
-			path = LocalModels;
+			path = Views;
 			sourceTree = "<group>";
 		};
 		MON100000000000000000001 /* Monitoring */ = {
@@ -12107,6 +12117,7 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 				ZF0000000000000000000002 /* ZIPFoundation */,
 				AU0200000000000000000001 /* Aurora */,
 				E8A1C3D5F7094B2D8E6A0C15 /* SwiftMCP */,
+				FC55D3C42FEB3B7300B2FE83 /* SymbolPicker */,
 			);
 			productName = "Tools-Kit";
 			productReference = 732E3165BFBB323BD8081B3F /* Tools-Kit.app */;
@@ -12190,6 +12201,7 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 				ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				AU0100000000000000000001 /* XCRemoteSwiftPackageReference "Aurora" */,
 				E8A1C3D5F7094B2D8E6A0C14 /* XCRemoteSwiftPackageReference "SwiftMCP" */,
+				FC55D3C22FEB39C800B2FE83 /* XCLocalSwiftPackageReference "../../Downloads/SymbolPicker-main" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B81AA4FC2BB81266E881DF5B /* Products */;
@@ -14952,6 +14964,13 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		FC55D3C22FEB39C800B2FE83 /* XCLocalSwiftPackageReference "../../Downloads/SymbolPicker-main" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../Downloads/SymbolPicker-main";
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		AU0100000000000000000001 /* XCRemoteSwiftPackageReference "Aurora" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -15023,6 +15042,11 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 			isa = XCSwiftPackageProductDependency;
 			package = E8A1C3D5F7094B2D8E6A0C14 /* XCRemoteSwiftPackageReference "SwiftMCP" */;
 			productName = SwiftMCP;
+		};
+		FC55D3C42FEB3B7300B2FE83 /* SymbolPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FC55D3C22FEB39C800B2FE83 /* XCLocalSwiftPackageReference "../../Downloads/SymbolPicker-main" */;
+			productName = SymbolPicker;
 		};
 		MC0200000000000000000001 /* MailCore2 */ = {
 			isa = XCSwiftPackageProductDependency;
