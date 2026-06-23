@@ -6,6 +6,7 @@ struct CreateNotebookView: View {
     @State private var name = ""
     @State private var selectedIcon = "book.closed"
     @State private var selectedColor = "#4F46E5"
+    @State private var isSymbolPickerPresented = false
 
     private let symbols = ["book.closed", "pencil", "graduationcap", "lightbulb", "brain", "doc.text", "folder", "archivebox", "calendar", "clock", "tag", "bookmark", "star", "heart", "globe", "house", "person", "envelope", "paperplane", "cart", "creditcard", "camera", "photo", "music.note", "video"]
 
@@ -19,7 +20,9 @@ struct CreateNotebookView: View {
                 }
 
                 Section("Icon") {
-                    NavigationLink(destination: SFSymbolPicker()) {
+                    Button {
+                        isSymbolPickerPresented = true
+                    } label: {
                         HStack {
                             Text("Select Icon")
                             Spacer()
@@ -27,6 +30,7 @@ struct CreateNotebookView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
+                    .foregroundColor(.primary)
                 }
 
                 Section("Color") {
@@ -63,6 +67,9 @@ struct CreateNotebookView: View {
                     .bold()
                 }
             }
+        }
+        .sheet(isPresented: $isSymbolPickerPresented) {
+            SFSymbolPicker(symbol: $selectedIcon)
         }
         .presentationDetents([.medium])
     }
