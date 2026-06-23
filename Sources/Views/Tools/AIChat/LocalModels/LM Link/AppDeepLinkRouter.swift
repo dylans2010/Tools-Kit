@@ -8,20 +8,22 @@ final class AppDeepLinkRouter {
     private init() {}
 
     func handle(_ url: URL) {
-        LMLinkLogger.deeplink.info("Router received deep link URL: \(url.absoluteString, privacy: .private(mask: .hash))")
-        LMLinkLogger.deeplink.info("App state at callback: \(UIApplication.shared.applicationState.rawValue, privacy: .public)")
+        LMLinkLogger.deeplink.info("Router received deep link: \(url.scheme ?? "nil", privacy: .public)://\(url.host ?? "nil", privacy: .public)")
 
-        switch url.scheme {
-        case "toolskit":
-            guard url.host == "lm-callback" else {
-                LMLinkLogger.deeplink.info("Ignoring toolskit URL with unrecognised host: \(url.host ?? "nil", privacy: .public)")
-                return
-            }
-            Task {
-                await LMLinkAuthManager.shared.handleCallback(url: url)
-            }
-        default:
-            LMLinkLogger.deeplink.info("URL not claimed by LM Link router — ignoring")
+        guard url.scheme == "toolskit" else {
+            LMLinkLogger.deeplink.info("Ignoring URL with unrecognized scheme: \(url.scheme ?? "nil", privacy: .public)")
+            return
+        }
+
+        guard url.host == "lm-callback" else {
+            LMLinkLogger.deeplink.info("Ignoring toolskit URL with unrecognized host: \(url.host ?? "nil", privacy: .public)")
+            return
+        }
+
+        LMLinkLogger.deeplink.info("Routing verified LM Link callback. App state: \(UIApplication.shared.applicationState.rawValue, privacy: .public)")
+
+        Task {
+            await LMLinkAuthManager.shared.handleCallback(url: url)
         }
     }
 }

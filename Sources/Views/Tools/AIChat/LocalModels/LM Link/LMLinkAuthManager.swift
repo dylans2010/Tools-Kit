@@ -32,7 +32,9 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
     private let validator = LMLinkAPIValidator()
     private var pendingKeyId: String?
     private var timeoutTask: Task<Void, Never>?
-    private var authSession: ASWebAuthenticationSession?
+
+    // Strongly retain the session to ensure it persists for the full lifecycle
+    private var activeAuthSession: ASWebAuthenticationSession?
 
     override init() {
         super.init()
@@ -48,7 +50,10 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
         guard state == .idle || {
             if case .error = state { return true }
             return false
-        }() else { return }
+        }() else {
+            LMLinkLogger.auth.info("Authorization already in progress or connected. Current state: \(String(describing: self.state))")
+            return
+        }
         state = .authorizing
 
         do {
@@ -64,43 +69,56 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
                 URLQueryItem(name: "clientKind",    value: "ios"),
                 URLQueryItem(name: "clientVersion", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
             ]
+
             guard let authURL = components?.url else {
+                LMLinkLogger.auth.error("Failed to construct authentication URL")
                 state = .error(.browserOpenFailed)
                 return
             }
 
-            LMLinkLogger.auth.info("Opening ASWebAuthenticationSession for keyId: \(keyId, privacy: .private(mask: .hash))")
+            LMLinkLogger.auth.info("Opening ASWebAuthenticationSession. URL: \(authURL.absoluteString, privacy: .private(mask: .hash))")
 
             let session = ASWebAuthenticationSession(
                 url: authURL,
                 callbackURLScheme: "toolskit"
             ) { [weak self] callbackURL, error in
                 Task { @MainActor in
+                    defer { self?.activeAuthSession = nil }
+
                     if let error = error {
                         if let authError = error as? ASWebAuthenticationSessionError, authError.code == .canceledLogin {
+                            LMLinkLogger.auth.info("User cancelled the authentication session")
                             self?.state = .error(.cancelled)
                         } else {
+                            LMLinkLogger.auth.error("ASWebAuthenticationSession failed: \(error.localizedDescription, privacy: .public)")
                             self?.state = .error(.browserOpenFailed)
                         }
-                        LMLinkLogger.auth.error("ASWebAuthenticationSession failed: \(error.localizedDescription, privacy: .public)")
                         return
                     }
 
-                    if let callbackURL = callbackURL {
-                        await self?.handleCallback(url: callbackURL)
+                    guard let callbackURL = callbackURL else {
+                        LMLinkLogger.auth.error("ASWebAuthenticationSession completed without error but no callback URL was provided")
+                        self?.state = .error(.malformedCallback)
+                        return
                     }
+
+                    LMLinkLogger.auth.info("ASWebAuthenticationSession received callback: \(callbackURL.host ?? "nil", privacy: .public)")
+                    await self?.handleCallback(url: callbackURL)
                 }
             }
 
             session.presentationContextProvider = self
+            // Important: prefersEphemeralWebBrowserSession must be false to share cookies with Safari
             session.prefersEphemeralWebBrowserSession = false
 
-            self.authSession = session
+            self.activeAuthSession = session
             if session.start() {
+                LMLinkLogger.auth.info("ASWebAuthenticationSession started successfully")
                 state = .awaitingCallback
                 startTimeoutTimer()
             } else {
                 state = .error(.browserOpenFailed)
+                self.activeAuthSession = nil
                 LMLinkLogger.auth.error("Failed to start ASWebAuthenticationSession")
             }
         } catch {
@@ -146,26 +164,7 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
 
         switch result {
         case .success(let credential, let keyId, let userId):
-            // Skip ping during callback on iOS to avoid localhost/sandbox issues.
-            // Connectivity is verified during discovery or first request.
-            let isReachable = false
-            let modelCount = 0
-
-            let session = LMLinkSession(
-                keyId: keyId,
-                credential: credential,
-                userId: userId,
-                connectedAt: Date(),
-                localServerReachable: isReachable,
-                localModelCount: modelCount
-            )
-            let saveResult = keychain.save(credential: credential, keyId: keyId, userId: userId)
-            if case .failure(let err) = saveResult {
-                state = .error(err)
-                return
-            }
-            state = .connected(session: session)
-            LMLinkLogger.auth.info("Auth complete. User: \(userId, privacy: .private(mask: .hash))")
+            await finalizeLink(credential: credential, keyId: keyId, userId: userId)
 
         case .cancelled:
             state = .error(.cancelled)
@@ -230,5 +229,69 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
     private func cancelTimeoutTimer() {
         timeoutTask?.cancel()
         timeoutTask = nil
+    }
+
+    private func finalizeLink(credential: String, keyId: String, userId: String) async {
+        LMLinkLogger.auth.info("Finalizing link for keyId: \(keyId, privacy: .private(mask: .hash))")
+
+        // LM Studio registration confirmation handshake
+        // After receiving the callback, we MUST notify the LM Studio server that the link is complete.
+        // This ensures the device is registered correctly in the LM Studio dashboard.
+
+        var components = URLComponents(string: "https://lmstudio.ai/authentication-confirm")
+        components?.queryItems = [
+            URLQueryItem(name: "keyId",      value: keyId),
+            URLQueryItem(name: "credential", value: credential),
+            URLQueryItem(name: "userId",     value: userId),
+            URLQueryItem(name: "platform",   value: "ios")
+        ]
+
+        guard let confirmURL = components?.url else {
+            LMLinkLogger.auth.error("Failed to construct confirmation URL")
+            state = .error(.malformedCallback)
+            return
+        }
+
+        var request = URLRequest(url: confirmURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+
+            if let httpResponse = response as? HTTPURLResponse {
+                LMLinkLogger.auth.info("Confirmation response status: \(httpResponse.statusCode, privacy: .public)")
+
+                if (200...299).contains(httpResponse.statusCode) {
+                    LMLinkLogger.auth.info("Device successfully registered with LM Studio")
+
+                    let session = LMLinkSession(
+                        keyId: keyId,
+                        credential: credential,
+                        userId: userId,
+                        connectedAt: Date(),
+                        localServerReachable: false,
+                        localModelCount: 0
+                    )
+
+                    let saveResult = keychain.save(credential: credential, keyId: keyId, userId: userId)
+                    if case .failure(let err) = saveResult {
+                        LMLinkLogger.auth.error("Failed to save credentials: \(err.localizedDescription, privacy: .public)")
+                        state = .error(err)
+                        return
+                    }
+
+                    state = .connected(session: session)
+                    LMLinkLogger.auth.info("Auth complete and session persisted.")
+                } else {
+                    let responseString = String(data: data, encoding: .utf8) ?? "no body"
+                    LMLinkLogger.auth.error("LM Studio confirmation failed. Status: \(httpResponse.statusCode), Body: \(responseString, privacy: .public)")
+                    state = .error(.denied)
+                }
+            }
+        } catch {
+            LMLinkLogger.auth.error("Network error during confirmation: \(error.localizedDescription, privacy: .public)")
+            state = .error(.browserOpenFailed)
+        }
     }
 }
