@@ -87,9 +87,8 @@ class LMLocalDevicesService: ObservableObject {
         await withTaskGroup(of: Void.self) { group in
             switch method {
             case .wifi:
-                group.addTask { await self.probeLocalhost() }
+                break
             case .lan:
-                group.addTask { await self.probeLocalhost() }
                 group.addTask { await self.scanLocalSubnet() }
             case .ip:
                 if let ip = manualIP, !ip.isEmpty {
@@ -107,19 +106,6 @@ class LMLocalDevicesService: ObservableObject {
         SDKLogStore.shared.log("LMLocalDevicesService: Probing manual IP \(ip):\(port)", source: "LMLocalDevicesService", level: .info)
         await probeDevice(ip: ip, port: port, type: .manualIP)
         saveCachedDevices()
-    }
-
-    private func probeLocalhost() async {
-        // On real iOS devices, probing 127.0.0.1 (localhost) is generally restricted
-        // by the sandbox and doesn't reach the desktop host. Probing is skipped
-        // on physical devices to avoid unnecessary sandbox violations.
-        #if targetEnvironment(simulator)
-        for port in defaultPorts {
-            await probeDevice(ip: "127.0.0.1", port: port, type: .local)
-        }
-        #else
-        SDKLogStore.shared.log("LMLocalDevicesService: Skipping localhost probe on physical device", source: "LMLocalDevicesService", level: .info)
-        #endif
     }
 
     private func scanLocalSubnet() async {

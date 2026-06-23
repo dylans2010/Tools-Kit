@@ -5,12 +5,14 @@ final class LMLinkKeychainService {
     private let service = "com.toolskit.lmlink"
     private let credentialAccount = "lmlink.credential"
     private let keyIdAccount = "lmlink.keyId"
+    private let publicKeyAccount = "lmlink.publicKey"
     private let userIdAccount = "lmlink.userId"
 
-    func save(credential: String, keyId: String, userId: String) -> Result<Void, LMLinkAuthError> {
+    func save(credential: String, keyId: String, publicKey: String, userId: String) -> Result<Void, LMLinkAuthError> {
         let items = [
             (credentialAccount, credential),
             (keyIdAccount, keyId),
+            (publicKeyAccount, publicKey),
             (userIdAccount, userId)
         ]
 
@@ -36,7 +38,7 @@ final class LMLinkKeychainService {
         return .success(())
     }
 
-    func load() -> Result<(credential: String, keyId: String, userId: String), LMLinkAuthError> {
+    func load() -> Result<(credential: String, keyId: String, publicKey: String, userId: String), LMLinkAuthError> {
         func fetch(account: String) -> String? {
             let query: [String: Any] = [
                 kSecClass as String: kSecClassGenericPassword,
@@ -53,15 +55,16 @@ final class LMLinkKeychainService {
 
         guard let credential = fetch(account: credentialAccount),
               let keyId = fetch(account: keyIdAccount),
+              let publicKey = fetch(account: publicKeyAccount),
               let userId = fetch(account: userIdAccount) else {
             return .failure(.keychainFailure("Incomplete session data"))
         }
 
-        return .success((credential, keyId, userId))
+        return .success((credential, keyId, publicKey, userId))
     }
 
     func clear() -> Result<Void, LMLinkAuthError> {
-        let accounts = [credentialAccount, keyIdAccount, userIdAccount]
+        let accounts = [credentialAccount, keyIdAccount, publicKeyAccount, userIdAccount]
         for account in accounts {
             let query: [String: Any] = [
                 kSecClass as String: kSecClassGenericPassword,
