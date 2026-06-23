@@ -10,7 +10,7 @@ class LMRequestSigner {
 
         do {
             let signature = try privateKey.signature(for: payload)
-            return signature.base64EncodedString()
+            return signature.rawRepresentation.base64EncodedString()
         } catch {
             LMLinkLogger.keypair.error("Ed25519 Signing failed via CryptoKit: \(error.localizedDescription, privacy: .public)")
             return nil
