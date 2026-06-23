@@ -10,15 +10,18 @@ struct LMLinkCallbackParser {
     }
 
     static func parse(url: URL) -> CallbackResult {
+        SDKLogStore.shared.log("LM Link: [PARSER] Beginning parse of URL: \(url.absoluteString)", source: "LMLinkCallbackParser", level: .info)
         LMLinkLogger.deeplink.info("Parsing callback URL: \(url.absoluteString, privacy: .private(mask: .hash))")
 
         guard url.scheme == "toolskit", url.host == "lm-callback" else {
+            SDKLogStore.shared.log("LM Link: [PARSER] ERROR: Invalid scheme (\(url.scheme ?? "nil")) or host (\(url.host ?? "nil"))", source: "LMLinkCallbackParser", level: .error)
             LMLinkLogger.deeplink.error("Malformed callback: Invalid scheme (\(url.scheme ?? "nil", privacy: .public)) or host (\(url.host ?? "nil", privacy: .public))")
             return .malformed
         }
 
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               let queryItems = components.queryItems else {
+            SDKLogStore.shared.log("LM Link: [PARSER] ERROR: Could not extract query parameters", source: "LMLinkCallbackParser", level: .error)
             LMLinkLogger.deeplink.error("Malformed callback: Could not extract query parameters")
             return .malformed
         }
@@ -28,9 +31,11 @@ struct LMLinkCallbackParser {
             return (item.name, value)
         })
 
+        SDKLogStore.shared.log("LM Link: [PARSER] Parameters received: \(params.keys.joined(separator: ", "))", source: "LMLinkCallbackParser", level: .info)
         LMLinkLogger.deeplink.info("Callback parameters received: \(params.keys.joined(separator: ", "), privacy: .public)")
 
         if let error = params["error"] {
+            SDKLogStore.shared.log("LM Link: [PARSER] Error parameter detected: \(error)", source: "LMLinkCallbackParser", level: .warning)
             LMLinkLogger.deeplink.info("Callback returned error: \(error, privacy: .public)")
             switch error {
             case "cancelled", "cancel": return .cancelled
@@ -42,6 +47,7 @@ struct LMLinkCallbackParser {
         // lmstudio.ai returns the credential under "credential", "token", or "access_token"
         let credential = params["credential"] ?? params["token"] ?? params["access_token"]
         guard let credential, !credential.isEmpty else {
+            SDKLogStore.shared.log("LM Link: [PARSER] ERROR: Missing credential/token in callback", source: "LMLinkCallbackParser", level: .error)
             LMLinkLogger.deeplink.error("Callback missing credential param. Available keys: \(params.keys.joined(separator: ", "), privacy: .public)")
             return .malformed
         }
