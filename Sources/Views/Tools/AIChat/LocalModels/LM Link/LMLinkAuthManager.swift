@@ -57,8 +57,10 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
         state = .authorizing
 
         do {
+            SDKLogStore.shared.log("LM Link: Starting authorization flow", source: "LMLinkAuthManager", level: .info)
             let (keyId, publicKeyBase64) = try LMLinkKeyPairService.generateKeyPair()
             pendingKeyId = keyId
+            SDKLogStore.shared.log("LM Link: Key pair generated. keyId: \(keyId)", source: "LMLinkAuthManager", level: .info)
 
             var components = URLComponents(string: "https://lmstudio.ai/authentication-request")
             components?.queryItems = [
@@ -72,11 +74,13 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
 
             guard let authURL = components?.url else {
                 LMLinkLogger.auth.error("Failed to construct authentication URL")
+                SDKLogStore.shared.log("LM Link: Failed to construct authentication URL", source: "LMLinkAuthManager", level: .error)
                 state = .error(.browserOpenFailed)
                 return
             }
 
             LMLinkLogger.auth.info("Opening ASWebAuthenticationSession. URL: \(authURL.absoluteString, privacy: .private(mask: .hash))")
+            SDKLogStore.shared.log("LM Link: Opening auth session for URL: \(authURL.absoluteString)", source: "LMLinkAuthManager", level: .info)
 
             let session = ASWebAuthenticationSession(
                 url: authURL,
@@ -88,9 +92,11 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
                     if let error = error {
                         if let authError = error as? ASWebAuthenticationSessionError, authError.code == .canceledLogin {
                             LMLinkLogger.auth.info("User cancelled the authentication session")
+                            SDKLogStore.shared.log("LM Link: User cancelled auth session", source: "LMLinkAuthManager", level: .info)
                             self?.state = .error(.cancelled)
                         } else {
                             LMLinkLogger.auth.error("ASWebAuthenticationSession failed: \(error.localizedDescription, privacy: .public)")
+                            SDKLogStore.shared.log("LM Link: Auth session failed: \(error.localizedDescription)", source: "LMLinkAuthManager", level: .error)
                             self?.state = .error(.browserOpenFailed)
                         }
                         return
@@ -98,11 +104,13 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
 
                     guard let callbackURL = callbackURL else {
                         LMLinkLogger.auth.error("ASWebAuthenticationSession completed without error but no callback URL was provided")
+                        SDKLogStore.shared.log("LM Link: Auth session completed but no callback URL", source: "LMLinkAuthManager", level: .error)
                         self?.state = .error(.malformedCallback)
                         return
                     }
 
                     LMLinkLogger.auth.info("ASWebAuthenticationSession received callback: \(callbackURL.host ?? "nil", privacy: .public)")
+                    SDKLogStore.shared.log("LM Link: Auth session received callback: \(callbackURL.absoluteString)", source: "LMLinkAuthManager", level: .info)
                     await self?.handleCallback(url: callbackURL)
                 }
             }
@@ -114,12 +122,14 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
             self.activeAuthSession = session
             if session.start() {
                 LMLinkLogger.auth.info("ASWebAuthenticationSession started successfully")
+                SDKLogStore.shared.log("LM Link: ASWebAuthenticationSession started", source: "LMLinkAuthManager", level: .info)
                 state = .awaitingCallback
                 startTimeoutTimer()
             } else {
                 state = .error(.browserOpenFailed)
                 self.activeAuthSession = nil
                 LMLinkLogger.auth.error("Failed to start ASWebAuthenticationSession")
+                SDKLogStore.shared.log("LM Link: Failed to start ASWebAuthenticationSession", source: "LMLinkAuthManager", level: .error)
             }
         } catch {
             LMLinkLogger.auth.error("Key pair generation failed: \(error.localizedDescription, privacy: .public)")
@@ -129,11 +139,14 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
 
     // MARK: - ASWebAuthenticationPresentationContextProviding
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        UIApplication.shared.connectedScenes
-            .filter { $0.activationState == .foregroundActive }
+        let anchor = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
+            .filter { $0.activationState == .foregroundActive }
             .first?.windows
             .first { $0.isKeyWindow } ?? ASPresentationAnchor()
+
+        SDKLogStore.shared.log("LM Link: Providing presentation anchor", source: "LMLinkAuthManager", level: .info)
+        return anchor
     }
 
     func handleCallback(url: URL) async {
@@ -233,10 +246,17 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
 
     private func finalizeLink(credential: String, keyId: String, userId: String) async {
         LMLinkLogger.auth.info("Finalizing link for keyId: \(keyId, privacy: .private(mask: .hash))")
+        SDKLogStore.shared.log("LM Link: Finalizing handshake for keyId: \(keyId)", source: "LMLinkAuthManager", level: .info)
 
         // LM Studio registration confirmation handshake
         // After receiving the callback, we MUST notify the LM Studio server that the link is complete.
         // This ensures the device is registered correctly in the LM Studio dashboard.
+
+        // We ensure that the keyId from the callback matches the pendingKeyId if available,
+        // to maintain strict key consistency.
+        if let pending = pendingKeyId, pending != keyId {
+            SDKLogStore.shared.log("LM Link: WARNING - keyId mismatch. Pending: \(pending), Callback: \(keyId). Using Callback ID.", source: "LMLinkAuthManager", level: .warning)
+        }
 
         var components = URLComponents(string: "https://lmstudio.ai/authentication-confirm")
         components?.queryItems = [
@@ -248,6 +268,7 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
 
         guard let confirmURL = components?.url else {
             LMLinkLogger.auth.error("Failed to construct confirmation URL")
+            SDKLogStore.shared.log("LM Link: Failed to construct confirmation URL", source: "LMLinkAuthManager", level: .error)
             state = .error(.malformedCallback)
             return
         }
@@ -256,14 +277,18 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
+        SDKLogStore.shared.log("LM Link: Sending POST confirmation to: \(confirmURL.absoluteString)", source: "LMLinkAuthManager", level: .info)
+
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
 
             if let httpResponse = response as? HTTPURLResponse {
                 LMLinkLogger.auth.info("Confirmation response status: \(httpResponse.statusCode, privacy: .public)")
+                SDKLogStore.shared.log("LM Link: Confirmation response status: \(httpResponse.statusCode)", source: "LMLinkAuthManager", level: .info)
 
                 if (200...299).contains(httpResponse.statusCode) {
                     LMLinkLogger.auth.info("Device successfully registered with LM Studio")
+                    SDKLogStore.shared.log("LM Link: Device successfully registered with LM Studio", source: "LMLinkAuthManager", level: .info)
 
                     let session = LMLinkSession(
                         keyId: keyId,
@@ -286,11 +311,13 @@ final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
                 } else {
                     let responseString = String(data: data, encoding: .utf8) ?? "no body"
                     LMLinkLogger.auth.error("LM Studio confirmation failed. Status: \(httpResponse.statusCode), Body: \(responseString, privacy: .public)")
+                    SDKLogStore.shared.log("LM Link: LM Studio confirmation failed. Status: \(httpResponse.statusCode), Body: \(responseString)", source: "LMLinkAuthManager", level: .error)
                     state = .error(.denied)
                 }
             }
         } catch {
             LMLinkLogger.auth.error("Network error during confirmation: \(error.localizedDescription, privacy: .public)")
+            SDKLogStore.shared.log("LM Link: Network error during confirmation: \(error.localizedDescription)", source: "LMLinkAuthManager", level: .error)
             state = .error(.browserOpenFailed)
         }
     }

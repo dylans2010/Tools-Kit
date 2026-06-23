@@ -8,8 +8,9 @@ class LMRequestSigner {
         let privateKey = try LMLinkKeyPairService.loadPrivateKey(for: keyId)
 
         var error: Unmanaged<CFError>?
-        guard let signature = SecKeyCreateSignature(privateKey, .ecdsaSignatureMessageX962SHA256, payload as CFData, &error) as Data? else {
-            LMLinkLogger.keypair.error("Signing failed: \(error.debugDescription, privacy: .public)")
+        // Using .edSignature for Ed25519 (Curve25519) keys
+        guard let signature = SecKeyCreateSignature(privateKey, .edSignature, payload as CFData, &error) as Data? else {
+            LMLinkLogger.keypair.error("Ed25519 Signing failed: \(error.debugDescription, privacy: .public)")
             return nil
         }
 
@@ -18,7 +19,6 @@ class LMRequestSigner {
 
     func addSignatureHeaders(to request: inout URLRequest, payload: Data) throws {
         // We need the keyId to load the private key.
-        // In the new architecture, we get it from the keychain.
         let result = keychain.load()
         guard case .success(let session) = result else {
             return
