@@ -477,6 +477,7 @@
 		AA11BB22CC33DD44EE55FF04 /* FileImporterRepresentableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */; };
 		AA11BB22CC33DD44EE55FF05 /* AIChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */; };
 		AA11BB22CC33DD44EE55FF06 /* AIChatMemoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */; };
+		SF0200000000000000000001 /* SFSymbolPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = SF0100000000000000000001 /* SFSymbolPicker.swift */; };
 		AA9F0279B4BEED0AC8111C3A /* AgentCodeLanguageDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01AC08F24D517F68A828494C /* AgentCodeLanguageDetector.swift */; };
 		AAAAF107572CB595BFED4CF4 /* SDKMigrationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E9EC74C78EF3E548EA53BD /* SDKMigrationManager.swift */; };
 		AAF5C810315D4C1488F582E1 /* load_memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF30730A939437A8A79A888 /* load_memory.swift */; };
@@ -2917,6 +2918,7 @@ LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = P
 		AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileImporterRepresentableView.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatViewModel.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatMemoryStore.swift; sourceTree = "<group>"; };
+		SF0100000000000000000001 /* SFSymbolPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSymbolPicker.swift; sourceTree = "<group>"; };
 		ABCD1234567890ABCDEF0100 /* Main/PresetConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/PresetConnectorsView.swift; sourceTree = "<group>"; };
 		AC0100000000000000000001 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		AC28589723B0B1D7FC48CF86 /* AgentBundleValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentBundleValidator.swift; sourceTree = "<group>"; };
@@ -5931,6 +5933,7 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 			isa = PBXGroup;
 			children = (
 				AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */,
+				SF0100000000000000000001 /* SFSymbolPicker.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -13831,6 +13834,7 @@ LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileRefer
 				953861AEFF6449C78881F9F1 /* ObjectDetectionView.swift in Sources */,
 				E036DBADA20142A39F528AE6 /* PerspectiveCorrectorView.swift in Sources */,
 				17DA2ACC865E4FA8AFB0010A /* IDClassifierView.swift in Sources */,
+				SF0200000000000000000001 /* SFSymbolPicker.swift in Sources */,
 				32881A0000EF42E8A0519188 /* NetworkSpeedView.swift in Sources */,
 				0FA0DBE2F12D4D58A65AAEB3 /* VideoCompressorView.swift in Sources */,
 				402C4D029D454D6F8F1DE928 /* ContextSummarizerView.swift in Sources */,

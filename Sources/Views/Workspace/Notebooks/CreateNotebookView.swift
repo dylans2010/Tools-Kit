@@ -19,19 +19,13 @@ struct CreateNotebookView: View {
                 }
 
                 Section("Icon") {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
-                            ForEach(symbols, id: \.self) { symbol in
-                                Image(systemName: symbol)
-                                    .font(.title2)
-                                    .frame(width: 44, height: 44)
-                                    .background(selectedIcon == symbol ? Color.accentColor : Color.secondary.opacity(0.1))
-                                    .foregroundColor(selectedIcon == symbol ? .white : .primary)
-                                    .cornerRadius(8)
-                                    .onTapGesture { selectedIcon = symbol }
-                            }
+                    NavigationLink(destination: SFSymbolPicker(selectedIcon: $selectedIcon)) {
+                        HStack {
+                            Text("Select Icon")
+                            Spacer()
+                            Image(systemName: selectedIcon)
+                                .foregroundColor(.secondary)
                         }
-                        .padding(.vertical, 4)
                     }
                 }
 
