@@ -60,7 +60,7 @@ struct LMLinkModelDetailView: View {
             do {
                 // Ensure we are using this device/model for the test
                 let response = try await connectionManager.sendChatRequest(messages: [
-                    ChatMessage(role: .user, content: testPrompt)
+                    ChatMessage(role: "user", content: testPrompt)
                 ])
                 await MainActor.run {
                     self.testResponse = response
