@@ -2,6 +2,8 @@ import Foundation
 import Security
 import CryptoKit
 
+private let kSecAttrKeyTypeCurve25519 = "75" as CFString
+
 final class LMLinkKeyPairService {
 
     enum KeyPairError: Error {
