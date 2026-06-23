@@ -1,8 +1,9 @@
 import Foundation
 import UIKit
+import AuthenticationServices
 
 @MainActor
-final class LMLinkAuthManager: ObservableObject {
+final class LMLinkAuthManager: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
     static let shared = LMLinkAuthManager()
     @Published private(set) var state: LMLinkAuthState = .idle {
         didSet {
@@ -31,8 +32,11 @@ final class LMLinkAuthManager: ObservableObject {
     private let validator = LMLinkAPIValidator()
     private var pendingKeyId: String?
     private var timeoutTask: Task<Void, Never>?
+    private var authSession: ASWebAuthenticationSession?
 
-    private init() {}
+    override init() {
+        super.init()
+    }
 
     func initiateLink() {
         Task {
@@ -65,20 +69,53 @@ final class LMLinkAuthManager: ObservableObject {
                 return
             }
 
-            LMLinkLogger.auth.info("Opening auth URL for keyId: \(keyId, privacy: .private(mask: .hash))")
+            LMLinkLogger.auth.info("Opening ASWebAuthenticationSession for keyId: \(keyId, privacy: .private(mask: .hash))")
 
-            let opened = await UIApplication.shared.open(authURL)
-            if opened {
+            let session = ASWebAuthenticationSession(
+                url: authURL,
+                callbackURLScheme: "toolskit"
+            ) { [weak self] callbackURL, error in
+                Task { @MainActor in
+                    if let error = error {
+                        if let authError = error as? ASWebAuthenticationSessionError, authError.code == .canceledLogin {
+                            self?.state = .error(.cancelled)
+                        } else {
+                            self?.state = .error(.browserOpenFailed)
+                        }
+                        LMLinkLogger.auth.error("ASWebAuthenticationSession failed: \(error.localizedDescription, privacy: .public)")
+                        return
+                    }
+
+                    if let callbackURL = callbackURL {
+                        await self?.handleCallback(url: callbackURL)
+                    }
+                }
+            }
+
+            session.presentationContextProvider = self
+            session.prefersEphemeralWebBrowserSession = false
+
+            self.authSession = session
+            if session.start() {
                 state = .awaitingCallback
                 startTimeoutTimer()
             } else {
                 state = .error(.browserOpenFailed)
-                LMLinkLogger.auth.error("Failed to open auth URL — browser returned false")
+                LMLinkLogger.auth.error("Failed to start ASWebAuthenticationSession")
             }
         } catch {
             LMLinkLogger.auth.error("Key pair generation failed: \(error.localizedDescription, privacy: .public)")
             state = .error(.keyPairGenerationFailed)
         }
+    }
+
+    // MARK: - ASWebAuthenticationPresentationContextProviding
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        UIApplication.shared.connectedScenes
+            .filter { $0.activationState == .foregroundActive }
+            .compactMap { $0 as? UIWindowScene }
+            .first?.windows
+            .first { $0.isKeyWindow } ?? ASPresentationAnchor()
     }
 
     func handleCallback(url: URL) async {
@@ -109,19 +146,10 @@ final class LMLinkAuthManager: ObservableObject {
 
         switch result {
         case .success(let credential, let keyId, let userId):
-            let ping = await validator.ping()
-
-            let isReachable: Bool
-            let modelCount: Int
-
-            switch ping {
-            case .reachable(let count):
-                isReachable = true
-                modelCount = count
-            case .unreachable:
-                isReachable = false
-                modelCount = 0
-            }
+            // Skip ping during callback on iOS to avoid localhost/sandbox issues.
+            // Connectivity is verified during discovery or first request.
+            let isReachable = false
+            let modelCount = 0
 
             let session = LMLinkSession(
                 keyId: keyId,
@@ -154,18 +182,9 @@ final class LMLinkAuthManager: ObservableObject {
     func restoreSession() async {
         switch keychain.load() {
         case .success(let (credential, keyId, userId)):
-            let ping = await validator.ping()
-            let isReachable: Bool
-            let modelCount: Int
-
-            switch ping {
-            case .reachable(let count):
-                isReachable = true
-                modelCount = count
-            case .unreachable:
-                isReachable = false
-                modelCount = 0
-            }
+            // Skip ping during restore on iOS.
+            let isReachable = false
+            let modelCount = 0
 
             let session = LMLinkSession(
                 keyId: keyId, credential: credential, userId: userId,

@@ -8,7 +8,7 @@ final class AppDeepLinkRouter {
     private init() {}
 
     func handle(_ url: URL) {
-        LMLinkLogger.deeplink.info("Router received URL scheme: \(url.scheme ?? "nil", privacy: .public)")
+        LMLinkLogger.deeplink.info("Router received deep link URL: \(url.absoluteString, privacy: .private(mask: .hash))")
         LMLinkLogger.deeplink.info("App state at callback: \(UIApplication.shared.applicationState.rawValue, privacy: .public)")
 
         switch url.scheme {
