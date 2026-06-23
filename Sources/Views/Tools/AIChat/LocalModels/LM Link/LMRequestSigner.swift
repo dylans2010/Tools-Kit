@@ -8,8 +8,15 @@ class LMRequestSigner {
         let privateKey = try LMLinkKeyPairService.loadPrivateKey(for: keyId)
 
         var error: Unmanaged<CFError>?
-        // Using .edSignature for Ed25519 (Curve25519) keys
-        guard let signature = SecKeyCreateSignature(privateKey, .edSignature, payload as CFData, &error) as Data? else {
+        // Use Ed25519 message-based signing algorithm supported by SecKey
+        let algorithm: SecKeyAlgorithm
+        if #available(iOS 15.0, macOS 12.0, *) {
+            algorithm = SecKeyAlgorithm(rawValue: "com.apple.security.ed25519-signature-message")
+        } else {
+            algorithm = SecKeyAlgorithm(rawValue: "com.apple.security.eddsa-signature-message")
+        }
+
+        guard let signature = SecKeyCreateSignature(privateKey, algorithm, payload as CFData, &error) as Data? else {
             LMLinkLogger.keypair.error("Ed25519 Signing failed: \(error.debugDescription, privacy: .public)")
             return nil
         }
