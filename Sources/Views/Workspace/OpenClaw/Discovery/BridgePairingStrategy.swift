@@ -5,15 +5,48 @@ struct BridgePairingStrategy: OpenClawPairingStrategy {
     let bridgeURL: URL
 
     func pair() async throws -> OpenClawDevice {
-        // In reality, this would fetch pairing info from the bridge
+        // 1. Validate Bridge Reachability
+        let (data, response) = try await URLSession.shared.data(from: bridgeURL.appendingPathComponent("pair"))
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw OpenClawError.unreachableHost
+        }
+
+        // 2. Extract Token and Device Info
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let token = json["token"] as? String,
+              let gatewayInfo = json["gateway"] as? [String: Any],
+              let host = gatewayInfo["host"] as? String,
+              let port = gatewayInfo["port"] as? Int else {
+            throw OpenClawError.invalidResponse
+        }
+
+        let deviceID = UUID().uuidString
+
+        // CRITICAL: Save token BEFORE attempting validation connection
+        OpenClawSecureStore.shared.saveToken(token, for: deviceID)
+
+        // 3. Validate Handshake through Bridge
+        let wsURL = URL(string: "ws://\(bridgeURL.host ?? "localhost"):\(bridgeURL.port ?? 3000)")!
+        let connection = OpenClawGatewayConnection(url: wsURL, deviceID: deviceID)
+
+        do {
+            _ = try await connection.connect()
+            await connection.disconnect()
+        } catch {
+            OpenClawSecureStore.shared.deleteToken(for: deviceID)
+            throw OpenClawError.handshakeFailed("Bridge handshake failed: \(error.localizedDescription)")
+        }
+
+        // 4. Register Device
         let device = OpenClawDevice(
-            id: UUID().uuidString,
-            name: "Bridged Gateway",
-            host: bridgeURL.host ?? "localhost",
-            port: bridgeURL.port ?? 3000,
+            id: deviceID,
+            name: json["name"] as? String ?? "Bridged Gateway",
+            host: host,
+            port: port,
             lastConnected: Date(),
-            metadata: ["type": "bridge"]
+            metadata: ["type": "bridge", "bridge": bridgeURL.absoluteString]
         )
+
         return device
     }
 }

@@ -2,94 +2,148 @@ import SwiftUI
 
 struct OpenClawMainView: View {
     @StateObject private var viewModel = OpenClawMainViewModel()
-    @State private var showingPairing = false
+    @State private var showingPair = false
+    @State private var showingSettings = false
 
     var body: some View {
-        List {
-            Section("Gateway Connection") {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(viewModel.activeDeviceName)
-                            .font(.headline)
-                        Text(viewModel.connectionStatus)
-                            .font(.subheadline)
+        NavigationStack {
+            List {
+                statusSection
+                actionsSection
+                deviceSection
+            }
+            .navigationTitle("OpenClaw")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { showingSettings = true } label: {
+                        Image(systemName: "gear")
+                    }
+                }
+            }
+            .sheet(isPresented: $showingPair) {
+                OpenClawPairView()
+            }
+            .sheet(isPresented: $showingSettings) {
+                OpenClawSettingsView()
+            }
+        }
+    }
+
+    private var statusSection: some View {
+        Section("Status") {
+            HStack {
+                Text("Connection")
+                Spacer()
+                ConnectionBadge(status: viewModel.connectionStatus, isConnecting: viewModel.isConnecting)
+            }
+
+            if let error = viewModel.lastError {
+                VStack(alignment: .leading, spacing: 4) {
+                    Label("Error", systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.red)
+                        .font(.headline)
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    Button("Retry") {
+                        viewModel.connect()
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.blue)
+                    .padding(.top, 4)
+                }
+                .padding(.vertical, 4)
+            }
+
+            HStack {
+                Text("Latency")
+                Spacer()
+                Text(viewModel.latency)
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+        }
+    }
+
+    private var actionsSection: some View {
+        Section("Actions") {
+            if viewModel.connectionStatus == "Connected" {
+                Button(role: .destructive) {
+                    viewModel.disconnect()
+                } label: {
+                    Label("Disconnect", systemImage: "bolt.slash.fill")
+                }
+            } else {
+                Button {
+                    viewModel.connect()
+                } label: {
+                    HStack {
+                        Label("Connect", systemImage: "bolt.fill")
+                        if viewModel.isConnecting {
+                            Spacer()
+                            ProgressView()
+                        }
+                    }
+                }
+                .disabled(viewModel.isConnecting || viewModel.activeDeviceName == "None")
+            }
+        }
+    }
+
+    private var deviceSection: some View {
+        Section("Active Device") {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(viewModel.activeDeviceName)
+                        .font(.headline)
+                    if viewModel.activeDeviceName == "None" {
+                        Text("No gateway paired")
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    Spacer()
-                    if viewModel.connectionStatus == "Connected" {
-                        Button("Disconnect", role: .destructive) {
-                            viewModel.disconnect()
-                        }
-                    } else {
-                        Button("Connect") {
-                            viewModel.connect()
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
                 }
+                Spacer()
+                Button("Switch") {
+                    showingPair = true
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
             }
-
-            Section("Live Metrics") {
-                HStack {
-                    OpenClawMetricTile(title: "Latency", value: viewModel.latency, icon: "timer")
-                    OpenClawMetricTile(title: "Quality", value: "98%", icon: "antenna.radiowaves.left.and.right")
-                }
-            }
-
-            Section("System") {
-                NavigationLink {
-                    OpenClawChatView()
-                } label: {
-                    Label("AI Controller", systemImage: "sparkles")
-                }
-
-                NavigationLink {
-                    OpenClawDeviceListView()
-                } label: {
-                    Label("Manage Devices", systemImage: "macpro.gen3")
-                }
-            }
-
-            Section("Diagnostics") {
-                NavigationLink {
-                    OpenClawLogsView()
-                } label: {
-                    Label("System Logs", systemImage: "terminal")
-                }
-            }
-        }
-        .navigationTitle("OpenClaw")
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showingPairing = true
-                } label: {
-                    Image(systemName: "plus")
-                }
-            }
-        }
-        .sheet(isPresented: $showingPairing) {
-            OpenClawPairView()
         }
     }
 }
 
-struct OpenClawMetricTile: View {
-    let title: String
-    let value: String
-    let icon: String
+struct ConnectionBadge: View {
+    let status: String
+    let isConnecting: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Label(title, systemImage: icon)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.title3.bold())
+        HStack(spacing: 6) {
+            if isConnecting {
+                ProgressView()
+                    .controlSize(.mini)
+            } else {
+                Circle()
+                    .fill(statusColor)
+                    .frame(width: 8, height: 8)
+            }
+            Text(status)
+                .font(.subheadline.bold())
+                .foregroundStyle(statusColor)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color.secondary.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(.horizontal, 10)
+        .padding(.vertical, 4)
+        .background(statusColor.opacity(0.1))
+        .clipShape(Capsule())
+    }
+
+    private var statusColor: Color {
+        switch status {
+        case "Connected": return .green
+        case "Error": return .red
+        case "Disconnected": return .secondary
+        default: return .orange
+        }
     }
 }

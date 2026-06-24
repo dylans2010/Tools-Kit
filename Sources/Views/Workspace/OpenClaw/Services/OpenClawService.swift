@@ -13,7 +13,6 @@ final class OpenClawService: ObservableObject {
     private let diagnostics = OpenClawDiagnosticsManager.shared
 
     private init() {
-        // Observe connection state changes if possible
     }
 
     func connectToActiveDevice() async {
@@ -29,11 +28,15 @@ final class OpenClawService: ObservableObject {
 
         let connection = OpenClawGatewayConnection(url: url, deviceID: device.id)
         self.currentConnection = connection
-        self.connectionState = .connecting
+
+        // Observe connection state from the actor
+        connection.statePublisher
+            .receive(on: RunLoop.main)
+            .assign(to: \.connectionState, on: self)
+            .store(in: &cancellables)
 
         do {
             let stream = try await connection.connect()
-            self.connectionState = .connected
             diagnostics.log("Connected to \(device.name)")
 
             Task {
@@ -43,13 +46,13 @@ final class OpenClawService: ObservableObject {
                 }
             }
         } catch {
-            self.connectionState = .failed(error)
             diagnostics.log("Failed to connect: \(error.localizedDescription)")
         }
     }
 
     func disconnect() async {
         await currentConnection?.disconnect()
+        cancellables.removeAll()
         self.currentConnection = nil
         self.connectionState = .idle
         diagnostics.log("Disconnected")

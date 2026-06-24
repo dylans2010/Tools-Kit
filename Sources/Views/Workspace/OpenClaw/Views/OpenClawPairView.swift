@@ -7,14 +7,21 @@ struct OpenClawPairView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                if viewModel.step == 0 {
+                if let error = viewModel.errorMessage {
+                    errorBanner(error)
+                }
+
+                switch viewModel.step {
+                case 0:
                     discoveryStep
-                } else if viewModel.step == 1 {
+                case 1:
                     manualStep
-                } else if viewModel.step == 2 {
+                case 2:
                     pairingLoadingStep
-                } else {
+                case 3:
                     successStep
+                default:
+                    discoveryStep
                 }
             }
             .navigationTitle("Pair Gateway")
@@ -23,16 +30,33 @@ struct OpenClawPairView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
+                if viewModel.step == 1 {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Back") { viewModel.step = 0 }
+                    }
+                }
             }
         }
+    }
+
+    private func errorBanner(_ message: String) -> some View {
+        Text(message)
+            .font(.caption)
+            .padding(8)
+            .frame(maxWidth: .infinity)
+            .background(Color.red.opacity(0.1))
+            .foregroundStyle(.red)
     }
 
     private var discoveryStep: some View {
         List {
             Section("Found Gateways") {
                 if viewModel.discoveredDevices.isEmpty {
-                    Text("Searching for OpenClaw gateways...")
-                        .foregroundStyle(.secondary)
+                    HStack {
+                        ProgressView().padding(.trailing, 8)
+                        Text("Searching for OpenClaw gateways...")
+                            .foregroundStyle(.secondary)
+                    }
                 } else {
                     ForEach(viewModel.discoveredDevices) { device in
                         Button {
@@ -46,7 +70,8 @@ struct OpenClawPairView: View {
                                     Text("\(device.host):\(device.port)").font(.caption).foregroundStyle(.secondary)
                                 }
                                 Spacer()
-                                Image(systemName: "chevron.right")
+                                Image(systemName: "plus.circle")
+                                    .foregroundStyle(.blue)
                             }
                         }
                     }
@@ -54,7 +79,11 @@ struct OpenClawPairView: View {
             }
 
             Section {
-                Button("Enter Manually") { viewModel.step = 1 }
+                Button {
+                    viewModel.step = 1
+                } label: {
+                    Label("Enter Manually", systemImage: "keyboard")
+                }
             }
         }
         .onAppear { viewModel.startDiscovery() }
@@ -64,19 +93,28 @@ struct OpenClawPairView: View {
         Form {
             Section("Gateway Details") {
                 TextField("Host (e.g. 192.168.1.5)", text: $viewModel.manualHost)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+
                 TextField("Port", text: $viewModel.manualPort)
                     .keyboardType(.numberPad)
             }
 
             Section {
-                Button("Pair Gateway") {
+                Button {
                     let host = viewModel.manualHost
                     let port = Int(viewModel.manualPort) ?? 18789
                     Task {
                         await viewModel.pair(with: ManualPairingStrategy(host: host, port: port))
                     }
+                } label: {
+                    if viewModel.isPairing {
+                        ProgressView().tint(.white)
+                    } else {
+                        Text("Pair Gateway")
+                    }
                 }
-                .disabled(viewModel.manualHost.isEmpty)
+                .disabled(viewModel.manualHost.isEmpty || viewModel.isPairing)
                 .frame(maxWidth: .infinity)
             }
         }
@@ -85,9 +123,14 @@ struct OpenClawPairView: View {
     private var pairingLoadingStep: some View {
         VStack(spacing: 20) {
             ProgressView()
+                .scaleEffect(1.5)
             Text("Establishing Trust...")
                 .font(.headline)
+            Text("Performing secure handshake with gateway")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var successStep: some View {
@@ -97,8 +140,14 @@ struct OpenClawPairView: View {
                 .foregroundStyle(.green)
             Text("Successfully Paired")
                 .font(.title2.bold())
+            Text("Your gateway is now ready to use.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
             Button("Done") { dismiss() }
                 .buttonStyle(.borderedProminent)
+                .controlSize(.large)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

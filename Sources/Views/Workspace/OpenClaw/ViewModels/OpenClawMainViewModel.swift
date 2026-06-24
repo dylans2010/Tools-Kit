@@ -6,6 +6,8 @@ final class OpenClawMainViewModel: ObservableObject {
     @Published var connectionStatus: String = "Disconnected"
     @Published var activeDeviceName: String = "None"
     @Published var latency: String = "-- ms"
+    @Published var isConnecting: Bool = false
+    @Published var lastError: String?
 
     private let service = OpenClawService.shared
     private let registry = OpenClawDeviceRegistry.shared
@@ -14,12 +16,14 @@ final class OpenClawMainViewModel: ObservableObject {
 
     init() {
         service.$connectionState
+            .receive(on: RunLoop.main)
             .sink { [weak self] state in
                 self?.updateStatus(state)
             }
             .store(in: &cancellables)
 
         registry.$activeDeviceID
+            .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 self?.activeDeviceName = self?.registry.activeDevice?.name ?? "None"
             }
@@ -27,6 +31,7 @@ final class OpenClawMainViewModel: ObservableObject {
 
         diagnostics.$metrics
             .filter { $0.name == "latency" }
+            .receive(on: RunLoop.main)
             .sink { [weak self] metric in
                 self?.latency = metric.value
             }
@@ -34,12 +39,24 @@ final class OpenClawMainViewModel: ObservableObject {
     }
 
     private func updateStatus(_ state: ConnectionState) {
+        isConnecting = (state == .connecting || state == .authenticating || state == .waitingChallenge)
+
         switch state {
-        case .idle: connectionStatus = "Disconnected"
-        case .connecting: connectionStatus = "Connecting..."
-        case .authenticating: connectionStatus = "Authenticating..."
-        case .connected: connectionStatus = "Connected"
-        case .failed(let error): connectionStatus = "Error: \(error.localizedDescription)"
+        case .idle:
+            connectionStatus = "Disconnected"
+            lastError = nil
+        case .connecting:
+            connectionStatus = "Connecting..."
+        case .waitingChallenge:
+            connectionStatus = "Waiting for challenge..."
+        case .authenticating:
+            connectionStatus = "Authenticating..."
+        case .connected:
+            connectionStatus = "Connected"
+            lastError = nil
+        case .failed(let error):
+            connectionStatus = "Error"
+            lastError = error
         }
     }
 

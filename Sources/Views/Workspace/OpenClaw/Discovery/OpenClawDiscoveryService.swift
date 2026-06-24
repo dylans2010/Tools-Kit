@@ -1,5 +1,4 @@
 import Foundation
-import Network
 
 struct OpenClawDiscoveredService: Identifiable, Hashable {
     let id = UUID()
@@ -8,45 +7,83 @@ struct OpenClawDiscoveredService: Identifiable, Hashable {
     let port: Int
 
     var url: URL? {
-        URL(string: "ws://\(host):\(port)")
+        // NetService.hostName usually ends with a dot, we need to handle that or use IP
+        let cleanedHost = host.hasSuffix(".") ? String(host.dropLast()) : host
+        return URL(string: "ws://\(cleanedHost):\(port)")
     }
 }
 
 final class OpenClawDiscoveryService: NSObject, ObservableObject {
     @Published var discoveredServices: [OpenClawDiscoveredService] = []
-    private var browser: NWBrowser?
+
+    private var browser: NetServiceBrowser?
+    private var services: Set<NetService> = []
+    private var pendingResolutions: Set<NetService> = []
 
     func startDiscovery() {
-        let descriptor = NWBrowser.Descriptor.bonjour(type: "_openclaw-gw._tcp", domain: nil)
-        let parameters = NWParameters()
-        parameters.includePeerToPeer = true
+        stopDiscovery()
+        discoveredServices.removeAll()
+        services.removeAll()
+        pendingResolutions.removeAll()
 
-        browser = NWBrowser(for: descriptor, using: parameters)
-        browser?.browseResultsChangedHandler = { [weak self] results, _ in
-            self?.handleResults(results)
-        }
-        browser?.start(queue: .main)
+        browser = NetServiceBrowser()
+        browser?.delegate = self
+        browser?.searchForServices(ofType: "_openclaw-gw._tcp.", inDomain: "local.")
     }
 
     func stopDiscovery() {
-        browser?.cancel()
+        browser?.stop()
         browser = nil
+        for service in services {
+            service.stop()
+        }
+        services.removeAll()
+        pendingResolutions.removeAll()
     }
 
-    private func handleResults(_ results: Set<NWBrowser.Result>) {
-        discoveredServices = results.compactMap { result in
-            if case .bonjour(let service) = result.endpoint {
-                // We need to resolve the IP/Host. NWBrowser gives us the service name.
-                // In a full implementation, we would use NWConnection to resolve or NWServiceResolver.
-                // For this implementation, we will use the service name as a placeholder host if needed,
-                // but usually .local address works.
+    private func updateDiscoveredServices() {
+        DispatchQueue.main.async {
+            self.discoveredServices = self.services.compactMap { service in
+                guard let host = service.hostName, service.port != -1 else { return nil }
                 return OpenClawDiscoveredService(
                     name: service.name,
-                    host: "\(service.name).local",
-                    port: 18789 // OpenClaw default port
+                    host: host,
+                    port: service.port
                 )
             }
-            return nil
         }
+    }
+}
+
+extension OpenClawDiscoveryService: NetServiceBrowserDelegate {
+    func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
+        services.insert(service)
+        service.delegate = self
+        service.resolve(withTimeout: 10.0)
+        pendingResolutions.insert(service)
+    }
+
+    func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
+        services.remove(service)
+        pendingResolutions.remove(service)
+        updateDiscoveredServices()
+    }
+
+    func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String: NSNumber]) {
+        print("Discovery failed: \(errorDict)")
+    }
+}
+
+extension OpenClawDiscoveryService: NetServiceDelegate {
+    func netServiceDidResolveAddress(_ sender: NetService) {
+        pendingResolutions.remove(sender)
+        updateDiscoveredServices()
+    }
+
+    func netService(_ sender: NetService, didNotResolve errorDict: [String: NSNumber]) {
+        print("Failed to resolve service \(sender.name): \(errorDict)")
+        pendingResolutions.remove(sender)
+        services.remove(sender)
+        updateDiscoveredServices()
     }
 }
