@@ -221,10 +221,18 @@ class AIService {
         static func sendRequest(messages: [ChatMessage], config: LocalModelConfig? = nil) async throws -> String {
             let settings = AIChatSettingsManager.shared.settings
 
-            if let config = config ?? (settings.selectedLocalConfigID != nil ? settings.localConfigs.first(where: { $0.id == settings.selectedLocalConfigID }) : nil) {
+            // If explicit config is provided, use it
+            if let config = config {
                 return try await sendToCustomEndpoint(messages: messages, config: config)
             }
 
+            // If local config is selected in settings, use it
+            if let configID = settings.selectedLocalConfigID,
+               let config = settings.localConfigs.first(where: { $0.id == configID }) {
+                return try await sendToCustomEndpoint(messages: messages, config: config)
+            }
+
+            // Fallback to LMConnectionManager for LM Link models
             return try await LMConnectionManager.shared.sendChatRequest(messages: messages)
         }
 

@@ -13,12 +13,17 @@ struct AIChatToolView: View {
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
 
     var body: some View {
-        VStack {
-            if !viewModel.isApiKeySaved {
-                apiKeySetupView
-            } else {
-                chatView
+        ZStack(alignment: .top) {
+            VStack {
+                if !viewModel.isApiKeySaved {
+                    apiKeySetupView
+                } else {
+                    chatView
+                }
             }
+
+            DownloadOverlayView()
+                .padding(.top, 8)
         }
         .navigationTitle("AI Chat")
         .navigationBarTitleDisplayMode(.inline)
