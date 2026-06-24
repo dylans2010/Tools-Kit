@@ -4196,7 +4196,7 @@
 		HF0100000000000000000009 /* HFModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFModelDetailView.swift; sourceTree = "<group>"; };
 		HF010000000000000000000A /* HFRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFRecommendationView.swift; sourceTree = "<group>"; };
 		HF010000000000000000000B /* HFInferenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFace/Services/HFInferenceService.swift; sourceTree = "<group>"; };
-c		HF010000000000000000000C /* OpenRouterFreeModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChat/OpenRouterFreeModelsView.swift; sourceTree = "<group>"; };
+		HF010000000000000000000C /* OpenRouterFreeModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterFreeModelsView.swift; sourceTree = "<group>"; };
 		HF010000000000000000000D /* HFInstalledModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFace/Views/HFInstalledModels.swift; sourceTree = "<group>"; };
 		HVADD29D00189D6E872BCD3E /* AgenticUIHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIHomeView.swift; sourceTree = "<group>"; };
 		IW0100000000000000000001 /* WorkspaceColorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceColorManager.swift; sourceTree = "<group>"; };
@@ -5771,6 +5771,7 @@ c		HF010000000000000000000C /* OpenRouterFreeModelsView.swift */ = {isa = PBXFil
 			children = (
 				LM0300000000000000000002 /* LocalModels */,
 				2613768EBF12072C6C0D2706 /* AIChatSettingsView.swift */,
+				HF010000000000000000000C /* OpenRouterFreeModelsView.swift */,
 				6662160AA2024E9FBEA29A4C /* AIChatToolView.swift */,
 				AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */,
 			);
@@ -11562,7 +11563,6 @@ c		HF010000000000000000000C /* OpenRouterFreeModelsView.swift */ = {isa = PBXFil
 				LM0100000000000000000006 /* LocalModelDetailsView.swift */,
 				HF0100000000000000000001 /* AvailableLocalModelsView.swift */,
 				HF010000000000000000000B /* HFInferenceService.swift */,
-				HF010000000000000000000C /* OpenRouterFreeModelsView.swift */,
 				HF010000000000000000000D /* HFInstalledModels.swift */,
 				LM0100000000000000000005 /* AdvancedLocalModelsConfigView.swift */,
 				LM0100000000000000000007 /* LMStudioLogsView.swift */,
