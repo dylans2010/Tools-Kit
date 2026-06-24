@@ -41,26 +41,75 @@ class HuggingFaceDownloadManager: NSObject, ObservableObject {
     }
 
     func downloadModel(_ model: HFModel) {
-        // Construct GGUF download URL. This is a simplification;
-        // in production, you'd need to pick the right file from the repo.
-        guard let url = URL(string: "https://huggingface.co/\(model.id)/resolve/main/\(model.name).gguf") else { return }
+        Task {
+            var modelWithDetails = model
+            if model.siblings == nil || model.siblings?.isEmpty == true {
+                do {
+                    modelWithDetails = try await HuggingFaceAPIClient.shared.fetchModelDetails(id: model.id)
+                } catch {
+                    SDKLogStore.shared.log("Failed to fetch model details for download: \(error)", source: "HFDownloadManager", level: .error)
+                    return
+                }
+            }
 
-        let task = HFDownloadTask(
-            id: model.id,
-            downloadURL: url,
-            progress: 0,
-            status: .queued,
-            totalBytes: 0,
-            bytesReceived: 0
-        )
+            guard let fileName = selectBestGGUF(model: modelWithDetails) else {
+                SDKLogStore.shared.log("No suitable GGUF found for \(model.id)", source: "HFDownloadManager", level: .error)
+                return
+            }
 
-        activeDownloads[model.id] = task
-        saveTasks()
+            guard let url = URL(string: "https://huggingface.co/\(model.id)/resolve/main/\(fileName)") else { return }
 
-        let downloadTask = session.downloadTask(with: url)
-        downloadTask.resume()
+            let task = HFDownloadTask(
+                id: model.id,
+                downloadURL: url,
+                progress: 0,
+                status: .queued,
+                totalBytes: 0,
+                bytesReceived: 0
+            )
 
-        activeDownloads[model.id]?.status = .downloading
+            activeDownloads[model.id] = task
+            saveTasks()
+
+            let downloadTask = session.downloadTask(with: url)
+            downloadTask.resume()
+
+            activeDownloads[model.id]?.status = .downloading
+        }
+    }
+
+    private func selectBestGGUF(model: HFModel) -> String? {
+        guard let siblings = model.siblings else { return nil }
+        let ggufFiles = siblings.map { $0.rfilename }.filter { $0.lowercased().hasSuffix(".gguf") }
+        guard !ggufFiles.isEmpty else { return nil }
+
+        let profile = DeviceProfile.current()
+        let ram = profile.ramGB
+
+        // Preference order based on RAM
+        let preferredQuants: [String]
+        if ram >= 16 {
+            preferredQuants = ["Q8_0", "Q6_K", "Q5_K_M", "Q4_K_M"]
+        } else if ram >= 12 {
+            preferredQuants = ["Q6_K", "Q5_K_M", "Q4_K_M", "Q3_K_M"]
+        } else if ram >= 8 {
+            preferredQuants = ["Q5_K_M", "Q4_K_M", "Q3_K_M"]
+        } else {
+            preferredQuants = ["Q4_K_M", "Q3_K_M", "Q2_K"]
+        }
+
+        for quant in preferredQuants {
+            if let found = ggufFiles.first(where: { $0.contains(quant) }) {
+                return found
+            }
+        }
+
+        // If no preferred quant matches, try to find any "Q4" or "Q5" as they are usually good balances
+        if let found = ggufFiles.first(where: { $0.contains("Q4") }) { return found }
+        if let found = ggufFiles.first(where: { $0.contains("Q5") }) { return found }
+
+        // Fallback to the first GGUF found if no preferred quant matches
+        return ggufFiles.first
     }
 
     func pauseDownload(id: String) {

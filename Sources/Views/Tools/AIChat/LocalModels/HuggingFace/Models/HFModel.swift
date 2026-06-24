@@ -1,5 +1,9 @@
 import Foundation
 
+struct HFFile: Codable, Hashable {
+    let rfilename: String
+}
+
 struct HFModel: Identifiable, Codable, Hashable {
     let id: String
     let author: String?
@@ -7,6 +11,7 @@ struct HFModel: Identifiable, Codable, Hashable {
     let likes: Int?
     let downloads: Int?
     let tags: [String]?
+    let siblings: [HFFile]?
 
     var name: String {
         id.components(separatedBy: "/").last ?? id

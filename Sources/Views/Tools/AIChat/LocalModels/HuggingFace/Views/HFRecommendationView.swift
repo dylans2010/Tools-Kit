@@ -96,16 +96,21 @@ struct HFRecommendationView: View {
     }
 
     private func downloadModel(_ rec: HFRecommendation) {
-        // Create a dummy HFModel to trigger download
-        let model = HFModel(
-            id: rec.model_link,
-            author: rec.model_link.components(separatedBy: "/").first,
-            lastModified: nil,
-            likes: nil,
-            downloads: nil,
-            tags: ["gguf"]
-        )
-        HuggingFaceDownloadManager.shared.downloadModel(model)
-        dismiss()
+        isLoading = true
+        Task {
+            do {
+                let model = try await HuggingFaceAPIClient.shared.fetchModelDetails(id: rec.model_link)
+                await MainActor.run {
+                    HuggingFaceDownloadManager.shared.downloadModel(model)
+                    self.isLoading = false
+                    dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = "Failed to fetch model details: \(error.localizedDescription)"
+                    self.isLoading = false
+                }
+            }
+        }
     }
 }
