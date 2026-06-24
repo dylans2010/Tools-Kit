@@ -93,7 +93,6 @@ class ToolRegistry: ObservableObject {
             SecureNotesTool(),
             EncryptionTool(),
             IPInfoTool(),
-            DNSLookupTool(),
             PortCheckerTool(),
             WebsiteScreenshotTool(),
             LinkPreviewTool(),

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DA0200000000000000000999 /* DNSLookupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000999 /* DNSLookupView.swift */; };
 		0001F0832037938D40776723 /* AgentToolResultCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643750A4D819D6E6CB623690 /* AgentToolResultCache.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		008580EC96F3EB7A63395DC9 /* AgentConfigurationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412F9451340C6E936945A3CF /* AgentConfigurationValidator.swift */; };
@@ -1164,7 +1163,6 @@
 		DG02000000000000000000000254 /* DiagnosticPresetPrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG01000000000000000000000254 /* DiagnosticPresetPrompts.swift */; };
 		DG0200000000000000000000092 /* Diag_GPSLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000092 /* Diag_GPSLocationView.swift */; };
 		DG0200000000000000000000093 /* Diag_SatelliteConnectivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000093 /* Diag_SatelliteConnectivityView.swift */; };
-		DG0200000000000000000000094 /* Diag_DNSLookupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000094 /* Diag_DNSLookupView.swift */; };
 		DG0200000000000000000000095 /* Diag_PortScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000095 /* Diag_PortScannerView.swift */; };
 		DG0200000000000000000000096 /* Diag_TracerouteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000096 /* Diag_TracerouteView.swift */; };
 		DG0200000000000000000000097 /* Diag_BandwidthMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DG0100000000000000000000097 /* Diag_BandwidthMonitorView.swift */; };
@@ -1340,7 +1338,6 @@
 		ED0200000000000000000005 /* EditingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0100000000000000000005 /* EditingEngine.swift */; };
 		ED020000000000000000000A /* EditingHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000A /* EditingHomeView.swift */; };
 		ED020000000000000000000B /* FullEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000B /* FullEditorView.swift */; };
-		ED1AB19FBD8A4AFA9E6A46DC /* Builder/DNSLookupDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 136AC1CC47A94BDFA3CA14EC /* Builder/DNSLookupDevTool.swift */; };
 		EF19A3ECB17B4450A2532876 /* generate_diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF5E5DE3A9C84E20A5C56373 /* generate_diff.swift */; };
 		EF1D47D690D248348EF35A87 /* Builder/Base64DecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D4A5F0DE4384EAFA7DC3B2F /* Builder/Base64DecoderDevTool.swift */; };
 		EF2937940BAE41CEA488B654 /* AudioConverterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BCF165F546441AB2C0C2E2 /* AudioConverterBackend.swift */; };
@@ -1380,7 +1377,6 @@
 		F18378B1CA7C4331BFBBAF3A /* migration_analyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBF9DD0E818F448B93A833EB /* migration_analyzer.swift */; };
 		F191EBEF408049258F2EB61D /* code_cleanup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A5319816EE145DC9B6565D5 /* code_cleanup.swift */; };
 		F2315F32F51848FF938FD42E /* CalendarConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17DF0AFC8D854FAC9706801A /* CalendarConnector.swift */; };
-		F258D262015947EA9CF9A087 /* DNSLookupBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E7247B9B51047C491148DB8 /* DNSLookupBackend.swift */; };
 		F2C0EB90D01949BABF3BDE96 /* Builder/RuntimeInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41BA841940D34636B5B2C8E1 /* Builder/RuntimeInspectorDevTool.swift */; };
 		F2E5E31805DE4F0783E49178 /* HabitTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDC177FCF5D46119D1C8CC1 /* HabitTrackerView.swift */; };
 		F2E5E31805DE4F0783E49179 /* HabitTrackerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDC177FCF5D46119D1C8CC2 /* HabitTrackerBackend.swift */; };
@@ -2427,7 +2423,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		DA0100000000000000000999 /* DNSLookupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSLookupView.swift; sourceTree = "<group>"; };
 		00C0E15FEF0E12A7A901E440 /* AgentDemoTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDemoTimeline.swift; sourceTree = "<group>"; };
 		00CA85AC8F214CE79F467511 /* UUIDGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UUIDGeneratorView.swift; sourceTree = "<group>"; };
 		011E855AF0F14D94AB4E22BE /* PDFToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFToolsView.swift; sourceTree = "<group>"; };
@@ -2481,7 +2476,6 @@
 		12AF1F56F4474A21B545104E /* Sources/Views/Workspace/GitHub/GitHubRepoComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/GitHub/GitHubRepoComparisonView.swift; sourceTree = "<group>"; };
 		1313368F3AC4642749782E31 /* SystemAgentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAgentViewModel.swift; sourceTree = "<group>"; };
 		1338057905715A34048EC6C2 /* AgentContextCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentContextCompressor.swift; sourceTree = "<group>"; };
-		136AC1CC47A94BDFA3CA14EC /* Builder/DNSLookupDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/DNSLookupDevTool.swift; sourceTree = "<group>"; };
 		13FDB940ADAE0855D6C08CA8 /* EditingCollaborationViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditingCollaborationViews.swift; sourceTree = "<group>"; };
 		14348B7A70A64EBC8BEA5262 /* TextInputQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputQuestionView.swift; sourceTree = "<group>"; };
 		14395D8F11D0492AA433E945 /* render_diff_state.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = render_diff_state.swift; sourceTree = "<group>"; };
@@ -2749,7 +2743,6 @@
 		7D0568311F934BEA9702023A /* architecture_review.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = architecture_review.swift; sourceTree = "<group>"; };
 		7D3E7FC509497E5291566A29 /* SDKPluginProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginProtocol.swift; sourceTree = "<group>"; };
 		7D67D8C4062943428EBFD695 /* Base64Backend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base64Backend.swift; sourceTree = "<group>"; };
-		7E7247B9B51047C491148DB8 /* DNSLookupBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSLookupBackend.swift; sourceTree = "<group>"; };
 		7F2E2F7FD50452EFABEF77A7 /* ProjectModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectModels.swift; sourceTree = "<group>"; };
 		7FB1750052D346DFBBD0A71D /* MailContentRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailContentRenderer.swift; sourceTree = "<group>"; };
 		8089CEDC467040D2B38719FF /* SectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
@@ -3561,7 +3554,6 @@
 		DG01000000000000000000000254 /* DiagnosticPresetPrompts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticPresetPrompts.swift; sourceTree = "<group>"; };
 		DG0100000000000000000000092 /* Diag_GPSLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_GPSLocationView.swift; sourceTree = "<group>"; };
 		DG0100000000000000000000093 /* Diag_SatelliteConnectivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SatelliteConnectivityView.swift; sourceTree = "<group>"; };
-		DG0100000000000000000000094 /* Diag_DNSLookupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DNSLookupView.swift; sourceTree = "<group>"; };
 		DG0100000000000000000000095 /* Diag_PortScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PortScannerView.swift; sourceTree = "<group>"; };
 		DG0100000000000000000000096 /* Diag_TracerouteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_TracerouteView.swift; sourceTree = "<group>"; };
 		DG0100000000000000000000097 /* Diag_BandwidthMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BandwidthMonitorView.swift; sourceTree = "<group>"; };
@@ -4847,13 +4839,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		00EB3FDB8C5C441AA723E135 /* DNSLookup */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = DNSLookup;
-			sourceTree = "<group>";
-		};
 		017AEE4C9C5346B39294CB17 /* Automation */ = {
 			isa = PBXGroup;
 			children = (
@@ -8335,7 +8320,6 @@
 				NG0500000000000000000004 /* Versioning */,
 				NG0500000000000000000005 /* Testing */,
 				NG0500000000000000000006 /* Changelog */,
-				136AC1CC47A94BDFA3CA14EC /* Builder/DNSLookupDevTool.swift */,
 				7B11523AC4E14CE488290B0B /* Builder/XMLFormatterDevTool.swift */,
 				E705DC3E3CC9462C8ACE76C4 /* Builder/JSONDiffDevTool.swift */,
 				5AE8DDE6A31B4B2EB00D6FF4 /* Builder/SFSymbolsBrowserDevTool.swift */,
@@ -8650,7 +8634,6 @@
 		D1CC39CE437180739A6432C7 /* Tools */ = {
 			isa = PBXGroup;
 			children = (
-				00EB3FDB8C5C441AA723E135 /* DNSLookup */,
 				01DF5A070731498DA43CBA31 /* Maps */,
 				099FD81FFA3C4E928B621CE6 /* AudioConverter */,
 				09A0728B420D4AB689B0B77E /* Weather */,
@@ -9306,7 +9289,6 @@
 				DG01000000000000000000000091 /* DiagnosticReportsView.swift */,
 				DG0100000000000000000000092 /* Diag_GPSLocationView.swift */,
 				DG0100000000000000000000093 /* Diag_SatelliteConnectivityView.swift */,
-				DG0100000000000000000000094 /* Diag_DNSLookupView.swift */,
 				DG0100000000000000000000095 /* Diag_PortScannerView.swift */,
 				DG0100000000000000000000096 /* Diag_TracerouteView.swift */,
 				DG0100000000000000000000097 /* Diag_BandwidthMonitorView.swift */,
@@ -9615,7 +9597,6 @@
 				F0B23DBA82804F7C9DD9EB20 /* SecureFileSender */,
 				F23344010D724C9FBB8C19B3 /* NATO */,
 				F41BBD804BAC40F7AB0D8C06 /* APITester */,
-				F65473E6379545A6B6616FBF /* DNSLookup */,
 				FCBD67EBD7214041BADF7C3B /* WordCounter */,
 				FEFAAFF0DB1647CC8A31E9BB /* Maps */,
 			);
@@ -10055,15 +10036,6 @@
 				FX0100000000000000000004 /* MQTTConnector.swift */,
 			);
 			path = Connectors;
-			sourceTree = "<group>";
-		};
-		F65473E6379545A6B6616FBF /* DNSLookup */ = {
-			isa = PBXGroup;
-			children = (
-				7E7247B9B51047C491148DB8 /* DNSLookupBackend.swift */,
-				DA0100000000000000000999 /* DNSLookupView.swift */,
-			);
-			path = DNSLookup;
 			sourceTree = "<group>";
 		};
 		F6AF4494893E4B9C9A6749AE /* Workouts */ = {
@@ -11260,7 +11232,6 @@
 				HF0100000000000000000004 /* HuggingFaceDownloadManager.swift */,
 				HF0100000000000000000007 /* DeviceProfiler.swift */,
 				HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */,
-				HF0100000000000000000009 /* HFModelDetailView.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -11270,6 +11241,7 @@
 			children = (
 				HF0100000000000000000005 /* HuggingFaceBrowseView.swift */,
 				HF0100000000000000000006 /* DownloadOverlayView.swift */,
+				HF0100000000000000000009 /* HFModelDetailView.swift */,
 				HF010000000000000000000A /* HFRecommendationView.swift */,
 			);
 			path = Views;
@@ -12799,7 +12771,6 @@
 				DG02000000000000000000000091 /* DiagnosticReportsView.swift in Sources */,
 				DG0200000000000000000000092 /* Diag_GPSLocationView.swift in Sources */,
 				DG0200000000000000000000093 /* Diag_SatelliteConnectivityView.swift in Sources */,
-				DG0200000000000000000000094 /* Diag_DNSLookupView.swift in Sources */,
 				DG0200000000000000000000095 /* Diag_PortScannerView.swift in Sources */,
 				DG0200000000000000000000096 /* Diag_TracerouteView.swift in Sources */,
 				DG0200000000000000000000097 /* Diag_BandwidthMonitorView.swift in Sources */,
@@ -13740,7 +13711,6 @@
 				DB4C2A13C5C24333B5594DE1 /* PortCheckerBackend.swift in Sources */,
 				B8F195B8B12841C7909EFF74 /* SQLFormatterBackend.swift in Sources */,
 				9A320A8617B74B279B426746 /* XMLFormatterBackend.swift in Sources */,
-				F258D262015947EA9CF9A087 /* DNSLookupBackend.swift in Sources */,
 				89B956BEBDF84E7CBCED4D80 /* OCRToolBackend.swift in Sources */,
 				61A1F633C2DD4956A17E15B2 /* FileConverterBackend.swift in Sources */,
 				7B8EF97A67214B06BDF5D234 /* IPInfoBackend.swift in Sources */,
@@ -14355,7 +14325,6 @@
 				A635DCE822B6300B2142EE01 /* SDKConnectorHealthView.swift in Sources */,
 				C0B0B0B0B0B0B0B0B0B0B003 /* Color+Hex.swift in Sources */,
 				04494BFF858161E110044905 /* SDKConnectorMetricsView.swift in Sources */,
-				ED1AB19FBD8A4AFA9E6A46DC /* Builder/DNSLookupDevTool.swift in Sources */,
 				0D46F6A690CC4DF0AF6E6A2E /* Builder/XMLFormatterDevTool.swift in Sources */,
 				71B11BC1C1D245B0A07447FA /* Builder/JSONDiffDevTool.swift in Sources */,
 				28ADF54F26984B3C8B68D2AA /* Builder/SFSymbolsBrowserDevTool.swift in Sources */,
@@ -14536,7 +14505,6 @@
 				B48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift in Sources */,
 				BBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift in Sources */,
 				B4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift in Sources */,
-							DA0200000000000000000999 /* DNSLookupView.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

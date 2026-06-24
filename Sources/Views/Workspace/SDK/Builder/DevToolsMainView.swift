@@ -171,7 +171,6 @@ final class DevToolRegistry: ObservableObject {
         register(NetworkReachabilityDevTool())
         register(APIResponseViewerDevTool())
         register(WebSocketMonitorDevTool())
-        register(DNSLookupDevTool())
         register(IPInfoDevTool())
 
         // Diagnostics
