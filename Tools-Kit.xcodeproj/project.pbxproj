@@ -1767,6 +1767,9 @@
 		HF0200000000000000000008 /* HuggingFaceRecommendationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */; };
 		HF0200000000000000000009 /* HFModelDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000009 /* HFModelDetailView.swift */; };
 		HF020000000000000000000A /* HFRecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF010000000000000000000A /* HFRecommendationView.swift */; };
+		HF020000000000000000000B /* HFInferenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF010000000000000000000B /* HFInferenceService.swift */; };
+		HF020000000000000000000C /* OpenRouterFreeModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF010000000000000000000C /* OpenRouterFreeModelsView.swift */; };
+		HF020000000000000000000D /* HFInstalledModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF010000000000000000000D /* HFInstalledModels.swift */; };
 		HV84F970AAEB0D52DC9A1CEB /* AgenticUIHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HVADD29D00189D6E872BCD3E /* AgenticUIHomeView.swift */; };
 		IW0200000000000000000001 /* WorkspaceColorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = IW0100000000000000000001 /* WorkspaceColorManager.swift */; };
 		IW0200000000000000000002 /* WorkspaceSurfaceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = IW0100000000000000000002 /* WorkspaceSurfaceCard.swift */; };
@@ -4192,6 +4195,9 @@
 		HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceRecommendationService.swift; sourceTree = "<group>"; };
 		HF0100000000000000000009 /* HFModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFModelDetailView.swift; sourceTree = "<group>"; };
 		HF010000000000000000000A /* HFRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFRecommendationView.swift; sourceTree = "<group>"; };
+		HF010000000000000000000B /* HFInferenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFInferenceService.swift; sourceTree = "<group>"; };
+		HF010000000000000000000C /* OpenRouterFreeModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterFreeModelsView.swift; sourceTree = "<group>"; };
+		HF010000000000000000000D /* HFInstalledModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFInstalledModels.swift; sourceTree = "<group>"; };
 		HVADD29D00189D6E872BCD3E /* AgenticUIHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIHomeView.swift; sourceTree = "<group>"; };
 		IW0100000000000000000001 /* WorkspaceColorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceColorManager.swift; sourceTree = "<group>"; };
 		IW0100000000000000000002 /* WorkspaceSurfaceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSurfaceCard.swift; sourceTree = "<group>"; };
@@ -11555,6 +11561,9 @@
 				LM0100000000000000000002 /* SetupLocalModelsView.swift */,
 				LM0100000000000000000006 /* LocalModelDetailsView.swift */,
 				HF0100000000000000000001 /* AvailableLocalModelsView.swift */,
+				HF010000000000000000000B /* HFInferenceService.swift */,
+				HF010000000000000000000C /* OpenRouterFreeModelsView.swift */,
+				HF010000000000000000000D /* HFInstalledModels.swift */,
 				LM0100000000000000000005 /* AdvancedLocalModelsConfigView.swift */,
 				LM0100000000000000000007 /* LMStudioLogsView.swift */,
 				LM0300000000000000000300 /* AFM */,
@@ -12389,6 +12398,9 @@
 				HF0200000000000000000008 /* HuggingFaceRecommendationService.swift in Sources */,
 				HF0200000000000000000009 /* HFModelDetailView.swift in Sources */,
 				HF020000000000000000000A /* HFRecommendationView.swift in Sources */,
+				HF020000000000000000000B /* HFInferenceService.swift in Sources */,
+				HF020000000000000000000C /* OpenRouterFreeModelsView.swift in Sources */,
+				HF020000000000000000000D /* HFInstalledModels.swift in Sources */,
 				RV020001 /* SpeechModels.swift in Sources */,
 				RV020002 /* SpeechMainView.swift in Sources */,
 				RV020003 /* SpeechSettingsView.swift in Sources */,

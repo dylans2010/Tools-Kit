@@ -7,10 +7,28 @@ struct AvailableLocalModelsView: View {
     @AppStorage("aichat_model_id") private var modelID = ""
 
     @StateObject private var afmManager = AFMModelManager.shared
+    @State private var downloadedModels: [AIModel] = []
 
     var body: some View {
         NavigationStack {
             List {
+                Section("Downloaded HuggingFace Models") {
+                    if downloadedModels.isEmpty {
+                        Text("No models downloaded.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } else {
+                        ForEach(downloadedModels) { model in
+                            modelRow(model, source: "huggingface")
+                        }
+                    }
+
+                    NavigationLink(destination: HFInstalledModels()) {
+                        Label("Manage Downloads", systemImage: "folder.badge.gearshape")
+                            .foregroundColor(.blue)
+                    }
+                }
+
                 Section("Favorited Models") {
                     if settingsManager.settings.favoriteModels.isEmpty {
                         Text("No favorite models.")
@@ -39,6 +57,9 @@ struct AvailableLocalModelsView: View {
                             .foregroundColor(.blue)
                     }
                 }
+            }
+            .onAppear {
+                loadDownloadedModels()
             }
             .navigationTitle("Select Model")
             .toolbar {
@@ -82,6 +103,9 @@ struct AvailableLocalModelsView: View {
         if source == "afm" {
             settingsManager.settings.selectedAFMModelID = model.id
             settingsManager.settings.selectedLocalConfigID = nil
+        } else if source == "huggingface" {
+            // HF models don't have a specific config ID yet, they use HFInferenceService
+            settingsManager.settings.selectedLocalConfigID = nil
         } else if source == "local_models" {
             if let configID = configID {
                 settingsManager.settings.selectedLocalConfigID = configID
@@ -91,5 +115,27 @@ struct AvailableLocalModelsView: View {
         }
 
         dismiss()
+    }
+
+    private func loadDownloadedModels() {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let hfRootFolder = paths[0].appendingPathComponent("HuggingFace", isDirectory: true)
+
+        guard let folders = try? FileManager.default.contentsOfDirectory(at: hfRootFolder, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) else {
+            return
+        }
+
+        var models: [AIModel] = []
+        for folder in folders {
+            if folder.hasDirectoryPath {
+                let modelID = folder.lastPathComponent.replacingOccurrences(of: "_", with: "/")
+                // Try to find a GGUF file in the folder
+                if let files = try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil),
+                   files.contains(where: { $0.pathExtension.lowercased() == "gguf" }) {
+                    models.append(AIModel(id: modelID, name: modelID.components(separatedBy: "/").last ?? modelID))
+                }
+            }
+        }
+        self.downloadedModels = models
     }
 }

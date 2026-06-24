@@ -217,29 +217,66 @@ class AIService {
 
     // MARK: - Local AI Service (Unified)
 
-    struct AILocalService {
-        static func sendRequest(messages: [ChatMessage], config: LocalModelConfig? = nil) async throws -> String {
-            let settings = AIChatSettingsManager.shared.settings
+    @MainActor
+    class AILocalService: ObservableObject {
+        static let shared = AILocalService()
+        private let settingsManager = AIChatSettingsManager.shared
 
-            // If explicit config is provided, use it
+        func sendRequest(messages: [ChatMessage], config: LocalModelConfig? = nil) async throws -> String {
+            let s = settingsManager.settings
+
+            // 1. If explicit config is provided, use it (Custom Provider)
             if let config = config {
                 return try await sendToCustomEndpoint(messages: messages, config: config)
             }
 
-            // If local config is selected in settings, use it
-            if let configID = settings.selectedLocalConfigID,
-               let config = settings.localConfigs.first(where: { $0.id == configID }) {
-                return try await sendToCustomEndpoint(messages: messages, config: config)
+            // 2. Route based on selected provider from AvailableLocalModelsView
+            switch s.selectedProviderID {
+            case "afm":
+                SDKLogStore.shared.log("AILocalService: Routing to AFM", source: "AIService", level: .info)
+                return try await AFMService.shared.generateResponse(
+                    prompt: messages.last?.content ?? "",
+                    systemPrompt: messages.first?.role == "system" ? messages.first?.content ?? "" : ""
+                )
+
+            case "huggingface":
+                SDKLogStore.shared.log("AILocalService: Routing to HuggingFace Local", source: "AIService", level: .info)
+                // Downloaded models are currently handled via a local runner if available,
+                // or bridged through a local provider. For now, we use HFInferenceService.
+                return try await HFInferenceService.shared.sendRequest(messages: messages, modelID: s.modelID)
+
+            case "local_models":
+                if let configID = s.selectedLocalConfigID,
+                   let config = s.localConfigs.first(where: { $0.id == configID }) {
+                    return try await sendToCustomEndpoint(messages: messages, config: config)
+                } else if let firstConfig = s.localConfigs.first {
+                    return try await sendToCustomEndpoint(messages: messages, config: firstConfig)
+                }
+
+            default:
+                // Fallback to first available local config if set to local mode but provider is unknown
+                if let firstConfig = s.localConfigs.first {
+                    return try await sendToCustomEndpoint(messages: messages, config: firstConfig)
+                }
             }
 
-            // Fallback to error if no config is available
             throw AIError.noModelSelected
         }
 
-        private static func sendToCustomEndpoint(messages: [ChatMessage], config: LocalModelConfig) async throws -> String {
-            guard let url = URL(string: "\(config.baseURL)/chat/completions") else {
+        private func sendToCustomEndpoint(messages: [ChatMessage], config: LocalModelConfig) async throws -> String {
+            var urlString = config.baseURL
+            if !urlString.contains("/chat/completions") {
+                if urlString.hasSuffix("/") {
+                    urlString += "chat/completions"
+                } else {
+                    urlString += "/chat/completions"
+                }
+            }
+
+            guard let url = URL(string: urlString) else {
                 throw AIError.invalidEndpoint
             }
+
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.timeoutInterval = config.timeout
@@ -260,7 +297,10 @@ class AIService {
                 "messages": payloadMessages,
                 "temperature": config.temperature,
                 "max_tokens": config.maxTokens,
-                "stream": false
+                "stream": false,
+                "top_p": config.topP,
+                "seed": config.seed,
+                "repeat_penalty": config.repeatPenalty
             ]
 
             request.httpBody = try JSONSerialization.data(withJSONObject: payload)
@@ -275,7 +315,7 @@ class AIService {
 
             if !(200...299).contains(httpResponse.statusCode) {
                 let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
-                SDKLogStore.shared.log("AILocalService: Request failed (\(httpResponse.statusCode)) for \(url.absoluteString). Auth Header Present: \(request.allHTTPHeaderFields?["Authorization"] != nil). Response: \(errorBody)", source: "AIService", level: .error)
+                SDKLogStore.shared.log("AILocalService: Request failed (\(httpResponse.statusCode)) for \(url.absoluteString). Response: \(errorBody)", source: "AIService", level: .error)
                 throw AIError.requestFailed("Server returned \(httpResponse.statusCode): \(errorBody)")
             }
 
@@ -347,7 +387,7 @@ class AIService {
         ]
 
         if settingsManager.settings.aiModelSource == .local {
-            return try await AILocalService.sendRequest(messages: messages)
+            return try await AILocalService.shared.sendRequest(messages: messages)
         }
 
         // Phase 10: Policy-driven routing
@@ -373,7 +413,7 @@ class AIService {
     @MainActor
     func processMessages(messages: [ChatMessage], attachments: [ChatAttachment] = [], model: String? = nil) async throws -> String {
         if settingsManager.settings.aiModelSource == .local {
-            return try await AILocalService.sendRequest(messages: messages)
+            return try await AILocalService.shared.sendRequest(messages: messages)
         }
 
         guard let provider = currentProvider else {

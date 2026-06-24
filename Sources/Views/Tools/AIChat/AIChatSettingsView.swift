@@ -168,7 +168,7 @@ struct AIChatSettingsView: View {
                     Button("Done") { dismiss() }
                 }
             }
-            .sheet(isPresented: $showAvailableLocalModels) {
+            .fullScreenCover(isPresented: $showAvailableLocalModels) {
                 AvailableLocalModelsView()
             }
             .task {
@@ -437,6 +437,29 @@ struct ModelConfigurationSection: View {
 
                     Divider()
 
+                    if provider.id == "openrouter" {
+                        Toggle(isOn: $settings.dynamicRoutingEnabled) {
+                            Label {
+                                VStack(alignment: .leading) {
+                                    Text("Dynamic Model Routing")
+                                    Text("Automatically switch between free models if one fails")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            } icon: {
+                                Image(systemName: "shuffle")
+                                    .foregroundColor(.purple)
+                            }
+                        }
+
+                        NavigationLink(destination: OpenRouterFreeModelsView()) {
+                            Label("Browse Free Models", systemImage: "sparkles")
+                                .foregroundColor(.orange)
+                        }
+
+                        Divider()
+                    }
+
                     let availableModels = modelCatalog.models(for: selectedProviderID)
                     if !availableModels.isEmpty {
                         Picker("Active Model", selection: $modelID) {
@@ -447,6 +470,7 @@ struct ModelConfigurationSection: View {
                         .onChange(of: modelID) { _, newValue in
                             settings.modelID = newValue
                         }
+                        .disabled(provider.id == "openrouter" && settings.dynamicRoutingEnabled)
                     } else {
                         HStack {
                             ProgressView().padding(.trailing, 8)

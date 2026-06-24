@@ -53,8 +53,13 @@ struct HuggingFaceBrowseView: View {
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: HFRecommendationView()) {
-                    Image(systemName: "sparkles")
+                HStack {
+                    NavigationLink(destination: HFInstalledModels()) {
+                        Image(systemName: "folder.badge.person.crop")
+                    }
+                    NavigationLink(destination: HFRecommendationView()) {
+                        Image(systemName: "sparkles")
+                    }
                 }
             }
         }
