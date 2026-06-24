@@ -232,7 +232,6 @@ struct DiagnosticsHomeView: View {
         case "device_orientation": Diag_DeviceOrientationView()
         case "motion_sensor_fusion": Diag_MotionSensorFusionView()
         // Networking
-        case "dns_lookup": Diag_DNSLookupView()
         case "port_scanner": Diag_PortScannerView()
         case "traceroute": Diag_TracerouteView()
         case "bandwidth_monitor": Diag_BandwidthMonitorView()

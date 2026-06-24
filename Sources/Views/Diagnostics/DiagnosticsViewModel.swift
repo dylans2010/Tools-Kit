@@ -217,7 +217,6 @@ final class DiagnosticsViewModel: ObservableObject {
         DiagnosticTool(id: "motion_sensor_fusion", name: "Motion Sensor Fusion", icon: "gyroscope", description: "Combined accelerometer, gyro, magnetometer fusion data", category: .sensors),
 
         // Networking
-        DiagnosticTool(id: "dns_lookup", name: "DNS Lookup", icon: "server.rack", description: "Real DNS resolution with IPv4/IPv6 address discovery", category: .connectivity),
         DiagnosticTool(id: "port_scanner", name: "Port Scanner", icon: "network.badge.shield.half.filled", description: "TCP port scanning with concurrent connection testing", category: .connectivity),
         DiagnosticTool(id: "traceroute", name: "Traceroute", icon: "point.3.connected.trianglepath.dotted", description: "Network path tracing with hop-by-hop RTT analysis", category: .connectivity),
         DiagnosticTool(id: "bandwidth_monitor", name: "Bandwidth Monitor", icon: "chart.line.uptrend.xyaxis", description: "Real-time network throughput from interface statistics", category: .connectivity),
