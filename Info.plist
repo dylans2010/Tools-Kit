@@ -119,8 +119,16 @@
 	<string>Access is needed to import and play music files.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Face ID is used to secure your mail settings and private messages.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Tools Kit uses the local network to discover and connect to your OpenClaw Gateway on your Mac.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_openclaw-gw._tcp</string>
+	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>50.21.181.105</key>

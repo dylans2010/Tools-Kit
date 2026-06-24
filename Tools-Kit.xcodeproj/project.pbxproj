@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		OC0200000000000000000001 /* OpenClawProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC0100000000000000000001 /* OpenClawProtocol.swift */; };
+		OC0200000000000000000002 /* OpenClawSecureStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC0100000000000000000002 /* OpenClawSecureStore.swift */; };
+		OC0200000000000000000003 /* OpenClawDeviceRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC0100000000000000000003 /* OpenClawDeviceRegistry.swift */; };
+		OC0200000000000000000004 /* OpenClawGatewayConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC0100000000000000000004 /* OpenClawGatewayConnection.swift */; };
+		OC0200000000000000000005 /* OpenClawDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC0100000000000000000005 /* OpenClawDiscoveryService.swift */; };
+		OC0200000000000000000006 /* OpenClawGatewayService.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC0100000000000000000006 /* OpenClawGatewayService.swift */; };
+		OC0200000000000000000007 /* OpenClawPairingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC0100000000000000000007 /* OpenClawPairingViewModel.swift */; };
+		OC0200000000000000000008 /* OpenClawMainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC0100000000000000000008 /* OpenClawMainViewModel.swift */; };
+		OC0200000000000000000009 /* OpenClawPairView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC0100000000000000000009 /* OpenClawPairView.swift */; };
+		OC0200000000000000000010 /* OpenClawMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC0100000000000000000010 /* OpenClawMainView.swift */; };
+		OC0200000000000000000011 /* OpenClawConnectionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC0100000000000000000011 /* OpenClawConnectionStatusView.swift */; };
+		OC0200000000000000000012 /* OpenClawAgentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC0100000000000000000012 /* OpenClawAgentView.swift */; };
 		0001F0832037938D40776723 /* AgentToolResultCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643750A4D819D6E6CB623690 /* AgentToolResultCache.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		008580EC96F3EB7A63395DC9 /* AgentConfigurationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412F9451340C6E936945A3CF /* AgentConfigurationValidator.swift */; };
@@ -2455,6 +2467,18 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		OC0100000000000000000001 /* OpenClawProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Protocol/OpenClawProtocol.swift; sourceTree = "<group>"; };
+		OC0100000000000000000002 /* OpenClawSecureStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Security/OpenClawSecureStore.swift; sourceTree = "<group>"; };
+		OC0100000000000000000003 /* OpenClawDeviceRegistry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Core/OpenClawDeviceRegistry.swift; sourceTree = "<group>"; };
+		OC0100000000000000000004 /* OpenClawGatewayConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Core/OpenClawGatewayConnection.swift; sourceTree = "<group>"; };
+		OC0100000000000000000005 /* OpenClawDiscoveryService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Discovery/OpenClawDiscoveryService.swift; sourceTree = "<group>"; };
+		OC0100000000000000000006 /* OpenClawGatewayService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Services/OpenClawGatewayService.swift; sourceTree = "<group>"; };
+		OC0100000000000000000007 /* OpenClawPairingViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModels/OpenClawPairingViewModel.swift; sourceTree = "<group>"; };
+		OC0100000000000000000008 /* OpenClawMainViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModels/OpenClawMainViewModel.swift; sourceTree = "<group>"; };
+		OC0100000000000000000009 /* OpenClawPairView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views/OpenClawPairView.swift; sourceTree = "<group>"; };
+		OC0100000000000000000010 /* OpenClawMainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views/OpenClawMainView.swift; sourceTree = "<group>"; };
+		OC0100000000000000000011 /* OpenClawConnectionStatusView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views/OpenClawConnectionStatusView.swift; sourceTree = "<group>"; };
+		OC0100000000000000000012 /* OpenClawAgentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views/OpenClawAgentView.swift; sourceTree = "<group>"; };
 		00C0E15FEF0E12A7A901E440 /* AgentDemoTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDemoTimeline.swift; sourceTree = "<group>"; };
 		00CA85AC8F214CE79F467511 /* UUIDGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UUIDGeneratorView.swift; sourceTree = "<group>"; };
 		011E855AF0F14D94AB4E22BE /* PDFToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFToolsView.swift; sourceTree = "<group>"; };
@@ -5172,9 +5196,29 @@
 			path = FileIntegrity;
 			sourceTree = "<group>";
 		};
+		OC0300000000000000000001 /* OpenClaw */ = {
+			isa = PBXGroup;
+			children = (
+				OC0100000000000000000003 /* OpenClawDeviceRegistry.swift */,
+				OC0100000000000000000004 /* OpenClawGatewayConnection.swift */,
+				OC0100000000000000000005 /* OpenClawDiscoveryService.swift */,
+				OC0100000000000000000001 /* OpenClawProtocol.swift */,
+				OC0100000000000000000002 /* OpenClawSecureStore.swift */,
+				OC0100000000000000000006 /* OpenClawGatewayService.swift */,
+				OC0100000000000000000007 /* OpenClawPairingViewModel.swift */,
+				OC0100000000000000000008 /* OpenClawMainViewModel.swift */,
+				OC0100000000000000000010 /* OpenClawMainView.swift */,
+				OC0100000000000000000009 /* OpenClawPairView.swift */,
+				OC0100000000000000000011 /* OpenClawConnectionStatusView.swift */,
+				OC0100000000000000000012 /* OpenClawAgentView.swift */,
+			);
+			path = OpenClaw;
+			sourceTree = "<group>";
+		};
 		1987FFD9C7B9ABE77AB250E2 /* Workspace */ = {
 			isa = PBXGroup;
 			children = (
+				OC0300000000000000000001 /* OpenClaw */,
 				BR00000000000001 /* Bridging */,
 				DA0000000000000000000001 /* Developer */,
 				AV7CB96B980CB75590CFDFC6 /* Agentic */,
@@ -12318,6 +12362,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				OC0200000000000000000001 /* OpenClawProtocol.swift in Sources */,
+				OC0200000000000000000002 /* OpenClawSecureStore.swift in Sources */,
+				OC0200000000000000000003 /* OpenClawDeviceRegistry.swift in Sources */,
+				OC0200000000000000000004 /* OpenClawGatewayConnection.swift in Sources */,
+				OC0200000000000000000005 /* OpenClawDiscoveryService.swift in Sources */,
+				OC0200000000000000000006 /* OpenClawGatewayService.swift in Sources */,
+				OC0200000000000000000007 /* OpenClawPairingViewModel.swift in Sources */,
+				OC0200000000000000000008 /* OpenClawMainViewModel.swift in Sources */,
+				OC0200000000000000000009 /* OpenClawPairView.swift in Sources */,
+				OC0200000000000000000010 /* OpenClawMainView.swift in Sources */,
+				OC0200000000000000000011 /* OpenClawConnectionStatusView.swift in Sources */,
+				OC0200000000000000000012 /* OpenClawAgentView.swift in Sources */,
 				FCAF21012FEBBE1100A22090 /* HFModelDetailView.swift in Sources */,
 				FC8E948A2FE7CF960041A2E2 /* NSpeechLoggerView.swift in Sources */,
 				HF0200000000000000000001 /* AvailableLocalModelsView.swift in Sources */,
