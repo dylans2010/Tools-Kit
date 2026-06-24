@@ -12,18 +12,34 @@ struct QRPairingStrategy: OpenClawPairingStrategy {
             throw OpenClawError.protocolError("Invalid QR payload")
         }
 
+        guard let url = URL(string: "ws://\(host):\(port)") else {
+            throw OpenClawError.unreachableHost
+        }
+
+        let deviceID = UUID().uuidString
+
+        // If QR already contains a token, save it
+        if let token = json["token"] as? String {
+            OpenClawSecureStore.shared.saveToken(token, for: deviceID)
+        }
+
+        let connection = OpenClawGatewayConnection(url: url, deviceID: deviceID)
+
+        do {
+            _ = try await connection.connect()
+            await connection.disconnect()
+        } catch {
+            throw OpenClawError.handshakeFailed("QR handshake failed: \(error.localizedDescription)")
+        }
+
         let device = OpenClawDevice(
-            id: UUID().uuidString,
+            id: deviceID,
             name: json["name"] as? String ?? "QR Gateway",
             host: host,
             port: port,
             lastConnected: Date(),
             metadata: ["type": "qr"]
         )
-
-        if let token = json["token"] as? String {
-            OpenClawSecureStore.shared.saveToken(token, for: device.id)
-        }
 
         return device
     }

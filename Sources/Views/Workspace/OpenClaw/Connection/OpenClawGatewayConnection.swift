@@ -1,12 +1,24 @@
 import Foundation
 import Combine
 
-enum ConnectionState {
+enum ConnectionState: Equatable {
     case idle
     case connecting
+    case waitingChallenge
     case authenticating
     case connected
-    case failed(Error)
+    case failed(String)
+
+    static func == (lhs: ConnectionState, rhs: ConnectionState) -> Bool {
+        switch (lhs, rhs) {
+        case (.idle, .idle), (.connecting, .connecting), (.waitingChallenge, .waitingChallenge), (.authenticating, .authenticating), (.connected, .connected):
+            return true
+        case (.failed(let l), .failed(let r)):
+            return l == r
+        default:
+            return false
+        }
+    }
 }
 
 actor OpenClawGatewayConnection {
@@ -15,77 +27,109 @@ actor OpenClawGatewayConnection {
     private var socket: URLSessionWebSocketTask?
     private let session = URLSession(configuration: .default)
 
-    private(set) var state: ConnectionState = .idle
-    private var pendingRequests: [String: CheckedContinuation<AnyCodable, Error>] = [:]
-    private var eventStreamContinuation: AsyncStream<OpenClawEvent>.Continuation?
-    private var handshakeContinuation: CheckedContinuation<Void, Error>?
+    private var _state: ConnectionState = .idle
+    private let stateSubject = CurrentValueSubject<ConnectionState, Never>(.idle)
 
+    nonisolated var statePublisher: AnyPublisher<ConnectionState, Never> {
+        stateSubject.eraseToAnyPublisher()
+    }
+
+    private var pendingRequests: [String: CheckedContinuation<AnyCodable, Error>] = [:]
+
+    // External long-lived stream
+    private var externalEventStreamContinuation: AsyncStream<OpenClawEvent>.Continuation?
+
+    private var handshakeContinuation: CheckedContinuation<Void, Error>?
     private var heartbeatTimer: Task<Void, Never>?
+    private var reconnectionTask: Task<Void, Never>?
+    private var connectionAttempt: Int = 0
+    private var isManuallyDisconnected: Bool = false
 
     init(url: URL, deviceID: String) {
         self.url = url
         self.deviceID = deviceID
     }
 
+    private func updateState(_ newState: ConnectionState) {
+        _state = newState
+        stateSubject.send(newState)
+    }
+
+    func getState() -> ConnectionState { _state }
+
     func connect() async throws -> AsyncStream<OpenClawEvent> {
-        guard await getState() == .idle || isFailed() else {
-            throw OpenClawError.connectionFailed("Already connecting or connected")
+        if _state == .connected {
+            throw OpenClawError.connectionFailed("Already connected")
         }
 
-        await setState(.connecting)
+        isManuallyDisconnected = false
+        reconnectionTask?.cancel()
+
+        // Create the external stream if it doesn't exist
+        let (stream, continuation) = AsyncStream.makeStream(of: OpenClawEvent.self)
+        self.externalEventStreamContinuation = continuation
+
+        try await performConnect()
+
+        return stream
+    }
+
+    private func performConnect() async throws {
+        updateState(.connecting)
         socket = session.webSocketTask(with: url)
         socket?.resume()
-
-        let (stream, continuation) = AsyncStream.makeStream(of: OpenClawEvent.self)
-        self.eventStreamContinuation = continuation
 
         listen()
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             self.handshakeContinuation = continuation
-            self.state = .authenticating
+            self.updateState(.waitingChallenge)
 
             // Timeout for handshake
             Task { [weak self] in
-                guard let self = self else { return }
-                try? await Task.sleep(nanoseconds: 10_000_000_000) // 10s
-                await self.handleHandshakeTimeout()
+                try? await Task.sleep(nanoseconds: 15_000_000_000) // 15s
+                await self?.handleHandshakeTimeout()
             }
         }
 
-        await setState(.connected)
+        updateState(.connected)
+        connectionAttempt = 0
         startHeartbeat()
-
-        return stream
-    }
-
-    private func getState() -> ConnectionState { state }
-    private func isFailed() -> Bool {
-        if case .failed = state { return true }
-        return false
-    }
-    private func setState(_ newState: ConnectionState) { self.state = newState }
-
-    private func handleHandshakeTimeout() {
-        if let handshake = self.handshakeContinuation {
-            self.handshakeContinuation = nil
-            handshake.resume(throwing: OpenClawError.authenticationFailed("Handshake timed out"))
-        }
     }
 
     func disconnect() {
+        isManuallyDisconnected = true
         heartbeatTimer?.cancel()
+        reconnectionTask?.cancel()
         socket?.cancel(with: .normalClosure, reason: nil)
-        state = .idle
-        eventStreamContinuation?.finish()
-        if let handshake = handshakeContinuation {
-            handshake.resume(throwing: OpenClawError.connectionFailed("Disconnected"))
-            handshakeContinuation = nil
+        updateState(.idle)
+        externalEventStreamContinuation?.finish()
+        cleanupHandshake(error: OpenClawError.connectionFailed("Disconnected"))
+        cleanupAllPendingRequests(error: OpenClawError.connectionFailed("Disconnected"))
+    }
+
+    private func handleHandshakeTimeout() {
+        if _state == .waitingChallenge || _state == .authenticating {
+            cleanupHandshake(error: OpenClawError.connectionTimeout)
+            socket?.cancel(with: .abnormalClosure, reason: nil)
+            updateState(.failed("Handshake timed out"))
         }
     }
 
+    private func cleanupHandshake(error: Error) {
+        handshakeContinuation?.resume(throwing: error)
+        handshakeContinuation = nil
+    }
+
+    private func cleanupAllPendingRequests(error: Error) {
+        for continuation in pendingRequests.values {
+            continuation.resume(throwing: error)
+        }
+        pendingRequests.removeAll()
+    }
+
     func sendRequest(_ method: String, params: [String: AnyCodable] = [:]) async throws -> AnyCodable {
-        guard case .connected = state else {
+        guard _state == .connected else {
             throw OpenClawError.connectionFailed("Not connected")
         }
         return try await sendRequestInternal(method, params: params)
@@ -115,14 +159,39 @@ actor OpenClawGatewayConnection {
             }
             listen()
         case .failure(let error):
-            state = .failed(error)
-            eventStreamContinuation?.finish()
-            if let handshake = handshakeContinuation {
-                handshake.resume(throwing: error)
-                handshakeContinuation = nil
+            await handleConnectionFailure(error)
+        }
+    }
+
+    private func handleConnectionFailure(_ error: Error) async {
+        if isManuallyDisconnected { return }
+
+        let errorMsg = error.localizedDescription
+        updateState(.failed(errorMsg))
+        cleanupHandshake(error: error)
+        cleanupAllPendingRequests(error: error)
+
+        scheduleReconnection()
+    }
+
+    private func scheduleReconnection() {
+        reconnectionTask?.cancel()
+        reconnectionTask = Task { [weak self] in
+            guard let self = self else { return }
+
+            let attempt = await getAttempt()
+            let delay = min(pow(2.0, Double(attempt)), 60.0)
+            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+
+            if !Task.isCancelled && !isManuallyDisconnected {
+                await self.incrementAttempt()
+                _ = try? await self.performConnect()
             }
         }
     }
+
+    private func getAttempt() -> Int { connectionAttempt }
+    private func incrementAttempt() { connectionAttempt += 1 }
 
     private func handleIncomingData(_ data: Data) async {
         // Try decoding as Response
@@ -131,6 +200,12 @@ actor OpenClawGatewayConnection {
                 if let error = response.error {
                     continuation.resume(throwing: OpenClawError.protocolError(error.message))
                 } else if let result = response.result {
+                    // Extract token if present in connect response
+                    if _state == .authenticating {
+                        if let dict = result.value as? [String: Any], let token = dict["token"] as? String {
+                            OpenClawSecureStore.shared.saveToken(token, for: deviceID)
+                        }
+                    }
                     continuation.resume(returning: result)
                 } else {
                     continuation.resume(returning: AnyCodable(NSNull()))
@@ -141,10 +216,9 @@ actor OpenClawGatewayConnection {
 
         // Try decoding as Event
         if let event = try? JSONDecoder().decode(OpenClawEvent.self, from: data) {
-            eventStreamContinuation?.yield(event)
+            externalEventStreamContinuation?.yield(event)
 
-            // Special case: challenge during handshake
-            if event.event == "connect.challenge", case .authenticating = state {
+            if event.event == "connect.challenge" {
                 await respondToChallenge(event)
             }
             return
@@ -152,16 +226,19 @@ actor OpenClawGatewayConnection {
     }
 
     private func respondToChallenge(_ event: OpenClawEvent) async {
+        guard _state == .waitingChallenge else { return }
+        updateState(.authenticating)
+
         guard let payload = event.payload.value as? [String: Any],
               let nonce = payload["nonce"] as? String else {
-            let error = OpenClawError.authenticationFailed("Missing nonce")
-            handshakeContinuation?.resume(throwing: error)
-            handshakeContinuation = nil
+            cleanupHandshake(error: OpenClawError.invalidNonce)
             return
         }
 
+        let token = OpenClawSecureStore.shared.getToken(for: deviceID)
         let connectParams: [String: AnyCodable] = [
             "nonce": AnyCodable(nonce),
+            "token": AnyCodable(token ?? ""),
             "role": AnyCodable("operator"),
             "metadata": AnyCodable([
                 "device_name": "iPhone",
@@ -174,8 +251,7 @@ actor OpenClawGatewayConnection {
             handshakeContinuation?.resume()
             handshakeContinuation = nil
         } catch {
-            handshakeContinuation?.resume(throwing: error)
-            handshakeContinuation = nil
+            cleanupHandshake(error: error)
         }
     }
 
@@ -215,11 +291,16 @@ actor OpenClawGatewayConnection {
     }
 
     private func startHeartbeat() {
+        heartbeatTimer?.cancel()
         heartbeatTimer = Task { [weak self] in
             while !Task.isCancelled {
-                try? await Task.sleep(nanoseconds: 30_000_000_000)
+                try? await Task.sleep(nanoseconds: 30_000_000_000) // 30s
                 guard let self = self else { break }
-                _ = try? await self.sendRequest("ping")
+                if await self.getState() == .connected {
+                    _ = try? await self.sendRequest("ping")
+                } else {
+                    break
+                }
             }
         }
     }

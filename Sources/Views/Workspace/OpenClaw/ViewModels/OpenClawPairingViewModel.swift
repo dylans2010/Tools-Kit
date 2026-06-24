@@ -21,6 +21,7 @@ final class OpenClawPairingViewModel: ObservableObject {
     }
 
     func startDiscovery() {
+        errorMessage = nil
         discoveryService.startDiscovery()
     }
 
@@ -31,13 +32,22 @@ final class OpenClawPairingViewModel: ObservableObject {
     func pair(with strategy: OpenClawPairingStrategy) async {
         isPairing = true
         errorMessage = nil
+        step = 2 // Pairing loading step
+
         do {
             let device = try await strategy.pair()
             OpenClawDeviceRegistry.shared.register(device)
             step = 3 // Success step
         } catch {
             errorMessage = error.localizedDescription
+            step = (strategy is ManualPairingStrategy) ? 1 : 0
         }
+        isPairing = false
+    }
+
+    func reset() {
+        step = 0
+        errorMessage = nil
         isPairing = false
     }
 }

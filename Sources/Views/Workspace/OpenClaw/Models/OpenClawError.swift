@@ -9,6 +9,10 @@ enum OpenClawError: Error, LocalizedError {
     case discoveryFailed(String)
     case deviceNotAuthorized
     case streamingError(String)
+    case unreachableHost
+    case invalidNonce
+    case handshakeFailed(String)
+    case connectionTimeout
     case unknown
 
     var errorDescription: String? {
@@ -21,6 +25,10 @@ enum OpenClawError: Error, LocalizedError {
         case .discoveryFailed(let msg): return "Discovery Failed: \(msg)"
         case .deviceNotAuthorized: return "Device not authorized"
         case .streamingError(let msg): return "Streaming Error: \(msg)"
+        case .unreachableHost: return "Host is unreachable"
+        case .invalidNonce: return "Invalid nonce received during handshake"
+        case .handshakeFailed(let msg): return "Handshake Failed: \(msg)"
+        case .connectionTimeout: return "The connection timed out"
         case .unknown: return "An unknown error occurred"
         }
     }
