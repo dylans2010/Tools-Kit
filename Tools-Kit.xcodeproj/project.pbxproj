@@ -3885,7 +3885,7 @@
 		FC2449F47F6946C6836E42F7 /* MetadataRemoverBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataRemoverBackend.swift; sourceTree = "<group>"; };
 		FC8E94892FE7CF950041A2E2 /* NSpeechLoggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSpeechLoggerView.swift; sourceTree = "<group>"; };
 		FCAB33AF454749D08BE4DB43 /* abort_task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = abort_task.swift; sourceTree = "<group>"; };
-		FCAF21002FEBBE1000A22090 /* HFModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HFModelDetailView.swift; path = Sources/Views/Tools/AIChat/LocalModels/HuggingFace/Views/HFModelDetailView.swift; sourceTree = "<group>"; };
+		FCAF21002FEBBE1000A22090 /* HFModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HFModelDetailView.swift; path = HFModelDetailView.swift; sourceTree = "<group>"; };
 		FCB887820F444B5F996E3A45 /* LogViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerView.swift; sourceTree = "<group>"; };
 		FD02A9EA505D413A96021DD2 /* RatingQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingQuestionView.swift; sourceTree = "<group>"; };
 		FE863366F23F43A093833FBF /* AgentStreamingHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentStreamingHandler.swift; sourceTree = "<group>"; };
@@ -4169,7 +4169,7 @@
 		HF0100000000000000000006 /* DownloadOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadOverlayView.swift; sourceTree = "<group>"; };
 		HF0100000000000000000007 /* DeviceProfiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceProfiler.swift; sourceTree = "<group>"; };
 		HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceRecommendationService.swift; sourceTree = "<group>"; };
-		HF0100000000000000000009 /* HFModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Tools/AIChat/LocalModels/HuggingFace/Views/HFModelDetailView.swift; sourceTree = "<group>"; };
+		HF0100000000000000000009 /* HFModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFModelDetailView.swift; sourceTree = "<group>"; };
 		HF010000000000000000000A /* HFRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFRecommendationView.swift; sourceTree = "<group>"; };
 		HVADD29D00189D6E872BCD3E /* AgenticUIHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIHomeView.swift; sourceTree = "<group>"; };
 		IW0100000000000000000001 /* WorkspaceColorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceColorManager.swift; sourceTree = "<group>"; };
