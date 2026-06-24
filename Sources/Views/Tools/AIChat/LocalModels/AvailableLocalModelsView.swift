@@ -7,7 +7,6 @@ struct AvailableLocalModelsView: View {
     @AppStorage("aichat_model_id") private var modelID = ""
 
     @StateObject private var afmManager = AFMModelManager.shared
-    @StateObject private var connectionManager = LMConnectionManager.shared
 
     var body: some View {
         NavigationStack {
@@ -30,21 +29,14 @@ struct AvailableLocalModelsView: View {
                     }
                 }
 
-                Section("LM Link Models") {
-                    if connectionManager.selectedDevice?.models.isEmpty ?? true {
-                        Text("No LM Link models available.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    } else {
-                        ForEach(connectionManager.selectedDevice?.models ?? []) { lmModel in
-                            modelRow(AIModel(id: lmModel.id, name: lmModel.name), source: "lmstudio")
-                        }
-                    }
-                }
-
                 Section("Custom Providers") {
                     ForEach(settingsManager.settings.localConfigs) { config in
                         modelRow(AIModel(id: config.modelName, name: config.name), source: "local_models", configID: config.id)
+                    }
+
+                    NavigationLink(destination: SetupLocalModelsView()) {
+                        Label("Add Custom Provider", systemImage: "plus.circle")
+                            .foregroundColor(.blue)
                     }
                 }
             }
@@ -80,9 +72,11 @@ struct AvailableLocalModelsView: View {
     }
 
     private func selectModel(_ model: AIModel, source: String, configID: UUID?) {
+        // Update both the binding/settings AND the AppStorage
         settingsManager.settings.selectedProviderID = source
-        selectedProviderID = source
-        modelID = model.id
+        self.selectedProviderID = source
+
+        self.modelID = model.id
         settingsManager.settings.modelID = model.id
 
         if source == "afm" {
@@ -94,8 +88,6 @@ struct AvailableLocalModelsView: View {
             } else if let config = settingsManager.settings.localConfigs.first(where: { $0.modelName == model.id }) {
                 settingsManager.settings.selectedLocalConfigID = config.id
             }
-        } else if source == "lmstudio" {
-            settingsManager.settings.selectedLocalConfigID = nil
         }
 
         dismiss()

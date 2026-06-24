@@ -59,40 +59,6 @@ struct SetupLocalModelsView: View {
 
     var body: some View {
         List {
-            Section {
-                NavigationLink(destination: LMDeviceFallbackView()) {
-                    HStack(spacing: 16) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.blue.opacity(0.1))
-                                .frame(width: 44, height: 44)
-                            Image(systemName: "wifi")
-                                .foregroundColor(.blue)
-                                .font(.title3)
-                        }
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Automatic Discovery")
-                                .font(.headline)
-                            Text("LM Studio & LAN Nodes")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-
-                        Spacer()
-
-                        if selectedProviderID == "lmstudio" {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.blue)
-                        }
-                    }
-                }
-                .padding(.vertical, 4)
-            } header: {
-                SectionHeader(title: "LM Studio", subtitle: "Connect to local inference servers", icon: "link")
-                    .listRowInsets(EdgeInsets())
-                    .padding(.bottom, 8)
-            }
 
             Section {
                 if settingsManager.settings.localConfigs.isEmpty {

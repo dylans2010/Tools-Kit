@@ -232,8 +232,8 @@ class AIService {
                 return try await sendToCustomEndpoint(messages: messages, config: config)
             }
 
-            // Fallback to LMConnectionManager for LM Link models
-            return try await LMConnectionManager.shared.sendChatRequest(messages: messages)
+            // Fallback to error if no config is available
+            throw AIError.noModelSelected
         }
 
         private static func sendToCustomEndpoint(messages: [ChatMessage], config: LocalModelConfig) async throws -> String {
@@ -326,32 +326,6 @@ class AIService {
         guard !providerID.isEmpty else { throw AIError.noProviderSelected }
         guard !modelID.isEmpty else { throw AIError.noModelSelected }
 
-        if providerID == "lmstudio" {
-            // Event-driven validation: LM Link MUST be linked via callback event
-            guard LMLinkAuthManager.shared.isLinked else {
-                throw AIError.requestFailed("LM Link not authenticated. Please link your account in settings.")
-            }
-
-            guard let device = LMConnectionManager.shared.selectedDevice else {
-                throw AIError.deviceOffline
-            }
-
-            // Phase 10: Strict reachability check
-            guard let url = URL(string: "\(device.baseURL)/v1/models") else {
-                throw AIError.invalidEndpoint
-            }
-            var request = URLRequest(url: url)
-            request.timeoutInterval = 3.0
-
-            do {
-                let (_, response) = try await URLSession.shared.data(for: request)
-                guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
-                    throw AIError.deviceOffline
-                }
-            } catch {
-                throw AIError.deviceOffline
-            }
-        }
 
         if providerID == "afm" {
             let available = AFMModelManager.shared.availableModels
@@ -383,9 +357,6 @@ class AIService {
         try await validateRequest(providerID: selectedProvider, modelID: modelToUse)
 
         switch selectedProvider {
-        case "lmstudio":
-            SDKLogStore.shared.log("Routing to LM Studio via LM Link", source: "AIService", level: .info)
-            return try await AILocalService.sendRequest(messages: messages)
         case "afm":
             SDKLogStore.shared.log("Routing to Apple Foundation Models", source: "AIService", level: .info)
             return try await AFMService.shared.generateResponse(prompt: prompt, systemPrompt: finalSystemPrompt)
