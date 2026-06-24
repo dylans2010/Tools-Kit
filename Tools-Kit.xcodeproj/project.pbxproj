@@ -11432,12 +11432,6 @@
 			path = LocalModels;
 			sourceTree = "<group>";
 		};
-			isa = PBXGroup;
-			children = (
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
 		LM0300000000000000000300 /* AFM */ = {
 			isa = PBXGroup;
 			children = (
