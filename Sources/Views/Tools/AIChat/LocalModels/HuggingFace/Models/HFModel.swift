@@ -7,6 +7,11 @@ struct HFModel: Identifiable, Codable, Hashable {
     let likes: Int?
     let downloads: Int?
     let tags: [String]?
+    let siblings: [HFSibling]?
+
+    struct HFSibling: Codable, Hashable {
+        let rfilename: String
+    }
 
     var name: String {
         id.components(separatedBy: "/").last ?? id

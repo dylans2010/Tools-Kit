@@ -294,90 +294,109 @@ struct AIChatSettingsView: View {
     private var modelSectionContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             if settings.aiModelSource == .local {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Local Model Configuration")
-                        .font(.caption.bold())
-                        .foregroundColor(.secondary)
-
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(connectionManager.selectedModel?.id ?? "No model selected")
-                                .font(.headline)
-                            if let device = connectionManager.selectedDevice {
-                                Text("Running on \(device.ipAddress):\(device.port)")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        Spacer()
-                        Image(systemName: "desktopcomputer")
-                            .foregroundColor(.blue)
-                    }
-                    .padding()
-                    .background(Color.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-
-                    NavigationLink(destination: LMDeviceFallbackView()) {
-                        Label("Change Local Device", systemImage: "arrow.triangle.2.circlepath")
-                            .font(.subheadline)
-                    }
-                    .padding(.top, 4)
-                }
-                .padding(.vertical, 4)
-            } else if ["local_models", "afm", "lmstudio"].contains(selectedProviderID) {
+                // Local Mode: Only allow opening AvailableLocalModelsView
                 Button {
-                    if modelID.isEmpty || modelID == "No model selected" {
-                        showAvailableLocalModels = true
-                    }
+                    showAvailableLocalModels = true
                 } label: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Current AI Model:")
+                    HStack(spacing: 16) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(Color.blue.opacity(0.1))
+                                .frame(width: 48, height: 48)
+                            Image(systemName: "cpu.fill")
+                                .foregroundColor(.blue)
+                                .font(.title2)
+                        }
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(modelID.isEmpty ? "No Local Model Selected" : modelID)
+                                .font(.headline)
+                            Text("Configure local inference & device")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
                             .font(.caption.bold())
                             .foregroundColor(.secondary)
-                        Text(modelID.isEmpty ? "No model selected" : modelID)
-                            .font(.headline)
-                            .foregroundColor(.primary)
                     }
-                    .padding(.vertical, 4)
+                    .padding(.vertical, 8)
                 }
                 .buttonStyle(.plain)
             } else {
-                let availableModels = modelCatalog.models(for: selectedProviderID)
-                if !availableModels.isEmpty {
-                    Picker("Active Model", selection: $modelID) {
-                        ForEach(availableModels) { model in
-                            HStack {
-                                Text(model.name)
-                                if model.supportsVision {
-                                    Image(systemName: "eye.fill").foregroundColor(.blue).font(.caption)
-                                }
+                // Cloud Mode: Standard Provider/Model Selection
+                if ["local_models", "afm", "lmstudio"].contains(selectedProviderID) {
+                    Button {
+                        showAvailableLocalModels = true
+                    } label: {
+                        HStack(spacing: 16) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill(Color.orange.opacity(0.1))
+                                    .frame(width: 48, height: 48)
+                                Image(systemName: "server.rack")
+                                    .foregroundColor(.orange)
+                                    .font(.title2)
                             }
-                            .tag(model.id)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(modelID.isEmpty ? "Select Local Model" : modelID)
+                                    .font(.headline)
+                                Text("Using local provider via cloud usage")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+
+                            Spacer()
+
+                            Image(systemName: "chevron.right")
+                                .font(.caption.bold())
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 8)
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    let availableModels = modelCatalog.models(for: selectedProviderID)
+                    if !availableModels.isEmpty {
+                        Picker("Active Model", selection: $modelID) {
+                            ForEach(availableModels) { model in
+                                HStack {
+                                    Text(model.name)
+                                    if model.supportsVision {
+                                        Image(systemName: "eye.fill").foregroundColor(.blue).font(.caption)
+                                    }
+                                }
+                                .tag(model.id)
+                            }
+                        }
+                        .pickerStyle(.navigationLink)
+                    } else {
+                        HStack {
+                            ProgressView().padding(.trailing, 8)
+                            Text("Fetching Models...")
+                                .foregroundColor(.secondary)
                         }
                     }
-                    .pickerStyle(.navigationLink)
-                } else {
-                    HStack {
-                        ProgressView().padding(.trailing, 8)
-                        Text("Fetching Models...")
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Models")
+                            .font(.caption.bold())
+                        TextField("Model ID or Endpoint", text: $modelID)
+                            .textFieldStyle(.roundedBorder)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+
+                        Text("This model will be used by all AI powered features inside ToolsKit.")
+                            .font(.caption2)
                             .foregroundColor(.secondary)
                     }
+                    .padding(.top, 4)
                 }
-
-                Divider()
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Models")
-                        .font(.caption.bold())
-                    TextField("Model ID or Endpoint", text: $modelID)
-                        .textFieldStyle(.roundedBorder)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
-
-                    Text("This model will be used by all AI powered features inside ToolsKit.")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.top, 4)
             }
 
             if settings.selectedProviderID == "openrouter" && settings.aiModelSource != .local {
