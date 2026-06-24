@@ -792,16 +792,6 @@
 		DA0200000000000000000003 /* ScopeManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000003 /* ScopeManagementView.swift */; };
 		DA0200000000000000000004 /* AuthServiceManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000004 /* AuthServiceManagerView.swift */; };
 		DA0200000000000000000005 /* DeveloperLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000005 /* DeveloperLogsView.swift */; };
-		HF0200000000000000000001 /* AvailableLocalModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000001 /* AvailableLocalModelsView.swift */; };
-		HF0200000000000000000002 /* HFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000002 /* HFModel.swift */; };
-		HF0200000000000000000003 /* HuggingFaceAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000003 /* HuggingFaceAPIClient.swift */; };
-		HF0200000000000000000004 /* HuggingFaceDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000004 /* HuggingFaceDownloadManager.swift */; };
-		HF0200000000000000000005 /* HuggingFaceBrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000005 /* HuggingFaceBrowseView.swift */; };
-		HF0200000000000000000006 /* DownloadOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000006 /* DownloadOverlayView.swift */; };
-		HF0200000000000000000007 /* DeviceProfiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000007 /* DeviceProfiler.swift */; };
-		HF0200000000000000000008 /* HuggingFaceRecommendationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */; };
-		HF0200000000000000000009 /* HFModelDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000009 /* HFModelDetailView.swift */; };
-		HF020000000000000000000A /* HFRecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF010000000000000000000A /* HFRecommendationView.swift */; };
 		DA0200000000000000000006 /* MarketplaceSubmissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000006 /* MarketplaceSubmissionView.swift */; };
 		DA0200000000000000000007 /* MarketplaceListingManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000007 /* MarketplaceListingManagerView.swift */; };
 		DA0200000000000000000008 /* DocumentationEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000008 /* DocumentationEditorView.swift */; };
@@ -1464,6 +1454,7 @@
 		FC8CA3A22FE6467900CBBA86 /* Aurora in Frameworks */ = {isa = PBXBuildFile; productRef = AU0200000000000000000001 /* Aurora */; };
 		FC8E948A2FE7CF960041A2E2 /* NSpeechLoggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8E94892FE7CF950041A2E2 /* NSpeechLoggerView.swift */; };
 		FC9161E6F50E480D81CB8E06 /* Builder/OSVersionInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90600279236049AB979A8D8B /* Builder/OSVersionInspectorDevTool.swift */; };
+		FCAF21012FEBBE1100A22090 /* HFModelDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCAF21002FEBBE1000A22090 /* HFModelDetailView.swift */; };
 		FCDCE575A6CBBCB1A1ADD026 /* AgentSystemPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBAFFC1E92FBF00D9D751465 /* AgentSystemPrompt.swift */; };
 		FD1B82035D684DA78F035222 /* summarize_memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B4B64C5BE6B41368B54FDDE /* summarize_memory.swift */; };
 		FD4F469463EB414E9FAFF23A /* TextSummarizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA8CFA6ED364F5EA8499A1E /* TextSummarizerView.swift */; };
@@ -1742,6 +1733,16 @@
 		GM0200000000000000000089 /* WordStormLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000089 /* WordStormLogic.swift */; };
 		GM0200000000000000000090 /* WordStormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM0100000000000000000090 /* WordStormView.swift */; };
 		GP0200000000000000000001 /* GoogleMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = GP0100000000000000000001 /* GoogleMailProvider.swift */; };
+		HF0200000000000000000001 /* AvailableLocalModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000001 /* AvailableLocalModelsView.swift */; };
+		HF0200000000000000000002 /* HFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000002 /* HFModel.swift */; };
+		HF0200000000000000000003 /* HuggingFaceAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000003 /* HuggingFaceAPIClient.swift */; };
+		HF0200000000000000000004 /* HuggingFaceDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000004 /* HuggingFaceDownloadManager.swift */; };
+		HF0200000000000000000005 /* HuggingFaceBrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000005 /* HuggingFaceBrowseView.swift */; };
+		HF0200000000000000000006 /* DownloadOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000006 /* DownloadOverlayView.swift */; };
+		HF0200000000000000000007 /* DeviceProfiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000007 /* DeviceProfiler.swift */; };
+		HF0200000000000000000008 /* HuggingFaceRecommendationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */; };
+		HF0200000000000000000009 /* HFModelDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000009 /* HFModelDetailView.swift */; };
+		HF020000000000000000000A /* HFRecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF010000000000000000000A /* HFRecommendationView.swift */; };
 		HV84F970AAEB0D52DC9A1CEB /* AgenticUIHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HVADD29D00189D6E872BCD3E /* AgenticUIHomeView.swift */; };
 		IW0200000000000000000001 /* WorkspaceColorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = IW0100000000000000000001 /* WorkspaceColorManager.swift */; };
 		IW0200000000000000000002 /* WorkspaceSurfaceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = IW0100000000000000000002 /* WorkspaceSurfaceCard.swift */; };
@@ -2455,16 +2456,6 @@
 
 /* Begin PBXFileReference section */
 		00C0E15FEF0E12A7A901E440 /* AgentDemoTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDemoTimeline.swift; sourceTree = "<group>"; };
-		HF0100000000000000000001 /* AvailableLocalModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailableLocalModelsView.swift; sourceTree = "<group>"; };
-		HF0100000000000000000002 /* HFModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFModel.swift; sourceTree = "<group>"; };
-		HF0100000000000000000003 /* HuggingFaceAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceAPIClient.swift; sourceTree = "<group>"; };
-		HF0100000000000000000004 /* HuggingFaceDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceDownloadManager.swift; sourceTree = "<group>"; };
-		HF0100000000000000000005 /* HuggingFaceBrowseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceBrowseView.swift; sourceTree = "<group>"; };
-		HF0100000000000000000006 /* DownloadOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadOverlayView.swift; sourceTree = "<group>"; };
-		HF0100000000000000000007 /* DeviceProfiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceProfiler.swift; sourceTree = "<group>"; };
-		HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceRecommendationService.swift; sourceTree = "<group>"; };
-		HF0100000000000000000009 /* HFModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFModelDetailView.swift; sourceTree = "<group>"; };
-		HF010000000000000000000A /* HFRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFRecommendationView.swift; sourceTree = "<group>"; };
 		00CA85AC8F214CE79F467511 /* UUIDGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UUIDGeneratorView.swift; sourceTree = "<group>"; };
 		011E855AF0F14D94AB4E22BE /* PDFToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFToolsView.swift; sourceTree = "<group>"; };
 		01AC08F24D517F68A828494C /* AgentCodeLanguageDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentCodeLanguageDetector.swift; sourceTree = "<group>"; };
@@ -3894,6 +3885,7 @@
 		FC2449F47F6946C6836E42F7 /* MetadataRemoverBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataRemoverBackend.swift; sourceTree = "<group>"; };
 		FC8E94892FE7CF950041A2E2 /* NSpeechLoggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSpeechLoggerView.swift; sourceTree = "<group>"; };
 		FCAB33AF454749D08BE4DB43 /* abort_task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = abort_task.swift; sourceTree = "<group>"; };
+		FCAF21002FEBBE1000A22090 /* HFModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HFModelDetailView.swift; path = Sources/Views/Tools/AIChat/LocalModels/HuggingFace/Views/HFModelDetailView.swift; sourceTree = "<group>"; };
 		FCB887820F444B5F996E3A45 /* LogViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerView.swift; sourceTree = "<group>"; };
 		FD02A9EA505D413A96021DD2 /* RatingQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingQuestionView.swift; sourceTree = "<group>"; };
 		FE863366F23F43A093833FBF /* AgentStreamingHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentStreamingHandler.swift; sourceTree = "<group>"; };
@@ -4169,6 +4161,16 @@
 		GM0100000000000000000089 /* WordStormLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordStormLogic.swift; sourceTree = "<group>"; };
 		GM0100000000000000000090 /* WordStormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordStormView.swift; sourceTree = "<group>"; };
 		GP0100000000000000000001 /* GoogleMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMailProvider.swift; sourceTree = "<group>"; };
+		HF0100000000000000000001 /* AvailableLocalModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailableLocalModelsView.swift; sourceTree = "<group>"; };
+		HF0100000000000000000002 /* HFModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFModel.swift; sourceTree = "<group>"; };
+		HF0100000000000000000003 /* HuggingFaceAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceAPIClient.swift; sourceTree = "<group>"; };
+		HF0100000000000000000004 /* HuggingFaceDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceDownloadManager.swift; sourceTree = "<group>"; };
+		HF0100000000000000000005 /* HuggingFaceBrowseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceBrowseView.swift; sourceTree = "<group>"; };
+		HF0100000000000000000006 /* DownloadOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadOverlayView.swift; sourceTree = "<group>"; };
+		HF0100000000000000000007 /* DeviceProfiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceProfiler.swift; sourceTree = "<group>"; };
+		HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceRecommendationService.swift; sourceTree = "<group>"; };
+		HF0100000000000000000009 /* HFModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFModelDetailView.swift; sourceTree = "<group>"; };
+		HF010000000000000000000A /* HFRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFRecommendationView.swift; sourceTree = "<group>"; };
 		HVADD29D00189D6E872BCD3E /* AgenticUIHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIHomeView.swift; sourceTree = "<group>"; };
 		IW0100000000000000000001 /* WorkspaceColorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceColorManager.swift; sourceTree = "<group>"; };
 		IW0100000000000000000002 /* WorkspaceSurfaceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSurfaceCard.swift; sourceTree = "<group>"; };
@@ -8825,6 +8827,7 @@
 		D3820CA2B6A4399486AA9649 = {
 			isa = PBXGroup;
 			children = (
+				FCAF21002FEBBE1000A22090 /* HFModelDetailView.swift */,
 				8DF4BF69CF55A81CB6EBF3DE /* Sources */,
 				B81AA4FC2BB81266E881DF5B /* Products */,
 				KB0300000000000000000000 /* Sources/Keyboard */,
@@ -11289,6 +11292,46 @@
 			path = WordStorm;
 			sourceTree = "<group>";
 		};
+		HF0300000000000000000001 /* HuggingFace */ = {
+			isa = PBXGroup;
+			children = (
+				HF0300000000000000000002 /* Models */,
+				HF0300000000000000000003 /* Services */,
+				HF0300000000000000000004 /* Views */,
+			);
+			path = HuggingFace;
+			sourceTree = "<group>";
+		};
+		HF0300000000000000000002 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				HF0100000000000000000002 /* HFModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		HF0300000000000000000003 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				HF0100000000000000000003 /* HuggingFaceAPIClient.swift */,
+				HF0100000000000000000004 /* HuggingFaceDownloadManager.swift */,
+				HF0100000000000000000007 /* DeviceProfiler.swift */,
+				HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */,
+				HF0100000000000000000009 /* HFModelDetailView.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		HF0300000000000000000004 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				HF0100000000000000000005 /* HuggingFaceBrowseView.swift */,
+				HF0100000000000000000006 /* DownloadOverlayView.swift */,
+				HF010000000000000000000A /* HFRecommendationView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		KB0300000000000000000000 /* Sources/Keyboard */ = {
 			isa = PBXGroup;
 			children = (
@@ -11485,46 +11528,6 @@
 				LM0100000000000000000208 /* LMLinkModelsView.swift */,
 				LM0100000000000000000209 /* LMLinkSettingsView.swift */,
 				LM0100000000000000000210 /* LMModelRowView.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		HF0300000000000000000001 /* HuggingFace */ = {
-			isa = PBXGroup;
-			children = (
-				HF0300000000000000000002 /* Models */,
-				HF0300000000000000000003 /* Services */,
-				HF0300000000000000000004 /* Views */,
-			);
-			path = HuggingFace;
-			sourceTree = "<group>";
-		};
-		HF0300000000000000000002 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				HF0100000000000000000002 /* HFModel.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		HF0300000000000000000003 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				HF0100000000000000000003 /* HuggingFaceAPIClient.swift */,
-				HF0100000000000000000004 /* HuggingFaceDownloadManager.swift */,
-				HF0100000000000000000007 /* DeviceProfiler.swift */,
-				HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */,
-				HF0100000000000000000009 /* HFModelDetailView.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		HF0300000000000000000004 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				HF0100000000000000000005 /* HuggingFaceBrowseView.swift */,
-				HF0100000000000000000006 /* DownloadOverlayView.swift */,
-				HF010000000000000000000A /* HFRecommendationView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -12315,6 +12318,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCAF21012FEBBE1100A22090 /* HFModelDetailView.swift in Sources */,
 				FC8E948A2FE7CF960041A2E2 /* NSpeechLoggerView.swift in Sources */,
 				HF0200000000000000000001 /* AvailableLocalModelsView.swift in Sources */,
 				HF0200000000000000000002 /* HFModel.swift in Sources */,
