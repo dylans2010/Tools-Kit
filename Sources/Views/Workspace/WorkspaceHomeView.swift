@@ -116,6 +116,7 @@ class WorkspaceNavConfig: ObservableObject {
         WorkspaceNavItem(id: "developer", label: "Developer", icon: "hammer.fill", section: "System", isVisible: true),
 
         WorkspaceNavItem(id: "mail", label: "Mail", icon: "envelope", section: "Workspace", isVisible: true),
+        WorkspaceNavItem(id: "openclaw", label: "OpenClaw", icon: "macpro.gen3", section: "System", isVisible: true),
     ]
 }
 
@@ -337,6 +338,8 @@ struct WorkspaceHomeView: View {
             } else {
                 NavigationLink { ManageAccountsView() } label: { Label(item.label, systemImage: item.icon) }
             }
+        case "openclaw":
+            NavigationLink { OpenClawMainView() } label: { Label(item.label, systemImage: item.icon) }
         default:
             EmptyView()
         }
