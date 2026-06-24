@@ -4196,7 +4196,7 @@
 		HF0100000000000000000009 /* HFModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFModelDetailView.swift; sourceTree = "<group>"; };
 		HF010000000000000000000A /* HFRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFRecommendationView.swift; sourceTree = "<group>"; };
 		HF010000000000000000000B /* HFInferenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFace/Services/HFInferenceService.swift; sourceTree = "<group>"; };
-		HF010000000000000000000C /* OpenRouterFreeModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterFreeModelsView.swift; sourceTree = "<group>"; };
+		HF010000000000000000000C /* OpenRouterFreeModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../OpenRouterFreeModelsView.swift; sourceTree = "<group>"; };
 		HF010000000000000000000D /* HFInstalledModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFace/Views/HFInstalledModels.swift; sourceTree = "<group>"; };
 		HVADD29D00189D6E872BCD3E /* AgenticUIHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIHomeView.swift; sourceTree = "<group>"; };
 		IW0100000000000000000001 /* WorkspaceColorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceColorManager.swift; sourceTree = "<group>"; };
