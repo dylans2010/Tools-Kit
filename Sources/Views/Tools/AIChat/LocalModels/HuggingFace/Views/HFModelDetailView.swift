@@ -7,6 +7,8 @@ struct HFModelDetailView: View {
     @State private var errorMessage: String?
     @ObservedObject var downloadManager = HuggingFaceDownloadManager.shared
 
+    @State private var totalSize: Int64?
+
     var body: some View {
         List {
             if isLoading {
@@ -62,19 +64,39 @@ struct HFModelDetailView: View {
                     }
                 }
 
-                Section("Download GGUF") {
+                Section("Download & Size") {
+                    if let size = totalSize {
+                        HStack {
+                            Text("Estimated Total Size")
+                            Spacer()
+                            Text(formatSize(size))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+
                     if let downloadTask = downloadManager.activeDownloads[model.id] {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
                                 Text(downloadTask.status.rawValue.capitalized)
                                     .font(.subheadline.bold())
                                 Spacer()
-                                Text("\(Int(downloadTask.progress * 100))%")
-                                    .font(.caption)
+                                if downloadTask.status == .downloading {
+                                    Text("\(Int(downloadTask.progress * 100))%")
+                                        .font(.caption)
+                                }
                             }
-                            ProgressView(value: downloadTask.progress)
 
                             if downloadTask.status == .downloading {
+                                ProgressView(value: downloadTask.progress)
+
+                                HStack {
+                                    Text(formatSize(downloadTask.bytesReceived))
+                                    Text("/")
+                                    Text(formatSize(downloadTask.totalBytes))
+                                }
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+
                                 Button(role: .destructive) {
                                     downloadManager.cancelDownload(id: model.id)
                                 } label: {
@@ -82,6 +104,10 @@ struct HFModelDetailView: View {
                                         .frame(maxWidth: .infinity)
                                 }
                                 .buttonStyle(.bordered)
+                            } else if downloadTask.status == .completed {
+                                Text("Model is ready to use.")
+                                    .font(.caption)
+                                    .foregroundColor(.green)
                             }
                         }
                     } else {
@@ -90,18 +116,33 @@ struct HFModelDetailView: View {
                         } label: {
                             HStack {
                                 Image(systemName: "icloud.and.arrow.down")
-                                Text("Download Model")
+                                Text("Download Recommended GGUF")
                                 Spacer()
                             }
                         }
                     }
                 }
 
+                Section("Model Information") {
+                    LabeledContent("Model ID", value: model.id)
+                    if let lastModified = model.lastModified {
+                        LabeledContent("Last Modified", value: lastModified.formatted(date: .abbreviated, time: .omitted))
+                    }
+                    if let author = model.author {
+                        LabeledContent("Author", value: author)
+                    }
+                }
+
                 if let siblings = model.siblings {
-                    Section("Files") {
+                    Section("Files (\(siblings.count))") {
                         ForEach(siblings, id: \.rfilename) { sibling in
-                            Text(sibling.rfilename)
-                                .font(.caption)
+                            HStack {
+                                Image(systemName: sibling.rfilename.lowercased().hasSuffix(".gguf") ? "cpu" : "doc")
+                                    .foregroundColor(.secondary)
+                                Text(sibling.rfilename)
+                                    .font(.caption)
+                                Spacer()
+                            }
                         }
                     }
                 }
@@ -127,6 +168,9 @@ struct HFModelDetailView: View {
             await MainActor.run {
                 self.model = details
                 self.isLoading = false
+                // Size estimation is tricky from just the model list,
+                // but some models have it in metadata or we could fetch it.
+                // For now, we'll placeholder it or try to find it in siblings if available.
             }
         } catch {
             await MainActor.run {
@@ -134,5 +178,12 @@ struct HFModelDetailView: View {
                 self.isLoading = false
             }
         }
+    }
+
+    private func formatSize(_ bytes: Int64) -> String {
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useGB, .useMB]
+        formatter.countStyle = .file
+        return formatter.string(fromByteCount: bytes)
     }
 }
