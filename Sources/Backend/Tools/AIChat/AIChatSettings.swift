@@ -65,12 +65,15 @@ struct LocalModelConfig: Codable, Identifiable, Equatable {
     var logitsAll: Bool = false
     var vocabOnly: Bool = false
 
+    var cachedModels: [AIModel] = []
+
     enum CodingKeys: String, CodingKey {
         case id, name, baseURL, modelName, apiKey, customHeaders, timeout
         case temperature, maxTokens, topP, frequencyPenalty, presencePenalty, isStreamingEnabled
         case seed, topK, minP, typicalP, tfsZ, repeatPenalty, repeatLastN
         case mirostat, mirostatTau, mirostatEta, numGpu, numThread, useMLock, useMMap
         case stopSequences, logprobs, batchSize, contextLength, lowVRAM, f16KV, logitsAll, vocabOnly
+        case cachedModels
     }
 
     init() {}
@@ -114,6 +117,7 @@ struct LocalModelConfig: Codable, Identifiable, Equatable {
         f16KV = try container.decodeIfPresent(Bool.self, forKey: .f16KV) ?? true
         logitsAll = try container.decodeIfPresent(Bool.self, forKey: .logitsAll) ?? false
         vocabOnly = try container.decodeIfPresent(Bool.self, forKey: .vocabOnly) ?? false
+        cachedModels = try container.decodeIfPresent([AIModel].self, forKey: .cachedModels) ?? []
     }
 }
 

@@ -11,7 +11,8 @@ class HuggingFaceAPIClient: ObservableObject {
             URLQueryItem(name: "limit", value: "\(limit)"),
             URLQueryItem(name: "offset", value: "\(offset)"),
             URLQueryItem(name: "sort", value: "downloads"),
-            URLQueryItem(name: "direction", value: "-1")
+            URLQueryItem(name: "direction", value: "-1"),
+            URLQueryItem(name: "siblings", value: "true")
         ]
 
         if let query = query, !query.isEmpty {
@@ -44,6 +45,31 @@ class HuggingFaceAPIClient: ObservableObject {
             return models
         } catch {
             SDKLogStore.shared.log("HF API Client decoding error: \(error)", source: "HuggingFaceAPIClient", level: .error)
+            throw AIError.decodingFailed
+        }
+    }
+
+    func fetchModelDetails(id: String) async throws -> HFModel {
+        guard let url = URL(string: "\(baseURL)/\(id)?siblings=true") else {
+            throw AIError.invalidEndpoint
+        }
+
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 15
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw AIError.invalidResponse
+        }
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+
+        do {
+            return try decoder.decode(HFModel.self, from: data)
+        } catch {
+            SDKLogStore.shared.log("HF API Client detail decoding error: \(error)", source: "HuggingFaceAPIClient", level: .error)
             throw AIError.decodingFailed
         }
     }

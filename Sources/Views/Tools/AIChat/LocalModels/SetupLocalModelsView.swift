@@ -157,60 +157,37 @@ struct SetupLocalModelsView: View {
             }
 
             Section {
-                Button(action: fetchActiveModels) {
-                    HStack {
-                        Spacer()
-                        if isFetching {
-                            ProgressView()
-                                .padding(.trailing, 8)
-                        }
-                        Text("Fetch Models")
-                            .bold()
-                        Spacer()
-                    }
-                }
-                .disabled(isFetching)
-
-                if isFetching {
-                    HStack {
-                        ProgressView()
-                        Text("Fetching models...")
-                            .padding(.leading, 8)
-                    }
-                } else if let error = fetchError {
-                    Text(error)
-                        .foregroundColor(.red)
+                let currentModels = activeConfig?.cachedModels ?? []
+                if currentModels.isEmpty {
+                    Text("No models fetched for this provider yet.")
                         .font(.caption)
-                }
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(currentModels) { model in
+                        NavigationLink(destination: LocalModelDetailsView(model: model, config: activeConfig ?? LocalModelConfig())) {
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text(model.name)
+                                        .font(.headline)
+                                    Text(model.id)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
 
-                if !fetchedModels.isEmpty {
-                    ForEach(fetchedModels) { model in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(model.name)
-                                    .font(.headline)
-                                Text(model.id)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
+                                Button {
+                                    toggleFavorite(model)
+                                } label: {
+                                    Image(systemName: isFavorite(model) ? "star.fill" : "star")
+                                        .foregroundColor(isFavorite(model) ? .yellow : .gray)
+                                }
+                                .buttonStyle(.plain)
 
-                            Button {
-                                toggleFavorite(model)
-                            } label: {
-                                Image(systemName: isFavorite(model) ? "star.fill" : "star")
-                                    .foregroundColor(isFavorite(model) ? .yellow : .gray)
+                                if modelID == model.id && selectedProviderID == "local_models" {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.blue)
+                                }
                             }
-                            .buttonStyle(.plain)
-
-                            if modelID == model.id && selectedProviderID == "local_models" {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.blue)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            selectModel(model)
                         }
                     }
                 }
@@ -221,20 +198,6 @@ struct SetupLocalModelsView: View {
             }
         }
         .navigationTitle("Local Models")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    fetchActiveModels()
-                } label: {
-                    if isFetching {
-                        ProgressView()
-                    } else {
-                        Label("Fetch Models", systemImage: "arrow.clockwise")
-                    }
-                }
-                .disabled(isFetching)
-            }
-        }
         .sheet(item: $configToEdit) { config in
             NavigationStack {
                 EditLocalModelConfigView(config: config) { updatedConfig in
@@ -282,6 +245,11 @@ struct SetupLocalModelsView: View {
         settingsManager.settings.modelID = config.modelName
     }
 
+    private var activeConfig: LocalModelConfig? {
+        guard let configID = settingsManager.settings.selectedLocalConfigID else { return nil }
+        return settingsManager.settings.localConfigs.first(where: { $0.id == configID })
+    }
+
     private func saveConfig(_ config: LocalModelConfig) {
         if let index = settingsManager.settings.localConfigs.firstIndex(where: { $0.id == config.id }) {
             settingsManager.settings.localConfigs[index] = config
@@ -292,32 +260,6 @@ struct SetupLocalModelsView: View {
 
     private func deleteConfigs(at offsets: IndexSet) {
         settingsManager.settings.localConfigs.remove(atOffsets: offsets)
-    }
-
-    private func fetchActiveModels() {
-        guard let configID = settingsManager.settings.selectedLocalConfigID,
-              let config = settingsManager.settings.localConfigs.first(where: { $0.id == configID }) else {
-            fetchError = "No local provider selected"
-            return
-        }
-
-        isFetching = true
-        fetchError = nil
-
-        Task {
-            do {
-                let models = try await FetchLocalModelsFramework.fetchModels(from: config.baseURL)
-                await MainActor.run {
-                    self.fetchedModels = models
-                    self.isFetching = false
-                }
-            } catch {
-                await MainActor.run {
-                    self.fetchError = error.localizedDescription
-                    self.isFetching = false
-                }
-            }
-        }
     }
 
     private func selectModel(_ model: AIModel) {
@@ -381,6 +323,8 @@ struct EditLocalModelConfigView: View {
     var onSave: (LocalModelConfig) -> Void
 
     @State private var showingAdvanced = false
+    @State private var isFetching = false
+    @State private var fetchError: String?
 
     var body: some View {
         Form {
@@ -394,6 +338,32 @@ struct EditLocalModelConfigView: View {
                     .textInputAutocapitalization(.never)
             } header: {
                 Text("Connection")
+            }
+
+            Section {
+                Button(action: fetchModels) {
+                    HStack {
+                        if isFetching {
+                            ProgressView()
+                                .padding(.trailing, 8)
+                        }
+                        Text(isFetching ? "Fetching Models..." : "Fetch Available Models")
+                            .bold()
+                    }
+                }
+                .disabled(isFetching || config.baseURL.isEmpty)
+
+                if let error = fetchError {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .font(.caption)
+                }
+
+                if !config.cachedModels.isEmpty {
+                    Text("\(config.cachedModels.count) models cached")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
             }
 
             Section {
@@ -443,6 +413,27 @@ struct EditLocalModelConfigView: View {
                     dismiss()
                 }
                 .disabled(config.name.isEmpty || config.baseURL.isEmpty)
+            }
+        }
+    }
+
+    private func fetchModels() {
+        isFetching = true
+        fetchError = nil
+
+        Task {
+            do {
+                let models = try await FetchLocalModelsFramework.fetchModels(from: config.baseURL)
+                await MainActor.run {
+                    self.config.cachedModels = models
+                    self.isFetching = false
+                    onSave(config)
+                }
+            } catch {
+                await MainActor.run {
+                    self.fetchError = error.localizedDescription
+                    self.isFetching = false
+                }
             }
         }
     }

@@ -7,6 +7,8 @@ struct HuggingFaceBrowseView: View {
     @State private var searchText = ""
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var offset = 0
+    private let limit = 20
 
     var body: some View {
         List {
@@ -18,39 +20,93 @@ struct HuggingFaceBrowseView: View {
             }
 
             ForEach(models) { model in
-                VStack(alignment: .leading) {
-                    Text(model.id)
-                        .font(.headline)
-                    if let downloads = model.downloads {
-                        Text("\(downloads) downloads")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                NavigationLink(destination: HFModelDetailView(modelId: model.id)) {
+                    VStack(alignment: .leading) {
+                        Text(model.id)
+                            .font(.headline)
+                        if let downloads = model.downloads {
+                            Text("\(downloads) downloads")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .onAppear {
+                    if model == models.last && !isLoading {
+                        loadMore()
                     }
                 }
             }
 
             if isLoading {
-                ProgressView()
+                HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
             }
         }
         .navigationTitle("HuggingFace")
         .searchable(text: $searchText)
+        .refreshable {
+            await search(isRefreshing: true)
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink(destination: HFRecommendationView()) {
+                    Image(systemName: "sparkles")
+                }
+            }
+        }
         .onChange(of: searchText) { oldValue, newValue in
-            search()
+            Task {
+                await search()
+            }
         }
         .onAppear {
-            search()
+            Task {
+                await search()
+            }
         }
     }
 
-    private func search() {
+    private func search(isRefreshing: Bool = false) async {
+        if isLoading && !isRefreshing { return }
+
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+            if !isRefreshing {
+                models = []
+                offset = 0
+            }
+        }
+
+        do {
+            let results = try await client.searchModels(query: searchText, limit: limit, offset: 0)
+            await MainActor.run {
+                self.models = results
+                self.offset = results.count
+                self.isLoading = false
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = error.localizedDescription
+                self.isLoading = false
+            }
+        }
+    }
+
+    private func loadMore() {
+        guard !isLoading else { return }
         isLoading = true
-        errorMessage = nil
+
         Task {
             do {
-                let results = try await client.searchModels(query: searchText)
+                let results = try await client.searchModels(query: searchText, limit: limit, offset: offset)
                 await MainActor.run {
-                    self.models = results
+                    self.models.append(contentsOf: results)
+                    self.offset += results.count
                     self.isLoading = false
                 }
             } catch {

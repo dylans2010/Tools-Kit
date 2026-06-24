@@ -800,7 +800,8 @@
 		HF0200000000000000000006 /* DownloadOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000006 /* DownloadOverlayView.swift */; };
 		HF0200000000000000000007 /* DeviceProfiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000007 /* DeviceProfiler.swift */; };
 		HF0200000000000000000008 /* HuggingFaceRecommendationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */; };
-		HF0200000000000000000009 /* HFRecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000009 /* HFRecommendationView.swift */; };
+		HF0200000000000000000009 /* HFModelDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF0100000000000000000009 /* HFModelDetailView.swift */; };
+		HF020000000000000000000A /* HFRecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HF010000000000000000000A /* HFRecommendationView.swift */; };
 		DA0200000000000000000006 /* MarketplaceSubmissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000006 /* MarketplaceSubmissionView.swift */; };
 		DA0200000000000000000007 /* MarketplaceListingManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000007 /* MarketplaceListingManagerView.swift */; };
 		DA0200000000000000000008 /* DocumentationEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0100000000000000000008 /* DocumentationEditorView.swift */; };
@@ -1777,7 +1778,8 @@
 		LM0200000000000000000003 /* LMLocalDevicesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000003 /* LMLocalDevicesService.swift */; };
 		LM0200000000000000000004 /* LMDeviceFallbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000004 /* LMDeviceFallbackView.swift */; };
 		LM0200000000000000000005 /* AdvancedLocalModelsConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000005 /* AdvancedLocalModelsConfigView.swift */; };
-		LM0200000000000000000006 /* LMStudioLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000006 /* LMStudioLogsView.swift */; };
+		LM0200000000000000000006 /* LocalModelDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000006 /* LocalModelDetailsView.swift */; };
+		LM0200000000000000000007 /* LMStudioLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000007 /* LMStudioLogsView.swift */; };
 		LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000100 /* LMLinkKeychainService.swift */; };
 		LM0200000000000000000101 /* LMLinkAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000101 /* LMLinkAuthManager.swift */; };
 		LM0200000000000000000102 /* LMRequestSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = LM0100000000000000000102 /* LMRequestSigner.swift */; };
@@ -2461,7 +2463,8 @@
 		HF0100000000000000000006 /* DownloadOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadOverlayView.swift; sourceTree = "<group>"; };
 		HF0100000000000000000007 /* DeviceProfiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceProfiler.swift; sourceTree = "<group>"; };
 		HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceRecommendationService.swift; sourceTree = "<group>"; };
-		HF0100000000000000000009 /* HFRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFRecommendationView.swift; sourceTree = "<group>"; };
+		HF0100000000000000000009 /* HFModelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFModelDetailView.swift; sourceTree = "<group>"; };
+		HF010000000000000000000A /* HFRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFRecommendationView.swift; sourceTree = "<group>"; };
 		00CA85AC8F214CE79F467511 /* UUIDGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UUIDGeneratorView.swift; sourceTree = "<group>"; };
 		011E855AF0F14D94AB4E22BE /* PDFToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFToolsView.swift; sourceTree = "<group>"; };
 		01AC08F24D517F68A828494C /* AgentCodeLanguageDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentCodeLanguageDetector.swift; sourceTree = "<group>"; };
@@ -4201,7 +4204,8 @@
 		LM0100000000000000000003 /* LMLocalDevicesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLocalDevicesService.swift; sourceTree = "<group>"; };
 		LM0100000000000000000004 /* LMDeviceFallbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMDeviceFallbackView.swift; sourceTree = "<group>"; };
 		LM0100000000000000000005 /* AdvancedLocalModelsConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedLocalModelsConfigView.swift; sourceTree = "<group>"; };
-		LM0100000000000000000006 /* LMStudioLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMStudioLogsView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000006 /* LocalModelDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalModelDetailsView.swift; sourceTree = "<group>"; };
+		LM0100000000000000000007 /* LMStudioLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMStudioLogsView.swift; sourceTree = "<group>"; };
 		LM0100000000000000000100 /* LMLinkKeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkKeychainService.swift; sourceTree = "<group>"; };
 		LM0100000000000000000101 /* LMLinkAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMLinkAuthManager.swift; sourceTree = "<group>"; };
 		LM0100000000000000000102 /* LMRequestSigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMRequestSigner.swift; sourceTree = "<group>"; };
@@ -11432,11 +11436,12 @@
 			isa = PBXGroup;
 			children = (
 				LM0100000000000000000002 /* SetupLocalModelsView.swift */,
+				LM0100000000000000000006 /* LocalModelDetailsView.swift */,
 				HF0100000000000000000001 /* AvailableLocalModelsView.swift */,
 				LM0100000000000000000003 /* LMLocalDevicesService.swift */,
 				LM0100000000000000000004 /* LMDeviceFallbackView.swift */,
 				LM0100000000000000000005 /* AdvancedLocalModelsConfigView.swift */,
-				LM0100000000000000000006 /* LMStudioLogsView.swift */,
+				LM0100000000000000000007 /* LMStudioLogsView.swift */,
 				LM0300000000000000000100 /* LM Link */,
 				LM0300000000000000000300 /* AFM */,
 				HF0300000000000000000001 /* HuggingFace */,
@@ -11509,6 +11514,7 @@
 				HF0100000000000000000004 /* HuggingFaceDownloadManager.swift */,
 				HF0100000000000000000007 /* DeviceProfiler.swift */,
 				HF0100000000000000000008 /* HuggingFaceRecommendationService.swift */,
+				HF0100000000000000000009 /* HFModelDetailView.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -11518,7 +11524,7 @@
 			children = (
 				HF0100000000000000000005 /* HuggingFaceBrowseView.swift */,
 				HF0100000000000000000006 /* DownloadOverlayView.swift */,
-				HF0100000000000000000009 /* HFRecommendationView.swift */,
+				HF010000000000000000000A /* HFRecommendationView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -12318,7 +12324,8 @@
 				HF0200000000000000000006 /* DownloadOverlayView.swift in Sources */,
 				HF0200000000000000000007 /* DeviceProfiler.swift in Sources */,
 				HF0200000000000000000008 /* HuggingFaceRecommendationService.swift in Sources */,
-				HF0200000000000000000009 /* HFRecommendationView.swift in Sources */,
+				HF0200000000000000000009 /* HFModelDetailView.swift in Sources */,
+				HF020000000000000000000A /* HFRecommendationView.swift in Sources */,
 				RV020001 /* SpeechModels.swift in Sources */,
 				RV020002 /* SpeechMainView.swift in Sources */,
 				RV020003 /* SpeechSettingsView.swift in Sources */,
@@ -12362,7 +12369,8 @@
 				LM0200000000000000000003 /* LMLocalDevicesService.swift in Sources */,
 				LM0200000000000000000004 /* LMDeviceFallbackView.swift in Sources */,
 				LM0200000000000000000005 /* AdvancedLocalModelsConfigView.swift in Sources */,
-				LM0200000000000000000006 /* LMStudioLogsView.swift in Sources */,
+				LM0200000000000000000006 /* LocalModelDetailsView.swift in Sources */,
+				LM0200000000000000000007 /* LMStudioLogsView.swift in Sources */,
 				LM0200000000000000000100 /* LMLinkKeychainService.swift in Sources */,
 				LM0200000000000000000101 /* LMLinkAuthManager.swift in Sources */,
 				LM0200000000000000000102 /* LMRequestSigner.swift in Sources */,
