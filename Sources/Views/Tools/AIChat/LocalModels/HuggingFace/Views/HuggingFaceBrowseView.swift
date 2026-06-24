@@ -1,23 +1,64 @@
-import Foundation
+import SwiftUI
 import Combine
 
-class HuggingFaceAPIClient: ObservableObject {
-    static let shared = HuggingFaceAPIClient()
+struct HuggingFaceBrowseView: View {
+    @ObservedObject private var client = HuggingFaceAPIClient.shared
+    @State private var models: [HFModel] = []
+    @State private var searchText = ""
+    @State private var isLoading = false
+    @State private var errorMessage: String?
 
-    private let session = URLSession.shared
-    private let baseURL = URL(string: "https://huggingface.co/api")!
+    var body: some View {
+        List {
+            if let error = errorMessage {
+                Section {
+                    Text(error)
+                        .foregroundColor(.red)
+                }
+            }
 
-    func searchModels(query: String, offset: Int) async throws -> [HFModel] {
-        var urlComponents = URLComponents(url: baseURL.appendingPathComponent("models"), resolvingAgainstBaseURL: false)!
-        var queryItems = [URLQueryItem(name: "limit", value: "20"),
-                          URLQueryItem(name: "offset", value: "\(offset)")]
-        if !query.isEmpty {
-            queryItems.append(URLQueryItem(name: "search", value: query))
+            ForEach(models) { model in
+                VStack(alignment: .leading) {
+                    Text(model.id)
+                        .font(.headline)
+                    if let downloads = model.downloads {
+                        Text("\(downloads) downloads")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+
+            if isLoading {
+                ProgressView()
+            }
         }
-        urlComponents.queryItems = queryItems
+        .navigationTitle("HuggingFace")
+        .searchable(text: $searchText)
+        .onChange(of: searchText) { oldValue, newValue in
+            search()
+        }
+        .onAppear {
+            search()
+        }
+    }
 
-        let (data, _) = try await session.data(from: urlComponents.url!)
-        let models = try JSONDecoder().decode([HFModel].self, from: data)
-        return models
+    private func search() {
+        isLoading = true
+        errorMessage = nil
+        Task {
+            do {
+                let results = try await client.searchModels(query: searchText)
+                await MainActor.run {
+                    self.models = results
+                    self.isLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = error.localizedDescription
+                    self.isLoading = false
+                }
+            }
+        }
     }
 }

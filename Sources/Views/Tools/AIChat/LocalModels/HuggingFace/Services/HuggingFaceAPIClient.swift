@@ -1,6 +1,7 @@
 import Foundation
+import Combine
 
-class HuggingFaceAPIClient {
+class HuggingFaceAPIClient: ObservableObject {
     static let shared = HuggingFaceAPIClient()
     private let baseURL = "https://huggingface.co/api/models"
 
