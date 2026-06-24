@@ -31,12 +31,12 @@ struct AvailableLocalModelsView: View {
                 }
 
                 Section("LM Link Models") {
-                    if connectionManager.availableModels.isEmpty {
+                    if connectionManager.selectedDevice?.models.isEmpty ?? true {
                         Text("No LM Link models available.")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     } else {
-                        ForEach(connectionManager.availableModels) { lmModel in
+                        ForEach(connectionManager.selectedDevice?.models ?? []) { lmModel in
                             modelRow(AIModel(id: lmModel.id, name: lmModel.name), source: "lmstudio")
                         }
                     }
