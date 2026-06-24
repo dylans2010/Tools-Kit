@@ -23,6 +23,7 @@ struct AIChatSettingsView: View {
     @State private var showFileImporter = false
     @State private var importedFileNames: [String] = []
     @State private var showModelConfigSheet = false
+    @State private var showAvailableLocalModels = false
     @State private var unsplashAccessKey = APIKeyManager.shared.unsplashAccessKey ?? ""
     @State private var unsplashSecretKey = APIKeyManager.shared.unsplashSecretKey ?? ""
     @State private var unsplashAppID = APIKeyManager.shared.unsplashApplicationID ?? ""
@@ -201,6 +202,9 @@ struct AIChatSettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
+            .sheet(isPresented: $showAvailableLocalModels) {
+                AvailableLocalModelsView()
+            }
         }
     }
 
@@ -320,15 +324,22 @@ struct AIChatSettingsView: View {
                 }
                 .padding(.vertical, 4)
             } else if ["local_models", "afm", "lmstudio"].contains(selectedProviderID) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Current AI Model:")
-                        .font(.caption.bold())
-                        .foregroundColor(.secondary)
-                    Text(modelID.isEmpty ? "No model selected" : modelID)
-                        .font(.headline)
-                        .foregroundColor(.primary)
+                Button {
+                    if modelID.isEmpty || modelID == "No model selected" {
+                        showAvailableLocalModels = true
+                    }
+                } label: {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Current AI Model:")
+                            .font(.caption.bold())
+                            .foregroundColor(.secondary)
+                        Text(modelID.isEmpty ? "No model selected" : modelID)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                    }
+                    .padding(.vertical, 4)
                 }
-                .padding(.vertical, 4)
+                .buttonStyle(.plain)
             } else {
                 let availableModels = modelCatalog.models(for: selectedProviderID)
                 if !availableModels.isEmpty {
@@ -369,7 +380,7 @@ struct AIChatSettingsView: View {
                 .padding(.top, 4)
             }
 
-            if settings.selectedProviderID == "openrouter" {
+            if settings.selectedProviderID == "openrouter" && settings.aiModelSource != .local {
                 VStack(alignment: .leading, spacing: 12) {
                     Divider()
 

@@ -149,6 +149,7 @@ struct AIChatSettings: Codable {
 
     // Local Models
     var localConfigs: [LocalModelConfig] = []
+    var favoriteModels: [AIModel] = []
     var selectedLocalConfigID: UUID? = nil
     var lmStudioUsername: String? = nil
 
