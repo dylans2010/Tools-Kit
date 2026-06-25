@@ -2264,6 +2264,7 @@
 		TE0E70F662A3193CE2438F64 /* AgenticToolExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = TEBF3E99FD9CC47C5CA8D3FF /* AgenticToolExecutor.swift */; };
 		TKBF0000000000000000000000 /* UnifiedDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000000 /* UnifiedDataStore.swift */; };
 		TKBF0000000000000000000001 /* DataSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000001 /* DataSyncManager.swift */; };
+		TKBF0000000000000000000013 /* AnyCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000013 /* AnyCodable.swift */; };
 		TKBF0000000000000000000002 /* AIOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000002 /* AIOrchestrator.swift */; };
 		TKBF0000000000000000000003 /* EmbeddingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000003 /* EmbeddingService.swift */; };
 		TKBF0000000000000000000004 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000004 /* WebSocketManager.swift */; };
@@ -4694,6 +4695,7 @@
 		TH0100000000000000000001 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000000 /* UnifiedDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedDataStore.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000001 /* DataSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSyncManager.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000013 /* AnyCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyCodable.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000002 /* AIOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIOrchestrator.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000003 /* EmbeddingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddingService.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000004 /* WebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketManager.swift; sourceTree = "<group>"; };
@@ -6661,6 +6663,7 @@
 		74B75DADFF2E4C73AFCFCC0F /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				TKRF0000000000000000000013 /* AnyCodable.swift */,
 				TKRF0000000000000000000000 /* UnifiedDataStore.swift */,
 				TKRF0000000000000000000001 /* DataSyncManager.swift */,
 			);
@@ -12278,7 +12281,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					F3353FBEDEEBF7704E1E6451 = {
 						CreatedOnToolsVersion = 14.3;
@@ -13397,6 +13400,7 @@
 				PL02000000000000000000010B /* Versioning/ConnectorVersioningView.swift in Sources */,
 				PL02000000000000000000010C /* Security/ConnectorScopeView.swift in Sources */,
 				PL020000000000000000000026 /* Main/SDKInternalView.swift in Sources */,
+				TKBF0000000000000000000013 /* AnyCodable.swift in Sources */,
 				TKBF0000000000000000000000 /* UnifiedDataStore.swift in Sources */,
 				TKBF0000000000000000000001 /* DataSyncManager.swift in Sources */,
 				TKBF0000000000000000000002 /* AIOrchestrator.swift in Sources */,
@@ -14850,7 +14854,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -14952,7 +14956,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
