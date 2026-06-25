@@ -4,9 +4,14 @@ struct OpenClawDiscoveredService: Identifiable, Hashable {
     let id = UUID()
     let name: String
     let host: String
+    let ipAddress: String?
     let port: Int
 
     var url: URL? {
+        // Prefer IP address if available for more reliable local connection
+        if let ip = ipAddress {
+            return URL(string: "ws://\(ip):\(port)")
+        }
         // NetService.hostName usually ends with a dot, we need to handle that or use IP
         let cleanedHost = host.hasSuffix(".") ? String(host.dropLast()) : host
         return URL(string: "ws://\(cleanedHost):\(port)")
@@ -45,13 +50,37 @@ final class OpenClawDiscoveryService: NSObject, ObservableObject {
         DispatchQueue.main.async {
             self.discoveredServices = self.services.compactMap { service in
                 guard let host = service.hostName, service.port != -1 else { return nil }
+
+                let ipAddress = self.extractIPAddress(from: service)
+
                 return OpenClawDiscoveredService(
                     name: service.name,
                     host: host,
+                    ipAddress: ipAddress,
                     port: service.port
                 )
             }
         }
+    }
+
+    private func extractIPAddress(from service: NetService) -> String? {
+        guard let addresses = service.addresses else { return nil }
+
+        for address in addresses {
+            let data = address as NSData
+            var storage = sockaddr_storage()
+            data.getBytes(&storage, length: MemoryLayout<sockaddr_storage>.size)
+
+            if Int32(storage.ss_family) == AF_INET {
+                let addr4 = data.withUnsafeBytes { $0.load(as: sockaddr_in.self) }
+                var ip = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
+                var mutableAddr = addr4.sin_addr
+                inet_ntop(AF_INET, &mutableAddr, &ip, socklen_t(INET_ADDRSTRLEN))
+                return String(cString: ip)
+            }
+            // Optional: Handle IPv6 if needed, but for local network stability IPv4 is often preferred
+        }
+        return nil
     }
 }
 
@@ -76,12 +105,13 @@ extension OpenClawDiscoveryService: NetServiceBrowserDelegate {
 
 extension OpenClawDiscoveryService: NetServiceDelegate {
     func netServiceDidResolveAddress(_ sender: NetService) {
+        OpenClawDiagnosticsManager.shared.log("Bonjour resolved service: \(sender.name) at \(sender.hostName ?? "unknown host"):\(sender.port)", type: .network)
         pendingResolutions.remove(sender)
         updateDiscoveredServices()
     }
 
     func netService(_ sender: NetService, didNotResolve errorDict: [String: NSNumber]) {
-        print("Failed to resolve service \(sender.name): \(errorDict)")
+        OpenClawDiagnosticsManager.shared.log("Bonjour failed to resolve service \(sender.name): \(errorDict)", type: .error)
         pendingResolutions.remove(sender)
         services.remove(sender)
         updateDiscoveredServices()

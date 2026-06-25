@@ -22,6 +22,7 @@ final class OpenClawDiagnosticsManager: ObservableObject {
     @Published var logs: [String] = []
 
     func log(_ message: String, type: OpenClawDiagnosticType = .info) {
+        #if DEBUG
         let timestamp = ISO8601DateFormatter().string(from: Date())
         let formatted = "[\(timestamp)] [\(type.rawValue)] \(message)"
         DispatchQueue.main.async {
@@ -29,6 +30,7 @@ final class OpenClawDiagnosticsManager: ObservableObject {
             if self.logs.count > 1000 { self.logs.removeFirst() }
         }
         print(formatted)
+        #endif
     }
 
     func recordMetric(name: String, value: String) {

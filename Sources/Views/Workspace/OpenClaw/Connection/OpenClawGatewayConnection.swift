@@ -24,11 +24,11 @@ enum ConnectionState: Equatable {
     }
 }
 
-actor OpenClawGatewayConnection {
+actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     private let url: URL
     private let deviceID: String
     private var socket: URLSessionWebSocketTask?
-    private let session = URLSession(configuration: .default)
+    private var session: URLSession!
 
     private var _state: ConnectionState = .idle
     private let stateSubject = CurrentValueSubject<ConnectionState, Never>(.idle)
@@ -43,6 +43,7 @@ actor OpenClawGatewayConnection {
     private var externalEventStreamContinuation: AsyncStream<OpenClawEvent>.Continuation?
 
     private var handshakeContinuation: CheckedContinuation<Void, Error>?
+    private var connectionOpenedContinuation: CheckedContinuation<Void, Error>?
     private var heartbeatTimer: Task<Void, Never>?
     private var reconnectionTask: Task<Void, Never>?
     private var connectionAttempt: Int = 0
@@ -51,6 +52,8 @@ actor OpenClawGatewayConnection {
     init(url: URL, deviceID: String) {
         self.url = url
         self.deviceID = deviceID
+        super.init()
+        self.session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
     }
 
     private func updateState(_ newState: ConnectionState) {
@@ -79,10 +82,23 @@ actor OpenClawGatewayConnection {
     }
 
     private func performConnect() async throws {
+        OpenClawDiagnosticsManager.shared.log("Initiating connection to \(url.absoluteString)", type: .network)
         updateState(.connecting)
-        socket = session.webSocketTask(with: url)
-        socket?.resume()
 
+        socket = session.webSocketTask(with: url)
+        guard let socket = socket else {
+            OpenClawDiagnosticsManager.shared.log("Failed to create URLSessionWebSocketTask", type: .error)
+            throw OpenClawError.connectionFailed("Failed to create socket")
+        }
+
+        // Set continuation before resume to avoid race condition
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            self.connectionOpenedContinuation = continuation
+            socket.resume()
+            OpenClawDiagnosticsManager.shared.log("WebSocket resume() called, waiting for open...", type: .network)
+        }
+
+        OpenClawDiagnosticsManager.shared.log("WebSocket opened successfully", type: .network)
         updateState(.socketConnected)
         listen()
 
@@ -92,9 +108,11 @@ actor OpenClawGatewayConnection {
             // OpenClaw Protocol: The first client frame must be a 'connect' request.
             Task {
                 do {
+                    OpenClawDiagnosticsManager.shared.log("Sending initial 'connect' request", type: .protocolMsg)
                     updateState(.waitingChallenge)
                     _ = try await self.sendRequestInternal("connect", params: [:])
                 } catch {
+                    OpenClawDiagnosticsManager.shared.log("Initial 'connect' request failed: \(error.localizedDescription)", type: .error)
                     self.cleanupHandshake(error: error)
                 }
             }
@@ -106,9 +124,37 @@ actor OpenClawGatewayConnection {
             }
         }
 
+        OpenClawDiagnosticsManager.shared.log("Handshake successful, connection established", type: .info)
         updateState(.connected)
         connectionAttempt = 0
         startHeartbeat()
+    }
+
+    // MARK: - URLSessionWebSocketDelegate
+
+    nonisolated func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
+        Task {
+            await handleSocketOpen()
+        }
+    }
+
+    private func handleSocketOpen() {
+        connectionOpenedContinuation?.resume()
+        connectionOpenedContinuation = nil
+    }
+
+    nonisolated func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        Task {
+            await handleTaskCompletion(error: error)
+        }
+    }
+
+    private func handleTaskCompletion(error: Error?) async {
+        if let error = error {
+            connectionOpenedContinuation?.resume(throwing: error)
+            connectionOpenedContinuation = nil
+            await handleConnectionFailure(error)
+        }
     }
 
     func disconnect() {
@@ -120,6 +166,9 @@ actor OpenClawGatewayConnection {
         externalEventStreamContinuation?.finish()
         cleanupHandshake(error: OpenClawError.connectionFailed("Disconnected"))
         cleanupAllPendingRequests(error: OpenClawError.connectionFailed("Disconnected"))
+
+        connectionOpenedContinuation?.resume(throwing: OpenClawError.connectionFailed("Disconnected"))
+        connectionOpenedContinuation = nil
     }
 
     private func handleHandshakeTimeout() {
