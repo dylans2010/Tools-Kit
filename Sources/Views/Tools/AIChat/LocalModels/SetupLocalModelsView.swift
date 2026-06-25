@@ -414,15 +414,17 @@ struct EditLocalModelConfigView: View {
     }
 }
 
-struct LocalModelsByDefault: View {
-    var body: some View {
-        SetupLocalModelsView()
-    }
-}
-
-// MARK: - Ollama Specific Logic
+// MARK: - Ollama Config (Redesign)
 
 struct OllamaConfig {
+    struct ValidationResult {
+        let success: Bool
+        let models: [AIModel]
+        let version: String?
+        let error: String?
+        let diagnostics: [String]
+    }
+
     static func normalizeEndpoint(_ input: String) -> String {
         var url = input.trimmingCharacters(in: .whitespacesAndNewlines)
         if !url.starts(with: "http") {
@@ -431,7 +433,39 @@ struct OllamaConfig {
         if url.hasSuffix("/") {
             url = String(url.dropLast())
         }
+        // If it contains /v1, remove it as we want the root for Ollama native APIs
+        if url.contains("/v1") {
+            url = url.replacingOccurrences(of: "/v1", with: "")
+        }
         return url
+    }
+
+    static func testConnection(endpoint: String) async -> ValidationResult {
+        var diagnostics: [String] = ["Probing Ollama server: \(endpoint)"]
+        let baseURL = normalizeEndpoint(endpoint)
+
+        // 1. Check version/root
+        do {
+            diagnostics.append("GET /")
+            guard let url = URL(string: baseURL) else { throw AIError.invalidEndpoint }
+            let (_, response) = try await URLSession.shared.data(from: url)
+            if let http = response as? HTTPURLResponse {
+                diagnostics.append("Server responded with status \(http.statusCode)")
+            }
+        } catch {
+            diagnostics.append("Root probe failed: \(error.localizedDescription)")
+        }
+
+        // 2. Fetch models
+        do {
+            diagnostics.append("Fetching models from /api/tags...")
+            let models = try await fetchModels(endpoint: baseURL)
+            diagnostics.append("Successfully discovered \(models.count) models.")
+            return ValidationResult(success: true, models: models, version: nil, error: nil, diagnostics: diagnostics)
+        } catch {
+            diagnostics.append("Model discovery failed: \(error.localizedDescription)")
+            return ValidationResult(success: false, models: [], version: nil, error: error.localizedDescription, diagnostics: diagnostics)
+        }
     }
 
     static func fetchModels(endpoint: String) async throws -> [AIModel] {
@@ -440,15 +474,22 @@ struct OllamaConfig {
             throw AIError.invalidEndpoint
         }
 
-        let (data, response) = try await URLSession.shared.data(from: url)
-        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 10
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             throw AIError.invalidResponse
         }
 
         let decoder = JSONDecoder()
-        let result = try decoder.decode(OllamaTagsResponse.self, from: data)
-        return result.models.map { m in
-            AIModel(id: m.name, name: m.name, supportsVision: m.name.contains("llava") || m.name.contains("vision"))
+        do {
+            let result = try decoder.decode(OllamaTagsResponse.self, from: data)
+            return result.models.map { m in
+                AIModel(id: m.name, name: m.name, supportsVision: m.name.contains("llava") || m.name.contains("vision"))
+            }
+        } catch {
+            throw AIError.decodingFailed
         }
     }
 
@@ -462,24 +503,68 @@ struct OllamaConfig {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        var body: [String: Any] = parameters
+        var body: [String: Any] = [:]
         body["model"] = model
         body["messages"] = messages.map { ["role": $0.role, "content": $0.content] }
         body["stream"] = false
 
+        // Map options
+        var options: [String: Any] = [:]
+        if let temp = parameters["temperature"] as? Double { options["temperature"] = temp }
+        if let topP = parameters["top_p"] as? Double { options["top_p"] = topP }
+        if let seed = parameters["seed"] as? Int { options["seed"] = seed }
+        if let repeatPenalty = parameters["repeat_penalty"] as? Double { options["repeat_penalty"] = repeatPenalty }
+        if let numThread = parameters["num_thread"] as? Int { options["num_thread"] = numThread }
+
+        if !options.isEmpty {
+            body["options"] = options
+        }
+
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
-            throw AIError.requestFailed("Ollama returned status \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+            let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
+            throw AIError.requestFailed("Ollama returned status \(status): \(errorMsg)")
         }
 
-        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        if let message = json?["message"] as? [String: Any], let content = message["content"] as? String {
-            return content
+        do {
+            let result = try JSONDecoder().decode(OllamaChatResponse.self, from: data)
+            return result.message.content
+        } catch {
+            throw AIError.decodingFailed
+        }
+    }
+
+    static func sendGenerate(endpoint: String, model: String, prompt: String, parameters: [String: Any] = [:]) async throws -> String {
+        let baseURL = normalizeEndpoint(endpoint)
+        guard let url = URL(string: "\(baseURL)/api/generate") else {
+            throw AIError.invalidEndpoint
         }
 
-        throw AIError.decodingFailed
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        var body: [String: Any] = [:]
+        body["model"] = model
+        body["prompt"] = prompt
+        body["stream"] = false
+
+        var options: [String: Any] = [:]
+        if let temp = parameters["temperature"] as? Double { options["temperature"] = temp }
+        if !options.isEmpty { body["options"] = options }
+
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw AIError.requestFailed("Ollama /api/generate failed")
+        }
+
+        let result = try JSONDecoder().decode(OllamaGenerateResponse.self, from: data)
+        return result.response
     }
 }
 
@@ -489,6 +574,22 @@ private struct OllamaTagsResponse: Codable {
 
 private struct OllamaTagModel: Codable {
     let name: String
+}
+
+private struct OllamaChatResponse: Codable {
+    struct Message: Codable {
+        let role: String
+        let content: String
+    }
+    let model: String
+    let message: Message
+    let done: Bool
+}
+
+private struct OllamaGenerateResponse: Codable {
+    let model: String
+    let response: String
+    let done: Bool
 }
 
 // MARK: - Ollama Setup UI
@@ -502,9 +603,20 @@ struct OllamaSetupView: View {
     @State private var diagnostics: [String] = []
     @AppStorage("aichat_selected_provider") private var selectedProviderID = "openrouter"
     @AppStorage("aichat_model_id") private var modelID = ""
+    @State private var showingConnectView = false
 
     var body: some View {
         Form {
+            Section {
+                Button {
+                    showingConnectView = true
+                } label: {
+                    Label("Connect to Mac Running Ollama", systemImage: "desktopcomputer")
+                        .foregroundColor(.blue)
+                        .bold()
+                }
+            }
+
             Section {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Ollama Server URL")
@@ -516,7 +628,7 @@ struct OllamaSetupView: View {
                         .font(.system(.body, design: .monospaced))
                 }
             } header: {
-                Text("Connection")
+                Text("Manual Connection")
             } footer: {
                 Text("Enter the base URL of your Ollama server.")
             }
@@ -527,7 +639,7 @@ struct OllamaSetupView: View {
                         if isFetching {
                             ProgressView().padding(.trailing, 8)
                         }
-                        Text(isFetching ? "Fetching Models..." : "Fetch Models")
+                        Text(isFetching ? "Validating Ollama..." : "Fetch Models")
                             .bold()
                     }
                 }
@@ -538,9 +650,10 @@ struct OllamaSetupView: View {
                         ForEach(diagnostics, id: \.self) { log in
                             Text(log)
                                 .font(.system(size: 10, design: .monospaced))
-                                .foregroundColor(.secondary)
+                                .foregroundColor(log.contains("FAILED") ? .red : .secondary)
                         }
                     }
+                    .padding(.vertical, 4)
                 }
 
                 if let error = errorMessage {
@@ -584,6 +697,13 @@ struct OllamaSetupView: View {
             }
         }
         .navigationTitle("Ollama Setup")
+        .sheet(isPresented: $showingConnectView) {
+            NavigationStack {
+                OllamaConnectView(config: $config) {
+                    fetchModels()
+                }
+            }
+        }
     }
 
     private func fetchModels() {
@@ -592,25 +712,190 @@ struct OllamaSetupView: View {
         diagnostics = ["Starting discovery..."]
 
         Task {
-            do {
-                let normalized = OllamaConfig.normalizeEndpoint(config.baseURL)
-                await MainActor.run { diagnostics.append("Normalized: \(normalized)") }
+            let result = await OllamaConfig.testConnection(endpoint: config.baseURL)
 
-                let models = try await OllamaConfig.fetchModels(endpoint: normalized)
-                await MainActor.run {
-                    self.config.cachedModels = models
-                    self.config.baseURL = normalized
-                    if self.config.modelName.isEmpty || !models.contains(where: { $0.id == self.config.modelName }) {
-                        self.config.modelName = models.first?.id ?? ""
+            await MainActor.run {
+                self.isFetching = false
+                self.diagnostics = result.diagnostics
+                if result.success {
+                    self.config.cachedModels = result.models
+                    self.config.baseURL = OllamaConfig.normalizeEndpoint(config.baseURL)
+                    if self.config.modelName.isEmpty || !result.models.contains(where: { $0.id == self.config.modelName }) {
+                        self.config.modelName = result.models.first?.id ?? ""
                     }
-                    self.diagnostics.append("Discovered \(models.count) models.")
-                    self.isFetching = false
+                } else {
+                    self.errorMessage = result.error
                 }
-            } catch {
-                await MainActor.run {
-                    self.errorMessage = error.localizedDescription
-                    self.diagnostics.append("FAILED: \(error.localizedDescription)")
-                    self.isFetching = false
+            }
+        }
+    }
+}
+
+// MARK: - WiFi Discovery (OllamaConnectConfig)
+
+struct OllamaDiscoveredServer: Identifiable, Hashable {
+    let id = UUID()
+    let name: String
+    let host: String
+    let port: Int
+
+    var baseURL: String {
+        let cleanedHost = host.hasSuffix(".") ? String(host.dropLast()) : host
+        return "http://\(cleanedHost):\(port)"
+    }
+}
+
+final class OllamaConnectConfig: NSObject, ObservableObject {
+    @Published var discoveredServers: [OllamaDiscoveredServer] = []
+    @Published var isSearching = false
+
+    private var browser: NetServiceBrowser?
+    private var services: Set<NetService> = []
+
+    func startDiscovery() {
+        stopDiscovery()
+        isSearching = true
+        discoveredServers.removeAll()
+        services.removeAll()
+
+        browser = NetServiceBrowser()
+        browser?.delegate = self
+        // Look for common HTTP services as Ollama doesn't always advertise specifically
+        // But we'll try to probe them.
+        browser?.searchForServices(ofType: "_http._tcp.", inDomain: "local.")
+    }
+
+    func stopDiscovery() {
+        browser?.stop()
+        browser = nil
+        for service in services {
+            service.stop()
+        }
+        services.removeAll()
+        isSearching = false
+    }
+
+    private func updateDiscoveredServers() {
+        DispatchQueue.main.async {
+            self.discoveredServers = self.services.compactMap { service in
+                guard let host = service.hostName, service.port != -1 else { return nil }
+                return OllamaDiscoveredServer(
+                    name: service.name,
+                    host: host,
+                    port: service.port
+                )
+            }
+        }
+    }
+}
+
+extension OllamaConnectConfig: NetServiceBrowserDelegate {
+    func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
+        services.insert(service)
+        service.delegate = self
+        service.resolve(withTimeout: 5.0)
+    }
+
+    func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
+        services.remove(service)
+        updateDiscoveredServers()
+    }
+}
+
+extension OllamaConnectConfig: NetServiceDelegate {
+    func netServiceDidResolveAddress(_ sender: NetService) {
+        updateDiscoveredServers()
+    }
+}
+
+// MARK: - OllamaConnectView
+
+struct OllamaConnectView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Binding var config: LocalModelConfig
+    var onSelected: () -> Void
+
+    @StateObject private var connector = OllamaConnectConfig()
+    @State private var validatingID: UUID?
+
+    var body: some View {
+        List {
+            Section {
+                if connector.discoveredServers.isEmpty {
+                    VStack(spacing: 12) {
+                        if connector.isSearching {
+                            ProgressView()
+                            Text("Searching for Macs on your network...")
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("No servers found.")
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                } else {
+                    ForEach(connector.discoveredServers) { server in
+                        Button {
+                            selectServer(server)
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text(server.name)
+                                        .font(.headline)
+                                    Text(server.baseURL)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
+                                if validatingID == server.id {
+                                    ProgressView()
+                                } else {
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                    }
+                }
+            } header: {
+                Text("Discovered Servers")
+            } footer: {
+                Text("Make sure Ollama is running on your Mac and 'OLLAMA_HOST=0.0.0.0' is set if connecting from another device.")
+            }
+
+            Section {
+                Button("Refresh") {
+                    connector.startDiscovery()
+                }
+                .disabled(connector.isSearching)
+            }
+        }
+        .navigationTitle("Connect to Mac")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Close") { dismiss() }
+            }
+        }
+        .onAppear {
+            connector.startDiscovery()
+        }
+        .onDisappear {
+            connector.stopDiscovery()
+        }
+    }
+
+    private func selectServer(_ server: OllamaDiscoveredServer) {
+        validatingID = server.id
+        Task {
+            let result = await OllamaConfig.testConnection(endpoint: server.baseURL)
+            await MainActor.run {
+                validatingID = nil
+                if result.success {
+                    config.baseURL = server.baseURL
+                    onSelected()
+                    dismiss()
                 }
             }
         }

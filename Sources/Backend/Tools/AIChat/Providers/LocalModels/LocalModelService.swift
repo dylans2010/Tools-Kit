@@ -25,10 +25,6 @@ final class LocalModelService: ObservableObject {
               let host = url.host, !host.isEmpty else {
             return .failure("Invalid URL format. Must include http/https and a valid host.", diagnostics: diagnostics)
         }
-
-        if !url.path.contains("/chat/completions") {
-            return .failure("Endpoint must end with /chat/completions", diagnostics: diagnostics)
-        }
         diagnostics.append("Endpoint validated: \(endpoint)")
 
         // STAGE 2 - ROOT URL DERIVATION
@@ -39,87 +35,59 @@ final class LocalModelService: ObservableObject {
         }
         diagnostics.append("Root URL derived: \(rootURLString)")
 
-        // STAGE 3 - ROOT SERVER VALIDATION
-        diagnostics.append("Stage 3: Validating root server connectivity...")
-        do {
-            var rootRequest = URLRequest(url: rootURL)
-            rootRequest.timeoutInterval = 5
-            let (_, response) = try await URLSession.shared.data(for: rootRequest)
-            if let httpResponse = response as? HTTPURLResponse {
-                diagnostics.append("Root server responded with status: \(httpResponse.statusCode)")
-            }
-        } catch {
-            diagnostics.append("Root server validation warning: \(error.localizedDescription)")
-            // We continue anyway as some servers might not have a root GET handler but chat works
-        }
-
-        // STAGE 4 - CHAT ENDPOINT VALIDATION
-        diagnostics.append("Stage 4: Validating chat endpoint...")
-        do {
-            var chatRequest = URLRequest(url: url)
-            chatRequest.httpMethod = "POST"
-            chatRequest.timeoutInterval = 10
-            chatRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            if !apiKey.isEmpty {
-                chatRequest.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-            }
-            customHeaders.forEach { chatRequest.setValue($1, forHTTPHeaderField: $0) }
-
-            // Lightweight compatibility request (invalid model to see if it responds with JSON)
-            let body: [String: Any] = [
-                "model": "probe-connection-test",
-                "messages": [["role": "user", "content": "ping"]],
-                "max_tokens": 1
-            ]
-            chatRequest.httpBody = try JSONSerialization.data(withJSONObject: body)
-
-            let (data, response) = try await URLSession.shared.data(for: chatRequest)
-            if let httpResponse = response as? HTTPURLResponse {
-                diagnostics.append("Chat endpoint responded with status: \(httpResponse.statusCode)")
-                if httpResponse.statusCode == 401 {
-                    return .failure("Authentication failed (401). Check your API Key.", diagnostics: diagnostics)
-                }
-            }
-
-            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                diagnostics.append("Chat endpoint returned valid JSON.")
-            }
-        } catch {
-            return .failure("Chat endpoint unreachable: \(error.localizedDescription)", diagnostics: diagnostics)
-        }
-
-        // STAGE 5 - LOCAL PROVIDER DETECTION
-        diagnostics.append("Stage 5: Detecting provider...")
+        // STAGE 3 - LOCAL PROVIDER DETECTION
+        diagnostics.append("Stage 3: Detecting provider...")
         var detectedProvider: LocalProviderType = .unknown
 
         // Try Ollama detection via root or specific paths
         if await checkOllama(rootURL: rootURLString) {
             detectedProvider = .ollama
-        } else if await checkLMStudio(rootURL: rootURLString) {
+            diagnostics.append("Detected provider: \(detectedProvider.rawValue)")
+
+            // STAGE 4 - OLLAMA NATIVE PIPELINE
+            diagnostics.append("Stage 4: Executing Ollama native discovery...")
+            let ollamaResult = await OllamaConfig.testConnection(endpoint: rootURLString)
+            diagnostics.append(contentsOf: ollamaResult.diagnostics)
+
+            if ollamaResult.success {
+                return LocalModelValidationResult(
+                    success: true,
+                    provider: .ollama,
+                    models: ollamaResult.models,
+                    error: nil,
+                    diagnostics: diagnostics
+                )
+            } else {
+                return .failure(ollamaResult.error ?? "Ollama discovery failed", diagnostics: diagnostics)
+            }
+        }
+
+        // If not Ollama, check for /chat/completions requirement for OpenAI-compatible
+        if !url.path.contains("/chat/completions") {
+             return .failure("OpenAI-compatible endpoint must end with /chat/completions", diagnostics: diagnostics)
+        }
+
+        if await checkLMStudio(rootURL: rootURLString) {
             detectedProvider = .lmStudio
         } else {
             detectedProvider = .openAICompatible
         }
         diagnostics.append("Detected provider: \(detectedProvider.rawValue)")
 
-        // STAGE 6 - MODEL DISCOVERY
-        diagnostics.append("Stage 6: Discovering models...")
+        // STAGE 5 - MODEL DISCOVERY (OpenAI Compatible)
+        diagnostics.append("Stage 5: Discovering models...")
         var discoveredModels: [AIModel] = []
 
-        if detectedProvider == .ollama {
-            discoveredModels = await discoverOllamaModels(rootURL: rootURLString)
-        } else {
-            // Try /v1/models (standard OpenAI)
-            discoveredModels = await discoverOpenAIModels(rootURL: rootURLString, apiKey: apiKey, headers: customHeaders)
+        // Try /v1/models (standard OpenAI)
+        discoveredModels = await discoverOpenAIModels(rootURL: rootURLString, apiKey: apiKey, headers: customHeaders)
 
-            if discoveredModels.isEmpty && detectedProvider == .unknown {
-                // If nothing found yet, try /models
-                discoveredModels = await discoverOpenAIModels(rootURL: rootURLString, path: "/models", apiKey: apiKey, headers: customHeaders)
-            }
+        if discoveredModels.isEmpty && detectedProvider == .unknown {
+            // If nothing found yet, try /models
+            discoveredModels = await discoverOpenAIModels(rootURL: rootURLString, path: "/models", apiKey: apiKey, headers: customHeaders)
         }
 
-        // STAGE 7 - MODEL NORMALIZATION
-        diagnostics.append("Stage 7: Normalizing models...")
+        // STAGE 6 - MODEL NORMALIZATION
+        diagnostics.append("Stage 6: Normalizing models...")
         if discoveredModels.isEmpty {
             return .failure("Connection succeeded but no models were discovered.", diagnostics: diagnostics)
         }
@@ -139,7 +107,9 @@ final class LocalModelService: ObservableObject {
     private func checkOllama(rootURL: String) async -> Bool {
         guard let url = URL(string: "\(rootURL)/api/tags") else { return false }
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            var request = URLRequest(url: url)
+            request.timeoutInterval = 3
+            let (data, response) = try await URLSession.shared.data(for: request)
             guard (response as? HTTPURLResponse)?.statusCode == 200 else { return false }
             let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
             return json?["models"] != nil
@@ -149,35 +119,22 @@ final class LocalModelService: ObservableObject {
     }
 
     private func checkLMStudio(rootURL: String) async -> Bool {
-        // LM Studio often has specific identifiers or we just rely on /v1/models success
         guard let url = URL(string: "\(rootURL)/v1/models") else { return false }
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            var request = URLRequest(url: url)
+            request.timeoutInterval = 3
+            let (_, response) = try await URLSession.shared.data(for: request)
             guard (response as? HTTPURLResponse)?.statusCode == 200 else { return false }
-            // Check if it's LM Studio specifically if possible, otherwise it's just OpenAI compatible
             return true
         } catch {
             return false
         }
     }
 
-    private func discoverOllamaModels(rootURL: String) async -> [AIModel] {
-        guard let url = URL(string: "\(rootURL)/api/tags") else { return [] }
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            let response = try JSONDecoder().decode(OllamaResponse.self, from: data)
-            return response.models.map { m in
-                let vision = m.name.lowercased().contains("vision") || m.name.lowercased().contains("llava")
-                return AIModel(id: m.name, name: m.name, supportsVision: vision)
-            }
-        } catch {
-            return []
-        }
-    }
-
     private func discoverOpenAIModels(rootURL: String, path: String = "/v1/models", apiKey: String = "", headers: [String: String] = [:]) async -> [AIModel] {
         guard let url = URL(string: "\(rootURL)\(path)") else { return [] }
         var request = URLRequest(url: url)
+        request.timeoutInterval = 5
         if !apiKey.isEmpty {
             request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         }
@@ -245,14 +202,6 @@ extension LocalModelValidationResult {
 }
 
 // MARK: - Internal Response Models
-
-private struct OllamaResponse: Codable {
-    let models: [OllamaModel]
-}
-
-private struct OllamaModel: Codable {
-    let name: String
-}
 
 private struct OpenAIModelsResponse: Codable {
     let data: [OpenAIModel]
