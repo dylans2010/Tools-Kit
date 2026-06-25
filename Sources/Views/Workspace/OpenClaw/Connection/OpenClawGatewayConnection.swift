@@ -5,6 +5,7 @@ import UIKit
 enum ConnectionState: Equatable {
     case idle
     case connecting
+    case socketConnected
     case waitingChallenge
     case authenticating
     case connected
@@ -12,7 +13,8 @@ enum ConnectionState: Equatable {
 
     static func == (lhs: ConnectionState, rhs: ConnectionState) -> Bool {
         switch (lhs, rhs) {
-        case (.idle, .idle), (.connecting, .connecting), (.waitingChallenge, .waitingChallenge), (.authenticating, .authenticating), (.connected, .connected):
+        case (.idle, .idle), (.connecting, .connecting), (.socketConnected, .socketConnected),
+             (.waitingChallenge, .waitingChallenge), (.authenticating, .authenticating), (.connected, .connected):
             return true
         case (.failed(let l), .failed(let r)):
             return l == r
@@ -54,6 +56,7 @@ actor OpenClawGatewayConnection {
     private func updateState(_ newState: ConnectionState) {
         _state = newState
         stateSubject.send(newState)
+        OpenClawDiagnosticsManager.shared.log("STATE: \(newState)", type: .info)
     }
 
     func getState() -> ConnectionState { _state }
@@ -80,11 +83,21 @@ actor OpenClawGatewayConnection {
         socket = session.webSocketTask(with: url)
         socket?.resume()
 
+        updateState(.socketConnected)
         listen()
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             self.handshakeContinuation = continuation
-            self.updateState(.waitingChallenge)
+
+            // OpenClaw Protocol: The first client frame must be a 'connect' request.
+            Task {
+                do {
+                    updateState(.waitingChallenge)
+                    _ = try await self.sendRequestInternal("connect", params: [:])
+                } catch {
+                    self.cleanupHandshake(error: error)
+                }
+            }
 
             // Timeout for handshake
             Task { [weak self] in
@@ -150,8 +163,12 @@ actor OpenClawGatewayConnection {
         case .success(let message):
             switch message {
             case .data(let data):
+                if let text = String(data: data, encoding: .utf8) {
+                    OpenClawDiagnosticsManager.shared.log("OPENCLAW INBOUND\n\(text)", type: .protocolMsg)
+                }
                 await handleIncomingData(data)
             case .string(let text):
+                OpenClawDiagnosticsManager.shared.log("OPENCLAW INBOUND\n\(text)", type: .protocolMsg)
                 if let data = text.data(using: .utf8) {
                     await handleIncomingData(data)
                 }
@@ -168,6 +185,7 @@ actor OpenClawGatewayConnection {
         if isManuallyDisconnected { return }
 
         let errorMsg = error.localizedDescription
+        OpenClawDiagnosticsManager.shared.log("Connection failure: \(errorMsg)", type: .error)
         updateState(.failed(errorMsg))
         cleanupHandshake(error: error)
         cleanupAllPendingRequests(error: error)
@@ -199,6 +217,12 @@ actor OpenClawGatewayConnection {
     private func handleIncomingData(_ data: Data) async {
         // Try decoding as Response
         if let response = try? JSONDecoder().decode(OpenClawRPCResponse.self, from: data), let id = response.id {
+            do {
+                try response.validate()
+            } catch {
+                OpenClawDiagnosticsManager.shared.log("Response validation failed: \(error)", type: .error)
+            }
+
             if let continuation = pendingRequests.removeValue(forKey: id) {
                 if let error = response.error {
                     continuation.resume(throwing: OpenClawError.protocolError(error.message))
@@ -234,6 +258,7 @@ actor OpenClawGatewayConnection {
 
         guard let payload = event.payload.value as? [String: Any],
               let nonce = payload["nonce"] as? String else {
+            OpenClawDiagnosticsManager.shared.log("Invalid challenge payload: missing nonce", type: .error)
             cleanupHandshake(error: OpenClawError.invalidNonce)
             return
         }
@@ -261,11 +286,24 @@ actor OpenClawGatewayConnection {
 
     private func sendRequestInternal(_ method: String, params: [String: AnyCodable]) async throws -> AnyCodable {
         let request = OpenClawRPCRequest(method: method, params: params)
+
+        do {
+            try request.validate()
+        } catch {
+            OpenClawDiagnosticsManager.shared.log("Request validation failed for \(method): \(error)", type: .error)
+            throw error
+        }
+
         let data = try JSONEncoder().encode(request)
+        let text = String(data: data, encoding: .utf8) ?? "{}"
+
+        OpenClawDiagnosticsManager.shared.log("OPENCLAW OUTBOUND\n\(text)", type: .protocolMsg)
 
         return try await withCheckedThrowingContinuation { continuation in
             pendingRequests[request.id] = continuation
-            socket?.send(.data(data)) { error in
+
+            // OpenClaw Gateway requires text frames
+            socket?.send(.string(text)) { error in
                 if let error = error {
                     Task { [weak self] in
                         await self?.cleanupPendingRequest(request.id, with: error)
@@ -290,6 +328,7 @@ actor OpenClawGatewayConnection {
 
     private func handleRequestTimeout(_ id: String) {
         if let continuation = pendingRequests.removeValue(forKey: id) {
+            OpenClawDiagnosticsManager.shared.log("Request timed out: \(id)", type: .error)
             continuation.resume(throwing: OpenClawError.requestTimeout)
         }
     }

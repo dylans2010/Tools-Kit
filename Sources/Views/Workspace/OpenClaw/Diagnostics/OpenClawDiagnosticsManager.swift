@@ -8,15 +8,22 @@ struct OpenClawMetric: Identifiable {
     let timestamp: Date
 }
 
+enum OpenClawDiagnosticType: String {
+    case info = "INFO"
+    case error = "ERROR"
+    case network = "NETWORK"
+    case protocolMsg = "PROTOCOL"
+}
+
 final class OpenClawDiagnosticsManager: ObservableObject {
     static let shared = OpenClawDiagnosticsManager()
 
     @Published var metrics: [OpenClawMetric] = []
     @Published var logs: [String] = []
 
-    func log(_ message: String) {
+    func log(_ message: String, type: OpenClawDiagnosticType = .info) {
         let timestamp = ISO8601DateFormatter().string(from: Date())
-        let formatted = "[\(timestamp)] \(message)"
+        let formatted = "[\(timestamp)] [\(type.rawValue)] \(message)"
         DispatchQueue.main.async {
             self.logs.append(formatted)
             if self.logs.count > 1000 { self.logs.removeFirst() }
