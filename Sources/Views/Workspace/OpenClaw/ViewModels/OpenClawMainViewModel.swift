@@ -30,7 +30,7 @@ final class OpenClawMainViewModel: ObservableObject {
             .store(in: &cancellables)
 
         diagnostics.$metrics
-            .filter { $0.name == "latency" }
+            .compactMap { $0.last(where: { $0.name == "latency" }) }
             .receive(on: RunLoop.main)
             .sink { [weak self] metric in
                 self?.latency = metric.value

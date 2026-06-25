@@ -183,7 +183,8 @@ actor OpenClawGatewayConnection {
             let delay = min(pow(2.0, Double(attempt)), 60.0)
             try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
 
-            if !Task.isCancelled && !isManuallyDisconnected {
+            let manuallyDisconnected = isManuallyDisconnected
+            if !Task.isCancelled && !manuallyDisconnected {
                 await self.incrementAttempt()
                 _ = try? await self.performConnect()
             }
