@@ -1,13 +1,6 @@
 import Foundation
 import SwiftUI
 
-enum LocalProviderType: String, Codable {
-    case ollama = "Ollama"
-    case lmStudio = "LM Studio"
-    case openAICompatible = "OpenAI-Compatible"
-    case unknown = "Unknown"
-}
-
 struct LocalModelValidationResult {
     let success: Bool
     let provider: LocalProviderType
