@@ -122,7 +122,7 @@ struct SystemAgentMessage: Codable, Identifiable {
     private var serializedContentForModel: String {
         switch role {
         case .toolCall(let name, let input):
-            let mapped = input.mapValues(\.value)
+            let mapped = input.mapValues { (codable: AnyCodable) -> Any in codable.value }
             let json = (try? JSONSerialization.data(withJSONObject: ["tool": name, "input": mapped], options: [.sortedKeys]))
                 .flatMap { String(data: $0, encoding: .utf8) } ?? "{}"
             return "Tool call: \(json)"
