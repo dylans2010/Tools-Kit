@@ -3,6 +3,7 @@ import SwiftUI
 struct LocalModelDetailsView: View {
     let model: AIModel
     let config: LocalModelConfig
+    @ObservedObject var localService: AIService.AILocalService
 
     @State private var testResponse: String?
     @State private var isTesting = false
@@ -91,7 +92,7 @@ struct LocalModelDetailsView: View {
                 detailedLogs += "[TEST] Starting request to \(config.baseURL)/chat/completions\n"
                 detailedLogs += "[TEST] Model: \(model.id)\n"
 
-                let response = try await AIService.AILocalService.sendRequest(messages: [message], config: testConfig)
+                let response = try await localService.sendRequest(messages: [message], config: testConfig)
 
                 await MainActor.run {
                     self.testResponse = response

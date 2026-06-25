@@ -84,7 +84,7 @@ struct SetupLocalModelsView: View {
                         .foregroundColor(.secondary)
                 } else {
                     ForEach(currentModels) { model in
-                        NavigationLink(destination: LocalModelDetailsView(model: model, config: activeConfig ?? LocalModelConfig())) {
+                        NavigationLink(destination: LocalModelDetailsView(model: model, config: activeConfig ?? LocalModelConfig(), localService: AIService.AILocalService.shared)) {
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text(model.name)
