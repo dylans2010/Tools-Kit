@@ -1,51 +1,5 @@
 import SwiftUI
 
-struct FetchLocalModelsFramework {
-    static func fetchModels(from baseURL: String) async throws -> [AIModel] {
-        guard let url = URL(string: "\(baseURL)/v1/models") else {
-            throw AIError.invalidEndpoint
-        }
-
-        var request = URLRequest(url: url)
-        request.timeoutInterval = 10
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw AIError.invalidResponse
-        }
-
-        let decoder = JSONDecoder()
-        // Try to decode as OpenAI format first
-        if let openAIResponse = try? decoder.decode(OpenAIModelsResponse.self, from: data) {
-            return openAIResponse.data.map { AIModel(id: $0.id, name: $0.id) }
-        }
-
-        // Try Ollama format
-        if let ollamaResponse = try? decoder.decode(OllamaModelsResponse.self, from: data) {
-            return ollamaResponse.models.map { AIModel(id: $0.name, name: $0.name) }
-        }
-
-        throw AIError.decodingFailed
-    }
-
-    struct OpenAIModelsResponse: Codable {
-        let data: [OpenAIModelData]
-    }
-
-    struct OpenAIModelData: Codable {
-        let id: String
-    }
-
-    struct OllamaModelsResponse: Codable {
-        let models: [OllamaModelData]
-    }
-
-    struct OllamaModelData: Codable {
-        let name: String
-    }
-}
-
 struct SetupLocalModelsView: View {
     @ObservedObject var settingsManager = AIChatSettingsManager.shared
     @AppStorage("aichat_selected_provider") private var selectedProviderID = "openrouter"
@@ -289,46 +243,72 @@ struct EditLocalModelConfigView: View {
     var onSave: (LocalModelConfig) -> Void
 
     @State private var showingAdvanced = false
-    @State private var isFetching = false
-    @State private var fetchError: String?
+    @State private var isValidating = false
+    @State private var validationError: String?
+    @State private var diagnostics: [String] = []
+    @State private var detectedProvider: LocalProviderType = .unknown
 
     var body: some View {
         Form {
             Section {
-                TextField("Name (e.g. Ollama Home)", text: $config.name)
-                TextField("Base URL", text: $config.baseURL)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-                TextField("Model Name", text: $config.modelName)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
+                TextField("Friendly Name (e.g. My PC)", text: $config.name)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Chat Endpoint")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    TextField("http://localhost:11434/v1/chat/completions", text: $config.baseURL)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                        .font(.system(.body, design: .monospaced))
+                }
             } header: {
-                Text("Connection")
+                Text("Inference Server")
+            } footer: {
+                Text("Enter the full URL for chat completions. Everything else will be derived automatically.")
             }
 
             Section {
-                Button(action: fetchModels) {
+                Button(action: startOnboarding) {
                     HStack {
-                        if isFetching {
+                        if isValidating {
                             ProgressView()
                                 .padding(.trailing, 8)
                         }
-                        Text(isFetching ? "Fetching Models..." : "Fetch Available Models")
+                        Text(isValidating ? "Validating..." : "Connect & Discover Models")
                             .bold()
                     }
                 }
-                .disabled(isFetching || config.baseURL.isEmpty)
+                .disabled(isValidating || config.baseURL.isEmpty)
 
-                if let error = fetchError {
-                    Text(error)
-                        .foregroundColor(.red)
-                        .font(.caption)
+                if !diagnostics.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(diagnostics, id: \.self) { log in
+                            Text(log)
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundColor(log.contains("FAILED") ? .red : .secondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
                 }
 
-                if !config.cachedModels.isEmpty {
-                    Text("\(config.cachedModels.count) models cached")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+                if let error = validationError {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .font(.caption.bold())
+                }
+            }
+
+            if !config.cachedModels.isEmpty {
+                Section {
+                    Picker("Active Model", selection: $config.modelName) {
+                        ForEach(config.cachedModels) { model in
+                            Text(model.name).tag(model.id)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                } header: {
+                    Text("Available Models")
                 }
             }
 
@@ -341,6 +321,10 @@ struct EditLocalModelConfigView: View {
             Section {
                 Button(action: { showingAdvanced = true }) {
                     Label("Advanced Parameters", systemImage: "slider.horizontal.3")
+                }
+
+                if detectedProvider != .unknown {
+                    LabeledContent("Detected Provider", value: detectedProvider.rawValue)
                 }
             }
 
@@ -355,12 +339,12 @@ struct EditLocalModelConfigView: View {
                 } label: {
                     HStack {
                         Spacer()
-                        Text("Set as Active Model")
+                        Text("Set as Active Configuration")
                             .bold()
                         Spacer()
                     }
                 }
-                .disabled(config.name.isEmpty || config.baseURL.isEmpty || config.modelName.isEmpty)
+                .disabled(config.name.isEmpty || config.baseURL.isEmpty || config.modelName.isEmpty || isValidating)
             }
         }
         .navigationTitle(config.name.isEmpty ? "New Endpoint" : config.name)
@@ -383,22 +367,30 @@ struct EditLocalModelConfigView: View {
         }
     }
 
-    private func fetchModels() {
-        isFetching = true
-        fetchError = nil
+    private func startOnboarding() {
+        isValidating = true
+        validationError = nil
+        diagnostics = []
 
         Task {
-            do {
-                let models = try await FetchLocalModelsFramework.fetchModels(from: config.baseURL)
-                await MainActor.run {
-                    self.config.cachedModels = models
-                    self.isFetching = false
+            let result = await LocalModelService.shared.validateAndDiscover(
+                endpoint: config.baseURL,
+                apiKey: config.apiKey
+            )
+
+            await MainActor.run {
+                self.isValidating = false
+                self.diagnostics = result.diagnostics
+
+                if result.success {
+                    self.config.cachedModels = result.models
+                    self.detectedProvider = result.provider
+                    if self.config.modelName.isEmpty || !result.models.contains(where: { $0.id == self.config.modelName }) {
+                        self.config.modelName = result.models.first?.id ?? ""
+                    }
                     onSave(config)
-                }
-            } catch {
-                await MainActor.run {
-                    self.fetchError = error.localizedDescription
-                    self.isFetching = false
+                } else {
+                    self.validationError = result.error
                 }
             }
         }

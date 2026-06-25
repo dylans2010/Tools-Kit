@@ -28,7 +28,7 @@ struct PromptChain: Codable, Identifiable {
 struct LocalModelConfig: Codable, Identifiable, Equatable {
     var id = UUID()
     var name: String = "My Local Model"
-    var baseURL: String = "http://localhost:11434/v1"
+    var baseURL: String = "http://localhost:11434/v1/chat/completions"
     var modelName: String = "llama3"
     var apiKey: String = ""
     var customHeaders: [String: String] = [:]
@@ -82,7 +82,7 @@ struct LocalModelConfig: Codable, Identifiable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
         name = try container.decodeIfPresent(String.self, forKey: .name) ?? "My Local Model"
-        baseURL = try container.decodeIfPresent(String.self, forKey: .baseURL) ?? "http://localhost:11434/v1"
+        baseURL = try container.decodeIfPresent(String.self, forKey: .baseURL) ?? "http://localhost:11434/v1/chat/completions"
         modelName = try container.decodeIfPresent(String.self, forKey: .modelName) ?? "llama3"
         apiKey = try container.decodeIfPresent(String.self, forKey: .apiKey) ?? ""
         customHeaders = try container.decodeIfPresent([String: String].self, forKey: .customHeaders) ?? [:]

@@ -452,10 +452,7 @@ struct ModelConfigurationSection: View {
                             }
                         }
 
-                        NavigationLink(destination: OpenRouterFreeModelsView()) {
-                            Label("Browse Free Models", systemImage: "sparkles")
-                                .foregroundColor(.orange)
-                        }
+                        OpenRouterModelsSection()
 
                         Divider()
                     }
@@ -1155,5 +1152,63 @@ struct ChangelogView: View {
             }
         }
         .navigationTitle("Changelog")
+    }
+}
+
+// MARK: - Migrated Components
+
+struct OpenRouterModelsSection: View {
+    @ObservedObject private var modelCatalog = AIModelCatalog.shared
+    @State private var freeModels: [AIModel] = []
+    @State private var isLoading = false
+    @State private var isExpanded = false
+
+    var body: some View {
+        DisclosureGroup(isExpanded: $isExpanded) {
+            if isLoading {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
+                .padding(.vertical, 8)
+            } else if freeModels.isEmpty {
+                Text("No free models found on OpenRouter.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.vertical, 8)
+            } else {
+                ForEach(freeModels) { model in
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(model.name)
+                            .font(.subheadline)
+                            .foregroundColor(.primary)
+                        Text(model.id)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+        } label: {
+            Label("Browse Free Models", systemImage: "sparkles")
+                .foregroundColor(.orange)
+        }
+        .onChange(of: isExpanded) { _, newValue in
+            if newValue && freeModels.isEmpty {
+                Task { await loadFreeModels() }
+            }
+        }
+    }
+
+    private func loadFreeModels() async {
+        isLoading = true
+        if modelCatalog.models(for: "openrouter").isEmpty {
+            await modelCatalog.loadModels(for: "openrouter", force: false)
+        }
+
+        let allOpenRouter = modelCatalog.models(for: "openrouter")
+        self.freeModels = allOpenRouter.filter { $0.id.lowercased().contains("free") }
+        isLoading = false
     }
 }
