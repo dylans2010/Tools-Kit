@@ -13,6 +13,12 @@ enum OpenClawError: Error, LocalizedError {
     case invalidNonce
     case handshakeFailed(String)
     case connectionTimeout
+    case invalidAuthMethodReuse
+    case challengeResponseRejected(String)
+    case missingChallengeNonce
+    case socketClosedDuringAuth
+    case protocolMismatchDetected(String)
+    case authTimeoutWithoutServerAck
     case unknown
 
     var errorDescription: String? {
@@ -29,6 +35,12 @@ enum OpenClawError: Error, LocalizedError {
         case .invalidNonce: return "Invalid nonce received during handshake"
         case .handshakeFailed(let msg): return "Handshake Failed: \(msg)"
         case .connectionTimeout: return "The connection timed out"
+        case .invalidAuthMethodReuse: return "Protocol Error: Invalid reuse of 'connect' method for authentication"
+        case .challengeResponseRejected(let msg): return "Authentication Rejected: \(msg)"
+        case .missingChallengeNonce: return "Authentication Failed: Missing challenge nonce"
+        case .socketClosedDuringAuth: return "Connection Lost: Socket closed during authentication"
+        case .protocolMismatchDetected(let msg): return "Protocol Mismatch: \(msg)"
+        case .authTimeoutWithoutServerAck: return "Authentication Timed Out: No response from gateway"
         case .unknown: return "An unknown error occurred"
         }
     }

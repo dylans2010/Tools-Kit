@@ -26,6 +26,14 @@ wss.on('connection', (ws) => {
         console.log('Received:', data);
 
         if (data.method === 'connect') {
+            // Initial connect should return a challenge (handled on connection open above usually,
+            // but we can acknowledge the connect too if the protocol requires)
+            ws.send(JSON.stringify({
+                jsonrpc: '2.0',
+                result: { status: 'pending_challenge' },
+                id: data.id
+            }));
+        } else if (data.method === 'authenticate') {
             ws.send(JSON.stringify({
                 jsonrpc: '2.0',
                 result: { status: 'authenticated' },

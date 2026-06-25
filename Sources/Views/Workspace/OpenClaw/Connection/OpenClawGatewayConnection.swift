@@ -172,16 +172,22 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     }
 
     private func handleHandshakeTimeout() {
-        if _state == .waitingChallenge || _state == .authenticating {
+        if _state == .waitingChallenge {
             cleanupHandshake(error: OpenClawError.connectionTimeout)
             socket?.cancel(with: .abnormalClosure, reason: nil)
-            updateState(.failed("Handshake timed out"))
+            updateState(.failed("Handshake timed out waiting for challenge"))
+        } else if _state == .authenticating {
+            cleanupHandshake(error: OpenClawError.authTimeoutWithoutServerAck)
+            socket?.cancel(with: .abnormalClosure, reason: nil)
+            updateState(.failed("Handshake timed out during authentication"))
         }
     }
 
     private func cleanupHandshake(error: Error) {
-        handshakeContinuation?.resume(throwing: error)
-        handshakeContinuation = nil
+        if let continuation = handshakeContinuation {
+            continuation.resume(throwing: error)
+            handshakeContinuation = nil
+        }
     }
 
     private func cleanupAllPendingRequests(error: Error) {
@@ -302,18 +308,31 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     }
 
     private func respondToChallenge(_ event: OpenClawEvent) async {
-        guard _state == .waitingChallenge else { return }
-        updateState(.authenticating)
+        guard _state == .waitingChallenge else {
+            OpenClawDiagnosticsManager.shared.log("Ignoring challenge: not in waitingChallenge state (current: \(_state))", type: .error)
+            return
+        }
 
         guard let payload = event.payload.value as? [String: Any],
               let nonce = payload["nonce"] as? String else {
             OpenClawDiagnosticsManager.shared.log("Invalid challenge payload: missing nonce", type: .error)
-            cleanupHandshake(error: OpenClawError.invalidNonce)
+            cleanupHandshake(error: OpenClawError.missingChallengeNonce)
+            updateState(.failed("Missing challenge nonce"))
             return
         }
 
+        // State Safety Check
+        guard socket?.state == .running else {
+            OpenClawDiagnosticsManager.shared.log("Cannot send auth: socket is not running", type: .error)
+            cleanupHandshake(error: OpenClawError.socketClosedDuringAuth)
+            updateState(.failed("Socket closed during auth"))
+            return
+        }
+
+        updateState(.authenticating)
+
         let token = OpenClawSecureStore.shared.getToken(for: deviceID)
-        let connectParams: [String: AnyCodable] = [
+        let authParams: [String: AnyCodable] = [
             "nonce": AnyCodable(nonce),
             "token": AnyCodable(token ?? ""),
             "device_id": AnyCodable(deviceID),
@@ -325,11 +344,18 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         ]
 
         do {
-            _ = try await sendRequestInternal("connect", params: connectParams)
+            OpenClawDiagnosticsManager.shared.log("Sending 'authenticate' request for challenge response", type: .protocolMsg)
+            _ = try await sendRequestInternal("authenticate", params: authParams)
+
+            // If we get a successful response to 'authenticate', we are paired
             handshakeContinuation?.resume()
             handshakeContinuation = nil
         } catch {
-            cleanupHandshake(error: error)
+            let errorMsg = error.localizedDescription
+            OpenClawDiagnosticsManager.shared.log("Authentication failed: \(errorMsg)\nState: \(_state)", type: .error)
+            let authError = OpenClawError.challengeResponseRejected(errorMsg)
+            cleanupHandshake(error: authError)
+            updateState(.failed(authError.localizedDescription))
         }
     }
 
