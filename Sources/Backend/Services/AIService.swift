@@ -227,7 +227,7 @@ class AIService {
 
             // 1. If explicit config is provided, use it (Custom Provider)
             if let config = config {
-                return try await sendToCustomEndpoint(messages: messages, config: config)
+                return try await sendToCentralizedService(messages: messages, config: config)
             }
 
             // 2. Route based on selected provider from AvailableLocalModelsView
@@ -241,93 +241,44 @@ class AIService {
 
             case "huggingface":
                 SDKLogStore.shared.log("AILocalService: Routing to HuggingFace Local", source: "AIService", level: .info)
-                // Downloaded models are currently handled via a local runner if available,
-                // or bridged through a local provider. For now, we use HFInferenceService.
                 return try await HFInferenceService.shared.sendRequest(messages: messages, modelID: s.modelID)
 
             case "local_models":
                 if let configID = s.selectedLocalConfigID,
                    let config = s.localConfigs.first(where: { $0.id == configID }) {
-                    return try await sendToCustomEndpoint(messages: messages, config: config)
+                    return try await sendToCentralizedService(messages: messages, config: config)
                 } else if let firstConfig = s.localConfigs.first {
-                    return try await sendToCustomEndpoint(messages: messages, config: firstConfig)
+                    return try await sendToCentralizedService(messages: messages, config: firstConfig)
                 }
 
             default:
-                // Fallback to first available local config if set to local mode but provider is unknown
                 if let firstConfig = s.localConfigs.first {
-                    return try await sendToCustomEndpoint(messages: messages, config: firstConfig)
+                    return try await sendToCentralizedService(messages: messages, config: firstConfig)
                 }
             }
 
             throw AIError.noModelSelected
         }
 
-        private func sendToCustomEndpoint(messages: [ChatMessage], config: LocalModelConfig) async throws -> String {
-            var urlString = config.baseURL
-            if !urlString.contains("/chat/completions") {
-                if urlString.hasSuffix("/") {
-                    urlString += "chat/completions"
-                } else {
-                    urlString += "/chat/completions"
-                }
-            }
+        private func sendToCentralizedService(messages: [ChatMessage], config: LocalModelConfig) async throws -> String {
+            SDKLogStore.shared.log("AILocalService: Routing to LocalModelService: \(config.baseURL)", source: "AIService", level: .info)
 
-            guard let url = URL(string: urlString) else {
-                throw AIError.invalidEndpoint
-            }
-
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.timeoutInterval = config.timeout
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-            if !config.apiKey.isEmpty {
-                request.setValue("Bearer \(config.apiKey)", forHTTPHeaderField: "Authorization")
-            }
-
-            for (key, value) in config.customHeaders {
-                request.setValue(value, forHTTPHeaderField: key)
-            }
-
-            let payloadMessages = messages.map { ["role": $0.role, "content": $0.content] }
-
-            let payload: [String: Any] = [
-                "model": config.modelName,
-                "messages": payloadMessages,
+            let parameters: [String: Any] = [
                 "temperature": config.temperature,
                 "max_tokens": config.maxTokens,
-                "stream": false,
                 "top_p": config.topP,
                 "seed": config.seed,
                 "repeat_penalty": config.repeatPenalty
             ]
 
-            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
-
-            SDKLogStore.shared.log("AILocalService: Sending request to \(url.absoluteString)", source: "AIService", level: .info)
-
-            let (data, response) = try await URLSession.shared.data(for: request)
-
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw AIError.invalidResponse
-            }
-
-            if !(200...299).contains(httpResponse.statusCode) {
-                let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
-                SDKLogStore.shared.log("AILocalService: Request failed (\(httpResponse.statusCode)) for \(url.absoluteString). Response: \(errorBody)", source: "AIService", level: .error)
-                throw AIError.requestFailed("Server returned \(httpResponse.statusCode): \(errorBody)")
-            }
-
-            let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-            let choices = json?["choices"] as? [[String: Any]]
-            let message = choices?.first?["message"] as? [String: Any]
-
-            guard let content = message?["content"] as? String else {
-                throw AIError.decodingFailed
-            }
-
-            return content
+            return try await LocalModelService.shared.sendChatRequest(
+                endpoint: config.baseURL,
+                messages: messages,
+                model: config.modelName,
+                apiKey: config.apiKey,
+                customHeaders: config.customHeaders,
+                parameters: parameters
+            )
         }
     }
 
