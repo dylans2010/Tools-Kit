@@ -39,7 +39,7 @@ final class OpenClawMainViewModel: ObservableObject {
     }
 
     private func updateStatus(_ state: ConnectionState) {
-        isConnecting = (state == .connecting || state == .authenticating || state == .waitingChallenge)
+        isConnecting = (state == .connecting || state == .socketConnected || state == .authenticating || state == .waitingChallenge)
 
         switch state {
         case .idle:
@@ -47,6 +47,8 @@ final class OpenClawMainViewModel: ObservableObject {
             lastError = nil
         case .connecting:
             connectionStatus = "Connecting..."
+        case .socketConnected:
+            connectionStatus = "Socket Connected..."
         case .waitingChallenge:
             connectionStatus = "Waiting for challenge..."
         case .authenticating:
