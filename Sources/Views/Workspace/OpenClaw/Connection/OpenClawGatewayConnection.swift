@@ -183,7 +183,7 @@ actor OpenClawGatewayConnection {
             let delay = min(pow(2.0, Double(attempt)), 60.0)
             try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
 
-            let manuallyDisconnected = isManuallyDisconnected
+            let manuallyDisconnected = await self.getIsManuallyDisconnected()
             if !Task.isCancelled && !manuallyDisconnected {
                 await self.incrementAttempt()
                 _ = try? await self.performConnect()
@@ -193,6 +193,7 @@ actor OpenClawGatewayConnection {
 
     private func getAttempt() -> Int { connectionAttempt }
     private func incrementAttempt() { connectionAttempt += 1 }
+    private func getIsManuallyDisconnected() -> Bool { isManuallyDisconnected }
 
     private func handleIncomingData(_ data: Data) async {
         // Try decoding as Response
