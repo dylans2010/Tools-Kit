@@ -1,21 +1,5 @@
 import Foundation
 
-// MARK: - AIModel
-
-struct AIModel: Identifiable, Hashable, Codable {
-    let id: String
-    let name: String
-    let supportsVision: Bool
-    let contextLength: Int?
-
-    init(id: String, name: String, supportsVision: Bool = false, contextLength: Int? = nil) {
-        self.id = id
-        self.name = name
-        self.supportsVision = supportsVision
-        self.contextLength = contextLength
-    }
-}
-
 // MARK: - AIProvider Protocol
 
 protocol AIProvider: Identifiable {
