@@ -1,5 +1,31 @@
 import SwiftUI
 
+struct AFMInfoCard: View {
+    let title: String
+    let value: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(color)
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            Text(value)
+                .font(.headline)
+                .lineLimit(1)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
+    }
+}
+
 struct AFMDashboardView: View {
     @StateObject private var service = AFMService.shared
     @StateObject private var sessionManager = AFMSessionManager.shared
@@ -37,8 +63,8 @@ struct AFMDashboardView: View {
 
                 // Session Info
                 HStack(spacing: 15) {
-                    InfoCard(title: "Session", value: sessionManager.sessionID.uuidString.prefix(8).lowercased(), icon: "clock", color: .blue)
-                    InfoCard(title: "Messages", value: "\(sessionManager.messageCount)", icon: "bubble.left", color: .purple)
+                    AFMInfoCard(title: "Session", value: String(sessionManager.sessionID.uuidString.prefix(8)).lowercased(), icon: "clock", color: .blue)
+                    AFMInfoCard(title: "Messages", value: "\(sessionManager.messageCount)", icon: "bubble.left", color: .purple)
                 }
                 .padding(.horizontal)
 
