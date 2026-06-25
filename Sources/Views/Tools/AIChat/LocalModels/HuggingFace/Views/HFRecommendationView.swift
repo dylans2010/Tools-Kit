@@ -103,7 +103,8 @@ struct HFRecommendationView: View {
             lastModified: nil,
             likes: nil,
             downloads: nil,
-            tags: ["gguf"]
+            tags: ["gguf"],
+            siblings: nil
         )
         HuggingFaceDownloadManager.shared.downloadModel(model)
         dismiss()
