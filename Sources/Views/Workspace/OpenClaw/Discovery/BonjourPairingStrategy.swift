@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 struct BonjourPairingStrategy: OpenClawPairingStrategy {
     let name = "Bonjour (Zero-Config)"

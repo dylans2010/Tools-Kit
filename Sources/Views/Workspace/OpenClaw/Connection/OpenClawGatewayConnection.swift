@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import UIKit
 
 enum ConnectionState: Equatable {
     case idle
