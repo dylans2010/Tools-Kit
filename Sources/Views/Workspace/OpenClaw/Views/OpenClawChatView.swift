@@ -9,7 +9,7 @@ struct OpenClawChatView: View {
                 ScrollView {
                     LazyVStack(spacing: 12) {
                         ForEach(viewModel.messages) { message in
-                            ChatBubble(message: message)
+                            OpenClawChatBubble(message: message)
                                 .id(message.id)
                         }
                     }
@@ -42,7 +42,7 @@ struct OpenClawChatView: View {
     }
 }
 
-struct ChatBubble: View {
+struct OpenClawChatBubble: View {
     let message: OpenClawAgentMessage
 
     var body: some View {

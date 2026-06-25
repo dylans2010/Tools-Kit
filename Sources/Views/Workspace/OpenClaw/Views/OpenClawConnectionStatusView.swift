@@ -17,7 +17,7 @@ struct OpenClawConnectionStatusView: View {
     private var statusColor: Color {
         switch state {
         case .idle: return .gray
-        case .connecting, .authenticating: return .orange
+        case .connecting, .waitingChallenge, .authenticating: return .orange
         case .connected: return .green
         case .failed: return .red
         }
@@ -27,9 +27,10 @@ struct OpenClawConnectionStatusView: View {
         switch state {
         case .idle: return "Disconnected"
         case .connecting: return "Connecting"
+        case .waitingChallenge: return "Authenticating"
         case .authenticating: return "Authenticating"
         case .connected: return "Connected"
-        case .failed: return "Error"
+        case .failed(let error): return "Error: \(error)"
         }
     }
 }
