@@ -51,6 +51,9 @@ struct AIChatSettingsView: View {
                         get: { settings.aiModelSource == .local ? .local : .app },
                         set: { newValue in
                             settings.aiModelSource = (newValue == .local) ? .local : .appModel
+                            if newValue == .local {
+                                LocalDirectoryManager.ensureModelsDirectoryExists()
+                            }
                         }
                     ))
                 } header: {
@@ -626,6 +629,36 @@ struct AccountSection: View {
             Button(role: .destructive, action: onSignOut) {
                 Text("Sign Out")
             }
+        }
+    }
+}
+
+struct LocalDirectoryManager {
+    static func ensureModelsDirectoryExists() {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let modelsDir = paths[0].appendingPathComponent("Models", isDirectory: true)
+
+        if !FileManager.default.fileExists(atPath: modelsDir.path) {
+            try? FileManager.default.createDirectory(at: modelsDir, withIntermediateDirectories: true)
+
+            let introPath = modelsDir.appendingPathComponent("intro.md")
+            let introContent = """
+            # ToolsKit Models Directory
+
+            Welcome to your local model storage. This directory is used by ToolsKit to manage and access on-device AI models.
+
+            ## Directory Structure
+            - **Models/**: The root folder for all local model assets.
+            - **Models/[ModelName]/**: Each model is stored in its own dedicated folder to keep assets organized and prevent filename collisions.
+
+            ## Usage
+            - **HuggingFace Downloads**: When you download a model from HuggingFace via the app, it will be automatically placed in a sub-folder here.
+            - **Manual Imports**: You can manually add GGUF or other supported model files by creating a folder for the model and placing the files inside.
+            - **Do Not Modify**: We recommend not changing the folder names or internal file structures manually, as this may break the app's ability to discover and load the models.
+
+            ToolsKit uses this directory to provide a seamless local-first AI experience.
+            """
+            try? introContent.write(to: introPath, atomically: true, encoding: .utf8)
         }
     }
 }

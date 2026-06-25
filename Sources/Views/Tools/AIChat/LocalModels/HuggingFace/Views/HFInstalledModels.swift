@@ -102,7 +102,7 @@ struct HFInstalledModels: View {
     private func loadModels() {
         isLoading = true
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        let hfRootFolder = paths[0].appendingPathComponent("HuggingFace", isDirectory: true)
+        let hfRootFolder = paths[0].appendingPathComponent("Models", isDirectory: true)
 
         guard let folders = try? FileManager.default.contentsOfDirectory(at: hfRootFolder, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) else {
             isLoading = false
@@ -144,16 +144,24 @@ struct HFInstalledModels: View {
     }
 
     private func openInFiles(_ model: InstalledModel) {
-        // Since we can't easily open a specific directory in the Files app on iOS via public API
-        // without a document picker or similar, we'll log it for now.
-        // In a real app, you might use UIDocumentPickerViewController or similar if appropriate.
-        SDKLogStore.shared.log("Opening folder: \(model.url.path)", source: "HFInstalledModels", level: .info)
+        let url = model.url
+        // Use share sheet to reveal the folder or try to open it
+        let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.windows.first?.rootViewController {
+            rootVC.present(activityVC, animated: true)
+        }
     }
 
     private func openStorageDirectory() {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        let hfRootFolder = paths[0].appendingPathComponent("HuggingFace", isDirectory: true)
-        SDKLogStore.shared.log("HuggingFace Root: \(hfRootFolder.path)", source: "HFInstalledModels", level: .info)
+        let hfRootFolder = paths[0].appendingPathComponent("Models", isDirectory: true)
+
+        let activityVC = UIActivityViewController(activityItems: [hfRootFolder], applicationActivities: nil)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.windows.first?.rootViewController {
+            rootVC.present(activityVC, animated: true)
+        }
     }
 
     private func formatSize(_ bytes: Int64) -> String {

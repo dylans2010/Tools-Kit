@@ -241,9 +241,10 @@ actor OpenClawGatewayConnection {
         let connectParams: [String: AnyCodable] = [
             "nonce": AnyCodable(nonce),
             "token": AnyCodable(token ?? ""),
+            "device_id": AnyCodable(deviceID),
             "role": AnyCodable("operator"),
             "metadata": AnyCodable([
-                "device_name": "iPhone",
+                "device_name": UIDevice.current.name,
                 "client_id": "com.toolskit.openclaw"
             ])
         ]

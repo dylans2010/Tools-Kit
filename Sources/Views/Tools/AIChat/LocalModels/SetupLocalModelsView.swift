@@ -247,9 +247,26 @@ struct EditLocalModelConfigView: View {
     @State private var validationError: String?
     @State private var diagnostics: [String] = []
     @State private var detectedProvider: LocalProviderType = .unknown
+    @State private var showingOllamaSetup = false
 
     var body: some View {
         Form {
+            Section {
+                Button {
+                    showingOllamaSetup = true
+                } label: {
+                    Label("Use Ollama Instead", systemImage: "sparkles")
+                        .foregroundColor(.orange)
+                        .bold()
+                }
+                .navigationDestination(isPresented: $showingOllamaSetup) {
+                    OllamaSetupView(config: $config) { updatedConfig in
+                        onSave(updatedConfig)
+                        dismiss()
+                    }
+                }
+            }
+
             Section {
                 TextField("Friendly Name (e.g. My PC)", text: $config.name)
 
@@ -400,5 +417,202 @@ struct EditLocalModelConfigView: View {
 struct LocalModelsByDefault: View {
     var body: some View {
         SetupLocalModelsView()
+    }
+}
+
+// MARK: - Ollama Specific Logic
+
+struct OllamaConfig {
+    static func normalizeEndpoint(_ input: String) -> String {
+        var url = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !url.starts(with: "http") {
+            url = "http://\(url)"
+        }
+        if url.hasSuffix("/") {
+            url = String(url.dropLast())
+        }
+        return url
+    }
+
+    static func fetchModels(endpoint: String) async throws -> [AIModel] {
+        let baseURL = normalizeEndpoint(endpoint)
+        guard let url = URL(string: "\(baseURL)/api/tags") else {
+            throw AIError.invalidEndpoint
+        }
+
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw AIError.invalidResponse
+        }
+
+        let decoder = JSONDecoder()
+        let result = try decoder.decode(OllamaTagsResponse.self, from: data)
+        return result.models.map { m in
+            AIModel(id: m.name, name: m.name, supportsVision: m.name.contains("llava") || m.name.contains("vision"))
+        }
+    }
+
+    static func sendChat(endpoint: String, model: String, messages: [ChatMessage], parameters: [String: Any] = [:]) async throws -> String {
+        let baseURL = normalizeEndpoint(endpoint)
+        guard let url = URL(string: "\(baseURL)/api/chat") else {
+            throw AIError.invalidEndpoint
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        var body: [String: Any] = parameters
+        body["model"] = model
+        body["messages"] = messages.map { ["role": $0.role, "content": $0.content] }
+        body["stream"] = false
+
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw AIError.requestFailed("Ollama returned status \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+        }
+
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        if let message = json?["message"] as? [String: Any], let content = message["content"] as? String {
+            return content
+        }
+
+        throw AIError.decodingFailed
+    }
+}
+
+private struct OllamaTagsResponse: Codable {
+    let models: [OllamaTagModel]
+}
+
+private struct OllamaTagModel: Codable {
+    let name: String
+}
+
+// MARK: - Ollama Setup UI
+
+struct OllamaSetupView: View {
+    @Binding var config: LocalModelConfig
+    var onComplete: (LocalModelConfig) -> Void
+
+    @State private var isFetching = false
+    @State private var errorMessage: String?
+    @State private var diagnostics: [String] = []
+    @AppStorage("aichat_selected_provider") private var selectedProviderID = "openrouter"
+    @AppStorage("aichat_model_id") private var modelID = ""
+
+    var body: some View {
+        Form {
+            Section {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Ollama Server URL")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    TextField("http://192.168.1.182:11434", text: $config.baseURL)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                        .font(.system(.body, design: .monospaced))
+                }
+            } header: {
+                Text("Connection")
+            } footer: {
+                Text("Enter the base URL of your Ollama server.")
+            }
+
+            Section {
+                Button(action: fetchModels) {
+                    HStack {
+                        if isFetching {
+                            ProgressView().padding(.trailing, 8)
+                        }
+                        Text(isFetching ? "Fetching Models..." : "Fetch Models")
+                            .bold()
+                    }
+                }
+                .disabled(isFetching || config.baseURL.isEmpty)
+
+                if !diagnostics.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(diagnostics, id: \.self) { log in
+                            Text(log)
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+
+                if let error = errorMessage {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .font(.caption.bold())
+                }
+            }
+
+            if !config.cachedModels.isEmpty {
+                Section {
+                    Picker("Selected Model", selection: $config.modelName) {
+                        ForEach(config.cachedModels) { model in
+                            Text(model.name).tag(model.id)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                } header: {
+                    Text("Available Models")
+                }
+            }
+
+            Section {
+                Button {
+                    config.providerType = .ollama
+                    config.name = "Ollama (\(config.modelName))"
+                    AIChatSettingsManager.shared.settings.selectedLocalConfigID = config.id
+                    AIChatSettingsManager.shared.settings.selectedProviderID = "local_models"
+                    selectedProviderID = "local_models"
+                    modelID = config.modelName
+                    onComplete(config)
+                } label: {
+                    HStack {
+                        Spacer()
+                        Text("Save & Set Active")
+                            .bold()
+                        Spacer()
+                    }
+                }
+                .disabled(config.modelName.isEmpty || isFetching)
+            }
+        }
+        .navigationTitle("Ollama Setup")
+    }
+
+    private func fetchModels() {
+        isFetching = true
+        errorMessage = nil
+        diagnostics = ["Starting discovery..."]
+
+        Task {
+            do {
+                let normalized = OllamaConfig.normalizeEndpoint(config.baseURL)
+                await MainActor.run { diagnostics.append("Normalized: \(normalized)") }
+
+                let models = try await OllamaConfig.fetchModels(endpoint: normalized)
+                await MainActor.run {
+                    self.config.cachedModels = models
+                    self.config.baseURL = normalized
+                    if self.config.modelName.isEmpty || !models.contains(where: { $0.id == self.config.modelName }) {
+                        self.config.modelName = models.first?.id ?? ""
+                    }
+                    self.diagnostics.append("Discovered \(models.count) models.")
+                    self.isFetching = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = error.localizedDescription
+                    self.diagnostics.append("FAILED: \(error.localizedDescription)")
+                    self.isFetching = false
+                }
+            }
+        }
     }
 }

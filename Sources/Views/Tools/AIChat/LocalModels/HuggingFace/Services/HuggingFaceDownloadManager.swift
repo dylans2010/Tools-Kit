@@ -31,7 +31,7 @@ class HuggingFaceDownloadManager: NSObject, ObservableObject {
 
     override init() {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        self.hfRootFolder = paths[0].appendingPathComponent("HuggingFace", isDirectory: true)
+        self.hfRootFolder = paths[0].appendingPathComponent("Models", isDirectory: true)
         try? FileManager.default.createDirectory(at: hfRootFolder, withIntermediateDirectories: true)
 
         super.init()
@@ -155,8 +155,7 @@ extension HuggingFaceDownloadManager: URLSessionDownloadDelegate {
         let taskPair = activeDownloads.first(where: { $0.value.downloadURL == sourceURL })
         guard let id = taskPair?.key, let task = taskPair?.value else { return }
 
-        let modelFolderName = id.replacingOccurrences(of: "/", with: "_")
-        let modelFolder = hfRootFolder.appendingPathComponent(modelFolderName, isDirectory: true)
+        let modelFolder = hfRootFolder.appendingPathComponent(task.modelName, isDirectory: true)
         try? FileManager.default.createDirectory(at: modelFolder, withIntermediateDirectories: true)
 
         let destinationURL = modelFolder.appendingPathComponent(task.fileName)
