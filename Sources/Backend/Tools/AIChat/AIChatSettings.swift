@@ -29,6 +29,7 @@ struct LocalModelConfig: Codable, Identifiable, Equatable {
     var id = UUID()
     var name: String = "My Local Model"
     var baseURL: String = "http://localhost:11434/v1/chat/completions"
+    var providerType: LocalProviderType = .openAICompatible
     var modelName: String = "llama3"
     var apiKey: String = ""
     var customHeaders: [String: String] = [:]
@@ -68,7 +69,7 @@ struct LocalModelConfig: Codable, Identifiable, Equatable {
     var cachedModels: [AIModel] = []
 
     enum CodingKeys: String, CodingKey {
-        case id, name, baseURL, modelName, apiKey, customHeaders, timeout
+        case id, name, baseURL, providerType, modelName, apiKey, customHeaders, timeout
         case temperature, maxTokens, topP, frequencyPenalty, presencePenalty, isStreamingEnabled
         case seed, topK, minP, typicalP, tfsZ, repeatPenalty, repeatLastN
         case mirostat, mirostatTau, mirostatEta, numGpu, numThread, useMLock, useMMap
@@ -83,6 +84,7 @@ struct LocalModelConfig: Codable, Identifiable, Equatable {
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
         name = try container.decodeIfPresent(String.self, forKey: .name) ?? "My Local Model"
         baseURL = try container.decodeIfPresent(String.self, forKey: .baseURL) ?? "http://localhost:11434/v1/chat/completions"
+        providerType = try container.decodeIfPresent(LocalProviderType.self, forKey: .providerType) ?? .openAICompatible
         modelName = try container.decodeIfPresent(String.self, forKey: .modelName) ?? "llama3"
         apiKey = try container.decodeIfPresent(String.self, forKey: .apiKey) ?? ""
         customHeaders = try container.decodeIfPresent([String: String].self, forKey: .customHeaders) ?? [:]

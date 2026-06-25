@@ -39,20 +39,27 @@ class AFMService: ObservableObject {
             throw NSError(domain: "AFMService", code: 502, userInfo: [NSLocalizedDescriptionKey: "Requires iOS 26 or newer"])
         }
         let selectedModelID = AIChatSettingsManager.shared.settings.selectedAFMModelID
+        SDKLogStore.shared.log("AFM: Generating response with model \(selectedModelID)", source: "AFMService", level: .info)
 
-        var session: LanguageModelSession
+        let instructions = systemPrompt.isEmpty ? "You are a helpful assistant." : systemPrompt
 
-        if let existing = activeSession as? LanguageModelSession {
-            session = existing
-        } else {
-            let instructions = systemPrompt.isEmpty ? "You are a helpful assistant." : systemPrompt
-            let newSession = LanguageModelSession(instructions: instructions)
-            activeSession = newSession
-            session = newSession
-        }
+        // We create a fresh session for each request to ensure instructions are always applied correctly
+        // and to avoid state pollution that might lead to "[]" responses.
+        let session = LanguageModelSession(instructions: instructions)
 
         let response = try await session.respond(to: prompt)
-        return response.content
+        let content = response.content
+
+        SDKLogStore.shared.log("AFM: Received response of length \(content.count)", source: "AFMService", level: .info)
+
+        // If the model literally returns "[]", it's often a sign of a failed task or restricted content
+        if content.trimmingCharacters(in: .whitespacesAndNewlines) == "[]" {
+            SDKLogStore.shared.log("AFM: Received bracketed empty response. Likely model refusal or error.", source: "AFMService", level: .warning)
+            // Instead of returning "[]", we throw a more descriptive error or could return a fallback message.
+            throw NSError(domain: "AFMService", code: 503, userInfo: [NSLocalizedDescriptionKey: "Apple Foundation Model returned an empty result. Please try rephrasing your request."])
+        }
+
+        return content
         #else
         throw NSError(domain: "AFMService", code: 501, userInfo: [NSLocalizedDescriptionKey: "FoundationModels not available"])
         #endif

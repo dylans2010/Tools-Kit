@@ -261,6 +261,22 @@ class AIService {
         }
 
         private func sendToCentralizedService(messages: [ChatMessage], config: LocalModelConfig) async throws -> String {
+            if config.providerType == .ollama {
+                SDKLogStore.shared.log("AILocalService: Routing to native Ollama: \(config.baseURL)", source: "AIService", level: .info)
+                return try await OllamaConfig.sendChat(
+                    endpoint: config.baseURL,
+                    model: config.modelName,
+                    messages: messages,
+                    parameters: [
+                        "temperature": config.temperature,
+                        "max_tokens": config.maxTokens,
+                        "top_p": config.topP,
+                        "seed": config.seed,
+                        "repeat_penalty": config.repeatPenalty
+                    ]
+                )
+            }
+
             SDKLogStore.shared.log("AILocalService: Routing to LocalModelService: \(config.baseURL)", source: "AIService", level: .info)
 
             let parameters: [String: Any] = [
@@ -353,7 +369,7 @@ class AIService {
             return try await AFMService.shared.generateResponse(prompt: prompt, systemPrompt: finalSystemPrompt)
         case "local_models":
             SDKLogStore.shared.log("Routing to Local Model System", source: "AIService", level: .info)
-            return try await AILocalService.sendRequest(messages: messages)
+            return try await AILocalService.shared.sendRequest(messages: messages)
         default:
             break
         }

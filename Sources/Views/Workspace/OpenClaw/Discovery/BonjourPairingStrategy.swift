@@ -9,7 +9,8 @@ struct BonjourPairingStrategy: OpenClawPairingStrategy {
             throw OpenClawError.unreachableHost
         }
 
-        let deviceID = UUID().uuidString
+        let vendorID = UIDevice.current.identifierForVendor?.uuidString.prefix(8).lowercased() ?? "unknown"
+        let deviceID = "iphone-\(vendorID)"
         let connection = OpenClawGatewayConnection(url: url, deviceID: deviceID)
 
         do {
