@@ -32,9 +32,18 @@ struct OpenClawRPCRequest: Codable {
 
         // Connect method specific validation
         if method == "connect" {
-            if let params = params {
-                // If we are at authenticating state, we expect nonce and device_id
-                // But the initial connect might have empty params
+            if let params = params, !params.isEmpty {
+                // We should NOT be sending params with connect anymore (they belong to authenticate)
+                throw OpenClawError.invalidAuthMethodReuse
+            }
+        }
+
+        if method == "authenticate" {
+            guard let params = params else {
+                throw OpenClawError.protocolMismatchDetected("Authentication requires parameters")
+            }
+            guard params["nonce"] != nil, params["device_id"] != nil else {
+                throw OpenClawError.protocolMismatchDetected("Authentication requires nonce and device_id")
             }
         }
     }
