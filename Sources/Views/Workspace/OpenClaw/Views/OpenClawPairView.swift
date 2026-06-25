@@ -76,7 +76,7 @@ struct OpenClawPairView: View {
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text(device.name).font(.headline)
-                                    Text("\(device.host):\(device.port)").font(.caption).foregroundStyle(.secondary)
+                                    Text("\(device.ipAddress ?? device.host):\(device.port)").font(.caption).foregroundStyle(.secondary)
                                 }
                                 Spacer()
                                 Image(systemName: "plus.circle")
@@ -137,10 +137,11 @@ struct OpenClawPairView: View {
                 .font(.headline)
 
             VStack(spacing: 8) {
-                protocolProgressRow(label: "Socket Connected", active: isStateAtLeast(.socketConnected))
-                protocolProgressRow(label: "Connect Sent", active: isStateAtLeast(.waitingChallenge))
-                protocolProgressRow(label: "Challenge Received", active: isStateAtLeast(.authenticating))
-                protocolProgressRow(label: "Authentication Sent", active: isStateAtLeast(.connected))
+                protocolProgressRow(label: "Connecting to Host", active: isStateAtLeast(.connecting))
+                protocolProgressRow(label: "Socket Opened", active: isStateAtLeast(.socketConnected))
+                protocolProgressRow(label: "Handshake Initiated", active: isStateAtLeast(.waitingChallenge))
+                protocolProgressRow(label: "Authenticating", active: isStateAtLeast(.authenticating))
+                protocolProgressRow(label: "Pairing Securely", active: isStateAtLeast(.connected))
             }
             .padding()
             .background(Color.secondary.opacity(0.1))
@@ -179,6 +180,8 @@ struct OpenClawPairView: View {
     private func isStateAtLeast(_ state: ConnectionState) -> Bool {
         let currentState = OpenClawService.shared.connectionState
         switch (state, currentState) {
+        case (.connecting, .connecting), (.connecting, .socketConnected), (.connecting, .waitingChallenge), (.connecting, .authenticating), (.connecting, .connected):
+            return true
         case (.socketConnected, .socketConnected), (.socketConnected, .waitingChallenge), (.socketConnected, .authenticating), (.socketConnected, .connected):
             return true
         case (.waitingChallenge, .waitingChallenge), (.waitingChallenge, .authenticating), (.waitingChallenge, .connected):
