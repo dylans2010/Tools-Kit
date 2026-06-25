@@ -67,12 +67,12 @@ final class OpenClawDiscoveryService: NSObject, ObservableObject {
         guard let addresses = service.addresses else { return nil }
 
         for address in addresses {
-            let data = address as NSData
-            var storage = sockaddr_storage()
-            data.getBytes(&storage, length: MemoryLayout<sockaddr_storage>.size)
+            let data = address as Data
+            guard data.count >= MemoryLayout<sockaddr_in>.size else { continue }
 
-            if Int32(storage.ss_family) == AF_INET {
-                let addr4 = data.withUnsafeBytes { $0.load(as: sockaddr_in.self) }
+            let addr4 = data.withUnsafeBytes { $0.load(as: sockaddr_in.self) }
+
+            if addr4.sin_family == sa_family_t(AF_INET) {
                 var ip = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
                 var mutableAddr = addr4.sin_addr
                 inet_ntop(AF_INET, &mutableAddr, &ip, socklen_t(INET_ADDRSTRLEN))
