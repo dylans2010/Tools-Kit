@@ -15,24 +15,10 @@ struct ManualPairingStrategy: OpenClawPairingStrategy {
             throw OpenClawError.protocolError("Invalid port number")
         }
 
-        // 2. Attempt Connection and Handshake
-        guard let url = URL(string: "ws://\(host):\(port)") else {
-            throw OpenClawError.unreachableHost
-        }
-
         let vendorID = UIDevice.current.identifierForVendor?.uuidString.prefix(8).lowercased() ?? "unknown"
         let deviceID = "iphone-\(vendorID)"
-        let connection = OpenClawGatewayConnection(url: url, deviceID: deviceID)
 
-        do {
-            _ = try await connection.connect()
-            // If connect() succeeds, it means the handshake was successful
-            await connection.disconnect()
-        } catch {
-            throw OpenClawError.handshakeFailed(error.localizedDescription)
-        }
-
-        // 3. Register Device
+        // 2. Register Device Metadata
         let device = OpenClawDevice(
             id: deviceID,
             name: "Manual Gateway (\(host))",

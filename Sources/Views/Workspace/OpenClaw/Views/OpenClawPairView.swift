@@ -139,10 +139,10 @@ struct OpenClawPairView: View {
             VStack(spacing: 8) {
                 protocolProgressRow(label: "Connecting to Host", active: isPhaseAtLeast(.connecting))
                 protocolProgressRow(label: "Socket Opened", active: isPhaseAtLeast(.socketConnected))
-                protocolProgressRow(label: "Handshake Initiated", active: isPhaseAtLeast(.waitingChallenge))
+                protocolProgressRow(label: "Handshake Initiated", active: isPhaseAtLeast(.waitingForChallenge))
                 protocolProgressRow(label: "Authenticating", active: isPhaseAtLeast(.authenticating))
 
-                if isPhaseAtLeast(.pairingRequired) {
+                if isPhaseAtLeast(.pairing) {
                     HStack {
                         Image(systemName: "exclamationmark.shield.fill")
                             .foregroundStyle(.orange)

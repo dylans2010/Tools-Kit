@@ -12,7 +12,7 @@ final class OpenClawPairingViewModel {
     var isPairing: Bool = false
     var errorMessage: String?
 
-    private let discoveryService = OpenClawDiscoveryService()
+    private let discoveryService = OpenClawDiscoveryService.shared
 
     init() {
     }
@@ -35,12 +35,31 @@ final class OpenClawPairingViewModel {
             let device = try await strategy.pair()
             OpenClawDeviceRegistry.shared.register(device)
 
-            // Wait for service to reach ready state
-            Task {
-                try? await OpenClawService.shared.connectToActiveDevice()
+            // Initiate connection through shared service
+            await OpenClawService.shared.connect(to: device)
+
+            // Wait for service to reach ready state using the stream to avoid busy-wait
+            guard let connection = OpenClawService.shared.currentConnection else {
+                 throw OpenClawError.connectionFailed("No active connection")
             }
 
-            step = 3 // Success step
+            for await state in connection.stateStream {
+                if state == .ready {
+                    step = 3 // Success step
+                    break
+                }
+                if case .failed(let reason) = state {
+                    throw OpenClawError.connectionFailed(String(describing: reason))
+                }
+                // If it gets to pairing state, it means we need to call pair() manually
+                // or wait for the user to trigger it if the UI allows.
+                // For a seamless flow, we can trigger pair() if we are in the pairing step.
+                if state == .pairing {
+                    Task {
+                        try? await OpenClawService.shared.pair()
+                    }
+                }
+            }
         } catch {
             errorMessage = error.localizedDescription
             step = (strategy is ManualPairingStrategy) ? 1 : 0
