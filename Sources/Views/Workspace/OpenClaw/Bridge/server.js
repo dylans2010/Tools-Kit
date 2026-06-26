@@ -53,12 +53,33 @@ wss.on('connection', (ws) => {
                 result: { status: 'pending_challenge' },
                 id: data.id
             }));
+        } else if (data.method === 'pair') {
+            console.log('Pairing requested by:', data.params.device_name);
+            // Simulate user approval after 1s
+            setTimeout(() => {
+                ws.send(JSON.stringify({
+                    jsonrpc: '2.0',
+                    result: {
+                        status: 'paired',
+                        token: 'simulated_pairing_token_' + Math.random().toString(36).substring(7)
+                    },
+                    id: data.id
+                }));
+            }, 1000);
         } else if (data.method === 'authenticate') {
-            ws.send(JSON.stringify({
-                jsonrpc: '2.0',
-                result: { status: 'authenticated' },
-                id: data.id
-            }));
+            if (data.params.token && data.params.token.startsWith('simulated_pairing_token_')) {
+                ws.send(JSON.stringify({
+                    jsonrpc: '2.0',
+                    result: { status: 'authenticated' },
+                    id: data.id
+                }));
+            } else {
+                ws.send(JSON.stringify({
+                    jsonrpc: '2.0',
+                    error: { code: 401, message: 'Invalid token' },
+                    id: data.id
+                }));
+            }
         } else if (data.method === 'ping') {
             ws.send(JSON.stringify({
                 jsonrpc: '2.0',

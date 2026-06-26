@@ -141,7 +141,25 @@ struct OpenClawPairView: View {
                 protocolProgressRow(label: "Socket Opened", active: isPhaseAtLeast(.socketConnected))
                 protocolProgressRow(label: "Handshake Initiated", active: isPhaseAtLeast(.waitingChallenge))
                 protocolProgressRow(label: "Authenticating", active: isPhaseAtLeast(.authenticating))
-                protocolProgressRow(label: "Pairing Securely", active: isPhaseAtLeast(.connected))
+
+                if isPhaseAtLeast(.pairingRequired) {
+                    HStack {
+                        Image(systemName: "exclamationmark.shield.fill")
+                            .foregroundStyle(.orange)
+                        Text("Pairing required. Check Mac.")
+                            .foregroundStyle(.orange)
+                        Button("Send Pair Request") {
+                            Task {
+                                try? await OpenClawService.shared.pair()
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+                    .padding(8)
+                    .background(Color.orange.opacity(0.1))
+                    .cornerRadius(8)
+                }
             }
             .padding()
             .background(Color.secondary.opacity(0.1))

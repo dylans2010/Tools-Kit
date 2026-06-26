@@ -34,6 +34,12 @@ final class OpenClawPairingViewModel {
         do {
             let device = try await strategy.pair()
             OpenClawDeviceRegistry.shared.register(device)
+
+            // Wait for service to reach ready state
+            Task {
+                try? await OpenClawService.shared.connectToActiveDevice()
+            }
+
             step = 3 // Success step
         } catch {
             errorMessage = error.localizedDescription
