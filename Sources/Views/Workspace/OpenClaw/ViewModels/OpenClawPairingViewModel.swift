@@ -1,23 +1,20 @@
 import SwiftUI
-import Combine
+import Observation
 
-@MainActor
-final class OpenClawPairingViewModel: ObservableObject {
-    @Published var step: Int = 0
-    @Published var discoveredDevices: [OpenClawDiscoveredService] = []
-    @Published var manualHost: String = ""
-    @Published var manualPort: String = "18789"
-    @Published var isPairing: Bool = false
-    @Published var errorMessage: String?
+@MainActor @Observable
+final class OpenClawPairingViewModel {
+    var step: Int = 0
+    var discoveredDevices: [OpenClawDiscoveredService] {
+        discoveryService.discoveredServices
+    }
+    var manualHost: String = ""
+    var manualPort: String = "18789"
+    var isPairing: Bool = false
+    var errorMessage: String?
 
     private let discoveryService = OpenClawDiscoveryService()
-    private var cancellables = Set<AnyCancellable>()
 
     init() {
-        discoveryService.$discoveredServices
-            .receive(on: RunLoop.main)
-            .assign(to: \.discoveredDevices, on: self)
-            .store(in: &cancellables)
     }
 
     func startDiscovery() {

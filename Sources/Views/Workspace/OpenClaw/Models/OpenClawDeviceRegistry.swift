@@ -1,11 +1,13 @@
 import Foundation
+import Observation
 
-final class OpenClawDeviceRegistry: ObservableObject {
+@Observable
+final class OpenClawDeviceRegistry {
     static let shared = OpenClawDeviceRegistry()
     private let storageKey = "openclaw_device_registry"
 
-    @Published var devices: [OpenClawDevice] = []
-    @Published var activeDeviceID: String?
+    var devices: [OpenClawDevice] = []
+    var activeDeviceID: String?
 
     init() {
         load()

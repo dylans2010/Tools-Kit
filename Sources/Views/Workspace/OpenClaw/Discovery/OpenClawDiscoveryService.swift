@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 
 struct OpenClawDiscoveredService: Identifiable, Hashable {
     let id = UUID()
@@ -18,8 +19,9 @@ struct OpenClawDiscoveredService: Identifiable, Hashable {
     }
 }
 
-final class OpenClawDiscoveryService: NSObject, ObservableObject {
-    @Published var discoveredServices: [OpenClawDiscoveredService] = []
+@MainActor @Observable
+final class OpenClawDiscoveryService: NSObject {
+    var discoveredServices: [OpenClawDiscoveredService] = []
 
     private var browser: NetServiceBrowser?
     private var services: Set<NetService> = []
@@ -47,20 +49,35 @@ final class OpenClawDiscoveryService: NSObject, ObservableObject {
     }
 
     private func updateDiscoveredServices() {
-        DispatchQueue.main.async {
-            self.discoveredServices = self.services.compactMap { service in
-                guard let host = service.hostName, service.port != -1 else { return nil }
+        let allResolved = self.services.compactMap { service -> OpenClawDiscoveredService? in
+            guard let host = service.hostName, service.port != -1 else { return nil }
+            let ipAddress = self.extractIPAddress(from: service)
+            return OpenClawDiscoveredService(
+                name: service.name,
+                host: host,
+                ipAddress: ipAddress,
+                port: service.port
+            )
+        }
 
-                let ipAddress = self.extractIPAddress(from: service)
+        // Client-side host-name deduplication (Feature E.3)
+        var deduped: [String: OpenClawDiscoveredService] = [:]
+        for service in allResolved {
+            // Deduplicate by host name to keep only one entry per machine
+            let hostKey = service.host.lowercased()
 
-                return OpenClawDiscoveredService(
-                    name: service.name,
-                    host: host,
-                    ipAddress: ipAddress,
-                    port: service.port
-                )
+            // If we already have this host, prefer the one without " (2)" style suffixes in name if possible,
+            // or just take the latest one.
+            if let existing = deduped[hostKey] {
+                if !service.name.contains("(") && existing.name.contains("(") {
+                    deduped[hostKey] = service
+                }
+            } else {
+                deduped[hostKey] = service
             }
         }
+
+        self.discoveredServices = Array(deduped.values)
     }
 
     private func extractIPAddress(from service: NetService) -> String? {

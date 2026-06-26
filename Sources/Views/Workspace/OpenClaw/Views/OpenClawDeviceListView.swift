@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OpenClawDeviceListView: View {
-    @StateObject private var registry = OpenClawDeviceRegistry.shared
+    private var registry = OpenClawDeviceRegistry.shared
 
     var body: some View {
         List {

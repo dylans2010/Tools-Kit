@@ -1,14 +1,14 @@
 import Foundation
-import Combine
+import Observation
 
-@MainActor
-final class OpenClawService: ObservableObject {
+@MainActor @Observable
+final class OpenClawService {
     static let shared = OpenClawService()
 
-    @Published var currentConnection: OpenClawGatewayConnection?
-    @Published var connectionState: ConnectionState = .idle
+    var currentConnection: OpenClawGatewayConnection?
+    var connectionState: ConnectionState = .idle
 
-    private var cancellables = Set<AnyCancellable>()
+    private var stateObservationTask: Task<Void, Never>?
     private let registry = OpenClawDeviceRegistry.shared
     private let diagnostics = OpenClawDiagnosticsManager.shared
 
@@ -29,11 +29,13 @@ final class OpenClawService: ObservableObject {
         let connection = OpenClawGatewayConnection(url: url, deviceID: device.id)
         self.currentConnection = connection
 
-        // Observe connection state from the actor
-        connection.statePublisher
-            .receive(on: RunLoop.main)
-            .assign(to: \.connectionState, on: self)
-            .store(in: &cancellables)
+        // Observe connection state from the actor via AsyncStream
+        stateObservationTask?.cancel()
+        stateObservationTask = Task { [weak self] in
+            for await state in connection.stateStream {
+                self?.connectionState = state
+            }
+        }
 
         do {
             let stream = try await connection.connect()
@@ -52,7 +54,8 @@ final class OpenClawService: ObservableObject {
 
     func disconnect() async {
         await currentConnection?.disconnect()
-        cancellables.removeAll()
+        stateObservationTask?.cancel()
+        stateObservationTask = nil
         self.currentConnection = nil
         self.connectionState = .idle
         diagnostics.log("Disconnected")

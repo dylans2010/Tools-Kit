@@ -1,9 +1,10 @@
 import SwiftUI
+import Observation
 
-@MainActor
-final class OpenClawDeviceDetailViewModel: ObservableObject {
+@MainActor @Observable
+final class OpenClawDeviceDetailViewModel {
     let device: OpenClawDevice
-    @Published var connectionQuality: Double = 0.0
+    var connectionQuality: Double = 0.0
 
     init(device: OpenClawDevice) {
         self.device = device
