@@ -15,6 +15,19 @@ enum OpenClawFailureReason: Equatable {
     case maxRetriesExceeded
 }
 
+enum ConnectionPhase: Int, Comparable {
+    case idle = 0
+    case connecting = 1
+    case socketConnected = 2
+    case waitingChallenge = 3
+    case authenticating = 4
+    case connected = 5
+
+    static func < (lhs: ConnectionPhase, rhs: ConnectionPhase) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
+}
+
 enum ConnectionState: Equatable {
     case idle
     case connecting
@@ -24,6 +37,19 @@ enum ConnectionState: Equatable {
     case connected
     case failed(OpenClawFailureReason)
     case reconnecting(attempt: Int)
+
+    var phase: ConnectionPhase {
+        switch self {
+        case .idle: return .idle
+        case .connecting: return .connecting
+        case .socketConnected: return .socketConnected
+        case .waitingChallenge: return .waitingChallenge
+        case .authenticating: return .authenticating
+        case .connected: return .connected
+        case .failed: return .idle
+        case .reconnecting: return .connecting
+        }
+    }
 }
 
 actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
