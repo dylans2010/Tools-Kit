@@ -96,6 +96,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     // NEVER generate locally. Cleared on disconnect.
     private var currentNonce: String? = nil
 
+    // Connection identifier for logging
+    private var connectionID: String? = nil
+
     private var connectionState: OpenClawConnectionState = .idle
     private var stateStreamContinuations: [UUID: AsyncStream<OpenClawConnectionState>.Continuation] = [:]
 
@@ -169,7 +172,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             level: .info,
             category: .gateway,
             title: "State Transition",
-            description: "\(oldState) → \(newState)"
+            description: "\(oldState) → \(newState)",
+            connectionID: connectionID,
+            attemptNumber: connectionAttempt
         )
     }
 
@@ -183,11 +188,12 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         case (.discovering, .gatewaySelected), (.discovering, .idle): return true
         case (.gatewaySelected, .resolvingAuthentication), (.gatewaySelected, .idle): return true
         case (.resolvingAuthentication, .pairing), (.resolvingAuthentication, .connecting), (.resolvingAuthentication, .idle): return true
-        case (.pairing, .connecting), (.pairing, .idle), (.pairing, .challenged): return true
+        case (.pairing, .connecting), (.pairing, .idle), (.pairing, .challenged), (.pairing, .authenticating): return true
         case (.connecting, .socketConnected): return true
         case (.socketConnected, .waitingForChallenge): return true
         case (.waitingForChallenge, .challenged), (.waitingForChallenge, .pairing): return true
-        case (.challenged, .authenticated): return true
+        case (.challenged, .authenticated), (.challenged, .authenticating): return true
+        case (.authenticating, .authenticated), (.authenticating, .failed): return true
         case (.authenticated, .ready): return true
         case (.ready, .idle): return true
         case (.disconnecting, .disconnected): return true
@@ -234,6 +240,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         socket = nil
         isSocketPhysicallyOpen = false
         currentNonce = nil
+        connectionID = nil
         pendingOutboundQueue.removeAll()
 
         cleanupHandshake(error: OpenClawError.connectionFailed("New connection initiated"))
@@ -250,13 +257,17 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
              throw OpenClawError.connectionFailed("Session not initialized")
         }
 
+        connectionID = String(UUID().uuidString.prefix(8))
+
         let urlString = self.url.absoluteString
         Logger.ws.info("[connect] Initiating — url: \(urlString)")
         OpenClawLoggerService.shared.log(
             level: .info,
             category: .gateway,
             title: "Connection Initiated",
-            description: "Target: \(urlString)"
+            description: "Target: \(urlString)",
+            connectionID: connectionID,
+            attemptNumber: connectionAttempt
         )
 
         // PHASE: Resolve Authentication
@@ -273,7 +284,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 level: .error,
                 category: .websocket,
                 title: "Socket Creation Failed",
-                description: "Failed to create URLSessionWebSocketTask"
+                description: "Failed to create URLSessionWebSocketTask",
+                connectionID: connectionID,
+                attemptNumber: connectionAttempt
             )
             throw OpenClawError.connectionFailed("Failed to create socket")
         }
@@ -287,7 +300,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 level: .debug,
                 category: .websocket,
                 title: "WebSocket Resume",
-                description: "Waiting for physical connection..."
+                description: "Waiting for physical connection...",
+                connectionID: connectionID,
+                attemptNumber: connectionAttempt
             )
         }
         cancelSocketOpenTimeout()
@@ -296,7 +311,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             level: .info,
             category: .websocket,
             title: "WebSocket Connected",
-            description: "Physical transport established"
+            description: "Physical transport established",
+            connectionID: connectionID,
+            attemptNumber: connectionAttempt
         )
         updateState(.socketConnected)
         updateState(.waitingForChallenge)
@@ -314,7 +331,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 level: .info,
                 category: .handshake,
                 title: "Waiting for Challenge",
-                description: "Transport open, expecting connect.challenge from gateway"
+                description: "Transport open, expecting connect.challenge from gateway",
+                connectionID: connectionID,
+                attemptNumber: connectionAttempt
             )
         }
     }
@@ -324,7 +343,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             level: .info,
             category: .handshake,
             title: "Handshake Successful",
-            description: "Connection fully established and authenticated"
+            description: "Connection fully established and authenticated",
+            connectionID: connectionID,
+            attemptNumber: connectionAttempt
         )
         logger.info("Handshake successful. Connected to \(self.url.absoluteString)")
         updateState(.authenticated)
@@ -354,7 +375,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             level: .debug,
             category: .websocket,
             title: "didOpen",
-            description: "Delegate callback: Socket physically open"
+            description: "Delegate callback: Socket physically open",
+            connectionID: connectionID,
+            attemptNumber: connectionAttempt
         )
         cancelSocketOpenTimeout()
         isSocketPhysicallyOpen = true
@@ -381,7 +404,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             level: closeCode == .normalClosure ? .info : .warning,
             category: .websocket,
             title: "Socket Closed",
-            description: "Code: \(closeCode.rawValue), Reason: \(reasonString)"
+            description: "Code: \(closeCode.rawValue), Reason: \(reasonString)",
+            connectionID: connectionID,
+            attemptNumber: connectionAttempt
         )
 
         isSocketPhysicallyOpen = false
@@ -451,7 +476,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             level: .error,
             category: .websocket,
             title: "Connection Timeout",
-            description: "Socket failed to open within 10s (\(elapsedMs)ms)"
+            description: "Socket failed to open within 10s (\(elapsedMs)ms)",
+            connectionID: connectionID,
+            attemptNumber: connectionAttempt
         )
         connectionOpenedContinuation?.resume(throwing: OpenClawError.connectionTimeout)
         connectionOpenedContinuation = nil
@@ -482,7 +509,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             level: .error,
             category: .handshake,
             title: "Challenge Timeout",
-            description: "Gateway did not send connect.challenge within 8s (\(elapsedMs)ms)"
+            description: "Gateway did not send connect.challenge within 8s (\(elapsedMs)ms)",
+            connectionID: connectionID,
+            attemptNumber: connectionAttempt
         )
         cleanupHandshake(error: OpenClawError.connectionTimeout)
         socket?.cancel(with: .abnormalClosure, reason: nil)
@@ -512,7 +541,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             level: .error,
             category: .authentication,
             title: "Authentication Timeout",
-            description: "Server did not acknowledge connect.response within 5s (\(elapsedMs)ms)"
+            description: "Server did not acknowledge connect.response within 5s (\(elapsedMs)ms)",
+            connectionID: connectionID,
+            attemptNumber: connectionAttempt
         )
         cleanupHandshake(error: OpenClawError.authTimeoutWithoutServerAck)
         socket?.cancel(with: .abnormalClosure, reason: nil)
@@ -539,7 +570,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     }
 
     func sendRequest(_ method: String, params: [String: AnyCodable] = [:]) async throws -> AnyCodable {
-        guard connectionState == .ready || connectionState == .authenticated else {
+        guard connectionState == .ready || connectionState == .authenticated || connectionState == .pairing || connectionState == .authenticating else {
             throw OpenClawError.connectionFailed("Not connected")
         }
         return try await sendRequestInternal(method, params: params)
@@ -547,10 +578,14 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
     func send(message: String) async {
         let currentState = connectionState
-        guard currentState == .authenticated || currentState == .ready else {
+
+        // Allow handshake-critical messages even before fully ready
+        let isHandshakeMessage = message.contains("\"method\":\"pair\"") || message.contains("\"event\":\"connect.response\"")
+
+        guard currentState == .authenticated || currentState == .ready || (isHandshakeMessage && isSocketPhysicallyOpen) else {
             pendingOutboundQueue.append(message)
             let count = pendingOutboundQueue.count
-            Logger.ws.warning("[send] Queued (state=\(String(describing: currentState)), depth=\(count))")
+            Logger.ws.warning("[send] Queued (state=\(String(describing: currentState)), depth=\(count), isHandshake=\(isHandshakeMessage))")
             return
         }
         await transmit(message)
@@ -574,6 +609,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 category: .websocket,
                 title: "Frame Outbound",
                 description: "Sending \(message.count) bytes",
+                connectionID: connectionID,
+                attemptNumber: connectionAttempt,
                 payload: message
             )
 
@@ -623,6 +660,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                     category: .websocket,
                     title: "Frame Inbound (Data)",
                     description: "Received \(data.count) bytes",
+                    connectionID: connectionID,
+                    attemptNumber: connectionAttempt,
                     payload: text
                 )
                 await handleIncomingData(data)
@@ -632,6 +671,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                     category: .websocket,
                     title: "Frame Inbound (String)",
                     description: "Received \(text.count) characters",
+                    connectionID: connectionID,
+                    attemptNumber: connectionAttempt,
                     payload: text
                 )
                 if let data = text.data(using: .utf8) {
@@ -655,6 +696,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             category: .network,
             title: "Connection Failure",
             description: errorMsg,
+            connectionID: connectionID,
+            attemptNumber: connectionAttempt,
             error: error
         )
 
@@ -712,7 +755,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 level: .info,
                 category: .gateway,
                 title: "Scheduling Reconnection",
-                description: "Attempt \(attempt + 1) in \(Int(delay))s"
+                description: "Attempt \(attempt + 1) in \(Int(delay))s",
+                connectionID: connectionID,
+                attemptNumber: attempt
             )
             await updateState(.connecting)
 
@@ -751,8 +796,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
         // Standard JSON-RPC and Event processing
         if let response = try? JSONDecoder().decode(OpenClawRPCResponse.self, from: data), let id = response.id {
-            // First non-handshake message can advance state from challenged to connected
-            if connectionState == .challenged {
+            // First non-handshake message or ANY message during authenticating state advances state
+            if connectionState == .challenged || connectionState == .authenticating {
                 cancelAuthTimeout()
                 handshakeContinuation?.resume()
                 handshakeContinuation = nil
@@ -768,6 +813,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                     category: .handshake,
                     title: "Response Validation Failed",
                     description: error.localizedDescription,
+                    connectionID: connectionID,
+                    attemptNumber: connectionAttempt,
                     error: error
                 )
             }
@@ -790,8 +837,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
         // Try decoding as Event
         if let event = try? JSONDecoder().decode(OpenClawEvent.self, from: data) {
-            // First non-handshake message can advance state from challenged to connected
-            if connectionState == .challenged {
+            // First non-handshake message or ANY message during authenticating state advances state
+            if connectionState == .challenged || connectionState == .authenticating {
                 cancelAuthTimeout()
                 handshakeContinuation?.resume()
                 handshakeContinuation = nil
@@ -813,7 +860,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             level: .info,
             category: .pairing,
             title: "Pairing Started",
-            description: "Sending pairing request to gateway"
+            description: "Sending pairing request to gateway",
+            connectionID: connectionID,
+            attemptNumber: connectionAttempt
         )
 
         let params: [String: AnyCodable] = [
@@ -827,7 +876,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 level: .info,
                 category: .pairing,
                 title: "Pairing Approved",
-                description: "Gateway accepted pairing request"
+                description: "Gateway accepted pairing request",
+                connectionID: connectionID,
+                attemptNumber: connectionAttempt
             )
             if let dict = result.value as? [String: Any], let token = dict["token"] as? String {
                 self.cachedToken = token
@@ -836,12 +887,16 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                     level: .debug,
                     category: .pairing,
                     title: "Token Persisted",
-                    description: "New auth token saved to Keychain"
+                    description: "New auth token saved to Keychain",
+                    connectionID: connectionID,
+                    attemptNumber: connectionAttempt
                 )
             }
 
             // After successful pairing, immediately attempt handshake response with the new token
             if let nonce = self.currentNonce {
+                updateState(.authenticating)
+                startAuthTimeout()
                 await sendHandshakeResponse(nonce: nonce, signature: self.cachedToken ?? "")
             } else {
                 // If we don't have a nonce, we might need to wait for one or restart
@@ -855,6 +910,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 category: .pairing,
                 title: "Pairing Failed",
                 description: error.localizedDescription,
+                connectionID: connectionID,
+                attemptNumber: connectionAttempt,
                 error: error
             )
             updateState(.failed(.pairingDenied))
@@ -864,7 +921,6 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
     private func handleChallenge(_ rawMessage: String) async {
         Logger.ws.debug("[handleChallenge] Raw challenge: \(rawMessage)")
-        startAuthTimeout()
 
         guard let data = rawMessage.data(using: .utf8) else {
             Logger.ws.error("[handleChallenge] Failed to encode challenge string to UTF-8 data")
@@ -884,6 +940,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 category: .handshake,
                 title: "connect.challenge Received",
                 description: "Nonce: \(nonce)",
+                connectionID: connectionID,
+                attemptNumber: connectionAttempt,
                 payload: rawMessage
             )
 
@@ -897,14 +955,19 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                     level: .warning,
                     category: .authentication,
                     title: "Token Missing",
-                    description: "No stored token found for this device. Pairing required."
+                    description: "No stored token found for this device. Pairing required.",
+                    connectionID: connectionID,
+                    attemptNumber: connectionAttempt
                 )
+                cancelAuthTimeout()
                 updateState(.pairing)
                 return
             }
             cachedToken = signature
 
             // Send response immediately
+            updateState(.authenticating)
+            startAuthTimeout()
             await sendHandshakeResponse(nonce: nonce, signature: signature)
 
         } catch {
@@ -934,6 +997,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 category: .handshake,
                 title: "Sending connect.response",
                 description: "Responding to challenge with signed nonce",
+                connectionID: connectionID,
+                attemptNumber: connectionAttempt,
                 payload: jsonString
             )
 
@@ -961,6 +1026,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 category: .gateway,
                 title: "RPC Validation Failed",
                 description: "Method: \(method)",
+                connectionID: connectionID,
+                attemptNumber: connectionAttempt,
                 error: error
             )
             throw error
@@ -974,6 +1041,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             category: .gateway,
             title: "RPC Outbound",
             description: "Method: \(method), ID: \(request.id)",
+            connectionID: connectionID,
+            attemptNumber: connectionAttempt,
             payload: text
         )
 
@@ -1006,7 +1075,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 level: .error,
                 category: .gateway,
                 title: "RPC Timeout",
-                description: "Request ID: \(id)"
+                description: "Request ID: \(id)",
+                connectionID: connectionID,
+                attemptNumber: connectionAttempt
             )
             logger.error("RPC request timed out: \(id)")
             continuation.resume(throwing: OpenClawError.requestTimeout)

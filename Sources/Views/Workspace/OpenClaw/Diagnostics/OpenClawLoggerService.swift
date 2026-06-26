@@ -40,6 +40,14 @@ public struct OpenClawLogEntry: Identifiable, Codable {
     public let pairingState: String
     public let sessionState: String
 
+    // Protocol Metadata
+    public let connectionID: String?
+    public let sessionID: String?
+    public let attemptNumber: Int?
+    public let gatewayAddress: String?
+    public let serviceName: String?
+    public let protocolVersion: String?
+
     public let payload: String?
     public let errorDetails: String?
     public let metadata: [String: String]?
@@ -53,6 +61,12 @@ public struct OpenClawLogEntry: Identifiable, Codable {
         authState: String = "N/A",
         pairingState: String = "N/A",
         sessionState: String = "N/A",
+        connectionID: String? = nil,
+        sessionID: String? = nil,
+        attemptNumber: Int? = nil,
+        gatewayAddress: String? = nil,
+        serviceName: String? = nil,
+        protocolVersion: String? = nil,
         payload: String? = nil,
         error: Error? = nil,
         metadata: [String: String]? = nil
@@ -67,6 +81,14 @@ public struct OpenClawLogEntry: Identifiable, Codable {
         self.authState = authState
         self.pairingState = pairingState
         self.sessionState = sessionState
+
+        self.connectionID = connectionID
+        self.sessionID = sessionID
+        self.attemptNumber = attemptNumber
+        self.gatewayAddress = gatewayAddress
+        self.serviceName = serviceName
+        self.protocolVersion = protocolVersion
+
         self.payload = payload
 
         if let error = error {
@@ -143,6 +165,9 @@ public final class OpenClawLoggerService {
         category: OpenClawLogCategory = .general,
         title: String,
         description: String = "",
+        connectionID: String? = nil,
+        sessionID: String? = nil,
+        attemptNumber: Int? = nil,
         payload: String? = nil,
         error: Error? = nil,
         metadata: [String: String]? = nil
@@ -196,6 +221,12 @@ public final class OpenClawLoggerService {
                 authState: authStateStr,
                 pairingState: pairingStateStr,
                 sessionState: sessionStateStr,
+                connectionID: connectionID,
+                sessionID: sessionID,
+                attemptNumber: attemptNumber,
+                gatewayAddress: self.gatewayAddress,
+                serviceName: self.connectedServiceName,
+                protocolVersion: self.protocolVersion,
                 payload: payload,
                 error: error,
                 metadata: metadata
@@ -224,7 +255,6 @@ public final class OpenClawLoggerService {
             warningCount += 1
         }
 
-        // Fixed case-sensitivity bug from review
         let titleLower = entry.title.lowercased()
         if entry.category == .handshake && titleLower.contains("successful") {
             lastHandshakeTime = entry.timestamp
@@ -256,10 +286,16 @@ public final class OpenClawLoggerService {
         return logs.map { entry in
             let ts = formatter.string(from: entry.timestamp)
             var text = "[\(ts)] [\(entry.level.rawValue)] [\(entry.category.rawValue)] \(entry.title)"
+            if let cid = entry.connectionID { text += " [Conn: \(cid)]" }
+            if let sid = entry.sessionID { text += " [Sess: \(sid)]" }
+            if let att = entry.attemptNumber { text += " [Attempt: \(att)]" }
+
             if !entry.description.isEmpty {
                 text += "\nDescription: \(entry.description)"
             }
             text += "\nStates: Conn=\(entry.connectionState), Auth=\(entry.authState), Pair=\(entry.pairingState), Session=\(entry.sessionState)"
+            text += "\nContext: Gateway=\(entry.gatewayAddress ?? "None"), Service=\(entry.serviceName ?? "None"), Protocol=\(entry.protocolVersion ?? "None")"
+
             if let payload = entry.payload {
                 text += "\nPayload: \(payload)"
             }
