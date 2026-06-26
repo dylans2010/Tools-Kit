@@ -6,7 +6,7 @@ final class OpenClawService {
     static let shared = OpenClawService()
 
     var currentConnection: OpenClawGatewayConnection?
-    var connectionState: ConnectionState = .idle
+    var connectionState: OpenClawConnectionState = .idle
 
     private var stateObservationTask: Task<Void, Never>?
     private let registry = OpenClawDeviceRegistry.shared

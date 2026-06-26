@@ -112,7 +112,7 @@ public final class OpenClawLoggerService {
 
     private init() {}
 
-    public func deriveAuthState(from state: ConnectionState) -> String {
+    public func deriveAuthState(from state: OpenClawConnectionState) -> String {
         switch state {
         case .authenticating: return "Authenticating"
         case .authenticated, .ready: return "Authenticated"
@@ -121,7 +121,7 @@ public final class OpenClawLoggerService {
         }
     }
 
-    public func derivePairingState(from state: ConnectionState) -> String {
+    public func derivePairingState(from state: OpenClawConnectionState) -> String {
         switch state {
         case .pairing: return "Required"
         case .failed(let reason): if reason == .pairingDenied { return "Denied" } else { return "Unknown" }
@@ -129,7 +129,7 @@ public final class OpenClawLoggerService {
         }
     }
 
-    public func deriveSessionState(from state: ConnectionState) -> String {
+    public func deriveSessionState(from state: OpenClawConnectionState) -> String {
         switch state {
         case .ready: return "Ready"
         case .authenticated: return "Established"

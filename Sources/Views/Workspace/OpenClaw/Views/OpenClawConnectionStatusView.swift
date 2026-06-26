@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OpenClawConnectionStatusView: View {
-    let state: ConnectionState
+    let state: OpenClawConnectionState
 
     private var color: Color {
         switch state {

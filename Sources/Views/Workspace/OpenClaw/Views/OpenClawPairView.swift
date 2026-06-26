@@ -195,7 +195,7 @@ struct OpenClawPairView: View {
         }
     }
 
-    private func isPhaseAtLeast(_ phase: ConnectionPhase) -> Bool {
+    private func isPhaseAtLeast(_ phase: OpenClawConnectionPhase) -> Bool {
         let currentPhase = OpenClawService.shared.connectionState.phase
         return currentPhase >= phase
     }
