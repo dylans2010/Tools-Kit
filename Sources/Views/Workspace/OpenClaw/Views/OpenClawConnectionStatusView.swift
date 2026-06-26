@@ -5,23 +5,33 @@ struct OpenClawConnectionStatusView: View {
 
     private var color: Color {
         switch state {
-        case .idle: return .secondary
-        case .connecting, .socketConnected, .waitingChallenge, .authenticating, .reconnecting: return .orange
-        case .connected: return .green
-        case .failed: return .red
+        case .idle, .disconnected:
+            return .secondary
+        case .discovering, .gatewaySelected, .resolvingAuthentication, .pairing, .connecting, .socketConnected, .waitingForChallenge, .authenticating, .authenticated, .disconnecting:
+            return .orange
+        case .ready:
+            return .green
+        case .failed:
+            return .red
         }
     }
 
     private var statusText: String {
         switch state {
-        case .idle: return "Disconnected"
+        case .idle: return "Idle"
+        case .discovering: return "Discovering"
+        case .gatewaySelected: return "Gateway Selected"
+        case .resolvingAuthentication: return "Resolving Auth"
+        case .pairing: return "Pairing"
         case .connecting: return "Connecting"
         case .socketConnected: return "Socket Connected"
-        case .waitingChallenge: return "Waiting Challenge"
+        case .waitingForChallenge: return "Waiting Challenge"
         case .authenticating: return "Authenticating"
-        case .connected: return "Connected"
+        case .authenticated: return "Authenticated"
+        case .ready: return "Connected"
+        case .disconnecting: return "Disconnecting"
+        case .disconnected: return "Disconnected"
         case .failed(let reason): return "Failed: \(String(describing: reason))"
-        case .reconnecting(let attempt): return "Reconnecting (Attempt \(attempt + 1))"
         }
     }
 
