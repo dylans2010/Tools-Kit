@@ -26,6 +26,18 @@ final class OpenClawService {
             return
         }
 
+        if let existing = currentConnection {
+            let state = await existing.getState()
+            if state != .idle {
+                if case .failed = state {
+                    // Allow retry if failed
+                } else {
+                    diagnostics.log("Already connecting or connected to \(device.name)")
+                    return
+                }
+            }
+        }
+
         let connection = OpenClawGatewayConnection(url: url, deviceID: device.id)
         self.currentConnection = connection
 
@@ -59,6 +71,13 @@ final class OpenClawService {
         self.currentConnection = nil
         self.connectionState = .idle
         diagnostics.log("Disconnected")
+    }
+
+    func pair() async throws {
+        guard let connection = currentConnection else {
+            throw OpenClawError.connectionFailed("No active connection")
+        }
+        try await connection.pair()
     }
 
     func sendRPC(_ method: String, params: [String: AnyCodable] = [:]) async throws -> AnyCodable {

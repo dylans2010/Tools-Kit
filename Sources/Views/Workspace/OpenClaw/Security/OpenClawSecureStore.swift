@@ -17,8 +17,16 @@ final class OpenClawSecureStore {
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
         ]
 
-        SecItemDelete(query as CFDictionary)
-        SecItemAdd(query as CFDictionary, nil)
+        Task { @MainActor in
+            OpenClawDiagnosticsManager.shared.log("Keychain save query for \(deviceID)", type: .info)
+        }
+
+        let deleteStatus = SecItemDelete(query as CFDictionary)
+        let addStatus = SecItemAdd(query as CFDictionary, nil)
+
+        Task { @MainActor in
+            OpenClawDiagnosticsManager.shared.log("Keychain save status: \(addStatus) (delete: \(deleteStatus))", type: .info)
+        }
     }
 
     func getToken(for deviceID: String) -> String? {
@@ -30,11 +38,21 @@ final class OpenClawSecureStore {
             kSecMatchLimit as String: kSecMatchLimitOne
         ]
 
+        Task { @MainActor in
+            OpenClawDiagnosticsManager.shared.log("Keychain query for \(deviceID)", type: .info)
+        }
+
         var result: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
 
         if status == errSecSuccess, let data = result as? Data {
+            Task { @MainActor in
+                OpenClawDiagnosticsManager.shared.log("Token found. Length: \(data.count)", type: .info)
+            }
             return String(data: data, encoding: .utf8)
+        }
+        Task { @MainActor in
+            OpenClawDiagnosticsManager.shared.log("Token missing. Status: \(status)", type: .info)
         }
         return nil
     }
@@ -45,6 +63,9 @@ final class OpenClawSecureStore {
             kSecAttrService as String: service,
             kSecAttrAccount as String: deviceID
         ]
-        SecItemDelete(query as CFDictionary)
+        let status = SecItemDelete(query as CFDictionary)
+        Task { @MainActor in
+            OpenClawDiagnosticsManager.shared.log("Keychain delete status for \(deviceID): \(status)", type: .info)
+        }
     }
 }
