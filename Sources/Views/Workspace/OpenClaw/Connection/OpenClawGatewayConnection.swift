@@ -499,7 +499,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         let isTerminal: Bool
         if let clawError = error as? OpenClawError {
             switch clawError {
-            case .invalidAuthMethodReuse, .missingChallengeNonce, .protocolMismatchDetected, .unsupportedVersion:
+            case .invalidAuthMethodReuse, .missingChallengeNonce, .protocolMismatchDetected(_):
                 isTerminal = true
             default:
                 isTerminal = false
