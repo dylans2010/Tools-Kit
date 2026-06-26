@@ -137,11 +137,11 @@ struct OpenClawPairView: View {
                 .font(.headline)
 
             VStack(spacing: 8) {
-                protocolProgressRow(label: "Connecting to Host", active: isStateAtLeast(.connecting))
-                protocolProgressRow(label: "Socket Opened", active: isStateAtLeast(.socketConnected))
-                protocolProgressRow(label: "Handshake Initiated", active: isStateAtLeast(.waitingChallenge))
-                protocolProgressRow(label: "Authenticating", active: isStateAtLeast(.authenticating))
-                protocolProgressRow(label: "Pairing Securely", active: isStateAtLeast(.connected))
+                protocolProgressRow(label: "Connecting to Host", active: isPhaseAtLeast(.connecting))
+                protocolProgressRow(label: "Socket Opened", active: isPhaseAtLeast(.socketConnected))
+                protocolProgressRow(label: "Handshake Initiated", active: isPhaseAtLeast(.waitingChallenge))
+                protocolProgressRow(label: "Authenticating", active: isPhaseAtLeast(.authenticating))
+                protocolProgressRow(label: "Pairing Securely", active: isPhaseAtLeast(.connected))
             }
             .padding()
             .background(Color.secondary.opacity(0.1))
@@ -177,22 +177,9 @@ struct OpenClawPairView: View {
         }
     }
 
-    private func isStateAtLeast(_ state: ConnectionState) -> Bool {
-        let currentState = OpenClawService.shared.connectionState
-        switch (state, currentState) {
-        case (.connecting, .connecting), (.connecting, .socketConnected), (.connecting, .waitingChallenge), (.connecting, .authenticating), (.connecting, .connected):
-            return true
-        case (.socketConnected, .socketConnected), (.socketConnected, .waitingChallenge), (.socketConnected, .authenticating), (.socketConnected, .connected):
-            return true
-        case (.waitingChallenge, .waitingChallenge), (.waitingChallenge, .authenticating), (.waitingChallenge, .connected):
-            return true
-        case (.authenticating, .authenticating), (.authenticating, .connected):
-            return true
-        case (.connected, .connected):
-            return true
-        default:
-            return false
-        }
+    private func isPhaseAtLeast(_ phase: ConnectionPhase) -> Bool {
+        let currentPhase = OpenClawService.shared.connectionState.phase
+        return currentPhase >= phase
     }
 
     private var successStep: some View {
