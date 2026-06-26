@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OpenClawMainView: View {
-    @StateObject private var viewModel = OpenClawMainViewModel()
+    @State private var viewModel = OpenClawMainViewModel()
     @State private var showingPair = false
     @State private var showingSettings = false
 

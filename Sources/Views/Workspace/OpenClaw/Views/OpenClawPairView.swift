@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct OpenClawPairView: View {
-    @StateObject private var viewModel = OpenClawPairingViewModel()
+    @State private var viewModel = OpenClawPairingViewModel()
     @Environment(\.dismiss) private var dismiss
-    @ObservedObject private var diagnostics = OpenClawDiagnosticsManager.shared
+    private var diagnostics = OpenClawDiagnosticsManager.shared
 
     var body: some View {
         NavigationStack {

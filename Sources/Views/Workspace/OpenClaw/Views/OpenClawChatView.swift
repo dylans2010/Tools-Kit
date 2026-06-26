@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OpenClawChatView: View {
-    @StateObject private var viewModel = OpenClawChatViewModel()
+    @State private var viewModel = OpenClawChatViewModel()
 
     var body: some View {
         VStack {

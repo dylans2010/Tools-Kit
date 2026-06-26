@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OpenClawLogsView: View {
-    @StateObject private var diagnostics = OpenClawDiagnosticsManager.shared
+    private var diagnostics = OpenClawDiagnosticsManager.shared
 
     var body: some View {
         ScrollView {

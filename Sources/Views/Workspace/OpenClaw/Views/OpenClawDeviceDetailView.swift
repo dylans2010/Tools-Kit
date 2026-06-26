@@ -2,7 +2,7 @@ import SwiftUI
 
 struct OpenClawDeviceDetailView: View {
     let device: OpenClawDevice
-    @StateObject private var registry = OpenClawDeviceRegistry.shared
+    private var registry = OpenClawDeviceRegistry.shared
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {

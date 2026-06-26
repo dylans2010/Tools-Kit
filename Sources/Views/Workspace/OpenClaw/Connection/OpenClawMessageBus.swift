@@ -1,17 +1,28 @@
 import Foundation
-import Combine
+import Observation
 
-final class OpenClawMessageBus: ObservableObject {
+@MainActor @Observable
+final class OpenClawMessageBus {
     static let shared = OpenClawMessageBus()
 
-    private let eventSubject = PassthroughSubject<OpenClawEvent, Never>()
-    var events: AnyPublisher<OpenClawEvent, Never> {
-        eventSubject.eraseToAnyPublisher()
+    private var continuations: [UUID: AsyncStream<OpenClawEvent>.Continuation] = [:]
+
+    func events() -> AsyncStream<OpenClawEvent> {
+        AsyncStream { continuation in
+            let id = UUID()
+            self.continuations[id] = continuation
+            continuation.onTermination = { [weak self] _ in
+                Task { @MainActor in
+                    self?.continuations.removeValue(forKey: id)
+                }
+            }
+        }
     }
 
+    @MainActor
     func publish(_ event: OpenClawEvent) {
-        DispatchQueue.main.async {
-            self.eventSubject.send(event)
+        for continuation in continuations.values {
+            continuation.yield(event)
         }
     }
 }

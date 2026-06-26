@@ -1,5 +1,5 @@
 import Foundation
-import Combine
+import Observation
 
 struct OpenClawAgentMessage: Identifiable {
     let id = UUID()
@@ -8,21 +8,22 @@ struct OpenClawAgentMessage: Identifiable {
     let timestamp: Date
 }
 
-@MainActor
-final class OpenClawAgentService: ObservableObject {
-    @Published var messages: [OpenClawAgentMessage] = []
-    @Published var isStreaming = false
+@MainActor @Observable
+final class OpenClawAgentService {
+    var messages: [OpenClawAgentMessage] = []
+    var isStreaming = false
 
-    private var cancellables = Set<AnyCancellable>()
+    private var eventObservationTask: Task<Void, Never>?
     private var currentRunID: String?
 
     init() {
-        OpenClawMessageBus.shared.events
-            .filter { $0.event == "agent.stream" }
-            .sink { [weak self] event in
-                self?.handleStreamEvent(event)
+        eventObservationTask = Task { [weak self] in
+            for await event in OpenClawMessageBus.shared.events() {
+                if event.event == "agent.stream" {
+                    self?.handleStreamEvent(event)
+                }
             }
-            .store(in: &cancellables)
+        }
     }
 
     func sendMessage(_ text: String) async {
@@ -54,11 +55,9 @@ final class OpenClawAgentService: ObservableObject {
               let runID = payload["run_id"] as? String,
               runID == currentRunID else { return }
 
-        DispatchQueue.main.async {
-            self.appendTokenToLastMessage(token)
-            if let isFinal = payload["is_final"] as? Bool, isFinal {
-                self.isStreaming = false
-            }
+        self.appendTokenToLastMessage(token)
+        if let isFinal = payload["is_final"] as? Bool, isFinal {
+            self.isStreaming = false
         }
     }
 

@@ -1,8 +1,9 @@
 import SwiftUI
+import Observation
 
-@MainActor
-final class OpenClawChatViewModel: ObservableObject {
-    @Published var inputText: String = ""
+@MainActor @Observable
+final class OpenClawChatViewModel {
+    var inputText: String = ""
     private let agentService = OpenClawAgentService()
 
     var messages: [OpenClawAgentMessage] { agentService.messages }

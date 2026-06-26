@@ -1,45 +1,44 @@
 import SwiftUI
-import Combine
+import Observation
 
-@MainActor
-final class OpenClawMainViewModel: ObservableObject {
-    @Published var connectionStatus: String = "Disconnected"
-    @Published var activeDeviceName: String = "None"
-    @Published var latency: String = "-- ms"
-    @Published var isConnecting: Bool = false
-    @Published var lastError: String?
+@MainActor @Observable
+final class OpenClawMainViewModel {
+    var connectionStatus: String = "Disconnected"
+    var activeDeviceName: String = "None"
+    var latency: String = "-- ms"
+    var isConnecting: Bool = false
+    var lastError: String?
 
     private let service = OpenClawService.shared
     private let registry = OpenClawDeviceRegistry.shared
     private let diagnostics = OpenClawDiagnosticsManager.shared
-    private var cancellables = Set<AnyCancellable>()
 
     init() {
-        service.$connectionState
-            .receive(on: RunLoop.main)
-            .sink { [weak self] state in
-                self?.updateStatus(state)
-            }
-            .store(in: &cancellables)
+        // SwiftUI's @Observable handles data flow, but we update our derived properties
+        observeChanges()
+    }
 
-        registry.$activeDeviceID
-            .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.activeDeviceName = self?.registry.activeDevice?.name ?? "None"
+    private func observeChanges() {
+        withObservationTracking {
+            updateStatus(service.connectionState)
+            activeDeviceName = registry.activeDevice?.name ?? "None"
+            if let latencyMetric = diagnostics.metrics.last(where: { $0.name == "latency" }) {
+                latency = latencyMetric.value
             }
-            .store(in: &cancellables)
-
-        diagnostics.$metrics
-            .compactMap { $0.last(where: { $0.name == "latency" }) }
-            .receive(on: RunLoop.main)
-            .sink { [weak self] metric in
-                self?.latency = metric.value
+        } onChange: {
+            Task { @MainActor in
+                self.observeChanges()
             }
-            .store(in: &cancellables)
+        }
     }
 
     private func updateStatus(_ state: ConnectionState) {
-        isConnecting = (state == .connecting || state == .socketConnected || state == .authenticating || state == .waitingChallenge)
+        isConnecting = ( {
+            switch state {
+            case .connecting, .socketConnected, .waitingChallenge, .authenticating, .reconnecting: return true
+            default: return false
+            }
+        }() )
 
         switch state {
         case .idle:
@@ -56,9 +55,11 @@ final class OpenClawMainViewModel: ObservableObject {
         case .connected:
             connectionStatus = "Connected"
             lastError = nil
-        case .failed(let error):
+        case .failed(let reason):
             connectionStatus = "Error"
-            lastError = error
+            lastError = String(describing: reason)
+        case .reconnecting(let attempt):
+            connectionStatus = "Reconnecting (Attempt \(attempt + 1))..."
         }
     }
 

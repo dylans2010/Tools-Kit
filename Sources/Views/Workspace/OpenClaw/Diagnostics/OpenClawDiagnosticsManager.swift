@@ -1,5 +1,8 @@
 import Foundation
-import Combine
+import Observation
+import OSLog
+
+private let logger = Logger(subsystem: "com.toolskit.openclaw", category: "diagnostics")
 
 struct OpenClawMetric: Identifiable {
     let id = UUID()
@@ -15,28 +18,33 @@ enum OpenClawDiagnosticType: String {
     case protocolMsg = "PROTOCOL"
 }
 
-final class OpenClawDiagnosticsManager: ObservableObject {
+@Observable
+final class OpenClawDiagnosticsManager {
     static let shared = OpenClawDiagnosticsManager()
 
-    @Published var metrics: [OpenClawMetric] = []
-    @Published var logs: [String] = []
+    var metrics: [OpenClawMetric] = []
+    var logs: [String] = []
 
+    @MainActor
     func log(_ message: String, type: OpenClawDiagnosticType = .info) {
         #if DEBUG
         let timestamp = ISO8601DateFormatter().string(from: Date())
         let formatted = "[\(timestamp)] [\(type.rawValue)] \(message)"
-        DispatchQueue.main.async {
-            self.logs.append(formatted)
-            if self.logs.count > 1000 { self.logs.removeFirst() }
+        self.logs.append(formatted)
+        if self.logs.count > 1000 { self.logs.removeFirst() }
+
+        switch type {
+        case .info: logger.info("\(message)")
+        case .error: logger.error("\(message)")
+        case .network: logger.debug("[NETWORK] \(message)")
+        case .protocolMsg: logger.debug("[PROTOCOL] \(message)")
         }
-        print(formatted)
         #endif
     }
 
+    @MainActor
     func recordMetric(name: String, value: String) {
-        DispatchQueue.main.async {
-            self.metrics.append(OpenClawMetric(name: name, value: value, timestamp: Date()))
-            if self.metrics.count > 100 { self.metrics.removeFirst() }
-        }
+        self.metrics.append(OpenClawMetric(name: name, value: value, timestamp: Date()))
+        if self.metrics.count > 100 { self.metrics.removeFirst() }
     }
 }

@@ -1,15 +1,16 @@
 import SwiftUI
+import Observation
 
-@MainActor
-final class OpenClawLogViewModel: ObservableObject {
-    @Published var logs: [String] = []
+@MainActor @Observable
+final class OpenClawLogViewModel {
+    var logs: [String] {
+        OpenClawDiagnosticsManager.shared.logs
+    }
 
     init() {
-        // Observe OpenClawDiagnosticsManager logs
     }
 
     func clear() {
         OpenClawDiagnosticsManager.shared.logs.removeAll()
-        logs = []
     }
 }

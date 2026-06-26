@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const bonjour = require('bonjour')();
+const os = require('os');
 
 const app = express();
 const server = http.createServer(app);
@@ -9,8 +10,27 @@ const wss = new WebSocket.Server({ server });
 
 const PORT = process.env.PORT || 3000;
 
-// Bonjour Advertisement
-bonjour.publish({ name: 'OpenClaw Bridge', type: 'openclaw-gw', port: PORT });
+// Unique service name construction (Feature E.2)
+const serviceName = `OpenClaw-${os.hostname()}-${process.pid}`;
+
+// Deregister any existing before register
+bonjour.unpublishAll(() => {
+    console.log('Unpublished existing services');
+    // Bonjour Advertisement
+    bonjour.publish({ name: serviceName, type: 'openclaw-gw', port: PORT });
+});
+
+process.on('SIGTERM', () => {
+    bonjour.unpublishAll(() => {
+        process.exit();
+    });
+});
+
+process.on('SIGINT', () => {
+    bonjour.unpublishAll(() => {
+        process.exit();
+    });
+});
 
 wss.on('connection', (ws) => {
     console.log('Client connected to bridge');
