@@ -6,9 +6,9 @@ struct BonjourPairingStrategy: OpenClawPairingStrategy {
     let service: OpenClawDiscoveredService
 
     func pair() async throws -> OpenClawDevice {
-        OpenClawDiagnosticsManager.shared.log("Bonjour pairing started for: \(service.name)", type: .info)
+        await OpenClawDiagnosticsManager.shared.log("Bonjour pairing started for: \(service.name)", type: .info)
         guard let url = service.url else {
-            OpenClawDiagnosticsManager.shared.log("Failed to construct URL for service: \(service.name)", type: .error)
+            await await OpenClawDiagnosticsManager.shared.log("Failed to construct URL for service: \(service.name)", type: .error)
             throw OpenClawError.unreachableHost
         }
 
