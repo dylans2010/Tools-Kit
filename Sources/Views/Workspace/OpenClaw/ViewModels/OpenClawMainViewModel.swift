@@ -35,7 +35,7 @@ final class OpenClawMainViewModel {
     private func updateStatus(_ state: ConnectionState) {
         isConnecting = ( {
             switch state {
-            case .discovering, .gatewaySelected, .resolvingAuthentication, .pairing, .connecting, .socketConnected, .waitingForChallenge, .authenticating: return true
+            case .discovering, .gatewaySelected, .resolvingAuthentication, .pairing, .connecting, .socketConnected, .waitingForChallenge, .challenged, .authenticating: return true
             default: return false
             }
         }() )
@@ -58,6 +58,8 @@ final class OpenClawMainViewModel {
             connectionStatus = "Socket Connected..."
         case .waitingForChallenge:
             connectionStatus = "Waiting for challenge..."
+        case .challenged:
+            connectionStatus = "Challenge received..."
         case .authenticating:
             connectionStatus = "Authenticating..."
         case .authenticated, .ready:

@@ -7,7 +7,7 @@ struct OpenClawConnectionStatusView: View {
         switch state {
         case .idle, .disconnected:
             return .secondary
-        case .discovering, .gatewaySelected, .resolvingAuthentication, .pairing, .connecting, .socketConnected, .waitingForChallenge, .authenticating, .authenticated, .disconnecting:
+        case .discovering, .gatewaySelected, .resolvingAuthentication, .pairing, .connecting, .socketConnected, .waitingForChallenge, .challenged, .authenticating, .authenticated, .disconnecting:
             return .orange
         case .ready:
             return .green
@@ -26,6 +26,7 @@ struct OpenClawConnectionStatusView: View {
         case .connecting: return "Connecting"
         case .socketConnected: return "Socket Connected"
         case .waitingForChallenge: return "Waiting Challenge"
+        case .challenged: return "Challenge Received"
         case .authenticating: return "Authenticating"
         case .authenticated: return "Authenticated"
         case .ready: return "Connected"
