@@ -76,6 +76,29 @@ struct OpenClawEvent: Codable {
     let payload: AnyCodable
 }
 
+// MARK: - Handshake Models
+
+struct OpenClawChallengeMessage: Decodable {
+    let type: String
+    let event: String
+    let payload: Payload
+
+    struct Payload: Decodable {
+        let nonce: String
+    }
+}
+
+struct OpenClawResponseMessage: Encodable {
+    let type: String = "event"
+    let event: String = "connect.response"
+    let payload: Payload
+
+    struct Payload: Encodable {
+        let nonce: String
+        let signature: String
+    }
+}
+
 /// Represents an outbound event frame for gateway handshakes.
 struct OpenClawOutboundEvent: Codable {
     let event: String
