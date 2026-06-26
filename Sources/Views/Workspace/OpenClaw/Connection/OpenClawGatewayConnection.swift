@@ -1,6 +1,7 @@
 import Foundation
 import UIKit
 import OSLog
+import CryptoKit
 
 private let logger = Logger(subsystem: "com.toolskit.openclaw", category: "handshake")
 
@@ -274,22 +275,12 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             self.handshakeContinuation = continuation
 
-            // OpenClaw Protocol: The first client frame must be a 'connect' request, but
-            // some gateways optimistically send connect.challenge immediately after didOpen.
-            // Enter waitingForChallenge before receive starts so that early challenges are
-            // handled instead of discarded as out-of-phase messages.
-            Task {
-                do {
-                    Task { @MainActor in
-                        OpenClawDiagnosticsManager.shared.log("Sending initial 'connect' request", type: .protocolMsg)
-                    }
-                    _ = try await self.sendRequestInternal("connect", params: [:])
-                } catch {
-                    Task { @MainActor in
-                        OpenClawDiagnosticsManager.shared.log("Initial 'connect' request failed: \(error.localizedDescription)", type: .error)
-                    }
-                    self.cleanupHandshake(error: error)
-                }
+            // The OpenClaw gateway initiates the application handshake by sending
+            // connect.challenge after the WebSocket transport is open. Do not send a
+            // JSON-RPC "connect" frame here: strict gateways treat any unexpected
+            // first client frame as an invalid handshake message and close with 1008.
+            Task { @MainActor in
+                OpenClawDiagnosticsManager.shared.log("Waiting for connect.challenge", type: .protocolMsg)
             }
         }
     }
@@ -816,31 +807,43 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     }
 
     private func sendChallengeResponse(nonce: String, token: String) async throws {
-        let payload: [String: Any] = [
+        guard socketIsOpen, socket != nil else {
+            logger.error("Refusing connect.response send while socket is not open. State: \(self.socketStateDescription)")
+            throw OpenClawError.socketClosedDuringAuth
+        }
+
+        let signature = makeChallengeSignature(nonce: nonce, token: token)
+        let payload: [String: String] = [
             "nonce": nonce,
-            "token": token,
-            "signature": token,
-            "device_id": deviceID,
-            "role": "operator",
-            "timestamp": authTimestamp ?? Int(Date().timeIntervalSince1970),
-            "metadata": [
-                "device_name": UIDevice.current.name,
-                "client_id": "com.toolskit.openclaw"
-            ]
+            "signature": signature
         ]
         let event = OpenClawOutboundEvent(event: "connect.response", payload: AnyCodable(payload))
         let data = try JSONEncoder().encode(event)
-        let text = String(data: data, encoding: .utf8) ?? "{}"
+        guard let text = String(data: data, encoding: .utf8) else {
+            throw OpenClawError.protocolError("Failed to UTF-8 encode connect.response")
+        }
+
+        logger.debug("Sending connect.response while socket state is \(self.socketStateDescription): \(text, privacy: .public)")
         Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("OPENCLAW OUTBOUND\nconnect.response nonce=\(nonce)", type: .protocolMsg)
+            OpenClawDiagnosticsManager.shared.log("OPENCLAW OUTBOUND\nstate=\(self.socketStateDescription)\n\(text)", type: .protocolMsg)
         }
         try await sendRawText(text)
+    }
+
+    private func makeChallengeSignature(nonce: String, token: String) -> String {
+        let key = SymmetricKey(data: Data(token.utf8))
+        let signature = HMAC<SHA256>.authenticationCode(for: Data(nonce.utf8), using: key)
+        return Data(signature).map { String(format: "%02hhx", $0) }.joined()
+    }
+
+    private var socketStateDescription: String {
+        "open=\(socketIsOpen), task=\(socket == nil ? "nil" : "present"), connection=\(_state)"
     }
 
     private func sendRawText(_ text: String) async throws {
         guard canSendOnActiveSocket else {
             queuedOutboundMessages.append(text)
-            logger.debug("Queued outbound WebSocket message until socket opens. Queue depth: \(self.queuedOutboundMessages.count)")
+            logger.debug("Queued outbound WebSocket message until socket opens. State: \(self.socketStateDescription). Queue depth: \(self.queuedOutboundMessages.count)")
             return
         }
 
@@ -848,6 +851,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             throw OpenClawError.connectionFailed("Socket is not connected")
         }
 
+        logger.debug("Sending raw WebSocket text while socket state is \(self.socketStateDescription): \(text, privacy: .public)")
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             socket.send(.string(text)) { error in
                 if let error = error {
