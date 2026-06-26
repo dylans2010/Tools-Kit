@@ -247,7 +247,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
              throw OpenClawError.connectionFailed("Session not initialized")
         }
 
-        Logger.ws.info("[connect] Initiating — url: \(self.url.absoluteString)")
+        let urlString = self.url.absoluteString
+        Logger.ws.info("[connect] Initiating — url: \(urlString)")
         Task { @MainActor in
             OpenClawDiagnosticsManager.shared.log("Initiating connection to \(url.absoluteString)", type: .network)
         }
@@ -502,9 +503,11 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     }
 
     func send(message: String) async {
-        guard connectionState == .authenticated || connectionState == .ready else {
+        let currentState = connectionState
+        guard currentState == .authenticated || currentState == .ready else {
             pendingOutboundQueue.append(message)
-            Logger.ws.warning("[send] Queued (state=\(String(describing: connectionState)), depth=\(pendingOutboundQueue.count))")
+            let count = pendingOutboundQueue.count
+            Logger.ws.warning("[send] Queued (state=\(String(describing: currentState)), depth=\(count))")
             return
         }
         await transmit(message)
@@ -513,13 +516,15 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     private func transmit(_ message: String) async {
         guard isSocketPhysicallyOpen, let socket = socket else {
             pendingOutboundQueue.append(message)
-            Logger.ws.warning("[transmit] Queued — isSocketPhysicallyOpen=false. depth=\(pendingOutboundQueue.count)")
+            let count = pendingOutboundQueue.count
+            Logger.ws.warning("[transmit] Queued — isSocketPhysicallyOpen=false. depth=\(count)")
             return
         }
 
         do {
+            let currentState = connectionState
             Logger.ws.debug("[transmit] SEND → \(message)")
-            Logger.ws.debug("[transmit] State at send: \(String(describing: self.connectionState))")
+            Logger.ws.debug("[transmit] State at send: \(String(describing: currentState))")
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
                 socket.send(.string(message)) { error in
                     if let error = error {
@@ -537,7 +542,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
     private func flushPendingQueue() async {
         guard isSocketPhysicallyOpen, !pendingOutboundQueue.isEmpty else { return }
-        Logger.ws.info("[flushPendingQueue] Flushing \(self.pendingOutboundQueue.count) queued message(s)")
+        let count = pendingOutboundQueue.count
+        Logger.ws.info("[flushPendingQueue] Flushing \(count) queued message(s)")
         let snapshot = pendingOutboundQueue
         pendingOutboundQueue.removeAll()
         for message in snapshot {
@@ -825,8 +831,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 return
             }
 
+            let currentState = connectionState
             Logger.ws.info("[sendHandshakeResponse] Sending connect.response: \(jsonString)")
-            Logger.ws.debug("[sendHandshakeResponse] State at send: \(String(describing: self.connectionState))")
+            Logger.ws.debug("[sendHandshakeResponse] State at send: \(String(describing: currentState))")
 
             // Direct transmit
             await transmit(jsonString)
