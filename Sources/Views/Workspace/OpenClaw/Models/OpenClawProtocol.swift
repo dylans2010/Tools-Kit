@@ -38,6 +38,15 @@ struct OpenClawRPCRequest: Codable {
             }
         }
 
+        if method == "pair" {
+            guard let params = params else {
+                throw OpenClawError.protocolMismatchDetected("Pairing requires parameters")
+            }
+            guard params["device_id"] != nil else {
+                throw OpenClawError.protocolMismatchDetected("Pairing requires device_id")
+            }
+        }
+
         if method == "authenticate" {
             guard let params = params else {
                 throw OpenClawError.protocolMismatchDetected("Authentication requires parameters")

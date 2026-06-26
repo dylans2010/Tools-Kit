@@ -17,11 +17,14 @@ enum OpenClawFailureReason: Equatable {
 
 enum ConnectionPhase: Int, Comparable {
     case idle = 0
-    case connecting = 1
-    case socketConnected = 2
-    case waitingChallenge = 3
-    case authenticating = 4
-    case connected = 5
+    case discovering = 1
+    case connecting = 2
+    case socketConnected = 3
+    case waitingChallenge = 4
+    case pairingRequired = 5
+    case authenticating = 6
+    case authenticated = 7
+    case ready = 8
 
     static func < (lhs: ConnectionPhase, rhs: ConnectionPhase) -> Bool {
         lhs.rawValue < rhs.rawValue
@@ -30,22 +33,28 @@ enum ConnectionPhase: Int, Comparable {
 
 enum ConnectionState: Equatable {
     case idle
+    case discovering
     case connecting
     case socketConnected
     case waitingChallenge
+    case pairingRequired
     case authenticating(nonce: String, timestamp: Int)
-    case connected
+    case authenticated
+    case ready
     case failed(OpenClawFailureReason)
     case reconnecting(attempt: Int)
 
     var phase: ConnectionPhase {
         switch self {
         case .idle: return .idle
+        case .discovering: return .discovering
         case .connecting: return .connecting
         case .socketConnected: return .socketConnected
         case .waitingChallenge: return .waitingChallenge
+        case .pairingRequired: return .pairingRequired
         case .authenticating: return .authenticating
-        case .connected: return .connected
+        case .authenticated: return .authenticated
+        case .ready: return .ready
         case .failed: return .idle
         case .reconnecting: return .connecting
         }
@@ -135,7 +144,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             isFailed = false
         }
 
-        guard currentState == .idle || isFailed else {
+        guard currentState == .idle || isFailed || currentState == .reconnecting else {
             logger.warning("connect() called in invalid state: \(String(describing: currentState))")
             throw OpenClawError.connectionFailed("Already connected or connecting")
         }
@@ -174,22 +183,13 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             OpenClawDiagnosticsManager.shared.log("Initiating connection to \(url.absoluteString)", type: .network)
         }
 
-        logger.debug("Starting token resolution")
+        // Token resolution is now non-fatal at this stage
         let token = OpenClawSecureStore.shared.getToken(for: deviceID)
-
-        if token == nil {
-            logger.error("Token resolution failed: nil")
-            updateState(.failed(.missingToken))
-            throw OpenClawError.authenticationFailed("Missing token")
+        if let token = token, !token.isEmpty {
+            logger.debug("Token resolved: valid (\(token.count) chars)")
+        } else {
+            logger.debug("Token missing or empty - will require pairing during handshake")
         }
-
-        guard let token = token, !token.isEmpty else {
-            logger.error("Token resolution failed: empty")
-            updateState(.failed(.emptyToken))
-            throw OpenClawError.authenticationFailed("Empty token")
-        }
-
-        logger.debug("Token resolved: valid (\(token.count) chars)")
 
         updateState(.connecting)
         logger.info("Connecting to host: \(self.url.host ?? "unknown"), port: \(self.url.port ?? 0)")
@@ -241,10 +241,10 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         }
 
         Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("Handshake successful, connection established", type: .info)
+            OpenClawDiagnosticsManager.shared.log("Handshake successful, session ready", type: .info)
         }
         logger.info("Handshake successful. Connected to \(self.url.absoluteString)")
-        updateState(.connected)
+        updateState(.ready)
         connectionAttempt = 0
         startHeartbeat()
     }
@@ -388,7 +388,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     }
 
     func sendRequest(_ method: String, params: [String: AnyCodable] = [:]) async throws -> AnyCodable {
-        guard _state == .connected else {
+        guard _state == .ready else {
             throw OpenClawError.connectionFailed("Not connected")
         }
         return try await sendRequestInternal(method, params: params)
@@ -437,6 +437,28 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         Task { @MainActor in
             OpenClawDiagnosticsManager.shared.log("Connection failure: \(errorMsg)", type: .error)
         }
+
+        // Determine if the error is terminal (auth related) or recoverable (network related)
+        let isTerminal: Bool
+        if let ocError = error as? OpenClawError {
+            switch ocError {
+            case .authenticationFailed, .challengeResponseRejected, .pairingDenied, .invalidAuthMethodReuse, .protocolMismatchDetected:
+                isTerminal = true
+            default:
+                isTerminal = false
+            }
+        } else {
+            isTerminal = false
+        }
+
+        if isTerminal {
+            updateState(.failed(.serverRejectedAuth))
+            cleanupHandshake(error: error)
+            cleanupAllPendingRequests(error: error)
+            logger.error("Terminal failure encountered. Stopping reconnection.")
+            return
+        }
+
         updateState(.failed(.socketError(errorMsg)))
         cleanupHandshake(error: error)
         cleanupAllPendingRequests(error: error)
@@ -496,19 +518,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
             if let continuation = pendingRequests.removeValue(forKey: id) {
                 if let error = response.error {
-                    if case .authenticating = _state {
-                        cancelAuthTimeout()
-                        updateState(.failed(.serverRejectedAuth))
-                    }
                     continuation.resume(throwing: OpenClawError.protocolError(error.message))
                 } else if let result = response.result {
-                    // Extract token if present in connect response
-                    if case .authenticating = _state {
-                        cancelAuthTimeout()
-                        if let dict = result.value as? [String: Any], let token = dict["token"] as? String {
-                            OpenClawSecureStore.shared.saveToken(token, for: deviceID)
-                        }
-                    }
                     continuation.resume(returning: result)
                 } else {
                     continuation.resume(returning: AnyCodable(NSNull()))
@@ -560,14 +571,62 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
         let timestamp = Int(Date().timeIntervalSince1970)
         logger.debug("connect.challenge received. Nonce: \(String(nonce.prefix(8))), timestamp: \(timestamp)")
+
+        let token = OpenClawSecureStore.shared.getToken(for: deviceID)
+
+        if let token = token, !token.isEmpty {
+            await performAuthentication(nonce: nonce, token: token, timestamp: timestamp)
+        } else {
+            await performPairing(nonce: nonce, timestamp: timestamp)
+        }
+    }
+
+    private func performPairing(nonce: String, timestamp: Int) async {
+        Task { @MainActor in
+            OpenClawDiagnosticsManager.shared.log("Pairing required: no token found", type: .info)
+        }
+        updateState(.pairingRequired)
+        startAuthTimeout() // Reuse auth timeout for pairing approval
+
+        let pairParams: [String: AnyCodable] = [
+            "device_id": AnyCodable(deviceID),
+            "metadata": AnyCodable([
+                "device_name": UIDevice.current.name,
+                "client_id": "com.toolskit.openclaw"
+            ])
+        ]
+
+        do {
+            Task { @MainActor in
+                OpenClawDiagnosticsManager.shared.log("Sending 'pair' request", type: .protocolMsg)
+            }
+            let result = try await sendRequestInternal("pair", params: pairParams)
+
+            if let dict = result.value as? [String: Any], let newToken = dict["token"] as? String {
+                Task { @MainActor in
+                    OpenClawDiagnosticsManager.shared.log("Pairing approved, token received", type: .info)
+                }
+                OpenClawSecureStore.shared.saveToken(newToken, for: deviceID)
+
+                // Now that we have a token, proceed to authenticate
+                cancelAuthTimeout()
+                await performAuthentication(nonce: nonce, token: newToken, timestamp: timestamp)
+            } else {
+                throw OpenClawError.invalidResponse
+            }
+        } catch {
+            cancelAuthTimeout()
+            Task { @MainActor in
+                OpenClawDiagnosticsManager.shared.log("Pairing failed: \(error.localizedDescription)", type: .error)
+            }
+            cleanupHandshake(error: error)
+            updateState(.failed(.serverRejectedAuth))
+        }
+    }
+
+    private func performAuthentication(nonce: String, token: String, timestamp: Int) async {
         updateState(.authenticating(nonce: nonce, timestamp: timestamp))
         startAuthTimeout()
-
-        guard let token = OpenClawSecureStore.shared.getToken(for: deviceID), !token.isEmpty else {
-            logger.error("Auth failed: Token missing or empty at auth time")
-            updateState(.failed(.missingToken))
-            return
-        }
 
         let authParams: [String: AnyCodable] = [
             "nonce": AnyCodable(nonce),
@@ -582,7 +641,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
         do {
             Task { @MainActor in
-                OpenClawDiagnosticsManager.shared.log("Sending 'authenticate' request for challenge response", type: .protocolMsg)
+                OpenClawDiagnosticsManager.shared.log("Sending 'authenticate' request", type: .protocolMsg)
             }
 
             // Log redacted payload
@@ -595,16 +654,15 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
             _ = try await sendRequestInternal("authenticate", params: authParams)
 
-            // If we get a successful response to 'authenticate', we are paired
             cancelAuthTimeout()
+            updateState(.authenticated)
             handshakeContinuation?.resume()
             handshakeContinuation = nil
         } catch {
             cancelAuthTimeout()
             let errorMsg = error.localizedDescription
-            let errorState = _state
             Task { @MainActor in
-                OpenClawDiagnosticsManager.shared.log("Authentication failed: \(errorMsg)\nState: \(errorState)", type: .error)
+                OpenClawDiagnosticsManager.shared.log("Authentication failed: \(errorMsg)", type: .error)
             }
             let authError = OpenClawError.challengeResponseRejected(errorMsg)
             cleanupHandshake(error: authError)
@@ -674,7 +732,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: 30_000_000_000) // 30s
                 guard let self = self else { break }
-                if await self.getState() == .connected {
+                if await self.getState() == .ready {
                     _ = try? await self.sendRequest("ping")
                 } else {
                     break

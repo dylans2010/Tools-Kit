@@ -19,6 +19,8 @@ enum OpenClawError: Error, LocalizedError {
     case socketClosedDuringAuth
     case protocolMismatchDetected(String)
     case authTimeoutWithoutServerAck
+    case pairingRequired
+    case pairingDenied
     case unknown
 
     var errorDescription: String? {
@@ -41,6 +43,8 @@ enum OpenClawError: Error, LocalizedError {
         case .socketClosedDuringAuth: return "Connection Lost: Socket closed during authentication"
         case .protocolMismatchDetected(let msg): return "Protocol Mismatch: \(msg)"
         case .authTimeoutWithoutServerAck: return "Authentication Timed Out: No response from gateway"
+        case .pairingRequired: return "Pairing Required: Please approve on the host"
+        case .pairingDenied: return "Pairing Denied: The request was rejected by the host"
         case .unknown: return "An unknown error occurred"
         }
     }

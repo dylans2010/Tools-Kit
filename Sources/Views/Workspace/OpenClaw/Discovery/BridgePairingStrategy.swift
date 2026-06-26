@@ -20,7 +20,8 @@ struct BridgePairingStrategy: OpenClawPairingStrategy {
             throw OpenClawError.invalidResponse
         }
 
-        let deviceID = UUID().uuidString
+        let vendorID = UIDevice.current.identifierForVendor?.uuidString.prefix(8).lowercased() ?? "unknown"
+        let deviceID = "iphone-\(vendorID)"
 
         // CRITICAL: Save token BEFORE attempting validation connection
         OpenClawSecureStore.shared.saveToken(token, for: deviceID)

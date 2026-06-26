@@ -16,7 +16,8 @@ struct QRPairingStrategy: OpenClawPairingStrategy {
             throw OpenClawError.unreachableHost
         }
 
-        let deviceID = UUID().uuidString
+        let vendorID = UIDevice.current.identifierForVendor?.uuidString.prefix(8).lowercased() ?? "unknown"
+        let deviceID = "iphone-\(vendorID)"
 
         // If QR already contains a token, save it
         if let token = json["token"] as? String {
