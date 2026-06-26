@@ -101,11 +101,16 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     func getState() -> ConnectionState { _state }
 
     func connect() async throws -> AsyncStream<OpenClawEvent> {
-        guard _state == .idle || ( {
-            if case .failed = _state { return true }
-            return false
-        }() ) else {
-            logger.warning("connect() called in invalid state: \(String(describing: _state))")
+        let currentState = _state
+        let isFailed: Bool
+        if case .failed = currentState {
+            isFailed = true
+        } else {
+            isFailed = false
+        }
+
+        guard currentState == .idle || isFailed else {
+            logger.warning("connect() called in invalid state: \(String(describing: currentState))")
             throw OpenClawError.connectionFailed("Already connected or connecting")
         }
 
@@ -126,11 +131,16 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         guard let session = session else {
              throw OpenClawError.connectionFailed("Session not initialized")
         }
-        guard _state == .idle || _state == .connecting || ( {
-            if case .failed = _state { return true }
-            if case .reconnecting = _state { return true }
-            return false
-        }() ) else {
+        let currentState = _state
+        let isRecoverable: Bool
+        switch currentState {
+        case .failed, .reconnecting:
+            isRecoverable = true
+        default:
+            isRecoverable = false
+        }
+
+        guard currentState == .idle || currentState == .connecting || isRecoverable else {
             return
         }
 
@@ -494,9 +504,10 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     }
 
     private func respondToChallenge(_ event: OpenClawEvent) async {
-        guard _state == .waitingChallenge else {
+        let currentState = _state
+        guard currentState == .waitingChallenge else {
             Task { @MainActor in
-                OpenClawDiagnosticsManager.shared.log("Ignoring challenge: not in waitingChallenge state (current: \(_state))", type: .error)
+                OpenClawDiagnosticsManager.shared.log("Ignoring challenge: not in waitingChallenge state (current: \(currentState))", type: .error)
             }
             return
         }
@@ -565,8 +576,9 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         } catch {
             cancelAuthTimeout()
             let errorMsg = error.localizedDescription
+            let errorState = _state
             Task { @MainActor in
-                OpenClawDiagnosticsManager.shared.log("Authentication failed: \(errorMsg)\nState: \(_state)", type: .error)
+                OpenClawDiagnosticsManager.shared.log("Authentication failed: \(errorMsg)\nState: \(errorState)", type: .error)
             }
             let authError = OpenClawError.challengeResponseRejected(errorMsg)
             cleanupHandshake(error: authError)
