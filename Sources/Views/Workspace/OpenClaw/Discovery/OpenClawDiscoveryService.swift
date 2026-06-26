@@ -40,12 +40,28 @@ final class OpenClawDiscoveryService: NSObject {
         services.removeAll()
         pendingResolutions.removeAll()
 
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .discovery,
+            title: "Discovery Started",
+            description: "Browsing for _openclaw-gw._tcp. in local."
+        )
+
         browser = NetServiceBrowser()
         browser?.delegate = self
         browser?.searchForServices(ofType: "_openclaw-gw._tcp.", inDomain: "local.")
     }
 
     func stopDiscovery() {
+        if browser != nil {
+            OpenClawLoggerService.shared.log(
+                level: .info,
+                category: .discovery,
+                title: "Discovery Stopped",
+                description: "Stopping Bonjour browser"
+            )
+        }
+
         browser?.stop()
         browser = nil
         for service in services {
@@ -110,6 +126,12 @@ final class OpenClawDiscoveryService: NSObject {
 
 extension OpenClawDiscoveryService: NetServiceBrowserDelegate {
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .bonjour,
+            title: "Service Found",
+            description: "Name: \(service.name), Resolving..."
+        )
         services.insert(service)
         service.delegate = self
         service.resolve(withTimeout: 10.0)
@@ -117,6 +139,12 @@ extension OpenClawDiscoveryService: NetServiceBrowserDelegate {
     }
 
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .bonjour,
+            title: "Service Removed",
+            description: "Name: \(service.name)"
+        )
         services.remove(service)
         pendingResolutions.remove(service)
         updateDiscoveredServices()
@@ -124,18 +152,34 @@ extension OpenClawDiscoveryService: NetServiceBrowserDelegate {
 
     func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String: NSNumber]) {
         Logger.ws.error("Discovery failed: \(errorDict)")
+        OpenClawLoggerService.shared.log(
+            level: .error,
+            category: .discovery,
+            title: "Discovery Error",
+            description: "NetServiceBrowser failed to start: \(errorDict)"
+        )
     }
 }
 
 extension OpenClawDiscoveryService: NetServiceDelegate {
     func netServiceDidResolveAddress(_ sender: NetService) {
-        OpenClawDiagnosticsManager.shared.log("Bonjour resolved service: \(sender.name) at \(sender.hostName ?? "unknown host"):\(sender.port)", type: .network)
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .bonjour,
+            title: "Service Resolved",
+            description: "Name: \(sender.name), Host: \(sender.hostName ?? "unknown"):\(sender.port)"
+        )
         pendingResolutions.remove(sender)
         updateDiscoveredServices()
     }
 
     func netService(_ sender: NetService, didNotResolve errorDict: [String: NSNumber]) {
-        OpenClawDiagnosticsManager.shared.log("Bonjour failed to resolve service \(sender.name): \(errorDict)", type: .error)
+        OpenClawLoggerService.shared.log(
+            level: .error,
+            category: .bonjour,
+            title: "Resolution Failed",
+            description: "Service \(sender.name) resolution error: \(errorDict)"
+        )
         pendingResolutions.remove(sender)
         services.remove(sender)
         updateDiscoveredServices()

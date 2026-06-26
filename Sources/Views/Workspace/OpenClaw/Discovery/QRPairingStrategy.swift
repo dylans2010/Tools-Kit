@@ -5,6 +5,12 @@ struct QRPairingStrategy: OpenClawPairingStrategy {
     let payload: String
 
     func pair() async throws -> OpenClawDevice {
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .pairing,
+            title: "QR Pairing",
+            description: "Processing scanned QR payload"
+        )
         guard let data = payload.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let host = json["host"] as? String,
@@ -20,6 +26,12 @@ struct QRPairingStrategy: OpenClawPairingStrategy {
 
         // If QR already contains a token, save it
         if let token = json["token"] as? String {
+            OpenClawLoggerService.shared.log(
+                level: .info,
+                category: .authentication,
+                title: "QR Token Found",
+                description: "Pre-authenticated token detected in QR"
+            )
             OpenClawSecureStore.shared.saveToken(token, for: deviceID)
         }
 

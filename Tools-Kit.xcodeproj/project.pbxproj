@@ -20,22 +20,21 @@
 		OC02000B /* QRPairingStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC01000B /* QRPairingStrategy.swift */; };
 		OC02000C /* BridgePairingStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC01000C /* BridgePairingStrategy.swift */; };
 		OC02000D /* OpenClawPairingStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC01000D /* OpenClawPairingStrategy.swift */; };
-		OC02000E /* OpenClawDiagnosticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC01000E /* OpenClawDiagnosticsManager.swift */; };
 		OC02000F /* OpenClawService.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC01000F /* OpenClawService.swift */; };
 		OC020010 /* OpenClawAgentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC010010 /* OpenClawAgentService.swift */; };
 		OC020011 /* OpenClawMainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC010011 /* OpenClawMainViewModel.swift */; };
 		OC020012 /* OpenClawPairingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC010012 /* OpenClawPairingViewModel.swift */; };
 		OC020013 /* OpenClawDeviceDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC010013 /* OpenClawDeviceDetailViewModel.swift */; };
 		OC020014 /* OpenClawChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC010014 /* OpenClawChatViewModel.swift */; };
-		OC020015 /* OpenClawLogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC010015 /* OpenClawLogViewModel.swift */; };
 		OC020016 /* OpenClawMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC010016 /* OpenClawMainView.swift */; };
 		OC020017 /* OpenClawPairView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC010017 /* OpenClawPairView.swift */; };
 		OC020018 /* OpenClawDeviceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC010018 /* OpenClawDeviceListView.swift */; };
 		OC020019 /* OpenClawDeviceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC010019 /* OpenClawDeviceDetailView.swift */; };
 		OC02001A /* OpenClawChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC01001A /* OpenClawChatView.swift */; };
-		OC02001B /* OpenClawLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC01001B /* OpenClawLogsView.swift */; };
 		OC02001C /* OpenClawSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC01001C /* OpenClawSettingsView.swift */; };
 		OC02001D /* OpenClawConnectionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC01001D /* OpenClawConnectionStatusView.swift */; };
+		OC02001E /* OpenClawLoggerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC01001E /* OpenClawLoggerService.swift */; };
+		OC02001F /* OpenClawLoggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC01001F /* OpenClawLoggerView.swift */; };
 		0001F0832037938D40776723 /* AgentToolResultCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643750A4D819D6E6CB623690 /* AgentToolResultCache.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		008580EC96F3EB7A63395DC9 /* AgentConfigurationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412F9451340C6E936945A3CF /* AgentConfigurationValidator.swift */; };
@@ -2469,22 +2468,21 @@
 		OC01000B /* QRPairingStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRPairingStrategy.swift; sourceTree = "<group>"; };
 		OC01000C /* BridgePairingStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgePairingStrategy.swift; sourceTree = "<group>"; };
 		OC01000D /* OpenClawPairingStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawPairingStrategy.swift; sourceTree = "<group>"; };
-		OC01000E /* OpenClawDiagnosticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawDiagnosticsManager.swift; sourceTree = "<group>"; };
 		OC01000F /* OpenClawService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawService.swift; sourceTree = "<group>"; };
 		OC010010 /* OpenClawAgentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawAgentService.swift; sourceTree = "<group>"; };
 		OC010011 /* OpenClawMainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawMainViewModel.swift; sourceTree = "<group>"; };
 		OC010012 /* OpenClawPairingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawPairingViewModel.swift; sourceTree = "<group>"; };
 		OC010013 /* OpenClawDeviceDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawDeviceDetailViewModel.swift; sourceTree = "<group>"; };
 		OC010014 /* OpenClawChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawChatViewModel.swift; sourceTree = "<group>"; };
-		OC010015 /* OpenClawLogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawLogViewModel.swift; sourceTree = "<group>"; };
 		OC010016 /* OpenClawMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawMainView.swift; sourceTree = "<group>"; };
 		OC010017 /* OpenClawPairView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawPairView.swift; sourceTree = "<group>"; };
 		OC010018 /* OpenClawDeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawDeviceListView.swift; sourceTree = "<group>"; };
 		OC010019 /* OpenClawDeviceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawDeviceDetailView.swift; sourceTree = "<group>"; };
 		OC01001A /* OpenClawChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawChatView.swift; sourceTree = "<group>"; };
-		OC01001B /* OpenClawLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawLogsView.swift; sourceTree = "<group>"; };
 		OC01001C /* OpenClawSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawSettingsView.swift; sourceTree = "<group>"; };
 		OC01001D /* OpenClawConnectionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawConnectionStatusView.swift; sourceTree = "<group>"; };
+		OC01001E /* OpenClawLoggerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawLoggerService.swift; sourceTree = "<group>"; };
+		OC01001F /* OpenClawLoggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawLoggerView.swift; sourceTree = "<group>"; };
 		00C0E15FEF0E12A7A901E440 /* AgentDemoTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDemoTimeline.swift; sourceTree = "<group>"; };
 		00CA85AC8F214CE79F467511 /* UUIDGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UUIDGeneratorView.swift; sourceTree = "<group>"; };
 		011E855AF0F14D94AB4E22BE /* PDFToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFToolsView.swift; sourceTree = "<group>"; };
@@ -5210,7 +5208,7 @@
 		OC030005 /* Diagnostics */ = {
 			isa = PBXGroup;
 			children = (
-				OC01000E /* OpenClawDiagnosticsManager.swift */,
+				OC01001E /* OpenClawLoggerService.swift */,
 			);
 			path = Diagnostics;
 			sourceTree = "<group>";
@@ -5231,7 +5229,6 @@
 				OC010012 /* OpenClawPairingViewModel.swift */,
 				OC010013 /* OpenClawDeviceDetailViewModel.swift */,
 				OC010014 /* OpenClawChatViewModel.swift */,
-				OC010015 /* OpenClawLogViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -5244,9 +5241,9 @@
 				OC010018 /* OpenClawDeviceListView.swift */,
 				OC010019 /* OpenClawDeviceDetailView.swift */,
 				OC01001A /* OpenClawChatView.swift */,
-				OC01001B /* OpenClawLogsView.swift */,
 				OC01001C /* OpenClawSettingsView.swift */,
 				OC01001D /* OpenClawConnectionStatusView.swift */,
+				OC01001F /* OpenClawLoggerView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -12374,22 +12371,21 @@
 				OC02000B /* QRPairingStrategy.swift in Sources */,
 				OC02000C /* BridgePairingStrategy.swift in Sources */,
 				OC02000D /* OpenClawPairingStrategy.swift in Sources */,
-				OC02000E /* OpenClawDiagnosticsManager.swift in Sources */,
 				OC02000F /* OpenClawService.swift in Sources */,
 				OC020010 /* OpenClawAgentService.swift in Sources */,
 				OC020011 /* OpenClawMainViewModel.swift in Sources */,
 				OC020012 /* OpenClawPairingViewModel.swift in Sources */,
 				OC020013 /* OpenClawDeviceDetailViewModel.swift in Sources */,
 				OC020014 /* OpenClawChatViewModel.swift in Sources */,
-				OC020015 /* OpenClawLogViewModel.swift in Sources */,
 				OC020016 /* OpenClawMainView.swift in Sources */,
 				OC020017 /* OpenClawPairView.swift in Sources */,
 				OC020018 /* OpenClawDeviceListView.swift in Sources */,
 				OC020019 /* OpenClawDeviceDetailView.swift in Sources */,
 				OC02001A /* OpenClawChatView.swift in Sources */,
-				OC02001B /* OpenClawLogsView.swift in Sources */,
 				OC02001C /* OpenClawSettingsView.swift in Sources */,
 				OC02001D /* OpenClawConnectionStatusView.swift in Sources */,
+				OC02001E /* OpenClawLoggerService.swift in Sources */,
+				OC02001F /* OpenClawLoggerView.swift in Sources */,
 				FC8E948A2FE7CF960041A2E2 /* NSpeechLoggerView.swift in Sources */,
 				HF0200000000000000000001 /* AvailableLocalModelsView.swift in Sources */,
 				HF0200000000000000000002 /* HFModel.swift in Sources */,

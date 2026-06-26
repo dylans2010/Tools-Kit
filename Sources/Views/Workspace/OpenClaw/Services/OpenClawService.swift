@@ -10,7 +10,7 @@ final class OpenClawService {
 
     private var stateObservationTask: Task<Void, Never>?
     private let registry = OpenClawDeviceRegistry.shared
-    private let diagnostics = OpenClawDiagnosticsManager.shared
+    private let logger = OpenClawLoggerService.shared
     private let discovery = OpenClawDiscoveryService.shared
 
     private init() {
@@ -18,7 +18,12 @@ final class OpenClawService {
 
     func connectToActiveDevice() async {
         guard let device = registry.activeDevice else {
-            diagnostics.log("No active device to connect to")
+            OpenClawLoggerService.shared.log(
+                level: .warning,
+                category: .general,
+                title: "Connection Aborted",
+                description: "No active device registered"
+            )
             return
         }
         await connect(to: device)
@@ -26,7 +31,12 @@ final class OpenClawService {
 
     func connect(to device: OpenClawDevice) async {
         guard let url = URL(string: "ws://\(device.host):\(device.port)") else {
-            diagnostics.log("Invalid URL for device: \(device.host)")
+            OpenClawLoggerService.shared.log(
+                level: .error,
+                category: .general,
+                title: "Invalid URL",
+                description: "Host: \(device.host), Port: \(device.port)"
+            )
             return
         }
 
@@ -36,7 +46,12 @@ final class OpenClawService {
                 if case .failed = state {
                     // Allow retry if failed
                 } else {
-                    diagnostics.log("Already connecting or connected to \(device.name)")
+                    OpenClawLoggerService.shared.log(
+                        level: .info,
+                        category: .general,
+                        title: "Already Connected",
+                        description: "Connection to \(device.name) is active"
+                    )
                     return
                 }
             }
@@ -55,16 +70,32 @@ final class OpenClawService {
 
         do {
             let stream = try await connection.connect()
-            diagnostics.log("Connected to \(device.name)")
+            OpenClawLoggerService.shared.log(
+                level: .info,
+                category: .gateway,
+                title: "Service Connected",
+                description: "Established connection to \(device.name)"
+            )
 
             Task {
                 for await event in stream {
                     OpenClawMessageBus.shared.publish(event)
-                    diagnostics.log("Received event: \(event.event)")
+                    OpenClawLoggerService.shared.log(
+                        level: .debug,
+                        category: .session,
+                        title: "Gateway Event",
+                        description: event.event
+                    )
                 }
             }
         } catch {
-            diagnostics.log("Failed to connect: \(error.localizedDescription)")
+            OpenClawLoggerService.shared.log(
+                level: .error,
+                category: .gateway,
+                title: "Connection Failed",
+                description: error.localizedDescription,
+                error: error
+            )
         }
     }
 
@@ -74,7 +105,12 @@ final class OpenClawService {
         stateObservationTask = nil
         self.currentConnection = nil
         self.connectionState = .idle
-        diagnostics.log("Disconnected")
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .gateway,
+            title: "Manual Disconnect",
+            description: "User initiated disconnect"
+        )
     }
 
     func pair() async throws {

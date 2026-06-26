@@ -11,6 +11,7 @@ struct OpenClawMainView: View {
                 statusSection
                 actionsSection
                 deviceSection
+                diagnosticsSection
             }
             .navigationTitle("OpenClaw")
             .toolbar {
@@ -109,6 +110,16 @@ struct OpenClawMainView: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
+            }
+        }
+    }
+
+    private var diagnosticsSection: some View {
+        Section("Diagnostics") {
+            NavigationLink {
+                OpenClawLoggerView()
+            } label: {
+                Label("Live Connection Logs", systemImage: "terminal.fill")
             }
         }
     }

@@ -5,6 +5,12 @@ struct BridgePairingStrategy: OpenClawPairingStrategy {
     let bridgeURL: URL
 
     func pair() async throws -> OpenClawDevice {
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .pairing,
+            title: "Bridge Pairing",
+            description: "Initiating pairing via bridge: \(bridgeURL.absoluteString)"
+        )
         // 1. Validate Bridge Reachability
         let (data, response) = try await URLSession.shared.data(from: bridgeURL.appendingPathComponent("pair"))
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
@@ -12,6 +18,12 @@ struct BridgePairingStrategy: OpenClawPairingStrategy {
         }
 
         // 2. Extract Token and Device Info
+        OpenClawLoggerService.shared.log(
+            level: .debug,
+            category: .http,
+            title: "Bridge Response",
+            description: "Status: 200, Parsing payload..."
+        )
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let token = json["token"] as? String,
               let gatewayInfo = json["gateway"] as? [String: Any],

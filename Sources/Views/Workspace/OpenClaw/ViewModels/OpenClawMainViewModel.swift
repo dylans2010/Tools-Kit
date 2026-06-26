@@ -11,7 +11,7 @@ final class OpenClawMainViewModel {
 
     private let service = OpenClawService.shared
     private let registry = OpenClawDeviceRegistry.shared
-    private let diagnostics = OpenClawDiagnosticsManager.shared
+    private let logger = OpenClawLoggerService.shared
 
     init() {
         // SwiftUI's @Observable handles data flow, but we update our derived properties
@@ -22,9 +22,9 @@ final class OpenClawMainViewModel {
         withObservationTracking {
             updateStatus(service.connectionState)
             activeDeviceName = registry.activeDevice?.name ?? "None"
-            if let latencyMetric = diagnostics.metrics.last(where: { $0.name == "latency" }) {
-                latency = latencyMetric.value
-            }
+            // Latency was managed by old diagnostics manager metrics.
+            // In the new system, we'd look for RPC response times if needed.
+            latency = "-- ms"
         } onChange: {
             Task { @MainActor in
                 self.observeChanges()
