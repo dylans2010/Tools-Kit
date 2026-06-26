@@ -9,7 +9,7 @@ private extension Logger {
     static let ws = Logger(subsystem: "com.toolskit.openclaw", category: "websocket")
 }
 
-enum OpenClawFailureReason: Equatable {
+public enum OpenClawFailureReason: Equatable {
     case missingToken
     case emptyToken
     case invalidToken
@@ -22,7 +22,7 @@ enum OpenClawFailureReason: Equatable {
     case maxRetriesExceeded
 }
 
-enum ConnectionPhase: Int, Comparable {
+public enum ConnectionPhase: Int, Comparable {
     case idle = 0
     case discovering = 1
     case gatewaySelected = 2
@@ -41,7 +41,7 @@ enum ConnectionPhase: Int, Comparable {
     }
 }
 
-enum ConnectionState: Equatable {
+public enum ConnectionState: Equatable {
     case idle
     case discovering
     case gatewaySelected
