@@ -825,7 +825,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
         logger.debug("Sending connect.response while socket state is \(self.socketStateDescription): \(text, privacy: .public)")
         Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("OPENCLAW OUTBOUND\nstate=\(self.socketStateDescription)\n\(text)", type: .protocolMsg)
+            OpenClawDiagnosticsManager.shared.log("OPENCLAW OUTBOUND\nstate=\(await self.socketStateDescription)\n\(text)", type: .protocolMsg)
         }
         try await sendRawText(text)
     }
