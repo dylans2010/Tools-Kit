@@ -75,3 +75,9 @@ struct OpenClawEvent: Codable {
     let event: String
     let payload: AnyCodable
 }
+
+/// Represents an outbound event frame for gateway handshakes.
+struct OpenClawOutboundEvent: Codable {
+    let event: String
+    let payload: AnyCodable
+}
