@@ -22,7 +22,7 @@ public enum OpenClawFailureReason: Equatable {
     case maxRetriesExceeded
 }
 
-public enum ConnectionPhase: Int, Comparable {
+public enum OpenClawConnectionPhase: Int, Comparable {
     case idle = 0
     case discovering = 1
     case gatewaySelected = 2
@@ -36,12 +36,12 @@ public enum ConnectionPhase: Int, Comparable {
     case authenticated = 10
     case ready = 11
 
-    static func < (lhs: ConnectionPhase, rhs: ConnectionPhase) -> Bool {
+    public static func < (lhs: OpenClawConnectionPhase, rhs: OpenClawConnectionPhase) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
 }
 
-public enum ConnectionState: Equatable {
+public enum OpenClawConnectionState: Equatable {
     case idle
     case discovering
     case gatewaySelected
@@ -58,7 +58,7 @@ public enum ConnectionState: Equatable {
     case disconnected
     case failed(OpenClawFailureReason)
 
-    var phase: ConnectionPhase {
+    var phase: OpenClawConnectionPhase {
         switch self {
         case .idle: return .idle
         case .discovering: return .discovering
@@ -96,10 +96,10 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     // NEVER generate locally. Cleared on disconnect.
     private var currentNonce: String? = nil
 
-    private var connectionState: ConnectionState = .idle
-    private var stateStreamContinuations: [UUID: AsyncStream<ConnectionState>.Continuation] = [:]
+    private var connectionState: OpenClawConnectionState = .idle
+    private var stateStreamContinuations: [UUID: AsyncStream<OpenClawConnectionState>.Continuation] = [:]
 
-    nonisolated var stateStream: AsyncStream<ConnectionState> {
+    nonisolated var stateStream: AsyncStream<OpenClawConnectionState> {
         AsyncStream { continuation in
             let id = UUID()
             Task {
@@ -108,7 +108,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         }
     }
 
-    private func registerStateContinuation(_ continuation: AsyncStream<ConnectionState>.Continuation, id: UUID) {
+    private func registerStateContinuation(_ continuation: AsyncStream<OpenClawConnectionState>.Continuation, id: UUID) {
         self.stateStreamContinuations[id] = continuation
         continuation.onTermination = { [weak self] _ in
             Task {
@@ -154,7 +154,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         self.session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
     }
 
-    private func updateState(_ newState: ConnectionState) {
+    private func updateState(_ newState: OpenClawConnectionState) {
         guard canTransition(from: connectionState, to: newState) else {
             logger.error("Illegal state transition: \(String(describing: self.connectionState)) -> \(String(describing: newState))")
             return
@@ -173,7 +173,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         )
     }
 
-    private func canTransition(from: ConnectionState, to: ConnectionState) -> Bool {
+    private func canTransition(from: OpenClawConnectionState, to: OpenClawConnectionState) -> Bool {
         if case .failed = to { return true }
         if to == .disconnecting || to == .disconnected { return true }
         if case .failed = from, to == .idle { return true }
@@ -197,7 +197,7 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         }
     }
 
-    func getState() -> ConnectionState { connectionState }
+    func getState() -> OpenClawConnectionState { connectionState }
 
     func connect() async throws -> AsyncStream<OpenClawEvent> {
         // Ensure clean slate

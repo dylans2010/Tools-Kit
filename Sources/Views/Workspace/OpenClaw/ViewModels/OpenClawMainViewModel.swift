@@ -32,7 +32,7 @@ final class OpenClawMainViewModel {
         }
     }
 
-    private func updateStatus(_ state: ConnectionState) {
+    private func updateStatus(_ state: OpenClawConnectionState) {
         isConnecting = ( {
             switch state {
             case .discovering, .gatewaySelected, .resolvingAuthentication, .pairing, .connecting, .socketConnected, .waitingForChallenge, .challenged, .authenticating: return true

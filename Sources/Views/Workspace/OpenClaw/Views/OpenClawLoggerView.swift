@@ -32,7 +32,7 @@ struct OpenClawLoggerView: View {
             ScrollViewReader { proxy in
                 List {
                     ForEach(filteredLogs) { entry in
-                        OpenClawLogEntryRow(entry: entry)
+                        OCLogEntryRow(entry: entry)
                             .id(entry.id)
                     }
                 }
@@ -218,7 +218,7 @@ struct OpenClawLoggerView: View {
     }
 }
 
-struct OpenClawLogEntryRow: View {
+struct OCLogEntryRow: View {
     let entry: OpenClawLogEntry
 
     var body: some View {
