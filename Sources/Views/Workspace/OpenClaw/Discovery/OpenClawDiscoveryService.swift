@@ -1,5 +1,10 @@
 import Foundation
 import Observation
+import OSLog
+
+private extension Logger {
+    static let ws = Logger(subsystem: "com.toolskit.openclaw", category: "discovery")
+}
 
 struct OpenClawDiscoveredService: Identifiable, Hashable {
     let id = UUID()
@@ -118,7 +123,7 @@ extension OpenClawDiscoveryService: NetServiceBrowserDelegate {
     }
 
     func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String: NSNumber]) {
-        print("Discovery failed: \(errorDict)")
+        Logger.ws.error("Discovery failed: \(errorDict)")
     }
 }
 
