@@ -165,9 +165,12 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             continuation.yield(newState)
         }
         logger.debug("\(String(describing: oldState)) → \(String(describing: newState))")
-        Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("STATE: \(newState)", type: .info)
-        }
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .gateway,
+            title: "State Transition",
+            description: "\(oldState) → \(newState)"
+        )
     }
 
     private func canTransition(from: ConnectionState, to: ConnectionState) -> Bool {
@@ -249,9 +252,12 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
         let urlString = self.url.absoluteString
         Logger.ws.info("[connect] Initiating — url: \(urlString)")
-        Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("Initiating connection to \(url.absoluteString)", type: .network)
-        }
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .gateway,
+            title: "Connection Initiated",
+            description: "Target: \(urlString)"
+        )
 
         // PHASE: Resolve Authentication
         updateState(.resolvingAuthentication)
@@ -263,9 +269,12 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
         socket = session.webSocketTask(with: url)
         guard let socket = socket else {
-            Task { @MainActor in
-                OpenClawDiagnosticsManager.shared.log("Failed to create URLSessionWebSocketTask", type: .error)
-            }
+            OpenClawLoggerService.shared.log(
+                level: .error,
+                category: .websocket,
+                title: "Socket Creation Failed",
+                description: "Failed to create URLSessionWebSocketTask"
+            )
             throw OpenClawError.connectionFailed("Failed to create socket")
         }
 
@@ -274,15 +283,21 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             self.connectionOpenedContinuation = continuation
             socket.resume()
-            Task { @MainActor in
-                OpenClawDiagnosticsManager.shared.log("WebSocket resume() called, waiting for open...", type: .network)
-            }
+            OpenClawLoggerService.shared.log(
+                level: .debug,
+                category: .websocket,
+                title: "WebSocket Resume",
+                description: "Waiting for physical connection..."
+            )
         }
         cancelSocketOpenTimeout()
 
-        Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("WebSocket opened successfully", type: .network)
-        }
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .websocket,
+            title: "WebSocket Connected",
+            description: "Physical transport established"
+        )
         updateState(.socketConnected)
         updateState(.waitingForChallenge)
         startChallengeTimeout()
@@ -295,16 +310,22 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             // connect.challenge after the WebSocket transport is open. Do not send a
             // JSON-RPC "connect" frame here: strict gateways treat any unexpected
             // first client frame as an invalid handshake message and close with 1008.
-            Task { @MainActor in
-                OpenClawDiagnosticsManager.shared.log("Waiting for connect.challenge", type: .protocolMsg)
-            }
+            OpenClawLoggerService.shared.log(
+                level: .info,
+                category: .handshake,
+                title: "Waiting for Challenge",
+                description: "Transport open, expecting connect.challenge from gateway"
+            )
         }
     }
 
     private func completeHandshake() {
-        Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("Handshake successful, connection established", type: .info)
-        }
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .handshake,
+            title: "Handshake Successful",
+            description: "Connection fully established and authenticated"
+        )
         logger.info("Handshake successful. Connected to \(self.url.absoluteString)")
         updateState(.authenticated)
         updateState(.ready)
@@ -329,6 +350,12 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
     private func handleSocketOpen() {
         logger.info("Socket open success. State: \(String(describing: self.connectionState))")
         Logger.ws.info("[didOpen] Socket physically open — flushing queue")
+        OpenClawLoggerService.shared.log(
+            level: .debug,
+            category: .websocket,
+            title: "didOpen",
+            description: "Delegate callback: Socket physically open"
+        )
         cancelSocketOpenTimeout()
         isSocketPhysicallyOpen = true
         connectionOpenedContinuation?.resume()
@@ -349,6 +376,13 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         default:
             Logger.ws.error("[didClose] Code \(closeCode.rawValue) — reason: \(reasonString)")
         }
+
+        OpenClawLoggerService.shared.log(
+            level: closeCode == .normalClosure ? .info : .warning,
+            category: .websocket,
+            title: "Socket Closed",
+            description: "Code: \(closeCode.rawValue), Reason: \(reasonString)"
+        )
 
         isSocketPhysicallyOpen = false
         currentNonce = nil
@@ -413,9 +447,12 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         let elapsed = phaseStartTime.map { clock.now - $0 } ?? .seconds(0)
         let elapsedMs = Int(elapsed.components.attoseconds / 1_000_000_000_000_000) + Int(elapsed.components.seconds * 1000)
         logger.error("Socket open timeout. State at fire: \(String(describing: self.connectionState)), elapsed: \(elapsedMs)ms")
-        Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("Timeout reason: socket_open (\(elapsedMs)ms)", type: .error)
-        }
+        OpenClawLoggerService.shared.log(
+            level: .error,
+            category: .websocket,
+            title: "Connection Timeout",
+            description: "Socket failed to open within 10s (\(elapsedMs)ms)"
+        )
         connectionOpenedContinuation?.resume(throwing: OpenClawError.connectionTimeout)
         connectionOpenedContinuation = nil
         socket?.cancel(with: .abnormalClosure, reason: nil)
@@ -441,9 +478,12 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         let elapsed = phaseStartTime.map { clock.now - $0 } ?? .seconds(0)
         let elapsedMs = Int(elapsed.components.attoseconds / 1_000_000_000_000_000) + Int(elapsed.components.seconds * 1000)
         logger.error("Challenge timeout. State at fire: \(String(describing: self.connectionState)), elapsed: \(elapsedMs)ms")
-        Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("Timeout reason: waiting_challenge (\(elapsedMs)ms)", type: .error)
-        }
+        OpenClawLoggerService.shared.log(
+            level: .error,
+            category: .handshake,
+            title: "Challenge Timeout",
+            description: "Gateway did not send connect.challenge within 8s (\(elapsedMs)ms)"
+        )
         cleanupHandshake(error: OpenClawError.connectionTimeout)
         socket?.cancel(with: .abnormalClosure, reason: nil)
         updateState(.failed(.challengeTimeout))
@@ -468,9 +508,12 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         let elapsed = phaseStartTime.map { clock.now - $0 } ?? .seconds(0)
         let elapsedMs = Int(elapsed.components.attoseconds / 1_000_000_000_000_000) + Int(elapsed.components.seconds * 1000)
         logger.error("Auth timeout. State at fire: \(String(describing: self.connectionState)), elapsed: \(elapsedMs)ms")
-        Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("Timeout reason: authentication (\(elapsedMs)ms)", type: .error)
-        }
+        OpenClawLoggerService.shared.log(
+            level: .error,
+            category: .authentication,
+            title: "Authentication Timeout",
+            description: "Server did not acknowledge connect.response within 5s (\(elapsedMs)ms)"
+        )
         cleanupHandshake(error: OpenClawError.authTimeoutWithoutServerAck)
         socket?.cancel(with: .abnormalClosure, reason: nil)
         updateState(.failed(.authTimeout))
@@ -525,6 +568,15 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             let currentState = connectionState
             Logger.ws.debug("[transmit] SEND → \(message)")
             Logger.ws.debug("[transmit] State at send: \(String(describing: currentState))")
+
+            OpenClawLoggerService.shared.log(
+                level: .debug,
+                category: .websocket,
+                title: "Frame Outbound",
+                description: "Sending \(message.count) bytes",
+                payload: message
+            )
+
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
                 socket.send(.string(message)) { error in
                     if let error = error {
@@ -565,16 +617,23 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         case .success(let message):
             switch message {
             case .data(let data):
-                if let text = String(data: data, encoding: .utf8) {
-                    Task { @MainActor in
-                        OpenClawDiagnosticsManager.shared.log("OPENCLAW INBOUND\n\(text)", type: .protocolMsg)
-                    }
-                }
+                let text = String(data: data, encoding: .utf8) ?? "<binary data>"
+                OpenClawLoggerService.shared.log(
+                    level: .debug,
+                    category: .websocket,
+                    title: "Frame Inbound (Data)",
+                    description: "Received \(data.count) bytes",
+                    payload: text
+                )
                 await handleIncomingData(data)
             case .string(let text):
-                Task { @MainActor in
-                    OpenClawDiagnosticsManager.shared.log("OPENCLAW INBOUND\n\(text)", type: .protocolMsg)
-                }
+                OpenClawLoggerService.shared.log(
+                    level: .debug,
+                    category: .websocket,
+                    title: "Frame Inbound (String)",
+                    description: "Received \(text.count) characters",
+                    payload: text
+                )
                 if let data = text.data(using: .utf8) {
                     await handleIncomingData(data)
                 }
@@ -591,9 +650,13 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         if isManuallyDisconnected { return }
 
         let errorMsg = error.localizedDescription
-        Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("Connection failure: \(errorMsg)", type: .error)
-        }
+        OpenClawLoggerService.shared.log(
+            level: .error,
+            category: .network,
+            title: "Connection Failure",
+            description: errorMsg,
+            error: error
+        )
 
         // Categorize error and decide if we should fail or reconnect
         let isTerminal: Bool
@@ -645,9 +708,12 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
             let delay = min(pow(2.0, Double(attempt)), 16.0)
             logger.info("Scheduling reconnect attempt \(attempt + 1) in \(delay)s")
-            Task { @MainActor in
-                OpenClawDiagnosticsManager.shared.log("Reconnect attempt \(attempt + 1) in \(Int(delay))s", type: .info)
-            }
+            OpenClawLoggerService.shared.log(
+                level: .info,
+                category: .gateway,
+                title: "Scheduling Reconnection",
+                description: "Attempt \(attempt + 1) in \(Int(delay))s"
+            )
             await updateState(.connecting)
 
             await cancelSocketOpenTimeout()
@@ -697,9 +763,13 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             do {
                 try response.validate()
             } catch {
-                Task { @MainActor in
-                    OpenClawDiagnosticsManager.shared.log("Response validation failed: \(error)", type: .error)
-                }
+                OpenClawLoggerService.shared.log(
+                    level: .error,
+                    category: .handshake,
+                    title: "Response Validation Failed",
+                    description: error.localizedDescription,
+                    error: error
+                )
             }
 
             if let continuation = pendingRequests.removeValue(forKey: id) {
@@ -739,9 +809,12 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             throw OpenClawError.protocolError("Not in pairing state")
         }
 
-        Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("Pairing request sent", type: .protocolMsg)
-        }
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .pairing,
+            title: "Pairing Started",
+            description: "Sending pairing request to gateway"
+        )
 
         let params: [String: AnyCodable] = [
             "device_id": AnyCodable(deviceID),
@@ -750,15 +823,21 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
         do {
             let result = try await sendRequestInternal("pair", params: params)
-            Task { @MainActor in
-                OpenClawDiagnosticsManager.shared.log("Pairing approved", type: .info)
-            }
+            OpenClawLoggerService.shared.log(
+                level: .info,
+                category: .pairing,
+                title: "Pairing Approved",
+                description: "Gateway accepted pairing request"
+            )
             if let dict = result.value as? [String: Any], let token = dict["token"] as? String {
                 self.cachedToken = token
                 OpenClawSecureStore.shared.saveToken(token, for: deviceID)
-                Task { @MainActor in
-                    OpenClawDiagnosticsManager.shared.log("Token stored", type: .info)
-                }
+                OpenClawLoggerService.shared.log(
+                    level: .debug,
+                    category: .pairing,
+                    title: "Token Persisted",
+                    description: "New auth token saved to Keychain"
+                )
             }
 
             // After successful pairing, immediately attempt handshake response with the new token
@@ -771,9 +850,13 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
                 _ = try await performConnect()
             }
         } catch {
-            Task { @MainActor in
-                OpenClawDiagnosticsManager.shared.log("Pairing failed: \(error.localizedDescription)", type: .error)
-            }
+            OpenClawLoggerService.shared.log(
+                level: .error,
+                category: .pairing,
+                title: "Pairing Failed",
+                description: error.localizedDescription,
+                error: error
+            )
             updateState(.failed(.pairingDenied))
             throw error
         }
@@ -796,15 +879,26 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             // Bind nonce to current session
             currentNonce = nonce
 
+            OpenClawLoggerService.shared.log(
+                level: .info,
+                category: .handshake,
+                title: "connect.challenge Received",
+                description: "Nonce: \(nonce)",
+                payload: rawMessage
+            )
+
             // Advance state
             updateState(.challenged)
 
             // Fetch signature (token) from SecureStore
             guard let signature = cachedToken ?? OpenClawSecureStore.shared.getToken(for: deviceID) else {
                 Logger.ws.error("[handleChallenge] No auth token in Keychain — cannot complete handshake")
-                Task { @MainActor in
-                    OpenClawDiagnosticsManager.shared.log("Token missing. Pairing required", type: .info)
-                }
+                OpenClawLoggerService.shared.log(
+                    level: .warning,
+                    category: .authentication,
+                    title: "Token Missing",
+                    description: "No stored token found for this device. Pairing required."
+                )
                 updateState(.pairing)
                 return
             }
@@ -835,6 +929,14 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
             Logger.ws.info("[sendHandshakeResponse] Sending connect.response: \(jsonString)")
             Logger.ws.debug("[sendHandshakeResponse] State at send: \(String(describing: currentState))")
 
+            OpenClawLoggerService.shared.log(
+                level: .info,
+                category: .handshake,
+                title: "Sending connect.response",
+                description: "Responding to challenge with signed nonce",
+                payload: jsonString
+            )
+
             // Direct transmit
             await transmit(jsonString)
 
@@ -854,18 +956,26 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         do {
             try request.validate()
         } catch {
-            Task { @MainActor in
-                OpenClawDiagnosticsManager.shared.log("Request validation failed for \(method): \(error)", type: .error)
-            }
+            OpenClawLoggerService.shared.log(
+                level: .error,
+                category: .gateway,
+                title: "RPC Validation Failed",
+                description: "Method: \(method)",
+                error: error
+            )
             throw error
         }
 
         let data = try JSONEncoder().encode(request)
         let text = String(data: data, encoding: .utf8) ?? "{}"
 
-        Task { @MainActor in
-            OpenClawDiagnosticsManager.shared.log("OPENCLAW OUTBOUND\n\(text)", type: .protocolMsg)
-        }
+        OpenClawLoggerService.shared.log(
+            level: .debug,
+            category: .gateway,
+            title: "RPC Outbound",
+            description: "Method: \(method), ID: \(request.id)",
+            payload: text
+        )
 
         return try await withCheckedThrowingContinuation { continuation in
             pendingRequests[request.id] = continuation
@@ -892,9 +1002,12 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
 
     private func handleRequestTimeout(_ id: String) {
         if let continuation = pendingRequests.removeValue(forKey: id) {
-            Task { @MainActor in
-                OpenClawDiagnosticsManager.shared.log("Request timed out: \(id)", type: .error)
-            }
+            OpenClawLoggerService.shared.log(
+                level: .error,
+                category: .gateway,
+                title: "RPC Timeout",
+                description: "Request ID: \(id)"
+            )
             logger.error("RPC request timed out: \(id)")
             continuation.resume(throwing: OpenClawError.requestTimeout)
         }

@@ -7,6 +7,12 @@ struct ManualPairingStrategy: OpenClawPairingStrategy {
     let port: Int
 
     func pair() async throws -> OpenClawDevice {
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .pairing,
+            title: "Manual Pairing",
+            description: "Target: \(host):\(port)"
+        )
         // 1. Validate Input
         guard !host.isEmpty else {
             throw OpenClawError.protocolError("Host cannot be empty")

@@ -3,7 +3,7 @@ import SwiftUI
 struct OpenClawPairView: View {
     @State private var viewModel = OpenClawPairingViewModel()
     @Environment(\.dismiss) private var dismiss
-    private var diagnostics = OpenClawDiagnosticsManager.shared
+    private var logger = OpenClawLoggerService.shared
 
     var body: some View {
         NavigationStack {
@@ -45,8 +45,8 @@ struct OpenClawPairView: View {
             Text(message)
                 .font(.caption.bold())
 
-            if let lastLog = diagnostics.logs.last(where: { $0.contains("[ERROR]") }) {
-                Text(lastLog)
+            if let lastLog = logger.logs.last(where: { $0.level == .error }) {
+                Text("[\(lastLog.category.rawValue)] \(lastLog.title): \(lastLog.description)")
                     .font(.system(size: 8, design: .monospaced))
                     .opacity(0.8)
             }
@@ -166,12 +166,12 @@ struct OpenClawPairView: View {
             .cornerRadius(10)
 
             // Real-time protocol log peek
-            if let lastProtocolLog = diagnostics.logs.last(where: { $0.contains("[PROTOCOL]") }) {
+            if let lastLog = logger.logs.last(where: { $0.category == .handshake || $0.category == .gateway }) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Protocol Traffic")
+                    Text("Last Event")
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(.secondary)
-                    Text(lastProtocolLog)
+                    Text("\(lastLog.title): \(lastLog.description)")
                         .font(.system(size: 8, design: .monospaced))
                         .lineLimit(2)
                         .foregroundStyle(.secondary)

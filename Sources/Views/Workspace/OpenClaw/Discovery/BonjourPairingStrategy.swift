@@ -6,7 +6,12 @@ struct BonjourPairingStrategy: OpenClawPairingStrategy {
     let service: OpenClawDiscoveredService
 
     func pair() async throws -> OpenClawDevice {
-        await OpenClawDiagnosticsManager.shared.log("Bonjour pairing metadata resolving for: \(service.name)", type: .info)
+        OpenClawLoggerService.shared.log(
+            level: .info,
+            category: .pairing,
+            title: "Bonjour Pairing",
+            description: "Resolving metadata for: \(service.name)"
+        )
 
         let vendorID = UIDevice.current.identifierForVendor?.uuidString.prefix(8).lowercased() ?? "unknown"
         let deviceID = "iphone-\(vendorID)"
