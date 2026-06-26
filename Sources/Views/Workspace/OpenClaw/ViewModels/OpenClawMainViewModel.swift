@@ -35,31 +35,39 @@ final class OpenClawMainViewModel {
     private func updateStatus(_ state: ConnectionState) {
         isConnecting = ( {
             switch state {
-            case .connecting, .socketConnected, .waitingChallenge, .authenticating, .reconnecting: return true
+            case .discovering, .gatewaySelected, .resolvingAuthentication, .pairing, .connecting, .socketConnected, .waitingForChallenge, .authenticating: return true
             default: return false
             }
         }() )
 
         switch state {
-        case .idle:
+        case .idle, .disconnected:
             connectionStatus = "Disconnected"
             lastError = nil
+        case .discovering:
+            connectionStatus = "Discovering..."
+        case .gatewaySelected:
+            connectionStatus = "Gateway Selected..."
+        case .resolvingAuthentication:
+            connectionStatus = "Resolving Authentication..."
+        case .pairing:
+            connectionStatus = "Pairing..."
         case .connecting:
             connectionStatus = "Connecting..."
         case .socketConnected:
             connectionStatus = "Socket Connected..."
-        case .waitingChallenge:
+        case .waitingForChallenge:
             connectionStatus = "Waiting for challenge..."
         case .authenticating:
             connectionStatus = "Authenticating..."
-        case .connected:
+        case .authenticated, .ready:
             connectionStatus = "Connected"
             lastError = nil
+        case .disconnecting:
+            connectionStatus = "Disconnecting..."
         case .failed(let reason):
             connectionStatus = "Error"
             lastError = String(describing: reason)
-        case .reconnecting(let attempt):
-            connectionStatus = "Reconnecting (Attempt \(attempt + 1))..."
         }
     }
 

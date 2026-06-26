@@ -6,23 +6,10 @@ struct BonjourPairingStrategy: OpenClawPairingStrategy {
     let service: OpenClawDiscoveredService
 
     func pair() async throws -> OpenClawDevice {
-        await OpenClawDiagnosticsManager.shared.log("Bonjour pairing started for: \(service.name)", type: .info)
-        guard let url = service.url else {
-            await await OpenClawDiagnosticsManager.shared.log("Failed to construct URL for service: \(service.name)", type: .error)
-            throw OpenClawError.unreachableHost
-        }
+        await OpenClawDiagnosticsManager.shared.log("Bonjour pairing metadata resolving for: \(service.name)", type: .info)
 
         let vendorID = UIDevice.current.identifierForVendor?.uuidString.prefix(8).lowercased() ?? "unknown"
         let deviceID = "iphone-\(vendorID)"
-        let connection = OpenClawGatewayConnection(url: url, deviceID: deviceID)
-
-        do {
-            _ = try await connection.connect()
-            // Token is extracted and saved automatically during connect() if provided by gateway
-            await connection.disconnect()
-        } catch {
-            throw OpenClawError.handshakeFailed("Bonjour handshake failed: \(error.localizedDescription)")
-        }
 
         let device = OpenClawDevice(
             id: deviceID,

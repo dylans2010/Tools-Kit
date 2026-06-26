@@ -21,6 +21,8 @@ struct OpenClawDiscoveredService: Identifiable, Hashable {
 
 @MainActor @Observable
 final class OpenClawDiscoveryService: NSObject {
+    static let shared = OpenClawDiscoveryService()
+
     var discoveredServices: [OpenClawDiscoveredService] = []
 
     private var browser: NetServiceBrowser?

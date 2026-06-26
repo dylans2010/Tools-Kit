@@ -11,6 +11,7 @@ final class OpenClawService {
     private var stateObservationTask: Task<Void, Never>?
     private let registry = OpenClawDeviceRegistry.shared
     private let diagnostics = OpenClawDiagnosticsManager.shared
+    private let discovery = OpenClawDiscoveryService.shared
 
     private init() {
     }
@@ -20,7 +21,10 @@ final class OpenClawService {
             diagnostics.log("No active device to connect to")
             return
         }
+        await connect(to: device)
+    }
 
+    func connect(to device: OpenClawDevice) async {
         guard let url = URL(string: "ws://\(device.host):\(device.port)") else {
             diagnostics.log("Invalid URL for device: \(device.host)")
             return
