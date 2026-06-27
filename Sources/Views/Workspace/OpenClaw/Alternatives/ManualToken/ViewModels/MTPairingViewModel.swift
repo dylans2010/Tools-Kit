@@ -12,12 +12,12 @@ public final class MTPairingViewModel {
     public init() {}
 
     public func pair(token: String, host: String, port: Int) async {
-        self.state = .submitting
+        self.state = .validating
         do {
             try await engine.validateToken(token, host: host, port: port)
             self.state = .paired
         } catch {
-            self.state = .networkError(error.localizedDescription)
+            self.state = .failed(error.localizedDescription)
         }
     }
 }

@@ -19,8 +19,10 @@ public enum MTPairingState: Equatable {
     case tokenEntered
     case formatValidated
     case formatInvalid
+    case validating
     case submitting
     case networkError(String)
+    case failed(String)
     case tokenInvalid(String)
     case tokenExpired
     case credentialExchange

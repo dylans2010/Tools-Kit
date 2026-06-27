@@ -16,8 +16,10 @@ public enum PCPairingState: Equatable {
     case idle
     case awaitingCodeInput
     case codeEntered(String)
+    case validating
     case submitting
     case codeInvalid
+    case failed(String)
     case rateLimited(Int)
     case gatewayLocked
     case networkError(String)
