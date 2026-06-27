@@ -88,12 +88,12 @@ public actor TLANPairingEngine {
             try await tokenService.saveToken(trustToken)
             try await send(TLANMessage(type: "ACK"))
             continuation.yield(.paired)
-            connection?.disconnect()
+            await connection?.disconnect()
 
         case "APPROVAL_DENIED":
             logger.error("Approval denied")
             continuation.yield(.failed("Approval Denied by Mac"))
-            connection?.disconnect()
+            await connection?.disconnect()
 
         default:
             logger.warning("Unknown message type: \(message.type)")
