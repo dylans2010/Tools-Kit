@@ -1,9 +1,27 @@
 import Foundation
 import Observation
-import OSLog
+import Network
+
 @Observable @MainActor public final class TLANPairingViewModel {
-    public var state: TLANPairingState = .idle; public var lastError: String?
-    private let pairingEngine = TLANPairingEngine()
+    public var state: PairingState = .idle
+    public var lastError: String?
+    private let engine = TLANPairingEngine()
+
     public init() {}
-    public func pair(with result: Network.NWBrowser.Result) async { state = .connecting }
+
+    public func startPairing(endpoint: NWEndpoint) async {
+        guard case .hostPort(let host, let port) = endpoint else { return }
+        let urlString = "ws://\(host.debugDescription):\(port.rawValue)"
+        guard let url = URL(string: urlString) else { return }
+
+        do {
+            let stream = try await engine.startPairing(url: url)
+            for await newState in stream {
+                self.state = newState
+            }
+        } catch {
+            self.state = .failed(error.localizedDescription)
+            self.lastError = error.localizedDescription
+        }
+    }
 }

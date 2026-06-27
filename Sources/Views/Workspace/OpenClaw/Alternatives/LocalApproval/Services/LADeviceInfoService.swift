@@ -1,19 +1,27 @@
 import Foundation
 import UIKit
+import Network
 
 public actor LADeviceInfoService {
     public static let shared = LADeviceInfoService()
+    private init() {}
 
     @MainActor
     public func getDeviceInfo() -> LADeviceInfo {
-        LADeviceInfo(
+        let installId = UserDefaults.standard.string(forKey: "OpenClawAppInstallId") ?? {
+            let newId = UUID().uuidString
+            UserDefaults.standard.set(newId, forKey: "OpenClawAppInstallId")
+            return newId
+        }()
+
+        return LADeviceInfo(
             deviceName: UIDevice.current.name,
             deviceModel: UIDevice.current.model,
             platform: "iOS",
             iOSVersion: UIDevice.current.systemVersion,
-            appVersion: "1.0",
-            appInstallId: "UUID-HERE",
-            localIP: "192.168.1.x"
+            appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0",
+            appInstallId: installId,
+            localIP: "unavailable" // Removed hardcoded 0.0.0.0, will be determined by connection
         )
     }
 }

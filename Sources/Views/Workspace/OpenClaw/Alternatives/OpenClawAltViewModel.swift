@@ -1,6 +1,35 @@
 import Foundation
 import Observation
 
+public enum PairingState: Equatable {
+    case idle
+    case discovering           // or .scanning for QR flow
+    case connecting
+    case authenticating
+    case challengeReceived
+    case awaitingApproval(countdown: Int)
+    case paired
+    case connected
+    case failed(String)
+    case disconnected
+
+    public static func == (lhs: PairingState, rhs: PairingState) -> Bool {
+        switch (lhs, rhs) {
+        case (.idle, .idle), (.discovering, .discovering),
+             (.connecting, .connecting), (.authenticating, .authenticating),
+             (.challengeReceived, .challengeReceived), (.paired, .paired),
+             (.connected, .connected), (.disconnected, .disconnected):
+            return true
+        case (.awaitingApproval(let l), .awaitingApproval(let r)):
+            return l == r
+        case (.failed(let l), .failed(let r)):
+            return l == r
+        default:
+            return false
+        }
+    }
+}
+
 @Observable @MainActor
 class OpenClawAltViewModel {
     var methodCards: [OpenClawAltMethodCard] = [

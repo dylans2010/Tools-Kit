@@ -23,8 +23,8 @@ public actor TLANPairingEngine {
 
     public init() {}
 
-    public func startPairing(url: URL) async throws -> AsyncStream<TLANPairingState> {
-        let (stream, continuation) = AsyncStream.makeStream(of: TLANPairingState.self)
+    public func startPairing(url: URL) async throws -> AsyncStream<PairingState> {
+        let (stream, continuation) = AsyncStream.makeStream(of: PairingState.self)
 
         let c = TLANWebSocketConnection(url: url)
         self.connection = c
@@ -45,7 +45,7 @@ public actor TLANPairingEngine {
         return stream
     }
 
-    private func handleMessage(_ data: Data, continuation: AsyncStream<TLANPairingState>.Continuation) async throws {
+    private func handleMessage(_ data: Data, continuation: AsyncStream<PairingState>.Continuation) async throws {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let message = try decoder.decode(TLANMessage.self, from: data)

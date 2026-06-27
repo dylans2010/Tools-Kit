@@ -1,65 +1,70 @@
 import Foundation
-import UIKit
 import AVFoundation
+import OSLog
+import UIKit
 
-public final class QRScannerBridge: NSObject, AVCaptureMetadataOutputObjectsDelegate {
-    private var captureSession: AVCaptureSession?
-    private var completion: ((String) -> Void)?
+public actor OpenClawQRScanner: NSObject, AVCaptureMetadataOutputObjectsDelegate {
+    private let session = AVCaptureSession()
+    private var continuation: CheckedContinuation<String, Error>?
+    private let logger = Logger(subsystem: "com.toolskit.openclaw.alternatives", category: "scanner")
 
-    @MainActor
-    public func startScanning(in view: UIView, completion: @escaping (String) -> Void) {
-        self.completion = completion
-
-        let session = AVCaptureSession()
-        self.captureSession = session
-
-        guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
-        let videoInput: AVCaptureDeviceInput
-
-        do {
-            videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
-        } catch {
-            return
+    public func scan(in view: UIView) async throws -> String {
+        guard let device = AVCaptureDevice.default(for: .video) else {
+            throw TLANError.connectionFailed("No camera available")
+        }
+        let input = try AVCaptureDeviceInput(device: device)
+        let output = AVCaptureMetadataOutput()
+        guard session.canAddInput(input), session.canAddOutput(output) else {
+            throw TLANError.connectionFailed("Capture session setup failed")
         }
 
-        if (session.canAddInput(videoInput)) {
-            session.addInput(videoInput)
-        } else {
-            return
-        }
-
-        let metadataOutput = AVCaptureMetadataOutput()
-
-        if (session.canAddOutput(metadataOutput)) {
-            session.addOutput(metadataOutput)
-
-            metadataOutput.setMetadataObjectsDelegate(self, queue: .main)
-            metadataOutput.metadataObjectTypes = [.qr]
-        } else {
-            return
-        }
+        session.beginConfiguration()
+        session.addInput(input)
+        session.addOutput(output)
+        output.setMetadataObjectsDelegate(self, queue: .main)
+        output.metadataObjectTypes = [.qr]
+        session.commitConfiguration()
 
         let previewLayer = AVCaptureVideoPreviewLayer(session: session)
         previewLayer.frame = view.layer.bounds
         previewLayer.videoGravity = .resizeAspectFill
-        view.layer.addSublayer(previewLayer)
+        await MainActor.run {
+            view.layer.addSublayer(previewLayer)
+        }
 
-        DispatchQueue.global(qos: .userInitiated).async {
+        return try await withCheckedThrowingContinuation { cont in
+            self.continuation = cont
             session.startRunning()
         }
     }
 
-    public func stopScanning() {
-        captureSession?.stopRunning()
-        captureSession = nil
+    public nonisolated func metadataOutput(_ output: AVCaptureMetadataOutput,
+                                    didOutput objects: [AVMetadataObject],
+                                    from connection: AVCaptureConnection) {
+        guard let obj = objects.first as? AVMetadataMachineReadableCodeObject,
+              let value = obj.stringValue else { return }
+        Task { await self.finish(with: value) }
     }
 
-    public func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
-        if let metadataObject = metadataObjects.first {
-            guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject else { return }
-            guard let stringValue = readableObject.stringValue else { return }
-            completion?(stringValue)
-            stopScanning()
+    private func finish(with value: String) {
+        session.stopRunning()
+        continuation?.resume(returning: value)
+        continuation = nil
+    }
+}
+
+public class QRScannerBridge {
+    private let scanner = OpenClawQRScanner()
+    private let logger = Logger(subsystem: "com.toolskit.openclaw.alternatives", category: "bridge")
+    public init() {}
+    public func startScanning(in view: UIView, completion: @escaping (String) -> Void) {
+        Task {
+            do {
+                let result = try await scanner.scan(in: view)
+                completion(result)
+            } catch {
+                logger.error("Scanning failed: \(error.localizedDescription)")
+            }
         }
     }
 }

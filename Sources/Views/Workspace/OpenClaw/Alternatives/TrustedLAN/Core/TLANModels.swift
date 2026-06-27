@@ -1,9 +1,5 @@
-
 import Foundation
-
-public enum TLANPairingState: Equatable {
-    case idle, discovering, connecting, challengeReceived, awaitingApproval(countdown: Int), paired, failed(String)
-}
+import Observation
 
 public struct TLANTrustToken: Codable {
     public let token: String
