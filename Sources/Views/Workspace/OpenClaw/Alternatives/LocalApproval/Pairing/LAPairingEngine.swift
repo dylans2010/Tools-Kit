@@ -28,18 +28,22 @@ public actor LAPairingEngine {
         let hello = LAMessage(type: "HELLO", deviceInfo: info)
         let data = try JSONEncoder().encode(hello)
         try await c.send(data: data)
-        continuation.yield(.awaitingApproval)
+        continuation.yield(.awaitingApproval(60))
 
         Task {
             for await d in dataStream {
-                let msg = try JSONDecoder().decode(LAMessage.self, from: d)
-                if msg.type == "TRUST_TOKEN", let t = msg.token {
-                    try await tokenService.saveToken(t)
-                    continuation.yield(.paired)
-                    break
-                } else if msg.type == "DENIED" {
-                    continuation.yield(.failed("Denied"))
-                    break
+                do {
+                    let msg = try JSONDecoder().decode(LAMessage.self, from: d)
+                    if msg.type == "TRUST_TOKEN", let t = msg.token {
+                        try await tokenService.saveToken(t)
+                        continuation.yield(.paired)
+                        break
+                    } else if msg.type == "DENIED" {
+                        continuation.yield(.failed("Denied"))
+                        break
+                    }
+                } catch {
+                    continuation.yield(.failed("Invalid message"))
                 }
             }
         }
