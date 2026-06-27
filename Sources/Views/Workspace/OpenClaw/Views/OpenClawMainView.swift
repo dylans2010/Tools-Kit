@@ -117,6 +117,12 @@ struct OpenClawMainView: View {
     private var diagnosticsSection: some View {
         Section("Diagnostics") {
             NavigationLink {
+                OpenClawAltView()
+            } label: {
+                Label("Alternative Pairing Methods", systemImage: "link.badge.plus")
+            }
+
+            NavigationLink {
                 OpenClawLoggerView()
             } label: {
                 Label("Live Connection Logs", systemImage: "terminal.fill")
