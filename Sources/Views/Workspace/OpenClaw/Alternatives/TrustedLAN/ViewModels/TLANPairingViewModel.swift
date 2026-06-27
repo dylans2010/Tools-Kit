@@ -15,10 +15,22 @@ public final class TLANPairingViewModel {
     public func pair(with result: NWBrowser.Result) async {
         state = .connecting
         do {
-            guard case let .service(_, _, _, endpoint) = result else {
-                throw TLANPairingError.invalidDiscoveryResult
+            let endpoint = result.endpoint
+            guard case let .hostPort(host, port) = endpoint else {
+                throw TLANError.connectionFailed("Invalid endpoint")
             }
-            let stream = try await pairingEngine.startPairing(endpoint: endpoint)
+            // Use debugDescription for host, or if it's an IP/hostname it can be tricky.
+            // A simple way to get string:
+            let hostStr = switch host {
+            case .name(let name, _): name
+            case .ipv4(let ipv4): "\(ipv4)"
+            case .ipv6(let ipv6): "[\(ipv6)]"
+            @unknown default: "\(host)"
+            }
+            guard let url = URL(string: "ws://\(hostStr):\(port.rawValue)") else {
+                throw TLANError.connectionFailed("Invalid URL")
+            }
+            let stream = try await pairingEngine.startPairing(url: url)
             for await newState in stream {
                 self.state = newState
             }
