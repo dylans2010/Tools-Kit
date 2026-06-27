@@ -5,6 +5,7 @@ public actor QRCredentialExchange {
     private init() {}
 
     public func finalizePairing(token: QRTrustToken) async throws {
-        // Finalize
+        let info = await LADeviceInfoService.shared.getDeviceInfo()
+        // Send final confirmation to gateway if required by protocol
     }
 }
