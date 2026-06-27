@@ -14,7 +14,7 @@ import Foundation
 import CryptoKit
 
 public actor PCPairingEngine {
-    private let client = PCHTTPClient()
+    private let client = PCNetworkClient()
     private let tokenService = PCTokenService.shared
 
     public init() {}
