@@ -68,7 +68,12 @@ struct Diag_RestrictionsCheckView: View {
         let context = LAContext()
         var authError: NSError?
         let hasBiometrics = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &authError)
-        let biometricRestricted = authError?.code == LAError.biometryLockout.rawValue
+        let biometricRestricted: Bool
+        if let laError = authError as? LAError {
+            biometricRestricted = laError.code == .biometryLockout
+        } else {
+            biometricRestricted = false
+        }
         results.append(("Biometrics", biometricRestricted ? "Biometrics locked out" : hasBiometrics ? "Biometrics available" : "Biometrics not available", biometricRestricted ? .restricted : hasBiometrics ? .allowed : .unknown))
 
         let fm = FileManager.default

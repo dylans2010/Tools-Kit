@@ -5,6 +5,13 @@ public struct PCCodeEntryView: View {
     @State private var pairingVM = PCPairingViewModel()
     @State private var settings = PCSettingsService.shared
 
+    private var isValidating: Bool {
+        if case .validating = pairingVM.state {
+            return true
+        }
+        return false
+    }
+
     public var body: some View {
         VStack(spacing: 30) {
             Text("Enter the 8-digit code shown on your Mac")
@@ -26,7 +33,7 @@ public struct PCCodeEntryView: View {
                 }
             }
             .buttonStyle(.borderedProminent)
-            .disabled(code.count < 6 || pairingVM.state == .validating)
+            .disabled(code.count < 6 || isValidating)
 
             if pairingVM.state == .validating {
                 ProgressView("Validating...")

@@ -742,6 +742,8 @@ actor OpenClawGatewayConnection: NSObject, URLSessionWebSocketDelegate {
         reconnectionTask = Task { [weak self] in
             guard let self = self else { return }
 
+            let connectionID = await self.connectionID
+
             let attempt = await getAttempt()
             if attempt >= 5 {
                 logger.error("Max retries exceeded. Total attempts: \(attempt)")

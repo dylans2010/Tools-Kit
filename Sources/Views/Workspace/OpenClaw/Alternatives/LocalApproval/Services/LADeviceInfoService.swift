@@ -18,7 +18,7 @@ public actor LADeviceInfoService {
         )
     }
 
-    private func getIPAddress() -> String? {
+    nonisolated private func getIPAddress() -> String? {
         var address: String?
         var ifaddr: UnsafeMutablePointer<ifaddrs>?
         if getifaddrs(&ifaddr) == 0 {

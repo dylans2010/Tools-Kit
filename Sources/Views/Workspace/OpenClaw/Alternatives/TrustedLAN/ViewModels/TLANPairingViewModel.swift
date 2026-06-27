@@ -15,7 +15,10 @@ public final class TLANPairingViewModel {
     public func pair(with result: NWBrowser.Result) async {
         state = .connecting
         do {
-            let stream = try await pairingEngine.startPairing(endpoint: result.endpoint)
+            guard case let .service(_, _, _, endpoint) = result else {
+                throw TLANPairingError.invalidDiscoveryResult
+            }
+            let stream = try await pairingEngine.startPairing(endpoint: endpoint)
             for await newState in stream {
                 self.state = newState
             }
