@@ -5,6 +5,18 @@ public enum TLANPairingState: Equatable {
     case idle, discovering, connecting, challengeReceived, awaitingApproval(countdown: Int), paired, failed(String)
 }
 
+public struct TLANDevice: Identifiable, Codable, Equatable {
+    public let id: String
+    public let name: String
+    public let pairedAt: Date
+
+    public init(id: String, name: String, pairedAt: Date = Date()) {
+        self.id = id
+        self.name = name
+        self.pairedAt = pairedAt
+    }
+}
+
 public struct TLANTrustToken: Codable {
     public let token: String
     public let deviceId: String
