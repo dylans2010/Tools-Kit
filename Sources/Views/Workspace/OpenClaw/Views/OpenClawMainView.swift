@@ -11,6 +11,7 @@ struct OpenClawMainView: View {
                 statusSection
                 actionsSection
                 deviceSection
+                alternativesSection
                 diagnosticsSection
             }
             .navigationTitle("OpenClaw")
@@ -110,6 +111,16 @@ struct OpenClawMainView: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
+            }
+        }
+    }
+
+    private var alternativesSection: some View {
+        Section("Compatibility") {
+            NavigationLink {
+                OpenClawAltView()
+            } label: {
+                Label("Pairing Alternatives", systemImage: "shuffle")
             }
         }
     }

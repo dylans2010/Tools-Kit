@@ -96,6 +96,8 @@
 	<string>Camera access is required for scanning documents, classifying IDs, detecting objects, and Daily video calls.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone access is required for voice meal logging, live coaching interactions, and Daily audio calls.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access is required for scanning OpenClaw pairing QR codes and other visual tools.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Speech recognition is required to convert spoken meal logs into nutrition entries.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -125,6 +127,8 @@
 	<array>
 		<string>_openclaw-gw._tcp</string>
 	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Tools Kit uses your local network to discover and connect to OpenClaw gateways on your Mac.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
