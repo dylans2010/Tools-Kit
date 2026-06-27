@@ -2480,7 +2480,7 @@
 		4C2D2A6D9ACF587185A995F0 /* MTStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB20A881B6D05F6899B822DF /* MTStatusView.swift */; };
 		02699B1B890D530CB1C7A408 /* OpenClawAltView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B34AF5CC2B50A0A3AC7C01 /* OpenClawAltView.swift */; };
 		8C91C070984057069BE7EE0F /* OpenClawAltViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669911302ABD51CCA9EE1086 /* OpenClawAltViewModel.swift */; };
-		9AA918AAFE9651C2882BE8E0 /* PCHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413A0AAF444D57AA9C1B85AD /* PCHTTPClient.swift */; };
+		9AA918AAFE9651C2882BE8E0 /* PCNetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413A0AAF444D57AA9C1B85AD /* PCNetworkClient.swift */; };
 		C54D27E0AEB55EE8A65A75A8 /* PCSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1CE84F05195A89840CFABD /* PCSessionManager.swift */; };
 		D147ED98B0CF5F8EA305CDF4 /* PCWebSocketConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DBA1502F935154862862CD /* PCWebSocketConnection.swift */; };
 		23F5E8CF73F75249A1BBC58B /* PCConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED942FE814652999B8B8751 /* PCConstants.swift */; };
@@ -5050,7 +5050,7 @@
 		DB20A881B6D05F6899B822DF /* MTStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/ManualToken/Views/MTStatusView.swift; sourceTree = SOURCE_ROOT; };
 		34B34AF5CC2B50A0A3AC7C01 /* OpenClawAltView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/OpenClawAltView.swift; sourceTree = SOURCE_ROOT; };
 		669911302ABD51CCA9EE1086 /* OpenClawAltViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/OpenClawAltViewModel.swift; sourceTree = SOURCE_ROOT; };
-		413A0AAF444D57AA9C1B85AD /* PCHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/PairingCode/Connections/PCHTTPClient.swift; sourceTree = SOURCE_ROOT; };
+		413A0AAF444D57AA9C1B85AD /* PCNetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/PairingCode/Connections/PCNetworkClient.swift; sourceTree = SOURCE_ROOT; };
 		DA1CE84F05195A89840CFABD /* PCSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/PairingCode/Connections/PCSessionManager.swift; sourceTree = SOURCE_ROOT; };
 		80DBA1502F935154862862CD /* PCWebSocketConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/PairingCode/Connections/PCWebSocketConnection.swift; sourceTree = SOURCE_ROOT; };
 		0ED942FE814652999B8B8751 /* PCConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/PairingCode/Core/PCConstants.swift; sourceTree = SOURCE_ROOT; };
@@ -12495,7 +12495,7 @@
 		5809351C2447508EA5F60256 /* Connections */ = {
 			isa = PBXGroup;
 			children = (
-				413A0AAF444D57AA9C1B85AD /* PCHTTPClient.swift */,				80DBA1502F935154862862CD /* PCWebSocketConnection.swift */,				DA1CE84F05195A89840CFABD /* PCSessionManager.swift */,			);
+				413A0AAF444D57AA9C1B85AD /* PCNetworkClient.swift */,				80DBA1502F935154862862CD /* PCWebSocketConnection.swift */,				DA1CE84F05195A89840CFABD /* PCSessionManager.swift */,			);
 			path = Connections;
 			sourceTree = "<group>";
 		};
