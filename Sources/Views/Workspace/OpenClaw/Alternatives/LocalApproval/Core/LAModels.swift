@@ -26,6 +26,19 @@ public enum LAPairingState: Equatable {
     case exchangeFailed(String)
     case paired
     case ready
+    case failed(String)
+}
+
+public struct LAMessage: Codable {
+    public let type: String
+    public let deviceInfo: LADeviceInfo?
+    public let token: LATrustToken?
+
+    public init(type: String, deviceInfo: LADeviceInfo? = nil, token: LATrustToken? = nil) {
+        self.type = type
+        self.deviceInfo = deviceInfo
+        self.token = token
+    }
 }
 
 public struct LADevice: Identifiable, Codable, Equatable {
