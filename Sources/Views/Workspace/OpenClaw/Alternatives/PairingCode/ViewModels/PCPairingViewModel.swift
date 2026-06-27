@@ -11,12 +11,12 @@ public final class PCPairingViewModel {
     public init() {}
 
     public func submitCode(_ code: String, host: String, port: Int) async {
-        self.state = .submitting
+        self.state = .validating
         do {
             try await engine.submitCode(code, host: host, port: port)
             self.state = .paired
         } catch {
-            self.state = .exchangeFailed(error.localizedDescription)
+            self.state = .failed(error.localizedDescription)
         }
     }
 }
