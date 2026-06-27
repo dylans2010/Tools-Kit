@@ -30,8 +30,26 @@ public actor LADeviceInfoService {
                 if addrFamily == UInt8(AF_INET) {
                     if let name = interface?.ifa_name, String(cString: name) == "en0" {
                         var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-                        // safe: sa_len is guaranteed by the OS for AF_INET on en0
-                        getnameinfo(interface?.ifa_addr, socklen_t((interface?.ifa_addr.pointee.sa_len)!) // safe: sa_len is guaranteed, &hostname, socklen_t(hostname.count), nil, socklen_t(0), NI_NUMERICHOST)
+                        guard let addr = interface?.ifa_addr else {
+                            continue
+                        }
+                        let length: socklen_t
+                        #if os(iOS)
+                        if addr.pointee.sa_family == UInt8(AF_INET) {
+                            length = socklen_t(MemoryLayout<sockaddr_in>.size)
+                        } else {
+                            length = socklen_t(MemoryLayout<sockaddr>.size)
+                        }
+                        #else
+                        length = socklen_t(addr.pointee.sa_len)
+                        #endif
+                        getnameinfo(addr,
+                                    length,
+                                    &hostname,
+                                    socklen_t(hostname.count),
+                                    nil,
+                                    0,
+                                    NI_NUMERICHOST)
                         address = String(cString: hostname)
                     }
                 }
