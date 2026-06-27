@@ -2437,6 +2437,145 @@
 		WT1C4BF8EBB28B8B53DA65BA /* WorkspaceAITools.swift in Sources */ = {isa = PBXBuildFile; fileRef = WT2150AD8D36DF890EC9A009 /* WorkspaceAITools.swift */; };
 		XM0200000000000000000001 /* MCPModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = XM0100000000000000000001 /* MCPModels.swift */; };
 		ZF0000000000000000000003 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = ZF0000000000000000000002 /* ZIPFoundation */; };
+		ED81ED7864BF5B92845C542D /* LABonjourBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EADCD307CE145954B76B77CC /* LABonjourBrowser.swift */; };
+		CA39CABAE9D15D5EAC96E217 /* LAHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35DB04FAA4CF595FB260AA6C /* LAHTTPClient.swift */; };
+		02F4F6A9619A5CA9A5C28450 /* LASessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00BF49BFAF45DC4B61CE711 /* LASessionManager.swift */; };
+		6F3AE168B48951A69D93378E /* LAWebSocketConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E30ED25E5EF5309B2506586 /* LAWebSocketConnection.swift */; };
+		496BA8073B8B5D2F8C8871DB /* LAConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B763A8060F25124BAC4ABF9 /* LAConstants.swift */; };
+		B264B822AD3B588683DEFE73 /* LAErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174A33BF686655A0803E8829 /* LAErrors.swift */; };
+		AE5868031EC15F8A9441A8CC /* LAModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EBC661240B5A7AB0CC403D /* LAModels.swift */; };
+		CF126A1AFEB85DAEBB3AD86A /* LACredentialExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28224D9EEF755B28886D57A3 /* LACredentialExchange.swift */; };
+		8347EFB94ED1578A9130FF43 /* LAPairingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB3DDDF6EC85E34AEF768C0 /* LAPairingEngine.swift */; };
+		3C71A81D8EC9532087F3FF0D /* LATrustManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F86B67419BB54E4903200F2 /* LATrustManager.swift */; };
+		792CB974D9F0590CBA7087D0 /* LAValidationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDDEAD4FAFF51C19D5202BE /* LAValidationEngine.swift */; };
+		3AF8CD445AB751EE8BA58757 /* LADeviceInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB7436F4285583BB41CD3B0 /* LADeviceInfoService.swift */; };
+		59341416438B5C8CBF57A26C /* LADeviceManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D180BDDE7C9C53E8BE661495 /* LADeviceManagerService.swift */; };
+		A180E25BF68D54BD8B7EB61E /* LASettingsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2221BA8777965FC38F1A2DB7 /* LASettingsService.swift */; };
+		91206E6784CF5CA389A4FCD7 /* LATokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40F985B7C55B532CA4EC0B70 /* LATokenService.swift */; };
+		F26ED8414D15527C8E68650F /* LADeviceListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B52979E1FE51AD8B3F8B7B /* LADeviceListViewModel.swift */; };
+		80673EC208AB514D9454AED3 /* LADiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC2AAFF26195D8192E68D53 /* LADiagnosticsViewModel.swift */; };
+		E2B26C24B44D556C830470A5 /* LAPairingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1189A5EE956756998CA8E3B3 /* LAPairingViewModel.swift */; };
+		AE76C008B60059979C3C06FF /* LARequestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1F87E6098A53EE9DB90AD0 /* LARequestViewModel.swift */; };
+		89A0EE54F64A5B1F8F4E8BD6 /* LAStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5CFEA05DCA5D9097B21BB1 /* LAStatusViewModel.swift */; };
+		F1A3C33F263C5E2BBE991DAD /* LADeviceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8155D8032795019B72EBE05 /* LADeviceListView.swift */; };
+		5E0AF1E454115D62B591796D /* LADiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F360CA452E562485AF2D0C /* LADiagnosticsView.swift */; };
+		AB987160639558749249197C /* LAGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCBF34900D1A5C2383701593 /* LAGuideView.swift */; };
+		E25BD3AAFBEF577484FA5155 /* LAHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B374EC9352E5E2696D85AF4 /* LAHomeView.swift */; };
+		A49BF63B0F5554C99BE669DA /* LAPairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6B23F1CEED05A38A8449F5D /* LAPairingView.swift */; };
+		04AC810ED4A7599F817EA083 /* LAReconnectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81F0D15EA3A5F38B02342F4 /* LAReconnectView.swift */; };
+		A45A75C95816529C88DD6DA2 /* LARequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9A07D54C8156EBBFEF811D /* LARequestView.swift */; };
+		3E03B3BC42785ADAA57C3978 /* LASettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A73B4CD965935BD68E2D3602 /* LASettingsView.swift */; };
+		50B2F1AE6E9557A38359E09C /* LAStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CD0C1F332A5F3F8CE8B8B0 /* LAStatusView.swift */; };
+		7FB1F4FA68B454099C805F76 /* MTHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF6A9C0DA42516FB57B4C1E /* MTHTTPClient.swift */; };
+		12C28F62635C52A59AF04B97 /* MTSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99BF13BC84FD5E36966A4B66 /* MTSessionManager.swift */; };
+		F65C46117FB15C498F952026 /* MTWebSocketConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 682E1ACBBF135C96AA297546 /* MTWebSocketConnection.swift */; };
+		AF06A74C93235DDD974287BC /* MTConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C6DAD6FCF95010BA630435 /* MTConstants.swift */; };
+		36DF441016875D3B8E671514 /* MTErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0645C05FF92B5BE190C5643A /* MTErrors.swift */; };
+		14E6FFAA9C4E5BF69C948465 /* MTModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847D5726840C595584504839 /* MTModels.swift */; };
+		8A0FFA67F543557EB39B6345 /* MTCredentialExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA5631FBFE605E40832A130B /* MTCredentialExchange.swift */; };
+		D1E27781CB8C538FAA31F55E /* MTPairingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E88DB72C8215C87A802B1CB /* MTPairingEngine.swift */; };
+		E703C3D053425190991F4556 /* MTTrustManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9217063F8EC959F195632A6B /* MTTrustManager.swift */; };
+		82E4DD865BF958DD9A33F77B /* MTValidationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923C771F72E05082B2E40EEC /* MTValidationEngine.swift */; };
+		EB54382C5E8A5C369B13A7BB /* MTClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B21309FE7B5E5EF5B52A022D /* MTClipboardService.swift */; };
+		A4168DF3D52F5FAEAB494DB5 /* MTSettingsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96035986100E5D1A93FF821F /* MTSettingsService.swift */; };
+		1799D41E49285267A3CA513F /* MTTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30E29C4BD045CF3B72A5270 /* MTTokenService.swift */; };
+		3C1DBC4CD97D5084B40426FF /* MTValidationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FCA6AA6F858541C9A4920DE /* MTValidationService.swift */; };
+		97CF0EEFD22858A3B466D1E2 /* MTDiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F645989E7B635FC49875CC18 /* MTDiagnosticsViewModel.swift */; };
+		602CAE01598B520B96B20BC6 /* MTPairingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78C25307E265793A8E82907 /* MTPairingViewModel.swift */; };
+		F3600DB481F8561B8B55437D /* MTPasteViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2C83E345D4E5BDE9E613A71 /* MTPasteViewModel.swift */; };
+		48E9678BCD155669BF96B5F0 /* MTStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F89FE6B790548198BD7C8F /* MTStatusViewModel.swift */; };
+		CD2EE5A15580572DA9C57CA0 /* MTDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8A982241CD54DDBC31A6C1 /* MTDiagnosticsView.swift */; };
+		58D69A3DC768597CA472EDF9 /* MTGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8EA7025F575D8794FB37F2 /* MTGuideView.swift */; };
+		97E2347293365D8084740540 /* MTHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB3441AB7D6554F4A037BE3A /* MTHomeView.swift */; };
+		AE59C8F3FC3951F68054DBF8 /* MTPairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8A46AECC6B51E9BC26E16A /* MTPairingView.swift */; };
+		83B62D2D2AFC5B02863E3979 /* MTPasteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5A1B20CC1C5DA395C603BD /* MTPasteView.swift */; };
+		03FDDE50CC485580A4E34BB6 /* MTSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1871BFAE6BE852E284EC1041 /* MTSettingsView.swift */; };
+		4C2D2A6D9ACF587185A995F0 /* MTStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB20A881B6D05F6899B822DF /* MTStatusView.swift */; };
+		02699B1B890D530CB1C7A408 /* OpenClawAltView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B34AF5CC2B50A0A3AC7C01 /* OpenClawAltView.swift */; };
+		8C91C070984057069BE7EE0F /* OpenClawAltViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669911302ABD51CCA9EE1086 /* OpenClawAltViewModel.swift */; };
+		9AA918AAFE9651C2882BE8E0 /* PCHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413A0AAF444D57AA9C1B85AD /* PCHTTPClient.swift */; };
+		C54D27E0AEB55EE8A65A75A8 /* PCSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1CE84F05195A89840CFABD /* PCSessionManager.swift */; };
+		D147ED98B0CF5F8EA305CDF4 /* PCWebSocketConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DBA1502F935154862862CD /* PCWebSocketConnection.swift */; };
+		23F5E8CF73F75249A1BBC58B /* PCConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED942FE814652999B8B8751 /* PCConstants.swift */; };
+		9D6FA08E3A5858D28BF84CE1 /* PCErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60CE4C58ABD657C4A7956EB1 /* PCErrors.swift */; };
+		279DF0BF3A855BCA91112027 /* PCModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1738A0E71D65746B27D2F7E /* PCModels.swift */; };
+		D6783CA05FCC54968845E193 /* PCCredentialExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61CBC79BF1095DBAB33D0DE2 /* PCCredentialExchange.swift */; };
+		976047C6728E56C3B3D3AA14 /* PCPairingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40498E67237C5567B7022A5F /* PCPairingEngine.swift */; };
+		C0E70675139B57878C58A047 /* PCTrustManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B199217CC93500FABB6375C /* PCTrustManager.swift */; };
+		EDB8307411775DD9B7F0DB19 /* PCValidationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AF0BA69A905951A1BE1C60 /* PCValidationEngine.swift */; };
+		101ECE9AD3CB52AC8514854B /* PCCodeValidationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C09FF922E855ECA884DE6B7 /* PCCodeValidationService.swift */; };
+		54419F1BB42450CC9ECCF86A /* PCHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7228357442F35B6580ABFF53 /* PCHTTPClient.swift */; };
+		2278B5E2D92E58619FDDCA40 /* PCSecurityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B94A4E9D0CAC5C7A9FC37A87 /* PCSecurityService.swift */; };
+		135C1083FF6352BF88AD4449 /* PCSettingsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AD273CC8AE0541E9EFC6024 /* PCSettingsService.swift */; };
+		CCA27E84417F57838A80DFE2 /* PCTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA99466D64B56FC85A7A64F /* PCTokenService.swift */; };
+		4948E514D7B45F8FA6B942B7 /* PCCodeEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03463FC3F38057A0A1CF1BA3 /* PCCodeEntryViewModel.swift */; };
+		43F59494936B557B9FF13DE5 /* PCDiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9780A4903942539F8A676DD4 /* PCDiagnosticsViewModel.swift */; };
+		95931BD661FE5693B4542581 /* PCPairingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B504F27988515EAA9B2DD9E3 /* PCPairingViewModel.swift */; };
+		76CE7699D7455DB28BA23E2F /* PCStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD559A92A6495CAA8D847A5F /* PCStatusViewModel.swift */; };
+		AF99AAD7BE2058A4923D140E /* PCCodeEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD8C5443D00858ECAD7747D5 /* PCCodeEntryView.swift */; };
+		BF142EA6FEF154B9AE63A674 /* PCDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DEF6C15BAF5C3BB1FE5B4C /* PCDiagnosticsView.swift */; };
+		3267B7F83A145B51A0D03C0C /* PCGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3B933425F5059089C132012 /* PCGuideView.swift */; };
+		3920031870015541834E2426 /* PCHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B25C235F06E57799923385A /* PCHomeView.swift */; };
+		9AF2621230F6541BABD88F95 /* PCPairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C5BAF227835C54B1367073 /* PCPairingView.swift */; };
+		764575629D3151128AEA441F /* PCSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14AB2FF9C2E8523FB54D8192 /* PCSettingsView.swift */; };
+		F58E970AAA645497B2EA80BE /* PCStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58997E18D4D754198ABDC556 /* PCStatusView.swift */; };
+		3999C6028D4651379BDE1515 /* QRHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162943DECA30541DA034C8BE /* QRHTTPClient.swift */; };
+		033490390136506BBC5211C9 /* QRScannerBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC2407F7096855C5AF4DFE4E /* QRScannerBridge.swift */; };
+		605C1C60321259A3B338FFD9 /* QRSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F001DF97C24357D19DAECD1B /* QRSessionManager.swift */; };
+		641AFE70B6895981A97CE62A /* QRWebSocketConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40B1EE385BD5CB9A9BC547D /* QRWebSocketConnection.swift */; };
+		2E49D97E14C1585AB65D8234 /* QRConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DC4AB0BE01586E91F2532F /* QRConstants.swift */; };
+		A6AFA32963DF5499BBBA7B8C /* QRErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA534690F9285B37A4697B15 /* QRErrors.swift */; };
+		5726DAED340157519E5C477E /* QRModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1AB91A264250428546DB5B /* QRModels.swift */; };
+		D9C28EE2A0D050878B74422B /* QRCredentialExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49EA0A9D7555F4FAB4C40D5 /* QRCredentialExchange.swift */; };
+		4573930701BA5CA4BA516582 /* QRPairingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 629278A667C05F98BA769BAB /* QRPairingEngine.swift */; };
+		8463691DBACD590B97B53FD8 /* QRTrustManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DA8D9B037135749BBBC2898 /* QRTrustManager.swift */; };
+		477A2F897E1256999F55A5A8 /* QRValidationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A52FD9341C95C88B9A4E137 /* QRValidationEngine.swift */; };
+		DEA4EF2E756656609E2C25F3 /* QRPayloadParserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3216A0257635D7F91F14994 /* QRPayloadParserService.swift */; };
+		923657F519ED573FA451E6FE /* QRPermissionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DDC064993A54B995DD23A7 /* QRPermissionService.swift */; };
+		B03DE194D8B451C4AB938FBF /* QRSettingsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 216376153EF053FDA63A14BF /* QRSettingsService.swift */; };
+		4B725CAE1ACF5559BF1F2B82 /* QRTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8BF3505470852BFA6098A6A /* QRTokenService.swift */; };
+		2AE6FABAC35C5FAF8EF57B98 /* QRValidationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6FEEF94385F5B88AE0CA18A /* QRValidationService.swift */; };
+		31ED541060305ADF9FC76114 /* QRDiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC25ED68B2305CDF9D750BD1 /* QRDiagnosticsViewModel.swift */; };
+		B939400A4E7F5E08BB09A2DF /* QRPairingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DD026351CD50D193CB7862 /* QRPairingViewModel.swift */; };
+		01EEBE9B9CAF5D51B048F923 /* QRScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE96959B2135EF9A73782DB /* QRScannerViewModel.swift */; };
+		01C55F12DA9D5FB9B7C28E24 /* QRStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6149E74760B55B2B5780CCD /* QRStatusViewModel.swift */; };
+		43DBE36DEA865FA2AC8B2097 /* QRDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6AF59C50ABC5048ADEC30D0 /* QRDiagnosticsView.swift */; };
+		6CD5E889618A5CCDB38D1F3E /* QRGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBCC23E250805826BEA13DF8 /* QRGuideView.swift */; };
+		02CAB28903A85AB38F416E70 /* QRHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2368501A1430543094233BDC /* QRHomeView.swift */; };
+		48F4B1DB675454F2888986E3 /* QRPairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57ED867F5D165093AB4B42A9 /* QRPairingView.swift */; };
+		B0A77153BEBB5BA09221A3EE /* QRPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483AC1E0E72156E586744BEB /* QRPermissionView.swift */; };
+		5B0E39EEA4D6541CBBAEFC43 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B44DC3EE7BE75C76942FC3BE /* QRScannerView.swift */; };
+		53BDEAE800C05749AAA17AB1 /* QRSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B199778550756E580C16D36 /* QRSettingsView.swift */; };
+		38DD7D42D5B05D9B995FE8AE /* QRStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF4075AECC857EABCDE63EF /* QRStatusView.swift */; };
+		7E3A701E1EA453098E28C1AE /* TLANBonjourBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F2B9E2C78A45AC3A76A2D04 /* TLANBonjourBrowser.swift */; };
+		C2348E9862005C11A18B4C21 /* TLANHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06968A3F71D15334A0E5F7B5 /* TLANHTTPClient.swift */; };
+		D79793A4C58E5392912C287B /* TLANSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 687558FBF93656F69623518E /* TLANSessionManager.swift */; };
+		72E5C478405B50E18969389E /* TLANWebSocketConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77A3BD6F21B05CBC8DEE67EC /* TLANWebSocketConnection.swift */; };
+		7F7E994247365C929ED07355 /* TLANConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3263AF88FF365562BEEC8D93 /* TLANConstants.swift */; };
+		49AC5112A106505099B11A7D /* TLANErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319CC874F0FD51BCAFA99CD6 /* TLANErrors.swift */; };
+		B0AF7665684457E3BD081527 /* TLANModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AAB6DFE01575C418CF6F7E5 /* TLANModels.swift */; };
+		1FD3F2BF8869537098B2841A /* TLANCredentialExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEEF5E8F84435A83A8570657 /* TLANCredentialExchange.swift */; };
+		0398435C716F5A66B4BE34F1 /* TLANPairingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C311C8E0C9F5DEE8BC482DE /* TLANPairingEngine.swift */; };
+		C54BE0554DD956EE88F26415 /* TLANTrustManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D07B77437BB593BA8A0DB10 /* TLANTrustManager.swift */; };
+		8038A40E712258F8B2DE094E /* TLANValidationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C96208807E5C6684CEBCBB /* TLANValidationEngine.swift */; };
+		6FE15025CF945D97879A6B77 /* TLANDeviceManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC55EDD68379594F9B8C31E7 /* TLANDeviceManagerService.swift */; };
+		905ACDFEC21D5DAB8734E376 /* TLANSecurityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356CE7595F6C5C82A98D9D7E /* TLANSecurityService.swift */; };
+		4ABD9E32D4A35DAC84443DA9 /* TLANSettingsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B90060F6775B8D86BBC86E /* TLANSettingsService.swift */; };
+		FE0B64E34DCF5F02B61367A0 /* TLANTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE01B876FAE5D969D62F016 /* TLANTokenService.swift */; };
+		D06E449083F05FF2946E0492 /* TLANValidationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5D35A220D256FDA1C31A22 /* TLANValidationService.swift */; };
+		83C92DBA0C825097BC0720D9 /* TLANDeviceListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A877A11528C05E158E5AD5D4 /* TLANDeviceListViewModel.swift */; };
+		B366B1ABCC6D5BA9BB145C03 /* TLANDiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449104D3ED44568BA16FE662 /* TLANDiagnosticsViewModel.swift */; };
+		C6F911EB50F0524799D42196 /* TLANDiscoveryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 351B12DC324453CEAD808233 /* TLANDiscoveryViewModel.swift */; };
+		FF25BC0E6B4D557689A1222D /* TLANPairingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFE3F78E41375F45A5752862 /* TLANPairingViewModel.swift */; };
+		478E04A4A8015726BBAA476F /* TLANStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE81AE92C095326971851DF /* TLANStatusViewModel.swift */; };
+		A2595945A7DC501BA452E46C /* TLANDeviceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7754042F8F25CA89953E264 /* TLANDeviceListView.swift */; };
+		CC6AC2163F7D54DA8CB0DD4F /* TLANDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8EEC0E2AE5B10B08A5AEA /* TLANDiagnosticsView.swift */; };
+		D1ED3A2E00C75E7C981B6F2A /* TLANDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 093C6EBD43AA518FBDB214D0 /* TLANDiscoveryView.swift */; };
+		762C86425E105870A2BBC6D3 /* TLANGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE59DEEE551593F9459A07C /* TLANGuideView.swift */; };
+		58CF678A686A5F50BCD536CF /* TLANHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077CCE515647549AB35CAF7E /* TLANHomeView.swift */; };
+		F049E130E2F35DB0B6D978B9 /* TLANPairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D434A5C34859AB9C616559 /* TLANPairingView.swift */; };
+		B4F65AEB3F4B554BB2E183F3 /* TLANSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D0CB82330F5FA6B9B20F2A /* TLANSettingsView.swift */; };
+		7687373CB574570694A587AA /* TLANStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361BD46450605CA0A7795A6A /* TLANStatusView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -4867,6 +5006,145 @@
 		WS01CEDE12EC1A3C4B62BE89 /* PersonaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaManager.swift; sourceTree = "<group>"; };
 		WT2150AD8D36DF890EC9A009 /* WorkspaceAITools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAITools.swift; sourceTree = "<group>"; };
 		XM0100000000000000000001 /* MCPModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MCPModels.swift; path = Sources/Views/External/MCPModels.swift; sourceTree = SOURCE_ROOT; };
+		EADCD307CE145954B76B77CC /* LABonjourBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LABonjourBrowser.swift; sourceTree = "<group>"; };
+		35DB04FAA4CF595FB260AA6C /* LAHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAHTTPClient.swift; sourceTree = "<group>"; };
+		F00BF49BFAF45DC4B61CE711 /* LASessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LASessionManager.swift; sourceTree = "<group>"; };
+		8E30ED25E5EF5309B2506586 /* LAWebSocketConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAWebSocketConnection.swift; sourceTree = "<group>"; };
+		2B763A8060F25124BAC4ABF9 /* LAConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAConstants.swift; sourceTree = "<group>"; };
+		174A33BF686655A0803E8829 /* LAErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAErrors.swift; sourceTree = "<group>"; };
+		38EBC661240B5A7AB0CC403D /* LAModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAModels.swift; sourceTree = "<group>"; };
+		28224D9EEF755B28886D57A3 /* LACredentialExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LACredentialExchange.swift; sourceTree = "<group>"; };
+		7AB3DDDF6EC85E34AEF768C0 /* LAPairingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAPairingEngine.swift; sourceTree = "<group>"; };
+		5F86B67419BB54E4903200F2 /* LATrustManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LATrustManager.swift; sourceTree = "<group>"; };
+		1EDDEAD4FAFF51C19D5202BE /* LAValidationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAValidationEngine.swift; sourceTree = "<group>"; };
+		BEB7436F4285583BB41CD3B0 /* LADeviceInfoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LADeviceInfoService.swift; sourceTree = "<group>"; };
+		D180BDDE7C9C53E8BE661495 /* LADeviceManagerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LADeviceManagerService.swift; sourceTree = "<group>"; };
+		2221BA8777965FC38F1A2DB7 /* LASettingsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LASettingsService.swift; sourceTree = "<group>"; };
+		40F985B7C55B532CA4EC0B70 /* LATokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LATokenService.swift; sourceTree = "<group>"; };
+		19B52979E1FE51AD8B3F8B7B /* LADeviceListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LADeviceListViewModel.swift; sourceTree = "<group>"; };
+		3CC2AAFF26195D8192E68D53 /* LADiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LADiagnosticsViewModel.swift; sourceTree = "<group>"; };
+		1189A5EE956756998CA8E3B3 /* LAPairingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAPairingViewModel.swift; sourceTree = "<group>"; };
+		CE1F87E6098A53EE9DB90AD0 /* LARequestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LARequestViewModel.swift; sourceTree = "<group>"; };
+		9D5CFEA05DCA5D9097B21BB1 /* LAStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAStatusViewModel.swift; sourceTree = "<group>"; };
+		D8155D8032795019B72EBE05 /* LADeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LADeviceListView.swift; sourceTree = "<group>"; };
+		46F360CA452E562485AF2D0C /* LADiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LADiagnosticsView.swift; sourceTree = "<group>"; };
+		CCBF34900D1A5C2383701593 /* LAGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAGuideView.swift; sourceTree = "<group>"; };
+		2B374EC9352E5E2696D85AF4 /* LAHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAHomeView.swift; sourceTree = "<group>"; };
+		F6B23F1CEED05A38A8449F5D /* LAPairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAPairingView.swift; sourceTree = "<group>"; };
+		A81F0D15EA3A5F38B02342F4 /* LAReconnectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAReconnectView.swift; sourceTree = "<group>"; };
+		4E9A07D54C8156EBBFEF811D /* LARequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LARequestView.swift; sourceTree = "<group>"; };
+		A73B4CD965935BD68E2D3602 /* LASettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LASettingsView.swift; sourceTree = "<group>"; };
+		D0CD0C1F332A5F3F8CE8B8B0 /* LAStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LAStatusView.swift; sourceTree = "<group>"; };
+		EEF6A9C0DA42516FB57B4C1E /* MTHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTHTTPClient.swift; sourceTree = "<group>"; };
+		99BF13BC84FD5E36966A4B66 /* MTSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTSessionManager.swift; sourceTree = "<group>"; };
+		682E1ACBBF135C96AA297546 /* MTWebSocketConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTWebSocketConnection.swift; sourceTree = "<group>"; };
+		27C6DAD6FCF95010BA630435 /* MTConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTConstants.swift; sourceTree = "<group>"; };
+		0645C05FF92B5BE190C5643A /* MTErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTErrors.swift; sourceTree = "<group>"; };
+		847D5726840C595584504839 /* MTModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTModels.swift; sourceTree = "<group>"; };
+		CA5631FBFE605E40832A130B /* MTCredentialExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTCredentialExchange.swift; sourceTree = "<group>"; };
+		7E88DB72C8215C87A802B1CB /* MTPairingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTPairingEngine.swift; sourceTree = "<group>"; };
+		9217063F8EC959F195632A6B /* MTTrustManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTTrustManager.swift; sourceTree = "<group>"; };
+		923C771F72E05082B2E40EEC /* MTValidationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTValidationEngine.swift; sourceTree = "<group>"; };
+		B21309FE7B5E5EF5B52A022D /* MTClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTClipboardService.swift; sourceTree = "<group>"; };
+		96035986100E5D1A93FF821F /* MTSettingsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTSettingsService.swift; sourceTree = "<group>"; };
+		E30E29C4BD045CF3B72A5270 /* MTTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTTokenService.swift; sourceTree = "<group>"; };
+		0FCA6AA6F858541C9A4920DE /* MTValidationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTValidationService.swift; sourceTree = "<group>"; };
+		F645989E7B635FC49875CC18 /* MTDiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTDiagnosticsViewModel.swift; sourceTree = "<group>"; };
+		C78C25307E265793A8E82907 /* MTPairingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTPairingViewModel.swift; sourceTree = "<group>"; };
+		C2C83E345D4E5BDE9E613A71 /* MTPasteViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTPasteViewModel.swift; sourceTree = "<group>"; };
+		E5F89FE6B790548198BD7C8F /* MTStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTStatusViewModel.swift; sourceTree = "<group>"; };
+		0A8A982241CD54DDBC31A6C1 /* MTDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTDiagnosticsView.swift; sourceTree = "<group>"; };
+		EF8EA7025F575D8794FB37F2 /* MTGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTGuideView.swift; sourceTree = "<group>"; };
+		BB3441AB7D6554F4A037BE3A /* MTHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTHomeView.swift; sourceTree = "<group>"; };
+		9E8A46AECC6B51E9BC26E16A /* MTPairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTPairingView.swift; sourceTree = "<group>"; };
+		EE5A1B20CC1C5DA395C603BD /* MTPasteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTPasteView.swift; sourceTree = "<group>"; };
+		1871BFAE6BE852E284EC1041 /* MTSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTSettingsView.swift; sourceTree = "<group>"; };
+		DB20A881B6D05F6899B822DF /* MTStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTStatusView.swift; sourceTree = "<group>"; };
+		34B34AF5CC2B50A0A3AC7C01 /* OpenClawAltView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawAltView.swift; sourceTree = "<group>"; };
+		669911302ABD51CCA9EE1086 /* OpenClawAltViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawAltViewModel.swift; sourceTree = "<group>"; };
+		413A0AAF444D57AA9C1B85AD /* PCHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCHTTPClient.swift; sourceTree = "<group>"; };
+		DA1CE84F05195A89840CFABD /* PCSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCSessionManager.swift; sourceTree = "<group>"; };
+		80DBA1502F935154862862CD /* PCWebSocketConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCWebSocketConnection.swift; sourceTree = "<group>"; };
+		0ED942FE814652999B8B8751 /* PCConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCConstants.swift; sourceTree = "<group>"; };
+		60CE4C58ABD657C4A7956EB1 /* PCErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCErrors.swift; sourceTree = "<group>"; };
+		E1738A0E71D65746B27D2F7E /* PCModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCModels.swift; sourceTree = "<group>"; };
+		61CBC79BF1095DBAB33D0DE2 /* PCCredentialExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCCredentialExchange.swift; sourceTree = "<group>"; };
+		40498E67237C5567B7022A5F /* PCPairingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCPairingEngine.swift; sourceTree = "<group>"; };
+		2B199217CC93500FABB6375C /* PCTrustManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCTrustManager.swift; sourceTree = "<group>"; };
+		F4AF0BA69A905951A1BE1C60 /* PCValidationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCValidationEngine.swift; sourceTree = "<group>"; };
+		7C09FF922E855ECA884DE6B7 /* PCCodeValidationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCCodeValidationService.swift; sourceTree = "<group>"; };
+		7228357442F35B6580ABFF53 /* PCHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCHTTPClient.swift; sourceTree = "<group>"; };
+		B94A4E9D0CAC5C7A9FC37A87 /* PCSecurityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCSecurityService.swift; sourceTree = "<group>"; };
+		3AD273CC8AE0541E9EFC6024 /* PCSettingsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCSettingsService.swift; sourceTree = "<group>"; };
+		7BA99466D64B56FC85A7A64F /* PCTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCTokenService.swift; sourceTree = "<group>"; };
+		03463FC3F38057A0A1CF1BA3 /* PCCodeEntryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCCodeEntryViewModel.swift; sourceTree = "<group>"; };
+		9780A4903942539F8A676DD4 /* PCDiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCDiagnosticsViewModel.swift; sourceTree = "<group>"; };
+		B504F27988515EAA9B2DD9E3 /* PCPairingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCPairingViewModel.swift; sourceTree = "<group>"; };
+		BD559A92A6495CAA8D847A5F /* PCStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCStatusViewModel.swift; sourceTree = "<group>"; };
+		AD8C5443D00858ECAD7747D5 /* PCCodeEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCCodeEntryView.swift; sourceTree = "<group>"; };
+		81DEF6C15BAF5C3BB1FE5B4C /* PCDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCDiagnosticsView.swift; sourceTree = "<group>"; };
+		C3B933425F5059089C132012 /* PCGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCGuideView.swift; sourceTree = "<group>"; };
+		0B25C235F06E57799923385A /* PCHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCHomeView.swift; sourceTree = "<group>"; };
+		C8C5BAF227835C54B1367073 /* PCPairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCPairingView.swift; sourceTree = "<group>"; };
+		14AB2FF9C2E8523FB54D8192 /* PCSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCSettingsView.swift; sourceTree = "<group>"; };
+		58997E18D4D754198ABDC556 /* PCStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCStatusView.swift; sourceTree = "<group>"; };
+		162943DECA30541DA034C8BE /* QRHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRHTTPClient.swift; sourceTree = "<group>"; };
+		CC2407F7096855C5AF4DFE4E /* QRScannerBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerBridge.swift; sourceTree = "<group>"; };
+		F001DF97C24357D19DAECD1B /* QRSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRSessionManager.swift; sourceTree = "<group>"; };
+		C40B1EE385BD5CB9A9BC547D /* QRWebSocketConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRWebSocketConnection.swift; sourceTree = "<group>"; };
+		32DC4AB0BE01586E91F2532F /* QRConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRConstants.swift; sourceTree = "<group>"; };
+		EA534690F9285B37A4697B15 /* QRErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRErrors.swift; sourceTree = "<group>"; };
+		EE1AB91A264250428546DB5B /* QRModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRModels.swift; sourceTree = "<group>"; };
+		B49EA0A9D7555F4FAB4C40D5 /* QRCredentialExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCredentialExchange.swift; sourceTree = "<group>"; };
+		629278A667C05F98BA769BAB /* QRPairingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRPairingEngine.swift; sourceTree = "<group>"; };
+		9DA8D9B037135749BBBC2898 /* QRTrustManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRTrustManager.swift; sourceTree = "<group>"; };
+		0A52FD9341C95C88B9A4E137 /* QRValidationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRValidationEngine.swift; sourceTree = "<group>"; };
+		F3216A0257635D7F91F14994 /* QRPayloadParserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRPayloadParserService.swift; sourceTree = "<group>"; };
+		37DDC064993A54B995DD23A7 /* QRPermissionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRPermissionService.swift; sourceTree = "<group>"; };
+		216376153EF053FDA63A14BF /* QRSettingsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRSettingsService.swift; sourceTree = "<group>"; };
+		D8BF3505470852BFA6098A6A /* QRTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRTokenService.swift; sourceTree = "<group>"; };
+		D6FEEF94385F5B88AE0CA18A /* QRValidationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRValidationService.swift; sourceTree = "<group>"; };
+		DC25ED68B2305CDF9D750BD1 /* QRDiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRDiagnosticsViewModel.swift; sourceTree = "<group>"; };
+		18DD026351CD50D193CB7862 /* QRPairingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRPairingViewModel.swift; sourceTree = "<group>"; };
+		4BE96959B2135EF9A73782DB /* QRScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerViewModel.swift; sourceTree = "<group>"; };
+		F6149E74760B55B2B5780CCD /* QRStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRStatusViewModel.swift; sourceTree = "<group>"; };
+		D6AF59C50ABC5048ADEC30D0 /* QRDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRDiagnosticsView.swift; sourceTree = "<group>"; };
+		BBCC23E250805826BEA13DF8 /* QRGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRGuideView.swift; sourceTree = "<group>"; };
+		2368501A1430543094233BDC /* QRHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRHomeView.swift; sourceTree = "<group>"; };
+		57ED867F5D165093AB4B42A9 /* QRPairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRPairingView.swift; sourceTree = "<group>"; };
+		483AC1E0E72156E586744BEB /* QRPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRPermissionView.swift; sourceTree = "<group>"; };
+		B44DC3EE7BE75C76942FC3BE /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
+		1B199778550756E580C16D36 /* QRSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRSettingsView.swift; sourceTree = "<group>"; };
+		1FF4075AECC857EABCDE63EF /* QRStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRStatusView.swift; sourceTree = "<group>"; };
+		8F2B9E2C78A45AC3A76A2D04 /* TLANBonjourBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANBonjourBrowser.swift; sourceTree = "<group>"; };
+		06968A3F71D15334A0E5F7B5 /* TLANHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANHTTPClient.swift; sourceTree = "<group>"; };
+		687558FBF93656F69623518E /* TLANSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANSessionManager.swift; sourceTree = "<group>"; };
+		77A3BD6F21B05CBC8DEE67EC /* TLANWebSocketConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANWebSocketConnection.swift; sourceTree = "<group>"; };
+		3263AF88FF365562BEEC8D93 /* TLANConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANConstants.swift; sourceTree = "<group>"; };
+		319CC874F0FD51BCAFA99CD6 /* TLANErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANErrors.swift; sourceTree = "<group>"; };
+		4AAB6DFE01575C418CF6F7E5 /* TLANModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANModels.swift; sourceTree = "<group>"; };
+		DEEF5E8F84435A83A8570657 /* TLANCredentialExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANCredentialExchange.swift; sourceTree = "<group>"; };
+		1C311C8E0C9F5DEE8BC482DE /* TLANPairingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANPairingEngine.swift; sourceTree = "<group>"; };
+		4D07B77437BB593BA8A0DB10 /* TLANTrustManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANTrustManager.swift; sourceTree = "<group>"; };
+		84C96208807E5C6684CEBCBB /* TLANValidationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANValidationEngine.swift; sourceTree = "<group>"; };
+		FC55EDD68379594F9B8C31E7 /* TLANDeviceManagerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANDeviceManagerService.swift; sourceTree = "<group>"; };
+		356CE7595F6C5C82A98D9D7E /* TLANSecurityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANSecurityService.swift; sourceTree = "<group>"; };
+		66B90060F6775B8D86BBC86E /* TLANSettingsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANSettingsService.swift; sourceTree = "<group>"; };
+		2AE01B876FAE5D969D62F016 /* TLANTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANTokenService.swift; sourceTree = "<group>"; };
+		BE5D35A220D256FDA1C31A22 /* TLANValidationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANValidationService.swift; sourceTree = "<group>"; };
+		A877A11528C05E158E5AD5D4 /* TLANDeviceListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANDeviceListViewModel.swift; sourceTree = "<group>"; };
+		449104D3ED44568BA16FE662 /* TLANDiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANDiagnosticsViewModel.swift; sourceTree = "<group>"; };
+		351B12DC324453CEAD808233 /* TLANDiscoveryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANDiscoveryViewModel.swift; sourceTree = "<group>"; };
+		DFE3F78E41375F45A5752862 /* TLANPairingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANPairingViewModel.swift; sourceTree = "<group>"; };
+		9EE81AE92C095326971851DF /* TLANStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANStatusViewModel.swift; sourceTree = "<group>"; };
+		E7754042F8F25CA89953E264 /* TLANDeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANDeviceListView.swift; sourceTree = "<group>"; };
+		5AD8EEC0E2AE5B10B08A5AEA /* TLANDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANDiagnosticsView.swift; sourceTree = "<group>"; };
+		093C6EBD43AA518FBDB214D0 /* TLANDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANDiscoveryView.swift; sourceTree = "<group>"; };
+		AFE59DEEE551593F9459A07C /* TLANGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANGuideView.swift; sourceTree = "<group>"; };
+		077CCE515647549AB35CAF7E /* TLANHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANHomeView.swift; sourceTree = "<group>"; };
+		94D434A5C34859AB9C616559 /* TLANPairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANPairingView.swift; sourceTree = "<group>"; };
+		52D0CB82330F5FA6B9B20F2A /* TLANSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANSettingsView.swift; sourceTree = "<group>"; };
+		361BD46450605CA0A7795A6A /* TLANStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANStatusView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -5236,6 +5514,7 @@
 		OC030008 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				FFCAABC286435074B9293051 /* Alternatives */,
 				OC010016 /* OpenClawMainView.swift */,
 				OC010017 /* OpenClawPairView.swift */,
 				OC010018 /* OpenClawDeviceListView.swift */,
@@ -12201,6 +12480,230 @@
 			path = Sources/Views/Bridging/TKBridge;
 			sourceTree = SOURCE_ROOT;
 		};
+		D3AC485EAE92554CBC84392C /* Connections */ = {
+			isa = PBXGroup;
+			children = (
+				35DB04FAA4CF595FB260AA6C /* LAHTTPClient.swift */,				8E30ED25E5EF5309B2506586 /* LAWebSocketConnection.swift */,				EADCD307CE145954B76B77CC /* LABonjourBrowser.swift */,				F00BF49BFAF45DC4B61CE711 /* LASessionManager.swift */,			);
+			path = Connections;
+			sourceTree = "<group>";
+		};
+		1590642216E05E7682140157 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				1189A5EE956756998CA8E3B3 /* LAPairingViewModel.swift */,				19B52979E1FE51AD8B3F8B7B /* LADeviceListViewModel.swift */,				3CC2AAFF26195D8192E68D53 /* LADiagnosticsViewModel.swift */,				9D5CFEA05DCA5D9097B21BB1 /* LAStatusViewModel.swift */,				CE1F87E6098A53EE9DB90AD0 /* LARequestViewModel.swift */,			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		E8EA7D6065F15BAB837A924F /* Connections */ = {
+			isa = PBXGroup;
+			children = (
+				682E1ACBBF135C96AA297546 /* MTWebSocketConnection.swift */,				99BF13BC84FD5E36966A4B66 /* MTSessionManager.swift */,				EEF6A9C0DA42516FB57B4C1E /* MTHTTPClient.swift */,			);
+			path = Connections;
+			sourceTree = "<group>";
+		};
+		5809351C2447508EA5F60256 /* Connections */ = {
+			isa = PBXGroup;
+			children = (
+				413A0AAF444D57AA9C1B85AD /* PCHTTPClient.swift */,				80DBA1502F935154862862CD /* PCWebSocketConnection.swift */,				DA1CE84F05195A89840CFABD /* PCSessionManager.swift */,			);
+			path = Connections;
+			sourceTree = "<group>";
+		};
+		EE4405FB06C1518CA9A2655D /* Connections */ = {
+			isa = PBXGroup;
+			children = (
+				06968A3F71D15334A0E5F7B5 /* TLANHTTPClient.swift */,				687558FBF93656F69623518E /* TLANSessionManager.swift */,				77A3BD6F21B05CBC8DEE67EC /* TLANWebSocketConnection.swift */,				8F2B9E2C78A45AC3A76A2D04 /* TLANBonjourBrowser.swift */,			);
+			path = Connections;
+			sourceTree = "<group>";
+		};
+		E6023F4E36385228AA3DBAEC /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				2221BA8777965FC38F1A2DB7 /* LASettingsService.swift */,				40F985B7C55B532CA4EC0B70 /* LATokenService.swift */,				BEB7436F4285583BB41CD3B0 /* LADeviceInfoService.swift */,				D180BDDE7C9C53E8BE661495 /* LADeviceManagerService.swift */,			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		BC15B9E1F23258E78B257A18 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				03463FC3F38057A0A1CF1BA3 /* PCCodeEntryViewModel.swift */,				9780A4903942539F8A676DD4 /* PCDiagnosticsViewModel.swift */,				B504F27988515EAA9B2DD9E3 /* PCPairingViewModel.swift */,				BD559A92A6495CAA8D847A5F /* PCStatusViewModel.swift */,			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		E4406ED01A0F5C3EB978FBA3 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				C2C83E345D4E5BDE9E613A71 /* MTPasteViewModel.swift */,				C78C25307E265793A8E82907 /* MTPairingViewModel.swift */,				E5F89FE6B790548198BD7C8F /* MTStatusViewModel.swift */,				F645989E7B635FC49875CC18 /* MTDiagnosticsViewModel.swift */,			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		83C267AAB9455B84A4073038 /* Pairing */ = {
+			isa = PBXGroup;
+			children = (
+				1EDDEAD4FAFF51C19D5202BE /* LAValidationEngine.swift */,				28224D9EEF755B28886D57A3 /* LACredentialExchange.swift */,				5F86B67419BB54E4903200F2 /* LATrustManager.swift */,				7AB3DDDF6EC85E34AEF768C0 /* LAPairingEngine.swift */,			);
+			path = Pairing;
+			sourceTree = "<group>";
+		};
+		6EAEBCB48AEC597E93CC5AAF /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				351B12DC324453CEAD808233 /* TLANDiscoveryViewModel.swift */,				449104D3ED44568BA16FE662 /* TLANDiagnosticsViewModel.swift */,				9EE81AE92C095326971851DF /* TLANStatusViewModel.swift */,				A877A11528C05E158E5AD5D4 /* TLANDeviceListViewModel.swift */,				DFE3F78E41375F45A5752862 /* TLANPairingViewModel.swift */,			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		E67D41ABCC505CF4AB853A88 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				0FCA6AA6F858541C9A4920DE /* MTValidationService.swift */,				96035986100E5D1A93FF821F /* MTSettingsService.swift */,				B21309FE7B5E5EF5B52A022D /* MTClipboardService.swift */,				E30E29C4BD045CF3B72A5270 /* MTTokenService.swift */,			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		D4A51062DC645E49BA641CF1 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				3AD273CC8AE0541E9EFC6024 /* PCSettingsService.swift */,				7228357442F35B6580ABFF53 /* PCHTTPClient.swift */,				7BA99466D64B56FC85A7A64F /* PCTokenService.swift */,				7C09FF922E855ECA884DE6B7 /* PCCodeValidationService.swift */,				B94A4E9D0CAC5C7A9FC37A87 /* PCSecurityService.swift */,			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		CFDA8D48F75859D5B9F86E15 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2B374EC9352E5E2696D85AF4 /* LAHomeView.swift */,				46F360CA452E562485AF2D0C /* LADiagnosticsView.swift */,				4E9A07D54C8156EBBFEF811D /* LARequestView.swift */,				A73B4CD965935BD68E2D3602 /* LASettingsView.swift */,				A81F0D15EA3A5F38B02342F4 /* LAReconnectView.swift */,				CCBF34900D1A5C2383701593 /* LAGuideView.swift */,				D0CD0C1F332A5F3F8CE8B8B0 /* LAStatusView.swift */,				D8155D8032795019B72EBE05 /* LADeviceListView.swift */,				F6B23F1CEED05A38A8449F5D /* LAPairingView.swift */,			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AB23CE4BCDD95E8BA53E89A4 /* Pairing */ = {
+			isa = PBXGroup;
+			children = (
+				2B199217CC93500FABB6375C /* PCTrustManager.swift */,				40498E67237C5567B7022A5F /* PCPairingEngine.swift */,				61CBC79BF1095DBAB33D0DE2 /* PCCredentialExchange.swift */,				F4AF0BA69A905951A1BE1C60 /* PCValidationEngine.swift */,			);
+			path = Pairing;
+			sourceTree = "<group>";
+		};
+		8C5AD8F03C63527CAAD51E1A /* Pairing */ = {
+			isa = PBXGroup;
+			children = (
+				7E88DB72C8215C87A802B1CB /* MTPairingEngine.swift */,				9217063F8EC959F195632A6B /* MTTrustManager.swift */,				923C771F72E05082B2E40EEC /* MTValidationEngine.swift */,				CA5631FBFE605E40832A130B /* MTCredentialExchange.swift */,			);
+			path = Pairing;
+			sourceTree = "<group>";
+		};
+		3A7D264CD56559B58B0E2BFB /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				2AE01B876FAE5D969D62F016 /* TLANTokenService.swift */,				356CE7595F6C5C82A98D9D7E /* TLANSecurityService.swift */,				66B90060F6775B8D86BBC86E /* TLANSettingsService.swift */,				BE5D35A220D256FDA1C31A22 /* TLANValidationService.swift */,				FC55EDD68379594F9B8C31E7 /* TLANDeviceManagerService.swift */,			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		2E4B4EA1E15D5C2893AFAB8F /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				174A33BF686655A0803E8829 /* LAErrors.swift */,				2B763A8060F25124BAC4ABF9 /* LAConstants.swift */,				38EBC661240B5A7AB0CC403D /* LAModels.swift */,			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		95F8564E5E2853B482F238CE /* Connections */ = {
+			isa = PBXGroup;
+			children = (
+				162943DECA30541DA034C8BE /* QRHTTPClient.swift */,				C40B1EE385BD5CB9A9BC547D /* QRWebSocketConnection.swift */,				CC2407F7096855C5AF4DFE4E /* QRScannerBridge.swift */,				F001DF97C24357D19DAECD1B /* QRSessionManager.swift */,			);
+			path = Connections;
+			sourceTree = "<group>";
+		};
+		A16E678FC2335EC8B722AD6A /* Pairing */ = {
+			isa = PBXGroup;
+			children = (
+				1C311C8E0C9F5DEE8BC482DE /* TLANPairingEngine.swift */,				4D07B77437BB593BA8A0DB10 /* TLANTrustManager.swift */,				84C96208807E5C6684CEBCBB /* TLANValidationEngine.swift */,				DEEF5E8F84435A83A8570657 /* TLANCredentialExchange.swift */,			);
+			path = Pairing;
+			sourceTree = "<group>";
+		};
+		F991D48150C457749DD77124 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				18DD026351CD50D193CB7862 /* QRPairingViewModel.swift */,				4BE96959B2135EF9A73782DB /* QRScannerViewModel.swift */,				DC25ED68B2305CDF9D750BD1 /* QRDiagnosticsViewModel.swift */,				F6149E74760B55B2B5780CCD /* QRStatusViewModel.swift */,			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		0164C240F486523C993C6C3F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				0A8A982241CD54DDBC31A6C1 /* MTDiagnosticsView.swift */,				1871BFAE6BE852E284EC1041 /* MTSettingsView.swift */,				9E8A46AECC6B51E9BC26E16A /* MTPairingView.swift */,				BB3441AB7D6554F4A037BE3A /* MTHomeView.swift */,				DB20A881B6D05F6899B822DF /* MTStatusView.swift */,				EE5A1B20CC1C5DA395C603BD /* MTPasteView.swift */,				EF8EA7025F575D8794FB37F2 /* MTGuideView.swift */,			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		0CDA66E232FD578990F0F93C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				0B25C235F06E57799923385A /* PCHomeView.swift */,				14AB2FF9C2E8523FB54D8192 /* PCSettingsView.swift */,				58997E18D4D754198ABDC556 /* PCStatusView.swift */,				81DEF6C15BAF5C3BB1FE5B4C /* PCDiagnosticsView.swift */,				AD8C5443D00858ECAD7747D5 /* PCCodeEntryView.swift */,				C3B933425F5059089C132012 /* PCGuideView.swift */,				C8C5BAF227835C54B1367073 /* PCPairingView.swift */,			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		467C49FBBFE7539F84DD20B2 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				0ED942FE814652999B8B8751 /* PCConstants.swift */,				60CE4C58ABD657C4A7956EB1 /* PCErrors.swift */,				E1738A0E71D65746B27D2F7E /* PCModels.swift */,			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		A2781C28173F53E5B01DFB23 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				0645C05FF92B5BE190C5643A /* MTErrors.swift */,				27C6DAD6FCF95010BA630435 /* MTConstants.swift */,				847D5726840C595584504839 /* MTModels.swift */,			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		C6954D9778C75E8192312E07 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				077CCE515647549AB35CAF7E /* TLANHomeView.swift */,				093C6EBD43AA518FBDB214D0 /* TLANDiscoveryView.swift */,				361BD46450605CA0A7795A6A /* TLANStatusView.swift */,				52D0CB82330F5FA6B9B20F2A /* TLANSettingsView.swift */,				5AD8EEC0E2AE5B10B08A5AEA /* TLANDiagnosticsView.swift */,				94D434A5C34859AB9C616559 /* TLANPairingView.swift */,				AFE59DEEE551593F9459A07C /* TLANGuideView.swift */,				E7754042F8F25CA89953E264 /* TLANDeviceListView.swift */,			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		660E5C83320E54A489676C41 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				216376153EF053FDA63A14BF /* QRSettingsService.swift */,				37DDC064993A54B995DD23A7 /* QRPermissionService.swift */,				D6FEEF94385F5B88AE0CA18A /* QRValidationService.swift */,				D8BF3505470852BFA6098A6A /* QRTokenService.swift */,				F3216A0257635D7F91F14994 /* QRPayloadParserService.swift */,			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		72AB19CD93775CC4830AC08F /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				319CC874F0FD51BCAFA99CD6 /* TLANErrors.swift */,				3263AF88FF365562BEEC8D93 /* TLANConstants.swift */,				4AAB6DFE01575C418CF6F7E5 /* TLANModels.swift */,			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		6362A32B033B52DCBC996E52 /* Pairing */ = {
+			isa = PBXGroup;
+			children = (
+				0A52FD9341C95C88B9A4E137 /* QRValidationEngine.swift */,				629278A667C05F98BA769BAB /* QRPairingEngine.swift */,				9DA8D9B037135749BBBC2898 /* QRTrustManager.swift */,				B49EA0A9D7555F4FAB4C40D5 /* QRCredentialExchange.swift */,			);
+			path = Pairing;
+			sourceTree = "<group>";
+		};
+		7580B15DA53E5F54BE9EBE2B /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				1B199778550756E580C16D36 /* QRSettingsView.swift */,				1FF4075AECC857EABCDE63EF /* QRStatusView.swift */,				2368501A1430543094233BDC /* QRHomeView.swift */,				483AC1E0E72156E586744BEB /* QRPermissionView.swift */,				57ED867F5D165093AB4B42A9 /* QRPairingView.swift */,				B44DC3EE7BE75C76942FC3BE /* QRScannerView.swift */,				BBCC23E250805826BEA13DF8 /* QRGuideView.swift */,				D6AF59C50ABC5048ADEC30D0 /* QRDiagnosticsView.swift */,			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AC19862C33AD5262946F7FCC /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				32DC4AB0BE01586E91F2532F /* QRConstants.swift */,				EA534690F9285B37A4697B15 /* QRErrors.swift */,				EE1AB91A264250428546DB5B /* QRModels.swift */,			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		FFCAABC286435074B9293051 /* Alternatives */ = {
+			isa = PBXGroup;
+			children = (
+				34B34AF5CC2B50A0A3AC7C01 /* OpenClawAltView.swift */,				669911302ABD51CCA9EE1086 /* OpenClawAltViewModel.swift */,			);
+			path = Alternatives;
+			sourceTree = "<group>";
+		};
+		FFCAABC286435074B9293051 /* Alternatives */ = {
+			isa = PBXGroup;
+			children = (
+				34B34AF5CC2B50A0A3AC7C01 /* OpenClawAltView.swift */,				669911302ABD51CCA9EE1086 /* OpenClawAltViewModel.swift */,			);
+			path = Alternatives;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -12358,6 +12861,145 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED81ED7864BF5B92845C542D /* LABonjourBrowser.swift in Sources */,
+				CA39CABAE9D15D5EAC96E217 /* LAHTTPClient.swift in Sources */,
+				02F4F6A9619A5CA9A5C28450 /* LASessionManager.swift in Sources */,
+				6F3AE168B48951A69D93378E /* LAWebSocketConnection.swift in Sources */,
+				496BA8073B8B5D2F8C8871DB /* LAConstants.swift in Sources */,
+				B264B822AD3B588683DEFE73 /* LAErrors.swift in Sources */,
+				AE5868031EC15F8A9441A8CC /* LAModels.swift in Sources */,
+				CF126A1AFEB85DAEBB3AD86A /* LACredentialExchange.swift in Sources */,
+				8347EFB94ED1578A9130FF43 /* LAPairingEngine.swift in Sources */,
+				3C71A81D8EC9532087F3FF0D /* LATrustManager.swift in Sources */,
+				792CB974D9F0590CBA7087D0 /* LAValidationEngine.swift in Sources */,
+				3AF8CD445AB751EE8BA58757 /* LADeviceInfoService.swift in Sources */,
+				59341416438B5C8CBF57A26C /* LADeviceManagerService.swift in Sources */,
+				A180E25BF68D54BD8B7EB61E /* LASettingsService.swift in Sources */,
+				91206E6784CF5CA389A4FCD7 /* LATokenService.swift in Sources */,
+				F26ED8414D15527C8E68650F /* LADeviceListViewModel.swift in Sources */,
+				80673EC208AB514D9454AED3 /* LADiagnosticsViewModel.swift in Sources */,
+				E2B26C24B44D556C830470A5 /* LAPairingViewModel.swift in Sources */,
+				AE76C008B60059979C3C06FF /* LARequestViewModel.swift in Sources */,
+				89A0EE54F64A5B1F8F4E8BD6 /* LAStatusViewModel.swift in Sources */,
+				F1A3C33F263C5E2BBE991DAD /* LADeviceListView.swift in Sources */,
+				5E0AF1E454115D62B591796D /* LADiagnosticsView.swift in Sources */,
+				AB987160639558749249197C /* LAGuideView.swift in Sources */,
+				E25BD3AAFBEF577484FA5155 /* LAHomeView.swift in Sources */,
+				A49BF63B0F5554C99BE669DA /* LAPairingView.swift in Sources */,
+				04AC810ED4A7599F817EA083 /* LAReconnectView.swift in Sources */,
+				A45A75C95816529C88DD6DA2 /* LARequestView.swift in Sources */,
+				3E03B3BC42785ADAA57C3978 /* LASettingsView.swift in Sources */,
+				50B2F1AE6E9557A38359E09C /* LAStatusView.swift in Sources */,
+				7FB1F4FA68B454099C805F76 /* MTHTTPClient.swift in Sources */,
+				12C28F62635C52A59AF04B97 /* MTSessionManager.swift in Sources */,
+				F65C46117FB15C498F952026 /* MTWebSocketConnection.swift in Sources */,
+				AF06A74C93235DDD974287BC /* MTConstants.swift in Sources */,
+				36DF441016875D3B8E671514 /* MTErrors.swift in Sources */,
+				14E6FFAA9C4E5BF69C948465 /* MTModels.swift in Sources */,
+				8A0FFA67F543557EB39B6345 /* MTCredentialExchange.swift in Sources */,
+				D1E27781CB8C538FAA31F55E /* MTPairingEngine.swift in Sources */,
+				E703C3D053425190991F4556 /* MTTrustManager.swift in Sources */,
+				82E4DD865BF958DD9A33F77B /* MTValidationEngine.swift in Sources */,
+				EB54382C5E8A5C369B13A7BB /* MTClipboardService.swift in Sources */,
+				A4168DF3D52F5FAEAB494DB5 /* MTSettingsService.swift in Sources */,
+				1799D41E49285267A3CA513F /* MTTokenService.swift in Sources */,
+				3C1DBC4CD97D5084B40426FF /* MTValidationService.swift in Sources */,
+				97CF0EEFD22858A3B466D1E2 /* MTDiagnosticsViewModel.swift in Sources */,
+				602CAE01598B520B96B20BC6 /* MTPairingViewModel.swift in Sources */,
+				F3600DB481F8561B8B55437D /* MTPasteViewModel.swift in Sources */,
+				48E9678BCD155669BF96B5F0 /* MTStatusViewModel.swift in Sources */,
+				CD2EE5A15580572DA9C57CA0 /* MTDiagnosticsView.swift in Sources */,
+				58D69A3DC768597CA472EDF9 /* MTGuideView.swift in Sources */,
+				97E2347293365D8084740540 /* MTHomeView.swift in Sources */,
+				AE59C8F3FC3951F68054DBF8 /* MTPairingView.swift in Sources */,
+				83B62D2D2AFC5B02863E3979 /* MTPasteView.swift in Sources */,
+				03FDDE50CC485580A4E34BB6 /* MTSettingsView.swift in Sources */,
+				4C2D2A6D9ACF587185A995F0 /* MTStatusView.swift in Sources */,
+				02699B1B890D530CB1C7A408 /* OpenClawAltView.swift in Sources */,
+				8C91C070984057069BE7EE0F /* OpenClawAltViewModel.swift in Sources */,
+				9AA918AAFE9651C2882BE8E0 /* PCHTTPClient.swift in Sources */,
+				C54D27E0AEB55EE8A65A75A8 /* PCSessionManager.swift in Sources */,
+				D147ED98B0CF5F8EA305CDF4 /* PCWebSocketConnection.swift in Sources */,
+				23F5E8CF73F75249A1BBC58B /* PCConstants.swift in Sources */,
+				9D6FA08E3A5858D28BF84CE1 /* PCErrors.swift in Sources */,
+				279DF0BF3A855BCA91112027 /* PCModels.swift in Sources */,
+				D6783CA05FCC54968845E193 /* PCCredentialExchange.swift in Sources */,
+				976047C6728E56C3B3D3AA14 /* PCPairingEngine.swift in Sources */,
+				C0E70675139B57878C58A047 /* PCTrustManager.swift in Sources */,
+				EDB8307411775DD9B7F0DB19 /* PCValidationEngine.swift in Sources */,
+				101ECE9AD3CB52AC8514854B /* PCCodeValidationService.swift in Sources */,
+				54419F1BB42450CC9ECCF86A /* PCHTTPClient.swift in Sources */,
+				2278B5E2D92E58619FDDCA40 /* PCSecurityService.swift in Sources */,
+				135C1083FF6352BF88AD4449 /* PCSettingsService.swift in Sources */,
+				CCA27E84417F57838A80DFE2 /* PCTokenService.swift in Sources */,
+				4948E514D7B45F8FA6B942B7 /* PCCodeEntryViewModel.swift in Sources */,
+				43F59494936B557B9FF13DE5 /* PCDiagnosticsViewModel.swift in Sources */,
+				95931BD661FE5693B4542581 /* PCPairingViewModel.swift in Sources */,
+				76CE7699D7455DB28BA23E2F /* PCStatusViewModel.swift in Sources */,
+				AF99AAD7BE2058A4923D140E /* PCCodeEntryView.swift in Sources */,
+				BF142EA6FEF154B9AE63A674 /* PCDiagnosticsView.swift in Sources */,
+				3267B7F83A145B51A0D03C0C /* PCGuideView.swift in Sources */,
+				3920031870015541834E2426 /* PCHomeView.swift in Sources */,
+				9AF2621230F6541BABD88F95 /* PCPairingView.swift in Sources */,
+				764575629D3151128AEA441F /* PCSettingsView.swift in Sources */,
+				F58E970AAA645497B2EA80BE /* PCStatusView.swift in Sources */,
+				3999C6028D4651379BDE1515 /* QRHTTPClient.swift in Sources */,
+				033490390136506BBC5211C9 /* QRScannerBridge.swift in Sources */,
+				605C1C60321259A3B338FFD9 /* QRSessionManager.swift in Sources */,
+				641AFE70B6895981A97CE62A /* QRWebSocketConnection.swift in Sources */,
+				2E49D97E14C1585AB65D8234 /* QRConstants.swift in Sources */,
+				A6AFA32963DF5499BBBA7B8C /* QRErrors.swift in Sources */,
+				5726DAED340157519E5C477E /* QRModels.swift in Sources */,
+				D9C28EE2A0D050878B74422B /* QRCredentialExchange.swift in Sources */,
+				4573930701BA5CA4BA516582 /* QRPairingEngine.swift in Sources */,
+				8463691DBACD590B97B53FD8 /* QRTrustManager.swift in Sources */,
+				477A2F897E1256999F55A5A8 /* QRValidationEngine.swift in Sources */,
+				DEA4EF2E756656609E2C25F3 /* QRPayloadParserService.swift in Sources */,
+				923657F519ED573FA451E6FE /* QRPermissionService.swift in Sources */,
+				B03DE194D8B451C4AB938FBF /* QRSettingsService.swift in Sources */,
+				4B725CAE1ACF5559BF1F2B82 /* QRTokenService.swift in Sources */,
+				2AE6FABAC35C5FAF8EF57B98 /* QRValidationService.swift in Sources */,
+				31ED541060305ADF9FC76114 /* QRDiagnosticsViewModel.swift in Sources */,
+				B939400A4E7F5E08BB09A2DF /* QRPairingViewModel.swift in Sources */,
+				01EEBE9B9CAF5D51B048F923 /* QRScannerViewModel.swift in Sources */,
+				01C55F12DA9D5FB9B7C28E24 /* QRStatusViewModel.swift in Sources */,
+				43DBE36DEA865FA2AC8B2097 /* QRDiagnosticsView.swift in Sources */,
+				6CD5E889618A5CCDB38D1F3E /* QRGuideView.swift in Sources */,
+				02CAB28903A85AB38F416E70 /* QRHomeView.swift in Sources */,
+				48F4B1DB675454F2888986E3 /* QRPairingView.swift in Sources */,
+				B0A77153BEBB5BA09221A3EE /* QRPermissionView.swift in Sources */,
+				5B0E39EEA4D6541CBBAEFC43 /* QRScannerView.swift in Sources */,
+				53BDEAE800C05749AAA17AB1 /* QRSettingsView.swift in Sources */,
+				38DD7D42D5B05D9B995FE8AE /* QRStatusView.swift in Sources */,
+				7E3A701E1EA453098E28C1AE /* TLANBonjourBrowser.swift in Sources */,
+				C2348E9862005C11A18B4C21 /* TLANHTTPClient.swift in Sources */,
+				D79793A4C58E5392912C287B /* TLANSessionManager.swift in Sources */,
+				72E5C478405B50E18969389E /* TLANWebSocketConnection.swift in Sources */,
+				7F7E994247365C929ED07355 /* TLANConstants.swift in Sources */,
+				49AC5112A106505099B11A7D /* TLANErrors.swift in Sources */,
+				B0AF7665684457E3BD081527 /* TLANModels.swift in Sources */,
+				1FD3F2BF8869537098B2841A /* TLANCredentialExchange.swift in Sources */,
+				0398435C716F5A66B4BE34F1 /* TLANPairingEngine.swift in Sources */,
+				C54BE0554DD956EE88F26415 /* TLANTrustManager.swift in Sources */,
+				8038A40E712258F8B2DE094E /* TLANValidationEngine.swift in Sources */,
+				6FE15025CF945D97879A6B77 /* TLANDeviceManagerService.swift in Sources */,
+				905ACDFEC21D5DAB8734E376 /* TLANSecurityService.swift in Sources */,
+				4ABD9E32D4A35DAC84443DA9 /* TLANSettingsService.swift in Sources */,
+				FE0B64E34DCF5F02B61367A0 /* TLANTokenService.swift in Sources */,
+				D06E449083F05FF2946E0492 /* TLANValidationService.swift in Sources */,
+				83C92DBA0C825097BC0720D9 /* TLANDeviceListViewModel.swift in Sources */,
+				B366B1ABCC6D5BA9BB145C03 /* TLANDiagnosticsViewModel.swift in Sources */,
+				C6F911EB50F0524799D42196 /* TLANDiscoveryViewModel.swift in Sources */,
+				FF25BC0E6B4D557689A1222D /* TLANPairingViewModel.swift in Sources */,
+				478E04A4A8015726BBAA476F /* TLANStatusViewModel.swift in Sources */,
+				A2595945A7DC501BA452E46C /* TLANDeviceListView.swift in Sources */,
+				CC6AC2163F7D54DA8CB0DD4F /* TLANDiagnosticsView.swift in Sources */,
+				D1ED3A2E00C75E7C981B6F2A /* TLANDiscoveryView.swift in Sources */,
+				762C86425E105870A2BBC6D3 /* TLANGuideView.swift in Sources */,
+				58CF678A686A5F50BCD536CF /* TLANHomeView.swift in Sources */,
+				F049E130E2F35DB0B6D978B9 /* TLANPairingView.swift in Sources */,
+				B4F65AEB3F4B554BB2E183F3 /* TLANSettingsView.swift in Sources */,
+				7687373CB574570694A587AA /* TLANStatusView.swift in Sources */,
 				OC020001 /* OpenClawError.swift in Sources */,
 				OC020002 /* OpenClawProtocol.swift in Sources */,
 				OC020003 /* OpenClawDevice.swift in Sources */,
