@@ -33,7 +33,7 @@ public actor LAWebSocketConnection: NSObject, URLSessionWebSocketDelegate {
 
     public func send(data: Data) async throws {
         guard let socket = socket, isSocketOpen else {
-            throw LAError.connectionFailed("Socket not open")
+            throw LocalApprovalError.connectionFailed("Socket not open")
         }
         try await socket.send(.data(data))
     }

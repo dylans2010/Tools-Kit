@@ -1,6 +1,6 @@
 import Foundation
 
-public enum LAError: Error, LocalizedError, Equatable {
+public enum LocalApprovalError: Error, LocalizedError, Equatable {
     case connectionFailed(String)
     case approvalTimeout
     case approvalDenied

@@ -16,7 +16,7 @@ public actor LATokenService {
         ]
         SecItemDelete(query as CFDictionary)
         let status = SecItemAdd(query as CFDictionary, nil)
-        guard status == errSecSuccess else { throw LAError.keychainError(status) }
+        guard status == errSecSuccess else { throw LocalApprovalError.keychainError(status) }
     }
 
     public func getToken(for gatewayId: String) throws -> LATrustToken? {
