@@ -1,65 +1,64 @@
 import Foundation
-import UIKit
 import AVFoundation
+import OSLog
+import UIKit
 
-public final class QRScannerBridge: NSObject, AVCaptureMetadataOutputObjectsDelegate {
-    private var captureSession: AVCaptureSession?
+public actor QRScannerBridge: NSObject, AVCaptureMetadataOutputObjectsDelegate {
+    private let session = AVCaptureSession()
     private var completion: ((String) -> Void)?
+    private let logger = Logger(subsystem: "com.toolskit.openclaw.alternatives", category: "qr-scanner")
+    private var previewLayer: AVCaptureVideoPreviewLayer?
 
-    @MainActor
     public func startScanning(in view: UIView, completion: @escaping (String) -> Void) {
         self.completion = completion
 
-        let session = AVCaptureSession()
-        self.captureSession = session
-
-        guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
-        let videoInput: AVCaptureDeviceInput
+        guard let device = AVCaptureDevice.default(for: .video) else { return }
 
         do {
-            videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
+            let input = try AVCaptureDeviceInput(device: device)
+            let output = AVCaptureMetadataOutput()
+
+            if session.canAddInput(input) && session.canAddOutput(output) {
+                session.addInput(input)
+                session.addOutput(output)
+                output.setMetadataObjectsDelegate(self, queue: .main)
+                output.metadataObjectTypes = [.qr]
+            }
+
+            let layer = AVCaptureVideoPreviewLayer(session: session)
+            layer.frame = view.layer.bounds
+            layer.videoGravity = .resizeAspectFill
+            view.layer.addSublayer(layer)
+            self.previewLayer = layer
+
+            Task {
+                self.session.startRunning()
+            }
         } catch {
-            return
-        }
-
-        if (session.canAddInput(videoInput)) {
-            session.addInput(videoInput)
-        } else {
-            return
-        }
-
-        let metadataOutput = AVCaptureMetadataOutput()
-
-        if (session.canAddOutput(metadataOutput)) {
-            session.addOutput(metadataOutput)
-
-            metadataOutput.setMetadataObjectsDelegate(self, queue: .main)
-            metadataOutput.metadataObjectTypes = [.qr]
-        } else {
-            return
-        }
-
-        let previewLayer = AVCaptureVideoPreviewLayer(session: session)
-        previewLayer.frame = view.layer.bounds
-        previewLayer.videoGravity = .resizeAspectFill
-        view.layer.addSublayer(previewLayer)
-
-        DispatchQueue.global(qos: .userInitiated).async {
-            session.startRunning()
+            logger.error("Failed to setup QR scanner: \(error.localizedDescription)")
         }
     }
 
-    public func stopScanning() {
-        captureSession?.stopRunning()
-        captureSession = nil
-    }
-
-    public func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+    public nonisolated func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         if let metadataObject = metadataObjects.first {
             guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject else { return }
             guard let stringValue = readableObject.stringValue else { return }
-            completion?(stringValue)
-            stopScanning()
+
+            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+
+            Task {
+                await stopAndNotify(value: stringValue)
+            }
         }
+    }
+
+    private func stopAndNotify(value: String) {
+        session.stopRunning()
+        completion?(value)
+        completion = nil
+    }
+
+    public func stopScanning() {
+        session.stopRunning()
     }
 }

@@ -5,6 +5,6 @@ public actor MTValidationEngine {
     private init() {}
 
     public func isValidToken(_ token: String) -> Bool {
-        return token.count == MTConstants.tokenLength
+        return token.count >= 10 && !token.contains(" ")
     }
 }

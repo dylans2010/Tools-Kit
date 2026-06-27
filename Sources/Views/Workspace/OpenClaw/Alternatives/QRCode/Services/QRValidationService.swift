@@ -4,8 +4,12 @@ public actor QRValidationService {
     public static let shared = QRValidationService()
     private init() {}
 
-    public func validateToken(_ payload: QRPayload, deviceInfo: LADeviceInfo) async throws -> QRTrustToken {
-        let url = URL(string: "http://\\(payload.host):\\(payload.port)\\(QRConstants.validationEndpoint)")!
+    public func validate(payload: QRPayload, deviceInfo: LADeviceInfo) async throws -> QRTrustToken {
+        let urlString = "http://\(payload.host):\(payload.port)\(QRConstants.validationEndpoint)"
+        guard let url = URL(string: urlString) else {
+            throw QRError.validationFailed("Invalid URL")
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

@@ -416,27 +416,16 @@
 		9E29AFE117323752E0047B17 /* AgentAPIRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD27CF38C0C05B75FB719B9 /* AgentAPIRouter.swift */; };
 		9FA95B350E1A41AB9AC0CB3B /* JSONFormatterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA88E64A466406883AE0477 /* JSONFormatterView.swift */; };
 		A00200000000000000000001 /* SiriCoreUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000001 /* SiriCoreUIView.swift */; };
-		A00200000000000000000002 /* SiriCoreUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000001 /* SiriCoreUIView.swift */; };
 		A00200000000000000000003 /* GlowingUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000002 /* GlowingUIView.swift */; };
-		A00200000000000000000004 /* GlowingUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000002 /* GlowingUIView.swift */; };
 		A00200000000000000000101 /* DemoCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000101 /* DemoCatalog.swift */; };
-		A00200000000000000000102 /* DemoCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000101 /* DemoCatalog.swift */; };
 		A00200000000000000000103 /* DemoCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000102 /* DemoCatalogView.swift */; };
-		A00200000000000000000104 /* DemoCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000102 /* DemoCatalogView.swift */; };
 		A00200000000000000000105 /* HeroDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000103 /* HeroDemo.swift */; };
-		A00200000000000000000106 /* HeroDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000103 /* HeroDemo.swift */; };
 		A00200000000000000000107 /* LiveTuningDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000104 /* LiveTuningDemo.swift */; };
-		A00200000000000000000108 /* LiveTuningDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000104 /* LiveTuningDemo.swift */; };
 		A00200000000000000000109 /* CustomProfileDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000105 /* CustomProfileDemo.swift */; };
-		A00200000000000000000110 /* CustomProfileDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000105 /* CustomProfileDemo.swift */; };
 		A00200000000000000000111 /* WashTuningDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000106 /* WashTuningDemo.swift */; };
-		A00200000000000000000112 /* WashTuningDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000106 /* WashTuningDemo.swift */; };
 		A00200000000000000000113 /* PaletteGalleryDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000107 /* PaletteGalleryDemo.swift */; };
-		A00200000000000000000114 /* PaletteGalleryDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000107 /* PaletteGalleryDemo.swift */; };
 		A00200000000000000000115 /* MoodDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000108 /* MoodDemo.swift */; };
-		A00200000000000000000116 /* MoodDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000108 /* MoodDemo.swift */; };
 		A00200000000000000000117 /* LoadingDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000109 /* LoadingDemo.swift */; };
-		A00200000000000000000118 /* LoadingDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000109 /* LoadingDemo.swift */; };
 		A00200000000000000000201 /* CustomGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000201 /* CustomGlow.swift */; };
 		A00200000000000000000202 /* HeroGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000202 /* HeroGlow.swift */; };
 		A00200000000000000000203 /* LiveTuningGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000203 /* LiveTuningGlow.swift */; };
@@ -704,8 +693,6 @@
 		BR02000000000017 /* Sources/Views/Bridging/Services/BridgeSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000017 /* Sources/Views/Bridging/Services/BridgeSessionManager.swift */; };
 		BR02000000000018 /* Sources/Views/Bridging/Services/BridgeWebSocketClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BR01000000000018 /* Sources/Views/Bridging/Services/BridgeWebSocketClient.swift */; };
 		C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
-		C0B0B0B0B0B0B0B0B0B0B002 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
-		C0B0B0B0B0B0B0B0B0B0B003 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
 		C28B4946EF36415783272126 /* YAMLConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D0075F88514881B6EC6070 /* YAMLConverterView.swift */; };
 		C28EB889BCD1429CA6C79834 /* HTMLEntityBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03C7F495D5548C6823903C2 /* HTMLEntityBackend.swift */; };
 		C3876F982C8C43BAB0F69A2E /* ToolCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E34B1777D4840A19DD9533B /* ToolCardView.swift */; };
@@ -2504,7 +2491,6 @@
 		C0E70675139B57878C58A047 /* PCTrustManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B199217CC93500FABB6375C /* PCTrustManager.swift */; };
 		EDB8307411775DD9B7F0DB19 /* PCValidationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AF0BA69A905951A1BE1C60 /* PCValidationEngine.swift */; };
 		101ECE9AD3CB52AC8514854B /* PCCodeValidationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C09FF922E855ECA884DE6B7 /* PCCodeValidationService.swift */; };
-		54419F1BB42450CC9ECCF86A /* PCHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7228357442F35B6580ABFF53 /* PCHTTPClient.swift */; };
 		2278B5E2D92E58619FDDCA40 /* PCSecurityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B94A4E9D0CAC5C7A9FC37A87 /* PCSecurityService.swift */; };
 		135C1083FF6352BF88AD4449 /* PCSettingsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AD273CC8AE0541E9EFC6024 /* PCSettingsService.swift */; };
 		CCA27E84417F57838A80DFE2 /* PCTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA99466D64B56FC85A7A64F /* PCTokenService.swift */; };
@@ -2576,6 +2562,7 @@
 		F049E130E2F35DB0B6D978B9 /* TLANPairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D434A5C34859AB9C616559 /* TLANPairingView.swift */; };
 		B4F65AEB3F4B554BB2E183F3 /* TLANSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D0CB82330F5FA6B9B20F2A /* TLANSettingsView.swift */; };
 		7687373CB574570694A587AA /* TLANStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361BD46450605CA0A7795A6A /* TLANStatusView.swift */; };
+		B228357442F35B6580ABFF54 /* PCHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7228357442F35B6580ABFF53 /* PCHTTPClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -2585,6 +2572,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+
 				KB0200000000000000000099 /* KeyboardExtension.appex in Embed App Extensions */,
 				MS0200000000000000000099 /* MessagesExtension.appex in Embed App Extensions */,
 			);
@@ -5073,7 +5061,6 @@
 		2B199217CC93500FABB6375C /* PCTrustManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCTrustManager.swift; sourceTree = "<group>"; };
 		F4AF0BA69A905951A1BE1C60 /* PCValidationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCValidationEngine.swift; sourceTree = "<group>"; };
 		7C09FF922E855ECA884DE6B7 /* PCCodeValidationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCCodeValidationService.swift; sourceTree = "<group>"; };
-		7228357442F35B6580ABFF53 /* PCHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCHTTPClient.swift; sourceTree = "<group>"; };
 		B94A4E9D0CAC5C7A9FC37A87 /* PCSecurityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCSecurityService.swift; sourceTree = "<group>"; };
 		3AD273CC8AE0541E9EFC6024 /* PCSettingsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCSettingsService.swift; sourceTree = "<group>"; };
 		7BA99466D64B56FC85A7A64F /* PCTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCTokenService.swift; sourceTree = "<group>"; };
@@ -5145,6 +5132,7 @@
 		94D434A5C34859AB9C616559 /* TLANPairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANPairingView.swift; sourceTree = "<group>"; };
 		52D0CB82330F5FA6B9B20F2A /* TLANSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANSettingsView.swift; sourceTree = "<group>"; };
 		361BD46450605CA0A7795A6A /* TLANStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLANStatusView.swift; sourceTree = "<group>"; };
+		7228357442F35B6580ABFF53 /* PCHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCHTTPClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -5152,6 +5140,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+
 				FC8CA3A12FE6467900CBBA86 /* Aurora in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5160,6 +5149,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+
 				FC8CA3A22FE6467900CBBA86 /* Aurora in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5168,6 +5158,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+
 				FC8CA3A02FE6467900CBBA86 /* SwiftMCP in Frameworks */,
 				FC55D3C52FEB3B7300B2FE83 /* SymbolPicker in Frameworks */,
 				FC8CA39F2FE6467900CBBA86 /* Aurora in Frameworks */,
@@ -12831,6 +12822,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+
 				FB000001 /* FoundationModelsSystem.md in Resources */,
 				RV020018 /* SpeechSystem.md in Resources */,
 				B1C2D3E4F5A60708090A0D05 /* Config.plist in Resources */,
@@ -12844,6 +12836,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12851,6 +12844,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12861,6 +12855,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+
 				ED81ED7864BF5B92845C542D /* LABonjourBrowser.swift in Sources */,
 				CA39CABAE9D15D5EAC96E217 /* LAHTTPClient.swift in Sources */,
 				02F4F6A9619A5CA9A5C28450 /* LASessionManager.swift in Sources */,
@@ -12918,6 +12913,7 @@
 				02699B1B890D530CB1C7A408 /* OpenClawAltView.swift in Sources */,
 				8C91C070984057069BE7EE0F /* OpenClawAltViewModel.swift in Sources */,
 				9AA918AAFE9651C2882BE8E0 /* PCHTTPClient.swift in Sources */,
+				B228357442F35B6580ABFF54 /* PCHTTPClient.swift in Sources */,
 				C54D27E0AEB55EE8A65A75A8 /* PCSessionManager.swift in Sources */,
 				D147ED98B0CF5F8EA305CDF4 /* PCWebSocketConnection.swift in Sources */,
 				23F5E8CF73F75249A1BBC58B /* PCConstants.swift in Sources */,
@@ -12928,7 +12924,6 @@
 				C0E70675139B57878C58A047 /* PCTrustManager.swift in Sources */,
 				EDB8307411775DD9B7F0DB19 /* PCValidationEngine.swift in Sources */,
 				101ECE9AD3CB52AC8514854B /* PCCodeValidationService.swift in Sources */,
-				54419F1BB42450CC9ECCF86A /* PCHTTPClient.swift in Sources */,
 				2278B5E2D92E58619FDDCA40 /* PCSecurityService.swift in Sources */,
 				135C1083FF6352BF88AD4449 /* PCSettingsService.swift in Sources */,
 				CCA27E84417F57838A80DFE2 /* PCTokenService.swift in Sources */,
@@ -13789,8 +13784,8 @@
 				SK020004 /* Sources/Views/Tools/AIChat/Skills/AddSkillView.swift in Sources */,
 				SK020005 /* Sources/Views/Tools/AIChat/Skills/DraftSkillsView.swift in Sources */,
 				SK020006 /* Sources/Components/Advanced UIs/SkillPickerModifier.swift in Sources */,
-				A00200000000000000000002 /* SiriCoreUIView.swift in Sources */,
-				A00200000000000000000004 /* GlowingUIView.swift in Sources */,
+				A00200000000000000000001 /* SiriCoreUIView.swift in Sources */,
+				A00200000000000000000003 /* GlowingUIView.swift in Sources */,
 				A00200000000000000000101 /* DemoCatalog.swift in Sources */,
 				A00200000000000000000103 /* DemoCatalogView.swift in Sources */,
 				A00200000000000000000105 /* HeroDemo.swift in Sources */,
@@ -15165,7 +15160,7 @@
 				144A90454B5592597A231A7F /* SDKMetricsDashboardView.swift in Sources */,
 				D2493764F3B55CB73F0BCC14 /* SDKPluginRegistryView.swift in Sources */,
 				A635DCE822B6300B2142EE01 /* SDKConnectorHealthView.swift in Sources */,
-				C0B0B0B0B0B0B0B0B0B0B003 /* Color+Hex.swift in Sources */,
+				C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */,
 				04494BFF858161E110044905 /* SDKConnectorMetricsView.swift in Sources */,
 				0D46F6A690CC4DF0AF6E6A2E /* Builder/XMLFormatterDevTool.swift in Sources */,
 				71B11BC1C1D245B0A07447FA /* Builder/JSONDiffDevTool.swift in Sources */,
@@ -15347,13 +15342,14 @@
 				B48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift in Sources */,
 				BBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift in Sources */,
 				B4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift in Sources */,
-);
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		KB0400000000000000000201 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+
 				KB0200000000000000000001 /* KeyboardViewController.swift in Sources */,
 				KB0200000000000000000002 /* KeyboardRootView.swift in Sources */,
 				KB0200000000000000000003 /* SuggestionBarView.swift in Sources */,
@@ -15377,7 +15373,7 @@
 				KB0200000000000000000021 /* TextAnalyzer.swift in Sources */,
 				KB0200000000000000000022 /* JSONCoder.swift in Sources */,
 				KB0200000000000000000023 /* Debouncer.swift in Sources */,
-				C0B0B0B0B0B0B0B0B0B0B002 /* Color+Hex.swift in Sources */,
+				C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */,
 				KB02OPENRT00000000000001 /* OpenRouterService.swift in Sources */,
 				KB02AIPROTO0000000000001 /* AIProviderProtocol.swift in Sources */,
 				KB02AICHAT00000000000001 /* AIChatSettings.swift in Sources */,
@@ -15388,6 +15384,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+
 				MS0207C4CA60A1926E94DEC9 /* MessagesViewController.swift in Sources */,
 				MS02F387A7A65E6019196A12 /* MessagesRootView.swift in Sources */,
 				MS0277F553B9F980351B8A6B /* MessagesAIService.swift in Sources */,
@@ -15418,15 +15415,15 @@
 				C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */,
 				A00200000000000000000001 /* SiriCoreUIView.swift in Sources */,
 				A00200000000000000000003 /* GlowingUIView.swift in Sources */,
-				A00200000000000000000102 /* DemoCatalog.swift in Sources */,
-				A00200000000000000000104 /* DemoCatalogView.swift in Sources */,
-				A00200000000000000000106 /* HeroDemo.swift in Sources */,
-				A00200000000000000000108 /* LiveTuningDemo.swift in Sources */,
-				A00200000000000000000110 /* CustomProfileDemo.swift in Sources */,
-				A00200000000000000000112 /* WashTuningDemo.swift in Sources */,
-				A00200000000000000000114 /* PaletteGalleryDemo.swift in Sources */,
-				A00200000000000000000116 /* MoodDemo.swift in Sources */,
-				A00200000000000000000118 /* LoadingDemo.swift in Sources */,
+				A00200000000000000000101 /* DemoCatalog.swift in Sources */,
+				A00200000000000000000103 /* DemoCatalogView.swift in Sources */,
+				A00200000000000000000105 /* HeroDemo.swift in Sources */,
+				A00200000000000000000107 /* LiveTuningDemo.swift in Sources */,
+				A00200000000000000000109 /* CustomProfileDemo.swift in Sources */,
+				A00200000000000000000111 /* WashTuningDemo.swift in Sources */,
+				A00200000000000000000113 /* PaletteGalleryDemo.swift in Sources */,
+				A00200000000000000000115 /* MoodDemo.swift in Sources */,
+				A00200000000000000000117 /* LoadingDemo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
