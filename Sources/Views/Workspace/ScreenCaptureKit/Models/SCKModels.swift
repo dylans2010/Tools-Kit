@@ -1,6 +1,7 @@
 import Foundation
 import CoreGraphics
 
+@available(iOS 27.0, *)
 struct SCKRecordingSession: Identifiable, Codable {
     let id: UUID
     var title: String
@@ -36,6 +37,7 @@ struct SCKRecordingSession: Identifiable, Codable {
     }
 }
 
+@available(iOS 27.0, *)
 enum SCKFeatureType: String, Codable, CaseIterable {
     case general = "General"
     case aiCapture = "AI Capture"
@@ -46,6 +48,7 @@ enum SCKFeatureType: String, Codable, CaseIterable {
     case bugReport = "Bug Report"
 }
 
+@available(iOS 27.0, *)
 struct SCKTranscriptSegment: Identifiable, Codable {
     let id: UUID
     let timestamp: TimeInterval
@@ -53,6 +56,7 @@ struct SCKTranscriptSegment: Identifiable, Codable {
     let speaker: String?
 }
 
+@available(iOS 27.0, *)
 struct SCKOCRResult: Identifiable, Codable {
     let id: UUID
     let timestamp: TimeInterval
@@ -61,6 +65,7 @@ struct SCKOCRResult: Identifiable, Codable {
     let boundingBox: CGRect
 }
 
+@available(iOS 27.0, *)
 struct SCKBookmark: Identifiable, Codable {
     let id: UUID
     let timestamp: TimeInterval

@@ -42,7 +42,7 @@ struct AIChatSettingsView: View {
     @State private var currentAppMode: AppMode = .dashboard
     @State private var showLogin = false
     @State private var showWelcomeFlow = false
-    @State private var userProfile: Appwrite.User?
+    @State private var userProfile: User?
     @State private var isAuthenticated = false
 
     var body: some View {
@@ -661,7 +661,7 @@ struct InterfaceSection: View {
 
 struct AccountSection: View {
     let isAuthenticated: Bool
-    let user: Appwrite.User?
+    let user: User?
     @Binding var isUploadingToCloud: Bool
     var onLogin: () -> Void
     var onSync: () -> Void

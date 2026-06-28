@@ -1,5 +1,6 @@
 import Foundation
 
+@available(iOS 27.0, *)
 @MainActor
 @Observable
 class SCKTimelineManager {

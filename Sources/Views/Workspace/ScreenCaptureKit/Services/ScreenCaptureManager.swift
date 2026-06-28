@@ -2,6 +2,7 @@ import Foundation
 import ScreenCaptureKit
 import CoreMedia
 
+@available(iOS 27.0, *)
 @MainActor
 @Observable
 class ScreenCaptureManager: NSObject, SCStreamOutput, SCStreamDelegate {
@@ -34,8 +35,6 @@ class ScreenCaptureManager: NSObject, SCStreamOutput, SCStreamDelegate {
         let config = SCStreamConfiguration()
         config.width = 1920
         config.height = 1080
-        config.minimumFrameInterval = CMTime(value: 1, timescale: 60) // 60 fps
-        config.queueDepth = 5
         config.capturesAudio = true
         config.excludesCurrentProcessAudio = false
 
@@ -80,15 +79,18 @@ class ScreenCaptureManager: NSObject, SCStreamOutput, SCStreamDelegate {
     }
 }
 
+@available(iOS 27.0, *)
 extension ScreenCaptureManager: SCContentSharingPickerObserver {
     func contentSharingPicker(_ picker: SCContentSharingPicker, didCancelFor stream: SCStream?) {
         // Handle cancel
     }
 
-    func contentSharingPicker(_ picker: SCContentSharingPicker, didSelect filter: SCContentFilter, for stream: SCStream?) {
+    func contentSharingPicker(_ picker: SCContentSharingPicker, didUpdateWith filter: SCContentFilter, for stream: SCStream?) {
         Task {
             if let stream = stream {
+                #if os(macOS)
                 try? await stream.updateContentFilter(filter)
+                #endif
             } else {
                 try? await startCapture(with: filter)
             }

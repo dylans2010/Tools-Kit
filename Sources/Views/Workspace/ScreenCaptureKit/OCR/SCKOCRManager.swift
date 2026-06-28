@@ -2,6 +2,7 @@ import Foundation
 import Vision
 import CoreMedia
 
+@available(iOS 27.0, *)
 @MainActor
 @Observable
 class SCKOCRManager {
@@ -40,5 +41,15 @@ class SCKOCRManager {
 
         let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
         try? handler.perform([request])
+    }
+}
+
+import SwiftUI
+
+@available(iOS 27.0, *)
+struct OCRScannerView: View {
+    var body: some View {
+        Text("OCR Scanner View")
+            .navigationTitle("OCR Scanner")
     }
 }

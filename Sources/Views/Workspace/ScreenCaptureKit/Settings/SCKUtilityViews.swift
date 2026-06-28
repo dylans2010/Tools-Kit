@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(iOS 27.0, *)
 struct SCKBugReporterView: View {
     @State private var description: String = ""
 
@@ -27,6 +28,7 @@ struct SCKBugReporterView: View {
     }
 }
 
+@available(iOS 27.0, *)
 struct SCKSearchView: View {
     @State private var query: String = ""
 
@@ -39,6 +41,7 @@ struct SCKSearchView: View {
     }
 }
 
+@available(iOS 27.0, *)
 struct SCKTimelineView: View {
     var body: some View {
         List {
@@ -48,6 +51,7 @@ struct SCKTimelineView: View {
     }
 }
 
+@available(iOS 27.0, *)
 struct SCKWorkspaceGeneratorView: View {
     var body: some View {
         VStack {
@@ -57,17 +61,8 @@ struct SCKWorkspaceGeneratorView: View {
     }
 }
 
-struct SCKAnalyticsView: View {
-    var body: some View {
-        VStack {
-            Text("Recording Analytics")
-                .font(.title)
-            // Charts and metrics
-        }
-        .navigationTitle("Analytics")
-    }
-}
 
+@available(iOS 27.0, *)
 struct SCKSettingsView: View {
     @State private var autoOCR = true
     @State private var autoTranscription = true
