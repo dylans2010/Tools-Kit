@@ -6236,7 +6236,7 @@
 		6C6BD6C4BA2D6F5E39B310AA /* SCKAnalyticsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKAnalyticsView.swift; sourceTree = "<group>"; };
 		CB0FCA0FA9A97E1B1146C7E1 /* SCKUtilityViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKUtilityViews.swift; sourceTree = "<group>"; };
 		223E3B85F4B0B092630658F4 /* ScreenCaptureMainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenCaptureMainView.swift; sourceTree = "<group>"; };
-		BC0100000000000000000001 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
+		BC0100000000000000000001 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backups/BackupManager.swift; sourceTree = "<group>"; };
 		BC0100000000000000000002 /* BackupsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupsMainView.swift; sourceTree = "<group>"; };
 		BC0100000000000000000003 /* BackupListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupListView.swift; sourceTree = "<group>"; };
 		BC0100000000000000000004 /* BackupDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupDetailView.swift; sourceTree = "<group>"; };
