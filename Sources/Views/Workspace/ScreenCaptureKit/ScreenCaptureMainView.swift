@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(iOS 27.0, *)
 struct ScreenCaptureMainView: View {
     @State private var showingSettings = false
 
@@ -48,6 +49,7 @@ struct ScreenCaptureMainView: View {
     }
 }
 
+@available(iOS 27.0, *)
 struct SCKDashboardSection<Content: View>: View {
     let title: String
     let content: () -> Content

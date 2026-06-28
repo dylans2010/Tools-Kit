@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(iOS 27.0, *)
 struct SmartScreenshotView: View {
     @State private var lastScreenshot: UIImage?
     @State private var isCapturing = false
@@ -79,5 +80,13 @@ struct SmartScreenshotView: View {
             }
             isCapturing = false
         }
+    }
+}
+
+@available(iOS 27.0, *)
+struct AICaptureView: View {
+    var body: some View {
+        Text("AI Capture View")
+            .navigationTitle("AI Capture")
     }
 }

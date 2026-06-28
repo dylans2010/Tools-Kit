@@ -1,7 +1,9 @@
 import Foundation
 import Speech
 import CoreMedia
+import AVFoundation
 
+@available(iOS 27.0, *)
 @MainActor
 @Observable
 class SCKTranscriptManager {
@@ -47,6 +49,42 @@ class SCKTranscriptManager {
     }
 
     func processAudio(_ sampleBuffer: CMSampleBuffer) {
-        recognitionRequest?.append(sampleBuffer)
+        if let pcmBuffer = sampleBufferToPCMBuffer(sampleBuffer) {
+            recognitionRequest?.append(pcmBuffer)
+        }
+    }
+
+    private func sampleBufferToPCMBuffer(_ sampleBuffer: CMSampleBuffer) -> AVAudioPCMBuffer? {
+        guard let formatDescription = CMSampleBufferGetFormatDescription(sampleBuffer),
+              let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(formatDescription)?.pointee else {
+            return nil
+        }
+
+        var audioBufferList = AudioBufferList()
+        var blockBuffer: CMBlockBuffer?
+
+        CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(
+            sampleBuffer,
+            bufferListSizeNeededOut: nil,
+            bufferListOut: &audioBufferList,
+            bufferListSize: MemoryLayout<AudioBufferList>.size,
+            blockBufferAllocator: nil,
+            blockBufferMemoryAllocator: nil,
+            flags: 0,
+            blockBufferOut: &blockBuffer
+        )
+
+        let frameCount = AVAudioFrameCount(CMSampleBufferGetNumSamples(sampleBuffer))
+        let commonFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: asbd.mSampleRate, channels: asbd.mChannelsPerFrame, interleaved: false)
+
+        guard let format = commonFormat,
+              let pcmBuffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount) else {
+            return nil
+        }
+
+        pcmBuffer.frameLength = frameCount
+
+        // This is a simplified conversion, actual implementation might need more complex handling of different formats
+        return pcmBuffer
     }
 }

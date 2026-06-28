@@ -1,5 +1,6 @@
 import Foundation
 
+@available(iOS 27.0, *)
 class RecordingStorageManager {
     static let shared = RecordingStorageManager()
 

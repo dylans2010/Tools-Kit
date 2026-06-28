@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(iOS 27.0, *)
 struct SCKScreenRecorderView: View {
     @State private var sessionManager = RecordingSessionManager.shared
     @State private var captureManager = ScreenCaptureManager.shared
@@ -72,30 +73,35 @@ struct SCKScreenRecorderView: View {
     }
 }
 
+@available(iOS 27.0, *)
 struct MeetingRecorderView: View {
     var body: some View {
         SCKGenericRecorderView(title: "Meeting Recorder", featureType: .meeting)
     }
 }
 
+@available(iOS 27.0, *)
 struct PresentationRecorderView: View {
     var body: some View {
         SCKGenericRecorderView(title: "Presentation Recorder", featureType: .presentation)
     }
 }
 
+@available(iOS 27.0, *)
 struct StudyModeView: View {
     var body: some View {
         SCKGenericRecorderView(title: "Study Mode", featureType: .study)
     }
 }
 
+@available(iOS 27.0, *)
 struct TutorialCreatorView: View {
     var body: some View {
         SCKGenericRecorderView(title: "Tutorial Creator", featureType: .tutorial)
     }
 }
 
+@available(iOS 27.0, *)
 struct SCKGenericRecorderView: View {
     let title: String
     let featureType: SCKFeatureType

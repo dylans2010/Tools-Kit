@@ -1,7 +1,9 @@
 import Foundation
 import CoreMedia
 import AVFoundation
+import ScreenCaptureKit
 
+@available(iOS 27.0, *)
 @MainActor
 @Observable
 class RecordingSessionManager {

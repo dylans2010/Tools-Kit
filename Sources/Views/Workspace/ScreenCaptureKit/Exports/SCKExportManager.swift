@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 
+@available(iOS 27.0, *)
 @MainActor
 class SCKExportManager {
     static let shared = SCKExportManager()

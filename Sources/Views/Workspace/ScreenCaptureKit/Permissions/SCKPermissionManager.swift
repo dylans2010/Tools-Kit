@@ -3,6 +3,7 @@ import ScreenCaptureKit
 import AVFoundation
 import Speech
 
+@available(iOS 27.0, *)
 @Observable
 class SCKPermissionManager {
     static let shared = SCKPermissionManager()

@@ -342,7 +342,12 @@ struct WorkspaceHomeView: View {
         case "openclaw":
             NavigationLink { OpenClawMainView() } label: { Label(item.label, systemImage: item.icon) }
         case "screencapture":
-            NavigationLink { ScreenCaptureMainView() } label: { Label(item.label, systemImage: item.icon) }
+            if #available(iOS 27.0, *) {
+                NavigationLink { ScreenCaptureMainView() } label: { Label(item.label, systemImage: item.icon) }
+            } else {
+                Label(item.label + " (iOS 27+)", systemImage: item.icon)
+                    .foregroundStyle(.secondary)
+            }
         default:
             EmptyView()
         }

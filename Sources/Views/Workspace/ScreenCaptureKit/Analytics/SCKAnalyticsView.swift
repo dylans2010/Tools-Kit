@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(iOS 27.0, *)
 struct SCKAnalyticsView: View {
     @State private var recordings: [SCKRecordingSession] = []
 

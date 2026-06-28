@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(iOS 27.0, *)
 struct SCKDashboardCards {
     @ViewBuilder
     static var recordingAndCapture: some View {
@@ -98,6 +99,7 @@ struct SCKDashboardCards {
     }
 }
 
+@available(iOS 27.0, *)
 struct SCKCard<Destination: View>: View {
     let title: String
     let icon: String
