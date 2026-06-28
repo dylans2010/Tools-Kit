@@ -2523,6 +2523,20 @@
 		SCKBA884412DD5750A4921BC /* SCKUtilityViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCKEBFAB6F80FF456308A1D8 /* SCKUtilityViews.swift */; };
 		SCK96E69B56403F540C93DB6C28 /* SCKAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCK6BD6C4BA2D6F5E39B310 /* SCKAnalyticsView.swift */; };
 		SCKE85AD349F6BB562BB38CD /* ScreenCaptureMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCK0915CFD4E25B5FC69542D /* ScreenCaptureMainView.swift */; };
+		BC0200000000000000000001 /* BackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000001 /* BackupManager.swift */; };
+		BC0200000000000000000002 /* BackupsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000002 /* BackupsMainView.swift */; };
+		BC0200000000000000000003 /* BackupListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000003 /* BackupListView.swift */; };
+		BC0200000000000000000004 /* BackupDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000004 /* BackupDetailView.swift */; };
+		BC0200000000000000000005 /* CreateBackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000005 /* CreateBackupView.swift */; };
+		BC0200000000000000000006 /* RestoreBackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000006 /* RestoreBackupView.swift */; };
+		BC0200000000000000000007 /* BackupModulePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000007 /* BackupModulePickerView.swift */; };
+		BC0200000000000000000008 /* BackupCompareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000008 /* BackupCompareView.swift */; };
+		BC0200000000000000000009 /* BackupExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000009 /* BackupExportView.swift */; };
+		BC0200000000000000000010 /* BackupIntegrityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000010 /* BackupIntegrityView.swift */; };
+		BC0200000000000000000011 /* AutoBackupSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000011 /* AutoBackupSettingsView.swift */; };
+		BC0200000000000000000012 /* BackupStorageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000012 /* BackupStorageView.swift */; };
+		BC0200000000000000000013 /* BackupTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000013 /* BackupTimelineView.swift */; };
+		BC0200000000000000000014 /* WelcomeFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000014 /* WelcomeFlowView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -5105,6 +5119,20 @@
 		SCK6BD6C4BA2D6F5E39B310 /* SCKAnalyticsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKAnalyticsView.swift; sourceTree = "<group>"; };
 		SCKEBFAB6F80FF456308A1D8 /* SCKUtilityViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKUtilityViews.swift; sourceTree = "<group>"; };
 		SCK0915CFD4E25B5FC69542D /* ScreenCaptureMainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenCaptureMainView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000001 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
+		BC0100000000000000000002 /* BackupsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupsMainView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000003 /* BackupListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupListView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000004 /* BackupDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupDetailView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000005 /* CreateBackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateBackupView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000006 /* RestoreBackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreBackupView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000007 /* BackupModulePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupModulePickerView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000008 /* BackupCompareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupCompareView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000009 /* BackupExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupExportView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000010 /* BackupIntegrityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupIntegrityView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000011 /* AutoBackupSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoBackupSettingsView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000012 /* BackupStorageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupStorageView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000013 /* BackupTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupTimelineView.swift; sourceTree = "<group>"; };
+		BC0100000000000000000014 /* WelcomeFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeFlowView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -5422,6 +5450,7 @@
 		1B4FC761F9C1E3726B2C313E /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				BC0100000000000000000001 /* BackupManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -6082,8 +6111,28 @@
 				D1CC39CE437180739A6432C7 /* Tools */,
 				DC2D175B29C54118833E3C57 /* Music */,
 				GM0300000000000000000001 /* Games */,
+				BC0000000000000000000001 /* Backups */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		BC0000000000000000000001 /* Backups */ = {
+			isa = PBXGroup;
+			children = (
+				BC0100000000000000000002 /* BackupsMainView.swift */,
+				BC0100000000000000000003 /* BackupListView.swift */,
+				BC0100000000000000000004 /* BackupDetailView.swift */,
+				BC0100000000000000000005 /* CreateBackupView.swift */,
+				BC0100000000000000000006 /* RestoreBackupView.swift */,
+				BC0100000000000000000007 /* BackupModulePickerView.swift */,
+				BC0100000000000000000008 /* BackupCompareView.swift */,
+				BC0100000000000000000009 /* BackupExportView.swift */,
+				BC0100000000000000000010 /* BackupIntegrityView.swift */,
+				BC0100000000000000000011 /* AutoBackupSettingsView.swift */,
+				BC0100000000000000000012 /* BackupStorageView.swift */,
+				BC0100000000000000000013 /* BackupTimelineView.swift */,
+			);
+			path = Backups;
 			sourceTree = "<group>";
 		};
 		4A4C7D3B42E04EE38B9F6999 /* PermissionAudit */ = {
@@ -8867,6 +8916,7 @@
 			children = (
 				A7D9E2F14C3B4A8192D0E6F1 /* LoginView.swift */,
 				BFA101000000000000000001 /* CreateAccountView.swift */,
+				BC0100000000000000000014 /* WelcomeFlowView.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -15304,6 +15354,20 @@
 				B48739E7808A76FA45CFFB78 /* SDKCapabilityQuery.swift in Sources */,
 				BBD000220BEB7DE4D182174C /* SDKPluginSandbox.swift in Sources */,
 				B4FA5D794495DBCB8A6A8BEC /* SDKConflictResolver.swift in Sources */,
+				BC0200000000000000000001 /* BackupManager.swift in Sources */,
+				BC0200000000000000000002 /* BackupsMainView.swift in Sources */,
+				BC0200000000000000000003 /* BackupListView.swift in Sources */,
+				BC0200000000000000000004 /* BackupDetailView.swift in Sources */,
+				BC0200000000000000000005 /* CreateBackupView.swift in Sources */,
+				BC0200000000000000000006 /* RestoreBackupView.swift in Sources */,
+				BC0200000000000000000007 /* BackupModulePickerView.swift in Sources */,
+				BC0200000000000000000008 /* BackupCompareView.swift in Sources */,
+				BC0200000000000000000009 /* BackupExportView.swift in Sources */,
+				BC0200000000000000000010 /* BackupIntegrityView.swift in Sources */,
+				BC0200000000000000000011 /* AutoBackupSettingsView.swift in Sources */,
+				BC0200000000000000000012 /* BackupStorageView.swift in Sources */,
+				BC0200000000000000000013 /* BackupTimelineView.swift in Sources */,
+				BC02000000000000000014 /* WelcomeFlowView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

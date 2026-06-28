@@ -11,30 +11,17 @@ struct ContentView: View {
     @State private var hasRestoredSession = false
 
     var body: some View {
-        Group {
-            if isCheckingSession {
-                ProgressView("Checking session...")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if isAuthenticated {
-                authenticatedContent
-            } else {
-                LoginView {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
-                        isAuthenticated = true
-                    }
+        mainContent
+            .task {
+                await restoreSessionIfNeeded()
+                Task {
+                    await InboxAIAnalysisCache.shared.warmCacheIfNeeded(force: false)
                 }
             }
-        }
-        .task {
-            await restoreSessionIfNeeded()
-            Task {
-                await InboxAIAnalysisCache.shared.warmCacheIfNeeded(force: false)
-            }
-        }
     }
 
     @ViewBuilder
-    private var authenticatedContent: some View {
+    private var mainContent: some View {
         if modeManager.isMusicModeEnabled {
             MusicTabView()
         } else if workoutsMode.isWorkoutsModeEnabled {
@@ -59,13 +46,6 @@ struct ContentView: View {
     private func restoreSessionIfNeeded() async {
         guard !hasRestoredSession else { return }
         hasRestoredSession = true
-
-        // Bypass sign-in flow if Bundle ID matches
-        if Bundle.main.bundleIdentifier == "FuncSignInBypass" {
-            isAuthenticated = true
-            isCheckingSession = false
-            return
-        }
 
         do {
             _ = try await AppwriteService.account.get()
