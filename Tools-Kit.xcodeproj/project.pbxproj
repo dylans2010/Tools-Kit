@@ -3087,7 +3087,7 @@
 		BBB725DD15F726A5E4C47C93 /* SCKDashboardCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38D3AAEE19509A42DD8795E /* SCKDashboardCards.swift */; };
 		14E31D3E35C6365C5D445E3A /* SCKCaptureViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15DE4D40F797F266A96E35AC /* SCKCaptureViews.swift */; };
 		ADECE16C216C79EFCEA7566D /* SCKUtilityViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB0FCA0FA9A97E1B1146C7E1 /* SCKUtilityViews.swift */; };
-		422EBBFB851ABA1F4330F412 /* SCKAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCK6BD6C4BA2D6F5E39B310 /* SCKAnalyticsView.swift */; };
+		422EBBFB851ABA1F4330F412 /* SCKAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C6BD6C4BA2D6F5E39B310AA /* SCKAnalyticsView.swift */; };
 		9C5B29E56E2A68A145582854 /* ScreenCaptureMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 223E3B85F4B0B092630658F4 /* ScreenCaptureMainView.swift */; };
 		BC0200000000000000000001 /* BackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000001 /* BackupManager.swift */; };
 		BC0200000000000000000002 /* BackupsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0100000000000000000002 /* BackupsMainView.swift */; };
@@ -6233,7 +6233,7 @@
 		1839366006A5F76260A07545 /* SCKExportManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKExportManager.swift; sourceTree = "<group>"; };
 		E38D3AAEE19509A42DD8795E /* SCKDashboardCards.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKDashboardCards.swift; sourceTree = "<group>"; };
 		15DE4D40F797F266A96E35AC /* SCKCaptureViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKCaptureViews.swift; sourceTree = "<group>"; };
-		SCK6BD6C4BA2D6F5E39B310 /* SCKAnalyticsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKAnalyticsView.swift; sourceTree = "<group>"; };
+		6C6BD6C4BA2D6F5E39B310AA /* SCKAnalyticsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKAnalyticsView.swift; sourceTree = "<group>"; };
 		CB0FCA0FA9A97E1B1146C7E1 /* SCKUtilityViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKUtilityViews.swift; sourceTree = "<group>"; };
 		223E3B85F4B0B092630658F4 /* ScreenCaptureMainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenCaptureMainView.swift; sourceTree = "<group>"; };
 		BC0100000000000000000001 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
@@ -12900,6 +12900,7 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		A7C9B2E14D6F48A3B5E9012C /* Sources/Keyboard */ = {
 			isa = PBXGroup;
 			children = (
 				54580C95884F8169F9D70F2C /* Info.plist */,
@@ -13230,6 +13231,7 @@
 			path = Root;
 			sourceTree = "<group>";
 		};
+		A3D64F5D0C794862A97D02E1 /* Sources/Messages */ = {
 			isa = PBXGroup;
 			children = (
 				1525A3109981BF259ED57368 /* Core */,
@@ -13907,7 +13909,7 @@
 				AB6CFA927C0E9F5F73060308 /* Services */,
 				7C81E1A15F1E00BB1F0A8944 /* Recording */,
 				588D5476D14A9A80EF09427B /* OCR */,
-				SCK4907D4C82E885B9E900D /* Analytics */,
+				5C44907D4C82E885B9E900DD /* Analytics */,
 				4548EFFA28E9BC8FAC1E9A82 /* Transcript */,
 				821D80437832FA596FBE026B /* Summaries */,
 				350BEAFF5842070E22825E26 /* WorkspaceGenerator */,
@@ -13916,19 +13918,18 @@
 				0608F242AC2D1FD68AFCA55E /* Components */,
 				C5765D7D4B03CC6F4FEC3801 /* Screenshot */,
 				14F09917D5D0AB6CFA64221C /* Settings */,
-		SCK4907D4C82E885B9E900D /* Analytics */ = {
-			isa = PBXGroup;
-			children = (
-				SCK6BD6C4BA2D6F5E39B310 /* SCKAnalyticsView.swift */,
-			);
-			path = Analytics;
-			sourceTree = "<group>";
-		};
 				223E3B85F4B0B092630658F4 /* ScreenCaptureMainView.swift */,
 			);
 			path = ScreenCaptureKit;
 			sourceTree = "<group>";
-
+		};
+		5C44907D4C82E885B9E900DD /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				6C6BD6C4BA2D6F5E39B310AA /* SCKAnalyticsView.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
