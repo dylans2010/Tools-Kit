@@ -1,6 +1,6 @@
 import SwiftUI
 import UIKit
-
+import Appwrite
 enum ModelType: String, CaseIterable, Identifiable {
     case local = "Local"
     case app = "App"
