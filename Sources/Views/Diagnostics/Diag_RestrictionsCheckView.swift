@@ -70,7 +70,7 @@ struct Diag_RestrictionsCheckView: View {
         let hasBiometrics = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &authError)
         let biometricRestricted: Bool
         if let laError = authError as? LAError {
-            biometricRestricted = laError == .biometryLockout
+            biometricRestricted = laError.code == LAError.Code.biometryLockout
         } else {
             biometricRestricted = false
         }
