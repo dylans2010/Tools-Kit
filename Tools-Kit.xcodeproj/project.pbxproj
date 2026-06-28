@@ -46,7 +46,7 @@
 		08AF05FE63A9400ABCE9FCE3 /* MailStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411F811D01A2429A91DBA6DD /* MailStorageService.swift */; };
 		090C32DF869F46339E3C9245 /* DropdownOptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A4B3BAC55A496B9C9F0455 /* DropdownOptionManager.swift */; };
 		096FA3D6396F4067881183B7 /* Builder/JWTDecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2208A9C0CF904CB4B32C0FBE /* Builder/JWTDecoderDevTool.swift */; };
-		0991C2DF78DB0AB9EDE8A659 /* RESTAPIC04D7045B44B7C6A1onnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7E58D0ABCB167C9BFE71C25 /* RESTAPIC04D7045B44B7C6A1onnector.swift */; };
+		0991C2DF78DB0AB9EDE8A659 /* RESTAPIConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7E58D0ABCB167C9BFE71C25 /* RESTAPIConnector.swift */; };
 		09E94604C14E49B795F9CBF6 /* URLParserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55764B5CEBE434BB117754F /* URLParserView.swift */; };
 		0A78374478B40A38DB97D3CF /* AIChatSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B0B52F727678316A6551CB /* AIChatSettings.swift */; };
 		0B00347173954E3C8B35B0C4 /* Builder/HeaderInspectorDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB0226F977E4DBFB7DBD1A2 /* Builder/HeaderInspectorDevTool.swift */; };
@@ -770,7 +770,7 @@
 		E35151C7DC4938EE4ED258B9 /* Sources/Views/Bridging/Services/BridgeWebSocketClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10845D8E3522EB0DE5935801 /* Sources/Views/Bridging/Services/BridgeWebSocketClient.swift */; };
 		C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
 		C0E70675139B57878C58A047 /* Sources/Views/Workspace/OpenClaw/Alternatives/PairingCode/Pairing/PCTrustManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B199217CC93500FABB6375C /* Sources/Views/Workspace/OpenClaw/Alternatives/PairingCode/Pairing/PCTrustManager.swift */; };
-		C2348E9862005C11A18B4C21 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANHTTPC562B73E41F500FFlient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06968A3F71D15334A0E5F7B5 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANHTTPC562B73E41F500FFlient.swift */; };
+		C2348E9862005C11A18B4C21 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06968A3F71D15334A0E5F7B5 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANHTTPClient.swift */; };
 		C28B4946EF36415783272126 /* YAMLConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D0075F88514881B6EC6070 /* YAMLConverterView.swift */; };
 		C28EB889BCD1429CA6C79834 /* HTMLEntityBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03C7F495D5548C6823903C2 /* HTMLEntityBackend.swift */; };
 		C3876F982C8C43BAB0F69A2E /* ToolCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E34B1777D4840A19DD9533B /* ToolCardView.swift */; };
@@ -2362,7 +2362,7 @@
 		05AFD0001A06477F8013C77D /* Builder/MemoryMonitorDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/MemoryMonitorDevTool.swift; sourceTree = "<group>"; };
 		0645C05FF92B5BE190C5643A /* Sources/Views/Workspace/OpenClaw/Alternatives/ManualToken/Core/MTErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/ManualToken/Core/MTErrors.swift; sourceTree = SOURCE_ROOT; };
 		064CB13BC205411B91EAA752 /* MapsToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsToolView.swift; sourceTree = "<group>"; };
-		06968A3F71D15334A0E5F7B5 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANHTTPC562B73E41F500FFlient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANHTTPC562B73E41F500FFlient.swift; sourceTree = SOURCE_ROOT; };
+		06968A3F71D15334A0E5F7B5 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANHTTPClient.swift; sourceTree = SOURCE_ROOT; };
 		06C00EFEC47F4EFA82E82DD7 /* Diagnostics/SDKLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKLogsView.swift; sourceTree = "<group>"; };
 		077CCE515647549AB35CAF7E /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Views/TLANHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Views/TLANHomeView.swift; sourceTree = SOURCE_ROOT; };
 		080B28C9F0E54D43BD51389A /* ToolVisibilityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolVisibilityManager.swift; sourceTree = "<group>"; };
@@ -3747,7 +3747,7 @@
 		E75D52D2ECF24F66B1A2B767 /* Sources/Views/Workspace/SDK/Explorer/SDKDependencyVisualizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Explorer/SDKDependencyVisualizerView.swift; sourceTree = "<group>"; };
 		E7754042F8F25CA89953E264 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Views/TLANDeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Views/TLANDeviceListView.swift; sourceTree = SOURCE_ROOT; };
 		E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iCloudMailProvider.swift; sourceTree = "<group>"; };
-		E7E58D0ABCB167C9BFE71C25 /* RESTAPIC04D7045B44B7C6A1onnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RESTAPIC04D7045B44B7C6A1onnector.swift; sourceTree = "<group>"; };
+		E7E58D0ABCB167C9BFE71C25 /* RESTAPIConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RESTAPIConnector.swift; sourceTree = "<group>"; };
 		E7F486EF5ED54F9B9D7B0875 /* FocusTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTrackerView.swift; sourceTree = "<group>"; };
 		E7F486EF5ED54F9B9D7B0876 /* FocusSessionBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionBackend.swift; sourceTree = "<group>"; };
 		E7FCD686F59E5C4A88418926 /* EditingWorkflow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditingWorkflow.swift; sourceTree = "<group>"; };
@@ -4642,7 +4642,7 @@
 		FA317AEF1259DC8AB125DF88 /* SCKAnalyticsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKAnalyticsView.swift; sourceTree = "<group>"; };
 		1B3F8E07D1B9A274421F2928 /* SCKUtilityViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKUtilityViews.swift; sourceTree = "<group>"; };
 		A470363A92CBFBA5397DA618 /* ScreenCaptureMainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenCaptureMainView.swift; sourceTree = "<group>"; };
-		6E61801969D963F473CB5A71 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
+		6E61801969D963F473CB5A71 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backups/BackupManager.swift; sourceTree = "<group>"; };
 		EF636F11AC5FED6E9D0EA89E /* BackupsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupsMainView.swift; sourceTree = "<group>"; };
 		40577C5BB952F69BC703B11E /* BackupListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupListView.swift; sourceTree = "<group>"; };
 		20BA8717BC589DC4655D0FEF /* BackupDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupDetailView.swift; sourceTree = "<group>"; };
@@ -9887,7 +9887,7 @@
 				297ED8337F88D3013A35BA2B /* SDKConnectorHealthMonitor.swift */,
 				F96FA2B7F364102FBBE349CF /* SDKConnectorMetrics.swift */,
 				19BFC903EA40BEB967C6EAD4 /* SlackConnector.swift */,
-				E7E58D0ABCB167C9BFE71C25 /* RESTAPIC04D7045B44B7C6A1onnector.swift */,
+				E7E58D0ABCB167C9BFE71C25 /* RESTAPIConnector.swift */,
 				A646FF8113DC3ED2CF6DC2CD /* RESTConnector.swift */,
 				8DDFA6697A1366099EDC16A5 /* MQTTConnector.swift */,
 			);
@@ -10208,7 +10208,7 @@
 				1B199778550756E580C16D36 /* Sources/Views/Workspace/OpenClaw/Alternatives/QRCode/Views/QRSettingsView.swift */,
 				1FF4075AECC857EABCDE63EF /* Sources/Views/Workspace/OpenClaw/Alternatives/QRCode/Views/QRStatusView.swift */,
 				8F2B9E2C78A45AC3A76A2D04 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANBonjourBrowser.swift */,
-				06968A3F71D15334A0E5F7B5 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANHTTPC562B73E41F500FFlient.swift */,
+				06968A3F71D15334A0E5F7B5 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANHTTPClient.swift */,
 				687558FBF93656F69623518E /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANSessionManager.swift */,
 				77A3BD6F21B05CBC8DEE67EC /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANWebSocketConnection.swift */,
 				3263AF88FF365562BEEC8D93 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Core/TLANConstants.swift */,
@@ -12183,7 +12183,7 @@
 				53BDEAE800C05749AAA17AB1 /* Sources/Views/Workspace/OpenClaw/Alternatives/QRCode/Views/QRSettingsView.swift in Sources */,
 				38DD7D42D5B05D9B995FE8AE /* Sources/Views/Workspace/OpenClaw/Alternatives/QRCode/Views/QRStatusView.swift in Sources */,
 				7E3A701E1EA453098E28C1AE /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANBonjourBrowser.swift in Sources */,
-				C2348E9862005C11A18B4C21 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANHTTPC562B73E41F500FFlient.swift in Sources */,
+				C2348E9862005C11A18B4C21 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANHTTPClient.swift in Sources */,
 				D79793A4C58E5392912C287B /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANSessionManager.swift in Sources */,
 				72E5C478405B50E18969389E /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Connections/TLANWebSocketConnection.swift in Sources */,
 				7F7E994247365C929ED07355 /* Sources/Views/Workspace/OpenClaw/Alternatives/TrustedLAN/Core/TLANConstants.swift in Sources */,
@@ -14364,7 +14364,7 @@
 				6A5CBEF5349D1C85A65947A8 /* SDKConnectorHealthMonitor.swift in Sources */,
 				3508CFF0CFE1C150E5B91D05 /* SDKConnectorMetrics.swift in Sources */,
 				D2E857608F01C9A69B1B2B85 /* SlackConnector.swift in Sources */,
-				0991C2DF78DB0AB9EDE8A659 /* RESTAPIC04D7045B44B7C6A1onnector.swift in Sources */,
+				0991C2DF78DB0AB9EDE8A659 /* RESTAPIConnector.swift in Sources */,
 				68CF1D32D5068B8BB8B2466C /* RESTConnector.swift in Sources */,
 				A076EF03EDA9981129488EC3 /* MQTTConnector.swift in Sources */,
 				D14D8CA404CF0A7335BBBBC0 /* SDKHealthDashboardView.swift in Sources */,
