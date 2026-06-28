@@ -16542,7 +16542,7 @@
 				BC0200000000000000000011 /* AutoBackupSettingsView.swift in Sources */,
 				BC0200000000000000000012 /* BackupStorageView.swift in Sources */,
 				BC0200000000000000000013 /* BackupTimelineView.swift in Sources */,
-				BC02000000000000000014 /* WelcomeFlowView.swift in Sources */,
+				BC0200000000000000000014 /* WelcomeFlowView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
