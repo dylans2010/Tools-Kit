@@ -7517,8 +7517,8 @@
 			isa = PBXGroup;
 			children = (
 				BEF44DFE1EE96D22FB035181 /* Models */,
-				93E25AE100F7E8053DF0E2B3 /* Services */,
-				A52DC0F87EACA7542DFB3C5C /* Managers */,
+				C2A9E9D5A7254D2E9C8D9B01 /* Services */,
+				C2A9E9D5A7254D2E9C8D9B02 /* Managers */,
 				1159A7D327F68DA295A347EE /* ViewModels */,
 				50967EA24DA83C8A8AA8C14A /* Views */,
 			);
@@ -9983,7 +9983,7 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		93E25AE100F7E8053DF0E2B3 /* Services */ = {
+		C2A9E9D5A7254D2E9C8D9B01 /* Services */ = {
 			isa = PBXGroup;
 			children = (
 				FBF0B4921AEF52F753496D39 /* AIAnalysisService.swift */,
@@ -9992,7 +9992,7 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		A52DC0F87EACA7542DFB3C5C /* Managers */ = {
+		C2A9E9D5A7254D2E9C8D9B02 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
 				FBD3111D9D395B0E8887560B /* DiagnosticsManager.swift */,
@@ -11929,6 +11929,14 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
+		C2E2607FD5C86290F8BF9F48 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				FA317AEF1259DC8AB125DF88 /* SCKAnalyticsView.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
 		62986BCFE7103DDE92E08794 /* ScreenCaptureKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -11946,14 +11954,6 @@
 				6CE61FC3033ADAA8D07238D5 /* Components */,
 				598745A164DF8276796C8FFB /* Screenshot */,
 				54842D32D8A6AC14F9E7074F /* Settings */,
-		C2E2607FD5C86290F8BF9F48 /* Analytics */ = {
-			isa = PBXGroup;
-			children = (
-				FA317AEF1259DC8AB125DF88 /* SCKAnalyticsView.swift */,
-			);
-			path = Analytics;
-			sourceTree = "<group>";
-		};
 				A470363A92CBFBA5397DA618 /* ScreenCaptureMainView.swift */,
 			);
 			path = ScreenCaptureKit;
