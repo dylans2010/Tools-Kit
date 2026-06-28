@@ -117,6 +117,7 @@ class WorkspaceNavConfig: ObservableObject {
 
         WorkspaceNavItem(id: "mail", label: "Mail", icon: "envelope", section: "Workspace", isVisible: true),
         WorkspaceNavItem(id: "openclaw", label: "OpenClaw", icon: "macpro.gen3", section: "System", isVisible: true),
+        WorkspaceNavItem(id: "screencapture", label: "Screen Capture", icon: "video.circle", section: "Workspace", isVisible: true),
     ]
 }
 
@@ -340,6 +341,8 @@ struct WorkspaceHomeView: View {
             }
         case "openclaw":
             NavigationLink { OpenClawMainView() } label: { Label(item.label, systemImage: item.icon) }
+        case "screencapture":
+            NavigationLink { ScreenCaptureMainView() } label: { Label(item.label, systemImage: item.icon) }
         default:
             EmptyView()
         }

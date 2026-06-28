@@ -2506,6 +2506,23 @@
 		WT1C4BF8EBB28B8B53DA65BA /* WorkspaceAITools.swift in Sources */ = {isa = PBXBuildFile; fileRef = WT2150AD8D36DF890EC9A009 /* WorkspaceAITools.swift */; };
 		XM0200000000000000000001 /* MCPModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = XM0100000000000000000001 /* MCPModels.swift */; };
 		ZF0000000000000000000003 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = ZF0000000000000000000002 /* ZIPFoundation */; };
+		SCK208C57FE82D85FDB87D29 /* SCKModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCKDD78DB6EE25457D384B99 /* SCKModels.swift */; };
+		SCK6F1422620F0753CDABA4D /* SCKPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCKDFA9C8F1BFC256FD8E41B /* SCKPermissionManager.swift */; };
+		SCKA08A88ED046D512C86177 /* ScreenCaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCK21B4BC36330857C6B8DC8 /* ScreenCaptureManager.swift */; };
+		SCK8F331439EEA55577A9BB3 /* RecordingSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCKEB1C13372F705D2AB8E98 /* RecordingSessionManager.swift */; };
+		SCKE5FCF25EE6C355EE93CF5 /* RecordingStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCKAD4771E91CC25AE496BDA /* RecordingStorageManager.swift */; };
+		SCK7EA66FA3CF965E0BBFDBC /* SCKRecorderViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCK508F3B718B6A5EC2B989D /* SCKRecorderViews.swift */; };
+		SCKE6D9BAF2DCAE52FEB4D3B /* SCKOCRManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCK2BA2262298045A2DA208D /* SCKOCRManager.swift */; };
+		SCK228756DBB17E5BE9B1473 /* SCKTranscriptManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCKD996BE5394465E3FB191B /* SCKTranscriptManager.swift */; };
+		SCK5DD4EC6754055A688B1E7 /* SCKSummaryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCKE25F6F4B2B3750C5B76F6 /* SCKSummaryManager.swift */; };
+		SCK9BD7ABB6B2AB5EF19A7FC /* SCKWorkspaceGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCK4CCF3ADD7EB453F0AD86D /* SCKWorkspaceGenerator.swift */; };
+		SCK8CB4C17F84A455F891610 /* SCKTimelineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCK92829DDF91E557139C6AA /* SCKTimelineManager.swift */; };
+		SCK4D96EBCE91D0586FB1E11 /* SCKExportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCKA4FE1426CB495902A79CC /* SCKExportManager.swift */; };
+		SCK4BD0DAFA5AC85404A1284 /* SCKDashboardCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCKAB02D6A1E7C45E828217E /* SCKDashboardCards.swift */; };
+		SCK1F3A14F4D4CB5B1E998B1 /* SCKCaptureViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCKA58AF2D4115C5364A2872 /* SCKCaptureViews.swift */; };
+		SCKBA884412DD5750A4921BC /* SCKUtilityViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCKEBFAB6F80FF456308A1D8 /* SCKUtilityViews.swift */; };
+		SCK96E69B56403F540C93DB6C28 /* SCKAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCK6BD6C4BA2D6F5E39B310 /* SCKAnalyticsView.swift */; };
+		SCKE85AD349F6BB562BB38CD /* ScreenCaptureMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCK0915CFD4E25B5FC69542D /* ScreenCaptureMainView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -5071,6 +5088,23 @@
 		WS01CEDE12EC1A3C4B62BE89 /* PersonaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaManager.swift; sourceTree = "<group>"; };
 		WT2150AD8D36DF890EC9A009 /* WorkspaceAITools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAITools.swift; sourceTree = "<group>"; };
 		XM0100000000000000000001 /* MCPModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MCPModels.swift; path = Sources/Views/External/MCPModels.swift; sourceTree = SOURCE_ROOT; };
+		SCKDD78DB6EE25457D384B99 /* SCKModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKModels.swift; sourceTree = "<group>"; };
+		SCKDFA9C8F1BFC256FD8E41B /* SCKPermissionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKPermissionManager.swift; sourceTree = "<group>"; };
+		SCK21B4BC36330857C6B8DC8 /* ScreenCaptureManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenCaptureManager.swift; sourceTree = "<group>"; };
+		SCKEB1C13372F705D2AB8E98 /* RecordingSessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordingSessionManager.swift; sourceTree = "<group>"; };
+		SCKAD4771E91CC25AE496BDA /* RecordingStorageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordingStorageManager.swift; sourceTree = "<group>"; };
+		SCK508F3B718B6A5EC2B989D /* SCKRecorderViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKRecorderViews.swift; sourceTree = "<group>"; };
+		SCK2BA2262298045A2DA208D /* SCKOCRManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKOCRManager.swift; sourceTree = "<group>"; };
+		SCKD996BE5394465E3FB191B /* SCKTranscriptManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKTranscriptManager.swift; sourceTree = "<group>"; };
+		SCKE25F6F4B2B3750C5B76F6 /* SCKSummaryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKSummaryManager.swift; sourceTree = "<group>"; };
+		SCK4CCF3ADD7EB453F0AD86D /* SCKWorkspaceGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKWorkspaceGenerator.swift; sourceTree = "<group>"; };
+		SCK92829DDF91E557139C6AA /* SCKTimelineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKTimelineManager.swift; sourceTree = "<group>"; };
+		SCKA4FE1426CB495902A79CC /* SCKExportManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKExportManager.swift; sourceTree = "<group>"; };
+		SCKAB02D6A1E7C45E828217E /* SCKDashboardCards.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKDashboardCards.swift; sourceTree = "<group>"; };
+		SCKA58AF2D4115C5364A2872 /* SCKCaptureViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKCaptureViews.swift; sourceTree = "<group>"; };
+		SCK6BD6C4BA2D6F5E39B310 /* SCKAnalyticsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKAnalyticsView.swift; sourceTree = "<group>"; };
+		SCKEBFAB6F80FF456308A1D8 /* SCKUtilityViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKUtilityViews.swift; sourceTree = "<group>"; };
+		SCK0915CFD4E25B5FC69542D /* ScreenCaptureMainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenCaptureMainView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -5366,6 +5400,7 @@
 				5AA1439AFB6E4B3A86508DF8 /* Notebooks */,
 				6591AE4B815141418A027C77 /* Habits */,
 				6B934E43881547CF91DADC5C /* App Lock */,
+				SCK0A18DD4BE995540D98034 /* ScreenCaptureKit */,
 				7AD559224428420AA379C30B /* Meet */,
 				A0780669AA604104AEC06C3C /* Calendar */,
 				AD54BB2BF7AD4834ACC3741B /* Sources/Views/Workspace/Feedback */,
@@ -12534,6 +12569,142 @@
 			path = Sources/Views/Bridging/TKBridge;
 			sourceTree = SOURCE_ROOT;
 		};
+		SCKD32A955257E75EE7AAEE0 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				SCKDD78DB6EE25457D384B99 /* SCKModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		SCK8584648BEC46518996982 /* Permissions */ = {
+			isa = PBXGroup;
+			children = (
+				SCKDFA9C8F1BFC256FD8E41B /* SCKPermissionManager.swift */,
+			);
+			path = Permissions;
+			sourceTree = "<group>";
+		};
+		SCKF0EA79E4129155BBBC435 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				SCK21B4BC36330857C6B8DC8 /* ScreenCaptureManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		SCK8DC4CA60EB275E78B8817 /* Recording */ = {
+			isa = PBXGroup;
+			children = (
+				SCKEB1C13372F705D2AB8E98 /* RecordingSessionManager.swift */,
+				SCKAD4771E91CC25AE496BDA /* RecordingStorageManager.swift */,
+				SCK508F3B718B6A5EC2B989D /* SCKRecorderViews.swift */,
+			);
+			path = Recording;
+			sourceTree = "<group>";
+		};
+		SCK205572059CAB579A8BB60 /* OCR */ = {
+			isa = PBXGroup;
+			children = (
+				SCK2BA2262298045A2DA208D /* SCKOCRManager.swift */,
+			);
+			path = OCR;
+			sourceTree = "<group>";
+		};
+		SCK36AAB202B5975F42AAEAE /* Transcript */ = {
+			isa = PBXGroup;
+			children = (
+				SCKD996BE5394465E3FB191B /* SCKTranscriptManager.swift */,
+			);
+			path = Transcript;
+			sourceTree = "<group>";
+		};
+		SCKFAFCA300C0EB5FC99AF96 /* Summaries */ = {
+			isa = PBXGroup;
+			children = (
+				SCKE25F6F4B2B3750C5B76F6 /* SCKSummaryManager.swift */,
+			);
+			path = Summaries;
+			sourceTree = "<group>";
+		};
+		SCK79BDF3F7995553B99E6A5 /* WorkspaceGenerator */ = {
+			isa = PBXGroup;
+			children = (
+				SCK4CCF3ADD7EB453F0AD86D /* SCKWorkspaceGenerator.swift */,
+			);
+			path = WorkspaceGenerator;
+			sourceTree = "<group>";
+		};
+		SCKA86746C6CA3A539797E33 /* Timeline */ = {
+			isa = PBXGroup;
+			children = (
+				SCK92829DDF91E557139C6AA /* SCKTimelineManager.swift */,
+			);
+			path = Timeline;
+			sourceTree = "<group>";
+		};
+		SCK9B9E8DE106BE5F97B5F16 /* Exports */ = {
+			isa = PBXGroup;
+			children = (
+				SCKA4FE1426CB495902A79CC /* SCKExportManager.swift */,
+			);
+			path = Exports;
+			sourceTree = "<group>";
+		};
+		SCKDDD622E8CBBF509F86D85 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				SCKAB02D6A1E7C45E828217E /* SCKDashboardCards.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		SCKBA2F319CA0B95A6F8628B /* Screenshot */ = {
+			isa = PBXGroup;
+			children = (
+				SCKA58AF2D4115C5364A2872 /* SCKCaptureViews.swift */,
+			);
+			path = Screenshot;
+			sourceTree = "<group>";
+		};
+		SCKE5F09D2507C658B5A2820 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				SCKEBFAB6F80FF456308A1D8 /* SCKUtilityViews.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		SCK0A18DD4BE995540D98034 /* ScreenCaptureKit */ = {
+			isa = PBXGroup;
+			children = (
+				SCKD32A955257E75EE7AAEE0 /* Models */,
+				SCK8584648BEC46518996982 /* Permissions */,
+				SCKF0EA79E4129155BBBC435 /* Services */,
+				SCK8DC4CA60EB275E78B8817 /* Recording */,
+				SCK205572059CAB579A8BB60 /* OCR */,
+				SCK4907D4C82E885B9E900D /* Analytics */,
+				SCK36AAB202B5975F42AAEAE /* Transcript */,
+				SCKFAFCA300C0EB5FC99AF96 /* Summaries */,
+				SCK79BDF3F7995553B99E6A5 /* WorkspaceGenerator */,
+				SCKA86746C6CA3A539797E33 /* Timeline */,
+				SCK9B9E8DE106BE5F97B5F16 /* Exports */,
+				SCKDDD622E8CBBF509F86D85 /* Components */,
+				SCKBA2F319CA0B95A6F8628B /* Screenshot */,
+				SCKE5F09D2507C658B5A2820 /* Settings */,
+		SCK4907D4C82E885B9E900D /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				SCK6BD6C4BA2D6F5E39B310 /* SCKAnalyticsView.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+				SCK0915CFD4E25B5FC69542D /* ScreenCaptureMainView.swift */,
+			);
+			path = ScreenCaptureKit;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -12630,6 +12801,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				SCK208C57FE82D85FDB87D29 /* SCKModels.swift in Sources */,
+				SCK6F1422620F0753CDABA4D /* SCKPermissionManager.swift in Sources */,
+				SCK96E69B56403F540C93DB6C28 /* SCKAnalyticsView.swift in Sources */,
+				SCKA08A88ED046D512C86177 /* ScreenCaptureManager.swift in Sources */,
+				SCK8F331439EEA55577A9BB3 /* RecordingSessionManager.swift in Sources */,
+				SCKE5FCF25EE6C355EE93CF5 /* RecordingStorageManager.swift in Sources */,
+				SCK7EA66FA3CF965E0BBFDBC /* SCKRecorderViews.swift in Sources */,
+				SCKE6D9BAF2DCAE52FEB4D3B /* SCKOCRManager.swift in Sources */,
+				SCK228756DBB17E5BE9B1473 /* SCKTranscriptManager.swift in Sources */,
+				SCK5DD4EC6754055A688B1E7 /* SCKSummaryManager.swift in Sources */,
+				SCK9BD7ABB6B2AB5EF19A7FC /* SCKWorkspaceGenerator.swift in Sources */,
+				SCK8CB4C17F84A455F891610 /* SCKTimelineManager.swift in Sources */,
+				SCK4D96EBCE91D0586FB1E11 /* SCKExportManager.swift in Sources */,
+				SCK4BD0DAFA5AC85404A1284 /* SCKDashboardCards.swift in Sources */,
+				SCK1F3A14F4D4CB5B1E998B1 /* SCKCaptureViews.swift in Sources */,
+				SCKBA884412DD5750A4921BC /* SCKUtilityViews.swift in Sources */,
+				SCKE85AD349F6BB562BB38CD /* ScreenCaptureMainView.swift in Sources */,
 				ED81ED7864BF5B92845C542D /* Sources/Views/Workspace/OpenClaw/Alternatives/LocalApproval/Connections/LABonjourBrowser.swift in Sources */,
 				CA39CABAE9D15D5EAC96E217 /* Sources/Views/Workspace/OpenClaw/Alternatives/LocalApproval/Connections/LAHTTPClient.swift in Sources */,
 				02F4F6A9619A5CA9A5C28450 /* Sources/Views/Workspace/OpenClaw/Alternatives/LocalApproval/Connections/LASessionManager.swift in Sources */,
@@ -15173,7 +15361,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -15194,7 +15382,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				DEVELOPMENT_TEAM = 3Z586KMX37;
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -15217,7 +15405,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 3Z586KMX37;
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -15276,7 +15464,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
