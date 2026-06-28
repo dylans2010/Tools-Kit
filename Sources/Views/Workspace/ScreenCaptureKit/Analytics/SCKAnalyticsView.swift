@@ -1,4 +1,7 @@
+#if canImport(ScreenCaptureKit)
+
 import SwiftUI
+
 
 @available(iOS 27.0, *)
 struct SCKAnalyticsView: View {
@@ -57,3 +60,6 @@ struct SCKAnalyticsView: View {
         return "\(hours)h \(mins)m"
     }
 }
+
+
+#endif

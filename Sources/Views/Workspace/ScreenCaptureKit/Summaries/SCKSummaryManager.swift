@@ -1,4 +1,7 @@
+#if canImport(ScreenCaptureKit)
+
 import Foundation
+
 
 @available(iOS 27.0, *)
 @MainActor
@@ -41,3 +44,6 @@ class SCKSummaryManager {
         return (try? JSONDecoder().decode([String].self, from: data)) ?? []
     }
 }
+
+
+#endif

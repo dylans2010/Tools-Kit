@@ -1,4 +1,7 @@
+#if canImport(ScreenCaptureKit)
+
 import Foundation
+
 
 @available(iOS 27.0, *)
 class RecordingStorageManager {
@@ -46,3 +49,6 @@ class RecordingStorageManager {
         try? fileManager.removeItem(at: movURL)
     }
 }
+
+
+#endif

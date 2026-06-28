@@ -1,3 +1,5 @@
+#if canImport(ScreenCaptureKit)
+
 import Foundation
 import Vision
 import CoreMedia
@@ -53,3 +55,5 @@ struct OCRScannerView: View {
             .navigationTitle("OCR Scanner")
     }
 }
+
+#endif

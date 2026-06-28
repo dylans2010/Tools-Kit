@@ -1,4 +1,7 @@
+#if canImport(ScreenCaptureKit)
+
 import SwiftUI
+
 
 @available(iOS 27.0, *)
 struct ScreenCaptureMainView: View {
@@ -72,3 +75,6 @@ struct SCKDashboardSection<Content: View>: View {
         ScreenCaptureMainView()
     }
 }
+
+
+#endif

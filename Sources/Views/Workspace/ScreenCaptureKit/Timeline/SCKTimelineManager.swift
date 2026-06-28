@@ -1,4 +1,7 @@
+#if canImport(ScreenCaptureKit)
+
 import Foundation
+
 
 @available(iOS 27.0, *)
 @MainActor
@@ -16,3 +19,6 @@ class SCKTimelineManager {
         // e.g., slide changes detected via OCR
     }
 }
+
+
+#endif

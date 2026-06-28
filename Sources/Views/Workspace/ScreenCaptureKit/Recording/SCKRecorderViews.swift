@@ -1,4 +1,7 @@
+#if canImport(ScreenCaptureKit)
+
 import SwiftUI
+
 
 @available(iOS 27.0, *)
 struct SCKScreenRecorderView: View {
@@ -148,3 +151,6 @@ struct SCKGenericRecorderView: View {
         return String(format: "%02d:%02d", mins, secs)
     }
 }
+
+
+#endif

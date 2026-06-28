@@ -1,4 +1,7 @@
+#if canImport(ScreenCaptureKit)
+
 import SwiftUI
+
 
 @available(iOS 27.0, *)
 struct SmartScreenshotView: View {
@@ -90,3 +93,6 @@ struct AICaptureView: View {
             .navigationTitle("AI Capture")
     }
 }
+
+
+#endif

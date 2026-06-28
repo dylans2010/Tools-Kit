@@ -1,7 +1,10 @@
+#if canImport(ScreenCaptureKit)
+
 import Foundation
 import Speech
 import CoreMedia
 import AVFoundation
+
 
 @available(iOS 27.0, *)
 @MainActor
@@ -88,3 +91,6 @@ class SCKTranscriptManager {
         return pcmBuffer
     }
 }
+
+
+#endif
