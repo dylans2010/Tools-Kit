@@ -12571,6 +12571,9 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
+				KnownAssetTags = (
+					New,
+				);
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					F3353FBEDEEBF7704E1E6451 = {
