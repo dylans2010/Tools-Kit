@@ -73,7 +73,7 @@ struct BackupsMainView: View {
                 NavigationLink(destination: BackupCompareView()) {
                     Label("Compare Backups", systemImage: "arrow.left.and.right.circle")
                 }
-                NavigationLink(destination: BackupExportView()) {
+                NavigationLink(destination: BackupExportView(backup: nil)) {
                     Label("Export & Migration", systemImage: "square.and.arrow.up")
                 }
             }

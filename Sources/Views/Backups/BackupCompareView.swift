@@ -109,9 +109,9 @@ struct BackupCompareView: View {
         HStack {
             Text(label)
             Spacer()
-            Text(valA).font(.caption).foregroundStyle(.secondary)
-            Image(systemName: "arrow.right").font(.caption2).foregroundStyle(.tertiary)
-            Text(valB).font(.caption).foregroundStyle(valA == valB ? .secondary : .blue)
+            Text(valA).font(.caption).foregroundStyle(Color.secondary)
+            Image(systemName: "arrow.right").font(.caption2).foregroundStyle(Color.secondary)
+            Text(valB).font(.caption).foregroundStyle(valA == valB ? Color.secondary : Color.blue)
         }
     }
 }

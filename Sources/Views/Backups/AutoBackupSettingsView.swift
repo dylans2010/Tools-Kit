@@ -60,7 +60,7 @@ struct AutoBackupSettingsView: View {
         .navigationTitle("Auto Backups")
         .sheet(isPresented: $showingShareSheet) {
             if let url = backupToShare {
-                ShareSheet(activityItems: [url])
+                BackupShareSheet(activityItems: [url])
             }
         }
     }
@@ -87,7 +87,7 @@ struct AutoBackupSettingsView: View {
     }
 }
 
-struct ShareSheet: UIViewControllerRepresentable {
+struct BackupShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
     func makeUIViewController(context: Context) -> UIActivityViewController {
         UIActivityViewController(activityItems: activityItems, applicationActivities: nil)

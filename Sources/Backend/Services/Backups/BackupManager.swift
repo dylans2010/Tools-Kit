@@ -113,7 +113,7 @@ class BackupManager: ObservableObject {
         try JSONEncoder().encode(metadata).write(to: metadataURL)
 
         let zipURL = backupsDirectory.appendingPathComponent("\(backupID.uuidString).zip")
-        try fileManager.zipItem(at: tempDir, destURL: zipURL)
+        try fileManager.zipItem(at: tempDir, to: zipURL)
 
         let compressedSize = (try? fileManager.attributesOfItem(atPath: zipURL.path)[.size] as? Int64) ?? 0
 
