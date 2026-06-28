@@ -1,7 +1,10 @@
+#if canImport(ScreenCaptureKit)
+
 import Foundation
 import CoreMedia
 import AVFoundation
 import ScreenCaptureKit
+
 
 @available(iOS 27.0, *)
 @MainActor
@@ -150,3 +153,6 @@ class RecordingSessionManager {
         }
     }
 }
+
+
+#endif

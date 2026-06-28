@@ -1,7 +1,10 @@
+#if canImport(ScreenCaptureKit)
+
 import Foundation
 import ScreenCaptureKit
 import AVFoundation
 import Speech
+
 
 @available(iOS 27.0, *)
 @Observable
@@ -67,3 +70,6 @@ class SCKPermissionManager {
         }
     }
 }
+
+
+#endif

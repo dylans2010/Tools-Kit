@@ -1,4 +1,7 @@
+#if canImport(ScreenCaptureKit)
+
 import SwiftUI
+
 
 @available(iOS 27.0, *)
 struct SCKBugReporterView: View {
@@ -92,3 +95,6 @@ struct SCKSettingsView: View {
         }
     }
 }
+
+
+#endif

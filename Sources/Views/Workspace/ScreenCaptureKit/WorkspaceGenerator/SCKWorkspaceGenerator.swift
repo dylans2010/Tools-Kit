@@ -1,4 +1,7 @@
+#if canImport(ScreenCaptureKit)
+
 import Foundation
+
 
 @available(iOS 27.0, *)
 @MainActor
@@ -31,3 +34,6 @@ class SCKWorkspaceGenerator {
         }
     }
 }
+
+
+#endif

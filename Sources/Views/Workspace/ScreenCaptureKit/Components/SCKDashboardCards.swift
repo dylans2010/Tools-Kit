@@ -1,4 +1,7 @@
+#if canImport(ScreenCaptureKit)
+
 import SwiftUI
+
 
 @available(iOS 27.0, *)
 struct SCKDashboardCards {
@@ -126,3 +129,6 @@ struct SCKCard<Destination: View>: View {
         .buttonStyle(.plain)
     }
 }
+
+
+#endif

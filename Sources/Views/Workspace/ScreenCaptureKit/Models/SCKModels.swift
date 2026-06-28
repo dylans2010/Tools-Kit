@@ -1,5 +1,8 @@
+#if canImport(ScreenCaptureKit)
+
 import Foundation
 import CoreGraphics
+
 
 @available(iOS 27.0, *)
 struct SCKRecordingSession: Identifiable, Codable {
@@ -72,3 +75,6 @@ struct SCKBookmark: Identifiable, Codable {
     let title: String
     let note: String?
 }
+
+
+#endif

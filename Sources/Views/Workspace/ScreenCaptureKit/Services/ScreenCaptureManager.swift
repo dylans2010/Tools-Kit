@@ -1,6 +1,9 @@
+#if canImport(ScreenCaptureKit)
+
 import Foundation
 import ScreenCaptureKit
 import CoreMedia
+
 
 @available(iOS 27.0, *)
 @MainActor
@@ -101,3 +104,6 @@ extension ScreenCaptureManager: SCContentSharingPickerObserver {
         // Handle error
     }
 }
+
+
+#endif
