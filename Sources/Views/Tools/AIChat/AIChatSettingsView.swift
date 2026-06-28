@@ -1,8 +1,10 @@
 import SwiftUI
 import UIKit
-import Appwrite
 
-typealias AppwriteUser = Appwrite.Models.User
+struct AppwriteUser {
+    let name: String
+    let email: String
+}
 
 enum ModelType: String, CaseIterable, Identifiable {
     case local = "Local"
@@ -265,8 +267,9 @@ struct AIChatSettingsView: View {
         Task {
             do {
                 let user = try await AppwriteService.account.get()
+                let profile = AppwriteUser(name: user.name, email: user.email)
                 await MainActor.run {
-                    self.userProfile = user
+                    self.userProfile = profile
                     self.isAuthenticated = true
                 }
             } catch {

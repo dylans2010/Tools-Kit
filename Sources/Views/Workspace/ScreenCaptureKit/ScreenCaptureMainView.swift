@@ -72,7 +72,11 @@ struct SCKDashboardSection<Content: View>: View {
 
 #Preview {
     NavigationStack {
-        ScreenCaptureMainView()
+        if #available(iOS 27.0, *) {
+            ScreenCaptureMainView()
+        } else {
+            // Fallback on earlier versions
+        }
     }
 }
 
