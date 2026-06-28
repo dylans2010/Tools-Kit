@@ -2,16 +2,32 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.toolskit.sdk.sync</string>
+		<string>com.toolskit.sdk.health</string>
+	</array>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Tools-Kit Form Document</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.dylans2010.toolskit.form</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleName</key>
 	<string>Tools Kit</string>
-	<key>CFBundleVersion</key>
-	<string>1</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -37,94 +53,20 @@
 			</array>
 		</dict>
 	</array>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeName</key>
-			<string>Tools-Kit Form Document</string>
-			<key>LSHandlerRank</key>
-			<string>Owner</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>com.dylans2010.toolskit.form</string>
-			</array>
-		</dict>
-	</array>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>GOOGLE_CLIENT_ID</key>
+	<string>127870730797-8rnpb3le5n3j34ur7uvsfma75592nr07.apps.googleusercontent.com</string>
+	<key>GOOGLE_OAUTH_REDIRECT_URI</key>
+	<string>com.googleusercontent.apps.127870730797-8rnpb3le5n3j34ur7uvsfma75592nr07:/oauthredirect</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
-	<key>UTExportedTypeDeclarations</key>
-	<array>
-		<dict>
-			<key>UTTypeIdentifier</key>
-			<string>com.dylans2010.toolskit.form</string>
-			<key>UTTypeDescription</key>
-			<string>Tools-Kit Form Data</string>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.data</string>
-				<string>public.json</string>
-			</array>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>public.filename-extension</key>
-				<array>
-					<string>form</string>
-				</array>
-				<key>public.mime-type</key>
-				<array>
-					<string>application/x-toolskit-form+json</string>
-				</array>
-			</dict>
-		</dict>
-	</array>
-	<key>UILaunchScreen</key>
-	<dict/>
-	<key>UIApplicationSceneManifest</key>
-	<dict>
-		<key>UIApplicationSupportsMultipleScenes</key>
-		<false/>
-		<key>UISceneConfigurations</key>
-		<dict/>
-	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Your location is used to provide accurate local weather data and forecasts.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Your location is used to provide accurate local weather data and forecasts, even when the app is in the background.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Camera access is required for scanning documents, classifying IDs, detecting objects, and Daily video calls.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Microphone access is required for voice meal logging, live coaching interactions, and Daily audio calls.</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Speech recognition is required to convert spoken meal logs into nutrition entries.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Photo Library access is required to import media for metadata viewing, perspective correction, and compression tools.</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>Health data access is required to read your workouts and activity trends.</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>Health data updates are required to write completed workouts and progress metrics.</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>audio</string>
-		<string>fetch</string>
-		<string>processing</string>
-	</array>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>com.toolskit.sdk.sync</string>
-		<string>com.toolskit.sdk.health</string>
-	</array>
-	<key>NSAppleMusicUsageDescription</key>
-	<string>Access is needed to import and play music files.</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Face ID is used to secure your mail settings and private messages.</string>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>Tools Kit uses your local network to discover and connect to OpenClaw gateways on your Mac.</string>
-	<key>NSBonjourServices</key>
-	<array>
-		<string>_openclaw-gw._tcp</string>
-	</array>
+	<key>MICROSOFT_CLIENT_ID</key>
+	<string>85e1d7da-8be9-42ae-ac6a-93acac534432</string>
+	<key>MICROSOFT_OAUTH_REDIRECT_URI</key>
+	<string>com.ToolsKit.microsoft:/oauthredirect</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -138,13 +80,6 @@
 				<key>NSTemporaryExceptionMinimumTLSVersion</key>
 				<string>TLSv1.0</string>
 			</dict>
-			<key>localhost</key>
-			<dict>
-				<key>NSIncludesSubdomains</key>
-				<true/>
-				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
 			<key>imap.mail.me.com</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
@@ -153,6 +88,13 @@
 				<string>TLSv1.2</string>
 				<key>NSRequiresCertificateTransparency</key>
 				<false/>
+			</dict>
+			<key>localhost</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
 			</dict>
 			<key>smtp.mail.me.com</key>
 			<dict>
@@ -163,16 +105,74 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>GOOGLE_CLIENT_ID</key>
-	<string>127870730797-8rnpb3le5n3j34ur7uvsfma75592nr07.apps.googleusercontent.com</string>
-	<key>MICROSOFT_CLIENT_ID</key>
-	<string>85e1d7da-8be9-42ae-ac6a-93acac534432</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Access is needed to import and play music files.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_openclaw-gw._tcp</string>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access is required for scanning documents, classifying IDs, detecting objects, and Daily video calls.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Face ID is used to secure your mail settings and private messages.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Health data access is required to read your workouts and activity trends.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Health data updates are required to write completed workouts and progress metrics.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Tools Kit uses your local network to discover and connect to OpenClaw gateways on your Mac.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Your location is used to provide accurate local weather data and forecasts, even when the app is in the background.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Your location is used to provide accurate local weather data and forecasts.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone access is required for voice meal logging, live coaching interactions, and Daily audio calls.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo Library access is required to import media for metadata viewing, perspective correction, and compression tools.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Speech recognition is required to convert spoken meal logs into nutrition entries.</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict/>
+	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>fetch</string>
+		<string>processing</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.json</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Tools-Kit Form Data</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.dylans2010.toolskit.form</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>form</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/x-toolskit-form+json</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
 	<key>YAHOO_CLIENT_ID</key>
 	<string>dj0yJmk9cGVXT2dIY1BqMFlLJmQ9WVdrOVRrRndkR2x4VTNVbWNHbzlNQT09JnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PTc4</string>
-	<key>GOOGLE_OAUTH_REDIRECT_URI</key>
-	<string>com.googleusercontent.apps.127870730797-8rnpb3le5n3j34ur7uvsfma75592nr07:/oauthredirect</string>
-	<key>MICROSOFT_OAUTH_REDIRECT_URI</key>
-	<string>com.ToolsKit.microsoft:/oauthredirect</string>
 	<key>YAHOO_OAUTH_REDIRECT_URI</key>
 	<string>toolskit://oauth/yahoo</string>
 </dict>
