@@ -4,7 +4,7 @@
 	classes = {
 
 	};
-	objectVersion = 77;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13980,6 +13980,7 @@
 
 			};
 			buildConfigurationList = 7E5F95D2373D6BB31D0BE224 /* Build configuration list for PBXProject "Tools-Kit" */;
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -13987,7 +13988,6 @@
 				en,
 			);
 			mainGroup = D3820CA2B6A4399486AA9649;
-			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				MC0100000000000000000001 /* XCRemoteSwiftPackageReference "mailcore2" */,
 				AW0100000000000000000001 /* XCRemoteSwiftPackageReference "sdk-for-apple" */,
@@ -13997,7 +13997,6 @@
 				E8A1C3D5F7094B2D8E6A0C14 /* XCRemoteSwiftPackageReference "SwiftMCP" */,
 				FC55D3C22FEB39C800B2FE83 /* XCLocalSwiftPackageReference "../../Downloads/SymbolPicker-main" */,
 			);
-			preferredProjectObjectVersion = 77;
 			productRefGroup = B81AA4FC2BB81266E881DF5B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
