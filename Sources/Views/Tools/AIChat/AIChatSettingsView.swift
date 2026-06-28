@@ -40,10 +40,27 @@ struct AIChatSettingsView: View {
     @State private var showAvailableLocalModels = false
     @State private var isUploadingToCloud = false
     @State private var currentAppMode: AppMode = .dashboard
+    @State private var showLogin = false
+    @State private var showWelcomeFlow = false
+    @State private var userProfile: Appwrite.User?
+    @State private var isAuthenticated = false
 
     var body: some View {
         NavigationStack {
             Form {
+                Section {
+                    AccountSection(
+                        isAuthenticated: isAuthenticated,
+                        user: userProfile,
+                        isUploadingToCloud: $isUploadingToCloud,
+                        onLogin: { showLogin = true },
+                        onSync: uploadDataToCloud,
+                        onSignOut: signOutCurrentUser
+                    )
+                } header: {
+                    Text("Account")
+                }
+
                 SettingsHeader()
 
                 Section {
@@ -71,6 +88,8 @@ struct AIChatSettingsView: View {
                 } header: {
                     Text("Model Configuration")
                 }
+                .disabled(!isAuthenticated)
+                .opacity(isAuthenticated ? 1 : 0.6)
 
                 Group {
                     Section {
@@ -110,6 +129,8 @@ struct AIChatSettingsView: View {
                         Label("Knowledge & Context", systemImage: "book.fill")
                     }
                 }
+                .disabled(!isAuthenticated)
+                .opacity(isAuthenticated ? 1 : 0.6)
 
                 Group {
                     Section {
@@ -130,6 +151,8 @@ struct AIChatSettingsView: View {
                         Label("Interface", systemImage: "paintbrush.fill")
                     }
                 }
+                .disabled(!isAuthenticated)
+                .opacity(isAuthenticated ? 1 : 0.6)
 
                 Group {
                     Section {
@@ -147,13 +170,11 @@ struct AIChatSettingsView: View {
 
                 Group {
                     Section {
-                        AccountSection(
-                            isUploadingToCloud: $isUploadingToCloud,
-                            onSync: uploadDataToCloud,
-                            onSignOut: signOutCurrentUser
-                        )
+                        NavigationLink(destination: BackupsMainView()) {
+                            Label("System Backups", systemImage: "archivebox.fill")
+                        }
                     } header: {
-                        Label("Account", systemImage: "person.crop.circle.fill")
+                        Label("Data Portability", systemImage: "arrow.up.arrow.down.circle.fill")
                     }
 
                     Section {
@@ -174,7 +195,17 @@ struct AIChatSettingsView: View {
             .fullScreenCover(isPresented: $showAvailableLocalModels) {
                 AvailableLocalModelsView()
             }
+            .fullScreenCover(isPresented: $showLogin) {
+                LoginView {
+                    checkAuth()
+                    showWelcomeFlow = true
+                }
+            }
+            .fullScreenCover(isPresented: $showWelcomeFlow) {
+                WelcomeFlowView()
+            }
             .task {
+                checkAuth()
                 await modelCatalog.loadModels(for: selectedProviderID, force: false)
                 featureCheck.refresh()
             }
@@ -221,8 +252,25 @@ struct AIChatSettingsView: View {
         Task {
             try? await AccountAuthService.shared.signOut()
             await MainActor.run {
+                checkAuth()
                 onSignOut?()
-                dismiss()
+            }
+        }
+    }
+
+    private func checkAuth() {
+        Task {
+            do {
+                let user = try await AppwriteService.account.get()
+                await MainActor.run {
+                    self.userProfile = user
+                    self.isAuthenticated = true
+                }
+            } catch {
+                await MainActor.run {
+                    self.userProfile = nil
+                    self.isAuthenticated = false
+                }
             }
         }
     }
@@ -612,22 +660,70 @@ struct InterfaceSection: View {
 }
 
 struct AccountSection: View {
+    let isAuthenticated: Bool
+    let user: Appwrite.User?
     @Binding var isUploadingToCloud: Bool
+    var onLogin: () -> Void
     var onSync: () -> Void
     var onSignOut: () -> Void
 
     var body: some View {
         Group {
-            Button(action: onSync) {
-                HStack {
-                    if isUploadingToCloud { ProgressView().padding(.trailing, 8) }
-                    Text(isUploadingToCloud ? "Syncing..." : "Sync to Cloud")
-                }
-            }
-            .disabled(isUploadingToCloud)
+            if isAuthenticated {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "person.crop.circle.fill")
+                            .font(.system(size: 40))
+                            .foregroundStyle(.blue)
 
-            Button(role: .destructive, action: onSignOut) {
-                Text("Sign Out")
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(user?.name ?? "User")
+                                .font(.headline)
+                            Text(user?.email ?? "No Email")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 8)
+
+                    Divider()
+
+                    Button(action: onSync) {
+                        HStack {
+                            if isUploadingToCloud { ProgressView().padding(.trailing, 8) }
+                            Text(isUploadingToCloud ? "Syncing..." : "Sync to Cloud")
+                        }
+                    }
+                    .disabled(isUploadingToCloud)
+
+                    Button(role: .destructive, action: onSignOut) {
+                        Text("Sign Out")
+                    }
+                }
+            } else {
+                VStack(alignment: .center, spacing: 16) {
+                    VStack(spacing: 8) {
+                        Text("Not Logged In")
+                            .font(.headline)
+                        Text("Sign in to sync your data and unlock AI features.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.top, 8)
+
+                    Button(action: onLogin) {
+                        Text("Log In")
+                            .bold()
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(Color.blue)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    .padding(.bottom, 8)
+                }
+                .frame(maxWidth: .infinity)
             }
         }
     }

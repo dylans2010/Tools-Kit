@@ -13,6 +13,10 @@ final class WorkspaceModeManager: ObservableObject {
     }
 
     private init() {
-        isWorkspaceModeEnabled = UserDefaults.standard.bool(forKey: key)
+        if UserDefaults.standard.object(forKey: key) == nil {
+            isWorkspaceModeEnabled = true
+        } else {
+            isWorkspaceModeEnabled = UserDefaults.standard.bool(forKey: key)
+        }
     }
 }
