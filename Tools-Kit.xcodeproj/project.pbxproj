@@ -8,6 +8,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AI0200000000000000000001 /* AnimationTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000001 /* AnimationTimelineView.swift */; };
+		AI0200000000000000000002 /* DualKeyboardInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000002 /* DualKeyboardInputView.swift */; };
+		AI0200000000000000000003 /* KeyboardGlowModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000003 /* KeyboardGlowModifier.swift */; };
+		AI0200000000000000000004 /* KeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000004 /* KeyboardObserver.swift */; };
+		AI0200000000000000000005 /* PresentationRuntimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000005 /* PresentationRuntimeView.swift */; };
 		0001F0832037938D40776723 /* AgentToolResultCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643750A4D819D6E6CB623690 /* AgentToolResultCache.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		008580EC96F3EB7A63395DC9 /* AgentConfigurationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412F9451340C6E936945A3CF /* AgentConfigurationValidator.swift */; };
@@ -646,7 +651,7 @@
 		746676D06C187794411E7BEC /* SlideRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FBB0E4CDBF5B9F8D74A6B33 /* SlideRenderer.swift */; };
 		03262994B319E6300FF701B1 /* GenSlidesScheme+SlideDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00E2B45E6D9E25D7F8FC2E29 /* GenSlidesScheme+SlideDeck.swift */; };
 		B1CD8F4EA36ECF9F1291058F /* SlideContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62080358497F931D647E64F0 /* SlideContentView.swift */; };
-		A3F9007A063BAD77BB757D3F /* Sources/Views/Workspace/Slides/AIGenSlidesPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE957ABB485094BD50D4B38 /* Sources/Views/Workspace/Slides/AIGenSlidesPreview.swift */; };
+		A3F9007A063BAD77BB757D3F /* AIGenSlidesPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE957ABB485094BD50D4B38 /* AIGenSlidesPreview.swift */; };
 		2C7FCDE46B104E136411CB5D /* AgenticUIActionStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCC3EC52F83FF5C53705CB6 /* AgenticUIActionStreamView.swift */; };
 		39FC36640002D00A8A6B83F0 /* SDKAuthorizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AAE6D462288E593ED1D1E3 /* SDKAuthorizationManager.swift */; };
 		B58A2D544883A2C996952AA4 /* SDKAuthorizationScopes.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF12EEE64C4D60290FB37B1 /* SDKAuthorizationScopes.swift */; };
@@ -3119,6 +3124,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AI0100000000000000000001 /* AnimationTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationTimelineView.swift; sourceTree = "<group>"; };
+		AI0100000000000000000002 /* DualKeyboardInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualKeyboardInputView.swift; sourceTree = "<group>"; };
+		AI0100000000000000000003 /* KeyboardGlowModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardGlowModifier.swift; sourceTree = "<group>"; };
+		AI0100000000000000000004 /* KeyboardObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObserver.swift; sourceTree = "<group>"; };
+		AI0100000000000000000005 /* PresentationRuntimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationRuntimeView.swift; sourceTree = "<group>"; };
 		00C0E15FEF0E12A7A901E440 /* AgentDemoTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDemoTimeline.swift; sourceTree = "<group>"; };
 		00CA85AC8F214CE79F467511 /* UUIDGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UUIDGeneratorView.swift; sourceTree = "<group>"; };
 		011E855AF0F14D94AB4E22BE /* PDFToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFToolsView.swift; sourceTree = "<group>"; };
@@ -3764,7 +3774,7 @@
 		4FBB0E4CDBF5B9F8D74A6B33 /* SlideRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideRenderer.swift; sourceTree = "<group>"; };
 		00E2B45E6D9E25D7F8FC2E29 /* GenSlidesScheme+SlideDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenSlidesScheme+SlideDeck.swift"; sourceTree = "<group>"; };
 		62080358497F931D647E64F0 /* SlideContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideContentView.swift; sourceTree = "<group>"; };
-		5FE957ABB485094BD50D4B38 /* Sources/Views/Workspace/Slides/AIGenSlidesPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Slides/AIGenSlidesPreview.swift; sourceTree = SOURCE_ROOT; };
+		5FE957ABB485094BD50D4B38 /* AIGenSlidesPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIGenSlidesPreview.swift; sourceTree = "<group>"; };
 		CCCC3EC52F83FF5C53705CB6 /* AgenticUIActionStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIActionStreamView.swift; sourceTree = "<group>"; };
 		68AAE6D462288E593ED1D1E3 /* SDKAuthorizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAuthorizationManager.swift; sourceTree = "<group>"; };
 		ABF12EEE64C4D60290FB37B1 /* SDKAuthorizationScopes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAuthorizationScopes.swift; sourceTree = "<group>"; };
@@ -6754,6 +6764,7 @@
 			isa = PBXGroup;
 			children = (
 				3A21FF6D1E1089A6C6971BC6 /* AIGenerateSlides.swift */,
+				5FE957ABB485094BD50D4B38 /* AIGenSlidesPreview.swift */,
 				92E2F49C388646DBBA691D76 /* SlidesHomeView.swift */,
 				D5E9A41A7E90FEEFE5DE4BAC /* SlideEditorView.swift */,
 				C086725E35AF2C71BEAB8257 /* SlideCanvasView.swift */,
@@ -6762,6 +6773,11 @@
 				3C5C7A24B54F1EA8D04E11F6 /* SlideDecksManager.swift */,
 				4FBB0E4CDBF5B9F8D74A6B33 /* SlideRenderer.swift */,
 				62080358497F931D647E64F0 /* SlideContentView.swift */,
+				AI0100000000000000000001 /* AnimationTimelineView.swift */,
+				AI0100000000000000000002 /* DualKeyboardInputView.swift */,
+				AI0100000000000000000003 /* KeyboardGlowModifier.swift */,
+				AI0100000000000000000004 /* KeyboardObserver.swift */,
+				AI0100000000000000000005 /* PresentationRuntimeView.swift */,
 			);
 			path = Slides;
 			sourceTree = "<group>";
@@ -11115,7 +11131,6 @@
 			isa = PBXGroup;
 			children = (
 				AC0100000000000000000001 /* AppConfig.swift */,
-				5FE957ABB485094BD50D4B38 /* Sources/Views/Workspace/Slides/AIGenSlidesPreview.swift */,
 				ECB26901C4E76F7E3A93FAB2 /* WorkspacePersistence.swift */,
 				B51A3B5DAB46FD7CC701BE09 /* SyncEngine.swift */,
 			);
@@ -15972,7 +15987,12 @@
 				D2AC94C0EEBA7F1628003943 /* Slide.swift in Sources */,
 				8F56C92784D4C1968DC75746 /* SlideElement.swift in Sources */,
 				71169E5B24F1F0D3D541D552 /* AIGenerateSlides.swift in Sources */,
-				A3F9007A063BAD77BB757D3F /* Sources/Views/Workspace/Slides/AIGenSlidesPreview.swift in Sources */,
+				AI0200000000000000000001 /* AnimationTimelineView.swift in Sources */,
+				AI0200000000000000000002 /* DualKeyboardInputView.swift in Sources */,
+				AI0200000000000000000003 /* KeyboardGlowModifier.swift in Sources */,
+				AI0200000000000000000004 /* KeyboardObserver.swift in Sources */,
+				AI0200000000000000000005 /* PresentationRuntimeView.swift in Sources */,
+				A3F9007A063BAD77BB757D3F /* AIGenSlidesPreview.swift in Sources */,
 				F64CC6B1240DC254E53FCF73 /* SlidesHomeView.swift in Sources */,
 				2B5B28AFC16E395B7F102695 /* SlideEditorView.swift in Sources */,
 				2AA24628FD07F077734F598A /* SlideCanvasView.swift in Sources */,
