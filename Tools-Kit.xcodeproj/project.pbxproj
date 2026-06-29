@@ -1506,6 +1506,11 @@
 		AI0200000000000000000003 /* KeyboardGlowModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000003 /* KeyboardGlowModifier.swift */; };
 		AI0200000000000000000004 /* KeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000004 /* KeyboardObserver.swift */; };
 		AI0200000000000000000005 /* PresentationRuntimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000005 /* PresentationRuntimeView.swift */; };
+		AI0200000000000000000011 /* AILayoutEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000011 /* AILayoutEngine.swift */; };
+		AI0200000000000000000012 /* AnimationRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000012 /* AnimationRuntime.swift */; };
+		AI0200000000000000000013 /* DataBindingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000013 /* DataBindingEngine.swift */; };
+		AI0200000000000000000014 /* ExportEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000014 /* ExportEngine.swift */; };
+		AI0200000000000000000015 /* SlideComponentSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000015 /* SlideComponentSystem.swift */; };
 		B03DE194D8B451C4AB938FBF /* Sources/Views/Workspace/OpenClaw/Alternatives/QRCode/Services/QRSettingsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 216376153EF053FDA63A14BF /* Sources/Views/Workspace/OpenClaw/Alternatives/QRCode/Services/QRSettingsService.swift */; };
 		B073D758188B45EFD5028FFB /* Diag_EmergencySOSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5761641F1EF6F54046E7E1B9 /* Diag_EmergencySOSView.swift */; };
 		B0A012F53987419C98F5626B /* stream_execution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA3BDD882C84119B1BA6DF8 /* stream_execution.swift */; };
@@ -4062,6 +4067,11 @@
 		AI0100000000000000000003 /* KeyboardGlowModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardGlowModifier.swift; sourceTree = "<group>"; };
 		AI0100000000000000000004 /* KeyboardObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObserver.swift; sourceTree = "<group>"; };
 		AI0100000000000000000005 /* PresentationRuntimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationRuntimeView.swift; sourceTree = "<group>"; };
+		AI0100000000000000000011 /* AILayoutEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AILayoutEngine.swift; sourceTree = "<group>"; };
+		AI0100000000000000000012 /* AnimationRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationRuntime.swift; sourceTree = "<group>"; };
+		AI0100000000000000000013 /* DataBindingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBindingEngine.swift; sourceTree = "<group>"; };
+		AI0100000000000000000014 /* ExportEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportEngine.swift; sourceTree = "<group>"; };
+		AI0100000000000000000015 /* SlideComponentSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideComponentSystem.swift; sourceTree = "<group>"; };
 		B00175F6922510F79BFDE2CE /* SDKCancellationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKCancellationManager.swift; sourceTree = "<group>"; };
 		B026248F1460DA04A4613059 /* ConnectFourBlitzView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectFourBlitzView.swift; sourceTree = "<group>"; };
 		B0303AA158E8DB1AA0D8F57C /* Diag_RecordingTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_RecordingTestView.swift; sourceTree = "<group>"; };
@@ -9579,8 +9589,21 @@
 			isa = PBXGroup;
 			children = (
 				99A85C7D463242B28FACE7A3 /* Notebooks */,
+				AI0300000000000000000011 /* Slides */,
 			);
 			path = Workspace;
+			sourceTree = "<group>";
+		};
+		AI0300000000000000000011 /* Slides */ = {
+			isa = PBXGroup;
+			children = (
+				AI0100000000000000000011 /* AILayoutEngine.swift */,
+				AI0100000000000000000012 /* AnimationRuntime.swift */,
+				AI0100000000000000000013 /* DataBindingEngine.swift */,
+				AI0100000000000000000014 /* ExportEngine.swift */,
+				AI0100000000000000000015 /* SlideComponentSystem.swift */,
+			);
+			path = Slides;
 			sourceTree = "<group>";
 		};
 		B5F9DF146BA1E459E771C817 /* Security */ = {
@@ -14431,6 +14454,11 @@
 				AI0200000000000000000003 /* KeyboardGlowModifier.swift in Sources */,
 				AI0200000000000000000004 /* KeyboardObserver.swift in Sources */,
 				AI0200000000000000000005 /* PresentationRuntimeView.swift in Sources */,
+				AI0200000000000000000011 /* AILayoutEngine.swift in Sources */,
+				AI0200000000000000000012 /* AnimationRuntime.swift in Sources */,
+				AI0200000000000000000013 /* DataBindingEngine.swift in Sources */,
+				AI0200000000000000000014 /* ExportEngine.swift in Sources */,
+				AI0200000000000000000015 /* SlideComponentSystem.swift in Sources */,
 				A3F9007A063BAD77BB757D3F /* AIGenSlidesPreview.swift in Sources */,
 				F64CC6B1240DC254E53FCF73 /* SlidesHomeView.swift in Sources */,
 				2B5B28AFC16E395B7F102695 /* SlideEditorView.swift in Sources */,
