@@ -2,6 +2,7 @@ import Foundation
 import ZIPFoundation
 import UIKit
 import CryptoKit
+import Observation
 
 struct BackupMetadata: Codable, Identifiable {
     let id: UUID
@@ -37,14 +38,15 @@ enum BackupModule: String, Codable, CaseIterable, Identifiable {
     var directoryName: String { rawValue }
 }
 
-class BackupManager: ObservableObject {
+@Observable
+class BackupManager {
     static let shared = BackupManager()
 
     private let fileManager = FileManager.default
     private let backupsDirectory: URL
     private let documentsDirectory: URL
 
-    @Published var availableBackups: [BackupMetadata] = []
+    var availableBackups: [BackupMetadata] = []
 
     private init() {
         documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]

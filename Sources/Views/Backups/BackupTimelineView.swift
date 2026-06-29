@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct BackupTimelineView: View {
-    @StateObject private var manager = BackupManager.shared
+    @State private var manager = BackupManager.shared
 
     var body: some View {
         ScrollView {

@@ -75,7 +75,7 @@ struct AutoBackupSettingsView: View {
                     name: "Manual Settings Snapshot"
                 )
                 await MainActor.run {
-                    self.backupToShare = BackupManager.shared.getZipURL(for: metadata)
+                    self.backupToShare = BackupManager.shared.getArchiveURL(for: metadata)
                     self.isCreating = false
                     self.showingShareSheet = true
                 }
