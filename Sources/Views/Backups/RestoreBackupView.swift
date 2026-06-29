@@ -64,7 +64,7 @@ struct RestoreBackupView: View {
                                         selectedModules = backup.restoreScope
                                         dismiss()
                                     } label: {
-                                        BackupRow(backup: backup)
+                                        BackupListRow(backup: backup)
                                     }
                                 }
                                 .navigationTitle("Local Backups")
