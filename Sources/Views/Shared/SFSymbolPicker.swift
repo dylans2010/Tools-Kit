@@ -6,7 +6,7 @@ struct SFSymbolPicker: View {
 
     var body: some View {
         NavigationStack {
-            SymbolPicker(symbol: $symbol)
+            SFSymbolPicker(symbol: $symbol)
                 .navigationTitle("Select Icon")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
