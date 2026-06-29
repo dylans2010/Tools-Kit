@@ -1414,6 +1414,8 @@
 		A8328D43D43D56C76BE8C700 /* ExerciseLoggingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55418169336F4A20D13B2720 /* ExerciseLoggingView.swift */; };
 		A8366E9C37EF4EEDE3BCAC8D /* AgentConfigLogsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6B430D5889804885BCD51F /* AgentConfigLogsTab.swift */; };
 		A8432153316DAFB92CFC5CBB /* SlideDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09ECDDA813253E17C4F1A66A /* SlideDeck.swift */; };
+		A99816DB476D64CC859E6EDC /* SlideNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7E764744C7769707707D2E /* SlideNode.swift */; };
+		25882D66E750452A050EB3BB /* SlideAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B6A7F207D43C35B83BDF3A /* SlideAnimation.swift */; };
 		A860C8FB9997A01834796C51 /* Builder/PlaceholderDataDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB05AACE01CB128593CBD88F /* Builder/PlaceholderDataDevTool.swift */; };
 		A868D1E1709A1B541BF23F9B /* WhiteboardGraphProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B5AE247A3F65990B38332B /* WhiteboardGraphProcessor.swift */; };
 		A869AD14E7C11FE743CDC183 /* HuggingFace/Views/HFInstalledModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4229E08243FE5BB06EEBAA96 /* HuggingFace/Views/HFInstalledModels.swift */; };
@@ -2640,6 +2642,8 @@
 		09BE5A61A477E0BBD85F8581 /* Detail/PluginDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Detail/PluginDetailView.swift; sourceTree = "<group>"; };
 		09E6435EECFF4FD6B31B4C0B /* MapsToolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsToolViewModel.swift; sourceTree = "<group>"; };
 		09ECDDA813253E17C4F1A66A /* SlideDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideDeck.swift; sourceTree = "<group>"; };
+		2B7E764744C7769707707D2E /* SlideNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideNode.swift; sourceTree = "<group>"; };
+		54B6A7F207D43C35B83BDF3A /* SlideAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideAnimation.swift; sourceTree = "<group>"; };
 		0A190449548918A0E795802E /* Diag_MagSafeTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MagSafeTestView.swift; sourceTree = "<group>"; };
 		0A301FDC08884E856CC07F3A /* Diag_BackgroundRefreshView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BackgroundRefreshView.swift; sourceTree = "<group>"; };
 		0A4A21FE0333397A02239F9E /* Diag_NetworkBandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetworkBandView.swift; sourceTree = "<group>"; };
@@ -11350,6 +11354,8 @@
 			children = (
 				DDC4A743DF37FB33ED0E93D4 /* NotebookBlock.swift */,
 				09ECDDA813253E17C4F1A66A /* SlideDeck.swift */,
+				2B7E764744C7769707707D2E /* SlideNode.swift */,
+				54B6A7F207D43C35B83BDF3A /* SlideAnimation.swift */,
 				F88D4352F9254383B2FA9433 /* Slide.swift */,
 				7EC80727065767BC5388071D /* SlideElement.swift */,
 				06BC5D82DD50AC82BF234DF0 /* Article.swift */,
@@ -14446,6 +14452,8 @@
 				40A86B7645C3906A155D8C54 /* WorkspaceModeManager.swift in Sources */,
 				458B13A27C3BA216A729F84A /* WorkspaceHomeView.swift in Sources */,
 				A8432153316DAFB92CFC5CBB /* SlideDeck.swift in Sources */,
+				A99816DB476D64CC859E6EDC /* SlideNode.swift in Sources */,
+				25882D66E750452A050EB3BB /* SlideAnimation.swift in Sources */,
 				D2AC94C0EEBA7F1628003943 /* Slide.swift in Sources */,
 				8F56C92784D4C1968DC75746 /* SlideElement.swift in Sources */,
 				71169E5B24F1F0D3D541D552 /* AIGenerateSlides.swift in Sources */,
