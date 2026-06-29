@@ -2,7 +2,7 @@ import SwiftUI
 
 struct BackupDetailView: View {
     let backup: BackupMetadata
-    @StateObject private var manager = BackupManager.shared
+    @State private var manager = BackupManager.shared
     @Environment(\.dismiss) private var dismiss
     @State private var showingRestore = false
     @State private var showingExport = false

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct BackupIntegrityView: View {
-    @StateObject private var manager = BackupManager.shared
+    @State private var manager = BackupManager.shared
     @State private var isValidating = false
     @State private var results: [UUID: ValidationResult] = [:]
     @State private var isRepairing = false
@@ -89,7 +89,7 @@ struct BackupIntegrityView: View {
             for backup in manager.availableBackups {
                 await MainActor.run { results[backup.id] = .pending }
 
-                let zipURL = manager.getZipURL(for: backup)
+                let zipURL = manager.getArchiveURL(for: backup)
                 let exists = FileManager.default.fileExists(atPath: zipURL.path)
                 let size = (try? FileManager.default.attributesOfItem(atPath: zipURL.path)[.size] as? Int64) ?? 0
 

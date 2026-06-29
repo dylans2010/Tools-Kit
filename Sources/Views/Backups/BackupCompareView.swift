@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct BackupCompareView: View {
-    @StateObject private var manager = BackupManager.shared
+    @State private var manager = BackupManager.shared
     @State private var backupA: BackupMetadata?
     @State private var backupB: BackupMetadata?
     @State private var showingPicker = false

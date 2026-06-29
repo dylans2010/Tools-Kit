@@ -2,7 +2,7 @@ import SwiftUI
 
 struct RestoreBackupView: View {
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var manager = BackupManager.shared
+    @State private var manager = BackupManager.shared
 
     @State var selectedBackup: BackupMetadata?
     @State private var restoreType: RestoreType = .full

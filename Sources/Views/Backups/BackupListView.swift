@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct BackupListView: View {
-    @StateObject private var manager = BackupManager.shared
+    @State private var manager = BackupManager.shared
     @State private var grouping: Grouping = .today
 
     enum Grouping: String, CaseIterable {

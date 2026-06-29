@@ -3,7 +3,7 @@ import SwiftUI
 struct BackupExportView: View {
     let backup: BackupMetadata?
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var manager = BackupManager.shared
+    @State private var manager = BackupManager.shared
 
     var body: some View {
         NavigationStack {

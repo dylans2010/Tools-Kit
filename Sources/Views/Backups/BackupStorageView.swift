@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct BackupStorageView: View {
-    @StateObject private var manager = BackupManager.shared
+    @State private var manager = BackupManager.shared
     @State private var totalSize: Int64 = 0
 
     var body: some View {
