@@ -89,7 +89,7 @@ struct BackupsMainView: View {
                         VStack(spacing: 12) {
                             ForEach(manager.availableBackups.prefix(3)) { backup in
                                 NavigationLink(destination: BackupDetailView(backup: backup)) {
-                                    BackupRow(backup: backup)
+                                    RecentBackupRow(backup: backup)
                                 }
                             }
 
@@ -145,7 +145,7 @@ struct QuickActionCard<Destination: View>: View {
     }
 }
 
-struct BackupRow: View {
+struct RecentBackupRow: View {
     let backup: BackupMetadata
 
     var body: some View {

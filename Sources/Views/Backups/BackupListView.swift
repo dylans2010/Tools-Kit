@@ -20,7 +20,7 @@ struct BackupListView: View {
                     Section(key.rawValue) {
                         ForEach(groupedBackups[key] ?? []) { backup in
                             NavigationLink(destination: BackupDetailView(backup: backup)) {
-                                BackupRow(backup: backup)
+                                BackupListRow(backup: backup)
                             }
                         }
                     }
@@ -59,7 +59,7 @@ struct BackupListView: View {
     }
 }
 
-struct BackupRow: View {
+struct BackupListRow: View {
     let backup: BackupMetadata
 
     var body: some View {
