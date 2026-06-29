@@ -1,5 +1,4 @@
 import SwiftUI
-import SymbolPicker
 
 struct SFSymbolPicker: View {
     @Environment(\.dismiss) private var dismiss
