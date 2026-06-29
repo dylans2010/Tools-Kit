@@ -50,9 +50,88 @@ import SwiftUI
 
 @available(iOS 27.0, *)
 struct OCRScannerView: View {
+    @State private var sessionManager = RecordingSessionManager.shared
+    @State private var searchText = ""
+
+    var filteredResults: [SCKOCRResult] {
+        guard let results = sessionManager.currentSession?.ocrResults else { return [] }
+        if searchText.isEmpty {
+            return results.sorted(by: { $0.timestamp > $1.timestamp })
+        }
+        return results.filter { $0.text.localizedCaseInsensitiveContains(searchText) }
+            .sorted(by: { $0.timestamp > $1.timestamp })
+    }
+
     var body: some View {
-        Text("OCR Scanner View")
-            .navigationTitle("OCR Scanner")
+        List {
+            if sessionManager.isRecording {
+                Section {
+                    HStack {
+                        ProgressView()
+                            .padding(.trailing, 8)
+                        VStack(alignment: .leading) {
+                            Text("Scanning Screen...")
+                                .font(.headline)
+                            Text("Detecting text in real-time")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                }
+            }
+
+            Section {
+                if filteredResults.isEmpty {
+                    ContentUnavailableView(
+                        searchText.isEmpty ? "No Text Detected" : "No Matches Found",
+                        systemImage: "text.viewfinder",
+                        description: Text(searchText.isEmpty ? "Start recording to detect text on your screen." : "Try a different search term.")
+                    )
+                } else {
+                    ForEach(filteredResults) { result in
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text(formatTime(result.timestamp))
+                                    .font(.caption.monospacedDigit())
+                                    .padding(4)
+                                    .background(Color.blue.opacity(0.1))
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+
+                                Spacer()
+
+                                Text(String(format: "%.1f%%", result.confidence * 100))
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Text(result.text)
+                                .font(.body)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            Button {
+                                UIPasteboard.general.string = result.text
+                            } label: {
+                                Label("Copy", systemImage: "doc.on.doc")
+                                    .font(.caption)
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            } header: {
+                Text("Detected Text")
+            }
+        }
+        .navigationTitle("OCR Scanner")
+        .searchable(text: $searchText, prompt: "Search detected text")
+    }
+
+    private func formatTime(_ time: TimeInterval) -> String {
+        let mins = Int(time) / 60
+        let secs = Int(time) % 60
+        return String(format: "%02d:%02d", mins, secs)
     }
 }
 

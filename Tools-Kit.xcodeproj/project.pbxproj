@@ -812,6 +812,7 @@
 		620D386F5CF94DE4A7DD3E21 /* security_scan.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6604DA80E214AC2A5903103 /* security_scan.swift */; };
 		6257DF0363748EEA979460D9 /* Diag_SatelliteConnectivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B5BCDB32CD89099FF3A7F9 /* Diag_SatelliteConnectivityView.swift */; };
 		62637283858E58960B7E3D7A /* RecordingSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C960F24A4ED8428EE36477FE /* RecordingSessionManager.swift */; };
+		62637283858E58960B7E3D7B /* SCKPlaybackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C960F24A4ED8428EE36477FF /* SCKPlaybackView.swift */; };
 		626B8A3705622A27A0C56BAA /* SCKTimelineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ECEC045930EE368E3E4C66E /* SCKTimelineManager.swift */; };
 		62D4A50C174A8AE447E2D940 /* ScreenCaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107AF82F8F3E388DB598F60A /* ScreenCaptureManager.swift */; };
 		62D4CB98642DA474A0CAD844 /* SecureFolderItemPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD833730216A5B630E7843BE /* SecureFolderItemPicker.swift */; };
@@ -4346,6 +4347,7 @@
 		C92FCABCCB58FF492753178A /* WorkspaceSDKKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSDKKernel.swift; sourceTree = "<group>"; };
 		C95F10C7BF2AE2D9067D01CF /* Diag_BluetoothPacketView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BluetoothPacketView.swift; sourceTree = "<group>"; };
 		C960F24A4ED8428EE36477FE /* RecordingSessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordingSessionManager.swift; sourceTree = "<group>"; };
+		C960F24A4ED8428EE36477FF /* SCKPlaybackView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCKPlaybackView.swift; sourceTree = "<group>"; };
 		C98264C336A26F3BD98EC630 /* Builder/EpochConverterDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/EpochConverterDevTool.swift; sourceTree = "<group>"; };
 		C9A0306C5BDE68A1B3174CB1 /* Builder/BezierPathCodeDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/BezierPathCodeDevTool.swift; sourceTree = "<group>"; };
 		C9CE0713895A4D92B8410432 /* FormDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormDetailView.swift; sourceTree = "<group>"; };
@@ -8078,6 +8080,7 @@
 				C960F24A4ED8428EE36477FE /* RecordingSessionManager.swift */,
 				9487BC5DEB825666DCC92BC7 /* RecordingStorageManager.swift */,
 				AC8D6EF112C212CFA84CD9A3 /* SCKRecorderViews.swift */,
+				C960F24A4ED8428EE36477FF /* SCKPlaybackView.swift */,
 			);
 			path = Recording;
 			sourceTree = "<group>";
@@ -12517,6 +12520,7 @@
 				422EBBFB851ABA1F4330F412 /* SCKAnalyticsView.swift in Sources */,
 				62D4A50C174A8AE447E2D940 /* ScreenCaptureManager.swift in Sources */,
 				62637283858E58960B7E3D7A /* RecordingSessionManager.swift in Sources */,
+				62637283858E58960B7E3D7B /* SCKPlaybackView.swift in Sources */,
 				090019F66297800719F59F55 /* RecordingStorageManager.swift in Sources */,
 				FA7E1070D28957942285E670 /* SCKRecorderViews.swift in Sources */,
 				45BF8836D5E491E49A268879 /* SCKOCRManager.swift in Sources */,
