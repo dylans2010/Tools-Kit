@@ -1,6 +1,7 @@
 import Foundation
 import ZIPFoundation
 import UIKit
+import CryptoKit
 
 struct BackupMetadata: Codable, Identifiable {
     let id: UUID
@@ -68,7 +69,7 @@ class BackupManager: ObservableObject {
         availableBackups = loaded.sorted(by: { $0.timestamp > $1.timestamp })
     }
 
-    func createBackup(modules: Set<BackupModule>, mode: BackupMetadata.BackupMode, name: String? = nil) async throws -> BackupMetadata {
+    func createBackup(modules: Set<BackupModule>, mode: BackupMetadata.BackupMode, name: String? = nil, useBackupExtension: Bool = false) async throws -> BackupMetadata {
         let backupID = UUID()
         let timestamp = Date()
         let tempDir = fileManager.temporaryDirectory.appendingPathComponent(backupID.uuidString)
@@ -112,14 +113,14 @@ class BackupManager: ObservableObject {
         let metadataURL = tempDir.appendingPathComponent("metadata.json")
         try JSONEncoder().encode(metadata).write(to: metadataURL)
 
-        let zipURL = backupsDirectory.appendingPathComponent("\(backupID.uuidString).zip")
-        try fileManager.zipItem(at: tempDir, to: zipURL)
+        let extensionName = useBackupExtension ? "backup" : "zip"
+        let archiveURL = backupsDirectory.appendingPathComponent("\(backupID.uuidString).\(extensionName)")
+        try fileManager.zipItem(at: tempDir, to: archiveURL)
 
-        let compressedSize = (try? fileManager.attributesOfItem(atPath: zipURL.path)[.size] as? Int64) ?? 0
+        let compressedSize = (try? fileManager.attributesOfItem(atPath: archiveURL.path)[.size] as? Int64) ?? 0
 
-        // Calculate Checksum
-        let zipData = try Data(contentsOf: zipURL)
-        let checksum = SHA256Hash(data: zipData)
+        // Calculate Checksum using streaming to avoid OOM
+        let checksum = try SHA256Hash(url: archiveURL)
 
         let updatedMetadata = BackupMetadata(
             id: metadata.id,
@@ -148,7 +149,7 @@ class BackupManager: ObservableObject {
         try? fileManager.removeItem(at: tempDir)
 
         await MainActor.run { loadBackups() }
-        return metadata
+        return updatedMetadata
     }
 
     private func exportModule(_ module: BackupModule, to destination: URL) throws -> (size: Int64, fileCount: Int) {
@@ -209,10 +210,10 @@ class BackupManager: ObservableObject {
     }
 
     func restoreBackup(metadata: BackupMetadata, modules: Set<BackupModule>) async throws {
-        let zipURL = backupsDirectory.appendingPathComponent("\(metadata.id.uuidString).zip")
+        let archiveURL = getArchiveURL(for: metadata)
         let tempDir = fileManager.temporaryDirectory.appendingPathComponent("Restore_\(UUID().uuidString)")
         try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
-        try fileManager.unzipItem(at: zipURL, to: tempDir)
+        try fileManager.unzipItem(at: archiveURL, to: tempDir)
 
         for module in modules {
             let moduleDir = tempDir.appendingPathComponent(module.directoryName)
@@ -270,9 +271,9 @@ class BackupManager: ObservableObject {
     }
 
     func deleteBackup(metadata: BackupMetadata) {
-        let zipURL = backupsDirectory.appendingPathComponent("\(metadata.id.uuidString).zip")
+        let archiveURL = getArchiveURL(for: metadata)
         let metadataURL = backupsDirectory.appendingPathComponent("\(metadata.id.uuidString)_metadata.json")
-        try? fileManager.removeItem(at: zipURL)
+        try? fileManager.removeItem(at: archiveURL)
         try? fileManager.removeItem(at: metadataURL)
         loadBackups()
     }
@@ -285,20 +286,34 @@ class BackupManager: ObservableObject {
         return "\(prefix) \(formatter.string(from: timestamp)) Snapshot"
     }
 
-    func getZipURL(for metadata: BackupMetadata) -> URL {
-        return backupsDirectory.appendingPathComponent("\(metadata.id.uuidString).zip")
+    func getArchiveURL(for metadata: BackupMetadata) -> URL {
+        let zipURL = backupsDirectory.appendingPathComponent("\(metadata.id.uuidString).zip")
+        let backupURL = backupsDirectory.appendingPathComponent("\(metadata.id.uuidString).backup")
+
+        if fileManager.fileExists(atPath: backupURL.path) {
+            return backupURL
+        }
+        return zipURL
     }
 
     func importBackupFile(from url: URL) async throws -> BackupMetadata {
         let backupID = UUID()
         let tempDir = fileManager.temporaryDirectory.appendingPathComponent("Import_\(backupID.uuidString)")
         try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+
+        // Ensure the file is accessible
+        guard url.startAccessingSecurityScopedResource() else {
+            throw NSError(domain: "BackupManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Permission denied to access file"])
+        }
+        defer { url.stopAccessingSecurityScopedResource() }
+
         try fileManager.unzipItem(at: url, to: tempDir)
 
         let metadataURL = tempDir.appendingPathComponent("metadata.json")
         guard let data = try? Data(contentsOf: metadataURL),
-              var metadata = try? JSONDecoder().decode(BackupMetadata.self, from: data) else {
-            throw NSError(domain: "BackupManager", code: 2, userInfo: [NSLocalizedDescriptionKey: "Invalid backup file structure"])
+              let metadata = try? JSONDecoder().decode(BackupMetadata.self, from: data) else {
+            try? fileManager.removeItem(at: tempDir)
+            throw NSError(domain: "BackupManager", code: 2, userInfo: [NSLocalizedDescriptionKey: "Invalid backup file: Missing or corrupt metadata.json"])
         }
 
         // Assign new ID to avoid collisions
@@ -322,8 +337,9 @@ class BackupManager: ObservableObject {
             name: "Imported: \(metadata.name)"
         )
 
-        let finalZipURL = backupsDirectory.appendingPathComponent("\(backupID.uuidString).zip")
-        try fileManager.copyItem(at: url, to: finalZipURL)
+        let extensionName = url.pathExtension == "backup" ? "backup" : "zip"
+        let finalArchiveURL = backupsDirectory.appendingPathComponent("\(backupID.uuidString).\(extensionName)")
+        try fileManager.copyItem(at: url, to: finalArchiveURL)
 
         let finalMetadataURL = backupsDirectory.appendingPathComponent("\(backupID.uuidString)_metadata.json")
         try JSONEncoder().encode(newMetadata).write(to: finalMetadataURL)
@@ -333,9 +349,20 @@ class BackupManager: ObservableObject {
         return newMetadata
     }
 
-    private func SHA256Hash(data: Data) -> String {
-        // Simple hash placeholder using Foundation
-        return "\(data.count)-\(data.hashValue)"
+    private func SHA256Hash(url: URL) throws -> String {
+        let file = try FileHandle(forReadingFrom: url)
+        defer { try? file.close() }
+
+        var hasher = SHA256()
+        let bufferSize = 1024 * 1024 // 1MB
+        while true {
+            let data = try file.read(upToCount: bufferSize) ?? Data()
+            if data.isEmpty { break }
+            hasher.update(data: data)
+        }
+
+        let digest = hasher.finalize()
+        return digest.map { String(format: "%02x", $0) }.joined()
     }
 
     func toggleStar(for metadata: BackupMetadata) {

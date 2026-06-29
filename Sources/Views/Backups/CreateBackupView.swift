@@ -7,17 +7,37 @@ struct CreateBackupView: View {
     @State private var name: String = ""
     @State private var type: BackupMetadata.BackupMode = .full
     @State private var selectedModules: Set<BackupModule> = Set(BackupModule.allCases)
+    @State private var useBackupExtension = true
     @State private var isCreating = false
     @State private var progress: Double = 0
+    @State private var statusMessage = "Waiting to start..."
 
     var body: some View {
         NavigationStack {
             Form {
-                Section("Backup Identity") {
-                    TextField("Backup Name (Optional)", text: $name)
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Snapshot Identity")
+                            .font(.caption.bold())
+                            .foregroundStyle(.blue)
+                        TextField("Give your backup a name...", text: $name)
+                            .font(.headline)
+                    }
+                    .padding(.vertical, 4)
                 }
 
-                Section("Backup Type") {
+                Section("Backup Format") {
+                    Toggle(isOn: $useBackupExtension) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Use .backup Extension")
+                            Text("Optimized for Tools-Kit ecosystem")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+
+                Section {
                     Picker("Type", selection: $type) {
                         Text("Full").tag(BackupMetadata.BackupMode.full)
                         Text("Incremental").tag(BackupMetadata.BackupMode.incremental)
@@ -28,32 +48,60 @@ struct CreateBackupView: View {
                     Text(typeDescription)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .padding(.top, 4)
+                } header: {
+                    Text("Snapshot Mode")
                 }
 
-                Section("Modules to Include") {
-                    ForEach(BackupModule.allCases) { module in
-                        Toggle(module.rawValue.capitalized, isOn: Binding(
-                            get: { selectedModules.contains(module) },
-                            set: { isSet in
-                                if isSet { selectedModules.insert(module) }
-                                else { selectedModules.remove(module) }
+                Section {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                        ForEach(BackupModule.allCases) { module in
+                            ModuleToggle(module: module, isSelected: Binding(
+                                get: { selectedModules.contains(module) },
+                                set: { isSet in
+                                    if isSet { selectedModules.insert(module) }
+                                    else { selectedModules.remove(module) }
+                                }
+                            ))
+                        }
+                    }
+                    .padding(.vertical, 8)
+                } header: {
+                    HStack {
+                        Text("Data Modules")
+                        Spacer()
+                        Button(selectedModules.count == BackupModule.allCases.count ? "Deselect All" : "Select All") {
+                            if selectedModules.count == BackupModule.allCases.count {
+                                selectedModules.removeAll()
+                            } else {
+                                selectedModules = Set(BackupModule.allCases)
                             }
-                        ))
+                        }
+                        .font(.caption)
                     }
                 }
 
                 if isCreating {
                     Section {
-                        VStack(spacing: 12) {
+                        VStack(spacing: 16) {
                             ProgressView(value: progress)
-                            Text("Creating backup...")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .tint(.blue)
+
+                            HStack {
+                                Text(statusMessage)
+                                    .font(.caption.bold())
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                Text("\(Int(progress * 100))%")
+                                    .font(.caption.monospacedDigit())
+                                    .foregroundStyle(.blue)
+                            }
                         }
+                        .padding(.vertical, 8)
                     }
                 }
             }
-            .navigationTitle("Create Backup")
+            .navigationTitle("New Snapshot")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -79,31 +127,79 @@ struct CreateBackupView: View {
 
     private func startBackup() {
         isCreating = true
-        progress = 0.1
+        progress = 0.05
+        statusMessage = "Preparing modules..."
 
         Task {
             do {
-                // Simulate some progress
-                for i in 1...5 {
-                    try? await Task.sleep(for: .milliseconds(200))
-                    await MainActor.run { progress = Double(i) * 0.15 }
-                }
+                // Stage 1: Exporting
+                await updateStatus("Exporting data...", p: 0.2)
+                try await Task.sleep(for: .milliseconds(400))
 
-                _ = try await manager.createBackup(
+                // Stage 2: Compressing
+                await updateStatus("Compressing archive...", p: 0.5)
+
+                let metadata = try await manager.createBackup(
                     modules: selectedModules,
                     mode: type,
-                    name: name.isEmpty ? nil : name
+                    name: name.isEmpty ? nil : name,
+                    useBackupExtension: useBackupExtension
                 )
+
+                // Stage 3: Finalizing
+                await updateStatus("Calculating checksum...", p: 0.9)
+                try await Task.sleep(for: .milliseconds(300))
 
                 await MainActor.run {
                     progress = 1.0
+                    statusMessage = "Backup Complete"
                     isCreating = false
                     dismiss()
                 }
             } catch {
                 print("Backup failed: \(error)")
-                await MainActor.run { isCreating = false }
+                await MainActor.run {
+                    isCreating = false
+                    statusMessage = "Error: \(error.localizedDescription)"
+                }
             }
         }
+    }
+
+    private func updateStatus(_ message: String, p: Double) async {
+        await MainActor.run {
+            statusMessage = message
+            withAnimation {
+                progress = p
+            }
+        }
+    }
+}
+
+struct ModuleToggle: View {
+    let module: BackupModule
+    @Binding var isSelected: Bool
+
+    var body: some View {
+        Button {
+            isSelected.toggle()
+        } label: {
+            HStack {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(isSelected ? .blue : .tertiary)
+                Text(module.rawValue.capitalized)
+                    .font(.caption.bold())
+                    .foregroundStyle(isSelected ? .primary : .secondary)
+                Spacer()
+            }
+            .padding(10)
+            .background(isSelected ? Color.blue.opacity(0.1) : Color(.tertiarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay {
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(isSelected ? Color.blue.opacity(0.2) : Color.clear, lineWidth: 1)
+            }
+        }
+        .buttonStyle(.plain)
     }
 }

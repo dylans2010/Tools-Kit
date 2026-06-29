@@ -11,6 +11,7 @@ struct RestoreBackupView: View {
     @State private var progress: Double = 0
     @State private var showConfirmation = false
     @State private var showingFilePicker = false
+    @State private var validationError: String?
 
     enum RestoreType {
         case full, partial
@@ -19,75 +20,117 @@ struct RestoreBackupView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Select Backup") {
+                Section {
                     if let backup = selectedBackup {
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(backup.name).bold()
-                                Text(backup.timestamp.formatted()).font(.caption).foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack(spacing: 12) {
+                                Image(systemName: "checkmark.seal.fill")
+                                    .font(.title2)
+                                    .foregroundStyle(.green)
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(backup.name)
+                                        .font(.headline)
+                                    Text("Verified Backup Snapshot")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Button("Change") { selectedBackup = nil }
+                                    .font(.caption.bold())
+                                    .buttonStyle(.bordered)
                             }
-                            Spacer()
-                            Button("Change") { selectedBackup = nil }
-                                .font(.caption)
+
+                            Divider()
+
+                            Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 10) {
+                                GridRow {
+                                    InfoLabel(title: "Date", value: backup.timestamp.formatted())
+                                    InfoLabel(title: "Version", value: backup.appVersion)
+                                }
+                                GridRow {
+                                    InfoLabel(title: "Device", value: backup.deviceInfo)
+                                    InfoLabel(title: "Size", value: formatSize(backup.totalSizeCompressed))
+                                }
+                            }
                         }
+                        .padding(.vertical, 8)
                     } else {
-                        VStack(spacing: 12) {
-                            NavigationLink("Choose from local backups...") {
+                        VStack(spacing: 16) {
+                            NavigationLink {
                                 List(manager.availableBackups) { backup in
                                     Button {
                                         selectedBackup = backup
                                         selectedModules = backup.restoreScope
                                         dismiss()
                                     } label: {
-                                        VStack(alignment: .leading) {
-                                            Text(backup.name).bold()
-                                            Text(backup.timestamp.formatted()).font(.caption).foregroundStyle(.secondary)
-                                        }
+                                        BackupRow(backup: backup)
                                     }
-                                    .foregroundStyle(.primary)
                                 }
-                                .navigationTitle("Select Backup")
+                                .navigationTitle("Local Backups")
+                            } label: {
+                                Label("Browse Local Backups", systemImage: "internaldrive.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.blue.opacity(0.1))
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
                             }
 
                             Button {
                                 showingFilePicker = true
                             } label: {
-                                Label("Import from Files app...", systemImage: "folder.badge.plus")
+                                Label("Import .backup or .zip", systemImage: "folder.badge.plus")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.blue)
+                                    .foregroundStyle(.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
                             }
-                            .padding(.vertical, 8)
                         }
+                        .padding(.vertical, 8)
                     }
+                } header: {
+                    Text("Source Selection")
                 }
 
                 if let backup = selectedBackup {
-                    Section("Restore Type") {
+                    Section("Restore Strategy") {
                         Picker("Type", selection: $restoreType) {
-                            Text("Full Restore").tag(RestoreType.full)
-                            Text("Partial Restore").tag(RestoreType.partial)
+                            Text("Full").tag(RestoreType.full)
+                            Text("Selective").tag(RestoreType.partial)
                         }
                         .pickerStyle(.segmented)
+
+                        Text(restoreType == .full ? "Overwrites all current data with the snapshot content." : "Allows you to choose specific modules to restore.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
 
                     if restoreType == .partial {
-                        Section("Modules to Restore") {
-                            ForEach(Array(backup.restoreScope)) { module in
-                                Toggle(module.rawValue.capitalized, isOn: Binding(
-                                    get: { selectedModules.contains(module) },
-                                    set: { isSet in
-                                        if isSet { selectedModules.insert(module) }
-                                        else { selectedModules.remove(module) }
-                                    }
-                                ))
+                        Section("Included Modules") {
+                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                                ForEach(Array(backup.restoreScope)) { module in
+                                    ModuleToggle(module: module, isSelected: Binding(
+                                        get: { selectedModules.contains(module) },
+                                        set: { isSet in
+                                            if isSet { selectedModules.insert(module) }
+                                            else { selectedModules.remove(module) }
+                                        }
+                                    ))
+                                }
                             }
+                            .padding(.vertical, 4)
                         }
                     }
 
                     Section {
                         VStack(alignment: .leading, spacing: 8) {
-                            Label("Safety Snapshot", systemImage: "shield.fill")
+                            Label("Safety First", systemImage: "shield.checkered")
                                 .font(.headline)
                                 .foregroundStyle(.green)
-                            Text("A temporary 'Undo Restore' snapshot will be created before starting the restore process.")
+                            Text("A 'Safety Restore' snapshot will be created automatically. You can always roll back if needed.")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -98,13 +141,13 @@ struct RestoreBackupView: View {
                         Button {
                             showConfirmation = true
                         } label: {
-                            Text("Start Restore")
+                            Text("Confirm & Start Restore")
                                 .bold()
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.blue)
                                 .foregroundStyle(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
                         }
                         .disabled(isRestoring || (restoreType == .partial && selectedModules.isEmpty))
                     }
@@ -113,27 +156,37 @@ struct RestoreBackupView: View {
 
                 if isRestoring {
                     Section {
-                        VStack(spacing: 12) {
+                        VStack(spacing: 16) {
                             ProgressView(value: progress)
-                            Text("Restoring system state...")
-                                .font(.caption)
+                                .tint(.blue)
+                            Text("Restoring System Assets...")
+                                .font(.caption.bold())
                                 .foregroundStyle(.secondary)
                         }
+                        .padding(.vertical, 8)
+                    }
+                }
+
+                if let error = validationError {
+                    Section {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.red)
                     }
                 }
             }
-            .navigationTitle("Restore Data")
+            .navigationTitle("Data Recovery")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { dismiss() }
+                    Button("Cancel") { dismiss() }
                 }
             }
-            .alert("Confirm Restore", isPresented: $showConfirmation) {
+            .alert("Final Confirmation", isPresented: $showConfirmation) {
                 Button("Cancel", role: .cancel) { }
-                Button("Restore Now") { performRestore() }
+                Button("Restore Now", role: .destructive) { performRestore() }
             } message: {
-                Text("This will replace current data in the selected modules. Are you sure you want to proceed?")
+                Text("This action will replace your current data. This process cannot be interrupted.")
             }
             .sheet(isPresented: $showingFilePicker) {
                 DocumentPicker { url in
@@ -143,9 +196,12 @@ struct RestoreBackupView: View {
                             await MainActor.run {
                                 self.selectedBackup = metadata
                                 self.selectedModules = metadata.restoreScope
+                                self.validationError = nil
                             }
                         } catch {
-                            print("Import failed: \(error)")
+                            await MainActor.run {
+                                self.validationError = "Invalid File: \(error.localizedDescription)"
+                            }
                         }
                     }
                 }
@@ -156,22 +212,49 @@ struct RestoreBackupView: View {
     private func performRestore() {
         guard let backup = selectedBackup else { return }
         isRestoring = true
-        progress = 0
+        progress = 0.1
 
         Task {
             do {
-                _ = try await manager.createBackup(modules: Set(BackupModule.allCases), mode: .full, name: "Undo Restore Safety")
+                // Safety first
+                try await manager.createBackup(modules: Set(BackupModule.allCases), mode: .full, name: "Auto-Safety (Pre-Restore)")
+
+                await MainActor.run { progress = 0.4 }
 
                 try await manager.restoreBackup(metadata: backup, modules: selectedModules)
 
                 await MainActor.run {
+                    progress = 1.0
                     isRestoring = false
                     dismiss()
                 }
             } catch {
-                print("Restore failed: \(error)")
-                await MainActor.run { isRestoring = false }
+                await MainActor.run {
+                    isRestoring = false
+                    validationError = "Restore Failed: \(error.localizedDescription)"
+                }
             }
+        }
+    }
+
+    private func formatSize(_ bytes: Int64) -> String {
+        ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+    }
+}
+
+struct InfoLabel: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption2.bold())
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+            Text(value)
+                .font(.subheadline)
+                .lineLimit(1)
         }
     }
 }
@@ -179,7 +262,7 @@ struct RestoreBackupView: View {
 struct DocumentPicker: UIViewControllerRepresentable {
     var onPick: (URL) -> Void
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
-        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.zip])
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.zip, .init("com.toolskit.backup")!])
         picker.delegate = context.coordinator
         return picker
     }

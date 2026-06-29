@@ -170,6 +170,28 @@
 				</array>
 			</dict>
 		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.pkware.zip-archive</string>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Tools-Kit Backup File</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.toolskit.backup</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>backup</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/x-toolskit-backup</string>
+				</array>
+			</dict>
+		</dict>
 	</array>
 	<key>YAHOO_CLIENT_ID</key>
 	<string>dj0yJmk9cGVXT2dIY1BqMFlLJmQ9WVdrOVRrRndkR2x4VTNVbWNHbzlNQT09JnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PTc4</string>
