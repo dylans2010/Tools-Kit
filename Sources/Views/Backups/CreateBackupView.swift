@@ -186,7 +186,7 @@ struct ModuleToggle: View {
         } label: {
             HStack {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(isSelected ? .blue : .tertiary)
+                    .foregroundStyle(isSelected ? Color.blue :Color.secondary)
                 Text(module.rawValue.capitalized)
                     .font(.caption.bold())
                     .foregroundStyle(isSelected ? .primary : .secondary)
