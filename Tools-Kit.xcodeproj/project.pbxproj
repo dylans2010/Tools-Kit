@@ -321,6 +321,7 @@
 		25281A85EE13C8496022EBC6 /* AgentBundleValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC28589723B0B1D7FC48CF86 /* AgentBundleValidator.swift */; };
 		252E24728B34456FB87766DF /* BaseConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288397E824F048869DC9ACC3 /* BaseConnector.swift */; };
 		255994A117DABA42CF2C4FE9 /* ProfessionalToolViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34FBFB3593F01B45E73252C /* ProfessionalToolViews.swift */; };
+		25882D66E750452A050EB3BB /* SlideAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B6A7F207D43C35B83BDF3A /* SlideAnimation.swift */; };
 		25BBECCED73D89C0EC1536CD /* AISlidesThemeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCE27B3291D3731B79044F1 /* AISlidesThemeEngine.swift */; };
 		25D8C4FF832B4C6190D19009 /* Builder/URLDecoderDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849ACEC3A4384BA4B4EBA3DD /* Builder/URLDecoderDevTool.swift */; };
 		25FF67BB14A572864B273C43 /* Diag_ScreenReplacementCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A247DC8219002E6CC294CF /* Diag_ScreenReplacementCheckView.swift */; };
@@ -1415,8 +1416,6 @@
 		A8328D43D43D56C76BE8C700 /* ExerciseLoggingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55418169336F4A20D13B2720 /* ExerciseLoggingView.swift */; };
 		A8366E9C37EF4EEDE3BCAC8D /* AgentConfigLogsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6B430D5889804885BCD51F /* AgentConfigLogsTab.swift */; };
 		A8432153316DAFB92CFC5CBB /* SlideDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09ECDDA813253E17C4F1A66A /* SlideDeck.swift */; };
-		A99816DB476D64CC859E6EDC /* SlideNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7E764744C7769707707D2E /* SlideNode.swift */; };
-		25882D66E750452A050EB3BB /* SlideAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B6A7F207D43C35B83BDF3A /* SlideAnimation.swift */; };
 		A860C8FB9997A01834796C51 /* Builder/PlaceholderDataDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB05AACE01CB128593CBD88F /* Builder/PlaceholderDataDevTool.swift */; };
 		A868D1E1709A1B541BF23F9B /* WhiteboardGraphProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B5AE247A3F65990B38332B /* WhiteboardGraphProcessor.swift */; };
 		A869AD14E7C11FE743CDC183 /* HuggingFace/Views/HFInstalledModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4229E08243FE5BB06EEBAA96 /* HuggingFace/Views/HFInstalledModels.swift */; };
@@ -1430,6 +1429,7 @@
 		A919A0A4BDBC470AA7C7D746 /* Builder/HTTPRequestTesterDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775C21DC04C543489C875010 /* Builder/HTTPRequestTesterDevTool.swift */; };
 		A93F9D38FC48FC2E41F5C2C7 /* AgentAutomationResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2007076E4F9F28A4D445A40 /* AgentAutomationResult.swift */; };
 		A97FB6D05896A4305B73BF8B /* WhiteboardsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A2E2E9FDDC37F884381F59 /* WhiteboardsHomeView.swift */; };
+		A99816DB476D64CC859E6EDC /* SlideNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7E764744C7769707707D2E /* SlideNode.swift */; };
 		A9AE889FF9EE48B689366A96 /* LogViewerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D23BF72C546CF9DE551B5 /* LogViewerBackend.swift */; };
 		A9BD31960A7B47E598C67F64 /* kill_process.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B83D666E14453AA539910D /* kill_process.swift */; };
 		A9CC30F336805E83666DF275 /* SDKDependencyExecutionPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BBFB959F7CAC3C1AE953FF /* SDKDependencyExecutionPlanner.swift */; };
@@ -2643,8 +2643,6 @@
 		09BE5A61A477E0BBD85F8581 /* Detail/PluginDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Detail/PluginDetailView.swift; sourceTree = "<group>"; };
 		09E6435EECFF4FD6B31B4C0B /* MapsToolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsToolViewModel.swift; sourceTree = "<group>"; };
 		09ECDDA813253E17C4F1A66A /* SlideDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideDeck.swift; sourceTree = "<group>"; };
-		2B7E764744C7769707707D2E /* SlideNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideNode.swift; sourceTree = "<group>"; };
-		54B6A7F207D43C35B83BDF3A /* SlideAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideAnimation.swift; sourceTree = "<group>"; };
 		0A190449548918A0E795802E /* Diag_MagSafeTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MagSafeTestView.swift; sourceTree = "<group>"; };
 		0A301FDC08884E856CC07F3A /* Diag_BackgroundRefreshView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BackgroundRefreshView.swift; sourceTree = "<group>"; };
 		0A4A21FE0333397A02239F9E /* Diag_NetworkBandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetworkBandView.swift; sourceTree = "<group>"; };
@@ -2956,6 +2954,7 @@
 		2B52186449A098DDF418AC31 /* GameDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDefinition.swift; sourceTree = "<group>"; };
 		2B763A8060F25124BAC4ABF9 /* Sources/Views/Workspace/OpenClaw/Alternatives/LocalApproval/Core/LAConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/OpenClaw/Alternatives/LocalApproval/Core/LAConstants.swift; sourceTree = SOURCE_ROOT; };
 		2B7677776F95714C02C360F1 /* NotebookComparePagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookComparePagesView.swift; sourceTree = "<group>"; };
+		2B7E764744C7769707707D2E /* SlideNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideNode.swift; sourceTree = "<group>"; };
 		2B9FF9C6F2A14E52815A572D /* Builder/SDKEventLoggerDevTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKEventLoggerDevTool.swift; sourceTree = "<group>"; };
 		2BD0EEAA820974821758647E /* BlackjackProLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackjackProLogic.swift; sourceTree = "<group>"; };
 		2BD27CF38C0C05B75FB719B9 /* AgentAPIRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentAPIRouter.swift; sourceTree = "<group>"; };
@@ -3299,6 +3298,7 @@
 		547D14D9FDC3EC39FC5B3BF9 /* AISummarySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISummarySheet.swift; sourceTree = "<group>"; };
 		5481FBA91D5941DF8E5E1D32 /* UnitConverterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConverterBackend.swift; sourceTree = "<group>"; };
 		548BCA2B814AF160CEC68B84 /* MailNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailNotificationManager.swift; sourceTree = "<group>"; };
+		54B6A7F207D43C35B83BDF3A /* SlideAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideAnimation.swift; sourceTree = "<group>"; };
 		54D5C7702C1A587793D0A510 /* HFModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HFModel.swift; sourceTree = "<group>"; };
 		54E6BE3F896010D3D53CC2B6 /* SequenceRecallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceRecallView.swift; sourceTree = "<group>"; };
 		5512AC21945B3956A08672BD /* Diag_IMEINetworkCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_IMEINetworkCheckView.swift; sourceTree = "<group>"; };
@@ -9428,6 +9428,18 @@
 			path = ColorRush;
 			sourceTree = "<group>";
 		};
+		AI0300000000000000000011 /* Slides */ = {
+			isa = PBXGroup;
+			children = (
+				AI0100000000000000000011 /* AILayoutEngine.swift */,
+				AI0100000000000000000012 /* AnimationRuntime.swift */,
+				AI0100000000000000000013 /* DataBindingEngine.swift */,
+				AI0100000000000000000014 /* ExportEngine.swift */,
+				AI0100000000000000000015 /* SlideComponentSystem.swift */,
+			);
+			path = Slides;
+			sourceTree = "<group>";
+		};
 		B073732830A84DAF88C790B3 /* Intelligence */ = {
 			isa = PBXGroup;
 			children = (
@@ -9599,18 +9611,6 @@
 				AI0300000000000000000011 /* Slides */,
 			);
 			path = Workspace;
-			sourceTree = "<group>";
-		};
-		AI0300000000000000000011 /* Slides */ = {
-			isa = PBXGroup;
-			children = (
-				AI0100000000000000000011 /* AILayoutEngine.swift */,
-				AI0100000000000000000012 /* AnimationRuntime.swift */,
-				AI0100000000000000000013 /* DataBindingEngine.swift */,
-				AI0100000000000000000014 /* ExportEngine.swift */,
-				AI0100000000000000000015 /* SlideComponentSystem.swift */,
-			);
-			path = Slides;
 			sourceTree = "<group>";
 		};
 		B5F9DF146BA1E459E771C817 /* Security */ = {
@@ -15119,6 +15119,13 @@
 				CODE_SIGN_ENTITLEMENTS = "Tools-Kit.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				DEVELOPMENT_TEAM = 3Z586KMX37;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = YES;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = YES;
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -15126,9 +15133,11 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.dylans2010.ToolsKit;
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -15142,6 +15151,13 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 3Z586KMX37;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = YES;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = YES;
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -15150,9 +15166,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.dylans2010.ToolsKit;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
