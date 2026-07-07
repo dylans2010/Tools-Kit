@@ -1,6 +1,8 @@
 import Foundation
 import Combine
+#if canImport(Daily)
 import Daily
+#endif
 
 enum DebugLogLevel: String, Codable {
     case info
