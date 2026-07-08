@@ -1,5 +1,7 @@
 import SwiftUI
+#if !targetEnvironment(macCatalyst)
 import FamilyControls
+#endif
 
 struct AppSelectionView: View {
     @ObservedObject var manager = AppLockManager.shared
@@ -17,6 +19,11 @@ struct AppSelectionView: View {
             }
 
             Section(header: Text("Selected Apps")) {
+                #if targetEnvironment(macCatalyst)
+                Text("App selection is unavailable on Mac Catalyst")
+                    .foregroundColor(.secondary)
+                    .italic()
+                #else
                 if profile.selection.applicationTokens.isEmpty && profile.selection.categoryTokens.isEmpty {
                     Text("No apps selected")
                         .foregroundColor(.secondary)
@@ -27,10 +34,11 @@ struct AppSelectionView: View {
                 Button(action: { isPickerPresented = true }) {
                     Label("Choose Apps & Categories", systemImage: "app.badge.plus")
                 }
+                #endif
             }
         }
         .navigationTitle("Edit Profile")
-        .familyActivityPicker(isPresented: $isPickerPresented, selection: $profile.selection)
+        .conditionalFamilyActivityPicker(isPresented: $isPickerPresented, selection: $profile.selection)
         .onChange(of: profile.selection) { _, _ in
             manager.updateProfile(profile)
         }
@@ -41,5 +49,16 @@ struct AppSelectionView: View {
                 }
             }
         }
+    }
+}
+
+extension View {
+    @ViewBuilder
+    func conditionalFamilyActivityPicker(isPresented: Binding<Bool>, selection: Binding<FamilyActivitySelection>) -> some View {
+        #if targetEnvironment(macCatalyst)
+        self
+        #else
+        self.familyActivityPicker(isPresented: isPresented, selection: selection)
+        #endif
     }
 }

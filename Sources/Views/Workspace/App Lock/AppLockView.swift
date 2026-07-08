@@ -8,8 +8,11 @@ struct AppLockView: View {
 
     var body: some View {
         List {
-            Section(header: Text("Permissions"), footer: Text("App Lock requires Screen Time permissions to function correctly.")) {
-                if authManager.isAuthorized {
+            Section(header: Text("Permissions"), footer: Text(authManager.state == .unavailable ? "App Lock is not available on Mac Catalyst." : "App Lock requires Screen Time permissions to function correctly.")) {
+                if authManager.state == .unavailable {
+                    Label("Unavailable on Mac Catalyst", systemImage: "xmark.octagon.fill")
+                        .foregroundColor(.secondary)
+                } else if authManager.isAuthorized {
                     Label("Authorized", systemImage: "checkmark.circle.fill")
                         .foregroundColor(.green)
                 } else {
@@ -52,9 +55,11 @@ struct AppLockView: View {
                     }
                 }
 
+                #if !targetEnvironment(macCatalyst)
                 Button(action: { showingAddProfile = true }) {
                     Label("Add Profile", systemImage: "plus.circle")
                 }
+                #endif
             }
         }
         .navigationTitle("App Lock System")
