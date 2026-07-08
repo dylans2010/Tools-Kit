@@ -1,7 +1,11 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 import VisionKit
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct EmailComposingView: View {
     @Environment(\.dismiss) private var dismiss

@@ -1,6 +1,8 @@
 import Foundation
 import Vision
+#if canImport(UIKit)
 import UIKit
+#endif
 
 final class PerspectiveCorrectorBackend: NSObject, ObservableObject, CameraServiceDelegate {
     @Published var processedImage: UIImage?

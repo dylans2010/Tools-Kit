@@ -1,6 +1,10 @@
 import SwiftUI
+#if canImport(UserNotifications)
 import UserNotifications
+#endif
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct Diag_NotificationStatusView: View {
     @State private var authStatus: String = "Checking..."

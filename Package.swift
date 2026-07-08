@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.0
 import PackageDescription
 
 let package = Package(
@@ -22,7 +22,7 @@ let package = Package(
             dependencies: [
                 .product(name: "MailCore2", package: "mailcore2"),
                 .product(name: "Appwrite", package: "sdk-for-apple"),
-                .product(name: "Daily", package: "daily-client-ios"),
+                .product(name: "Daily", package: "daily-client-ios", condition: .when(platforms: [.iOS])),
                 .product(name: "Aurora", package: "Aurora"),
                 .product(name: "ZIPFoundation", package: "ZIPFoundation"),
                 .product(name: "SwiftMCP", package: "SwiftMCP")

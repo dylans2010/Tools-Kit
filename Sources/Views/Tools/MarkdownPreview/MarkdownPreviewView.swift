@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(WebKit)
 import WebKit
+#endif
 
 struct MarkdownPreviewView: View {
     @StateObject private var backend = MarkdownPreviewBackend()

@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct Diag_StereoBalanceView: View {
     @State private var balance: Float = 0.0

@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct SecurityDeviceTrustView: View {
     @AppStorage("com.toolskit.security.trustedDevices") private var trustedDevicesData: Data = Data()

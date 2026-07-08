@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct Diag_InstalledFontsView: View {
     @State private var fontFamilies: [FontFamily] = []

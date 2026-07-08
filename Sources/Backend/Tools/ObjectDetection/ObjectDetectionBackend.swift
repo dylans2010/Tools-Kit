@@ -1,6 +1,8 @@
 import Foundation
 import Vision
+#if canImport(UIKit)
 import UIKit
+#endif
 
 final class ObjectDetectionBackend: NSObject, ObservableObject, CameraServiceDelegate {
     @Published var detectedObjects: [String] = []

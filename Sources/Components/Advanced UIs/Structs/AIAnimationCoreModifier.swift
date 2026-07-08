@@ -1,6 +1,8 @@
 import SwiftUI
 import Aurora
+#if canImport(UIKit)
 import UIKit
+#endif
 
 public struct AIAnimationCoreModifier: ViewModifier {
     let isLoading: Bool

@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 struct MusicSettingsView: View {
     @StateObject private var modeManager = MusicModeManager.shared

@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 final class DeviceInfoBackend: ObservableObject {
     @Published var info: [InfoItem] = []

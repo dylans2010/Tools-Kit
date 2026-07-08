@@ -1,8 +1,12 @@
 import Foundation
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import Speech
 import Combine
+#if canImport(UIKit)
 import UIKit
+#endif
 
 @MainActor
 class SpeechSessionManager: NSObject, ObservableObject {

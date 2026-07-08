@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct SpeechSettingsView: View {
     @ObservedObject var ttsService = TTSService.shared

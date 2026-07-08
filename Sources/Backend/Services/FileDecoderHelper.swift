@@ -1,6 +1,8 @@
 import Foundation
 import PDFKit
+#if canImport(UIKit)
 import UIKit
+#endif
 
 /// A helper utility to decode various attachment types for AI processing.
 /// Ensures that text-based files are extracted into the prompt and images are handled separately.

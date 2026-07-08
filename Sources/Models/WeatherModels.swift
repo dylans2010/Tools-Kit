@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(WeatherKit)
 import WeatherKit
+#endif
 
 struct CurrentWeatherModel: Codable {
     let temperature: Double

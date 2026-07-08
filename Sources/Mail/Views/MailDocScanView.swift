@@ -1,7 +1,9 @@
 #if os(iOS)
 import SwiftUI
 import VisionKit
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct MailDocScanView: UIViewControllerRepresentable {
     var onFinish: (VNDocumentCameraScan) -> Void

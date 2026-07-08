@@ -1,7 +1,9 @@
 import SwiftUI
 import Aurora
 import Speech
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import AudioToolbox
 
 struct PersonaHomeView: View {

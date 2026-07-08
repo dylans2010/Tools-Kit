@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 @preconcurrency import Vision
 
 // MARK: - Scan Engine

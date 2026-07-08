@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 final class BatteryAnalyticsBackend: ObservableObject {
     @Published var batteryLevel: Float = 0.0

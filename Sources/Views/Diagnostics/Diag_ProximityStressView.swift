@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct Diag_ProximityStressView: View {
     @State private var isRunning = false

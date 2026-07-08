@@ -1,7 +1,9 @@
 import Foundation
 import Observation
 import OSLog
+#if canImport(UIKit)
 import UIKit
+#endif
 
 public enum OpenClawLogLevel: String, Codable, CaseIterable {
     case debug = "DEBUG"

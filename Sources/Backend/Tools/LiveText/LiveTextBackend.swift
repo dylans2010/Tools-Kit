@@ -1,6 +1,8 @@
 import Foundation
 import Vision
+#if canImport(UIKit)
 import UIKit
+#endif
 
 final class LiveTextBackend: NSObject, ObservableObject, CameraServiceDelegate {
     @Published var recognizedText: String = ""

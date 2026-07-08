@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(PhotosUI)
 import PhotosUI
+#endif
 
 struct OCRToolView: View {
     @StateObject private var backend = OCRToolBackend()

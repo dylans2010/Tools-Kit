@@ -1,4 +1,6 @@
+#if canImport(AuthenticationServices)
 import AuthenticationServices
+#endif
 import CryptoKit
 import Foundation
 import SwiftUI

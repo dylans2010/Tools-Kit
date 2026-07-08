@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import MediaPlayer
 
 struct Diag_MuteSwitchActionButtonView: View {

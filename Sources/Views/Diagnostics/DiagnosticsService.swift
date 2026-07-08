@@ -1,6 +1,10 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import CoreMotion
 import CoreHaptics
 import Network

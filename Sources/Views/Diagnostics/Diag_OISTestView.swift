@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import CoreMotion
 
 struct Diag_OISTestView: View {

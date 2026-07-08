@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 public final class DiagnosticsManager {
     public static let shared = DiagnosticsManager()

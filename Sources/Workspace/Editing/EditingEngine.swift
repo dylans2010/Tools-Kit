@@ -1,5 +1,7 @@
 #if os(iOS)
+#if canImport(UIKit)
 import UIKit
+#endif
 import CoreGraphics
 import QuartzCore
 

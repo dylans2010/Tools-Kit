@@ -1,6 +1,8 @@
 import SwiftUI
 import LocalAuthentication
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct Diag_FaceIDDiagnosticsView: View {
     @State private var faceIDAvailable = false

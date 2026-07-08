@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct Diag_AutofocusTestView: View {
     @State private var details: [(String, String)] = []

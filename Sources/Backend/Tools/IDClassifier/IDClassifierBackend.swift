@@ -1,6 +1,8 @@
 import Foundation
 import Vision
+#if canImport(UIKit)
 import UIKit
+#endif
 
 final class IDClassifierBackend: NSObject, ObservableObject, CameraServiceDelegate {
     @Published var detectedInfo: [String: String] = [:]

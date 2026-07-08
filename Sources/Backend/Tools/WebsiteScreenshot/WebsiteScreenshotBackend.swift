@@ -1,6 +1,8 @@
 import Foundation
 import SwiftUI
+#if canImport(WebKit)
 import WebKit
+#endif
 
 class WebsiteScreenshotBackend: NSObject, ObservableObject, WKNavigationDelegate {
     @Published var urlString = "https://apple.com"

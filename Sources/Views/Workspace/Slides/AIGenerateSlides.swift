@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(PhotosUI)
 import PhotosUI
+#endif
 import Aurora
 
 public struct AIGenerateSlides: View {

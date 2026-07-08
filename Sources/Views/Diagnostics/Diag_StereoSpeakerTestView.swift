@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct Diag_StereoSpeakerTestView: View {
     @State private var isPlaying = false

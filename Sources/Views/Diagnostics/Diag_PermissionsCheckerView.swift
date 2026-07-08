@@ -1,7 +1,13 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
+#if canImport(CoreLocation)
 import CoreLocation
+#endif
+#if canImport(UserNotifications)
 import UserNotifications
+#endif
 
 struct Diag_PermissionsCheckerView: View {
     @State private var permissions: [PermissionItem] = []

@@ -3,7 +3,9 @@ import LocalAuthentication
 import CryptoKit
 import Combine
 #if canImport(UIKit)
+#if canImport(UIKit)
 import UIKit
+#endif
 #endif
 
 @MainActor

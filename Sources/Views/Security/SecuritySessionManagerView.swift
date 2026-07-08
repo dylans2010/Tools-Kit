@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct SecuritySessionManagerView: View {
     @ObservedObject private var authService = AuthService.shared

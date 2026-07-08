@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 struct FileConverterView: View {
     @StateObject private var backend = FileConverterBackend()

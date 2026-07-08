@@ -1,7 +1,9 @@
 import Foundation
 import Combine
 import SwiftUI
+#if canImport(AuthenticationServices)
 import AuthenticationServices
+#endif
 import Security
 import SwiftMCP
 

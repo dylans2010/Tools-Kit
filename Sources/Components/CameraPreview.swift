@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct CameraPreview: UIViewRepresentable {
     let cameraService: CameraService

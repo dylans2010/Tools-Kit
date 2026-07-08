@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 struct FallbackFetchView: View {
     @StateObject private var viewModel = FallbackFetchViewModel()

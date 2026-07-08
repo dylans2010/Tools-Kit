@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 /// Shows a summary / metadata overview for a single FormDocument.
 struct FormDetailView: View {

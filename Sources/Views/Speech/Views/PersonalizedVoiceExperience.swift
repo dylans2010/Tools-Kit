@@ -1,6 +1,8 @@
 import SwiftUI
 import Observation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 @Observable
 final class VoicePersonalizationViewModel {

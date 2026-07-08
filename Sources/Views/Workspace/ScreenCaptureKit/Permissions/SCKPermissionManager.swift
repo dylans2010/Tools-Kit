@@ -2,7 +2,9 @@
 
 import Foundation
 import ScreenCaptureKit
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import Speech
 
 

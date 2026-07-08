@@ -1,6 +1,8 @@
 import Foundation
 import Combine
+#if canImport(UserNotifications)
 import UserNotifications
+#endif
 
 public struct SDKAutomationRule: Identifiable, Codable {
     public var id: UUID

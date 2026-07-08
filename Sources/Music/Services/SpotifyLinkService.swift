@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 /// Handles Spotify URL parsing and safe deep-link playback.
 /// Does NOT attempt audio extraction – playback is delegated to the Spotify app.

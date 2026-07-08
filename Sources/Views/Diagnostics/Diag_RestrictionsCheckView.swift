@@ -1,6 +1,10 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
+#if canImport(CoreLocation)
 import CoreLocation
+#endif
 import LocalAuthentication
 
 struct Diag_RestrictionsCheckView: View {

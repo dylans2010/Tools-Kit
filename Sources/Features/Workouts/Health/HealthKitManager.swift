@@ -19,7 +19,9 @@ struct HealthImportedData: Codable {
 }
 
 #if canImport(HealthKit)
+#if canImport(HealthKit)
 import HealthKit
+#endif
 
 final class HealthKitManager {
     private let store = HKHealthStore()
