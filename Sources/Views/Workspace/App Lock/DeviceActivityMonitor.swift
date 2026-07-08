@@ -1,3 +1,4 @@
+#if !targetEnvironment(macCatalyst)
 import DeviceActivity
 import ManagedSettings
 import Foundation
@@ -22,3 +23,4 @@ class AppDeviceActivityMonitor: DeviceActivityMonitor {
         // Handle interval end if needed
     }
 }
+#endif

@@ -1,8 +1,18 @@
 import Foundation
+#if !targetEnvironment(macCatalyst)
 import FamilyControls
 import ManagedSettings
 import DeviceActivity
+#endif
 import Combine
+
+#if targetEnvironment(macCatalyst)
+struct FamilyActivitySelection: Codable, Equatable {
+    var applicationTokens: Set<String> = []
+    var categoryTokens: Set<String> = []
+    var webDomainTokens: Set<String> = []
+}
+#endif
 
 struct AppLockProfile: Identifiable, Codable, Equatable {
     let id: String
@@ -22,8 +32,10 @@ struct AppLockProfile: Identifiable, Codable, Equatable {
 class AppLockManager: ObservableObject {
     static let shared = AppLockManager()
 
+    #if !targetEnvironment(macCatalyst)
     private let store = ManagedSettingsStore()
     private let center = DeviceActivityCenter()
+    #endif
 
     @Published var profiles: [AppLockProfile] = [] {
         didSet {
@@ -43,7 +55,11 @@ class AppLockManager: ObservableObject {
     // MARK: - Authorization
 
     func requestAuthorization() async throws {
+        #if targetEnvironment(macCatalyst)
+        throw ScreenTimeError.unavailableOnCatalyst
+        #else
         try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
+        #endif
     }
 
     // MARK: - Profile Management
@@ -100,6 +116,7 @@ class AppLockManager: ObservableObject {
     }
 
     private func applyRestrictions() {
+        #if !targetEnvironment(macCatalyst)
         var aggregateSelection = FamilyActivitySelection()
 
         for profile in profiles where profile.isActive {
@@ -112,14 +129,18 @@ class AppLockManager: ObservableObject {
 
         store.shield.applications = aggregateSelection.applicationTokens
         store.shield.applicationCategories = .specific(aggregateSelection.categoryTokens)
+        #endif
     }
 
     private func clearRestrictions() {
+        #if !targetEnvironment(macCatalyst)
         store.shield.applications = nil
         store.shield.applicationCategories = nil
+        #endif
     }
 
     private func startMonitoring(for profile: AppLockProfile) {
+        #if !targetEnvironment(macCatalyst)
         let schedule = DeviceActivitySchedule(
             intervalStart: DateComponents(hour: 0, minute: 0),
             intervalEnd: DateComponents(hour: 23, minute: 59),
@@ -133,10 +154,13 @@ class AppLockManager: ObservableObject {
         } catch {
             print("Failed to start monitoring for \(profile.id): \(error)")
         }
+        #endif
     }
 
     private func stopMonitoring(for profileId: String) {
+        #if !targetEnvironment(macCatalyst)
         center.stopMonitoring([DeviceActivityName("com.toolskit.applock.activity.\(profileId)")])
+        #endif
     }
 
     // MARK: - Persistence
