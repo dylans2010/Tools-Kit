@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(PhotosUI)
 import PhotosUI
+#endif
 
 /// Interactive image upload question component for filling out a form.
 /// Stores a reference string (e.g. filename description) as the answer.

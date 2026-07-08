@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(MapKit)
 import MapKit
+#endif
 import SwiftUI
 
 class MapsToolViewModel: ObservableObject {

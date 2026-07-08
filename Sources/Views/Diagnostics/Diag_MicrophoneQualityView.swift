@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import Accelerate
 
 struct Diag_MicrophoneQualityView: View {

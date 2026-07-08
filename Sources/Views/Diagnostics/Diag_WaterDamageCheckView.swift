@@ -1,6 +1,8 @@
 import SwiftUI
 import CoreMotion
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct Diag_WaterDamageCheckView: View {
     @State private var checks: [(String, String, DamageIndicator)] = []

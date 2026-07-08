@@ -1,6 +1,10 @@
 import SwiftUI
+#if canImport(PhotosUI)
 import PhotosUI
+#endif
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 struct AIChatToolView: View {
     @StateObject private var viewModel = AIChatViewModel()

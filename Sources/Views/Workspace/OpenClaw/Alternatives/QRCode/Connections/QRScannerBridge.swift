@@ -1,7 +1,11 @@
 import Foundation
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import OSLog
+#if canImport(UIKit)
 import UIKit
+#endif
 
 public actor QRScannerBridge: NSObject, AVCaptureMetadataOutputObjectsDelegate {
     private let session = AVCaptureSession()

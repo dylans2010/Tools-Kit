@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(PhotosUI)
 import PhotosUI
+#endif
 
 struct ImageProcessorView: View {
     @StateObject private var backend = ImageProcessorBackend()

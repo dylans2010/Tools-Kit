@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct Diag_SpeakerFrequencyView: View {
     @State private var audioEngine = AVAudioEngine()

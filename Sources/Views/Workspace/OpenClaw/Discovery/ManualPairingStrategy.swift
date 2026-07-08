@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct ManualPairingStrategy: OpenClawPairingStrategy {
     let name = "Manual Entry"

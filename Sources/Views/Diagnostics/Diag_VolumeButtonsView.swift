@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct Diag_VolumeButtonsView: View {
     @State private var currentVolume: Float = 0

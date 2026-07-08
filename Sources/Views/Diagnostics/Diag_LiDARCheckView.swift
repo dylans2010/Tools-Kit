@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import ARKit
 
 struct Diag_LiDARCheckView: View {

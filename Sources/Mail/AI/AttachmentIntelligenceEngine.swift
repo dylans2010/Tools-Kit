@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 /// Engine for file-type classification, OCR, and structured data extraction from attachments.
 actor AttachmentIntelligenceEngine {

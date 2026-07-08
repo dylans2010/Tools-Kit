@@ -1,9 +1,15 @@
 import Foundation
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import Photos
 import Contacts
+#if canImport(CoreLocation)
 import CoreLocation
+#endif
+#if canImport(UserNotifications)
 import UserNotifications
+#endif
 import EventKit
 
 struct PermissionItem: Identifiable {

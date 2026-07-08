@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 // MARK: - LyricsEditorView
 

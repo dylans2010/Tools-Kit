@@ -1,7 +1,9 @@
 import SwiftUI
 import CoreHaptics
 import AudioToolbox
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct Diag_VibrationMotorView: View {
     @State private var engine: CHHapticEngine?

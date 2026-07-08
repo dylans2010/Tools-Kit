@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 struct EditFormView: View {
     @ObservedObject var backend: FormsBackend

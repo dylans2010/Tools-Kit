@@ -1,8 +1,12 @@
 import Foundation
 import CoreImage.CIFilterBuiltins
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
+#if canImport(UIKit)
 import UIKit
+#endif
 
 class QRCodeBackend: NSObject, ObservableObject, AVCaptureMetadataOutputObjectsDelegate {
     @Published var inputText = ""

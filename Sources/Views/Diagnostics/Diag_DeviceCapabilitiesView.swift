@@ -1,7 +1,11 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import CoreHaptics
+#if canImport(CoreLocation)
 import CoreLocation
+#endif
 import LocalAuthentication
 import CoreNFC
 import ARKit

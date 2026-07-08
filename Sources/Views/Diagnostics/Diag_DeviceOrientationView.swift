@@ -1,6 +1,8 @@
 import SwiftUI
 import CoreMotion
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct Diag_DeviceOrientationView: View {
     @State private var deviceOrientation: String = "Unknown"

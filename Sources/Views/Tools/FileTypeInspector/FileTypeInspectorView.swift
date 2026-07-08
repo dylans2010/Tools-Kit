@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 struct FileTypeInspectorView: View {
     @State private var showingPicker = false

@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 /// A reusable file importer component that wraps UIDocumentPickerViewController.
 /// This component provides a full UIKit-backed document picker that can be used within SwiftUI sheets.

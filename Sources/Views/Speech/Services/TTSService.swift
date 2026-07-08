@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 protocol TTSServiceProtocol {
     func speak(text: String) async throws

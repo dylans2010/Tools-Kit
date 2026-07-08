@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 import CoreImage
 import CoreImage.CIFilterBuiltins
 import Observation

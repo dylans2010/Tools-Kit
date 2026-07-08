@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct Diag_MicInputLevelView: View {
     @State private var audioRecorder: AVAudioRecorder?

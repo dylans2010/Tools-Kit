@@ -2,7 +2,9 @@
 
 import Foundation
 import CoreMedia
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import ScreenCaptureKit
 
 

@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 struct FileFolderContentsView: View {
     @StateObject private var backend: FileFolderBackend

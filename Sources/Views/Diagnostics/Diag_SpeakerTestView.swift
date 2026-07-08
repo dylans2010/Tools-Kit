@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct Diag_SpeakerTestView: View {
     @State private var isPlayingLeft = false

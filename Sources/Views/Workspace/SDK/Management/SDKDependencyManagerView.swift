@@ -1,7 +1,9 @@
 
 
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 struct SDKDependencyManagerView: View {
     @StateObject private var state = SDKRuntimeWorkspaceState.shared

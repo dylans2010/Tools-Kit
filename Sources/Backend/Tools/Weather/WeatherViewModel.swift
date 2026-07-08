@@ -1,6 +1,10 @@
 import SwiftUI
+#if canImport(WeatherKit)
 import WeatherKit
+#endif
+#if canImport(CoreLocation)
 import CoreLocation
+#endif
 
 @MainActor
 final class WeatherViewModel: ObservableObject {

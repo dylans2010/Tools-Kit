@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct Diag_VoiceOverStatusView: View {
     @State private var isVoiceOverRunning = UIAccessibility.isVoiceOverRunning

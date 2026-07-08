@@ -1,8 +1,12 @@
 import Foundation
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import MediaPlayer
 import Combine
+#if canImport(UIKit)
 import UIKit
+#endif
 
 enum RepeatMode: String, CaseIterable {
     case off, one, all

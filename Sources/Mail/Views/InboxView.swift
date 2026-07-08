@@ -1,6 +1,10 @@
 import SwiftUI
+#if canImport(WebKit)
 import WebKit
+#endif
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct InboxView: View {
     let account: MailAccount

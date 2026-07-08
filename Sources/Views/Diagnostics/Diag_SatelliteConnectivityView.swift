@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(CoreLocation)
 import CoreLocation
+#endif
 import Network
 
 struct Diag_SatelliteConnectivityView: View {

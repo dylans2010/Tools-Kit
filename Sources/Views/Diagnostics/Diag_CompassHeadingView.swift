@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(CoreLocation)
 import CoreLocation
+#endif
 
 struct Diag_CompassHeadingView: View {
     @StateObject private var compassManager = CompassManager()

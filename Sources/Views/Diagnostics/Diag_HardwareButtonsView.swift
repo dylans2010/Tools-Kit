@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct Diag_HardwareButtonsView: View {
     @State private var volumeUpPressed = false

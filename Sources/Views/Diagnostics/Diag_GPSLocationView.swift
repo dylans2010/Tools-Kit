@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(CoreLocation)
 import CoreLocation
+#endif
 
 struct Diag_GPSLocationView: View {
     @StateObject private var locationManager = GPSLocationManager()

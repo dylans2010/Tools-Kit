@@ -1,6 +1,8 @@
 import Foundation
 import ZIPFoundation
+#if canImport(UIKit)
 import UIKit
+#endif
 import CryptoKit
 import Observation
 

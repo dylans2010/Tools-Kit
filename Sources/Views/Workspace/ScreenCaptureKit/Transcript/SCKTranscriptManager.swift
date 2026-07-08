@@ -3,7 +3,9 @@
 import Foundation
 import Speech
 import CoreMedia
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 
 @available(iOS 27.0, *)

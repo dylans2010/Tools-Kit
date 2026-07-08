@@ -1,5 +1,9 @@
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
+#if canImport(UIKit)
 import UIKit
+#endif
 
 protocol CameraServiceDelegate: AnyObject {
     func didOutput(pixelBuffer: CVPixelBuffer)

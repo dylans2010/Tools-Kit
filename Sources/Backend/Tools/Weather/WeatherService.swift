@@ -1,6 +1,10 @@
 import Foundation
+#if canImport(WeatherKit)
 import WeatherKit
+#endif
+#if canImport(CoreLocation)
 import CoreLocation
+#endif
 
 class WeatherKitManager: NSObject, CLLocationManagerDelegate {
     private let weatherProvider = WeatherService.shared

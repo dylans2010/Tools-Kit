@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 public actor QRPermissionService {
     public static let shared = QRPermissionService()

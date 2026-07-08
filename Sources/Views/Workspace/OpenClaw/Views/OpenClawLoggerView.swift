@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 struct OpenClawLoggerView: View {
     @State private var logger = OpenClawLoggerService.shared

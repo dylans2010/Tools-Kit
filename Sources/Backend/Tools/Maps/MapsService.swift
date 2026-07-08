@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(MapKit)
 import MapKit
+#endif
 
 struct MapLocation: Identifiable, Codable {
     let id: UUID

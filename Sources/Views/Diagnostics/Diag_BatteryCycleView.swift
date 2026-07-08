@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct Diag_BatteryCycleView: View {
     @State private var batteryLevel: Float = 0

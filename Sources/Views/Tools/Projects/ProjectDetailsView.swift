@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(PhotosUI)
 import PhotosUI
+#endif
 
 struct ProjectDetailsView: View {
     let project: Project

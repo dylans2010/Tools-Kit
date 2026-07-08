@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(PhotosUI)
 import PhotosUI
+#endif
 
 struct AIMentorChatView: View {
     @StateObject private var manager = WorkoutsManager.shared

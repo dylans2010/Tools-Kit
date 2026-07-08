@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 struct SkillsView: View {
     @StateObject private var skillsManager = AIService.SkillsManager.shared

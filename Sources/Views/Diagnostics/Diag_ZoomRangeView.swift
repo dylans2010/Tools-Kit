@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 struct Diag_ZoomRangeView: View {
     @State private var cameras: [CameraInfo] = []

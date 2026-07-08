@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import Speech
 
 class ExtendedTranslationBackend: NSObject, ObservableObject, SFSpeechRecognizerDelegate {

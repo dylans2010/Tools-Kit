@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 struct ImportMusicView: View {
     @StateObject private var library = MusicLibraryManager.shared

@@ -1,11 +1,15 @@
 import Foundation
 import Combine
 #if os(iOS)
+#if canImport(UIKit)
 import UIKit
+#endif
 import CoreImage
 import Vision
 #endif
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 /// Logic for professional media production tools.
 final class ProfessionalEditingSuite: ObservableObject {

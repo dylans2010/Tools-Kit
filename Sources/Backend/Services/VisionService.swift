@@ -1,5 +1,7 @@
 import Vision
+#if canImport(UIKit)
 import UIKit
+#endif
 
 class VisionService {
     static let shared = VisionService()

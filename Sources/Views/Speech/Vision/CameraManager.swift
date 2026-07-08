@@ -1,7 +1,11 @@
 import Foundation
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import CoreImage
+#if canImport(UIKit)
 import UIKit
+#endif
 
 class CameraManager: NSObject, ObservableObject {
     @Published var session = AVCaptureSession()

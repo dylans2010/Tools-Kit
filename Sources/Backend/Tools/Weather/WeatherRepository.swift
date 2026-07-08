@@ -1,6 +1,10 @@
 import Foundation
+#if canImport(WeatherKit)
 import WeatherKit
+#endif
+#if canImport(CoreLocation)
 import CoreLocation
+#endif
 
 class WeatherRepository {
     private let cacheKey = "cached_weather_data"

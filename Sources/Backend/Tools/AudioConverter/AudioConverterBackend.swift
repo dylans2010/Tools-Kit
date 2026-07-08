@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 
 final class AudioConverterBackend: ObservableObject {
     @Published var isProcessing = false

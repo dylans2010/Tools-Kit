@@ -1,6 +1,8 @@
 import Foundation
 import Combine
+#if canImport(AuthenticationServices)
 import AuthenticationServices
+#endif
 
 public final class GmailConnector: BaseConnector {
     public let id = UUID()

@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UserNotifications)
 import UserNotifications
+#endif
 
 final class XPEngine: ObservableObject {
     static let shared = XPEngine()

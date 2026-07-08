@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(WebKit)
 import WebKit
+#endif
 
 struct EmailDetailView: View {
     @ObservedObject var viewModel: MailViewModel

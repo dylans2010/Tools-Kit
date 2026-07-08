@@ -1,7 +1,11 @@
 import SwiftUI
+#if canImport(AVFoundation)
 import AVFoundation
+#endif
 import CoreMotion
+#if canImport(CoreLocation)
 import CoreLocation
+#endif
 import LocalAuthentication
 
 struct Diag_PreRepairChecklistView: View {

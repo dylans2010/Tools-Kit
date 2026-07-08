@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#endif
 
 /// A collection of modern, monochrome UI components optimized for the ToolsKit SDK Workspace.
 /// These components follow a clean design language with heavy use of SF Symbols and subtexts.

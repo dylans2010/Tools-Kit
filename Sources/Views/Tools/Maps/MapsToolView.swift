@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(MapKit)
 import MapKit
+#endif
 
 struct MapsToolView: View {
     @StateObject private var viewModel = MapsToolViewModel()
