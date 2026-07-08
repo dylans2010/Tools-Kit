@@ -2429,9 +2429,9 @@
 		FC335125304A4830BFC09FE0 /* Builder/DevToolSharedUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5802738C69834F1BBAAA2C66 /* Builder/DevToolSharedUtils.swift */; };
 		FC869B09B707AEC3DBA69C9D /* CodeAuditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7965B0E0AEB92AE6DCC5E51 /* CodeAuditView.swift */; };
 		FC86D8A565028510D54EBB11 /* Diag_DeviceOrientationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED67276AE8FF2B7D1A255F2 /* Diag_DeviceOrientationView.swift */; };
-		FC8CA39C2FE6467900CBBA86 /* MailCore2 in Frameworks */ = {isa = PBXBuildFile; productRef = 8BDCD4BA0D3BCBCF1B729F72 /* MailCore2 */; };
+		FC8CA39C2FE6467900CBBA86 /* MailCore2 in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 8BDCD4BA0D3BCBCF1B729F72 /* MailCore2 */; };
 		FC8CA39D2FE6467900CBBA86 /* Appwrite in Frameworks */ = {isa = PBXBuildFile; productRef = A995FBE1DAC1D7EFCC419997 /* Appwrite */; };
-		FC8CA39E2FE6467900CBBA86 /* Daily in Frameworks */ = {isa = PBXBuildFile; productRef = 3BBFFD500684985F5ABCBCA5 /* Daily */; };
+		FC8CA39E2FE6467900CBBA86 /* Daily in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 3BBFFD500684985F5ABCBCA5 /* Daily */; };
 		FC8CA39F2FE6467900CBBA86 /* Aurora in Frameworks */ = {isa = PBXBuildFile; productRef = 9490ACC3BEE8EE58C4FF6365 /* Aurora */; };
 		FC8CA3A02FE6467900CBBA86 /* SwiftMCP in Frameworks */ = {isa = PBXBuildFile; productRef = E8A1C3D5F7094B2D8E6A0C15 /* SwiftMCP */; };
 		FC8E948A2FE7CF960041A2E2 /* NSpeechLoggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8E94892FE7CF950041A2E2 /* NSpeechLoggerView.swift */; };
@@ -15138,6 +15138,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -15171,6 +15172,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
