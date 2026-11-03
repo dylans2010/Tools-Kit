@@ -26,8 +26,8 @@ struct Diag_MicInputLatencyView: View {
 
     private func load() {
         rows = [
-            ("Input Latency (ms)", "\(AVAudioSession.sharedInstance().inputLatency * 1000, specifier: "%.1f")"),
-            ("I/O Buffer (ms)", "\(AVAudioSession.sharedInstance().ioBufferDuration * 1000, specifier: "%.1f")"),
+            ("Input Latency (ms)", String(format: "%.1f", AVAudioSession.sharedInstance().inputLatency * 1000)),
+            ("I/O Buffer (ms)", String(format: "%.1f", AVAudioSession.sharedInstance().ioBufferDuration * 1000)),
             ("Sample Rate", "\(Int(AVAudioSession.sharedInstance().sampleRate)) Hz")
         ]
     }

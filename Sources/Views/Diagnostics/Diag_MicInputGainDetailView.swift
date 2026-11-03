@@ -26,7 +26,7 @@ struct Diag_MicInputGainDetailView: View {
 
     private func load() {
         rows = [
-            ("Input Gain", "\(AVAudioSession.sharedInstance().inputGain, specifier: "%.2f")"),
+            ("Input Gain", String(format: "%.2f", AVAudioSession.sharedInstance().inputGain)),
             ("Gain Settable", AVAudioSession.sharedInstance().isInputGainSettable ? "Yes" : "No"),
             ("Input Channels", "\(AVAudioSession.sharedInstance().inputNumberOfChannels)")
         ]

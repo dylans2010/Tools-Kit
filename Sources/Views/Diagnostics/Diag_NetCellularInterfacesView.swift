@@ -70,6 +70,6 @@ struct Diag_NetCellularInterfacesView: View {
     }
 
     private func load() {
-        rows = diagNewLoadInterfacesNetCellularInterfaces().filter { r.name.hasPrefix("pdp_ip") }
+        rows = diagNewLoadInterfacesNetCellularInterfaces().filter { $0.name.hasPrefix("pdp_ip") }
     }
 }

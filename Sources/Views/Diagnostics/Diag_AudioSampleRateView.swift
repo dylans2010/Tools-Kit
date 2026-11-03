@@ -27,9 +27,9 @@ struct Diag_AudioSampleRateView: View {
     private func load() {
         rows = [
             ("Sample Rate", "\(Int(AVAudioSession.sharedInstance().sampleRate)) Hz"),
-            ("I/O Buffer Duration", "\(AVAudioSession.sharedInstance().ioBufferDuration, specifier: "%.4f") s"),
-            ("Input Latency", "\(AVAudioSession.sharedInstance().inputLatency, specifier: "%.4f") s"),
-            ("Output Latency", "\(AVAudioSession.sharedInstance().outputLatency, specifier: "%.4f") s")
+            ("I/O Buffer Duration", String(format: "%.4f s", AVAudioSession.sharedInstance().ioBufferDuration)),
+            ("Input Latency", String(format: "%.4f s", AVAudioSession.sharedInstance().inputLatency)),
+            ("Output Latency", String(format: "%.4f s", AVAudioSession.sharedInstance().outputLatency))
         ]
     }
 }

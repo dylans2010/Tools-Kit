@@ -26,8 +26,8 @@ struct Diag_SystemBootTimeView: View {
     private func load() {
         rows = [
             ("Boot Date", "\(Date(timeIntervalSinceNow: -ProcessInfo.processInfo.systemUptime))"),
-            ("Uptime (days)", "\(ProcessInfo.processInfo.systemUptime / 86400, specifier: "%.1f")"),
-            ("Uptime (hours)", "\(ProcessInfo.processInfo.systemUptime / 3600, specifier: "%.1f")")
+            ("Uptime (days)", String(format: "%.1f", ProcessInfo.processInfo.systemUptime / 86400)),
+            ("Uptime (hours)", String(format: "%.1f", ProcessInfo.processInfo.systemUptime / 3600))
         ]
     }
 }

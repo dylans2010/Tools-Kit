@@ -26,9 +26,9 @@ struct Diag_AudioLatencyDetailView: View {
 
     private func load() {
         rows = [
-            ("Input Latency (ms)", "\(AVAudioSession.sharedInstance().inputLatency * 1000, specifier: "%.1f")"),
-            ("Output Latency (ms)", "\(AVAudioSession.sharedInstance().outputLatency * 1000, specifier: "%.1f")"),
-            ("Total Latency (ms)", "\((AVAudioSession.sharedInstance().inputLatency + AVAudioSession.sharedInstance().outputLatency) * 1000, specifier: "%.1f")"),
+            ("Input Latency (ms)", String(format: "%.1f", AVAudioSession.sharedInstance().inputLatency * 1000)),
+            ("Output Latency (ms)", String(format: "%.1f", AVAudioSession.sharedInstance().outputLatency * 1000)),
+            ("Total Latency (ms)", String(format: "%.1f", (AVAudioSession.sharedInstance().inputLatency + AVAudioSession.sharedInstance().outputLatency) * 1000)),
             ("Sample Rate", "\(Int(AVAudioSession.sharedInstance().sampleRate)) Hz")
         ]
     }

@@ -70,6 +70,6 @@ struct Diag_NetWiFiInterfaceView: View {
     }
 
     private func load() {
-        rows = diagNewLoadInterfacesNetWiFiInterface().filter { r.name == "en0" }
+        rows = diagNewLoadInterfacesNetWiFiInterface().filter { $0.name == "en0" }
     }
 }

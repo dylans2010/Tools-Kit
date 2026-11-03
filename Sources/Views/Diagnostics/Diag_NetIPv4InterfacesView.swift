@@ -70,6 +70,6 @@ struct Diag_NetIPv4InterfacesView: View {
     }
 
     private func load() {
-        rows = diagNewLoadInterfacesNetIPv4Interfaces().filter { r.family == "IPv4" }
+        rows = diagNewLoadInterfacesNetIPv4Interfaces().filter { $0.family == "IPv4" }
     }
 }

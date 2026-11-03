@@ -28,7 +28,7 @@ struct Diag_SystemRegionDetailView: View {
             ("Region Code", Locale.current.region?.identifier ?? "Unknown"),
             ("Currency Code", Locale.current.currency?.identifier ?? "Unknown"),
             ("Measurement System", Locale.current.measurementSystem == .metric ? "Metric" : Locale.current.measurementSystem == .us ? "US" : "UK"),
-            ("Calendar", Calendar.current.identifier.rawValue)
+            ("Calendar", Calendar.current.identifier.debugDescription)
         ]
     }
 }

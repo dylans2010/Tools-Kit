@@ -22,7 +22,7 @@ struct Diag_StorageTmpDetailView: View {
     }
 
     private func load() {
-        guard let dir = FileManager.default.temporaryDirectory else { return }
+        let dir = FileManager.default.temporaryDirectory
         pathText = dir.path
         var total: Int64 = 0
         var count = 0

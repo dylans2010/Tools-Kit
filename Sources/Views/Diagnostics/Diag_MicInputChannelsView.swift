@@ -28,7 +28,7 @@ struct Diag_MicInputChannelsView: View {
         rows = [
             ("Input Channels", "\(AVAudioSession.sharedInstance().inputNumberOfChannels)"),
             ("Input Available", AVAudioSession.sharedInstance().isInputAvailable ? "Yes" : "No"),
-            ("Input Gain", "\(AVAudioSession.sharedInstance().inputGain, specifier: "%.2f")")
+            ("Input Gain", String(format: "%.2f", AVAudioSession.sharedInstance().inputGain))
         ]
     }
 }

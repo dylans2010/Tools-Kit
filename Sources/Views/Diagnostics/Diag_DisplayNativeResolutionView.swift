@@ -27,8 +27,8 @@ struct Diag_DisplayNativeResolutionView: View {
         rows = [
             ("Screen Bounds", "\(Int(UIScreen.main.bounds.width)) x \(Int(UIScreen.main.bounds.height))"),
             ("Native Bounds", "\(Int(UIScreen.main.nativeBounds.width)) x \(Int(UIScreen.main.nativeBounds.height))"),
-            ("Scale", "\(UIScreen.main.scale, specifier: "%.0f")x"),
-            ("Native Scale", "\(UIScreen.main.nativeScale, specifier: "%.2f")x"),
+            ("Scale", String(format: "%.0fx", UIScreen.main.scale)),
+            ("Native Scale", String(format: "%.2fx", UIScreen.main.nativeScale)),
             ("Pixel Count", "\(Int(UIScreen.main.nativeBounds.width * UIScreen.main.nativeBounds.height))")
         ]
     }

@@ -27,7 +27,7 @@ struct Diag_DisplayPixelCountView: View {
         rows = [
             ("Points", "\(Int(UIScreen.main.bounds.width)) x \(Int(UIScreen.main.bounds.height))"),
             ("Native Pixels", "\(Int(UIScreen.main.nativeBounds.width)) x \(Int(UIScreen.main.nativeBounds.height))"),
-            ("Scale Factor", "\(UIScreen.main.scale, specifier: "%.0f")x"),
+            ("Scale Factor", String(format: "%.0fx", UIScreen.main.scale)),
             ("Max Frames Per Second", "\(UIScreen.main.maximumFramesPerSecond)")
         ]
     }

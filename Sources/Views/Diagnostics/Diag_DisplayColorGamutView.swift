@@ -28,7 +28,7 @@ struct Diag_DisplayColorGamutView: View {
             ("Gamut", UIScreen.main.traitCollection.displayGamut == .P3 ? "Display P3" : "sRGB"),
             ("Accessibility Contrast", UIScreen.main.traitCollection.accessibilityContrast == .high ? "High" : "Normal"),
             ("Layout Direction", UIScreen.main.traitCollection.layoutDirection == .rightToLeft ? "Right to Left" : "Left to Right"),
-            ("Scale", "\(UIScreen.main.scale, specifier: "%.0f")x")
+            ("Scale", String(format: "%.0fx", UIScreen.main.scale))
         ]
     }
 }

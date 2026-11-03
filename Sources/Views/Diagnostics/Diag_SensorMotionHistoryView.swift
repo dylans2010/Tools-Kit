@@ -38,7 +38,8 @@ struct Diag_SensorMotionHistoryView: View {
                 if a.cycling { parts.append("Cycling") }
                 if a.automotive { parts.append("Driving") }
                 if a.unknown { parts.append("Unknown") }
-                return "\(a.startDate, style: .time): \(parts.joined(separator: ", "))"
+                let timeString = DateFormatter.localizedString(from: a.startDate, dateStyle: .none, timeStyle: .short)
+                return "\(timeString): \(parts.joined(separator: ", "))"
             }
         }
     }
