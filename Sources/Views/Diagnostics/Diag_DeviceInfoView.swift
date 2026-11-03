@@ -6,6 +6,7 @@ struct Diag_DeviceInfoView: View {
     var body: some View {
         Form {
             Section("Device") {
+                LabeledContent("Marketing Name") { Text(DeviceModelCatalog.marketingName(for: service.deviceModelIdentifier)) }
                 LabeledContent("Model") { Text(service.deviceModel) }
                 LabeledContent("Name") { Text(service.deviceName) }
                 LabeledContent("Model Identifier") { Text(service.deviceModelIdentifier).font(.caption) }

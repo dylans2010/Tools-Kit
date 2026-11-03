@@ -3,6 +3,8 @@ import SwiftUI
 struct Diag_DynamicIslandView: View {
     @State private var hasDynamicIsland = false
     @State private var details: [(String, String)] = []
+    @State private var current: DeviceModelInfo = DeviceModelCatalog.currentInfo()
+    @State private var note: String = ""
 
     var body: some View {
         Form {
@@ -17,6 +19,12 @@ struct Diag_DynamicIslandView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
+                    if current.isProvisional {
+                        Text("Provisional result for an unrecognised or unreleased model — see note below.")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                            .multilineTextAlignment(.center)
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
@@ -25,6 +33,11 @@ struct Diag_DynamicIslandView: View {
             Section("Device Info") {
                 ForEach(details, id: \.0) { d in
                     LabeledContent(d.0) { Text(d.1).font(.caption) }
+                }
+                if !note.isEmpty {
+                    Text(note)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
 
@@ -47,9 +60,27 @@ struct Diag_DynamicIslandView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Label("iPhone 14 Pro / Pro Max", systemImage: "iphone.gen3").font(.caption)
                     Label("iPhone 15 (all models)", systemImage: "iphone.gen3").font(.caption)
-                    Label("iPhone 16 (all models)", systemImage: "iphone.gen3").font(.caption)
+                    Label("iPhone 16 (all models except 16e)", systemImage: "iphone.gen3").font(.caption)
+                    Label("iPhone 17, iPhone 17 Pro / Pro Max, iPhone Air", systemImage: "iphone.gen3").font(.caption)
+                    Label("iPhone 18 Pro / Pro Max, iPhone Duo (provisional)", systemImage: "iphone.gen3").font(.caption)
+                    Text("Not Dynamic Island: iPhone 14 / 14 Plus (notch), iPhone 16e and iPhone 17e (notch).")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 4)
+            }
+
+            Section("Supported Lineup") {
+                ForEach(DeviceModelCatalog.supportedLineup) { model in
+                    HStack {
+                        Text(model.marketingName)
+                            .font(.subheadline)
+                        Spacer()
+                        Text(model.isProvisional ? "Provisional" : (model.hasDynamicIsland ? "Dynamic Island" : "Notch"))
+                            .font(.caption)
+                            .foregroundStyle(model.isProvisional ? .orange : (model.hasDynamicIsland ? .green : .secondary))
+                    }
+                }
             }
 
             Section {
@@ -64,31 +95,25 @@ struct Diag_DynamicIslandView: View {
     }
 
     private func checkDynamicIsland() {
-        var info: [(String, String)] = []
+        // Single source of truth — no more copy-pasted identifier lists here.
+        // This is the fix for iPhone 17 reporting "Not Available": the old
+        // list stopped at iPhone17,x (iPhone 16 generation) and never
+        // contained iPhone18,1–iPhone18,4.
+        let info = DeviceModelCatalog.currentInfo()
+        current = info
+        hasDynamicIsland = info.hasDynamicIsland
+        note = info.note
 
-        var sysInfo = utsname()
-        uname(&sysInfo)
-        let modelId = Mirror(reflecting: sysInfo.machine).children.reduce("") { id, el in
-            guard let v = el.value as? Int8, v != 0 else { return id }
-            return id + String(UnicodeScalar(UInt8(v)))
-        }
-        info.append(("Device Model", modelId))
-
-        let dynamicIslandModels = [
-            "iPhone15,2", "iPhone15,3",
-            "iPhone15,4", "iPhone15,5",
-            "iPhone16,1", "iPhone16,2",
-            "iPhone17,1", "iPhone17,2", "iPhone17,3", "iPhone17,4",
-            "iPhone17,5", "iPhone17,6", "iPhone17,7", "iPhone17,8"
-        ]
-        hasDynamicIsland = dynamicIslandModels.contains(modelId)
-        info.append(("Dynamic Island", hasDynamicIsland ? "Present" : "Not present"))
-
+        var rows: [(String, String)] = []
+        rows.append(("Device Model", info.marketingName))
+        rows.append(("Model Identifier", info.identifier ?? "Not published yet"))
+        rows.append(("Chip", info.chip))
+        rows.append(("Dynamic Island", hasDynamicIsland ? "Present" : "Not present"))
+        rows.append(("Catalog Status", info.isProvisional ? "Provisional" : "Confirmed"))
         let screenBounds = UIScreen.main.bounds
-        info.append(("Screen Size", "\(Int(screenBounds.width)) x \(Int(screenBounds.height))"))
-        info.append(("Scale", "\(Int(UIScreen.main.scale))x"))
-        info.append(("iOS Version", UIDevice.current.systemVersion))
-
-        details = info
+        rows.append(("Screen Size", "\(Int(screenBounds.width)) x \(Int(screenBounds.height))"))
+        rows.append(("Scale", "\(Int(UIScreen.main.scale))x"))
+        rows.append(("iOS Version", UIDevice.current.systemVersion))
+        details = rows
     }
 }

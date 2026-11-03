@@ -8,6 +8,8 @@ import CoreLocation
 #if canImport(UserNotifications)
 import UserNotifications
 #endif
+import CoreMotion
+import CoreNFC
 
 struct Diag_PermissionsCheckerView: View {
     @State private var permissions: [PermissionItem] = []
@@ -76,6 +78,18 @@ struct Diag_PermissionsCheckerView: View {
         let locStatus = CLLocationManager().authorizationStatus
         items.append(PermissionItem(name: "Location", icon: "location.fill", status: mapLocationStatus(locStatus), detail: "Used for location-aware diagnostics"))
 
+        // Motion & Fitness — required by Barometer, Altimeter, Pedometer and
+        // Motion Activity. This was previously missing from Info.plist
+        // entirely (no NSMotionUsageDescription), so those tools could not
+        // be authorised. See Info.plist.
+        let motionStatus = CMAltimeter.authorizationStatus()
+        items.append(PermissionItem(name: "Motion & Fitness", icon: "figure.walk", status: mapMotionStatus(motionStatus), detail: "Barometer, Altimeter, Pedometer, Motion Activity"))
+
+        // NFC availability (readingAvailable is a hardware check, not an
+        // authorization prompt — shown here so the NFC tools' status is visible)
+        let nfcAvailable = NFCNDEFReaderSession.readingAvailable
+        items.append(PermissionItem(name: "NFC", icon: "wave.3.right.circle.fill", status: nfcAvailable ? .granted : .denied, detail: "NFC Check, NFC Diagnostics, NFC Read/Write"))
+
         // Notifications
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             let notifStatus = settings.authorizationStatus
@@ -101,6 +115,16 @@ struct Diag_PermissionsCheckerView: View {
     private func mapLocationStatus(_ status: CLAuthorizationStatus) -> PermissionItem.Status {
         switch status {
         case .authorizedAlways, .authorizedWhenInUse: return .granted
+        case .denied: return .denied
+        case .restricted: return .restricted
+        case .notDetermined: return .undetermined
+        @unknown default: return .undetermined
+        }
+    }
+
+    private func mapMotionStatus(_ status: CMAuthorizationStatus) -> PermissionItem.Status {
+        switch status {
+        case .authorized: return .granted
         case .denied: return .denied
         case .restricted: return .restricted
         case .notDetermined: return .undetermined

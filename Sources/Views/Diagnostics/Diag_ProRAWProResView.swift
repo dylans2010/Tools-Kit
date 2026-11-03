@@ -107,7 +107,8 @@ struct Diag_ProRAWProResView: View {
             "iPhone14,2", "iPhone14,3",
             "iPhone15,2", "iPhone15,3",
             "iPhone16,1", "iPhone16,2",
-            "iPhone17,1", "iPhone17,2", "iPhone17,3", "iPhone17,4"
+            "iPhone17,1", "iPhone17,2", "iPhone17,3", "iPhone17,4",
+            "iPhone18,1", "iPhone18,2", "iPhone18,3", "iPhone18,4"
         ]
         supportsProRAW = proRAWModels.contains(modelId)
         info.append(("ProRAW Photography", supportsProRAW ? "Supported" : "Not Supported"))

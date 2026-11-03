@@ -97,12 +97,12 @@ struct Diag_eSIMStatusView: View {
         }
         info.append(("Device Model", modelId))
 
-        let eSIMModels = ["iPhone11", "iPhone12", "iPhone13", "iPhone14", "iPhone15", "iPhone16", "iPhone17"]
+        let eSIMModels = ["iPhone11", "iPhone12", "iPhone13", "iPhone14", "iPhone15", "iPhone16", "iPhone17", "iPhone18"]
         let modelSupports = eSIMModels.contains { modelId.hasPrefix($0) }
         eSIMSupported = modelSupports
         info.append(("Hardware eSIM", modelSupports ? "Supported" : "Check Settings → Cellular"))
 
-        let usOnlyESIM = modelId.hasPrefix("iPhone15") || modelId.hasPrefix("iPhone16") || modelId.hasPrefix("iPhone17")
+        let usOnlyESIM = modelId.hasPrefix("iPhone15") || modelId.hasPrefix("iPhone16") || modelId.hasPrefix("iPhone17") || modelId.hasPrefix("iPhone18")
         if usOnlyESIM {
             info.append(("SIM Tray", "eSIM-only (US model, no physical tray)"))
         }

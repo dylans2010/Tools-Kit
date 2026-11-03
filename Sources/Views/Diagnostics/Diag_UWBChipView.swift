@@ -95,13 +95,13 @@ struct Diag_UWBChipView: View {
         details.append(("Device Model", modelId))
 
         let uwbModels = [
-            "iPhone12", "iPhone13", "iPhone14", "iPhone15", "iPhone16", "iPhone17"
+            "iPhone12", "iPhone13", "iPhone14", "iPhone15", "iPhone16", "iPhone17", "iPhone18"
         ]
         let hasUWBHardware = uwbModels.contains { modelId.hasPrefix($0) }
         details.append(("UWB Hardware", hasUWBHardware || supported ? "Present" : "Not detected"))
 
         if supported {
-            let chipGen = modelId.hasPrefix("iPhone16") || modelId.hasPrefix("iPhone17") ? "U2" : "U1"
+            let chipGen = modelId.hasPrefix("iPhone16") || modelId.hasPrefix("iPhone17") || modelId.hasPrefix("iPhone18") ? "U2" : "U1"
             details.append(("Chip Generation", chipGen))
         }
 

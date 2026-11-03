@@ -107,6 +107,10 @@
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Access is needed to import and play music files.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Bluetooth access is required for the Bluetooth Scanner, Bluetooth Packet Monitor, and Bluetooth State diagnostics to discover nearby Bluetooth devices.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Bluetooth access is required for the Bluetooth Scanner and related connectivity diagnostics to discover nearby Bluetooth devices.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_openclaw-gw._tcp</string>
@@ -127,8 +131,14 @@
 	<string>Your location is used to provide accurate local weather data and forecasts.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone access is required for voice meal logging, live coaching interactions, and Daily audio calls.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Motion &amp; Fitness access is required for the Barometer, Altimeter, Pedometer, and Motion Activity diagnostics to read atmospheric pressure, steps, distance, floors climbed, and walking/running/driving activity.</string>
+	<key>NSNFCReaderUsageDescription</key>
+	<string>NFC access is required for the NFC Check, NFC Diagnostics, and NFC Read/Write tools to read and write NFC tags.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Photo Library access is required to import media for metadata viewing, perspective correction, and compression tools.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Photo Library access is required to save diagnostic reports, screenshots, and test images from the Diagnostics tools.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Speech recognition is required to convert spoken meal logs into nutrition entries.</string>
 	<key>UIApplicationSceneManifest</key>

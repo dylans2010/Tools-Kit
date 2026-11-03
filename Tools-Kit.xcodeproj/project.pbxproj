@@ -908,6 +908,125 @@
 		6D696D18919C5BEE3D7B2CCA /* Security/SecurityScopeApplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0AF60233863A99BC2F9702B /* Security/SecurityScopeApplicationView.swift */; };
 		6D84B228DBFC98015DAFD37E /* Builder/ProxyConfigDevTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28DC63793E41FE801CF991A /* Builder/ProxyConfigDevTool.swift */; };
 		6DC01FABC579B299D649F3BD /* Diag_AudioPhaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08E617E2A07FB3B75FD110A /* Diag_AudioPhaseView.swift */; };
+		37441D6611E205250B8188C6 /* DeviceModelCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B6C5C935BEE395B8C22B6A6 /* DeviceModelCatalog.swift */; };
+		34848797208E4C536E15CB93 /* Diag_DisplayNativeResolutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74B48BFD1FDB24261DA55396 /* Diag_DisplayNativeResolutionView.swift */; };
+		81B3C29F1ADCE5BD69D0C414 /* Diag_DisplayPixelCountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0A9F54CE2521CA722B7150 /* Diag_DisplayPixelCountView.swift */; };
+		898AF3FF1A97129608EF6C4E /* Diag_DisplaySafeAreaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36654346ED2689D63E3AA846 /* Diag_DisplaySafeAreaView.swift */; };
+		B4A30E2C1A6835B75B4E937F /* Diag_DisplayOrientationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DC035983005B135E921476 /* Diag_DisplayOrientationView.swift */; };
+		D17E453540B75AC05F021D5A /* Diag_DisplayHDRCapabilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7004C45920F54F036EA728 /* Diag_DisplayHDRCapabilityView.swift */; };
+		9D6FCF333769585E34CB6E02 /* Diag_DisplayColorGamutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77198B863884B97E6845FC51 /* Diag_DisplayColorGamutView.swift */; };
+		7870D5DC876F8A4D2F760087 /* Diag_DisplayRefreshLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF49F882CDFF365571CAAB5E /* Diag_DisplayRefreshLiveView.swift */; };
+		F2B30CB4A92FA472A30EBB97 /* Diag_DisplayTextSizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB3B70B2FA30B0D1B7207783 /* Diag_DisplayTextSizeView.swift */; };
+		624C64F5E02010A6B4521ECB /* Diag_DisplayDarkModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3D7392436FA5B6DC7CCF13 /* Diag_DisplayDarkModeView.swift */; };
+		B282BE635B21FB194F86236D /* Diag_AudioSampleRateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3A04E00F79C17A12F365985 /* Diag_AudioSampleRateView.swift */; };
+		9482C99D437A50E2355DADA4 /* Diag_AudioOutputVolumeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8238EDB8AF938A08CF84B492 /* Diag_AudioOutputVolumeView.swift */; };
+		80A1E6EE64A38722640D6257 /* Diag_AudioRouteOutputsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CF5FB03C40E10C507B81E8 /* Diag_AudioRouteOutputsView.swift */; };
+		ADF1AE0450CBA1047DCB673E /* Diag_AudioRouteInputsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E3575BC3DFE04006673D19 /* Diag_AudioRouteInputsView.swift */; };
+		9BBE176401CF518404722657 /* Diag_AudioCategoryModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F144DF072F91F05303DE768D /* Diag_AudioCategoryModeView.swift */; };
+		6528260087C7A224E562806D /* Diag_AudioAirPlayRouteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A29A8D8F5AA17081A1FC2F /* Diag_AudioAirPlayRouteView.swift */; };
+		35D372CF20FEEFB03B7DC51F /* Diag_AudioBluetoothRouteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297301A996C74EE94FEF6C78 /* Diag_AudioBluetoothRouteView.swift */; };
+		38DE8E2C96D318492C2523C7 /* Diag_AudioLatencyDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34251C0ACF1564DF450A5317 /* Diag_AudioLatencyDetailView.swift */; };
+		B2E71AE42B521FF391B89596 /* Diag_AudioSessionOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E08821E8A81467A12DC5C8 /* Diag_AudioSessionOptionsView.swift */; };
+		8E3C00B359C4576796868BA7 /* Diag_MicInputChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13B37DD0B4E34FB93BC675C /* Diag_MicInputChannelsView.swift */; };
+		46C71B7FD6E5FE6FDB988D22 /* Diag_MicDataSourcesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818968DEB43E901D6E3921DE /* Diag_MicDataSourcesView.swift */; };
+		59624DB814C648A0A51EA3F9 /* Diag_MicAvailableInputsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2F2DD068BA57CD5D01B453 /* Diag_MicAvailableInputsView.swift */; };
+		D1C09DBC8820E77DC8D56FEC /* Diag_MicInputLatencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BC7F93BC7218B5BDF58CC02 /* Diag_MicInputLatencyView.swift */; };
+		656888CB4C5C32EE4AC72380 /* Diag_MicInputGainDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134B4D3AF64679D4A459D8C9 /* Diag_MicInputGainDetailView.swift */; };
+		3D0E7A5A266AF386A5F39006 /* Diag_SensorAvailabilityMatrixView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B789C8DC67BE925EED6FBD0A /* Diag_SensorAvailabilityMatrixView.swift */; };
+		97F4CF2BBBBE062330B1C68B /* Diag_SensorMotionAuthorizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BA1A719E422757DFD2F21 /* Diag_SensorMotionAuthorizationView.swift */; };
+		7AA264F93FB317E66AD0FBF6 /* Diag_SensorHeadingInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C3276FB4D8AC1D8F64CAE2C /* Diag_SensorHeadingInfoView.swift */; };
+		1A98F9A6447045060A80728A /* Diag_SensorPressureInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BE28AE645E9D5B328C1A37 /* Diag_SensorPressureInfoView.swift */; };
+		A5A730A8B54A85793B886A3C /* Diag_NetInterfaceCountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296E2F97C5CDF4E6DE3B62AD /* Diag_NetInterfaceCountView.swift */; };
+		1BB8532AA298C05391E56266 /* Diag_PerfCPUCoresView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024390D3EE750632B9ED03C9 /* Diag_PerfCPUCoresView.swift */; };
+		FB4427EEE2F4410B9E01A858 /* Diag_PerfUptimeBootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DECFAAC21D99C4B8AEB9307 /* Diag_PerfUptimeBootView.swift */; };
+		518B35C16BBDBEB5472AC8F9 /* Diag_PerfThermalLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE9B8075E6C586308054033E /* Diag_PerfThermalLiveView.swift */; };
+		AF5774B03CD31874068264C0 /* Diag_PerfLowPowerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69B7233A906C32F7312E269 /* Diag_PerfLowPowerDetailView.swift */; };
+		B1BB633A91E4938720BCCCB6 /* Diag_PerfProcessorActiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9853198C59A6F6729E418943 /* Diag_PerfProcessorActiveView.swift */; };
+		A9DFE2553A034F400575D489 /* Diag_PerfMetalLimitsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41569B027D6CE77A04C4B6C7 /* Diag_PerfMetalLimitsView.swift */; };
+		82C62CF04AC36C77314A0293 /* Diag_PerfFrameRateMaxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C933137BA7DABBD1481496C /* Diag_PerfFrameRateMaxView.swift */; };
+		E9DBC1F0D780D5DC9EF4F32C /* Diag_BatteryLevelDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 061C70918BB89133FF04B0FD /* Diag_BatteryLevelDetailView.swift */; };
+		08EF66B62B389ABD19E39D66 /* Diag_BatteryMonitoringStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E77042B020DF7977E51B8C39 /* Diag_BatteryMonitoringStatusView.swift */; };
+		3B19C0580272B79F20D0D2C4 /* Diag_BatteryChargeStateDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2531951872EB32E25DE9035 /* Diag_BatteryChargeStateDetailView.swift */; };
+		B2A20E552D9FD666D972D71D /* Diag_BatteryLowPowerImpactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1F2245862031D18347CEEC /* Diag_BatteryLowPowerImpactView.swift */; };
+		EFDBBDF10F61A3FB8724A30E /* Diag_StorageTotalFreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F423218C2570C736C0F173F /* Diag_StorageTotalFreeView.swift */; };
+		425321C171E26DCE549890D3 /* Diag_StorageUsedDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E97459AFB08FFF0CD2C11CA /* Diag_StorageUsedDetailView.swift */; };
+		620A83695F4DD916875954D9 /* Diag_SystemDeviceIdentityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CE6CC1C7F0625E051770C86 /* Diag_SystemDeviceIdentityView.swift */; };
+		8671102F230B1FD72696E70F /* Diag_SystemOSBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE83C6F8F2D5B5AC8CCB83A /* Diag_SystemOSBuildView.swift */; };
+		CCDD477D69D7409625463299 /* Diag_SystemBootTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36F5AE487ED8FF3D43BB2A4 /* Diag_SystemBootTimeView.swift */; };
+		31A27B50F448FDD23EC9A899 /* Diag_SystemHostNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A28FDE39361FBC8323DBC9EC /* Diag_SystemHostNameView.swift */; };
+		51BB899F1D4C8F3A4E032DE8 /* Diag_SystemLanguageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29318C9B48E23D6D01EDEA1D /* Diag_SystemLanguageListView.swift */; };
+		7C362A47712B9C654A81C895 /* Diag_SystemTimezoneDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA0CE0DB4FFE33921B3B59E /* Diag_SystemTimezoneDetailView.swift */; };
+		A85D0752E4A3FE6FBD529562 /* Diag_SystemRegionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8CD31F587C88604B9A4151 /* Diag_SystemRegionDetailView.swift */; };
+		2E88E297AAD3FA046159C225 /* Diag_SystemFontsCountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6030A7D5A75AAC4199E9F98E /* Diag_SystemFontsCountView.swift */; };
+		A7AC66AD32E5807986C76366 /* Diag_SystemScreenTraitsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1231E4B4F438603C77B764EE /* Diag_SystemScreenTraitsView.swift */; };
+		EF2498AEAEC03FFE550B3A34 /* Diag_SystemModelCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4F115FB4501DA47B5B3D2A /* Diag_SystemModelCatalogView.swift */; };
+		06CB0C4F0DA5B45A85706AD9 /* Diag_AccSwitchControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448984609C17A7101D98B4C0 /* Diag_AccSwitchControlView.swift */; };
+		1E557A48A220246896987695 /* Diag_AccAssistiveTouchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F14AF9F23A40E5C73A7EE84 /* Diag_AccAssistiveTouchView.swift */; };
+		0CDC66ACD213CA8DF09999F0 /* Diag_AccGuidedAccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CEBB103CDBE866D68CACC0 /* Diag_AccGuidedAccessView.swift */; };
+		37884668C2243B97FF0D26FD /* Diag_AccMonoAudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54EB1C3EA4B66426B040891 /* Diag_AccMonoAudioView.swift */; };
+		6D4E1D342D3EB3F07C33D290 /* Diag_AccClosedCaptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B44532A18D3A8C9EB5F959D8 /* Diag_AccClosedCaptionsView.swift */; };
+		FD46821674F4B58B57C504D4 /* Diag_AccSpeakSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A935E367FA37DFE8EFD3C5F /* Diag_AccSpeakSelectionView.swift */; };
+		42110A29D260432849E35E68 /* Diag_SecBiometryTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFDB2BF535455C710A0E473 /* Diag_SecBiometryTypeView.swift */; };
+		8013698A3A1B86A079DC071A /* Diag_SecDeviceOwnerAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14570E2A084A3365C8AAEC31 /* Diag_SecDeviceOwnerAuthView.swift */; };
+		2E8BB06E88FFAA054FC5116F /* Diag_SecLocationAuthDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E764F85AB8F9717EBA0FD7B9 /* Diag_SecLocationAuthDetailView.swift */; };
+		50E9BE27D069B643A4F915BA /* Diag_SecCameraAuthDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B49D9CC70E5DDECDD2185D /* Diag_SecCameraAuthDetailView.swift */; };
+		8A3F65B564E8C9B21EB9923B /* Diag_SecMicAuthDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B883411E443C651BE9AC00F /* Diag_SecMicAuthDetailView.swift */; };
+		6D0E3CB78C7C38E340A09F95 /* Diag_SecMotionAuthDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBED06B2EC3E861A9E5E7F3B /* Diag_SecMotionAuthDetailView.swift */; };
+		F81AC929AA25A22366BC2B89 /* Diag_SecPhotoAuthDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34BF5B68F713AC1C6704ACF8 /* Diag_SecPhotoAuthDetailView.swift */; };
+		C11A296CFCE0849FFC9D4C66 /* Diag_SecHealthAuthDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BA7542EBBEDC25BB4CB5D70 /* Diag_SecHealthAuthDetailView.swift */; };
+		6D8310C54892130A2EF84CD5 /* Diag_CameraDeviceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADBEBF3A21C71AE9F7191C3 /* Diag_CameraDeviceListView.swift */; };
+		A57FF187B7F92DD4EBC7EA64 /* Diag_CameraWideFormatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F50B0C43292D95115A74073 /* Diag_CameraWideFormatsView.swift */; };
+		0109C80BD6D0D9365D8049F7 /* Diag_CameraTrueDepthDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA3F777EF1DD50B07110542 /* Diag_CameraTrueDepthDetailView.swift */; };
+		3A9406AFE4D3CADF2C410D3D /* Diag_CameraFlashModesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF06AE1C1EEE7F3A33685AB2 /* Diag_CameraFlashModesView.swift */; };
+		D748F31D13F662D1D4347276 /* Diag_CameraFocusModesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C464419D0F629B7C03CD8F3 /* Diag_CameraFocusModesView.swift */; };
+		16D6E9611AFBD21FF1647504 /* Diag_CameraExposureModesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EFD1E168D3B83AD0FB664F /* Diag_CameraExposureModesView.swift */; };
+		6AD36014F2C41277F049DC3F /* Diag_CameraWhiteBalanceModesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45E0945D18DF854E357E31B6 /* Diag_CameraWhiteBalanceModesView.swift */; };
+		544CB63EE205B105384F6546 /* Diag_CameraFrameRatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D756C5E5BE906D64FF7162 /* Diag_CameraFrameRatesView.swift */; };
+		80DCF85EC04000D56964E338 /* Diag_CameraISORangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9FC6AC028B39E15A4A34F30 /* Diag_CameraISORangeView.swift */; };
+		B18C1DD22E534F116F4AD153 /* Diag_CameraZoomFactorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354A4972F21859B6B704E5A5 /* Diag_CameraZoomFactorsView.swift */; };
+		D651B6E57FC85C19D00D77BC /* Diag_SensorUserAccelerationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0AE8ADA78E01F183A784DC /* Diag_SensorUserAccelerationView.swift */; };
+		19EFEF54FE4C90EE25A6379D /* Diag_SensorRotationRateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A28425DD4675EC56B139CBA3 /* Diag_SensorRotationRateView.swift */; };
+		BF88E33B2DB187B68DEC500B /* Diag_SensorAttitudeEulerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DB5A93CC6C921227C988281 /* Diag_SensorAttitudeEulerView.swift */; };
+		53490892A30F6627B8857527 /* Diag_SensorAttitudeQuaternionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6909AA70ED32A178EA59DC2 /* Diag_SensorAttitudeQuaternionView.swift */; };
+		38E1E37F7B7F54BB0F58360B /* Diag_SensorMagneticFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366D91F4EB0A279B5C1896C6 /* Diag_SensorMagneticFieldView.swift */; };
+		3F12A943B684788272CE7F56 /* Diag_SensorDeviceMotionSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B134024900AE05E203EC86 /* Diag_SensorDeviceMotionSummaryView.swift */; };
+		1B07E549CF14DFD69A98D99F /* Diag_SensorStepCadenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D82777CA1B9B813DDD97A7 /* Diag_SensorStepCadenceView.swift */; };
+		0E890D34DC4D9E773ABEE4CA /* Diag_SensorWalkingPaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A942AE070D8608F2352F5B /* Diag_SensorWalkingPaceView.swift */; };
+		33C98121F00C5BEE68F5F5AB /* Diag_SensorDistanceTodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9800D68EBD11E10B0EB4A6B7 /* Diag_SensorDistanceTodayView.swift */; };
+		FCE8D3D92372DA917831C85C /* Diag_SensorFlightsTodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17454FD9BC6AC8226FDB831 /* Diag_SensorFlightsTodayView.swift */; };
+		1BCC40B349734B29CDE70CC8 /* Diag_SensorMotionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75445AB61F3023330FC7DFD /* Diag_SensorMotionHistoryView.swift */; };
+		F3E4971E13EEAFE53F273A5C /* Diag_SensorPressureTrendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6FA80848CAD76FED6F26BCF /* Diag_SensorPressureTrendView.swift */; };
+		F34CA007E0FA26D1E322B95F /* Diag_HapticImpactLightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101C66963877760AC2B0491B /* Diag_HapticImpactLightView.swift */; };
+		B31B70554898D58C6D3EF7C2 /* Diag_HapticImpactMediumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6398A37721EA16653FCE1A /* Diag_HapticImpactMediumView.swift */; };
+		486D00896856F7B7707D8FC3 /* Diag_HapticImpactHeavyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B965818922477112F60A76F5 /* Diag_HapticImpactHeavyView.swift */; };
+		86DA8B2017685491F1A62F2E /* Diag_HapticImpactRigidView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CB2F14AFD1D03FBFD1DBEC /* Diag_HapticImpactRigidView.swift */; };
+		92716109916D941BD55C030D /* Diag_HapticNotificationFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7083EE16B336D5EE55011223 /* Diag_HapticNotificationFeedbackView.swift */; };
+		A3F3BABC61FDE8B607456B0F /* Diag_HapticSelectionFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAA5D350805E04E2B690705 /* Diag_HapticSelectionFeedbackView.swift */; };
+		4D8F70E6356F623AEF788447 /* Diag_NetIPv4InterfacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA375621A81A7D2F2EE4C1A /* Diag_NetIPv4InterfacesView.swift */; };
+		C2A710B97461D8349AC75221 /* Diag_NetIPv6InterfacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504A31E464DA7F766EE2A1DC /* Diag_NetIPv6InterfacesView.swift */; };
+		82271956AEE051ADE3415AE0 /* Diag_NetWiFiInterfaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF438BA47BBAB2CBDBD4F1AD /* Diag_NetWiFiInterfaceView.swift */; };
+		328BE094C3F3FB3429D61C16 /* Diag_NetCellularInterfacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D4DDE564B7284D339BF6641 /* Diag_NetCellularInterfacesView.swift */; };
+		DF6D69E56D3563F222748BA1 /* Diag_NetInterfaceFlagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D3DEE417B057B1F4A5AD72 /* Diag_NetInterfaceFlagsView.swift */; };
+		BB0ED092775B4908AD4B8747 /* Diag_NetTrafficTotalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CCEC97FBE3DA8E7E4784A4 /* Diag_NetTrafficTotalsView.swift */; };
+		7DC7B7E28140DD1C170B12F0 /* Diag_NetPathStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0377D9D806083B575B8975A2 /* Diag_NetPathStatusView.swift */; };
+		97D130CEFB6190608D6E92AD /* Diag_NetPathInterfacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803F4EA84B8006FF0A25833E /* Diag_NetPathInterfacesView.swift */; };
+		AECDC10625E9A52CA9A78082 /* Diag_NetCarrierDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 323DF9C6EE231AA3C31DC786 /* Diag_NetCarrierDetailView.swift */; };
+		12F54DB126BBC22BD8F6978A /* Diag_NetRadioTechView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61DB88FA5B1A03B187C894DC /* Diag_NetRadioTechView.swift */; };
+		27A4DD59B6090CCE7E7A20F3 /* Diag_NetBluetoothStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4634D9A37B027CBAF155A6D6 /* Diag_NetBluetoothStateView.swift */; };
+		45F8618C7B31747720D92D5F /* Diag_NetNFCAvailabilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB0E35A08127B9947AE1AA1 /* Diag_NetNFCAvailabilityView.swift */; };
+		85537167F1C5F2C0BFACC1AF /* Diag_NetUWBAvailabilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294ECE47FF154DE981173F72 /* Diag_NetUWBAvailabilityView.swift */; };
+		D42E5CDBEE7F9885F1317452 /* Diag_PerfDiskLatencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 384AAA84097B033408B6BD68 /* Diag_PerfDiskLatencyView.swift */; };
+		42D586D82D21775A823D1874 /* Diag_PerfFileWriteSpeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80AEA85A38A4C1F364B08043 /* Diag_PerfFileWriteSpeedView.swift */; };
+		EF325F0F1866FB6151A5BEC1 /* Diag_PerfStringBenchmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE2D738BD0E7B47941DCFD2E /* Diag_PerfStringBenchmarkView.swift */; };
+		A32912F931E88737043933C6 /* Diag_PerfMathBenchmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04772671B9462783B617533 /* Diag_PerfMathBenchmarkView.swift */; };
+		E5ED61BD1E29510D9BBC8998 /* Diag_BatteryDrainRateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C0140E231F12169F3A0A7E /* Diag_BatteryDrainRateView.swift */; };
+		F4CC0B4BB5D80972E2D22B78 /* Diag_BatteryStateHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12B24205DEA7C40CF655D6CB /* Diag_BatteryStateHistoryView.swift */; };
+		9DF839105CFAF37DE9B037D9 /* Diag_StorageDocumentsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93B474256ECF5B32C89A730 /* Diag_StorageDocumentsDetailView.swift */; };
+		97F17606B7F828039639D568 /* Diag_StorageCachesDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940CA2778993BC3174A5743E /* Diag_StorageCachesDetailView.swift */; };
+		75A6ACF5632008875DD5C1A6 /* Diag_StorageTmpDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417497D4E9DC137F8A8C5D18 /* Diag_StorageTmpDetailView.swift */; };
+		721D8878C4B54CE4EC6DDB74 /* Diag_StorageHomeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC04C31BD13160E190B7A09 /* Diag_StorageHomeDetailView.swift */; };
+		2B8CAD7B84D2234139AD00D3 /* Diag_StorageVolumeImportantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319FD0A2010A1481E210027E /* Diag_StorageVolumeImportantView.swift */; };
+		60B511D24820C716B14FB761 /* Diag_SecNotificationsAuthDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4373E5F2DC2A9560A77AF90C /* Diag_SecNotificationsAuthDetailView.swift */; };
 		6DE20E441C6624B41ADDEDC7 /* AgentResponseValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D84E503CCEE704658615BE92 /* AgentResponseValidator.swift */; };
 		6DF13200FDEB8D7BF09F5740 /* Diag_DEPEnrollmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53FF5F9C4787DF0E39B9DC51 /* Diag_DEPEnrollmentView.swift */; };
 		6DF44B4F59AC9D4BAE6CDDFE /* Detail/ConnectorDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8997382D2BC7B7327988E3B /* Detail/ConnectorDetailView.swift */; };
@@ -4708,6 +4827,125 @@
 		E03216C0589E83A5138841DB /* AgenticUIDebugPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIDebugPanel.swift; sourceTree = "<group>"; };
 		E05BBF18741CF9D1C14087C4 /* NutritionSummaryInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionSummaryInfoView.swift; sourceTree = "<group>"; };
 		E08E617E2A07FB3B75FD110A /* Diag_AudioPhaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioPhaseView.swift; sourceTree = "<group>"; };
+		1B6C5C935BEE395B8C22B6A6 /* DeviceModelCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceModelCatalog.swift; sourceTree = "<group>"; };
+		74B48BFD1FDB24261DA55396 /* Diag_DisplayNativeResolutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DisplayNativeResolutionView.swift; sourceTree = "<group>"; };
+		1B0A9F54CE2521CA722B7150 /* Diag_DisplayPixelCountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DisplayPixelCountView.swift; sourceTree = "<group>"; };
+		36654346ED2689D63E3AA846 /* Diag_DisplaySafeAreaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DisplaySafeAreaView.swift; sourceTree = "<group>"; };
+		E0DC035983005B135E921476 /* Diag_DisplayOrientationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DisplayOrientationView.swift; sourceTree = "<group>"; };
+		2E7004C45920F54F036EA728 /* Diag_DisplayHDRCapabilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DisplayHDRCapabilityView.swift; sourceTree = "<group>"; };
+		77198B863884B97E6845FC51 /* Diag_DisplayColorGamutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DisplayColorGamutView.swift; sourceTree = "<group>"; };
+		FF49F882CDFF365571CAAB5E /* Diag_DisplayRefreshLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DisplayRefreshLiveView.swift; sourceTree = "<group>"; };
+		BB3B70B2FA30B0D1B7207783 /* Diag_DisplayTextSizeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DisplayTextSizeView.swift; sourceTree = "<group>"; };
+		BD3D7392436FA5B6DC7CCF13 /* Diag_DisplayDarkModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_DisplayDarkModeView.swift; sourceTree = "<group>"; };
+		A3A04E00F79C17A12F365985 /* Diag_AudioSampleRateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioSampleRateView.swift; sourceTree = "<group>"; };
+		8238EDB8AF938A08CF84B492 /* Diag_AudioOutputVolumeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioOutputVolumeView.swift; sourceTree = "<group>"; };
+		69CF5FB03C40E10C507B81E8 /* Diag_AudioRouteOutputsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioRouteOutputsView.swift; sourceTree = "<group>"; };
+		A7E3575BC3DFE04006673D19 /* Diag_AudioRouteInputsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioRouteInputsView.swift; sourceTree = "<group>"; };
+		F144DF072F91F05303DE768D /* Diag_AudioCategoryModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioCategoryModeView.swift; sourceTree = "<group>"; };
+		99A29A8D8F5AA17081A1FC2F /* Diag_AudioAirPlayRouteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioAirPlayRouteView.swift; sourceTree = "<group>"; };
+		297301A996C74EE94FEF6C78 /* Diag_AudioBluetoothRouteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioBluetoothRouteView.swift; sourceTree = "<group>"; };
+		34251C0ACF1564DF450A5317 /* Diag_AudioLatencyDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioLatencyDetailView.swift; sourceTree = "<group>"; };
+		36E08821E8A81467A12DC5C8 /* Diag_AudioSessionOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AudioSessionOptionsView.swift; sourceTree = "<group>"; };
+		B13B37DD0B4E34FB93BC675C /* Diag_MicInputChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MicInputChannelsView.swift; sourceTree = "<group>"; };
+		818968DEB43E901D6E3921DE /* Diag_MicDataSourcesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MicDataSourcesView.swift; sourceTree = "<group>"; };
+		8B2F2DD068BA57CD5D01B453 /* Diag_MicAvailableInputsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MicAvailableInputsView.swift; sourceTree = "<group>"; };
+		0BC7F93BC7218B5BDF58CC02 /* Diag_MicInputLatencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MicInputLatencyView.swift; sourceTree = "<group>"; };
+		134B4D3AF64679D4A459D8C9 /* Diag_MicInputGainDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_MicInputGainDetailView.swift; sourceTree = "<group>"; };
+		B789C8DC67BE925EED6FBD0A /* Diag_SensorAvailabilityMatrixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorAvailabilityMatrixView.swift; sourceTree = "<group>"; };
+		7D8BA1A719E422757DFD2F21 /* Diag_SensorMotionAuthorizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorMotionAuthorizationView.swift; sourceTree = "<group>"; };
+		3C3276FB4D8AC1D8F64CAE2C /* Diag_SensorHeadingInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorHeadingInfoView.swift; sourceTree = "<group>"; };
+		E0BE28AE645E9D5B328C1A37 /* Diag_SensorPressureInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorPressureInfoView.swift; sourceTree = "<group>"; };
+		296E2F97C5CDF4E6DE3B62AD /* Diag_NetInterfaceCountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetInterfaceCountView.swift; sourceTree = "<group>"; };
+		024390D3EE750632B9ED03C9 /* Diag_PerfCPUCoresView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PerfCPUCoresView.swift; sourceTree = "<group>"; };
+		5DECFAAC21D99C4B8AEB9307 /* Diag_PerfUptimeBootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PerfUptimeBootView.swift; sourceTree = "<group>"; };
+		EE9B8075E6C586308054033E /* Diag_PerfThermalLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PerfThermalLiveView.swift; sourceTree = "<group>"; };
+		A69B7233A906C32F7312E269 /* Diag_PerfLowPowerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PerfLowPowerDetailView.swift; sourceTree = "<group>"; };
+		9853198C59A6F6729E418943 /* Diag_PerfProcessorActiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PerfProcessorActiveView.swift; sourceTree = "<group>"; };
+		41569B027D6CE77A04C4B6C7 /* Diag_PerfMetalLimitsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PerfMetalLimitsView.swift; sourceTree = "<group>"; };
+		1C933137BA7DABBD1481496C /* Diag_PerfFrameRateMaxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PerfFrameRateMaxView.swift; sourceTree = "<group>"; };
+		061C70918BB89133FF04B0FD /* Diag_BatteryLevelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BatteryLevelDetailView.swift; sourceTree = "<group>"; };
+		E77042B020DF7977E51B8C39 /* Diag_BatteryMonitoringStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BatteryMonitoringStatusView.swift; sourceTree = "<group>"; };
+		C2531951872EB32E25DE9035 /* Diag_BatteryChargeStateDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BatteryChargeStateDetailView.swift; sourceTree = "<group>"; };
+		5D1F2245862031D18347CEEC /* Diag_BatteryLowPowerImpactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BatteryLowPowerImpactView.swift; sourceTree = "<group>"; };
+		5F423218C2570C736C0F173F /* Diag_StorageTotalFreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_StorageTotalFreeView.swift; sourceTree = "<group>"; };
+		2E97459AFB08FFF0CD2C11CA /* Diag_StorageUsedDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_StorageUsedDetailView.swift; sourceTree = "<group>"; };
+		1CE6CC1C7F0625E051770C86 /* Diag_SystemDeviceIdentityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemDeviceIdentityView.swift; sourceTree = "<group>"; };
+		CFE83C6F8F2D5B5AC8CCB83A /* Diag_SystemOSBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemOSBuildView.swift; sourceTree = "<group>"; };
+		A36F5AE487ED8FF3D43BB2A4 /* Diag_SystemBootTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemBootTimeView.swift; sourceTree = "<group>"; };
+		A28FDE39361FBC8323DBC9EC /* Diag_SystemHostNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemHostNameView.swift; sourceTree = "<group>"; };
+		29318C9B48E23D6D01EDEA1D /* Diag_SystemLanguageListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemLanguageListView.swift; sourceTree = "<group>"; };
+		8DA0CE0DB4FFE33921B3B59E /* Diag_SystemTimezoneDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemTimezoneDetailView.swift; sourceTree = "<group>"; };
+		FB8CD31F587C88604B9A4151 /* Diag_SystemRegionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemRegionDetailView.swift; sourceTree = "<group>"; };
+		6030A7D5A75AAC4199E9F98E /* Diag_SystemFontsCountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemFontsCountView.swift; sourceTree = "<group>"; };
+		1231E4B4F438603C77B764EE /* Diag_SystemScreenTraitsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemScreenTraitsView.swift; sourceTree = "<group>"; };
+		FA4F115FB4501DA47B5B3D2A /* Diag_SystemModelCatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SystemModelCatalogView.swift; sourceTree = "<group>"; };
+		448984609C17A7101D98B4C0 /* Diag_AccSwitchControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AccSwitchControlView.swift; sourceTree = "<group>"; };
+		8F14AF9F23A40E5C73A7EE84 /* Diag_AccAssistiveTouchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AccAssistiveTouchView.swift; sourceTree = "<group>"; };
+		C5CEBB103CDBE866D68CACC0 /* Diag_AccGuidedAccessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AccGuidedAccessView.swift; sourceTree = "<group>"; };
+		C54EB1C3EA4B66426B040891 /* Diag_AccMonoAudioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AccMonoAudioView.swift; sourceTree = "<group>"; };
+		B44532A18D3A8C9EB5F959D8 /* Diag_AccClosedCaptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AccClosedCaptionsView.swift; sourceTree = "<group>"; };
+		7A935E367FA37DFE8EFD3C5F /* Diag_AccSpeakSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_AccSpeakSelectionView.swift; sourceTree = "<group>"; };
+		7CFDB2BF535455C710A0E473 /* Diag_SecBiometryTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SecBiometryTypeView.swift; sourceTree = "<group>"; };
+		14570E2A084A3365C8AAEC31 /* Diag_SecDeviceOwnerAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SecDeviceOwnerAuthView.swift; sourceTree = "<group>"; };
+		E764F85AB8F9717EBA0FD7B9 /* Diag_SecLocationAuthDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SecLocationAuthDetailView.swift; sourceTree = "<group>"; };
+		81B49D9CC70E5DDECDD2185D /* Diag_SecCameraAuthDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SecCameraAuthDetailView.swift; sourceTree = "<group>"; };
+		6B883411E443C651BE9AC00F /* Diag_SecMicAuthDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SecMicAuthDetailView.swift; sourceTree = "<group>"; };
+		DBED06B2EC3E861A9E5E7F3B /* Diag_SecMotionAuthDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SecMotionAuthDetailView.swift; sourceTree = "<group>"; };
+		34BF5B68F713AC1C6704ACF8 /* Diag_SecPhotoAuthDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SecPhotoAuthDetailView.swift; sourceTree = "<group>"; };
+		9BA7542EBBEDC25BB4CB5D70 /* Diag_SecHealthAuthDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SecHealthAuthDetailView.swift; sourceTree = "<group>"; };
+		1ADBEBF3A21C71AE9F7191C3 /* Diag_CameraDeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CameraDeviceListView.swift; sourceTree = "<group>"; };
+		4F50B0C43292D95115A74073 /* Diag_CameraWideFormatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CameraWideFormatsView.swift; sourceTree = "<group>"; };
+		6DA3F777EF1DD50B07110542 /* Diag_CameraTrueDepthDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CameraTrueDepthDetailView.swift; sourceTree = "<group>"; };
+		FF06AE1C1EEE7F3A33685AB2 /* Diag_CameraFlashModesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CameraFlashModesView.swift; sourceTree = "<group>"; };
+		3C464419D0F629B7C03CD8F3 /* Diag_CameraFocusModesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CameraFocusModesView.swift; sourceTree = "<group>"; };
+		61EFD1E168D3B83AD0FB664F /* Diag_CameraExposureModesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CameraExposureModesView.swift; sourceTree = "<group>"; };
+		45E0945D18DF854E357E31B6 /* Diag_CameraWhiteBalanceModesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CameraWhiteBalanceModesView.swift; sourceTree = "<group>"; };
+		E9D756C5E5BE906D64FF7162 /* Diag_CameraFrameRatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CameraFrameRatesView.swift; sourceTree = "<group>"; };
+		B9FC6AC028B39E15A4A34F30 /* Diag_CameraISORangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CameraISORangeView.swift; sourceTree = "<group>"; };
+		354A4972F21859B6B704E5A5 /* Diag_CameraZoomFactorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_CameraZoomFactorsView.swift; sourceTree = "<group>"; };
+		3F0AE8ADA78E01F183A784DC /* Diag_SensorUserAccelerationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorUserAccelerationView.swift; sourceTree = "<group>"; };
+		A28425DD4675EC56B139CBA3 /* Diag_SensorRotationRateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorRotationRateView.swift; sourceTree = "<group>"; };
+		9DB5A93CC6C921227C988281 /* Diag_SensorAttitudeEulerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorAttitudeEulerView.swift; sourceTree = "<group>"; };
+		E6909AA70ED32A178EA59DC2 /* Diag_SensorAttitudeQuaternionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorAttitudeQuaternionView.swift; sourceTree = "<group>"; };
+		366D91F4EB0A279B5C1896C6 /* Diag_SensorMagneticFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorMagneticFieldView.swift; sourceTree = "<group>"; };
+		36B134024900AE05E203EC86 /* Diag_SensorDeviceMotionSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorDeviceMotionSummaryView.swift; sourceTree = "<group>"; };
+		39D82777CA1B9B813DDD97A7 /* Diag_SensorStepCadenceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorStepCadenceView.swift; sourceTree = "<group>"; };
+		E8A942AE070D8608F2352F5B /* Diag_SensorWalkingPaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorWalkingPaceView.swift; sourceTree = "<group>"; };
+		9800D68EBD11E10B0EB4A6B7 /* Diag_SensorDistanceTodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorDistanceTodayView.swift; sourceTree = "<group>"; };
+		A17454FD9BC6AC8226FDB831 /* Diag_SensorFlightsTodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorFlightsTodayView.swift; sourceTree = "<group>"; };
+		E75445AB61F3023330FC7DFD /* Diag_SensorMotionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorMotionHistoryView.swift; sourceTree = "<group>"; };
+		C6FA80848CAD76FED6F26BCF /* Diag_SensorPressureTrendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SensorPressureTrendView.swift; sourceTree = "<group>"; };
+		101C66963877760AC2B0491B /* Diag_HapticImpactLightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_HapticImpactLightView.swift; sourceTree = "<group>"; };
+		DC6398A37721EA16653FCE1A /* Diag_HapticImpactMediumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_HapticImpactMediumView.swift; sourceTree = "<group>"; };
+		B965818922477112F60A76F5 /* Diag_HapticImpactHeavyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_HapticImpactHeavyView.swift; sourceTree = "<group>"; };
+		75CB2F14AFD1D03FBFD1DBEC /* Diag_HapticImpactRigidView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_HapticImpactRigidView.swift; sourceTree = "<group>"; };
+		7083EE16B336D5EE55011223 /* Diag_HapticNotificationFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_HapticNotificationFeedbackView.swift; sourceTree = "<group>"; };
+		9FAA5D350805E04E2B690705 /* Diag_HapticSelectionFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_HapticSelectionFeedbackView.swift; sourceTree = "<group>"; };
+		5EA375621A81A7D2F2EE4C1A /* Diag_NetIPv4InterfacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetIPv4InterfacesView.swift; sourceTree = "<group>"; };
+		504A31E464DA7F766EE2A1DC /* Diag_NetIPv6InterfacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetIPv6InterfacesView.swift; sourceTree = "<group>"; };
+		CF438BA47BBAB2CBDBD4F1AD /* Diag_NetWiFiInterfaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetWiFiInterfaceView.swift; sourceTree = "<group>"; };
+		5D4DDE564B7284D339BF6641 /* Diag_NetCellularInterfacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetCellularInterfacesView.swift; sourceTree = "<group>"; };
+		41D3DEE417B057B1F4A5AD72 /* Diag_NetInterfaceFlagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetInterfaceFlagsView.swift; sourceTree = "<group>"; };
+		D4CCEC97FBE3DA8E7E4784A4 /* Diag_NetTrafficTotalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetTrafficTotalsView.swift; sourceTree = "<group>"; };
+		0377D9D806083B575B8975A2 /* Diag_NetPathStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetPathStatusView.swift; sourceTree = "<group>"; };
+		803F4EA84B8006FF0A25833E /* Diag_NetPathInterfacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetPathInterfacesView.swift; sourceTree = "<group>"; };
+		323DF9C6EE231AA3C31DC786 /* Diag_NetCarrierDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetCarrierDetailView.swift; sourceTree = "<group>"; };
+		61DB88FA5B1A03B187C894DC /* Diag_NetRadioTechView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetRadioTechView.swift; sourceTree = "<group>"; };
+		4634D9A37B027CBAF155A6D6 /* Diag_NetBluetoothStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetBluetoothStateView.swift; sourceTree = "<group>"; };
+		9EB0E35A08127B9947AE1AA1 /* Diag_NetNFCAvailabilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetNFCAvailabilityView.swift; sourceTree = "<group>"; };
+		294ECE47FF154DE981173F72 /* Diag_NetUWBAvailabilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_NetUWBAvailabilityView.swift; sourceTree = "<group>"; };
+		384AAA84097B033408B6BD68 /* Diag_PerfDiskLatencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PerfDiskLatencyView.swift; sourceTree = "<group>"; };
+		80AEA85A38A4C1F364B08043 /* Diag_PerfFileWriteSpeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PerfFileWriteSpeedView.swift; sourceTree = "<group>"; };
+		FE2D738BD0E7B47941DCFD2E /* Diag_PerfStringBenchmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PerfStringBenchmarkView.swift; sourceTree = "<group>"; };
+		C04772671B9462783B617533 /* Diag_PerfMathBenchmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_PerfMathBenchmarkView.swift; sourceTree = "<group>"; };
+		47C0140E231F12169F3A0A7E /* Diag_BatteryDrainRateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BatteryDrainRateView.swift; sourceTree = "<group>"; };
+		12B24205DEA7C40CF655D6CB /* Diag_BatteryStateHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_BatteryStateHistoryView.swift; sourceTree = "<group>"; };
+		C93B474256ECF5B32C89A730 /* Diag_StorageDocumentsDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_StorageDocumentsDetailView.swift; sourceTree = "<group>"; };
+		940CA2778993BC3174A5743E /* Diag_StorageCachesDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_StorageCachesDetailView.swift; sourceTree = "<group>"; };
+		417497D4E9DC137F8A8C5D18 /* Diag_StorageTmpDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_StorageTmpDetailView.swift; sourceTree = "<group>"; };
+		CAC04C31BD13160E190B7A09 /* Diag_StorageHomeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_StorageHomeDetailView.swift; sourceTree = "<group>"; };
+		319FD0A2010A1481E210027E /* Diag_StorageVolumeImportantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_StorageVolumeImportantView.swift; sourceTree = "<group>"; };
+		4373E5F2DC2A9560A77AF90C /* Diag_SecNotificationsAuthDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diag_SecNotificationsAuthDetailView.swift; sourceTree = "<group>"; };
 		E0E00A1458A464DAB575C4FE /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		E0EEB4B68C1E4CE975A3F4C1 /* AttachmentIntelligenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentIntelligenceEngine.swift; sourceTree = "<group>"; };
 		E1010000000000000000002F /* MailMarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailMarkdownRenderer.swift; sourceTree = "<group>"; };
@@ -6927,6 +7165,125 @@
 				C2C49E4F8DA2E2E742004EAA /* Diag_SensorDriftView.swift */,
 				0524CAA337027BC4B79C9FC2 /* Diag_DisplayWhitePointView.swift */,
 				E08E617E2A07FB3B75FD110A /* Diag_AudioPhaseView.swift */,
+				1B6C5C935BEE395B8C22B6A6 /* DeviceModelCatalog.swift */,
+				74B48BFD1FDB24261DA55396 /* Diag_DisplayNativeResolutionView.swift */,
+				1B0A9F54CE2521CA722B7150 /* Diag_DisplayPixelCountView.swift */,
+				36654346ED2689D63E3AA846 /* Diag_DisplaySafeAreaView.swift */,
+				E0DC035983005B135E921476 /* Diag_DisplayOrientationView.swift */,
+				2E7004C45920F54F036EA728 /* Diag_DisplayHDRCapabilityView.swift */,
+				77198B863884B97E6845FC51 /* Diag_DisplayColorGamutView.swift */,
+				FF49F882CDFF365571CAAB5E /* Diag_DisplayRefreshLiveView.swift */,
+				BB3B70B2FA30B0D1B7207783 /* Diag_DisplayTextSizeView.swift */,
+				BD3D7392436FA5B6DC7CCF13 /* Diag_DisplayDarkModeView.swift */,
+				A3A04E00F79C17A12F365985 /* Diag_AudioSampleRateView.swift */,
+				8238EDB8AF938A08CF84B492 /* Diag_AudioOutputVolumeView.swift */,
+				69CF5FB03C40E10C507B81E8 /* Diag_AudioRouteOutputsView.swift */,
+				A7E3575BC3DFE04006673D19 /* Diag_AudioRouteInputsView.swift */,
+				F144DF072F91F05303DE768D /* Diag_AudioCategoryModeView.swift */,
+				99A29A8D8F5AA17081A1FC2F /* Diag_AudioAirPlayRouteView.swift */,
+				297301A996C74EE94FEF6C78 /* Diag_AudioBluetoothRouteView.swift */,
+				34251C0ACF1564DF450A5317 /* Diag_AudioLatencyDetailView.swift */,
+				36E08821E8A81467A12DC5C8 /* Diag_AudioSessionOptionsView.swift */,
+				B13B37DD0B4E34FB93BC675C /* Diag_MicInputChannelsView.swift */,
+				818968DEB43E901D6E3921DE /* Diag_MicDataSourcesView.swift */,
+				8B2F2DD068BA57CD5D01B453 /* Diag_MicAvailableInputsView.swift */,
+				0BC7F93BC7218B5BDF58CC02 /* Diag_MicInputLatencyView.swift */,
+				134B4D3AF64679D4A459D8C9 /* Diag_MicInputGainDetailView.swift */,
+				B789C8DC67BE925EED6FBD0A /* Diag_SensorAvailabilityMatrixView.swift */,
+				7D8BA1A719E422757DFD2F21 /* Diag_SensorMotionAuthorizationView.swift */,
+				3C3276FB4D8AC1D8F64CAE2C /* Diag_SensorHeadingInfoView.swift */,
+				E0BE28AE645E9D5B328C1A37 /* Diag_SensorPressureInfoView.swift */,
+				296E2F97C5CDF4E6DE3B62AD /* Diag_NetInterfaceCountView.swift */,
+				024390D3EE750632B9ED03C9 /* Diag_PerfCPUCoresView.swift */,
+				5DECFAAC21D99C4B8AEB9307 /* Diag_PerfUptimeBootView.swift */,
+				EE9B8075E6C586308054033E /* Diag_PerfThermalLiveView.swift */,
+				A69B7233A906C32F7312E269 /* Diag_PerfLowPowerDetailView.swift */,
+				9853198C59A6F6729E418943 /* Diag_PerfProcessorActiveView.swift */,
+				41569B027D6CE77A04C4B6C7 /* Diag_PerfMetalLimitsView.swift */,
+				1C933137BA7DABBD1481496C /* Diag_PerfFrameRateMaxView.swift */,
+				061C70918BB89133FF04B0FD /* Diag_BatteryLevelDetailView.swift */,
+				E77042B020DF7977E51B8C39 /* Diag_BatteryMonitoringStatusView.swift */,
+				C2531951872EB32E25DE9035 /* Diag_BatteryChargeStateDetailView.swift */,
+				5D1F2245862031D18347CEEC /* Diag_BatteryLowPowerImpactView.swift */,
+				5F423218C2570C736C0F173F /* Diag_StorageTotalFreeView.swift */,
+				2E97459AFB08FFF0CD2C11CA /* Diag_StorageUsedDetailView.swift */,
+				1CE6CC1C7F0625E051770C86 /* Diag_SystemDeviceIdentityView.swift */,
+				CFE83C6F8F2D5B5AC8CCB83A /* Diag_SystemOSBuildView.swift */,
+				A36F5AE487ED8FF3D43BB2A4 /* Diag_SystemBootTimeView.swift */,
+				A28FDE39361FBC8323DBC9EC /* Diag_SystemHostNameView.swift */,
+				29318C9B48E23D6D01EDEA1D /* Diag_SystemLanguageListView.swift */,
+				8DA0CE0DB4FFE33921B3B59E /* Diag_SystemTimezoneDetailView.swift */,
+				FB8CD31F587C88604B9A4151 /* Diag_SystemRegionDetailView.swift */,
+				6030A7D5A75AAC4199E9F98E /* Diag_SystemFontsCountView.swift */,
+				1231E4B4F438603C77B764EE /* Diag_SystemScreenTraitsView.swift */,
+				FA4F115FB4501DA47B5B3D2A /* Diag_SystemModelCatalogView.swift */,
+				448984609C17A7101D98B4C0 /* Diag_AccSwitchControlView.swift */,
+				8F14AF9F23A40E5C73A7EE84 /* Diag_AccAssistiveTouchView.swift */,
+				C5CEBB103CDBE866D68CACC0 /* Diag_AccGuidedAccessView.swift */,
+				C54EB1C3EA4B66426B040891 /* Diag_AccMonoAudioView.swift */,
+				B44532A18D3A8C9EB5F959D8 /* Diag_AccClosedCaptionsView.swift */,
+				7A935E367FA37DFE8EFD3C5F /* Diag_AccSpeakSelectionView.swift */,
+				7CFDB2BF535455C710A0E473 /* Diag_SecBiometryTypeView.swift */,
+				14570E2A084A3365C8AAEC31 /* Diag_SecDeviceOwnerAuthView.swift */,
+				E764F85AB8F9717EBA0FD7B9 /* Diag_SecLocationAuthDetailView.swift */,
+				81B49D9CC70E5DDECDD2185D /* Diag_SecCameraAuthDetailView.swift */,
+				6B883411E443C651BE9AC00F /* Diag_SecMicAuthDetailView.swift */,
+				DBED06B2EC3E861A9E5E7F3B /* Diag_SecMotionAuthDetailView.swift */,
+				34BF5B68F713AC1C6704ACF8 /* Diag_SecPhotoAuthDetailView.swift */,
+				9BA7542EBBEDC25BB4CB5D70 /* Diag_SecHealthAuthDetailView.swift */,
+				1ADBEBF3A21C71AE9F7191C3 /* Diag_CameraDeviceListView.swift */,
+				4F50B0C43292D95115A74073 /* Diag_CameraWideFormatsView.swift */,
+				6DA3F777EF1DD50B07110542 /* Diag_CameraTrueDepthDetailView.swift */,
+				FF06AE1C1EEE7F3A33685AB2 /* Diag_CameraFlashModesView.swift */,
+				3C464419D0F629B7C03CD8F3 /* Diag_CameraFocusModesView.swift */,
+				61EFD1E168D3B83AD0FB664F /* Diag_CameraExposureModesView.swift */,
+				45E0945D18DF854E357E31B6 /* Diag_CameraWhiteBalanceModesView.swift */,
+				E9D756C5E5BE906D64FF7162 /* Diag_CameraFrameRatesView.swift */,
+				B9FC6AC028B39E15A4A34F30 /* Diag_CameraISORangeView.swift */,
+				354A4972F21859B6B704E5A5 /* Diag_CameraZoomFactorsView.swift */,
+				3F0AE8ADA78E01F183A784DC /* Diag_SensorUserAccelerationView.swift */,
+				A28425DD4675EC56B139CBA3 /* Diag_SensorRotationRateView.swift */,
+				9DB5A93CC6C921227C988281 /* Diag_SensorAttitudeEulerView.swift */,
+				E6909AA70ED32A178EA59DC2 /* Diag_SensorAttitudeQuaternionView.swift */,
+				366D91F4EB0A279B5C1896C6 /* Diag_SensorMagneticFieldView.swift */,
+				36B134024900AE05E203EC86 /* Diag_SensorDeviceMotionSummaryView.swift */,
+				39D82777CA1B9B813DDD97A7 /* Diag_SensorStepCadenceView.swift */,
+				E8A942AE070D8608F2352F5B /* Diag_SensorWalkingPaceView.swift */,
+				9800D68EBD11E10B0EB4A6B7 /* Diag_SensorDistanceTodayView.swift */,
+				A17454FD9BC6AC8226FDB831 /* Diag_SensorFlightsTodayView.swift */,
+				E75445AB61F3023330FC7DFD /* Diag_SensorMotionHistoryView.swift */,
+				C6FA80848CAD76FED6F26BCF /* Diag_SensorPressureTrendView.swift */,
+				101C66963877760AC2B0491B /* Diag_HapticImpactLightView.swift */,
+				DC6398A37721EA16653FCE1A /* Diag_HapticImpactMediumView.swift */,
+				B965818922477112F60A76F5 /* Diag_HapticImpactHeavyView.swift */,
+				75CB2F14AFD1D03FBFD1DBEC /* Diag_HapticImpactRigidView.swift */,
+				7083EE16B336D5EE55011223 /* Diag_HapticNotificationFeedbackView.swift */,
+				9FAA5D350805E04E2B690705 /* Diag_HapticSelectionFeedbackView.swift */,
+				5EA375621A81A7D2F2EE4C1A /* Diag_NetIPv4InterfacesView.swift */,
+				504A31E464DA7F766EE2A1DC /* Diag_NetIPv6InterfacesView.swift */,
+				CF438BA47BBAB2CBDBD4F1AD /* Diag_NetWiFiInterfaceView.swift */,
+				5D4DDE564B7284D339BF6641 /* Diag_NetCellularInterfacesView.swift */,
+				41D3DEE417B057B1F4A5AD72 /* Diag_NetInterfaceFlagsView.swift */,
+				D4CCEC97FBE3DA8E7E4784A4 /* Diag_NetTrafficTotalsView.swift */,
+				0377D9D806083B575B8975A2 /* Diag_NetPathStatusView.swift */,
+				803F4EA84B8006FF0A25833E /* Diag_NetPathInterfacesView.swift */,
+				323DF9C6EE231AA3C31DC786 /* Diag_NetCarrierDetailView.swift */,
+				61DB88FA5B1A03B187C894DC /* Diag_NetRadioTechView.swift */,
+				4634D9A37B027CBAF155A6D6 /* Diag_NetBluetoothStateView.swift */,
+				9EB0E35A08127B9947AE1AA1 /* Diag_NetNFCAvailabilityView.swift */,
+				294ECE47FF154DE981173F72 /* Diag_NetUWBAvailabilityView.swift */,
+				384AAA84097B033408B6BD68 /* Diag_PerfDiskLatencyView.swift */,
+				80AEA85A38A4C1F364B08043 /* Diag_PerfFileWriteSpeedView.swift */,
+				FE2D738BD0E7B47941DCFD2E /* Diag_PerfStringBenchmarkView.swift */,
+				C04772671B9462783B617533 /* Diag_PerfMathBenchmarkView.swift */,
+				47C0140E231F12169F3A0A7E /* Diag_BatteryDrainRateView.swift */,
+				12B24205DEA7C40CF655D6CB /* Diag_BatteryStateHistoryView.swift */,
+				C93B474256ECF5B32C89A730 /* Diag_StorageDocumentsDetailView.swift */,
+				940CA2778993BC3174A5743E /* Diag_StorageCachesDetailView.swift */,
+				417497D4E9DC137F8A8C5D18 /* Diag_StorageTmpDetailView.swift */,
+				CAC04C31BD13160E190B7A09 /* Diag_StorageHomeDetailView.swift */,
+				319FD0A2010A1481E210027E /* Diag_StorageVolumeImportantView.swift */,
+				4373E5F2DC2A9560A77AF90C /* Diag_SecNotificationsAuthDetailView.swift */,
 				0D4A340FE560FF406EC3E74E /* DiagnosticChatHistory.swift */,
 				B4B2A609AC02CBF5953589D6 /* DiagnosticChatNamingService.swift */,
 				A534F6AFEDC0489B261BC1C4 /* DiagnosticChatStore.swift */,
@@ -13437,6 +13794,125 @@
 				1AF3C1BA964B427749D3145C /* Diag_SensorDriftView.swift in Sources */,
 				68BC3602D72461038877CB00 /* Diag_DisplayWhitePointView.swift in Sources */,
 				6DC01FABC579B299D649F3BD /* Diag_AudioPhaseView.swift in Sources */,
+				37441D6611E205250B8188C6 /* DeviceModelCatalog.swift in Sources */,
+				34848797208E4C536E15CB93 /* Diag_DisplayNativeResolutionView.swift in Sources */,
+				81B3C29F1ADCE5BD69D0C414 /* Diag_DisplayPixelCountView.swift in Sources */,
+				898AF3FF1A97129608EF6C4E /* Diag_DisplaySafeAreaView.swift in Sources */,
+				B4A30E2C1A6835B75B4E937F /* Diag_DisplayOrientationView.swift in Sources */,
+				D17E453540B75AC05F021D5A /* Diag_DisplayHDRCapabilityView.swift in Sources */,
+				9D6FCF333769585E34CB6E02 /* Diag_DisplayColorGamutView.swift in Sources */,
+				7870D5DC876F8A4D2F760087 /* Diag_DisplayRefreshLiveView.swift in Sources */,
+				F2B30CB4A92FA472A30EBB97 /* Diag_DisplayTextSizeView.swift in Sources */,
+				624C64F5E02010A6B4521ECB /* Diag_DisplayDarkModeView.swift in Sources */,
+				B282BE635B21FB194F86236D /* Diag_AudioSampleRateView.swift in Sources */,
+				9482C99D437A50E2355DADA4 /* Diag_AudioOutputVolumeView.swift in Sources */,
+				80A1E6EE64A38722640D6257 /* Diag_AudioRouteOutputsView.swift in Sources */,
+				ADF1AE0450CBA1047DCB673E /* Diag_AudioRouteInputsView.swift in Sources */,
+				9BBE176401CF518404722657 /* Diag_AudioCategoryModeView.swift in Sources */,
+				6528260087C7A224E562806D /* Diag_AudioAirPlayRouteView.swift in Sources */,
+				35D372CF20FEEFB03B7DC51F /* Diag_AudioBluetoothRouteView.swift in Sources */,
+				38DE8E2C96D318492C2523C7 /* Diag_AudioLatencyDetailView.swift in Sources */,
+				B2E71AE42B521FF391B89596 /* Diag_AudioSessionOptionsView.swift in Sources */,
+				8E3C00B359C4576796868BA7 /* Diag_MicInputChannelsView.swift in Sources */,
+				46C71B7FD6E5FE6FDB988D22 /* Diag_MicDataSourcesView.swift in Sources */,
+				59624DB814C648A0A51EA3F9 /* Diag_MicAvailableInputsView.swift in Sources */,
+				D1C09DBC8820E77DC8D56FEC /* Diag_MicInputLatencyView.swift in Sources */,
+				656888CB4C5C32EE4AC72380 /* Diag_MicInputGainDetailView.swift in Sources */,
+				3D0E7A5A266AF386A5F39006 /* Diag_SensorAvailabilityMatrixView.swift in Sources */,
+				97F4CF2BBBBE062330B1C68B /* Diag_SensorMotionAuthorizationView.swift in Sources */,
+				7AA264F93FB317E66AD0FBF6 /* Diag_SensorHeadingInfoView.swift in Sources */,
+				1A98F9A6447045060A80728A /* Diag_SensorPressureInfoView.swift in Sources */,
+				A5A730A8B54A85793B886A3C /* Diag_NetInterfaceCountView.swift in Sources */,
+				1BB8532AA298C05391E56266 /* Diag_PerfCPUCoresView.swift in Sources */,
+				FB4427EEE2F4410B9E01A858 /* Diag_PerfUptimeBootView.swift in Sources */,
+				518B35C16BBDBEB5472AC8F9 /* Diag_PerfThermalLiveView.swift in Sources */,
+				AF5774B03CD31874068264C0 /* Diag_PerfLowPowerDetailView.swift in Sources */,
+				B1BB633A91E4938720BCCCB6 /* Diag_PerfProcessorActiveView.swift in Sources */,
+				A9DFE2553A034F400575D489 /* Diag_PerfMetalLimitsView.swift in Sources */,
+				82C62CF04AC36C77314A0293 /* Diag_PerfFrameRateMaxView.swift in Sources */,
+				E9DBC1F0D780D5DC9EF4F32C /* Diag_BatteryLevelDetailView.swift in Sources */,
+				08EF66B62B389ABD19E39D66 /* Diag_BatteryMonitoringStatusView.swift in Sources */,
+				3B19C0580272B79F20D0D2C4 /* Diag_BatteryChargeStateDetailView.swift in Sources */,
+				B2A20E552D9FD666D972D71D /* Diag_BatteryLowPowerImpactView.swift in Sources */,
+				EFDBBDF10F61A3FB8724A30E /* Diag_StorageTotalFreeView.swift in Sources */,
+				425321C171E26DCE549890D3 /* Diag_StorageUsedDetailView.swift in Sources */,
+				620A83695F4DD916875954D9 /* Diag_SystemDeviceIdentityView.swift in Sources */,
+				8671102F230B1FD72696E70F /* Diag_SystemOSBuildView.swift in Sources */,
+				CCDD477D69D7409625463299 /* Diag_SystemBootTimeView.swift in Sources */,
+				31A27B50F448FDD23EC9A899 /* Diag_SystemHostNameView.swift in Sources */,
+				51BB899F1D4C8F3A4E032DE8 /* Diag_SystemLanguageListView.swift in Sources */,
+				7C362A47712B9C654A81C895 /* Diag_SystemTimezoneDetailView.swift in Sources */,
+				A85D0752E4A3FE6FBD529562 /* Diag_SystemRegionDetailView.swift in Sources */,
+				2E88E297AAD3FA046159C225 /* Diag_SystemFontsCountView.swift in Sources */,
+				A7AC66AD32E5807986C76366 /* Diag_SystemScreenTraitsView.swift in Sources */,
+				EF2498AEAEC03FFE550B3A34 /* Diag_SystemModelCatalogView.swift in Sources */,
+				06CB0C4F0DA5B45A85706AD9 /* Diag_AccSwitchControlView.swift in Sources */,
+				1E557A48A220246896987695 /* Diag_AccAssistiveTouchView.swift in Sources */,
+				0CDC66ACD213CA8DF09999F0 /* Diag_AccGuidedAccessView.swift in Sources */,
+				37884668C2243B97FF0D26FD /* Diag_AccMonoAudioView.swift in Sources */,
+				6D4E1D342D3EB3F07C33D290 /* Diag_AccClosedCaptionsView.swift in Sources */,
+				FD46821674F4B58B57C504D4 /* Diag_AccSpeakSelectionView.swift in Sources */,
+				42110A29D260432849E35E68 /* Diag_SecBiometryTypeView.swift in Sources */,
+				8013698A3A1B86A079DC071A /* Diag_SecDeviceOwnerAuthView.swift in Sources */,
+				2E8BB06E88FFAA054FC5116F /* Diag_SecLocationAuthDetailView.swift in Sources */,
+				50E9BE27D069B643A4F915BA /* Diag_SecCameraAuthDetailView.swift in Sources */,
+				8A3F65B564E8C9B21EB9923B /* Diag_SecMicAuthDetailView.swift in Sources */,
+				6D0E3CB78C7C38E340A09F95 /* Diag_SecMotionAuthDetailView.swift in Sources */,
+				F81AC929AA25A22366BC2B89 /* Diag_SecPhotoAuthDetailView.swift in Sources */,
+				C11A296CFCE0849FFC9D4C66 /* Diag_SecHealthAuthDetailView.swift in Sources */,
+				6D8310C54892130A2EF84CD5 /* Diag_CameraDeviceListView.swift in Sources */,
+				A57FF187B7F92DD4EBC7EA64 /* Diag_CameraWideFormatsView.swift in Sources */,
+				0109C80BD6D0D9365D8049F7 /* Diag_CameraTrueDepthDetailView.swift in Sources */,
+				3A9406AFE4D3CADF2C410D3D /* Diag_CameraFlashModesView.swift in Sources */,
+				D748F31D13F662D1D4347276 /* Diag_CameraFocusModesView.swift in Sources */,
+				16D6E9611AFBD21FF1647504 /* Diag_CameraExposureModesView.swift in Sources */,
+				6AD36014F2C41277F049DC3F /* Diag_CameraWhiteBalanceModesView.swift in Sources */,
+				544CB63EE205B105384F6546 /* Diag_CameraFrameRatesView.swift in Sources */,
+				80DCF85EC04000D56964E338 /* Diag_CameraISORangeView.swift in Sources */,
+				B18C1DD22E534F116F4AD153 /* Diag_CameraZoomFactorsView.swift in Sources */,
+				D651B6E57FC85C19D00D77BC /* Diag_SensorUserAccelerationView.swift in Sources */,
+				19EFEF54FE4C90EE25A6379D /* Diag_SensorRotationRateView.swift in Sources */,
+				BF88E33B2DB187B68DEC500B /* Diag_SensorAttitudeEulerView.swift in Sources */,
+				53490892A30F6627B8857527 /* Diag_SensorAttitudeQuaternionView.swift in Sources */,
+				38E1E37F7B7F54BB0F58360B /* Diag_SensorMagneticFieldView.swift in Sources */,
+				3F12A943B684788272CE7F56 /* Diag_SensorDeviceMotionSummaryView.swift in Sources */,
+				1B07E549CF14DFD69A98D99F /* Diag_SensorStepCadenceView.swift in Sources */,
+				0E890D34DC4D9E773ABEE4CA /* Diag_SensorWalkingPaceView.swift in Sources */,
+				33C98121F00C5BEE68F5F5AB /* Diag_SensorDistanceTodayView.swift in Sources */,
+				FCE8D3D92372DA917831C85C /* Diag_SensorFlightsTodayView.swift in Sources */,
+				1BCC40B349734B29CDE70CC8 /* Diag_SensorMotionHistoryView.swift in Sources */,
+				F3E4971E13EEAFE53F273A5C /* Diag_SensorPressureTrendView.swift in Sources */,
+				F34CA007E0FA26D1E322B95F /* Diag_HapticImpactLightView.swift in Sources */,
+				B31B70554898D58C6D3EF7C2 /* Diag_HapticImpactMediumView.swift in Sources */,
+				486D00896856F7B7707D8FC3 /* Diag_HapticImpactHeavyView.swift in Sources */,
+				86DA8B2017685491F1A62F2E /* Diag_HapticImpactRigidView.swift in Sources */,
+				92716109916D941BD55C030D /* Diag_HapticNotificationFeedbackView.swift in Sources */,
+				A3F3BABC61FDE8B607456B0F /* Diag_HapticSelectionFeedbackView.swift in Sources */,
+				4D8F70E6356F623AEF788447 /* Diag_NetIPv4InterfacesView.swift in Sources */,
+				C2A710B97461D8349AC75221 /* Diag_NetIPv6InterfacesView.swift in Sources */,
+				82271956AEE051ADE3415AE0 /* Diag_NetWiFiInterfaceView.swift in Sources */,
+				328BE094C3F3FB3429D61C16 /* Diag_NetCellularInterfacesView.swift in Sources */,
+				DF6D69E56D3563F222748BA1 /* Diag_NetInterfaceFlagsView.swift in Sources */,
+				BB0ED092775B4908AD4B8747 /* Diag_NetTrafficTotalsView.swift in Sources */,
+				7DC7B7E28140DD1C170B12F0 /* Diag_NetPathStatusView.swift in Sources */,
+				97D130CEFB6190608D6E92AD /* Diag_NetPathInterfacesView.swift in Sources */,
+				AECDC10625E9A52CA9A78082 /* Diag_NetCarrierDetailView.swift in Sources */,
+				12F54DB126BBC22BD8F6978A /* Diag_NetRadioTechView.swift in Sources */,
+				27A4DD59B6090CCE7E7A20F3 /* Diag_NetBluetoothStateView.swift in Sources */,
+				45F8618C7B31747720D92D5F /* Diag_NetNFCAvailabilityView.swift in Sources */,
+				85537167F1C5F2C0BFACC1AF /* Diag_NetUWBAvailabilityView.swift in Sources */,
+				D42E5CDBEE7F9885F1317452 /* Diag_PerfDiskLatencyView.swift in Sources */,
+				42D586D82D21775A823D1874 /* Diag_PerfFileWriteSpeedView.swift in Sources */,
+				EF325F0F1866FB6151A5BEC1 /* Diag_PerfStringBenchmarkView.swift in Sources */,
+				A32912F931E88737043933C6 /* Diag_PerfMathBenchmarkView.swift in Sources */,
+				E5ED61BD1E29510D9BBC8998 /* Diag_BatteryDrainRateView.swift in Sources */,
+				F4CC0B4BB5D80972E2D22B78 /* Diag_BatteryStateHistoryView.swift in Sources */,
+				9DF839105CFAF37DE9B037D9 /* Diag_StorageDocumentsDetailView.swift in Sources */,
+				97F17606B7F828039639D568 /* Diag_StorageCachesDetailView.swift in Sources */,
+				75A6ACF5632008875DD5C1A6 /* Diag_StorageTmpDetailView.swift in Sources */,
+				721D8878C4B54CE4EC6DDB74 /* Diag_StorageHomeDetailView.swift in Sources */,
+				2B8CAD7B84D2234139AD00D3 /* Diag_StorageVolumeImportantView.swift in Sources */,
+				60B511D24820C716B14FB761 /* Diag_SecNotificationsAuthDetailView.swift in Sources */,
 				68CF1265B810E5E39DD1A835 /* DiagnosticChatHistory.swift in Sources */,
 				A499564663C87C45A42D3C4D /* DiagnosticChatNamingService.swift in Sources */,
 				6669029549150298E4534C69 /* DiagnosticChatStore.swift in Sources */,

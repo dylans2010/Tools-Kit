@@ -86,7 +86,8 @@ struct Diag_AlwaysOnDisplayView: View {
         let aodModels = [
             "iPhone15,2", "iPhone15,3",
             "iPhone16,1", "iPhone16,2",
-            "iPhone17,1", "iPhone17,2"
+            "iPhone17,1", "iPhone17,2",
+            "iPhone18,1", "iPhone18,2"
         ]
         supported = aodModels.contains(modelId)
         info.append(("Always On Display", supported ? "Supported" : "Not Supported"))

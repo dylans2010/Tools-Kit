@@ -85,7 +85,7 @@ struct Diag_ThreadRadioView: View {
         let threadModels = [
             "iPhone16,1", "iPhone16,2",
             "iPhone17,1", "iPhone17,2", "iPhone17,3", "iPhone17,4",
-            "iPhone17,5", "iPhone17,6", "iPhone17,7", "iPhone17,8"
+            "iPhone17,5", "iPhone18,1", "iPhone18,2", "iPhone18,3", "iPhone18,4"
         ]
         supported = threadModels.contains(modelId)
         info.append(("Thread Radio", supported ? "Present" : "Not present"))

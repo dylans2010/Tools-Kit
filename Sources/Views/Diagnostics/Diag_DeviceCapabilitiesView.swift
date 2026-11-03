@@ -132,6 +132,7 @@ struct Diag_DeviceCapabilitiesView: View {
 
         let metalDevice = MTLCreateSystemDefaultDevice()
         let gpu = CapabilityGroup(name: "GPU & Display", icon: "gpu", items: [
+            CapabilityItem(name: "Dynamic Island", available: DeviceModelCatalog.hasDynamicIsland(for: DeviceModelCatalog.currentIdentifier()), detail: DeviceModelCatalog.marketingName(for: DeviceModelCatalog.currentIdentifier())),
             CapabilityItem(name: "Metal", available: metalDevice != nil, detail: metalDevice?.name),
             CapabilityItem(name: "Metal GPU Family Apple 7+", available: metalDevice?.supportsFamily(.apple7) ?? false, detail: nil),
             CapabilityItem(name: "ProMotion (120Hz)", available: UIScreen.main.maximumFramesPerSecond >= 120, detail: "\(UIScreen.main.maximumFramesPerSecond) Hz max"),

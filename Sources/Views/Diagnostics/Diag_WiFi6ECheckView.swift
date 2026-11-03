@@ -103,7 +103,7 @@ struct Diag_WiFi6ECheckView: View {
         let wifi6eModels = ["iPhone16,1", "iPhone16,2"]
         let wifi7Models = [
             "iPhone17,1", "iPhone17,2", "iPhone17,3", "iPhone17,4",
-            "iPhone17,5", "iPhone17,6", "iPhone17,7", "iPhone17,8"
+            "iPhone17,5", "iPhone18,1", "iPhone18,2", "iPhone18,3", "iPhone18,4"
         ]
 
         if wifi7Models.contains(modelId) {
