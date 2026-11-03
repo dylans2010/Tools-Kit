@@ -109,13 +109,13 @@ final class DiagnosticsViewModel: ObservableObject {
 
         // Connectivity (5)
         DiagnosticTool(id: "wifi_strength", name: "WiFi Strength", icon: "wifi", description: "Measure current WiFi signal and connection quality", category: .connectivity),
-        DiagnosticTool(id: "network_latency", name: "Network Latency", icon: "network", description: "Ping simulation to measure network latency", category: .connectivity),
+        DiagnosticTool(id: "network_latency", name: "Network Latency", icon: "network", description: "Measure network latency with real HTTPS requests", category: .connectivity),
         DiagnosticTool(id: "internet_speed", name: "Internet Speed", icon: "speedometer", description: "Approximate upload and download speed", category: .connectivity),
         DiagnosticTool(id: "bluetooth", name: "Bluetooth Scanner", icon: "wave.3.right", description: "Check Bluetooth availability and scan for devices", category: .connectivity),
         DiagnosticTool(id: "airplane", name: "Airplane Mode", icon: "airplane", description: "Detect airplane mode and network interface status", category: .connectivity),
 
         // Performance (5)
-        DiagnosticTool(id: "cpu_stress", name: "CPU Stress Test", icon: "cpu", description: "Safe CPU load simulation with real-time metrics", category: .performance),
+        DiagnosticTool(id: "cpu_stress", name: "CPU Stress Test", icon: "cpu", description: "Real CPU load test with live metrics", category: .performance),
         DiagnosticTool(id: "memory_usage", name: "Memory Usage", icon: "memorychip", description: "Display current memory allocation and pressure", category: .performance),
         DiagnosticTool(id: "fps_monitor", name: "FPS Monitor", icon: "gauge.with.dots.needle.67percent", description: "Real-time frame rate monitoring", category: .performance),
         DiagnosticTool(id: "thermal_state", name: "Thermal State", icon: "thermometer.medium", description: "Monitor device thermal state in real time", category: .performance),
@@ -124,7 +124,7 @@ final class DiagnosticsViewModel: ObservableObject {
         // Battery (3)
         DiagnosticTool(id: "battery_level", name: "Battery Health", icon: "battery.100", description: "Battery level, state, and health information", category: .battery),
         DiagnosticTool(id: "charging_state", name: "Charging State", icon: "bolt.fill", description: "Monitor charging status and power source", category: .battery),
-        DiagnosticTool(id: "battery_drain", name: "Battery Drain Sim", icon: "battery.25", description: "Visual simulation of battery drain over time", category: .battery),
+        DiagnosticTool(id: "battery_drain", name: "Battery Drain Monitor", icon: "battery.25", description: "Real battery level sampled every 5 seconds, with measured drain rate", category: .battery),
 
         // Camera (4)
         DiagnosticTool(id: "front_camera", name: "Front Camera", icon: "camera.fill", description: "Preview and test front-facing camera", category: .camera),
@@ -134,7 +134,7 @@ final class DiagnosticsViewModel: ObservableObject {
 
         // Storage (3)
         DiagnosticTool(id: "disk_usage", name: "Disk Usage", icon: "internaldrive.fill", description: "Detailed breakdown of disk space usage", category: .storage),
-        DiagnosticTool(id: "rw_test", name: "Read/Write Test", icon: "doc.badge.gearshape", description: "Simulate disk read and write speed test", category: .storage),
+        DiagnosticTool(id: "rw_test", name: "Read/Write Test", icon: "doc.badge.gearshape", description: "Measure real disk read and write speed", category: .storage),
         DiagnosticTool(id: "file_system", name: "File System Info", icon: "folder.fill.badge.gearshape", description: "View file system details and attributes", category: .storage),
 
         // System (5)
@@ -415,16 +415,16 @@ final class DiagnosticsViewModel: ObservableObject {
         DiagnosticTool(id: "microphone_array", name: "Microphone Array", icon: "mic.fill", description: "All built-in microphones, beamforming, and positions", category: .microphone),
 
         // === DEEPER DIAGNOSTICS (10) ===
-        DiagnosticTool(id: "privacy_report", name: "App Privacy Report", icon: "hand.raised.square.on.square.fill", description: "Audit app access to photos, location, and sensors", category: .security),
-        DiagnosticTool(id: "metal_capability", name: "Metal Capabilities", icon: "cpu.fill", description: "Detailed GPU architecture and feature support", category: .performance),
+        DiagnosticTool(id: "privacy_report", name: "App Privacy Report", icon: "hand.raised.square.on.square.fill", description: "This app's real permission statuses for photos, location, and sensors", category: .security),
+        DiagnosticTool(id: "metal_capability", name: "Metal Capabilities", icon: "cpu.fill", description: "GPU name, limits, and families read from the live Metal device", category: .performance),
         DiagnosticTool(id: "cpu_topology", name: "CPU Topology", icon: "cpu", description: "View P-cores and E-cores load and layout", category: .performance),
         DiagnosticTool(id: "disk_leak", name: "Disk Space Leak", icon: "internaldrive.fill", description: "Find hidden storage consumers and temporary files", category: .storage),
-        DiagnosticTool(id: "bt_packet", name: "BT Packet Monitor", icon: "wave.3.right.circle", description: "Simulated Bluetooth packet traffic analysis", category: .connectivity),
+        DiagnosticTool(id: "bt_packet", name: "BT Packet Monitor", icon: "wave.3.right.circle", description: "Live CoreBluetooth scan of nearby BLE peripherals with RSSI", category: .connectivity),
         DiagnosticTool(id: "adv_traceroute", name: "Advanced TraceRoute", icon: "point.3.connected.trianglepath.dotted", description: "Detailed hop-by-hop network path analysis", category: .connectivity),
-        DiagnosticTool(id: "memory_map", name: "Memory Mapping", icon: "memorychip", description: "View virtual memory regions and protections", category: .performance),
-        DiagnosticTool(id: "sensor_drift", name: "Sensor Drift Analysis", icon: "sensor", description: "Check calibration and drift for all motion sensors", category: .sensors),
-        DiagnosticTool(id: "white_point", name: "White Point Test", icon: "sun.max.circle", description: "Verify D65 calibration and color temperature", category: .display),
-        DiagnosticTool(id: "audio_phase", name: "Audio Phase Test", icon: "waveform.path", description: "Check phase correlation between stereo speakers", category: .audio),
+        DiagnosticTool(id: "memory_map", name: "Memory Mapping", icon: "memorychip", description: "Real resident/virtual memory for this process from task_info", category: .performance),
+        DiagnosticTool(id: "sensor_drift", name: "Sensor Drift Analysis", icon: "sensor", description: "Measure live sensor bias at rest for 3 seconds", category: .sensors),
+        DiagnosticTool(id: "white_point", name: "White Point Test", icon: "sun.max.circle", description: "Live display traits and a D65 reference swatch (no invented Delta E)", category: .display),
+        DiagnosticTool(id: "audio_phase", name: "Audio Phase Test", icon: "waveform.path", description: "Live audio route plus a real panned stereo tone test", category: .audio),
 
         // === DIAGNOSTICS EXPANSION (118 NEW TOOLS, 2026-11-02) ===
         DiagnosticTool(id: "display_native_resolution", name: "Native Resolution", icon: "rectangle.inset.filled", description: "Native pixel resolution, scale, and native scale", category: .display),

@@ -37,7 +37,6 @@ public struct DiagnosticsSettingsView: View {
     @AppStorage("diagnostics_theme") private var theme = "System"
     @AppStorage("diagnostics_stressTestDuration") private var stressDuration: Double = 30
     @AppStorage("diagnostics_includeHardwareSerials") private var includeSerials = false
-    @AppStorage("diagnostics_enableAIAssist") private var enableAIAssist = true
 
     @State private var showAppSettings = false
     @State private var showResetConfirmation = false
@@ -208,9 +207,10 @@ public struct DiagnosticsSettingsView: View {
             Toggle(isOn: $networkToolsEnabled) {
                 Label("Network Tools", systemImage: "network")
             }
-            Toggle(isOn: $enableAIAssist) {
-                Label("AI Support Assist", systemImage: "sparkles")
-            }
+            Label("AI Support Assist", systemImage: "sparkles")
+            Text("Always on. Support Assist runs only on Apple Foundation Models, on-device — no API key, account, or sign-in.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         } header: {
             Label("Tool Categories", systemImage: "folder.fill")
         } footer: {
@@ -337,6 +337,5 @@ public struct DiagnosticsSettingsView: View {
         theme = "System"
         stressDuration = 30
         includeSerials = false
-        enableAIAssist = true
     }
 }

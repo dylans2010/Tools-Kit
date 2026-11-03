@@ -21,8 +21,19 @@ class AFMService: ObservableObject {
     func checkAvailability() {
         #if canImport(FoundationModels)
         if #available(iOS 26.0, *) {
-            self.isAvailable = true
-            self.availabilityMessage = "Apple Foundation Models are available and ready."
+            // Ask the system model itself, not just the OS version: a
+            // device can run iOS 26 and still not have the on-device
+            // model available (Apple Intelligence off, model not ready).
+            // This is a platform availability report, not a login, key,
+            // or provider-selection guard — there is nothing to sign
+            // into and no key to enter for Foundation Models.
+            if case .available = SystemLanguageModel.default.availability {
+                self.isAvailable = true
+                self.availabilityMessage = "Apple Foundation Models are available on this device."
+            } else {
+                self.isAvailable = false
+                self.availabilityMessage = "Apple Foundation Models are not available on this device right now (Apple Intelligence / on-device model not ready). No API key or account can substitute for it."
+            }
         } else {
             self.isAvailable = false
             self.availabilityMessage = "Requires iOS 26 or newer."
@@ -38,8 +49,11 @@ class AFMService: ObservableObject {
         guard #available(iOS 26.0, *) else {
             throw NSError(domain: "AFMService", code: 502, userInfo: [NSLocalizedDescriptionKey: "Requires iOS 26 or newer"])
         }
-        let selectedModelID = AIChatSettingsManager.shared.settings.selectedAFMModelID
-        SDKLogStore.shared.log("AFM: Generating response with model \(selectedModelID)", source: "AFMService", level: .info)
+        // Foundation Models has no model picker and no API key: the
+        // system model is used directly. Previous code logged a
+        // settings-selected model ID that the session never actually
+        // used — LanguageModelSession always uses the system model.
+        SDKLogStore.shared.log("AFM: Generating response with the on-device system model", source: "AFMService", level: .info)
 
         let instructions = systemPrompt.isEmpty ? "You are a helpful assistant." : systemPrompt
 

@@ -1,7 +1,4 @@
 import SwiftUI
-#if canImport(PhotosUI)
-import PhotosUI
-#endif
 #if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
 #endif
@@ -25,14 +22,18 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var error: String?
     @Published var pendingAttachments: [AttachmentItem] = []
-    @Published var isWebSearchEnabled: Bool = false
-    @Published var searchingStatus: String?
-    @Published var lastSearchResults: [AIService.WebSearchResult] = []
-    @Published var lastSearchQuery: String = ""
-    @Published var showSearchResults: Bool = false
+    @Published var foundationModelsMessage = ""
 
-    private let aiService = AIService.shared
+    // Diagnostic Support Assist runs ONLY on Apple Foundation Models.
+    // No AIService, no provider selection, no API key, no account, no
+    // daily limit, no web search — the on-device system model is the
+    // entire backend. See AFMService (FoundationModels framework).
     private var currentTask: Task<Void, Never>?
+
+    init() {
+        AFMService.shared.checkAvailability()
+        foundationModelsMessage = AFMService.shared.availabilityMessage
+    }
 
     private let systemPrompt = """
     You are the "Diagnostics Support Assist" AI, a fully intelligent system specialized in debugging and diagnosing iOS devices.
@@ -44,9 +45,12 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
     CRITICAL RULES:
     1. You ONLY provide support related to iOS devices and debugging.
     2. If a user asks about anything else, politely decline and redirect them to device diagnostics.
-    3. You have access to a conceptual "WebSearchTool" if you need more context about specific error codes or device issues.
-       To use it, respond ONLY with: [SEARCH: your query]
-    4. You can analyze images and files uploaded by the user to identify hardware damage or inspect log files.
+    3. You run entirely on-device on Apple Foundation Models. You have
+       no web access, no API key, and no account — do not invent web
+       search results, and do not claim to have searched the web.
+    4. You can read text, log, crash-report, and PDF attachments the
+       user uploads. You cannot see image pixels: if a photo is
+       mentioned, ask the user to describe what it shows.
     5. ALWAYS use Markdown for your responses. Organize your content using '##' headers for sections, bullet points for lists, and code blocks for technical details. Ensure a structured, professional, and clear response.
     6. Be precise, technical, and helpful.
     """
@@ -120,8 +124,6 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
     }
 
     private func performChat(attachmentItems: [AttachmentItem]) async throws {
-        var currentSystemPrompt = systemPrompt
-
         let chatAttachments = attachmentItems.map { $0.attachment }
         let decoded = await FileDecoderHelper.decodeAttachments(chatAttachments)
 
@@ -135,63 +137,31 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
                 chatMessages[lastIdx] = ChatMessage(id: chatMessages[lastIdx].id, role: chatMessages[lastIdx].role, content: updatedContent, timestamp: chatMessages[lastIdx].timestamp)
             }
         }
-
-        if isWebSearchEnabled {
-            currentSystemPrompt += "\n\nCRITICAL: Web search is ENABLED. You MUST perform a web search before answering any user question. Identify the core technical query and use the [SEARCH: query] tool. Do not provide a final answer until search results are analyzed."
-            await MainActor.run { searchingStatus = "Thinking..." }
+        if !decoded.images.isEmpty {
+            // On-device Foundation Models in this app is text-only: image
+            // pixels are never sent anywhere. Say so in the prompt rather
+            // than pretending to have analysed the photo.
+            let note = "\n\n[Note: the user also attached \(decoded.images.count) image(s). You cannot see image pixels, so do not describe them. Ask the user to describe what the photo shows if it matters.]"
+            if !chatMessages.isEmpty {
+                let lastIdx = chatMessages.count - 1
+                chatMessages[lastIdx] = ChatMessage(id: chatMessages[lastIdx].id, role: chatMessages[lastIdx].role, content: chatMessages[lastIdx].content + note, timestamp: chatMessages[lastIdx].timestamp)
+            }
         }
 
-        try Task.checkCancellation()
-
-        let response = try await aiService.processMessages(
-            messages: [ChatMessage(role: "system", content: currentSystemPrompt)] + chatMessages,
-            attachments: decoded.images
+        // Full conversation history is passed in the prompt because
+        // AFMService creates a fresh LanguageModelSession per request.
+        let history = chatMessages.map { "\($0.role): \($0.content)" }.joined(separator: "\n\n")
+        let response = try await AFMService.shared.generateResponse(
+            prompt: history,
+            systemPrompt: systemPrompt
         )
 
         try Task.checkCancellation()
-
-        if isWebSearchEnabled, let query = extractSearchQuery(from: response) {
-            await MainActor.run { searchingStatus = "Searching: \(query)..." }
-            let searchResponse = await aiService.performFullWebSearch(query: query)
-
-            try Task.checkCancellation()
-
-            await MainActor.run {
-                lastSearchResults = searchResponse.results
-                lastSearchQuery = query
-                searchingStatus = "Analyzing Results..."
-            }
-
-            let searchContext = ChatMessage(role: "system", content: "Search results for '\(query)':\n\(searchResponse.summary)")
-            let updatedMessages = [ChatMessage(role: "system", content: currentSystemPrompt)] + chatMessages + [ChatMessage(role: "assistant", content: response), searchContext]
-
-            let finalResponse = try await aiService.processMessages(
-                messages: updatedMessages,
-                attachments: decoded.images
-            )
-
-            try Task.checkCancellation()
-            await MainActor.run {
-                searchingStatus = nil
-                withAnimation {
-                    messages.append(ChatMessage(role: "assistant", content: finalResponse))
-                }
-            }
-        } else {
-            await MainActor.run {
-                searchingStatus = nil
-                withAnimation {
-                    messages.append(ChatMessage(role: "assistant", content: response))
-                }
+        await MainActor.run {
+            withAnimation {
+                messages.append(ChatMessage(role: "assistant", content: response))
             }
         }
-    }
-
-    private func extractSearchQuery(from text: String) -> String? {
-        guard let startRange = text.range(of: "[SEARCH:") else { return nil }
-        let remaining = text[startRange.upperBound...]
-        guard let endRange = remaining.range(of: "]") else { return nil }
-        return String(remaining[..<endRange.lowerBound]).trimmingCharacters(in: .whitespaces)
     }
 
     func addAttachment(_ attachment: ChatAttachment) {
@@ -208,13 +178,6 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         }
     }
 
-    func addImageFromLibrary(_ image: UIImage) {
-        Task {
-            let attachment = await FileDecoderHelper.decodeImageFromLibrary(image)
-            addAttachment(attachment)
-        }
-    }
-
     func removeAttachment(at index: Int) {
         if index < pendingAttachments.count {
             pendingAttachments.remove(at: index)
@@ -228,7 +191,6 @@ final class DiagnosticsSupportAssistViewModel: ObservableObject {
         messages = []
         isLoading = false
         error = nil
-        searchingStatus = nil
     }
 
     func loadSession(_ session: DiagnosticChatSession) {
@@ -260,11 +222,9 @@ struct DiagnosticsSupportAssistView: View {
     @StateObject private var viewModel = DiagnosticsSupportAssistViewModel()
     @Environment(\.dismiss) private var dismiss
 
-    @State private var showPhotoPicker = false
     @State private var showFileImporter = false
     @State private var showHistory = false
     @State private var showPresets = false
-    @State private var selectedPhotoItem: PhotosPickerItem?
 
     private let subtleBlue = Color.blue.opacity(0.05)
 
@@ -272,10 +232,6 @@ struct DiagnosticsSupportAssistView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 chatScrollView
-
-                if let status = viewModel.searchingStatus {
-                    searchStatusBar(status: status)
-                }
 
                 if let error = viewModel.error {
                     Text(error)
@@ -306,21 +262,8 @@ struct DiagnosticsSupportAssistView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Close") { dismiss() }
                 }
-                ToolbarItem(placement: .principal) {
-                    Toggle("Web Search", isOn: $viewModel.isWebSearchEnabled)
-                        .toggleStyle(.button)
-                        .controlSize(.small)
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 12) {
-                        if !viewModel.lastSearchResults.isEmpty {
-                            Button {
-                                viewModel.showSearchResults = true
-                            } label: {
-                                Image(systemName: "globe.badge.chevron.backward")
-                            }
-                        }
-
                         Button {
                             showHistory = true
                         } label: {
@@ -341,21 +284,9 @@ struct DiagnosticsSupportAssistView: View {
                 }
             }
             .sheet(isPresented: $showFileImporter) {
-                FileImporterRepresentableView(allowedContentTypes: [.data, .image, .pdf, .text], allowsMultipleSelection: false) { urls in
+                FileImporterRepresentableView(allowedContentTypes: [.data, .pdf, .text], allowsMultipleSelection: false) { urls in
                     handleImportedURLs(urls)
                 }
-            }
-            .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhotoItem, matching: .images)
-            .onChange(of: selectedPhotoItem) { _, newItem in
-                if let newItem {
-                    loadPhoto(from: newItem)
-                }
-            }
-            .sheet(isPresented: $viewModel.showSearchResults) {
-                WebSearchResultsSheet(
-                    query: viewModel.lastSearchQuery,
-                    results: viewModel.lastSearchResults
-                )
             }
             .sheet(isPresented: $showHistory) {
                 DiagnosticChatHistory { session in
@@ -463,50 +394,24 @@ struct DiagnosticsSupportAssistView: View {
             Text("Diagnostic Support Assist")
                 .font(.headline)
 
-            Text("Ask me anything about your iOS device. Upload logs, crash reports, or photos of hardware issues for analysis.")
+            Text("Ask me anything about your iOS device. Upload logs, crash reports, or text files for analysis.")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
-        }
-    }
 
-    // MARK: - Search Status Bar
-
-    private func searchStatusBar(status: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: "sparkles")
-                .symbolEffect(.variableColor.iterative)
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.blue, .purple, .cyan],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-
-            Text(status)
-                .font(.subheadline)
+            Text("Powered only by Apple Foundation Models, on-device. No API key, no account, no sign-in.")
+                .font(.caption)
                 .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
 
-            Spacer()
-
-            if !viewModel.lastSearchResults.isEmpty {
-                Button {
-                    viewModel.showSearchResults = true
-                } label: {
-                    Text("View Sources")
-                        .font(.caption.weight(.medium))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.blue.opacity(0.15))
-                        .clipShape(Capsule())
-                }
-            }
+            Text(viewModel.foundationModelsMessage)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
         }
-        .padding()
-        .background(.ultraThinMaterial)
-        .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
     // MARK: - Attachment Preview
@@ -541,11 +446,6 @@ struct DiagnosticsSupportAssistView: View {
                         showPresets = true
                     } label: {
                         Label("Preset Prompts", systemImage: "sparkles.rectangle.stack")
-                    }
-                    Button {
-                        showPhotoPicker = true
-                    } label: {
-                        Label("Photo Library", systemImage: "photo.on.rectangle")
                     }
                     Button {
                         showFileImporter = true
@@ -604,6 +504,14 @@ struct DiagnosticsSupportAssistView: View {
         let ext = url.pathExtension.lowercased()
         let mime = mimeType(for: ext)
 
+        // The on-device model is text-only in this app, so photos are
+        // not accepted here — accepting them would imply vision that
+        // does not exist. The user can describe a photo in words.
+        if mime.hasPrefix("image") {
+            viewModel.error = "Photos are not analysed by the on-device Foundation Model. Attach a log or text file instead, or describe the photo in your message."
+            return
+        }
+
         Task.detached(priority: .userInitiated) {
             defer { if accessing { url.stopAccessingSecurityScopedResource() } }
             guard var data = try? Data(contentsOf: url) else { return }
@@ -617,25 +525,6 @@ struct DiagnosticsSupportAssistView: View {
             let attachment = ChatAttachment(data: data, mimeType: mime, fileName: fileName)
             await MainActor.run {
                 viewModel.addAttachment(attachment)
-            }
-        }
-    }
-
-    private func loadPhoto(from item: PhotosPickerItem) {
-        Task {
-            defer { selectedPhotoItem = nil }
-            do {
-                if let data = try await item.loadTransferable(type: Data.self) {
-                    if let uiImage = UIImage(data: data) {
-                        await MainActor.run {
-                            viewModel.addImageFromLibrary(uiImage)
-                        }
-                    }
-                }
-            } catch {
-                await MainActor.run {
-                    viewModel.error = "Failed to load photo: \(error.localizedDescription)"
-                }
             }
         }
     }
@@ -654,91 +543,6 @@ struct DiagnosticsSupportAssistView: View {
         case "xml": return "application/xml"
         case "csv": return "text/csv"
         default: return "application/octet-stream"
-        }
-    }
-}
-
-// MARK: - Web Search Results Sheet
-
-struct WebSearchResultsSheet: View {
-    let query: String
-    let results: [AIService.WebSearchResult]
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    HStack(spacing: 8) {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundStyle(.blue)
-                        Text(query)
-                            .font(.subheadline.weight(.medium))
-                    }
-                } header: {
-                    Text("Search Query")
-                }
-
-                Section {
-                    if results.isEmpty {
-                        ContentUnavailableView("No Results", systemImage: "magnifyingglass", description: Text("No web results were found for this query."))
-                    } else {
-                        ForEach(results, id: \.id) { result in
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(result.title)
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(.primary)
-                                    .lineLimit(2)
-
-                                if !result.snippet.isEmpty {
-                                    Text(result.snippet)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                        .lineLimit(3)
-                                }
-
-                                if !result.url.isEmpty {
-                                    Link(destination: URL(string: result.url) ?? URL(string: "about:blank")!) {
-                                        HStack(spacing: 4) {
-                                            Image(systemName: "link")
-                                                .font(.caption2)
-                                            Text(result.url)
-                                                .font(.caption2)
-                                                .lineLimit(1)
-                                        }
-                                        .foregroundStyle(.blue)
-                                    }
-                                }
-
-                                HStack {
-                                    Text(result.source)
-                                        .font(.caption2)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(Color.blue.opacity(0.1))
-                                        .clipShape(Capsule())
-
-                                    Spacer()
-
-                                    Text(result.timestamp, style: .relative)
-                                        .font(.caption2)
-                                        .foregroundStyle(.tertiary)
-                                }
-                            }
-                            .padding(.vertical, 4)
-                        }
-                    }
-                } header: {
-                    Text("\(results.count) Results")
-                }
-            }
-            .navigationTitle("Search Results")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
-            }
         }
     }
 }

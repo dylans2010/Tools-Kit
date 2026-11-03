@@ -78,11 +78,11 @@ struct Diag_CrashLogView: View {
 
             Section("Diagnostics") {
                 Button {
-                    collector.simulateMemoryWarning()
+                    collector.recordTestEntry()
                 } label: {
                     HStack {
                         Image(systemName: "exclamationmark.triangle")
-                        Text("Simulate Memory Warning")
+                        Text("Add Manual Test Entry")
                     }
                 }
 
@@ -169,8 +169,14 @@ final class CrashLogCollector: NSObject, ObservableObject, MXMetricManagerSubscr
         recentEvents.insert(CrashEvent(timestamp: Date(), title: "Memory Warning", detail: "System memory pressure detected", icon: "exclamationmark.triangle.fill", color: .red), at: 0)
     }
 
-    func simulateMemoryWarning() {
-        recordMemoryWarning()
+    /// A manual test entry, labelled as such — not a system memory
+    /// warning. The old "Simulate Memory Warning" button recorded a
+    /// fake warning event, which is exactly the kind of mock this
+    /// pass removes.
+    func recordTestEntry() {
+        memoryWarningCount += 1
+        UserDefaults.standard.set(memoryWarningCount, forKey: memWarningKey)
+        recentEvents.insert(CrashEvent(timestamp: Date(), title: "Manual Test Entry", detail: "Added by the user to test this list — not a system warning", icon: "exclamationmark.triangle.fill", color: .orange), at: 0)
     }
 
     func didReceive(_ payloads: [MXMetricPayload]) {

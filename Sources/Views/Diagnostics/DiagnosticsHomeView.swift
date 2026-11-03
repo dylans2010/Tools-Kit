@@ -5,7 +5,9 @@ struct DiagnosticsHomeView: View {
     @StateObject private var diagnosticsMode = DiagnosticsModeManager.shared
     @State private var showSupportAssist = false
 
-    @AppStorage("diagnostics_enableAIAssist") private var enableAIAssist = true
+    // Support Assist is always available from here — no toggle gates
+    // it. It runs only on Apple Foundation Models, on-device, with no
+    // API key, account, or sign-in, so there is nothing to enable.
 
     var body: some View {
         NavigationStack {
@@ -20,12 +22,10 @@ struct DiagnosticsHomeView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 12) {
-                        if enableAIAssist {
-                            Button {
-                                showSupportAssist = true
-                            } label: {
-                                Image(systemName: "apple.intelligence")
-                            }
+                        Button {
+                            showSupportAssist = true
+                        } label: {
+                            Image(systemName: "apple.intelligence")
                         }
                         NavigationLink {
                             DiagnosticsSettingsView()

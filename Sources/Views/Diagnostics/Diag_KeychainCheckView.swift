@@ -1,5 +1,6 @@
 import SwiftUI
 import Security
+import LocalAuthentication
 
 struct Diag_KeychainCheckView: View {
     @State private var keychainAccessible = false
@@ -42,12 +43,16 @@ struct Diag_KeychainCheckView: View {
             }
 
             Section("Protection Classes") {
-                LabeledContent("When Unlocked") { Text("Available").foregroundStyle(.green) }
-                LabeledContent("After First Unlock") { Text("Available").foregroundStyle(.green) }
-                LabeledContent("Always") { Text("Available").foregroundStyle(.green) }
-                LabeledContent("When Passcode Set") {
-                    Text(biometricProtection ? "Available" : "Check Passcode")
+                Text("Protection classes are Keychain constants, not a device capability — the real check is the write/read/delete test above, plus the Secure Enclave and device-owner policy tests below it. No class is reported as 'Available' without a test.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                LabeledContent("Device-Owner Policy") {
+                    Text(biometricProtection ? "Can evaluate" : "Unavailable")
                         .foregroundStyle(biometricProtection ? .green : .orange)
+                }
+                LabeledContent("Secure Enclave Key") {
+                    Text(secureEnclaveAvailable ? "Created" : "Failed")
+                        .foregroundStyle(secureEnclaveAvailable ? .green : .red)
                 }
             }
 
@@ -73,9 +78,16 @@ struct Diag_KeychainCheckView: View {
         let deleteSuccess = testKeychainDelete()
         results.append(("Delete Test", deleteSuccess, deleteSuccess ? "Can remove data" : "Delete failed"))
 
-        results.append(("Secure Enclave", true, "Hardware security available"))
-        secureEnclaveAvailable = true
-        biometricProtection = true
+        // Real tests, not hardcoded "true": Secure Enclave is probed by
+        // actually creating a Secure Enclave key, and biometric protection
+        // is probed via LAContext — the old version set both to true.
+        let enclaveOK = testSecureEnclaveKey()
+        results.append(("Secure Enclave", enclaveOK, enclaveOK ? "Secure Enclave key created" : "Secure Enclave key creation failed"))
+        secureEnclaveAvailable = enclaveOK
+
+        let biometricOK = testBiometricPolicy()
+        results.append(("Biometric / Passcode Policy", biometricOK, biometricOK ? "Device-owner authentication can be evaluated" : "Device-owner authentication unavailable"))
+        biometricProtection = biometricOK
 
         testResults = results
     }
@@ -98,6 +110,25 @@ struct Diag_KeychainCheckView: View {
         ]
         var result: AnyObject?
         return SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess
+    }
+
+    private func testSecureEnclaveKey() -> Bool {
+        let attributes: [String: Any] = [
+            kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom,
+            kSecAttrKeySizeInBits as String: 256,
+            kSecAttrTokenID as String: kSecAttrTokenIDSecureEnclave,
+            kSecPrivateKeyAttrs as String: [
+                kSecAttrIsPermanent as String: false
+            ] as [String: Any]
+        ]
+        var error: Unmanaged<CFError>?
+        return SecKeyCreateRandomKey(attributes as CFDictionary, &error) != nil
+    }
+
+    private func testBiometricPolicy() -> Bool {
+        let context = LAContext()
+        var error: NSError?
+        return context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
     }
 
     private func testKeychainDelete() -> Bool {
